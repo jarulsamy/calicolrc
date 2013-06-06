@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygenindex xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="index.xsd" version="1.8.3.1">
+  <compound refid="class_finch_d_l_l_1_1_finch" kind="class"><name>FinchDLL::Finch</name>
+    <member refid="class_finch_d_l_l_1_1_finch_1ab29693728e9adae14a4f8305e23f82aa" kind="variable"><name>stream</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1a969e5ff463119d1edc26c11949b26751" kind="variable"><name>robot</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1abce1722b0675e50c28790dd8d7b983f1" kind="variable"><name>loader</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1a4a724ea469538af6812b2ee6918fa37c" kind="variable"><name>keepAliveThread</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1ae09b11e3189ed14cc52db9422f9d2847" kind="variable"><name>red</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1a5aade1bdba50397e9602ad8ced6221b2" kind="variable"><name>green</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1aa3cb74d8f2e58f7226579d556e2afa88" kind="variable"><name>blue</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1a24ff122e392d21e2e68fa9bbe426a1d6" kind="variable"><name>color</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1a2c0b401692623f7b9b07f417eb43df27" kind="variable"><name>changeByte</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1ae3c6de6c0051e3e2c799c116d1bb6301" kind="function"><name>open</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1a3986b5556a6a93891031e24b25b7f807" kind="function"><name>setLED</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1aa2e3e4a38fb54000e25ffba9b320de6b" kind="function"><name>motors</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1a7dbe0678e4931628e25171c8a53ce061" kind="function"><name>idle</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1ad5c49d206fd714eac703a09c66577754" kind="function"><name>halt</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1abff5ccc51861ee7e9ac0c90f76267c45" kind="function"><name>wait</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1aa01cb71a4e60ceb5235de03229d9abd8" kind="function"><name>beep</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1aa36c685b8a3781d0a9696e49ed63547f" kind="function"><name>getLight</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1a93bf2c37f392b0c553da068a2950d06c" kind="function"><name>getLeftLightSensor</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1afcd26dd619bca4320b67af67bbe396d0" kind="function"><name>getRightLightSensor</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1a17817bf38ddc3b3073414ca2465fcd94" kind="function"><name>getAccelerations</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1a19958860ef1e1af5d82ef79f2747d2a6" kind="function"><name>getXAcceleration</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1acb44222ad142565e6f3d6fff4b898ccd" kind="function"><name>getYAcceleration</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1a1305176bbe3ba9deba337173e7093ce3" kind="function"><name>getZAcceleration</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1ad1e1a7dba76b9d5caca77da7418ef561" kind="function"><name>getTemperature</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1ac1e60dc36fbeb1e92d2b1b45b9f147c9" kind="function"><name>getObstacle</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1a4d4e08037cc20af6f7bd8844cad89be6" kind="function"><name>isObstacleLeftSide</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1a9263c9aaac9e945adc4ed947539da6d0" kind="function"><name>isObstacleRightSide</name></member>
+    <member refid="class_finch_d_l_l_1_1_finch_1a4ba3b721e7394062869932fac5b9d421" kind="function"><name>keepAlive</name></member>
+  </compound>
+  <compound refid="namespace_finch_d_l_l" kind="namespace"><name>FinchDLL</name>
+  </compound>
+  <compound refid="namespace_hid_sharp" kind="namespace"><name>HidSharp</name>
+  </compound>
+  <compound refid="namespace_system" kind="namespace"><name>System</name>
+  </compound>
+  <compound refid="namespace_system_1_1_collections_1_1_generic" kind="namespace"><name>System::Collections::Generic</name>
+  </compound>
+  <compound refid="namespace_system_1_1_linq" kind="namespace"><name>System::Linq</name>
+  </compound>
+  <compound refid="namespace_system_1_1_text" kind="namespace"><name>System::Text</name>
+  </compound>
+  <compound refid="namespace_system_1_1_threading" kind="namespace"><name>System::Threading</name>
+  </compound>
+  <compound refid="_class1_8cs" kind="file"><name>Class1.cs</name>
+  </compound>
+</doxygenindex>

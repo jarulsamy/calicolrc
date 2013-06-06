@@ -1,0 +1,535 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.8.3.1">
+  <compounddef id="class_finch_d_l_l_1_1_finch" kind="class" prot="public">
+    <compoundname>FinchDLL::Finch</compoundname>
+    <basecompoundref prot="public" virt="non-virtual">Robot</basecompoundref>
+      <sectiondef kind="private-attrib">
+      <memberdef kind="variable" id="class_finch_d_l_l_1_1_finch_1ab29693728e9adae14a4f8305e23f82aa" prot="private" static="no" mutable="no">
+        <type>HidStream</type>
+        <definition>HidStream FinchDLL.Finch.stream</definition>
+        <argsstring></argsstring>
+        <name>stream</name>
+        <initializer>= null</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="11" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="11" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_finch_d_l_l_1_1_finch_1a969e5ff463119d1edc26c11949b26751" prot="private" static="no" mutable="no">
+        <type>HidDevice</type>
+        <definition>HidDevice FinchDLL.Finch.robot</definition>
+        <argsstring></argsstring>
+        <name>robot</name>
+        <initializer>= null</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="12" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="12" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_finch_d_l_l_1_1_finch_1abce1722b0675e50c28790dd8d7b983f1" prot="private" static="no" mutable="no">
+        <type>HidDeviceLoader</type>
+        <definition>HidDeviceLoader FinchDLL.Finch.loader</definition>
+        <argsstring></argsstring>
+        <name>loader</name>
+        <initializer>= null</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="13" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="13" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_finch_d_l_l_1_1_finch_1a4a724ea469538af6812b2ee6918fa37c" prot="private" static="no" mutable="no">
+        <type>Thread</type>
+        <definition>Thread FinchDLL.Finch.keepAliveThread</definition>
+        <argsstring></argsstring>
+        <name>keepAliveThread</name>
+        <initializer>= null</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="14" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="14" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_finch_d_l_l_1_1_finch_1ae09b11e3189ed14cc52db9422f9d2847" prot="private" static="no" mutable="no">
+        <type>int</type>
+        <definition>int FinchDLL.Finch.red</definition>
+        <argsstring></argsstring>
+        <name>red</name>
+        <initializer>= 0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="15" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="15" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_finch_d_l_l_1_1_finch_1a5aade1bdba50397e9602ad8ced6221b2" prot="private" static="no" mutable="no">
+        <type>int</type>
+        <definition>int FinchDLL.Finch.green</definition>
+        <argsstring></argsstring>
+        <name>green</name>
+        <initializer>= 0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="16" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="16" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_finch_d_l_l_1_1_finch_1aa3cb74d8f2e58f7226579d556e2afa88" prot="private" static="no" mutable="no">
+        <type>int</type>
+        <definition>int FinchDLL.Finch.blue</definition>
+        <argsstring></argsstring>
+        <name>blue</name>
+        <initializer>= 0</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="17" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="17" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_finch_d_l_l_1_1_finch_1a24ff122e392d21e2e68fa9bbe426a1d6" prot="private" static="no" mutable="no">
+        <type>string</type>
+        <definition>string FinchDLL.Finch.color</definition>
+        <argsstring></argsstring>
+        <name>color</name>
+        <initializer>= &quot;#000000&quot;</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="18" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="18" bodyend="-1"/>
+      </memberdef>
+      <memberdef kind="variable" id="class_finch_d_l_l_1_1_finch_1a2c0b401692623f7b9b07f417eb43df27" prot="private" static="no" mutable="no">
+        <type>byte</type>
+        <definition>byte FinchDLL.Finch.changeByte</definition>
+        <argsstring></argsstring>
+        <name>changeByte</name>
+        <initializer>= 1</initializer>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="19" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="19" bodyend="-1"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="public-func">
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1ae3c6de6c0051e3e2c799c116d1bb6301" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void FinchDLL.Finch.open</definition>
+        <argsstring>()</argsstring>
+        <name>open</name>
+        <briefdescription>
+<para>Open&apos;s connection to the <ref refid="class_finch_d_l_l_1_1_finch" kindref="compound">Finch</ref>. Call this after making the robot and before calling any other functions. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="25" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="24" bodyend="34"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1a3986b5556a6a93891031e24b25b7f807" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>override void</type>
+        <definition>override void FinchDLL.Finch.setLED</definition>
+        <argsstring>(string position, object value)</argsstring>
+        <name>setLED</name>
+        <param>
+          <type>string</type>
+          <declname>position</declname>
+        </param>
+        <param>
+          <type>object</type>
+          <declname>value</declname>
+        </param>
+        <briefdescription>
+<para>Sets the color of the LED </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>position</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Type &quot;finch&quot; for this parameter, it does not do anything but is necessary for inheritance</para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>value</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A string containing &apos;#&apos; followed by the hex value of the color. Example: &quot;#00FF00&quot;</para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="43" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="42" bodyend="50"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1aa2e3e4a38fb54000e25ffba9b320de6b" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void FinchDLL.Finch.motors</definition>
+        <argsstring>(int left, int right)</argsstring>
+        <name>motors</name>
+        <param>
+          <type>int</type>
+          <declname>left</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>right</declname>
+        </param>
+        <briefdescription>
+<para>Sets the speed of the two motors </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>left</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A value between -255 and 255, corresponding from full throtle reverse to full throtle forwards</para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>right</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>A value between -255 and 255, corresponding from full throtle reverse to full throtle forwards</para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="58" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="57" bodyend="73"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1a7dbe0678e4931628e25171c8a53ce061" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void FinchDLL.Finch.idle</definition>
+        <argsstring>()</argsstring>
+        <name>idle</name>
+        <briefdescription>
+<para>Sets the robot into idle mode. Use this function rather than halt in most cases. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="79" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="78" bodyend="86"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1ad5c49d206fd714eac703a09c66577754" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void FinchDLL.Finch.halt</definition>
+        <argsstring>()</argsstring>
+        <name>halt</name>
+        <briefdescription>
+<para>Turns off all motors, LEDs and disconnects. </para>        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="92" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="91" bodyend="99"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1abff5ccc51861ee7e9ac0c90f76267c45" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void FinchDLL.Finch.wait</definition>
+        <argsstring>(int ms)</argsstring>
+        <name>wait</name>
+        <param>
+          <type>int</type>
+          <declname>ms</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="102" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="101" bodyend="104"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1aa01cb71a4e60ceb5235de03229d9abd8" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>override void</type>
+        <definition>override void FinchDLL.Finch.beep</definition>
+        <argsstring>(double duration, double frequency)</argsstring>
+        <name>beep</name>
+        <param>
+          <type>double</type>
+          <declname>duration</declname>
+        </param>
+        <param>
+          <type>double</type>
+          <declname>frequency</declname>
+        </param>
+        <briefdescription>
+<para>Beeps for a certain duration and frequency </para>        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>duration</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The duration of the beep in seconds</para></parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>frequency</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>The frequency of the beep in Hz</para></parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="112" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="111" bodyend="119"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1aa36c685b8a3781d0a9696e49ed63547f" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>override object</type>
+        <definition>override object FinchDLL.Finch.getLight</definition>
+        <argsstring>(params object[] position)</argsstring>
+        <name>getLight</name>
+        <param>
+          <type>params object[]</type>
+          <declname>position</declname>
+        </param>
+        <briefdescription>
+<para>Get left and right light sensors </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Two element array containing the the left and right light sensor values (0 to 255)</para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="126" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="125" bodyend="149"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1a93bf2c37f392b0c553da068a2950d06c" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>int</type>
+        <definition>int FinchDLL.Finch.getLeftLightSensor</definition>
+        <argsstring>()</argsstring>
+        <name>getLeftLightSensor</name>
+        <briefdescription>
+<para>Returns the value of the left light sensor </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Left light sensor value, 0(dark) to 255(bright)</para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="156" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="155" bodyend="163"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1afcd26dd619bca4320b67af67bbe396d0" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>int</type>
+        <definition>int FinchDLL.Finch.getRightLightSensor</definition>
+        <argsstring>()</argsstring>
+        <name>getRightLightSensor</name>
+        <briefdescription>
+<para>Returns the value of the right light sensor </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Right light sensor value, 0(dark) to 255(bright)</para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="170" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="169" bodyend="177"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1a17817bf38ddc3b3073414ca2465fcd94" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>double[]</type>
+        <definition>double [] FinchDLL.Finch.getAccelerations</definition>
+        <argsstring>()</argsstring>
+        <name>getAccelerations</name>
+        <briefdescription>
+<para>Returns the accelerations experienced by <ref refid="class_finch_d_l_l_1_1_finch" kindref="compound">Finch</ref>&apos;s accelerometer. Values are -1.5g to 1.5g. </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>An array of 3 doubles holding X, Y, and Z acceleration, null if the read failed.</para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="184" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="183" bodyend="209"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1a19958860ef1e1af5d82ef79f2747d2a6" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>double</type>
+        <definition>double FinchDLL.Finch.getXAcceleration</definition>
+        <argsstring>()</argsstring>
+        <name>getXAcceleration</name>
+        <briefdescription>
+<para>Returns the X (beak to tail) acceleration </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Acceleration in gees</para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="216" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="215" bodyend="222"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1acb44222ad142565e6f3d6fff4b898ccd" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>double</type>
+        <definition>double FinchDLL.Finch.getYAcceleration</definition>
+        <argsstring>()</argsstring>
+        <name>getYAcceleration</name>
+        <briefdescription>
+<para>Returns the Y (wheel to wheel) acceleration </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Acceleration in gees</para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="229" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="228" bodyend="235"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1a1305176bbe3ba9deba337173e7093ce3" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>double</type>
+        <definition>double FinchDLL.Finch.getZAcceleration</definition>
+        <argsstring>()</argsstring>
+        <name>getZAcceleration</name>
+        <briefdescription>
+<para>Returns the Z (top to bottom) acceleration </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Acceleration in gees</para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="242" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="241" bodyend="248"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1ad1e1a7dba76b9d5caca77da7418ef561" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>double</type>
+        <definition>double FinchDLL.Finch.getTemperature</definition>
+        <argsstring>()</argsstring>
+        <name>getTemperature</name>
+        <briefdescription>
+<para>Gets the temperature measured by the <ref refid="class_finch_d_l_l_1_1_finch" kindref="compound">Finch</ref>&apos;s small temperature sensor. </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Ambient temperature in Celcius</para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="255" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="254" bodyend="273"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1ac1e60dc36fbeb1e92d2b1b45b9f147c9" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>override object</type>
+        <definition>override object FinchDLL.Finch.getObstacle</definition>
+        <argsstring>(params object[] position)</argsstring>
+        <name>getObstacle</name>
+        <param>
+          <type>params object[]</type>
+          <declname>position</declname>
+        </param>
+        <briefdescription>
+<para>Gets a two element boolean array representing the left (element 0) and right (element 1) obstacle sensors. True if an obstacle is detected, false otherwise. </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>Array contain <ref refid="class_finch_d_l_l_1_1_finch" kindref="compound">Finch</ref> obstacle data</para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="280" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="279" bodyend="306"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1a4d4e08037cc20af6f7bd8844cad89be6" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool FinchDLL.Finch.isObstacleLeftSide</definition>
+        <argsstring>()</argsstring>
+        <name>isObstacleLeftSide</name>
+        <briefdescription>
+<para>Checks if there&apos;s an obstacle on the left side </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>True if there&apos;s an obstacle, false otherwise</para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="313" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="312" bodyend="323"/>
+      </memberdef>
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1a9263c9aaac9e945adc4ed947539da6d0" prot="public" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>bool</type>
+        <definition>bool FinchDLL.Finch.isObstacleRightSide</definition>
+        <argsstring>()</argsstring>
+        <name>isObstacleRightSide</name>
+        <briefdescription>
+<para>Checks if there&apos;s an obstacle on the right side </para>        </briefdescription>
+        <detaileddescription>
+<para><simplesect kind="return"><para>True if there&apos;s an obstacle, false otherwise</para></simplesect>
+</para>        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="330" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="329" bodyend="340"/>
+      </memberdef>
+      </sectiondef>
+      <sectiondef kind="private-func">
+      <memberdef kind="function" id="class_finch_d_l_l_1_1_finch_1a4ba3b721e7394062869932fac5b9d421" prot="private" static="no" const="no" explicit="no" inline="yes" virt="non-virtual">
+        <type>void</type>
+        <definition>void FinchDLL.Finch.keepAlive</definition>
+        <argsstring>()</argsstring>
+        <name>keepAlive</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="344" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="343" bodyend="350"/>
+      </memberdef>
+      </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <inheritancegraph>
+      <node id="0">
+        <label>FinchDLL.Finch</label>
+        <link refid="class_finch_d_l_l_1_1_finch"/>
+        <childnode refid="1" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>Myro::Robot</label>
+      </node>
+    </inheritancegraph>
+    <collaborationgraph>
+      <node id="2">
+        <label>FinchDLL.Finch</label>
+        <link refid="class_finch_d_l_l_1_1_finch"/>
+        <childnode refid="3" relation="public-inheritance">
+        </childnode>
+      </node>
+      <node id="3">
+        <label>Myro::Robot</label>
+      </node>
+    </collaborationgraph>
+    <location file="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" line="10" bodyfile="C:/Users/JayJin/Documents/Visual Studio 2012/Projects/FinchDLL/FinchDLL/Class1.cs" bodystart="9" bodyend="352"/>
+    <listofallmembers>
+      <member refid="class_finch_d_l_l_1_1_finch_1aa01cb71a4e60ceb5235de03229d9abd8" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>beep</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1aa3cb74d8f2e58f7226579d556e2afa88" prot="private" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>blue</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1a2c0b401692623f7b9b07f417eb43df27" prot="private" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>changeByte</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1a24ff122e392d21e2e68fa9bbe426a1d6" prot="private" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>color</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1a17817bf38ddc3b3073414ca2465fcd94" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>getAccelerations</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1a93bf2c37f392b0c553da068a2950d06c" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>getLeftLightSensor</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1aa36c685b8a3781d0a9696e49ed63547f" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>getLight</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1ac1e60dc36fbeb1e92d2b1b45b9f147c9" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>getObstacle</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1afcd26dd619bca4320b67af67bbe396d0" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>getRightLightSensor</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1ad1e1a7dba76b9d5caca77da7418ef561" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>getTemperature</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1a19958860ef1e1af5d82ef79f2747d2a6" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>getXAcceleration</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1acb44222ad142565e6f3d6fff4b898ccd" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>getYAcceleration</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1a1305176bbe3ba9deba337173e7093ce3" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>getZAcceleration</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1a5aade1bdba50397e9602ad8ced6221b2" prot="private" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>green</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1ad5c49d206fd714eac703a09c66577754" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>halt</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1a7dbe0678e4931628e25171c8a53ce061" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>idle</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1a4d4e08037cc20af6f7bd8844cad89be6" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>isObstacleLeftSide</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1a9263c9aaac9e945adc4ed947539da6d0" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>isObstacleRightSide</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1a4ba3b721e7394062869932fac5b9d421" prot="private" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>keepAlive</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1a4a724ea469538af6812b2ee6918fa37c" prot="private" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>keepAliveThread</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1abce1722b0675e50c28790dd8d7b983f1" prot="private" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>loader</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1aa2e3e4a38fb54000e25ffba9b320de6b" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>motors</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1ae3c6de6c0051e3e2c799c116d1bb6301" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>open</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1ae09b11e3189ed14cc52db9422f9d2847" prot="private" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>red</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1a969e5ff463119d1edc26c11949b26751" prot="private" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>robot</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1a3986b5556a6a93891031e24b25b7f807" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>setLED</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1ab29693728e9adae14a4f8305e23f82aa" prot="private" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>stream</name></member>
+      <member refid="class_finch_d_l_l_1_1_finch_1abff5ccc51861ee7e9ac0c90f76267c45" prot="public" virt="non-virtual"><scope>FinchDLL::Finch</scope><name>wait</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>
