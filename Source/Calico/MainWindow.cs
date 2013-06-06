@@ -1514,30 +1514,32 @@ namespace Calico {
                 if (connection != null) {
                     connection.Close();
                 }
-				foreach (String lang in manager.getLanguages()) {
-				  //manager[lang].engine.Close();
-				  if (manager[lang].engine != null)
-					manager[lang].engine.Close();
-				}
-                foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcesses()) {
-                    try {
-                        if (process.ProcessName == "mono") {
-                            process.Kill();
-                        }
-                    } catch {
-                        // pass
-                    }
-                }
-				System.Environment.Exit(0);
-                //Gtk.Application.Quit();
-            }
-            return retval;
-        }
+		foreach (String lang in manager.getLanguages()) {
+		    //manager[lang].engine.Close();
+		    if (manager[lang].engine != null)
+			manager[lang].engine.Close();
+		}
+		if (OS == "Windows") {
+		    foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcesses()) {
+			try {
+			    if (process.ProcessName.EndsWith("mono")) {
+				process.Kill();
+			    }
+			} catch {
+			    // pass
+			}
+		    }
+		}
+		System.Environment.Exit(0);
+		//Gtk.Application.Quit();
+	    }
+	    return retval;
+	}
 
-        protected void OnDeleteEvent(object sender, Gtk.DeleteEventArgs a) {
-            // set RetVal to true to keep window
-            a.RetVal = ! RequestQuit();
-        }
+	protected void OnDeleteEvent(object sender, Gtk.DeleteEventArgs a) {
+	    // set RetVal to true to keep window
+	    a.RetVal = ! RequestQuit();
+	}
 
         public void PickNew() {
             if (manager.languages.Count > 1) {
