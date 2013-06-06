@@ -30,7 +30,7 @@ public class Finch: Myro.Robot
             }
             catch (Exception e)
             {
-                Console.Write("Could not find the finch");
+                Console.WriteLine("Could not find the finch");
             }
             if (robot != null && keepAliveThread == null)
             {
