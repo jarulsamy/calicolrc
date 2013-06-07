@@ -1965,6 +1965,29 @@ public static class Myro
 	}
 
 	[method: JigsawTab("M/Senses")]
+	public static object getAcceleration (params object [] position)
+	{
+	    if (robot != null) {
+		if (position == null || position.Length == 0)
+			return robot.getAcceleration ();
+		else
+			return robot.getAcceleration (position);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
+	}
+
+	[method: JigsawTab("M/Senses")]
+	public static object getTemperature ()
+	{
+	    if (robot != null) {
+		return robot.getTemperature ();
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
+	}
+
+	[method: JigsawTab("M/Senses")]
 	public static object getIR (params object [] position)
 	{
 	    if (robot != null) {
@@ -3112,6 +3135,16 @@ public static class Myro
 		}
     
 		public virtual object getLight (params object [] position)
+		{
+			return null;
+		}
+    
+		public virtual object getAcceleration (params object [] position)
+		{
+			return null;
+		}
+    
+		public virtual object getTemperature ()
 		{
 			return null;
 		}
