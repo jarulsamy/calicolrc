@@ -368,17 +368,24 @@ public class SimScribbler : Myro.Robot
 		public override Graphics.Picture takePicture (string mode="jpeg") {
 		    Graphics.Picture pic = null;
 		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Exception exception = null;
 		    // Lock the queue, as this method can fire at any time
 		    lock (queue) {
 			// Add a delegate to the queue, which will execute when appropriate
 			queue.Add(delegate {
-				pic = _takePicture();
+				try {
+				    pic = _takePicture();
+				} catch (Exception e) {
+				    exception = e;
+				}
 				ev.Set();
 			    });
 		    }
 		    // Wait for delegate to fire
 		    ev.WaitOne();
 		    // And return picture
+		    if (exception != null)
+			throw exception;
 		    return pic;
 		}
 
@@ -606,16 +613,23 @@ public class SimScribbler : Myro.Robot
 		public override object getDistance (params object [] positions) {
 		    object retval = null;
 		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Exception exception = null;
 		    // Lock the queue, as this method can fire at any time
 		    lock (queue) {
 			// Add a delegate to the queue, which will execute when appropriate
 			queue.Add(delegate {
-				retval = _getDistance(positions);
+				try {
+				    retval = _getDistance(positions);
+				} catch (Exception e) {
+				    exception = e;
+				}
 				ev.Set();
 			    });
 		    }
 		    // Wait for delegate to fire
 		    ev.WaitOne();
+		    if (exception != null)
+			throw exception;
 		    // And return picture
 		    return retval;
 	        }
@@ -671,16 +685,23 @@ public class SimScribbler : Myro.Robot
 		public override object getLight (params object [] positions) {
 		    object retval = null;
 		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Exception exception = null;
 		    // Lock the queue, as this method can fire at any time
 		    lock (queue) {
 			// Add a delegate to the queue, which will execute when appropriate
 			queue.Add(delegate {
-				retval = _getLight(positions);
+				try {
+				    retval = _getLight(positions);
+				} catch (Exception e) {
+				    exception = e;
+				}
 				ev.Set();
 			    });
 		    }
 		    // Wait for delegate to fire
 		    ev.WaitOne();
+		    if (exception != null)
+			throw exception;
 		    // And return picture
 		    return retval;
 	        }
@@ -742,16 +763,23 @@ public class SimScribbler : Myro.Robot
 		public override object getIR (params object [] positions) {
 		    object retval = null;
 		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Exception exception = null;
 		    // Lock the queue, as this method can fire at any time
 		    lock (queue) {
 			// Add a delegate to the queue, which will execute when appropriate
 			queue.Add(delegate {
-				retval = _getIR(positions);
+				try {
+				    retval = _getIR(positions);
+				} catch (Exception e) {
+				    exception = e;
+				}
 				ev.Set();
 			    });
 		    }
 		    // Wait for delegate to fire
 		    ev.WaitOne();
+		    if (exception != null)
+			throw exception;
 		    // And return picture
 		    return retval;
 	        }
@@ -807,16 +835,23 @@ public class SimScribbler : Myro.Robot
 		public override object getBright (string window) {
 		    object retval = null;
 		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Exception exception = null;
 		    // Lock the queue, as this method can fire at any time
 		    lock (queue) {
 			// Add a delegate to the queue, which will execute when appropriate
 			queue.Add(delegate {
-				retval = _getBright(window);
+				try {
+				    retval = _getBright(window);
+				} catch (Exception e) {
+				    exception = e;
+				}
 				ev.Set();
 			    });
 		    }
 		    // Wait for delegate to fire
 		    ev.WaitOne();
+		    if (exception != null) 
+			throw exception;
 		    // And return picture
 		    return retval;
 	        }
@@ -838,16 +873,23 @@ public class SimScribbler : Myro.Robot
 		public override object getBright () {
 		    object retval = null;
 		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Exception exception = null;
 		    // Lock the queue, as this method can fire at any time
 		    lock (queue) {
 			// Add a delegate to the queue, which will execute when appropriate
 			queue.Add(delegate {
-				retval = _getBright();
+				try {
+				    retval = _getBright();
+				} catch (Exception e) {
+				    exception = e;
+				}
 				ev.Set();
 			    });
 		    }
 		    // Wait for delegate to fire
 		    ev.WaitOne();
+		    if (exception != null)
+			throw exception;
 		    // And return picture
 		    return retval;
 	        }
@@ -916,16 +958,23 @@ public class SimScribbler : Myro.Robot
 		public override object getBright (int window) {
 		    object retval = null;
 		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Exception exception = null;
 		    // Lock the queue, as this method can fire at any time
 		    lock (queue) {
 			// Add a delegate to the queue, which will execute when appropriate
 			queue.Add(delegate {
-				retval = _getBright(window);
+				try {
+				    retval = _getBright(window);
+				} catch (Exception e) {
+				    exception = e;
+				}
 				ev.Set();
 			    });
 		    }
 		    // Wait for delegate to fire
 		    ev.WaitOne();
+		    if (exception != null)
+			throw exception;
 		    // And return picture
 		    return retval;
 	        }
@@ -938,16 +987,23 @@ public class SimScribbler : Myro.Robot
 		public override object getLine (params object [] positions) {
 		    object retval = null;
 		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Exception exception = null;
 		    // Lock the queue, as this method can fire at any time
 		    lock (queue) {
 			// Add a delegate to the queue, which will execute when appropriate
 			queue.Add(delegate {
-				retval = _getLine(positions);
+				try {
+				    retval = _getLine(positions);
+				} catch (Exception e) {
+				    exception = e;
+				}
 				ev.Set();
 			    });
 		    }
 		    // Wait for delegate to fire
 		    ev.WaitOne();
+		    if (exception != null)
+			throw exception;
 		    // And return picture
 		    return retval;
 	        }

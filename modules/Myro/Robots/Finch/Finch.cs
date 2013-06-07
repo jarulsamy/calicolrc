@@ -280,7 +280,7 @@ public class Finch: Myro.Robot
         /// Gets the temperature measured by the Finch's small temperature sensor.
         /// </summary>
         /// <returns>Ambient temperature in Celcius</returns>
-        public double getTemperature()
+        public override object getTemperature()
         {
             if (robot != null)
             {
