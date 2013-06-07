@@ -528,16 +528,23 @@ public class SimScribbler : Myro.Robot
 		public override object getObstacle (params object [] positions) {
 		    object retval = null;
 		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Exception exception = null;
 		    // Lock the queue, as this method can fire at any time
 		    lock (queue) {
 			// Add a delegate to the queue, which will execute when appropriate
 			queue.Add(delegate {
-				retval = _getObstacle(positions);
+				try {
+				    retval = _getObstacle(positions);
+				} catch (Exception e) {
+				    exception = e;
+				}
 				ev.Set();
 			    });
 		    }
 		    // Wait for delegate to fire
 		    ev.WaitOne();
+		    if (exception != null)
+			throw exception;
 		    // And return picture
 		    return retval;
 	        }
