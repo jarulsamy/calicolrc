@@ -17,6 +17,11 @@ public class Finch: Myro.Robot
         private string color = "#000000"; // stores the color of the LED
         private byte changeByte = 1; //counter
 
+
+	public Finch() {
+	    open();
+	}
+
         /// <summary>
         /// Open's connection to the Finch. Call this after making the robot and before calling any other functions.
         /// </summary>
@@ -28,9 +33,9 @@ public class Finch: Myro.Robot
                 robot = loader.GetDeviceOrDefault(0x2354, 0x1111);
                 stream = robot.Open();
             }
-            catch (Exception e)
+            catch 
             {
-                Console.WriteLine("Could not find the finch");
+                Console.Error.WriteLine("Could not find the finch");
             }
             if (robot != null && keepAliveThread == null)
             {
@@ -62,10 +67,11 @@ public class Finch: Myro.Robot
         /// <summary>
         /// Sets the speed of the two motors
         /// </summary>
-        /// <param name="left">A value between -255 and 255, corresponding from full throtle reverse to full throtle forwards</param>
-        /// <param name="right">A value between -255 and 255, corresponding from full throtle reverse to full throtle forwards</param>
-        public void motors(int left, int right)
-        {
+	public override void adjustSpeed ()
+	{
+	    int left  = (int)(_lastTranslate * 255 - _lastRotate * 255);
+	    int right = (int)(_lastTranslate * 255 + _lastRotate * 255);
+
             if (robot != null)
             {
                 int dir_left = 0;

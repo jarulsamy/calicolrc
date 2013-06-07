@@ -12,3 +12,6 @@
 		-out:../Finch.dll \
 		-target:library \
 		$^ 
+
+clean:
+	rm -rf *~ ../Finch.dll

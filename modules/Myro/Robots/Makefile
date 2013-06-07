@@ -1,5 +1,8 @@
 
-all: Scribbler.dll SimScribbler.dll SimPioneer.dll NxtRobot.dll
+all: Scribbler.dll SimScribbler.dll SimPioneer.dll NxtRobot.dll Finch.dll
+
+Finch.dll: Finch/Finch.cs
+	cd Finch; make
 
 NxtRobot.dll: NxtRobot/NxtRobot.cs NxtRobot/NxtNet.cs NxtRobot/MotorPort.cs \
 	NxtRobot/SensorState.cs NxtRobot/Command.cs \
