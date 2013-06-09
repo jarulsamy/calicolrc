@@ -1474,14 +1474,14 @@ public class Scheme {
 	  while (pair_q(parts_list)) {
 	      //printf("   dlr_object_contains: part: {0}, '{1}'\n", retobj, car(parts_list));
 	      //printf("members: {0}", get_external_members(retobj));
-	      // fixme: needs to use args to get method
-	      try{
-		  retobj = _dlr_runtime.Operations.GetMember(retobj, car(parts_list).ToString());
-		  //retobj = IronPython.Runtime.Types.DynamicHelpers.GetPythonTypeFromType(retobj);
-	      } catch {
-		  //object binding = PJScheme.make_binding("dlr", get_external_member(result, car(parts_list).ToString()));
-		  return get_external_member(result, car(parts_list).ToString());
-	      }
+ 	      // fixme: needs to use args to get method
+	      //try{
+	      retobj = _dlr_runtime.Operations.GetMember(retobj, car(parts_list).ToString());
+	      //retobj = IronPython.Runtime.Types.DynamicHelpers.GetPythonTypeFromType(retobj);
+	      //} catch {
+	      //object binding = PJScheme.make_binding("dlr", get_external_member(result, car(parts_list).ToString()));
+	      //return get_external_member(result, car(parts_list).ToString());
+	      //}
 	      parts_list = cdr(parts_list);
 	  }
       } else {
@@ -3447,10 +3447,26 @@ public class Scheme {
     _dlr_runtime = runtime;
   }
 
+  public static void SetVariable(string variable, object value) {
+      if (variable.Contains(".")) {
+	  string [] parts = variable.Split('.');
+	  object obj = _dlr_env.GetVariable(parts[0]);
+	  for (int i = 1; i < parts.Length - 1; i++) {
+	      obj = _dlr_env.Engine.Operations.GetMember(obj, parts[i]);
+	  }
+	  if (obj != null) {
+	      _dlr_env.Engine.Operations.SetMember(obj, parts[parts.Length - 1], value);
+	  } else {
+	      throw new Exception(String.Format("no such item: '{0}'", variable));
+	  }
+      } else {
+	  _dlr_env.SetVariable(variable, value);
+      }
+  }
+    
   public static void set_global_value_b(object var, object value) {
 	if (_dlr_env != null) {
-	  _dlr_env.SetVariable(var.ToString(), 
-		  value);
+	    SetVariable(var.ToString(), value);
 	} else {
 	  throw new Exception(String.Format("DLR Environment not available"));
 	}
