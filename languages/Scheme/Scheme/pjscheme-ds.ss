@@ -1768,7 +1768,17 @@
             info
             handler
             fail))))
-      (<proc-98> (external-function-object)
+      (<proc-98> ()
+       (cond
+         ((and (length-one? args) (number? (car args)))
+          (apply-cont2 k2 (round (car args)) fail))
+         (else
+          (runtime-error
+            "round requires exactly one number"
+            info
+            handler
+            fail))))
+      (<proc-99> (external-function-object)
        (apply-cont2
          k2
          (apply* external-function-object args)
@@ -4227,7 +4237,8 @@
                        (list 'vector-set! vector-set!-prim)
                        (list 'void void-prim) (list 'zero? zero?-prim)
                        (list 'current-directory current-directory-prim)
-                       (list 'cd current-directory-prim))))
+                       (list 'cd current-directory-prim)
+                       (list 'round round-prim))))
       (make-initial-env-extended
         (make-initial-environment
           (map car primitives)
@@ -4235,7 +4246,7 @@
 
 (define make-external-proc
   (lambda (external-function-object)
-    (make-proc '<proc-98> external-function-object)))
+    (make-proc '<proc-99> external-function-object)))
 
 (define pattern?
   (lambda (x)
@@ -4785,6 +4796,8 @@
 (define list-ref-prim (make-proc '<proc-96>))
 
 (define current-directory-prim (make-proc '<proc-97>))
+
+(define round-prim (make-proc '<proc-98>))
 
 (define toplevel-env (make-toplevel-env))
 

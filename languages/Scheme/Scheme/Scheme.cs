@@ -619,6 +619,19 @@ public class Scheme {
 	}
   }
   
+  public static object ToInteger(object obj) {
+	try {
+	  return Convert.ToInt32(obj);
+	} catch {
+	  if (obj is Rational) {
+		return (int)((Rational)obj);
+	  } else if (obj is BigInteger) {
+ 		return obj;
+	  } else	  
+		throw new Exception(string.Format("can't convert object of type '{0}' to int", obj.GetType()));
+	}
+  }
+  
   public static object ToRational(object obj1, object obj2) {
     return new Rational((int) obj1, (int)obj2);
   }
@@ -2067,7 +2080,7 @@ public class Scheme {
   }
 	
   public static object quotient(object num1, object num2) {
-      return ToInt(Divide(num1, num2));
+      return ToInteger(Divide(num1, num2));
   }
 
   public static object Divide(object obj) {
@@ -2366,6 +2379,10 @@ public class Scheme {
   }
 
     // Add new low-level procedures here!
+
+    public static object round(object number) {
+	return ToInteger(number);
+    }
 
     public static object current_directory() {
         return System.IO.Directory.GetCurrentDirectory();

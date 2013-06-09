@@ -4269,6 +4269,14 @@
 	   (runtime-error "directory must be a string" info handler fail)))
       (else (runtime-error "incorrect number of arguments to current-directory" info handler fail)))))
 
+(define round-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((and (length-one? args) (number? (car args)))
+       (k2 (round (car args)) fail))
+      (else
+       (runtime-error "round requires exactly one number" info handler fail)))))
+
 ;; Add new procedures above here!
 ;; Then, add NAME to env
 ;; Then, add NAME_proc to Scheme.cs (if you use map or apply on it internally)
@@ -4375,6 +4383,7 @@
 	    (list 'zero? zero?-prim)
 	    (list 'current-directory current-directory-prim)
 	    (list 'cd current-directory-prim)
+	    (list 'round round-prim)
 	    )))
       (make-initial-env-extended
         (make-initial-environment (map car primitives) (map cadr primitives))))))
