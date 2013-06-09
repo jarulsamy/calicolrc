@@ -1,0 +1,41 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="HidSharp/Platform/Linux/LinuxHidManager.cs">
+    <Files>
+      <File FileName="HidSharp.Test/Program.cs" Line="51" Column="1" />
+      <File FileName="HidSharp/HidDeviceLoader.cs" Line="55" Column="1" />
+      <File FileName="HidSharp/Platform/HidManager.cs" Line="70" Column="1" />
+      <File FileName="HidSharp/Platform/Linux/LinuxHidManager.cs" Line="77" Column="10" />
+      <File FileName="HidSharp/Platform/Linux/LinuxHidDevice.cs" Line="55" Column="38" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="HidSharp" expanded="True">
+            <Node name="References" expanded="True" />
+            <Node name="Platform" expanded="True">
+              <Node name="Linux" expanded="True">
+                <Node name="LinuxHidManager.cs" selected="True" />
+              </Node>
+            </Node>
+            <Node name="ReportDescriptors" expanded="True">
+              <Node name="Parser" expanded="True" />
+            </Node>
+          </Node>
+          <Node name="HidSharp.DeviceHelpers" expanded="True" />
+          <Node name="HidSharp.Test" expanded="True">
+            <Node name="References" expanded="True" />
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="/home/dblank/Desktop/hidsharp/HidSharp/Platform/Linux/LinuxHidManager.cs" line="29" />
+      <Breakpoint file="/home/dblank/Desktop/hidsharp/HidSharp/Platform/Linux/LinuxHidManager.cs" line="69" />
+      <Breakpoint file="/home/dblank/Desktop/hidsharp/HidSharp/Platform/Linux/LinuxHidDevice.cs" line="80" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
