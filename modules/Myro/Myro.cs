@@ -1964,7 +1964,7 @@ public static class Myro
 	    }
 	}
 
-	[method: JigsawTab("M/Senses")]
+        [method: JigsawTab("M/Advanced Set 2")]
 	public static object getAcceleration (params object [] position)
 	{
 	    if (robot != null) {
@@ -1977,7 +1977,7 @@ public static class Myro
 	    }
 	}
 
-	[method: JigsawTab("M/Senses")]
+        [method: JigsawTab("M/Advanced Set 2")]
 	public static object getTemperature ()
 	{
 	    if (robot != null) {
@@ -2296,7 +2296,7 @@ public static class Myro
     }
 
 	// s2
-	[method: JigsawTab("M/Senses")]
+	[method: JigsawTab("M/Advanced Set 1")]
 	public static object getEncoders (bool zero = false)
 	{
 	    if (robot != null) {
@@ -2306,7 +2306,7 @@ public static class Myro
 	    }
 	}
 
-	[method: JigsawTab("M/Senses")]
+	[method: JigsawTab("M/Advanced Set 1")]
 	public static object getMicrophone ()
 	{
 	    if (robot != null) {
@@ -2316,7 +2316,7 @@ public static class Myro
 	    }
 	}
   
-	[method: JigsawTab("M/Senses")]
+	[method: JigsawTab("M/Advanced Set 1")]
 	public static object getPosition ()
 	{
 	    if (robot != null) {
@@ -2326,7 +2326,7 @@ public static class Myro
 	    }
 	}
   
-	[method: JigsawTab("M/Senses")]
+	[method: JigsawTab("M/Advanced Set 1")]
 	public static int getAngle ()
 	{
 	    if (robot != null) {
@@ -2336,7 +2336,7 @@ public static class Myro
 	    }
 	}
   
-       [method: JigsawTab("M/Movement")]
+       [method: JigsawTab("M/Advanced Set 1")]
 	public static void turnTo (int angle, string units = "deg")
 	{
 	    if (robot != null) {
@@ -2346,7 +2346,7 @@ public static class Myro
 	    }
 	}
 
-       [method: JigsawTab("M/Movement")]
+       [method: JigsawTab("M/Advanced Set 1")]
 	public static void turnBy (int angle, string units = "deg")
 	{
 	    if (robot != null) {
@@ -2356,7 +2356,7 @@ public static class Myro
 	    }
 	}
 
-       [method: JigsawTab("M/Movement")]
+       [method: JigsawTab("M/Advanced Set 1")]
 	public static void setPosition (int x, int y)
 	{
 	    if (robot != null) {
@@ -2366,7 +2366,7 @@ public static class Myro
 	    }
 	}
 
-       [method: JigsawTab("M/Movement")]
+       [method: JigsawTab("M/Advanced Set 1")]
 	public static void setAngle (uint a)
 	{
 	    if (robot != null) {
@@ -2376,7 +2376,7 @@ public static class Myro
 	    }
 	}
 
-       [method: JigsawTab("M/Movement")]
+       [method: JigsawTab("M/Advanced Set 1")]
 	public static void setBeginPath (int speed=7)
 	{
 	    if (robot != null) {
@@ -2386,7 +2386,7 @@ public static class Myro
 	    }
 	}
 
-       [method: JigsawTab("M/Movement")]
+       [method: JigsawTab("M/Advanced Set 1")]
 	public static void moveTo (int x, int y, string units = "mm")
 	{
 	    if (robot != null) {
@@ -2396,7 +2396,7 @@ public static class Myro
 	    }
 	}
 
-       [method: JigsawTab("M/Movement")]
+       [method: JigsawTab("M/Advanced Set 1")]
 	public static void moveBy (int x, int y, string units = "mm")
 	{
 	    if (robot != null) {
@@ -2406,7 +2406,7 @@ public static class Myro
 	    }
 	}
 
-       [method: JigsawTab("M/Movement")]
+       [method: JigsawTab("M/Advanced Set 1")]
 	public static void arc (int degrees, int radius)
 	{
 	    if (robot != null) {
@@ -2416,7 +2416,7 @@ public static class Myro
 	    }
 	}
 
-       [method: JigsawTab("M/Movement")]
+       [method: JigsawTab("M/Advanced Set 1")]
 	public static void arcTo (int x, int y, int radius, string units = "mm")
 	{
 	    if (robot != null) {
@@ -2426,7 +2426,7 @@ public static class Myro
 	    }
 	}
 
-       [method: JigsawTab("M/Movement")]
+       [method: JigsawTab("M/Advanced Set 1")]
 	public static void arcBy (int x, int y, int radius, string units = "mm")
 	{
 	    if (robot != null) {
@@ -2436,7 +2436,7 @@ public static class Myro
 	    }
 	}
   
-       [method: JigsawTab("M/Movement")]
+       [method: JigsawTab("M/Advanced Set 1")]
 	public static void setEndPath ()
 	{
 	    if (robot != null) {
@@ -2446,7 +2446,7 @@ public static class Myro
 	    }
 	}
   
-       [method: JigsawTab("M/Audio")]
+       [method: JigsawTab("M/Advanced Set 1")]
 	public static void setS2Volume (int level)
 	{
 	    if (robot != null) {
