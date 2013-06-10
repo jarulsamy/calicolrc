@@ -277,7 +277,6 @@ public class Scheme {
     public enum ReturnType { ReturnVoid=0, ReturnObject=1, ReturnBool=2 };
     public enum TakesType { TakesAll=-1, TakesOne=1, TakesTwo=2 };
 
-  public static Proc Add_proc = new Proc("+", (Procedure1)Add, -1, 1);
   // FIXME: make these four different:
     /*
       1. eq? evaluates to #f unless its parameters represent the same
@@ -306,6 +305,7 @@ public class Scheme {
   public static Proc Multiply_proc = new Proc("*", (Procedure1) Multiply, -1, 1);
   public static Proc modulo_proc = new Proc("%", (Procedure1) modulo, -1, 1);
   public static Proc Divide_proc = new Proc("/", (Procedure1) Divide, -1, 1);
+  public static Proc Add_proc = new Proc("+", (Procedure1)Add, -1, 1);
   public static Proc Subtract_proc = new Proc("-", (Procedure1) Subtract, -1, 1);
   public static Proc car_proc = new Proc("car", (Procedure1) car, 1, 1);
   public static Proc cdr_proc = new Proc("cdr", (Procedure1) cdr, 1, 1);
@@ -484,7 +484,6 @@ public class Scheme {
 	       list(symbol("float"), new Proc("float", (Procedure1)ToDouble, 1, 1)),
 	       list(symbol("format"), new Proc("format", (Procedure1)format_list, -1, 1)),
 	       list(symbol("globals"), new Proc("globals", (Procedure0)dlr_env_list, 0, 1)),
-	       list(symbol("string-split"), new Proc("string-split", (Procedure2) string_split, 2, 1)),
 	       list(symbol("int"), new Proc("int", (Procedure1)ToInt, 1, 1)),
 	       list(symbol("iter?"), new Proc("iter?", (Procedure1Bool)iter_q, 1, 2)),
 	       list(symbol("list?"), new Proc("list?", (Procedure1Bool)list_q, 1, 2)),
@@ -495,7 +494,8 @@ public class Scheme {
 	       list(symbol("string->list"), new Proc("string->list", (Procedure1) string_to_list, 1, 1)),
 	       list(symbol("string->symbol"), new Proc("string->symbol", (Procedure1) string_to_symbol, 1, 1)),
 	       list(symbol("string-append"), string_append_proc),
-	       list(symbol("string<?"), new Proc("string<?", (Procedure2Bool) stringLessThan_q, 2, 2)),
+	       list(symbol("string-split"), new Proc("string-split", (Procedure2) string_split, 2, 1)),
+	       list(symbol("string<?"), stringLessThan_q_proc),
 	       list(symbol("symbol"), new Proc("symbol", (Procedure1)symbol, 1, 1)),
 	       list(symbol("symbol->string"), new Proc("symbol->string", (Procedure1) symbol_to_string, 1, 1)),
 	       list(symbol("typeof"), new Proc("typeof", (Procedure1)get_type, 1, 1)),
@@ -1216,56 +1216,53 @@ public class Scheme {
   }
 
   public static object get_external_members(object obj) {
-      Type type = obj.GetType();
       object retval = EmptyList;
-      foreach (MemberInfo m in type.GetMembers()) {
-	  retval = new Cons(m.Name, retval);
+      foreach (string name in _dlr_runtime.Operations.GetMemberNames(obj)) {
+	  retval = new Cons(name, retval);
       }
-      return retval;
+      return sort(make_external_proc(stringLessThan_q_proc), retval);
   }
 
     // FIXME: can't get Myro.robot.name after (Myro.init "sim")
-    // Why not? I don't know
+    // Why not? I don't know;;; because it is a Python Member?
 
-  public static object get_external_member(object obj, string name) {
-      //printf("get_external_member(object={0}, string={1})\n", obj, name);
-      //printf("get_external_member: {0}\n", get_external_members(obj));
-      Type type = obj.GetType();
-      MethodInfo method;
-      try {
-	  method = type.GetMethod(name);
-      } catch (System.Reflection.AmbiguousMatchException) {
-	  return new Method(obj, name);
-      }
-      if (method != null) { // not ambiguous
-	  //printf("GetMethod: {0}\n", method);
-	  return new Method(obj, name);
-      }
-      FieldInfo field = type.GetField(name);
-      if (field != null) {
-	  //printf("GetField: {0}\n", field.GetValue(obj));
-	  return field.GetValue(obj);
-      }
-      PropertyInfo property = type.GetProperty(name);
-      if (property != null) {
-	  //printf("GetProperty: {0}\n", property);
-	  return property;
-	  //return IronPython.Runtime.Types.DynamicHelpers.
-	  //GetPythonTypeFromType(property.GetType());
-      }
-      try {
-	  return _dlr_runtime.Operations.GetMember(obj, name);
-      } catch {
-	  //pass
-      }
-      try {
-	  return _dlr_runtime.Operations.GetMember(obj, "get_Item");
-      } catch {
-	  //pass
-      }
-      throw new Exception(String.Format("no such member: '{0}'", name));
-  }
-
+    public static object get_external_member(object obj, string name) {
+	Type type = obj.GetType();
+	MethodInfo method;
+	try {
+	    method = type.GetMethod(name);
+	} catch (System.Reflection.AmbiguousMatchException) {
+	    return new Method(obj, name);
+	}
+	if (method != null) { // not ambiguous
+	    //printf("GetMethod: {0}\n", method);
+	    return new Method(obj, name);
+	}
+	FieldInfo field = type.GetField(name);
+	if (field != null) {
+	    //printf("GetField: {0}\n", field.GetValue(obj));
+	    return field.GetValue(obj);
+	}
+	PropertyInfo property = type.GetProperty(name);
+	if (property != null) {
+	    //printf("GetProperty: {0}\n", property);
+	    return property;
+	    //return IronPython.Runtime.Types.DynamicHelpers.
+	    //GetPythonTypeFromType(property.GetType());
+	}
+	try {
+	    return _dlr_runtime.Operations.GetMember(obj, name);
+	} catch {
+	    //pass
+	}
+	try {
+	    return _dlr_runtime.Operations.GetMember(obj, "get_Item");
+	} catch {
+	    //pass
+	}
+	throw new Exception(String.Format("no such member: '{0}'", name));
+    }
+    
   public static object call_external_proc(object obj, object path, object args) {
       //string name = obj.ToString();
       //Type type = null;
@@ -1472,13 +1469,12 @@ public class Scheme {
 	      //printf("   dlr_object_contains: part: {0}, '{1}'\n", retobj, car(parts_list));
 	      //printf("members: {0}", get_external_members(retobj));
  	      // fixme: needs to use args to get method
-	      //try{
-	      retobj = _dlr_runtime.Operations.GetMember(retobj, car(parts_list).ToString());
-	      //retobj = IronPython.Runtime.Types.DynamicHelpers.GetPythonTypeFromType(retobj);
-	      //} catch {
-	      //object binding = PJScheme.make_binding("dlr", get_external_member(result, car(parts_list).ToString()));
-	      //return get_external_member(result, car(parts_list).ToString());
-	      //}
+	      try {
+		  retobj = _dlr_runtime.Operations.GetMember(retobj, car(parts_list).ToString());
+		  //retobj = IronPython.Runtime.Types.DynamicHelpers.GetPythonTypeFromType(retobj.GetType());
+	      } catch {
+		  throw new Exception(String.Format("invalid member of {0}: '{1}'", retobj, car(parts_list).ToString()));
+	      }
 	      parts_list = cdr(parts_list);
 	  }
       } else {
