@@ -229,6 +229,16 @@
     };
   }
 
+  public static object apply_comparison_rm(object schemeProc, object arg1, object arg2) {
+      // used from non-pcs code that evaluates a scheme proc in sort
+      proc_reg = schemeProc;
+      args_reg = PJScheme.list (arg1, arg2);
+      handler_reg = REP_handler;
+      k2_reg = REP_k;
+      pc = (Function) apply_proc;
+      return PJScheme.trampoline();
+  }
+
    static int _closure_depth = 0;
    static bool _trace_pause = false;
 

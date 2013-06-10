@@ -756,17 +756,14 @@ public class Scheme {
 	}
   }
 
-  public static object apply(object proc, object args) {
+    public static object apply(object proc, object args) {
 	if (proc is Proc)
-	  return ((Proc)proc).Call(args);
-	else {
-	    if (procedure_q(proc) && Eq(cadr(proc), symbol("<extension>"))) {
-		return ((Proc)caddr(proc)).Call(args);
-	    } else {
-		throw new Exception(string.Format("invalid procedure: {0}", proc));
-	    }
+	    return ((Proc)proc).Call(args);
+	else if (procedure_q(proc) && Eq(cadr(proc), symbol("<extension>"))) {
+	    return ((Proc)caddr(proc)).Call(args);
 	}
-  }
+	throw new Exception(string.Format("invalid procedure: {0}", proc));
+    }
 
   public static object apply(object proc, object args1, object args2) {
 	if (proc is Proc)
@@ -2510,26 +2507,51 @@ public class Scheme {
 	return retval;
   }
 
-  static object pivot (object p, object l) {
+    public static object pivot (object p, object l) {
 	if (null_q(l))
-	  return symbol("done");
+	    return symbol("done");
 	else if (null_q(cdr(l)))
-	  return symbol("done");
-	// FIXME: use p to compare
-	else if (cmp(car(l), cadr(l)) <= 0)
-	  return pivot(p, cdr(l));
+	    return symbol("done");
+	bool result = apply_comparison(p, car(l), cadr(l));
+	if (result)
+	    return pivot(p, cdr(l));
 	else
-	  return car(l);
-  }
+	    return car(l);
+    }
+
+    public static bool apply_comparison(object p, object carl, object cadrl) {
+	object result = null;
+	if (p is Predicate2) {
+	    Predicate2 f = (Predicate2)p;
+	    try {
+		result = f(carl, cadrl);
+	    } catch (Exception e) {
+		throw new Exception("error in sort comparison predicate: " + e.Message);
+	    }
+	} else if (procedure_q(p)) {
+	    try {
+		result = PJScheme.apply_comparison_rm(p, carl, cadrl);
+	    } catch (Exception e) {
+		throw new Exception("error in sort comparision procedure: " + e.Message);
+	    }
+	} else {
+	    throw new Exception("error in sort comparision result: " + result);
+	}
+	if (result is bool) {
+	    return (bool)result;
+	} else {
+	    throw new Exception("sort comparision function did not return a boolean, but " + result);
+	}
+    }
 
   // usage: (partition 4 '(6 4 2 1 7) () ()) -> returns partitions
-  static object partition (object p, object piv,  object l, object p1, object p2) {
-	if (null_q(l))
+  public static object partition (object p, object piv,  object l, object p1, object p2) {
+      if (null_q(l))
 	  return list(p1, p2);
-	// FIXME: use p to compare
-	else if (cmp(car(l), piv) < 0)
+      bool result = apply_comparison(p, car(l), piv);
+      if (result)
 	  return partition(p, piv, cdr(l), cons(car(l), p1), p2);
-	else
+      else
 	  return partition(p, piv, cdr(l), p1, cons(car(l), p2));
   }
 
