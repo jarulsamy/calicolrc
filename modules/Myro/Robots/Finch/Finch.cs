@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,12 +18,12 @@ public class Finch: Myro.Robot
         private byte changeByte = 1; //counter
 
 
-	public Finch() {
-	    open();
-	}
+	    public Finch() {
+	        open();
+	    }
 
         /// <summary>
-        /// Open's connection to the Finch. Call this after making the robot and before calling any other functions.
+        /// Open's connection to the Finch.
         /// </summary>
         public void open()
         {
@@ -54,23 +54,29 @@ public class Finch: Myro.Robot
         {
             if (robot != null)
             {
-
-                color = (string)value;
-                red = Int32.Parse(color.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
-                green = Int32.Parse(color.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
-                blue = Int32.Parse(color.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
-                byte[] report = { (byte)0, (byte)'O', (byte)red, (byte)green, (byte)blue };
-                stream.Write(report);
+                try
+                {
+                    color = (string)value;
+                    red = Int32.Parse(color.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+                    green = Int32.Parse(color.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+                    blue = Int32.Parse(color.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+                    byte[] report = { (byte)0, (byte)'O', (byte)red, (byte)green, (byte)blue };
+                    stream.Write(report);
+                }
+                catch (Exception e)
+                {
+                    //Do nothing
+                }
             }
         }
 
         /// <summary>
         /// Sets the speed of the two motors
         /// </summary>
-	public override void adjustSpeed ()
-	{
-	    int left  = (int)(_lastTranslate * 255 - _lastRotate * 255);
-	    int right = (int)(_lastTranslate * 255 + _lastRotate * 255);
+	    public override void adjustSpeed ()
+	    {
+	        int left  = (int)(_lastTranslate * 255 - _lastRotate * 255);
+	        int right = (int)(_lastTranslate * 255 + _lastRotate * 255);
 
             if (robot != null)
             {
@@ -150,9 +156,23 @@ public class Finch: Myro.Robot
         /// <summary>
         /// Get left and right light sensors
         /// </summary>
-        /// <returns>Two element array containing the the left and right light sensor values (0 to 255)</returns>
+        /// <param name="position">"left" to return the left light sensor, "right" to return the right light sensor, and "both" to return both</param>
+        /// <returns>An int, or a two element array containing the the left and right light sensor values (0 to 255)</returns>
         public override object getLight(params object[] position)
         {
+            string temp = "";
+            try
+            {
+                if (position != null)
+                {
+                    temp = (string)position[0];
+                }
+            }
+            catch (Exception e)
+            {
+                //Do Nothing
+            }
+
             if (robot != null)
             {
                 // Add the "changeByte" into the report to force every returning report to be slightly different - otherwise read won't work
@@ -172,47 +192,46 @@ public class Finch: Myro.Robot
                 int[] returnData = new int[2];
                 returnData[0] = readData[1];
                 returnData[1] = readData[2];
-                return returnData;
+                if (temp == "left")
+                {
+                    return returnData[0];
+                }
+                else if(temp == "right")
+                {
+                    return returnData[1];
+                }
+                else if (temp == "both")
+                {
+                    return returnData;
+                }
             }
             return null;
         }
 
-        /// <summary>
-        /// Returns the value of the left light sensor
-        /// </summary>
-        /// <returns>Left light sensor value, 0(dark) to 255(bright)</returns>
-        public int getLeftLightSensor()
-        {
-            int[] lights = (int[])getLight();
 
-            if (lights != null)
-                return lights[0];
-            else
-                return 0;
-        }
-
-        /// <summary>
-        /// Returns the value of the right light sensor
-        /// </summary>
-        /// <returns>Right light sensor value, 0(dark) to 255(bright)</returns>
-        public int getRightLightSensor()
-        {
-            int[] lights = (int[])getLight();
-
-            if (lights != null)
-                return lights[1];
-            else
-                return 0;
-        }
 
         /// <summary>
         /// Returns the accelerations experienced by Finch's accelerometer. Values are -1.5g to 1.5g.
         /// </summary>
-        /// <returns>An array of 3 doubles holding X, Y, and Z acceleration, null if the read failed.</returns>
-        public double[] getAccelerations()
+        /// <param name="position">"x" to return the x acceleration, "y" to return the y accerleration, "z" to return the z acceleration, and "all" to return all three.</param>
+        /// <returns>A double, or an array of 3 doubles holding X, Y, and Z acceleration, null if the read failed.</returns>
+        public override object getAcceleration(params object[] position)
         {
             if (robot != null)
             {
+                string temp = "";
+                try
+                {
+                    if (position != null)
+                    {
+                        temp = (string)position[0];
+                    }
+                }
+                catch (Exception e)
+                {
+                    //Do Nothing
+                }
+
                 byte[] report = { (byte)0, (byte)'A', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, changeByte };
                 stream.Write(report);
                 byte[] readData = stream.Read();
@@ -232,54 +251,30 @@ public class Finch: Myro.Robot
                     else
                         returnData[i - 2] = ((double)readData[i]) * 1.5 / 32;
                 }
-                return returnData;
+                if (temp == "x")
+                {
+                    return returnData[0];
+                }
+                else if (temp == "y")
+                {
+                    return returnData[1];
+                }
+                else if (temp == "z")
+                {
+                    return returnData[2];
+                }
+                else if (temp == "all")
+                {
+                    return returnData;
+                }
             }
             return null;
         }
 
         /// <summary>
-        /// Returns the X (beak to tail) acceleration
-        /// </summary>
-        /// <returns>Acceleration in gees</returns>
-        public double getXAcceleration()
-        {
-            double[] accels = getAccelerations();
-            if (accels != null)
-                return accels[0];
-            else
-                return 0;
-        }
-
-        /// <summary>
-        /// Returns the Y (wheel to wheel) acceleration
-        /// </summary>
-        /// <returns>Acceleration in gees</returns>
-        public double getYAcceleration()
-        {
-            double[] accels = getAccelerations();
-            if (accels != null)
-                return accels[1];
-            else
-                return 0;
-        }
-
-        /// <summary>
-        /// Returns the Z (top to bottom) acceleration
-        /// </summary>
-        /// <returns>Acceleration in gees</returns>
-        public double getZAcceleration()
-        {
-            double[] accels = getAccelerations();
-            if (accels != null)
-                return accels[2];
-            else
-                return 0;
-        }
-
-        /// <summary>
         /// Gets the temperature measured by the Finch's small temperature sensor.
         /// </summary>
-        /// <returns>Ambient temperature in Celcius</returns>
+        /// <returns>A double, which is the ambient temperature in Celcius</returns>
         public override object getTemperature()
         {
             if (robot != null)
@@ -302,13 +297,28 @@ public class Finch: Myro.Robot
         }
 
         /// <summary>
-        /// Gets a two element boolean array representing the left (element 0) and right (element 1) obstacle sensors. True if an obstacle is detected, false otherwise. 
+        /// Gets a two element boolean array representing the left (element 0) and right (element 1) obstacle sensors or a bool. True if an obstacle is detected, false otherwise. 
         /// </summary>
-        /// <returns>Array contain Finch obstacle data</returns>
+        /// <param name="position">"left" to return the left obstacle sensor, "right" to return the right obstacle sensor, "both" to return both</param>
+        /// <returns>A bool or an array of bools containing Finch obstacle data</returns>
         public override object getObstacle(params object[] position)
         {
             if (robot != null)
             {
+                string temp = "";
+                try
+                {
+                    if (position != null)
+                    {
+                        temp = (string)position[0];
+                    }
+                }
+
+                catch (Exception e)
+                {
+                    //Do Nothing
+                }
+
                 byte[] report = { (byte)0, (byte)'I', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, changeByte };
                 stream.Write(report);
                 byte[] readData = stream.Read();
@@ -329,43 +339,20 @@ public class Finch: Myro.Robot
                     returnData[1] = true;
                 else
                     returnData[1] = false;
-                return returnData;
+                if (temp == "left")
+                {
+                    return returnData[0];
+                }
+                else if (temp == "right")
+                {
+                    return returnData[1];
+                }
+                else if (temp == "both")
+                {
+                    return returnData;
+                }
             }
             return null;
-        }
-
-        /// <summary>
-        /// Checks if there's an obstacle on the left side
-        /// </summary>
-        /// <returns>True if there's an obstacle, false otherwise</returns>
-        public bool isObstacleLeftSide()
-        {
-            bool[] obstacles = (bool[])getObstacle();
-            if (obstacles != null)
-            {
-                if (obstacles[0])
-                    return true;
-                else
-                    return false;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Checks if there's an obstacle on the right side
-        /// </summary>
-        /// <returns>True if there's an obstacle, false otherwise</returns>
-        public bool isObstacleRightSide()
-        {
-            bool[] obstacles = (bool[])getObstacle();
-            if (obstacles != null)
-            {
-                if (obstacles[1])
-                    return true;
-                else
-                    return false;
-            }
-            return false;
         }
 
 
