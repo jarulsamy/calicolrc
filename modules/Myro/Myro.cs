@@ -1290,6 +1290,29 @@ public static class Myro
     }
 
 
+    [method: JigsawTab("M/Robot")]
+    public static Type getRobotType (string name)
+    {
+	string path = System.IO.Path.GetDirectoryName (System.Reflection.Assembly.GetExecutingAssembly ().GetName ().CodeBase).Substring (5);
+	if (path.StartsWith ("\\")) {
+	    path = path.Substring (1);
+	}
+	DirectoryInfo d = new DirectoryInfo (System.IO.Path.Combine (path, "Myro", "Robots"));		
+	foreach (FileInfo f in d.GetFiles("*.dll")) {
+	    //System.Console.WriteLine ("Loading {0}...", f.FullName);
+	    if (f.Name.Substring(0, f.Name.Length - 4) == name) {
+		Assembly assembly = Assembly.LoadFrom (f.FullName);
+		foreach (Type type in assembly.GetTypes()) {
+		    if (type.Name == name) {
+			return type;
+		    }
+		}
+	    }
+	}
+	return null;
+    }
+
+
 	public class Simulation
 	{
 		public Graphics.WindowClass window;
