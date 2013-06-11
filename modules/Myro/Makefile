@@ -20,6 +20,7 @@ all: ../Myro.dll
 		-pkg:gtk-sharp-2.0 \
 		-r:Mono.Cairo.dll \
 		-pkg:glib-sharp-2.0 
+	cd Robots; make
 
 clean::
 	rm -rf ../Myro.dll */*~ *~

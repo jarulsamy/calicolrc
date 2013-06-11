@@ -1008,9 +1008,40 @@ public class SimScribbler : Myro.Robot
 		    return retval;
 	        }
 
+		public override object getLocation ()
+		{
+		    object retval = null;
+		    ManualResetEvent ev = new ManualResetEvent(false);
+		    Exception exception = null;
+		    // Lock the queue, as this method can fire at any time
+		    lock (queue) {
+			// Add a delegate to the queue, which will execute when appropriate
+			queue.Add(delegate {
+				try {
+				    retval = _getLocation();
+				} catch (Exception e) {
+				    exception = e;
+				}
+				ev.Set();
+			    });
+		    }
+		    // Wait for delegate to fire
+		    ev.WaitOne();
+		    if (exception != null)
+			throw exception;
+		    // And return picture
+		    return retval;
+
+		}
+
 		public object _getLine (params object [] position)
 		{
 			return Graphics.PyList (0, 0);
+		}
+    
+		public object _getLocation ()
+		{
+			return Graphics.PyList (frame.center.x, frame.center.y);
 		}
     
 		public override object get (string sensor="all")
@@ -1144,5 +1175,5 @@ public class SimScribbler : Myro.Robot
 			    }
 			}
 		    }
-		}
+		} // draw_simulation
 	} // SimScribbler

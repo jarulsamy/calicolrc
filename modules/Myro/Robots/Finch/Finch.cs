@@ -1,4 +1,5 @@
 using System;
+using IronPython.Runtime;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -305,19 +306,7 @@ public class Finch: Myro.Robot
         {
             if (robot != null)
             {
-                string temp = "";
-                try
-                {
-                    if (position != null)
-                    {
-                        temp = (string)position[0];
-                    }
-                }
-
-                catch (Exception e)
-                {
-                    //Do Nothing
-                }
+		List list = new List();
 
                 byte[] report = { (byte)0, (byte)'I', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, changeByte };
                 stream.Write(report);
@@ -339,21 +328,40 @@ public class Finch: Myro.Robot
                     returnData[1] = true;
                 else
                     returnData[1] = false;
-                if (temp == "left")
-                {
-                    return returnData[0];
-                }
-                else if (temp == "right")
-                {
-                    return returnData[1];
-                }
-                else if (temp == "both")
-                {
-                    return returnData;
-                }
-            }
-            return null;
-        }
+
+		foreach (object item in position) {
+		    if (item is string) {
+			string temp = (string)item;
+			if (temp == "left") {
+			    list.append(returnData[0]);
+			} else if (temp == "right") {
+			    return returnData[1];
+			} else if (temp == "both") {
+			    return returnData;
+			} else {
+			    // error
+			}
+		    } else if (item is int) {
+			int temp = (int)item;
+			if (temp == 0) {
+			    list.append(returnData[0]);
+			} else if (temp == 1) {
+			    return returnData[1];
+			} else {
+			    // error
+			}
+		    }
+		}
+		if (list.Count == 0) {
+		    return null;
+		} else if (list.Count == 1) {
+		    return list[0];
+		} else {
+		    return list;
+		}
+	    }
+	    return null;
+	}
 
 
         private void keepAlive()
