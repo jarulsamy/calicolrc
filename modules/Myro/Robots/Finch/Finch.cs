@@ -17,7 +17,7 @@ All commands to the Finch are 9 bytes long:
   Bytes 2-7:  parametric data in binary
      Byte 8:  sequence number
 
-All responses are 11 bytes long:
+All responses are 11 bytes long on Linux/ 9 bytes on Windows:
 
   Bytes 0-6:  sensor data in binary
      Byte 10:  sequence number (from byte 8 of the command)
@@ -379,7 +379,11 @@ public class Finch: Myro.Robot
 	}
 
 	public byte [] WriteBytesRead(params byte [] bytes) {
-	    int SIZE = 9;
+	    int SIZE = 11;
+	    string os_name = System.Environment.OSVersion.Platform.ToString();
+	    if (os_name.StartsWith("Win")) {
+		SIZE = 9;
+	    } 
 	    lock (stream) {
 		bytes[8] = changeByte;
 		stream.Write(bytes);
