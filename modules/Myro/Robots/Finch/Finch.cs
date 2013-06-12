@@ -383,7 +383,7 @@ public class Finch: Myro.Robot
 	    lock (stream) {
 		bytes[8] = changeByte;
 		stream.Write(bytes);
-		byte [] readData = ReadBytes(11);
+		byte [] readData = ReadBytes(SIZE);
 		while (readData[SIZE - 1] != changeByte && bytes[1] != (byte)'z') {
 		    readData = ReadBytes(SIZE);
 		}
