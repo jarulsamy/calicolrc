@@ -379,12 +379,13 @@ public class Finch: Myro.Robot
 	}
 
 	public byte [] WriteBytesRead(params byte [] bytes) {
+	    int SIZE = 9;
 	    lock (stream) {
 		bytes[8] = changeByte;
 		stream.Write(bytes);
 		byte [] readData = ReadBytes(11);
-		while (readData[10] != changeByte && bytes[1] != (byte)'z') {
-		    readData = ReadBytes(11);
+		while (readData[SIZE - 1] != changeByte && bytes[1] != (byte)'z') {
+		    readData = ReadBytes(SIZE);
 		}
 		changeByte++;
 		return readData;
