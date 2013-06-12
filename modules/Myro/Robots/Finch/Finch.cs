@@ -97,12 +97,16 @@ public class Finch: Myro.Robot
         private string color = "#000000"; // stores the color of the LED
         private byte changeByte = 1; //counter
 	private string name = "Finchy";
+	public bool debug = false;
 
 	    public Finch() {
 	        open();
 		if (stream != null) {
-		    lock (stream)
+		    lock (stream) {
+			if (debug)
+			    System.Console.WriteLine("stream.Flush");
 			stream.Flush();
+		    }
 		    setLED("front", color); // Set the LED to the current values (doesn't change the LED color)
 		}
 	    }
@@ -163,7 +167,7 @@ public class Finch: Myro.Robot
 			red = Int32.Parse(color.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
 			green = Int32.Parse(color.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
 			blue = Int32.Parse(color.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
-			byte[] report = { (byte)0, (byte)'O', (byte)red, (byte)green, (byte)blue , 0, 0, 0, 0};
+			byte[] report = { (byte)0, (byte)'O', (byte)red, (byte)green, (byte)blue};
 			WriteBytes(report);
 		    } catch {
 			//Do nothing
@@ -196,7 +200,7 @@ public class Finch: Myro.Robot
                 }
                 int left1 = Math.Min(Math.Abs(left), 255);
                 int right1 = Math.Min(Math.Abs(right), 255);
-                byte[] report = { (byte)0, (byte)'M', (byte)dir_left, (byte)left1, (byte)dir_right, (byte)right1, 0, 0, 0 };
+                byte[] report = { (byte)0, (byte)'M', (byte)dir_left, (byte)left1, (byte)dir_right, (byte)right1};
 		WriteBytes(report);
             }
         }
@@ -209,7 +213,7 @@ public class Finch: Myro.Robot
             if (robot != null)
             {
 
-                byte[] report = { (byte)0, (byte)'R', 0, 0, 0, 0, 0, 0, 0 };
+                byte[] report = { (byte)0, (byte)'R'};
 		WriteBytes(report);
                 stream = null;
                 robot = null;
@@ -225,7 +229,7 @@ public class Finch: Myro.Robot
         {
             if (robot != null)
             {
-                byte[] report = { (byte)0, (byte)'X', 0, 0, 0, 0, 0, 0, 0 };
+                byte[] report = { (byte)0, (byte)'X'};
 		WriteBytes(report);
                 stream = null;
                 robot = null;
@@ -251,7 +255,7 @@ public class Finch: Myro.Robot
                 int milliseconds = (int)(duration * 1000);
                 int freq = (int)frequency;
                 byte[] report = { (byte)0, (byte)'B', (byte)((milliseconds&0xff00)/256), (byte)(milliseconds&0x00ff), 
-				  (byte)((freq&0xff00)/256), (byte)(freq&0x00ff), 0, 0, 0};
+				  (byte)((freq&0xff00)/256), (byte)(freq&0x00ff)};
 		WriteBytes(report);
                 wait((int)(milliseconds * 1.05));
             }
@@ -269,7 +273,7 @@ public class Finch: Myro.Robot
 		List list = new List();
 
                 // Add the "changeByte" into the report to force every returning report to be slightly different - otherwise read won't work
-                byte[] report = { (byte)0, (byte)'L', 0x00, 0x00, 0x00, 0x00, 0x00, 0, 0};
+                byte[] report = { (byte)0, (byte)'L'};
                 byte[] readData = WriteBytesRead(report);
 
                 // Collect and format data - note that the first element in readData is always value 0, so we're off by one when returning
@@ -324,7 +328,7 @@ public class Finch: Myro.Robot
             if (robot != null)
             {
 		List list = new List();
-                byte[] report = { (byte)0, (byte)'A', 0x00, 0x00, 0x00, 0x00, 0x00, 0, 0};
+                byte[] report = { (byte)0, (byte)'A'};
                 byte[] readData = WriteBytesRead(report);
                 double[] returnData = new double[3];
                 // Convert to g's. Acceleration data starts at element 2 of the array
@@ -367,14 +371,29 @@ public class Finch: Myro.Robot
         }
 
 	public override void flush() {
-	    lock (stream)
+	    lock (stream) {
+		if (debug)
+		    System.Console.WriteLine("stream.flush");
 		stream.Flush();
+	    }
 	}
 
 	public void WriteBytes(params byte [] bytes) {
+	    int SIZE = 9;
+	    string os_name = System.Environment.OSVersion.Platform.ToString();
+	    if (os_name.Contains("Win")) {
+		SIZE = 8;
+	    } 
+	    byte[] tbuffer = new byte[SIZE];
+	    for (int i=0; i < bytes.Length; i++) {
+		tbuffer[i] = bytes[i];
+	    }
 	    lock (stream) {
-		stream.Write(bytes);
+		tbuffer[SIZE - 1] = changeByte;
 		changeByte++;
+		if (debug)
+		    System.Console.WriteLine("WriteBytes: " + arrayToString(tbuffer));
+		stream.Write(tbuffer);
 	    }
 	}
 
@@ -384,14 +403,21 @@ public class Finch: Myro.Robot
 	    if (os_name.Contains("Win")) {
 		SIZE = 9;
 	    } 
+	    byte[] tbuffer = new byte[SIZE];
+	    for (int i=0; i < bytes.Length; i++) {
+		tbuffer[i] = bytes[i];
+	    }
 	    lock (stream) {
-		bytes[8] = changeByte;
-		stream.Write(bytes);
-		byte [] readData = ReadBytes(SIZE);
-		while (readData[SIZE - 1] != changeByte && bytes[1] != (byte)'z') {
-		    readData = ReadBytes(SIZE);
-		}
+		byte lastChangeByte = changeByte;
+		tbuffer[SIZE - 1] = changeByte;
 		changeByte++;
+		if (debug)
+		    System.Console.WriteLine("WriteBytes: " + arrayToString(tbuffer));
+		stream.Write(tbuffer);
+		byte [] readData = ReadBytes(SIZE);
+		//while (readData[SIZE - 1] != lastChangeByte && bytes[1] != (byte)'z') {
+		//    readData = ReadBytes(SIZE);
+		//}
 		return readData;
 	    }
 	}
@@ -404,9 +430,23 @@ public class Finch: Myro.Robot
 		for (int b = 0; b < buffer.Length; b++) {
 		    if (r < size)
 			retval[r++] = buffer[b];
+		    else
+			System.Console.Error.WriteLine("Leftover byte on buffer: " + buffer[b]);
 		}
 	    }
+	    if (debug)
+		System.Console.WriteLine("ReadBytes: " + arrayToString(retval));
 	    return retval;
+	}
+
+	private string arrayToString(byte [] array) {
+	    string retval = "";
+	    foreach(byte b in array) {
+		if (retval != "")
+		    retval += ", ";
+		retval += b.ToString();
+	    }
+	    return "[" + retval + "]";
 	}
 
         /// <summary>
@@ -417,7 +457,7 @@ public class Finch: Myro.Robot
         {
             if (robot != null)
             {
-                byte[] report = {(byte)0, (byte)'T', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+                byte[] report = {(byte)0, (byte)'T'};
 		byte[] readData = WriteBytesRead(report);
                 // Converts data to Celcius
                 double returnData = ((double)readData[1] - 127) / 2.4 + 25;
@@ -437,7 +477,7 @@ public class Finch: Myro.Robot
             {
 		List list = new List();
 
-                byte[] report = { (byte)0, (byte)'I', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+                byte[] report = { (byte)0, (byte)'I'};
                 byte[] readData = WriteBytesRead(report);
 
                 bool[] returnData = new bool[2];
@@ -490,18 +530,24 @@ public class Finch: Myro.Robot
         {
             while (true)
             {
+		if (debug) {
+		    System.Console.WriteLine("Exiting from keepAlive...");
+		    break;
+		}
                 if (robot != null)
                 {
 		    try {
-			byte[] report = { 0, (byte)'z', 0, 0, 0, 0, 0, 0, 0 };
+			byte[] report = { 0, (byte)'z'};
 			WriteBytesRead(report);
 		    } catch (Exception e) {
 			System.Console.Error.WriteLine("error in keepAlive: " + e.Message);
 		    }
                     wait(2000); // do this again in 2 seconds
-                }
+                } else {
+		    System.Console.Error.WriteLine("Looking for the Finch...");
+		}
             }
+	    System.Console.WriteLine("Done!");
         }
-
 }
 
