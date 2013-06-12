@@ -886,7 +886,7 @@ public class Scribbler: Myro.Robot
     public void set (string item, object position, object value)
     {
         if (item == "led") {
-            if ((string)position == "center") {
+            if ((string)position == "center" || (string)position == "middle") {
                 if (isTrue (value))
                     set (Scribbler.SET_LED_CENTER_ON);
                 else

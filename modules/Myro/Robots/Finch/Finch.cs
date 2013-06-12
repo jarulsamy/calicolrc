@@ -6,6 +6,85 @@ using System.Text;
 using System.Threading;
 using HidSharp;
 
+/*
+Command/Response Format:
+
+All commands to the Finch are 9 bytes long:
+
+     Byte 0:  is always 0x00.
+     Byte 1:  is an Ascii character
+              determines the command for the Finch to execute
+  Bytes 2-7:  parametric data in binary
+     Byte 8:  sequence number
+
+All responses are 8 bytes long:
+
+  Bytes 0-6:  sensor data in binary
+     Byte 7:  sequence number (from byte 8 of the command)
+
+
+Ascii Command Codes:
+
+ - 'O' - control full-color LEDs (Orbs)
+         Byte 2 = Red Intensity (0-255)
+         Byte 3 = Green Intensity (0-255)
+         Byte 4 = Blue Intensity (0-255)
+
+ - 'M' - control the velocity of the motors
+         Byte 2 = Left Wheel Direction (0:forward, 1:reverse)
+         Byte 3 = Left Wheel Speed (0-255)
+         Byte 4 = Right Wheel Direction (0:forward, 1:reverse)
+         Byte 5 = Right Wheel Speed (0-255)
+         *All zeroes will immediately turn the motors off
+
+ - 'B' - sets the buzzer to chirp for a period of time
+         Byte 2 = Duration in msec (MSB)
+         Byte 3 = Duration in msec (LSB)
+         Byte 4 = Frequency in Hz (MSB)
+         Byte 5 = Frequency in Hz (LSB)
+         *All zeroes will immediately turn the buzzer off
+
+ - 'T' - gets the temperature
+         returns
+         Byte 0 = Temperature Value (0-255)
+                   Celsius = (value-127) / 2.4 + 25.0
+
+ - 'L' - gets the values from the two light sensors
+         returns
+         Byte 0 = Left Light Sensor (0-255)
+         Byte 1 = Right Light Sensor (0-255)
+
+ - 'A' - gets the accelerometer values of the X, Y, Z axis, and the tap/shake byte.
+         returns
+         Byte 0 = 153 (decimal)
+         Byte 1 = X-axis (0-63)
+         Byte 2 = Y-axis (0-63)
+         Byte 3 = Z-axis (0-63)
+                  if value is 0x00 to 0x1f (positive)
+                     g-force = value * 1.5/32.0
+                  if value is 0x20 to 0x3f (negative)
+                     g-force = (value-64) * 1.5/32.0
+         Byte 4 = Tap/Shaken flag (0-255)
+                  If bit 7 (0x80) is a 1, then the Finch has been shaken since the last read
+                  If bit 5 (0x20) is a 0, then the Finch has been tapped since the last read
+
+ - 'I' - gets the values of the two obstacle sensors
+         returns
+         Byte 0 = Left Sensor (0:none or 1:obstacle present)
+         Byte 1 =  Right Sensor (0:none or 1:obstacle present)
+
+ - 'X' - set all motors and LEDs to off
+
+ - 'R' - turns off the motor and
+         has the Finch go back into color-cycling mode
+
+ - 'z' - send a counter value showing the number of times command-z has been sent
+         used for "keep-alive" or communication tests only
+         returns
+         Byte 0 = Counter (0-255)
+
+ */
+
 public class Finch: Myro.Robot
 {
         private HidStream stream = null;
@@ -21,6 +100,9 @@ public class Finch: Myro.Robot
 
 	    public Finch() {
 	        open();
+		if (stream != null) {
+		    stream.Flush();
+		}
 	    }
 
         /// <summary>
@@ -55,19 +137,20 @@ public class Finch: Myro.Robot
         {
             if (robot != null)
             {
-                try
-                {
-                    color = (string)value;
-                    red = Int32.Parse(color.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
-                    green = Int32.Parse(color.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
-                    blue = Int32.Parse(color.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
-                    byte[] report = { (byte)0, (byte)'O', (byte)red, (byte)green, (byte)blue };
-                    stream.Write(report);
-                }
-                catch (Exception e)
-                {
-                    //Do nothing
-                }
+		if (position == "front" || position == "center" || position == "middle" || position == "all") {
+		    try {
+			color = (string)value;
+			red = Int32.Parse(color.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+			green = Int32.Parse(color.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+			blue = Int32.Parse(color.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+			byte[] report = { (byte)0, (byte)'O', (byte)red, (byte)green, (byte)blue };
+			stream.Write(report);
+		    } catch (Exception e) {
+			//Do nothing
+		    }
+		} else {
+		    throw new Exception (String.Format ("no such LED: '{0}'", position));
+		}
             }
         }
 
@@ -160,7 +243,7 @@ public class Finch: Myro.Robot
         /// <param name="position">"left" to return the left light sensor, "right" to return the right light sensor, and "both" to return both</param>
         /// <returns>An int, or a two element array containing the the left and right light sensor values (0 to 255)</returns>
         public override object getLight(params object[] position)
-        {
+        { // position can be: 0, "left"; 1, "middle", "center"; 2, "right"; "all"
             string temp = "";
             try
             {
@@ -272,6 +355,25 @@ public class Finch: Myro.Robot
             return null;
         }
 
+	public override void flush() {
+	    stream.Flush();
+	}
+
+	public byte [] ReadBytes(int size) {
+	    byte [] retval = new byte[size];
+	    stream.Read(retval);
+	    return retval;
+	}
+
+	public void WriteBytes(params byte [] bytes) {
+	    foreach(byte b in bytes) {
+		System.Console.Write(b);
+		System.Console.Write(", ");
+	    }
+	    System.Console.Write("\n");
+	    stream.Write(bytes);
+	}
+
         /// <summary>
         /// Gets the temperature measured by the Finch's small temperature sensor.
         /// </summary>
@@ -280,19 +382,29 @@ public class Finch: Myro.Robot
         {
             if (robot != null)
             {
-                byte[] report = {(byte)0, (byte)'T', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, changeByte };
-                stream.Write(report);
-                byte[] readData = stream.Read();
+                byte[] report = {(byte)0, (byte)'T', 
+				 0x00, 0x00, 
+				 0x00, 0x00, 
+				 0x00, changeByte };
+                WriteBytes(report);
+                byte[] readData = ReadBytes(9);
+		changeByte++;
+		return readData;
                 // Keep reading until you get back to the report that matches to the one you wrote (hopefully this loop isn't triggered, but just in case
-                while (readData[8] != changeByte)
-                {
-                    stream.Write(report);
-                    readData = stream.Read();
-                }
-                changeByte++;
+		/*
+		while (readData[8] != changeByte)
+		{
+		    stream.Write(report);
+		    readData = ReadBytes(11);
+		    System.Console.WriteLine(readData.Length);
+		}
+		System.Console.WriteLine("changeByte: " + changeByte + " read: " + readData[8]);
+		changeByte++;
+		System.Console.WriteLine(readData.Length);
                 // Converts data to Celcius
                 double returnData = ((double)readData[1] - 127) / 2.4 + 25;
                 return returnData;
+		*/
             }
             return 0;
         }
@@ -335,20 +447,20 @@ public class Finch: Myro.Robot
 			if (temp == "left") {
 			    list.append(returnData[0]);
 			} else if (temp == "right") {
-			    return returnData[1];
+			    list.append(returnData[1]);
 			} else if (temp == "both") {
-			    return returnData;
+			    list.append(returnData);
 			} else {
-			    // error
+			    throw new Exception (String.Format ("no such light: '{0}'", item));
 			}
 		    } else if (item is int) {
 			int temp = (int)item;
 			if (temp == 0) {
 			    list.append(returnData[0]);
 			} else if (temp == 1) {
-			    return returnData[1];
+			    list.append(returnData[1]);
 			} else {
-			    // error
+			    throw new Exception (String.Format ("no such light: '{0}'", item));
 			}
 		    }
 		}
@@ -370,7 +482,11 @@ public class Finch: Myro.Robot
             {
                 if (robot != null)
                 {
-                    setLED("finch", color); // Set the LED to the current values (doesn't change the LED color)
+		    try {
+			setLED("front", color); // Set the LED to the current values (doesn't change the LED color)
+		    } catch (Exception e) {
+			System.Console.Error.WriteLine("error in setLED: " + e.Message);
+		    }
                     wait(2000); // do this again in 2 seconds
                 }
             }
