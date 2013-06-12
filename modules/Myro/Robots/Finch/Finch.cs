@@ -102,6 +102,7 @@ public class Finch: Myro.Robot
 		if (stream != null) {
 		    lock (stream)
 			stream.Flush();
+		    setLED("front", color); // Set the LED to the current values (doesn't change the LED color)
 		}
 	    }
 
@@ -354,6 +355,7 @@ public class Finch: Myro.Robot
 		}
 		System.Console.Write("\n");
 		stream.Write(bytes);
+		changeByte++;
 	    }
 	}
 
@@ -365,16 +367,23 @@ public class Finch: Myro.Robot
 		    System.Console.Write(b);
 		    System.Console.Write(", ");
 		}
-		System.Console.Write("\nread: ");
 		stream.Write(bytes);
-		byte [] readData = ReadBytes(8);
-		// check to see if 7th is same
-		changeByte++;
+		System.Console.Write("\nread: ");
+		byte [] readData = ReadBytes(11);
+		while (readData[10] != changeByte && bytes[1] != (byte)'z') {
+		    foreach(byte b in readData) {
+			System.Console.Write(b);
+			System.Console.Write(", ");
+		    }
+		    System.Console.Write("\nagain: ");
+		    readData = ReadBytes(11);
+		}
 		foreach(byte b in readData) {
 		    System.Console.Write(b);
 		    System.Console.Write(", ");
 		}
 		System.Console.Write("\n");
+		changeByte++;
 		return readData;
 	    }
 	    return null;
@@ -382,7 +391,14 @@ public class Finch: Myro.Robot
 
 	public byte [] ReadBytes(int size) {
 	    byte [] retval = new byte[size];
-	    stream.Read(retval);
+	    int r = 0;
+	    while (r < size) {
+		byte [] buffer = stream.Read();
+		for (int b = 0; b < buffer.Length; b++) {
+		    if (r < size)
+			retval[r++] = buffer[b];
+		}
+	    }
 	    return retval;
 	}
 
@@ -396,22 +412,10 @@ public class Finch: Myro.Robot
             {
                 byte[] report = {(byte)0, (byte)'T', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 		byte[] readData = WriteBytesRead(report);
-		return readData;
-                // Keep reading until you get back to the report that matches to the one you wrote (hopefully this loop isn't triggered, but just in case
-		/*
-		while (readData[8] != changeByte)
-		{
-		    stream.Write(report);
-		    readData = ReadBytes(11);
-		    System.Console.WriteLine(readData.Length);
-		}
-		System.Console.WriteLine("changeByte: " + changeByte + " read: " + readData[8]);
-		changeByte++;
 		System.Console.WriteLine(readData.Length);
                 // Converts data to Celcius
                 double returnData = ((double)readData[1] - 127) / 2.4 + 25;
                 return returnData;
-		*/
             }
             return 0;
         }
@@ -482,7 +486,8 @@ public class Finch: Myro.Robot
                 if (robot != null)
                 {
 		    try {
-			setLED("front", color); // Set the LED to the current values (doesn't change the LED color)
+			byte[] report = { 0, (byte)'z', 0, 0, 0, 0, 0, 0, 0 };
+			WriteBytesRead(report);
 		    } catch (Exception e) {
 			System.Console.Error.WriteLine("error in setLED: " + e.Message);
 		    }
