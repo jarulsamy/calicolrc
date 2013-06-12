@@ -738,14 +738,15 @@ public class Scribbler: Myro.Robot
         }
     }
 
-    public override void setLEDBack (double value)
+    public override void setLEDBack (object value)
     {
-        if (value > 1) {
-            value = 1;
-        } else if (value <= 0) {
-            value = 0;
+	double dvalue = (double)value;
+        if (dvalue > 1) {
+            dvalue = 1;
+        } else if (dvalue <= 0) {
+            dvalue = 0;
         } else {
-            value = (int)(value * (255 - 170) + 170); // scale
+            dvalue = (int)(dvalue * (255 - 170) + 170); // scale
         }
         write (Scribbler.SET_DIMMER_LED);
         write ((byte)value);

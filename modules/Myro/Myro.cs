@@ -2163,7 +2163,7 @@ public static class Myro
 	}
 
 	[method: JigsawTab("M/Actions")]
-	public static void setLEDBack (double value)
+	public static void setLEDBack (object value)
 	{
 	    if (robot != null) {
 		robot.setLEDBack (value);
@@ -3369,7 +3369,7 @@ public static class Myro
 		{
 		}
     
-		public virtual void setLEDBack (double value)
+		public virtual void setLEDBack (object value)
 		{
 		}
     

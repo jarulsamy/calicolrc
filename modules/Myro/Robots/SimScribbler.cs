@@ -1082,7 +1082,7 @@ public class SimScribbler : Myro.Robot
 		{
 		}
     
-		public override void setLEDBack (double value)
+		public override void setLEDBack (object value)
 		{
 		}
     

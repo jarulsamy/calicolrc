@@ -683,7 +683,7 @@ using Microsoft.Xna.Framework; // Vector2, Matrix
 		{
 		}
     
-		public override void setLEDBack (double value)
+		public override void setLEDBack (object value)
 		{
 		}
     

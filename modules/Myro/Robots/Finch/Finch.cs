@@ -17,10 +17,10 @@ All commands to the Finch are 9 bytes long:
   Bytes 2-7:  parametric data in binary
      Byte 8:  sequence number
 
-All responses are 8 bytes long:
+All responses are 11 bytes long:
 
   Bytes 0-6:  sensor data in binary
-     Byte 7:  sequence number (from byte 8 of the command)
+     Byte 10:  sequence number (from byte 8 of the command)
 
 
 Ascii Command Codes:
@@ -46,32 +46,32 @@ Ascii Command Codes:
 
  - 'T' - gets the temperature
          returns
-         Byte 0 = Temperature Value (0-255)
+         Byte 2 = Temperature Value (0-255)
                    Celsius = (value-127) / 2.4 + 25.0
 
  - 'L' - gets the values from the two light sensors
          returns
-         Byte 0 = Left Light Sensor (0-255)
-         Byte 1 = Right Light Sensor (0-255)
+         Byte 2 = Left Light Sensor (0-255)
+         Byte 3 = Right Light Sensor (0-255)
 
  - 'A' - gets the accelerometer values of the X, Y, Z axis, and the tap/shake byte.
          returns
-         Byte 0 = 153 (decimal)
-         Byte 1 = X-axis (0-63)
-         Byte 2 = Y-axis (0-63)
-         Byte 3 = Z-axis (0-63)
+         Byte 2 = 153 (decimal)
+         Byte 3 = X-axis (0-63)
+         Byte 4 = Y-axis (0-63)
+         Byte 5 = Z-axis (0-63)
                   if value is 0x00 to 0x1f (positive)
                      g-force = value * 1.5/32.0
                   if value is 0x20 to 0x3f (negative)
                      g-force = (value-64) * 1.5/32.0
-         Byte 4 = Tap/Shaken flag (0-255)
+         Byte 6 = Tap/Shaken flag (0-255)
                   If bit 7 (0x80) is a 1, then the Finch has been shaken since the last read
                   If bit 5 (0x20) is a 0, then the Finch has been tapped since the last read
 
  - 'I' - gets the values of the two obstacle sensors
          returns
-         Byte 0 = Left Sensor (0:none or 1:obstacle present)
-         Byte 1 =  Right Sensor (0:none or 1:obstacle present)
+         Byte 2 = Left Sensor (0:none or 1:obstacle present)
+         Byte 3 =  Right Sensor (0:none or 1:obstacle present)
 
  - 'X' - set all motors and LEDs to off
 
@@ -81,7 +81,7 @@ Ascii Command Codes:
  - 'z' - send a counter value showing the number of times command-z has been sent
          used for "keep-alive" or communication tests only
          returns
-         Byte 0 = Counter (0-255)
+         Byte 2 = Counter (0-255)
 
  */
 
@@ -128,6 +128,14 @@ public class Finch: Myro.Robot
             }
         }
 
+        public override void setLEDFront(object value) {
+	    setLED("front", value);
+	}
+
+        public override void setLEDBack(object value) {
+	    setLED("back", value);
+	}
+
         /// <summary>
         /// Sets the color of the LED
         /// </summary>
@@ -146,7 +154,7 @@ public class Finch: Myro.Robot
 			blue = Int32.Parse(color.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
 			byte[] report = { (byte)0, (byte)'O', (byte)red, (byte)green, (byte)blue , 0, 0, 0, 0};
 			WriteBytes(report);
-		    } catch (Exception e) {
+		    } catch {
 			//Do nothing
 		    }
 		} else {
@@ -244,22 +252,11 @@ public class Finch: Myro.Robot
         /// <param name="position">"left" to return the left light sensor, "right" to return the right light sensor, and "both" to return both</param>
         /// <returns>An int, or a two element array containing the the left and right light sensor values (0 to 255)</returns>
         public override object getLight(params object[] position)
-        { // position can be: 0, "left"; 1, "middle", "center"; 2, "right"; "all"
-            string temp = "";
-            try
-            {
-                if (position != null)
-                {
-                    temp = (string)position[0];
-                }
-            }
-            catch (Exception e)
-            {
-                //Do Nothing
-            }
-
+        { // position can be: 0, "left"; 2, "right"; "all" "both"
             if (robot != null)
             {
+		List list = new List();
+
                 // Add the "changeByte" into the report to force every returning report to be slightly different - otherwise read won't work
                 byte[] report = { (byte)0, (byte)'L', 0x00, 0x00, 0x00, 0x00, 0x00, 0, 0};
                 byte[] readData = WriteBytesRead(report);
@@ -268,20 +265,40 @@ public class Finch: Myro.Robot
                 int[] returnData = new int[2];
                 returnData[0] = readData[1];
                 returnData[1] = readData[2];
-                if (temp == "left")
-                {
-                    return returnData[0];
-                }
-                else if(temp == "right")
-                {
-                    return returnData[1];
-                }
-                else if (temp == "both")
-                {
-                    return returnData;
-                }
-            }
-            return null;
+
+		foreach (object item in position) {
+		    if (item is string) {
+			string temp = (string)item;
+			if (temp == "left") {
+			    list.append(returnData[0]);
+			} else if (temp == "right") {
+			    list.append(returnData[1]);
+			} else if (temp == "both" || temp == "all") {
+			    list.append(returnData[0]);
+			    list.append(returnData[1]);
+			} else {
+			    throw new Exception (String.Format ("no such light: '{0}'", item));
+			}
+		    } else if (item is int) {
+			int temp = (int)item;
+			if (temp == 0) {
+			    list.append(returnData[0]);
+			} else if (temp == 1) {
+			    list.append(returnData[1]);
+			} else {
+			    throw new Exception (String.Format ("no such light: '{0}'", item));
+			}
+		    }
+		}
+		if (list.Count == 0) {
+		    return null;
+		} else if (list.Count == 1) {
+		    return list[0];
+		} else {
+		    return list;
+		}
+	    }
+	    return null;
         }
 
 
@@ -295,23 +312,9 @@ public class Finch: Myro.Robot
         {
             if (robot != null)
             {
-                string temp = "";
-                try
-                {
-                    if (position != null)
-                    {
-                        temp = (string)position[0];
-                    }
-                }
-                catch (Exception e)
-                {
-                    //Do Nothing
-                }
-
+		List list = new List();
                 byte[] report = { (byte)0, (byte)'A', 0x00, 0x00, 0x00, 0x00, 0x00, 0, 0};
-
                 byte[] readData = WriteBytesRead(report);
-
                 double[] returnData = new double[3];
                 // Convert to g's. Acceleration data starts at element 2 of the array
                 for (int i = 2; i < 5; i++)
@@ -321,24 +324,35 @@ public class Finch: Myro.Robot
                     else
                         returnData[i - 2] = ((double)readData[i]) * 1.5 / 32;
                 }
-                if (temp == "x")
-                {
-                    return returnData[0];
-                }
-                else if (temp == "y")
-                {
-                    return returnData[1];
-                }
-                else if (temp == "z")
-                {
-                    return returnData[2];
-                }
-                else if (temp == "all")
-                {
-                    return returnData;
-                }
-            }
-            return null;
+		foreach (object item in position) {
+		    if (item is string) {
+			string temp = (string)item;
+			if (temp == "x") {
+			    list.append(returnData[0]);
+			} else if (temp == "y") {
+			    list.append(returnData[1]);
+			} else if (temp == "z") {
+			    list.append(returnData[2]);
+			} else if (temp == "all") {
+			    list.append(returnData[0]);
+			    list.append(returnData[1]);
+			    list.append(returnData[2]);
+			} else {
+			    throw new Exception (String.Format ("no such acceleration: '{0}'", item));
+			}
+		    } else {
+			throw new Exception (String.Format ("no such acceleration: '{0}'", item));
+		    }
+		}
+		if (list.Count == 0) {
+		    return null;
+		} else if (list.Count == 1) {
+		    return list[0];
+		} else {
+		    return list;
+		}
+	    }
+	    return null;
         }
 
 	public override void flush() {
@@ -348,12 +362,6 @@ public class Finch: Myro.Robot
 
 	public void WriteBytes(params byte [] bytes) {
 	    lock (stream) {
-		System.Console.Write("write: ");
-		foreach(byte b in bytes) {
-		    System.Console.Write(b);
-		    System.Console.Write(", ");
-		}
-		System.Console.Write("\n");
 		stream.Write(bytes);
 		changeByte++;
 	    }
@@ -362,31 +370,14 @@ public class Finch: Myro.Robot
 	public byte [] WriteBytesRead(params byte [] bytes) {
 	    lock (stream) {
 		bytes[8] = changeByte;
-		System.Console.Write("write: ");
-		foreach(byte b in bytes) {
-		    System.Console.Write(b);
-		    System.Console.Write(", ");
-		}
 		stream.Write(bytes);
-		System.Console.Write("\nread: ");
 		byte [] readData = ReadBytes(11);
 		while (readData[10] != changeByte && bytes[1] != (byte)'z') {
-		    foreach(byte b in readData) {
-			System.Console.Write(b);
-			System.Console.Write(", ");
-		    }
-		    System.Console.Write("\nagain: ");
 		    readData = ReadBytes(11);
 		}
-		foreach(byte b in readData) {
-		    System.Console.Write(b);
-		    System.Console.Write(", ");
-		}
-		System.Console.Write("\n");
 		changeByte++;
 		return readData;
 	    }
-	    return null;
 	}
 
 	public byte [] ReadBytes(int size) {
@@ -412,7 +403,6 @@ public class Finch: Myro.Robot
             {
                 byte[] report = {(byte)0, (byte)'T', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 		byte[] readData = WriteBytesRead(report);
-		System.Console.WriteLine(readData.Length);
                 // Converts data to Celcius
                 double returnData = ((double)readData[1] - 127) / 2.4 + 25;
                 return returnData;
@@ -451,10 +441,11 @@ public class Finch: Myro.Robot
 			    list.append(returnData[0]);
 			} else if (temp == "right") {
 			    list.append(returnData[1]);
-			} else if (temp == "both") {
-			    list.append(returnData);
+			} else if (temp == "both" || temp == "all") {
+			    list.append(returnData[0]);
+			    list.append(returnData[1]);
 			} else {
-			    throw new Exception (String.Format ("no such light: '{0}'", item));
+			    throw new Exception (String.Format ("no such obstacle: '{0}'", item));
 			}
 		    } else if (item is int) {
 			int temp = (int)item;
@@ -463,7 +454,7 @@ public class Finch: Myro.Robot
 			} else if (temp == 1) {
 			    list.append(returnData[1]);
 			} else {
-			    throw new Exception (String.Format ("no such light: '{0}'", item));
+			    throw new Exception (String.Format ("no such obstacle: '{0}'", item));
 			}
 		    }
 		}
@@ -489,7 +480,7 @@ public class Finch: Myro.Robot
 			byte[] report = { 0, (byte)'z', 0, 0, 0, 0, 0, 0, 0 };
 			WriteBytesRead(report);
 		    } catch (Exception e) {
-			System.Console.Error.WriteLine("error in setLED: " + e.Message);
+			System.Console.Error.WriteLine("error in keepAlive: " + e.Message);
 		    }
                     wait(2000); // do this again in 2 seconds
                 }
