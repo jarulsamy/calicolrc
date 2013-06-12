@@ -87,21 +87,21 @@ Ascii Command Codes:
 
 public class Finch: Myro.Robot
 {
-        private HidStream stream = null;
-        private HidDevice robot = null;
+        public HidStream stream = null;
+        public HidDevice robot = null;
         private HidDeviceLoader loader = null;
-        private Thread keepAliveThread = null;
+        private static Thread keepAliveThread = null;
         private int red = 0; // stores red LED setting
         private int green = 0; // stores green LED setting 
         private int blue = 0; // stores blue LED setting
         private string color = "#000000"; // stores the color of the LED
         private byte changeByte = 1; //counter
 
-
 	    public Finch() {
 	        open();
 		if (stream != null) {
-		    stream.Flush();
+		    lock (stream)
+			stream.Flush();
 		}
 	    }
 
@@ -143,8 +143,8 @@ public class Finch: Myro.Robot
 			red = Int32.Parse(color.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
 			green = Int32.Parse(color.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
 			blue = Int32.Parse(color.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
-			byte[] report = { (byte)0, (byte)'O', (byte)red, (byte)green, (byte)blue };
-			stream.Write(report);
+			byte[] report = { (byte)0, (byte)'O', (byte)red, (byte)green, (byte)blue , 0, 0, 0, 0};
+			WriteBytes(report);
 		    } catch (Exception e) {
 			//Do nothing
 		    }
@@ -176,8 +176,8 @@ public class Finch: Myro.Robot
                 }
                 int left1 = Math.Min(Math.Abs(left), 255);
                 int right1 = Math.Min(Math.Abs(right), 255);
-                byte[] report = { (byte)0, (byte)'M', (byte)dir_left, (byte)left1, (byte)dir_right, (byte)right1 };
-                stream.Write(report);
+                byte[] report = { (byte)0, (byte)'M', (byte)dir_left, (byte)left1, (byte)dir_right, (byte)right1, 0, 0, 0 };
+		WriteBytes(report);
             }
         }
 
@@ -189,8 +189,8 @@ public class Finch: Myro.Robot
             if (robot != null)
             {
 
-                byte[] report = { (byte)0, (byte)'R' };
-                stream.Write(report);
+                byte[] report = { (byte)0, (byte)'R', 0, 0, 0, 0, 0, 0, 0 };
+		WriteBytes(report);
                 stream = null;
                 robot = null;
                 loader = null;
@@ -205,8 +205,8 @@ public class Finch: Myro.Robot
         {
             if (robot != null)
             {
-                byte[] report = { (byte)0, (byte)'X' };
-                stream.Write(report);
+                byte[] report = { (byte)0, (byte)'X', 0, 0, 0, 0, 0, 0, 0 };
+		WriteBytes(report);
                 stream = null;
                 robot = null;
                 loader = null;
@@ -231,8 +231,8 @@ public class Finch: Myro.Robot
                 int milliseconds = (int)duration * 1000;
                 int freq = (int)frequency;
                 byte[] report = { (byte)0, (byte)'B', (byte)((milliseconds&0xff00)/256), (byte)(milliseconds&0x00ff), 
-                                (byte)((freq&0xff00)/256), (byte)(freq&0x00ff)};
-                stream.Write(report);
+				  (byte)((freq&0xff00)/256), (byte)(freq&0x00ff), 0, 0, 0};
+		WriteBytes(report);
                 wait((int)(milliseconds * 1.05));
             }
         }
@@ -260,17 +260,8 @@ public class Finch: Myro.Robot
             if (robot != null)
             {
                 // Add the "changeByte" into the report to force every returning report to be slightly different - otherwise read won't work
-                byte[] report = { (byte)0, (byte)'L', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, changeByte };
-                stream.Write(report);
-                byte[] readData = stream.Read();
-                // Keep reading until you get back to the report that matches to the one you wrote (hopefully this loop isn't triggered, but just in case
-                while (readData[8] != changeByte)
-                {
-                    stream.Write(report);
-                    readData = stream.Read();
-                }
-
-                changeByte++;
+                byte[] report = { (byte)0, (byte)'L', 0x00, 0x00, 0x00, 0x00, 0x00, 0, 0};
+                byte[] readData = WriteBytesRead(report);
 
                 // Collect and format data - note that the first element in readData is always value 0, so we're off by one when returning
                 int[] returnData = new int[2];
@@ -316,16 +307,10 @@ public class Finch: Myro.Robot
                     //Do Nothing
                 }
 
-                byte[] report = { (byte)0, (byte)'A', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, changeByte };
-                stream.Write(report);
-                byte[] readData = stream.Read();
-                // Keep reading until you get back to the report that matches to the one you wrote (hopefully this loop isn't triggered, but just in case
-                while (readData[8] != changeByte)
-                {
-                    stream.Write(report);
-                    readData = stream.Read();
-                }
-                changeByte++;
+                byte[] report = { (byte)0, (byte)'A', 0x00, 0x00, 0x00, 0x00, 0x00, 0, 0};
+
+                byte[] readData = WriteBytesRead(report);
+
                 double[] returnData = new double[3];
                 // Convert to g's. Acceleration data starts at element 2 of the array
                 for (int i = 2; i < 5; i++)
@@ -356,22 +341,49 @@ public class Finch: Myro.Robot
         }
 
 	public override void flush() {
-	    stream.Flush();
+	    lock (stream)
+		stream.Flush();
+	}
+
+	public void WriteBytes(params byte [] bytes) {
+	    lock (stream) {
+		System.Console.Write("write: ");
+		foreach(byte b in bytes) {
+		    System.Console.Write(b);
+		    System.Console.Write(", ");
+		}
+		System.Console.Write("\n");
+		stream.Write(bytes);
+	    }
+	}
+
+	public byte [] WriteBytesRead(params byte [] bytes) {
+	    lock (stream) {
+		bytes[8] = changeByte;
+		System.Console.Write("write: ");
+		foreach(byte b in bytes) {
+		    System.Console.Write(b);
+		    System.Console.Write(", ");
+		}
+		System.Console.Write("\nread: ");
+		stream.Write(bytes);
+		byte [] readData = ReadBytes(8);
+		// check to see if 7th is same
+		changeByte++;
+		foreach(byte b in readData) {
+		    System.Console.Write(b);
+		    System.Console.Write(", ");
+		}
+		System.Console.Write("\n");
+		return readData;
+	    }
+	    return null;
 	}
 
 	public byte [] ReadBytes(int size) {
 	    byte [] retval = new byte[size];
 	    stream.Read(retval);
 	    return retval;
-	}
-
-	public void WriteBytes(params byte [] bytes) {
-	    foreach(byte b in bytes) {
-		System.Console.Write(b);
-		System.Console.Write(", ");
-	    }
-	    System.Console.Write("\n");
-	    stream.Write(bytes);
 	}
 
         /// <summary>
@@ -382,13 +394,8 @@ public class Finch: Myro.Robot
         {
             if (robot != null)
             {
-                byte[] report = {(byte)0, (byte)'T', 
-				 0x00, 0x00, 
-				 0x00, 0x00, 
-				 0x00, changeByte };
-                WriteBytes(report);
-                byte[] readData = ReadBytes(9);
-		changeByte++;
+                byte[] report = {(byte)0, (byte)'T', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+		byte[] readData = WriteBytesRead(report);
 		return readData;
                 // Keep reading until you get back to the report that matches to the one you wrote (hopefully this loop isn't triggered, but just in case
 		/*
@@ -420,16 +427,8 @@ public class Finch: Myro.Robot
             {
 		List list = new List();
 
-                byte[] report = { (byte)0, (byte)'I', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, changeByte };
-                stream.Write(report);
-                byte[] readData = stream.Read();
-                // Keep reading until you get back to the report that matches to the one you wrote (hopefully this loop isn't triggered, but just in case
-                while (readData[8] != changeByte)
-                {
-                    stream.Write(report);
-                    readData = stream.Read();
-                }
-                changeByte++;
+                byte[] report = { (byte)0, (byte)'I', 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+                byte[] readData = WriteBytesRead(report);
 
                 bool[] returnData = new bool[2];
                 if (readData[1] == 1)
