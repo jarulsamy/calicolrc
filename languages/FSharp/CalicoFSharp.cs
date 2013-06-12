@@ -44,7 +44,7 @@ public class CalicoFSharpEngine : Engine
 	   ProcessStartInfo startInfo = new ProcessStartInfo();
 	   // FIXME: on windows, run directly; on others need mono in path
 	   string arguments = "";
-	   if (System.Environment.OSVersion.Platform.ToString().StartsWith("Win")) {
+	   if (System.Environment.OSVersion.Platform.ToString().Contains("Win")) {
 	     startInfo.FileName = fsi;
 	   } else {
 	     startInfo.FileName = "mono";

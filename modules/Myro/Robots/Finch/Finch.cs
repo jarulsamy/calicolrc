@@ -381,7 +381,7 @@ public class Finch: Myro.Robot
 	public byte [] WriteBytesRead(params byte [] bytes) {
 	    int SIZE = 11;
 	    string os_name = System.Environment.OSVersion.Platform.ToString();
-	    if (os_name.StartsWith("Win")) {
+	    if (os_name.Contains("Win")) {
 		SIZE = 9;
 	    } 
 	    lock (stream) {

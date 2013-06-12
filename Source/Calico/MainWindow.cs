@@ -733,7 +733,7 @@ namespace Calico {
         public string OS {
             get {
                 string retval = System.Environment.OSVersion.Platform.ToString();
-                if (retval.StartsWith("Win")) {
+                if (retval.Contains("Win")) {
                     retval = "Windows";
                 } else if (System.IO.Directory.Exists("/Applications")) {
                     return "Mac";

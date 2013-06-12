@@ -264,7 +264,7 @@ namespace Calico {
             } else {
                 // Catch SIGINT
                 System.Threading.Thread  signal_thread = null;
-                if (!System.Environment.OSVersion.Platform.ToString().StartsWith("Win")) {
+                if (!System.Environment.OSVersion.Platform.ToString().Contains("Win")) {
                             UnixSignal[] signals = new UnixSignal [] {
                                 new UnixSignal (Mono.Unix.Native.Signum.SIGINT),
                             };
