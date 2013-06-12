@@ -248,7 +248,7 @@ public class Finch: Myro.Robot
         {
             if (robot != null)
             {
-                int milliseconds = (int)duration * 1000;
+                int milliseconds = (int)(duration * 1000);
                 int freq = (int)frequency;
                 byte[] report = { (byte)0, (byte)'B', (byte)((milliseconds&0xff00)/256), (byte)(milliseconds&0x00ff), 
 				  (byte)((freq&0xff00)/256), (byte)(freq&0x00ff), 0, 0, 0};
