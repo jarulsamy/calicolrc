@@ -96,6 +96,7 @@ public class Finch: Myro.Robot
         private int blue = 0; // stores blue LED setting
         private string color = "#000000"; // stores the color of the LED
         private byte changeByte = 1; //counter
+	private string name = "Finchy";
 
 	    public Finch() {
 	        open();
@@ -128,6 +129,16 @@ public class Finch: Myro.Robot
             }
         }
 
+	public override string getName ()
+	{
+	    return this.name;
+	}
+    
+	public override void setName (string name)
+	{
+	    this.name = name;
+	}
+    
         public override void setLEDFront(object value) {
 	    setLED("front", value);
 	}
