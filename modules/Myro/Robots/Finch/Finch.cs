@@ -125,7 +125,7 @@ public class Finch: Myro.Robot
             if (robot != null && keepAliveThread == null)
             {
                 keepAliveThread = new Thread(new ThreadStart(keepAlive)); // Start the thread that keeps Finch out of idle mode while program is running
-                keepAliveThread.Start();
+                //keepAliveThread.Start();
             }
         }
 
