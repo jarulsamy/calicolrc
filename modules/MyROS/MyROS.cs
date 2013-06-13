@@ -7,7 +7,7 @@ using org.ros.node.topic;
 using geometry_msgs;
 using turtlesim;
 
-public static class ROS
+public static class MyROS
 {
   public class CSharpTurtleTest: NodeMain
   {
