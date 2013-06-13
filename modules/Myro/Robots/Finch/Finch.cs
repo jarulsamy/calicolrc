@@ -98,6 +98,9 @@ public class Finch: Myro.Robot
         private byte changeByte = 1; //counter
 	private string name = "Finchy";
 	public bool debug = false;
+	public byte READSIZE = 9;
+	public byte WRITESIZE = 9;
+	public bool loop = true;
 
 	    public Finch() {
 	        open();
@@ -126,12 +129,25 @@ public class Finch: Myro.Robot
             {
                 Console.Error.WriteLine("Could not find the finch");
             }
-            if (robot != null && keepAliveThread == null)
-            {
-                keepAliveThread = new Thread(new ThreadStart(keepAlive)); // Start the thread that keeps Finch out of idle mode while program is running
-                keepAliveThread.Start();
-            }
+            if (robot != null) {
+		if (keepAliveThread == null) {
+		    startKeepAlive();
+		} else {
+		    System.Console.WriteLine("Keep alive thread already running...");
+		}
+	    }
         }
+
+	public void stopKeepAlive() {
+	    loop = false;
+	    keepAliveThread = null;
+	}
+
+	public void startKeepAlive() {
+	    loop = true;
+	    keepAliveThread = new Thread(new ThreadStart(keepAlive)); // Start the thread that keeps Finch out of idle mode while program is running
+	    keepAliveThread.Start();
+	}
 
 	public override string getName ()
 	{
@@ -379,17 +395,12 @@ public class Finch: Myro.Robot
 	}
 
 	public void WriteBytes(params byte [] bytes) {
-	    int SIZE = 9;
-	    string os_name = System.Environment.OSVersion.Platform.ToString();
-	    if (os_name.Contains("Win")) {
-		SIZE = 8;
-	    } 
-	    byte[] tbuffer = new byte[SIZE];
+	    byte[] tbuffer = new byte[WRITESIZE];
 	    for (int i=0; i < bytes.Length; i++) {
 		tbuffer[i] = bytes[i];
 	    }
 	    lock (stream) {
-		tbuffer[SIZE - 1] = changeByte;
+		tbuffer[WRITESIZE - 1] = changeByte;
 		changeByte++;
 		if (debug)
 		    System.Console.WriteLine("WriteBytes: " + arrayToString(tbuffer));
@@ -398,25 +409,20 @@ public class Finch: Myro.Robot
 	}
 
 	public byte [] WriteBytesRead(params byte [] bytes) {
-	    int SIZE = 11;
-	    string os_name = System.Environment.OSVersion.Platform.ToString();
-	    if (os_name.Contains("Win")) {
-		SIZE = 9;
-	    } 
-	    byte[] tbuffer = new byte[SIZE];
+	    byte[] tbuffer = new byte[WRITESIZE];
 	    for (int i=0; i < bytes.Length; i++) {
 		tbuffer[i] = bytes[i];
 	    }
 	    lock (stream) {
 		byte lastChangeByte = changeByte;
-		tbuffer[SIZE - 1] = changeByte;
+		tbuffer[WRITESIZE - 1] = changeByte;
 		changeByte++;
 		if (debug)
 		    System.Console.WriteLine("WriteBytes: " + arrayToString(tbuffer));
 		stream.Write(tbuffer);
-		byte [] readData = ReadBytes(SIZE);
-		//while (readData[SIZE - 1] != lastChangeByte && bytes[1] != (byte)'z') {
-		//    readData = ReadBytes(SIZE);
+		byte [] readData = ReadBytes(READSIZE);
+		//while (readData[READSIZE - 1] != lastChangeByte && bytes[1] != (byte)'z') {
+		//    readData = ReadBytes(READSIZE);
 		//}
 		return readData;
 	    }
@@ -528,19 +534,15 @@ public class Finch: Myro.Robot
 
         private void keepAlive()
         {
-            while (true)
+            while (loop)
             {
-		if (debug) {
-		    System.Console.WriteLine("Exiting from keepAlive...");
-		    break;
-		}
                 if (robot != null)
                 {
 		    try {
 			byte[] report = { 0, (byte)'z'};
 			WriteBytesRead(report);
 		    } catch (Exception e) {
-			System.Console.Error.WriteLine("error in keepAlive: " + e.Message);
+			System.Console.Error.WriteLine("warning in keepAlive, continuing...: " + e.Message);
 		    }
                     wait(2000); // do this again in 2 seconds
                 } else {
