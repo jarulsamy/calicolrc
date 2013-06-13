@@ -87,8 +87,8 @@ Ascii Command Codes:
 
 public class Finch: Myro.Robot
 {
-        public HidStream stream = null;
-        public HidDevice robot = null;
+        public static HidStream stream = null;
+        public static HidDevice robot = null;
         private HidDeviceLoader loader = null;
         private static Thread keepAliveThread = null;
         private int red = 0; // stores red LED setting
@@ -130,13 +130,16 @@ public class Finch: Myro.Robot
 		if (keepAliveThread == null) {
 		    startKeepAlive();
 		} else {
-		    System.Console.WriteLine("Keep alive thread already running...");
+		    System.Console.WriteLine("Restarting keep alive thread...");
+		    stopKeepAlive();
+		    startKeepAlive();
 		}
 	    }
         }
 
 	public void stopKeepAlive() {
 	    loop = false;
+	    keepAliveThread.Abort();
 	    keepAliveThread = null;
 	}
 
@@ -368,10 +371,16 @@ public class Finch: Myro.Robot
 			    list.append(returnData[1]);
 			} else if (temp == "z") {
 			    list.append(returnData[2]);
+			} else if (temp == "shake") {
+			    list.append(returnData[3]);
+			} else if (temp == "tap") {
+			    list.append(returnData[4]);
 			} else if (temp == "all") {
 			    list.append(returnData[0]);
 			    list.append(returnData[1]);
 			    list.append(returnData[2]);
+			    list.append(returnData[3]);
+			    list.append(returnData[4]);
 			} else {
 			    throw new Exception (String.Format ("no such acceleration: '{0}'", item));
 			}
