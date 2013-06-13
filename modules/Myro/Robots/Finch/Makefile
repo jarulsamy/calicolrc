@@ -1,6 +1,7 @@
 
 ../Finch.dll: Finch.cs
 	dmcs -sdk:4 -lib:../../../../bin \
+	-lib:../../../../bin/linux \
 		-r:../../../Myro.dll \
 		-r:../../../Graphics.dll \
 		-r:../../../../bin/IronPython.dll \

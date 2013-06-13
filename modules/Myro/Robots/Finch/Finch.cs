@@ -103,6 +103,9 @@ public class Finch: Myro.Robot
 	public bool loop = true;
 
 	    public Finch() {
+		if (System.Environment.OSVersion.Platform.ToString().Contains("Unix")) {
+		    READSIZE = 11;
+		}
 	        open();
 		if (stream != null) {
 		    lock (stream) {

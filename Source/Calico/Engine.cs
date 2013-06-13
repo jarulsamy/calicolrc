@@ -170,40 +170,51 @@ namespace Calico {
 			  engine.Runtime.LoadAssembly(assembly);
 		  }
 		  // ---------------------------------------
-		  DirectoryInfo dir = new DirectoryInfo(Path.Combine(calico.path, "..", "modules"));
-		  foreach (FileInfo f in dir.GetFiles("*.dll")) {
-			string assembly_name = f.FullName;
-			assembly = System.Reflection.Assembly.LoadFile(assembly_name);
-			if (assembly != null) {
-			  // initialize_module if possible
-			  try {
-				foreach (Type type in assembly.GetTypes()) {
-				  System.Reflection.MethodInfo method;
-				  try {
-					method = type.GetMethod("initialize_module");
-                    if (method != null)
-					    method.Invoke(type, new object [] {calico.path, calico.OS});
-				  } catch {
+		  string os_specific_dir = null;
+		  if (calico.OS == "Windows") {
+		      os_specific_dir = "windows";
+		  } else if (calico.OS == "Mac") {
+		      os_specific_dir = "mac";
+		  } else {
+		      os_specific_dir = "linux";
+		  }
+		  foreach (DirectoryInfo dir in new DirectoryInfo[] {new DirectoryInfo(Path.Combine(calico.path, "..", "modules")),
+								     new DirectoryInfo(Path.Combine(calico.path, os_specific_dir)),
+		      }) {
+		      foreach (FileInfo f in dir.GetFiles("*.dll")) {
+			  string assembly_name = f.FullName;
+			  assembly = System.Reflection.Assembly.LoadFile(assembly_name);
+			  if (assembly != null) {
+			      // initialize_module if possible
+			      try {
+				  foreach (Type type in assembly.GetTypes()) {
+				      System.Reflection.MethodInfo method;
+				      try {
+					  method = type.GetMethod("initialize_module");
+					  if (method != null)
+					      method.Invoke(type, new object [] {calico.path, calico.OS});
+				      } catch {
+				      }
+				      try {
+					  method = type.GetMethod("set_gui_thread_id");
+					  if (method != null)
+					      method.Invoke(type, new object [] {MainWindow.gui_thread_id});
+				      } catch {
+				      }
 				  }
+			      } catch {
+				  continue;
+			      }
+			      if (engine != null) {
 				  try {
-					method = type.GetMethod("set_gui_thread_id");
-                    if (method != null)
-					    method.Invoke(type, new object [] {MainWindow.gui_thread_id});
+				      engine.Runtime.LoadAssembly(assembly);
 				  } catch {
+				      Console.WriteLine("{0} failed to load assembly {1}", 
+							dlr_name, assembly);
 				  }
-				}
-			  } catch {
-				continue;
+			      }
 			  }
-			  if (engine != null) {
-				try {
-				  engine.Runtime.LoadAssembly(assembly);
-				} catch {
-				  Console.WriteLine("{0} failed to load assembly {1}", 
-					  dlr_name, assembly);
-				}
-			  }
-			}
+		      }
 		  }
         }
 		
