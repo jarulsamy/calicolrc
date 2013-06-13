@@ -1,6 +1,3 @@
-import clr
-clr.AddReference("ros.dll")
-
 from org.ros.namespace import GraphName
 from org.ros.node import *
 from org.ros.internal.loader import CommandLineLoader
