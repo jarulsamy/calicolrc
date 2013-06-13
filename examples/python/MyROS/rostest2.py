@@ -9,7 +9,7 @@ from std_srvs import *
 from org.ros import RosCore
 import time
 
-class MyNode(NodeMain):
+class ROSTurtle(NodeMain):
 
   def __init__(self):
     self.publisher = None
@@ -17,14 +17,13 @@ class MyNode(NodeMain):
 
   def reset(self):
     class response(ServiceResponseListener):
-        def onSuccess(response):
+        def onSuccess(self, response):
             print(response)
-        def onFailure(e):
+        def onFailure(self, e):
             print (e)
     self.resetF.call(self.resetF.newMessage(), response())
 
-  def move(self, dx=0, da=0):
-    print("moving")
+  def move(self, dx=0.1, da=0):
     velocity = self.publisher.newMessage()
     velocity.setLinear(dx)
     velocity.setAngular(da)
@@ -35,19 +34,14 @@ class MyNode(NodeMain):
 
   def onStart(self, node):
     self.publisher = node.newPublisher("/turtle1/command_velocity", Velocity._TYPE)
+
     class myListener(MessageListener):
-        def onNewMessage(msg):
-            print(msg)
+        def onNewMessage(self, msg):
+            print("r:%d\tg:%d\tb:%d" % (msg.getR(), msg.getG(), msg.getB()))
     self.subscriber = node.newSubscriber("/turtle1/color_sensor", Color._TYPE)
     self.subscriber.addMessageListener(myListener())
-    print("all set")
+    self.resetF = node.newServiceClient("reset", Empty._TYPE)
 
-    try:
-        #self.resetF = node.newServiceClient("reset", Empty._TYPE)
-        pass
-    except Exception as e:
-        print ("trouble connecting to resetF", e)
-    print ("hello")
 
   def onStop(self, node):
     pass
@@ -62,7 +56,7 @@ class MyNode(NodeMain):
 #roscore.start()
 #time.sleep(5)
 
-nodeMain = MyNode()
+turtle = ROSTurtle()
 nodeMainExecutor = DefaultNodeMainExecutor.newDefault()
-nodeConfig = NodeConfiguration.newPublic("127.0.0.1")
-nodeMainExecutor.execute(nodeMain, nodeConfig);
+nodeConfig = NodeConfiguration.newPrivate()
+nodeMainExecutor.execute(turtle, nodeConfig);

@@ -5,15 +5,15 @@ from turtlesim import *
 from org.ros import RosCore
 import time
 
-class MyNode(NodeMain):
+class ROSTurtle(NodeMain):
 
   def __init__(self):
     self.publisher = None
 
-  def move(self):
-    print("moving")
+  def move(self, dx=0.1, da=0):
     velocity = self.publisher.newMessage();
-    velocity.setLinear(0.5);
+    velocity.setLinear(dx);
+    velocity.setAngular(da);
     self.publisher.publish(velocity);
 
   def getDefaultNodeName(self):
@@ -35,6 +35,6 @@ class MyNode(NodeMain):
 #roscore.start()
 #time.sleep(5)
 
-nodeMain = MyNode()
+turtle = ROSTurtle()
 nodeMainExecutor = DefaultNodeMainExecutor.newDefault()
-nodeMainExecutor.execute(nodeMain, NodeConfiguration.newPrivate());
+nodeMainExecutor.execute(turtle, NodeConfiguration.newPrivate());

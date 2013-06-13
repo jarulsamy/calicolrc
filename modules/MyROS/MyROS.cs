@@ -4,6 +4,7 @@ using org.ros.node;
 using org.ros.@namespace;
 using org.ros.@internal.loader;
 using org.ros.node.topic;
+using org.ros.message;
 using geometry_msgs;
 using turtlesim;
 
@@ -12,16 +13,30 @@ public static class MyROS
   public class CSharpTurtleTest: NodeMain
   {
     Publisher publisher;
+    Subscriber subscriber;
     
     public GraphName getDefaultNodeName() {
       return GraphName.of("my_node");
     }  
+
+    private class MessageHandler: MessageListener
+    {
+      public void onNewMessage(object o)
+      {
+	turtlesim.Color c = (turtlesim.Color)o;
+	Console.WriteLine(c);
+      }
+    }
     
     public void onStart(ConnectedNode node) {
       Console.WriteLine("Hello!");
       publisher = node.newPublisher("/turtle1/command_velocity", 
 				    turtlesim.Velocity._TYPE);
+      subscriber = node.newSubscriber("/turtle1/color_sensor", 
+				      turtlesim.Color._TYPE);
+      subscriber.addMessageListener(new MessageHandler());
     }
+
     
     public void move()
     {
