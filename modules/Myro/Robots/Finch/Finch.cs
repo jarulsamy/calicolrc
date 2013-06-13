@@ -87,8 +87,8 @@ Ascii Command Codes:
 
 public class Finch: Myro.Robot
 {
-        public HidStream stream = null;
-        public HidDevice robot = null;
+        public static HidStream stream = null;
+        public static HidDevice robot = null;
         private HidDeviceLoader loader = null;
         private static Thread keepAliveThread = null;
         private int red = 0; // stores red LED setting
@@ -103,15 +103,12 @@ public class Finch: Myro.Robot
 	public bool loop = true;
 
 	    public Finch() {
-	        open();
-		if (stream != null) {
-		    lock (stream) {
-			if (debug)
-			    System.Console.WriteLine("stream.Flush");
-			stream.Flush();
-		    }
-		    setLED("front", color); // Set the LED to the current values (doesn't change the LED color)
+		if (System.Environment.OSVersion.Platform.ToString().Contains("Unix")) {
+		    READSIZE = 11;
 		}
+	        open();
+		flush();
+		setLED("front", color); // Set the LED to the current values (doesn't change the LED color)
 	    }
 
         /// <summary>
@@ -133,13 +130,16 @@ public class Finch: Myro.Robot
 		if (keepAliveThread == null) {
 		    startKeepAlive();
 		} else {
-		    System.Console.WriteLine("Keep alive thread already running...");
+		    System.Console.WriteLine("Restarting keep alive thread...");
+		    stopKeepAlive();
+		    startKeepAlive();
 		}
 	    }
         }
 
 	public void stopKeepAlive() {
 	    loop = false;
+	    keepAliveThread.Abort();
 	    keepAliveThread = null;
 	}
 
@@ -297,6 +297,9 @@ public class Finch: Myro.Robot
                 returnData[0] = readData[1];
                 returnData[1] = readData[2];
 
+		if (position.Length == 0)
+		    position = new object [] {"all"};
+
 		foreach (object item in position) {
 		    if (item is string) {
 			string temp = (string)item;
@@ -355,6 +358,10 @@ public class Finch: Myro.Robot
                     else
                         returnData[i - 2] = ((double)readData[i]) * 1.5 / 32;
                 }
+
+		if (position.Length == 0)
+		    position = new object [] {"all"};
+
 		foreach (object item in position) {
 		    if (item is string) {
 			string temp = (string)item;
@@ -364,10 +371,16 @@ public class Finch: Myro.Robot
 			    list.append(returnData[1]);
 			} else if (temp == "z") {
 			    list.append(returnData[2]);
+			} else if (temp == "shake") {
+			    list.append(returnData[3]);
+			} else if (temp == "tap") {
+			    list.append(returnData[4]);
 			} else if (temp == "all") {
 			    list.append(returnData[0]);
 			    list.append(returnData[1]);
 			    list.append(returnData[2]);
+			    list.append(returnData[3]);
+			    list.append(returnData[4]);
 			} else {
 			    throw new Exception (String.Format ("no such acceleration: '{0}'", item));
 			}
@@ -387,10 +400,17 @@ public class Finch: Myro.Robot
         }
 
 	public override void flush() {
+	    if (debug)
+		System.Console.WriteLine("stream.flush");
 	    lock (stream) {
-		if (debug)
-		    System.Console.WriteLine("stream.flush");
 		stream.Flush();
+		try {
+		    while (true) {
+			stream.Read();
+		    }
+		} catch { // catch a timeout
+		    // Ok, done
+		}
 	    }
 	}
 
@@ -399,11 +419,11 @@ public class Finch: Myro.Robot
 	    for (int i=0; i < bytes.Length; i++) {
 		tbuffer[i] = bytes[i];
 	    }
+	    tbuffer[WRITESIZE - 1] = changeByte;
+	    changeByte++;
+	    if (debug)
+		System.Console.WriteLine("WriteBytes: " + arrayToString(tbuffer));
 	    lock (stream) {
-		tbuffer[WRITESIZE - 1] = changeByte;
-		changeByte++;
-		if (debug)
-		    System.Console.WriteLine("WriteBytes: " + arrayToString(tbuffer));
 		stream.Write(tbuffer);
 	    }
 	}
@@ -413,26 +433,29 @@ public class Finch: Myro.Robot
 	    for (int i=0; i < bytes.Length; i++) {
 		tbuffer[i] = bytes[i];
 	    }
+	    byte lastChangeByte = changeByte;
+	    tbuffer[WRITESIZE - 1] = changeByte;
+	    changeByte++;
+	    if (debug)
+		System.Console.WriteLine("WriteBytes: " + arrayToString(tbuffer));
 	    lock (stream) {
-		byte lastChangeByte = changeByte;
-		tbuffer[WRITESIZE - 1] = changeByte;
-		changeByte++;
-		if (debug)
-		    System.Console.WriteLine("WriteBytes: " + arrayToString(tbuffer));
 		stream.Write(tbuffer);
-		byte [] readData = ReadBytes(READSIZE);
-		//while (readData[READSIZE - 1] != lastChangeByte && bytes[1] != (byte)'z') {
-		//    readData = ReadBytes(READSIZE);
-		//}
-		return readData;
 	    }
+	    byte [] readData = ReadBytes(READSIZE);
+	    while (readData[READSIZE - 1] != lastChangeByte && bytes[1] != (byte)'z') {
+		readData = ReadBytes(READSIZE);
+	    }
+	    return readData;
 	}
 
 	public byte [] ReadBytes(int size) {
 	    byte [] retval = new byte[size];
 	    int r = 0;
 	    while (r < size) {
-		byte [] buffer = stream.Read();
+		byte [] buffer = null;
+		lock (stream) {
+		    buffer = stream.Read();
+		}
 		for (int b = 0; b < buffer.Length; b++) {
 		    if (r < size)
 			retval[r++] = buffer[b];
@@ -495,6 +518,9 @@ public class Finch: Myro.Robot
                     returnData[1] = true;
                 else
                     returnData[1] = false;
+
+		if (position.Length == 0)
+		    position = new object [] {"all"};
 
 		foreach (object item in position) {
 		    if (item is string) {
