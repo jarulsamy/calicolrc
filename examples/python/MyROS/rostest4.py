@@ -60,4 +60,12 @@ class ROSTurtle(NodeMain):
 turtle = ROSTurtle()
 nodeMainExecutor = DefaultNodeMainExecutor.newDefault()
 nodeConfig = NodeConfiguration.newPrivate()
+
+#### To use a ros core on another machine set
+#### the Master URI in the following way:
+#import clr
+#clr.AddReference("IKVM.OpenJDK.Core")
+#from java.net import URI
+#nodeConfig.setMasterUri(URI("http://192.168.1.135:11311"))
+
 nodeMainExecutor.execute(turtle, nodeConfig);

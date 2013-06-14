@@ -10,15 +10,6 @@ class ROSTurtle(NodeMain):
 
   def __init__(self):
     self.publisher = None
-    self.resetF = None
-
-  def reset(self):
-    class response(ServiceResponseListener):
-        def onSuccess(self, response):
-            print(response)
-        def onFailure(self, e):
-            print (e)
-    self.resetF.call(self.resetF.newMessage(), response())
 
   def move(self, dx=0.1, da=0):
     velocity = self.publisher.newMessage()
@@ -37,7 +28,6 @@ class ROSTurtle(NodeMain):
             print("r:%d\tg:%d\tb:%d" % (msg.getR(), msg.getG(), msg.getB()))
     self.subscriber = node.newSubscriber("/turtle1/color_sensor", Color._TYPE)
     self.subscriber.addMessageListener(myListener())
-    self.resetF = node.newServiceClient("reset", Empty._TYPE)
 
 
   def onStop(self, node):
