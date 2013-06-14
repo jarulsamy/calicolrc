@@ -1,8 +1,6 @@
 from org.ros.namespace import GraphName
 from org.ros.node import *
-from org.ros.internal.loader import CommandLineLoader
 from turtlesim import *
-from org.ros import RosCore
 import time
 
 class ROSTurtle(NodeMain):
@@ -31,6 +29,7 @@ class ROSTurtle(NodeMain):
   def onError(self, node, throwable):
     pass
 
+#from org.ros import RosCore
 #roscore = RosCore.newPublic()
 #roscore.start()
 #time.sleep(5)
