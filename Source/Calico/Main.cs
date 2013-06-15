@@ -246,21 +246,32 @@ namespace Calico {
             }
             // Process executable commands here:
             if (((IList<string>)args).Contains("--exec")) {
-                if (withGraphics) {
-                    Application.Init();
-                    win = new CalicoConsole(args, manager, Debug, config, false);
-                    Application.Run();
-                } else {
-                    win = new CalicoConsoleNoGUI(args, manager, Debug, config, false); 
-                }
+		// implies running with noconsole, with or without repl
+		if (withGraphics) {
+		    Application.Init();
+		    // run in background if repl:
+		    if (((IList<string>)args).Contains("--repl")) {
+			System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
+				Application.Run();
+			    });
+			thread.Start();
+		    }
+		}
+		win = new CalicoConsoleNoGUI(args, manager, Debug, config, ((IList<string>)args).Contains("--repl")); 
+		// run now, if not repl:
+		if (!((IList<string>)args).Contains("--repl")) {
+		    Application.Run();
+		}
             } else if (((IList<string>)args).Contains("--repl")) {
                 if (withGraphics) {
                     Application.Init();
-                    win = new CalicoConsole(args, manager, Debug, config, true);  
-                    Application.Run();
-                } else {
-                    win = new CalicoConsoleNoGUI(args, manager, Debug, config, true);
-                }
+		    // run in background:
+		    System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
+			    Application.Run();
+			});
+		    thread.Start();
+		}
+		win = new CalicoConsoleNoGUI(args, manager, Debug, config, true);  
             } else {
                 // Catch SIGINT
                 System.Threading.Thread  signal_thread = null;

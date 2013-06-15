@@ -18,6 +18,7 @@
 // 
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 using Mono.Unix;
 using System;
 using System.IO;
@@ -64,7 +65,7 @@ namespace Calico {
         public static MainWindow _mainWindow = null;
         Gtk.Widget _lastSelectedPage = null;
         private bool searchMode; // true: search-only; false: replace
-
+	public string[] args = null;
 	
 	public double ProgramSpeedValue {
 	    get {
@@ -106,7 +107,7 @@ namespace Calico {
         public MainWindow(string[] args, LanguageManager manager, bool Debug, Config config, 
               System.Threading.Thread signal_thread) :
                 base(Gtk.WindowType.Toplevel) {
-
+	    this.args = args;
             this.signal_thread = signal_thread;
             _mainWindow = this;
             this.Icon = new Gdk.Pixbuf(System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "abstract-butterfly-icon.gif"));

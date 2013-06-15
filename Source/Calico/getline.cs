@@ -852,6 +852,7 @@ namespace Mono.Terminal {
 					SetText ("");
 				}
 			} while (!done);
+
 			Console.WriteLine ();
 			
 			Console.CancelKeyPress -= InterruptEdit;
