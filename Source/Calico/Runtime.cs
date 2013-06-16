@@ -218,6 +218,30 @@ namespace Calico {
             Print(Tag.Normal, format);
         }
 
+        public new void PrintLine(Tag tag, string format) {
+            System.Console.WriteLine(format);
+        }
+
+        public new void PrintLine(string format) {
+            PrintLine(Tag.Normal, format);
+        }
+
+        public new void Error(Tag tag, string format) {
+            System.Console.Error.Write(format);
+        }
+
+        public new void Error(string format) {
+            Error(Tag.Normal, format);
+        }
+
+        public new void ErrorLine(Tag tag, string format) {
+            System.Console.Error.WriteLine(format);
+        }
+
+        public new void ErrorLine(string format) {
+            ErrorLine(Tag.Normal, format);
+        }
+
         private bool UpdateGUI() {
             // update any pending requests
             while (Gtk.Application.EventsPending ()) {
