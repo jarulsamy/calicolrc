@@ -55,6 +55,9 @@ def rm(incoming, tty, args):
     return []
 
 def mkdir(incoming, ttyp, args):
+    """
+    mkdir - make a directory
+    """
     args, flags = splitArgs(args)
     for filename in args:
         os.makedirs(filename)
