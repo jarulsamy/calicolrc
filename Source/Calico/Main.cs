@@ -256,8 +256,10 @@ namespace Calico {
 			    });
 			thread.Start();
 		    }
+		    win = new CalicoConsole(args, manager, Debug, config, ((IList<string>)args).Contains("--repl")); 
+		} else {
+		    win = new CalicoConsoleNoGUI(args, manager, Debug, config, ((IList<string>)args).Contains("--repl")); 
 		}
-		win = new CalicoConsoleNoGUI(args, manager, Debug, config, ((IList<string>)args).Contains("--repl")); 
 		// run now, if not repl:
 		if (!((IList<string>)args).Contains("--repl")) {
 		    Application.Run();
@@ -270,8 +272,10 @@ namespace Calico {
 			    Application.Run();
 			});
 		    thread.Start();
+		    win = new CalicoConsole(args, manager, Debug, config, true);  
+		} else {
+		    win = new CalicoConsoleNoGUI(args, manager, Debug, config, true);  
 		}
-		win = new CalicoConsoleNoGUI(args, manager, Debug, config, true);  
             } else {
                 // Catch SIGINT
                 System.Threading.Thread  signal_thread = null;
