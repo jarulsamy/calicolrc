@@ -124,6 +124,12 @@ def list_file(f, flags, tty):
     else:
         return os.path.abspath(f)
 
+def make_line(retval, item):
+    if retval:
+        retval += " "
+    retval += str(item)
+    return retval
+
 def list_dir(d, flags, tty):
     """
     List the contents of a directory
@@ -138,8 +144,8 @@ def list_dir(d, flags, tty):
             yield os.path.abspath(f)
         else:
             i = os.path.basename(f)
-            if len(retval + " " + str(i)) < width:
-                retval += " " + str(i)
+            if len(make_line(retval, i)) < width:
+                retval = make_line(retval, i)
             elif len(str(i)) > width:
                 if retval:
                     yield retval
@@ -547,12 +553,16 @@ def execute(calico, text, return_value=False):
     """
     # put calico in the environment:
     globals()["calico"] = calico
-    w = calico.Output.Allocation.Width
-    h = calico.Output.Allocation.Height
-    scale = (calico.GetFont().Size/1024)
+    try:
+        w = calico.Output.Allocation.Width
+        h = calico.Output.Allocation.Height
+        scale = (calico.GetFont().Size/1024)
+        globals()["width"] = int(w/(scale - 2))
+        globals()["height"] = int(h/(scale * 1.7))
+    except:
+        globals()["width"] = 80
+        globals()["height"] = 24
     # compute the width, height of the output window:
-    globals()["width"] = int(w/(scale - 2))
-    globals()["height"] = int(h/(scale * 1.7))
     # Break the command into parts:
     line = splitLines(text)
     incoming = None
