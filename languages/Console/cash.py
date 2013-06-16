@@ -4,11 +4,12 @@ import glob
 import os
 import re
 import shutil
+import inspect
 
 ## ------------------------------------------------------------
 ## Globals:
 
-lastcd = None
+lastcd = [os.getcwd()]
 
 ## ------------------------------------------------------------
 ## Commands:
@@ -33,15 +34,17 @@ def cd(incoming, tty, args):
         directory = args[0]
     # ---
     if directory == "-":
-        if lastcd:
-            os.chdir(lastcd)
+        if len(lastcd) > 1:
+            directory = lastcd[-2]
+        else:
+            directory = None
         # else pass
     if directory:
         os.chdir(directory)
     else:
         os.chdir(os.path.expanduser("~"))
-    lastcd = os.getcwd()
-    return [os.getcwd()]
+    lastcd.append(os.getcwd())
+    return [lastcd[-1]]
 
 def rm(incoming, tty, args):
     """
@@ -103,29 +106,28 @@ def pwd(incoming, tty, args):
     args, flags = splitArgs(args)
     return [os.getcwd()]
 
-def ls(incoming, tty, args):
+def list_file(f, flags, tty):
     """
-    ls - list files
-
-    Use ls to list the files in a folder.
-
-    Flags:
-       -a   see all
-       -l   long format
+    List a file
     """
-    args, flags = splitArgs(args)
-    if len(args) > 0:
-        patterns = args
-    else:
-        patterns = ["*"]
-    data = []
-    for pattern in patterns:
-        data.extend(matchFiles(pattern))
+    if "-l" in flags:
+        return os.path.abspath(f)
+    elif tty:
+        return os.path.basename(f)
+
+def list_dir(d, flags, tty):
+    """
+    List the contents of a directory
+    """
     retval = ""
-    for f in data:
-        if "-l" in flags:
-            yield os.path.abspath(f)
-        elif tty:
+    if "-l" in flags or not tty:
+        pass
+    else:
+        yield "%s:" % os.path.relpath(d)
+    for f in glob.glob(os.path.join(d, "*")):
+        if "-l" in flags or not tty:
+            yield os.path.basename(f)
+        else:
             i = os.path.basename(f)
             if len(retval + " " + str(i)) < width:
                 retval += " " + str(i)
@@ -137,10 +139,36 @@ def ls(incoming, tty, args):
             else:
                 yield retval
                 retval = str(i)
-        else:
-            yield os.path.basename(f)
     if retval:
         yield retval
+    yield ""
+
+def ls(incoming, tty, args):
+    """
+    ls - list files
+
+    Use ls to list the files in a folder.
+
+    Flags:
+       -a   see all
+       -l   long format
+    """
+    args, flags = splitArgs(args)
+    if incoming:
+        data = incoming
+    else:
+        data = args
+    if not data:
+        data = ["."]
+    for f in data:
+        if not os.path.exists(f):
+            calico.ErrorLine("ls: cannot access '%s': no such file for directory" % f)
+            continue
+        if os.path.isfile(f):
+            yield list_file(f, flags, tty)
+        else:
+            for item in list_dir(f, flags, tty):
+                yield item
 
 def grep(incoming, tty, args):
     """
@@ -151,11 +179,13 @@ def grep(incoming, tty, args):
     args, flags = splitArgs(args)
     if incoming:
         pattern = args[0]
-        for i in match(pattern, incoming):
-            yield i
+        for i in incoming:
+            if match(pattern, i):
+                yield i
     else:
-        pass # look in the contents of args
-    return
+        ## FIXME: look in the contents of args
+        pass 
+    return # ends yields
 
 def more(incoming, tty, args):
     """
@@ -214,6 +244,9 @@ def help_cmd(incoming, tty, args):
     help - get help on commands
     """
     args, flags = splitArgs(args)
+    if "--help" in flags:
+        yield inspect.getdoc(help_cmd)
+        return
     if len(args) == 0:
         for command in sorted(commands.keys()):
             yield commands[command].__doc__.strip().split("\n")[0].strip()
@@ -303,12 +336,28 @@ def echo(incoming, tty, args):
     args, flags = splitArgs(args)
     return [" ".join(args)]
 
+def switch(incoming, tty, args):
+    """
+    switch - to unix or dos
+    """
+    global commands, command_set
+    args, flags = splitArgs(args)
+    if len(args) > 0:
+        if args[0] == "unix":
+            commands = unix_commands
+            command_set = "unix"
+        elif args[0] == "dos":
+            commands = dos_commands
+            command_set = "dos"
+        else:
+            calico.ErrorLine("switch: cannot switch to '%s': use 'unix' or 'dos'" % args[0])
+    else:
+        return [command_set]
+    return []
+
 ## ------------------------------------------------------------
 
-def matchFiles(pattern):
-    return match(pattern, glob.glob("*"))
-
-def match(pattern, data):
+def match(pattern, item):
     # Dots are literal:
     pattern = pattern.replace(".", "\.")
     # asterisks mean match anything
@@ -317,11 +366,7 @@ def match(pattern, data):
         pattern = pattern[1:]
     else: ## match anything on front end:
         pattern = ".*" + pattern
-    retval = []
-    for i in data:
-        if re.match(pattern, i):
-            retval.append(i)
-    return retval
+    return re.match(pattern, item)
 
 def split(arg_text):
     """
@@ -345,6 +390,23 @@ def splitArgs(arg_list):
             args.append(arg)
     return args, flags
 
+def expand(pattern):
+    """
+    Looks to see if pattern has file-matching characters. If so,
+    expand now.
+    """
+    if ("*" in pattern or 
+        "?" in pattern or
+        "~" in pattern):
+        pattern = pattern.replace("~", os.path.expanduser("~"))
+        return match(pattern, glob.glob("*"))
+    elif pattern == ".":
+        return [os.getcwd()]
+    elif pattern == "..":
+        return [os.path.join(os.getcwd(), os.pardir)]
+    else:
+        return [pattern]
+
 def splitParts(text):
     retval = []
     i = 0
@@ -354,7 +416,7 @@ def splitParts(text):
         if mode == "start":
             if text[i] == " ":
                 if current:
-                    retval.append(current)
+                    retval.extend(expand(current))
                     current = ""
                 else:
                     pass ## skip
@@ -387,7 +449,7 @@ def splitParts(text):
         i += 1
     if current:
         if mode == "start":
-            retval.append(current)
+            retval.extend(expand(current))
         elif mode == "quote":
             retval.append(current)
         elif mode == "double-quote":
@@ -395,12 +457,17 @@ def splitParts(text):
     return retval
 
 def parse(command_text):
+    """
+    Break the command_text up into the command, and args + flags.
+    """
     command_text = command_text.strip()
     if " " in command_text:
         command_name, arg_text = command_text.split(" ", 1)
     else:
         command_name = command_text
         arg_text = ""
+    # Make all lower-case
+    command_name = command_name.lower()
     command_name = command_name.strip()
     if command_name in commands:
         command = commands[command_name]
@@ -410,34 +477,59 @@ def parse(command_text):
     return command, args
 
 def execute(calico, text):
+    """
+    Execute a shell command line.
+    """
+    # put calico in the environment:
     globals()["calico"] = calico
     w = calico.Output.Allocation.Width
     h = calico.Output.Allocation.Height
     scale = (calico.GetFont().Size/1024)
+    # compute the width, height of the output window:
     globals()["width"] = int(w/(scale - 2))
     globals()["height"] = int(h/(scale * 1.7))
+    # Break the command into parts:
     line = text.split("|")
     incoming = None
     count = 0
+    # Process each command, chaining to the next:
     for command_text in line:
+        # only last one is a tty
         tty = (count == len(line) - 1) # pipe to a tty or not
         command, args = parse(command_text)
+        if command_set == "unix" and command == "#":
+            continue
+        elif command_set == "dos" and command == "rem":
+            continue
         incoming = command(incoming, tty, args)
         count += 1
+    # and display the output
     display(incoming)
 
 def display(g):
+    """
+    The terminal emulator for displaying output.
+    """
     for item in g:
         print(item)
 
-# FIXME: head tail find pushd popd wget wc cal date du df uname cut plot printf time hostname id < >
+# FIXME add these: head tail find pushd popd wget wc cal date du df
+# uname cut plot printf time hostname id < > cls REM # 
 
-# Unix commands
-commands = {"ls": ls, "more": more, "cd": cd, "grep": grep,
-            "cat": cat, "help": help_cmd, "pwd": pwd, "cp": cp,
-            "rm": rm, "less": more, "show": show, "open": open_cmd,
-            "sort": sort, "exec": exec_cmd, "eval": eval_cmd,
-            "mkdir": mkdir, "mv": mv, "rmdir": rmdir, "echo": echo, 
-            "edit": open_cmd}
-
-#execute("ls")
+# Commands
+unix_commands = {"ls": ls, "more": more, "cd": cd, "grep": grep,
+                 "cat": cat, "help": help_cmd, "pwd": pwd, "cp": cp,
+                 "rm": rm, "less": more, "show": show, "open": open_cmd,
+                 "sort": sort, "exec": exec_cmd, "eval": eval_cmd,
+                 "mkdir": mkdir, "mv": mv, "rmdir": rmdir, "echo": echo, 
+                 "edit": open_cmd, "switch": switch}
+dos_commands = {"dir": ls, "more": more, "cd": cd, "chdir": cd,
+                "help": help_cmd, "pwd": pwd, "copy": cp,
+                "del": rm, "erase": rm, "show": show, "open": open_cmd,
+                "sort": sort, "exec": exec_cmd, "eval": eval_cmd,
+                "mkdir": mkdir, "md": mkdir, "move": mv, "rename": mv, 
+                "ren": mv, "rmdir": rmdir, 
+                "rd": rmdir, "echo": echo, 
+                "edit": open_cmd, "switch": switch}
+commands = unix_commands
+command_set = "unix"
