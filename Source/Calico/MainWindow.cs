@@ -2350,6 +2350,11 @@ del _invoke, _
             }
         }
 
+        public void ExecuteFile(string filename) {
+            string language = manager.GetLanguageFromExtension(filename);
+	    manager [language].engine.ExecuteFile(filename); 
+	}
+
         public void ExecuteFileInBackground(string filename, string language) {
             if (language == null || filename == null) {
                 return;
