@@ -26,23 +26,24 @@ class MyLanguageEngine(Calico.Engine):
         the interpreter.
         """
         import cash
+        retval = True
         for line in text.split("\n"):
             try:
                 cash.execute(self.calico, line)
             except Exception, e:
                 self.calico.ErrorLine(e.message)
-        return True
+                retval = False
+        return retval
 
     def ExecuteFile(self, filename):
         """
         This is the code that will interprete a file.
         """
-        print("Run filename '%s'!" % filename)
         fp = open(filename)
         text = "".join(fp.readlines())
         fp.close()
-        self.Execute(text, feedback=False)
-        return True
+        result = self.Execute(text, feedback=False)
+        return result
 
     def ReadyToExecute(self, text):
         """

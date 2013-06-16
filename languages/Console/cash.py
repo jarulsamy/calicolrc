@@ -1,5 +1,11 @@
 ## Calico Shell: Console
 
+## A cross-platform bash-like shell, integrated with Calico
+## http://calicoproject.org/Calico_Console
+
+## GPL, version 3 or greater
+## Doug Blank
+
 import glob
 import os
 import re
@@ -17,6 +23,7 @@ lastcd = [os.getcwd()]
 ## command(incoming-sequence, tty?, arguments)
 ## -> returns a sequence [eg, returns a seq, or defines a generator]
 ## __doc__ : first line, summary; rest for a complete help doc
+## all should handle --help
 
 def cd(incoming, tty, args):
     """
@@ -126,7 +133,7 @@ def list_dir(d, flags, tty):
         yield "%s:" % os.path.relpath(d)
     for f in glob.glob(os.path.join(d, "*")):
         if "-l" in flags or not tty:
-            yield os.path.basename(f)
+            yield os.path.abspath(f)
         else:
             i = os.path.basename(f)
             if len(retval + " " + str(i)) < width:
@@ -178,10 +185,11 @@ def grep(incoming, tty, args):
     """
     args, flags = splitArgs(args)
     if incoming:
-        pattern = args[0]
-        for i in incoming:
-            if match(pattern, i):
-                yield i
+        if len(args) > 0:
+            pattern = args[0]
+            for i in incoming:
+                if match(pattern, i):
+                    yield i
     else:
         ## FIXME: look in the contents of args
         pass 
@@ -307,7 +315,7 @@ def exec_cmd(incoming, tty, args):
             if os.path.isfile(args[0]):
                 calico.ExecuteFile(args[0])
             else:
-                raise Exception("no such file: '%s'" % parts[0])
+                raise Exception("no such file: '%s'" % args[0])
         else:
             calico.Execute(args[0], args[1])
     return []
@@ -331,10 +339,18 @@ def eval_cmd(incoming, tty, args):
 
 def echo(incoming, tty, args):
     """
-    echo - display output
+    echo - create output
     """
     args, flags = splitArgs(args)
     return [" ".join(args)]
+
+def printf(incoming, tty, args):
+    """
+    print - display output
+    """
+    args, flags = splitArgs(args)
+    print(" ".join(args))
+    return []
 
 def switch(incoming, tty, args):
     """
@@ -368,12 +384,6 @@ def match(pattern, item):
         pattern = ".*" + pattern
     return re.match(pattern, item)
 
-def split(arg_text):
-    """
-    Split into command and args
-    """
-    return arg_text.split(" ", 1)
-
 def splitArgs(arg_list):
     """
     Split into command and args
@@ -400,6 +410,9 @@ def expand(pattern):
         "~" in pattern):
         pattern = pattern.replace("~", os.path.expanduser("~"))
         return match(pattern, glob.glob("*"))
+    elif pattern.startswith("$"):
+        ## expand variable, which could be a pattern:
+        return expand(str(calico.Evaluate(pattern[1:], "python")))
     elif pattern == ".":
         return [os.getcwd()]
     elif pattern == "..":
@@ -414,12 +427,22 @@ def splitParts(text):
     mode = "start"
     while i < len(text):
         if mode == "start":
-            if text[i] == " ":
+            if text[i].startswith("#"):
+                # ignore here to end of line
+                break
+            elif text[i] == " ":
                 if current:
                     retval.extend(expand(current))
                     current = ""
                 else:
                     pass ## skip
+            elif text[i] == "=":
+                if current:
+                    retval.extend(expand(current))
+                    current = ""
+                else:
+                    pass ## skip
+                retval.append('=')
             elif text[i] == "'":
                 if current:
                     retval.append(current)
@@ -451,30 +474,25 @@ def splitParts(text):
         if mode == "start":
             retval.extend(expand(current))
         elif mode == "quote":
-            retval.append(current)
+            raise Exception("Unended quote")
         elif mode == "double-quote":
-            retval.append(current)
+            raise Exception("Unended double-quote")
     return retval
 
 def parse(command_text):
     """
     Break the command_text up into the command, and args + flags.
     """
-    command_text = command_text.strip()
-    if " " in command_text:
-        command_name, arg_text = command_text.split(" ", 1)
+    command_line = splitParts(command_text)
+    if command_line:
+        command_name = command_line[0]
+        args = command_line[1:]
+        # Make lower-case and clean up:
+        command_name = command_name.lower()
+        command_name = command_name.strip()
+        return command_name, args
     else:
-        command_name = command_text
-        arg_text = ""
-    # Make all lower-case
-    command_name = command_name.lower()
-    command_name = command_name.strip()
-    if command_name in commands:
-        command = commands[command_name]
-    else:
-        raise Exception("No such command: '%s'. Try 'help'" % command_name)
-    args = splitParts(arg_text)
-    return command, args
+        return []
 
 def execute(calico, text):
     """
@@ -493,18 +511,35 @@ def execute(calico, text):
     incoming = None
     count = 0
     # Process each command, chaining to the next:
+    incoming = None
     for command_text in line:
+        command_text = command_text.strip()
+        if not command_text:
+            continue
         # only last one is a tty
         tty = (count == len(line) - 1) # pipe to a tty or not
-        command, args = parse(command_text)
-        if command_set == "unix" and command == "#":
+        data = parse(command_text)
+        if len(data) == 2:
+            command_name, args = data
+        else:
             continue
-        elif command_set == "dos" and command == "rem":
-            continue
-        incoming = command(incoming, tty, args)
+        if command_name:
+            if command_set == "unix" and command_name.startswith("#"):
+                continue
+            elif command_set == "dos" and command_name == "rem":
+                continue
+            if len(args) > 1 and args[0] == "=":
+                calico.Execute("%s = %s" % (command_name, " ".join(args[1:])), "python")
+                continue
+            if command_name in commands:
+                command = commands[command_name]
+            else:
+                raise Exception("No such command: '%s'. Try 'help'" % command_name)
+            incoming = command(incoming, tty, args)
         count += 1
     # and display the output
-    display(incoming)
+    if incoming:
+        display(incoming)
 
 def display(g):
     """
@@ -514,7 +549,7 @@ def display(g):
         print(item)
 
 # FIXME add these: head tail find pushd popd wget wc cal date du df
-# uname cut plot printf time hostname id < > cls REM # 
+# uname cut plot time hostname id < > cls TAB-completion
 
 # Commands
 unix_commands = {"ls": ls, "more": more, "cd": cd, "grep": grep,
@@ -522,14 +557,14 @@ unix_commands = {"ls": ls, "more": more, "cd": cd, "grep": grep,
                  "rm": rm, "less": more, "show": show, "open": open_cmd,
                  "sort": sort, "exec": exec_cmd, "eval": eval_cmd,
                  "mkdir": mkdir, "mv": mv, "rmdir": rmdir, "echo": echo, 
-                 "edit": open_cmd, "switch": switch}
+                 "edit": open_cmd, "switch": switch, "printf": printf}
 dos_commands = {"dir": ls, "more": more, "cd": cd, "chdir": cd,
                 "help": help_cmd, "pwd": pwd, "copy": cp,
                 "del": rm, "erase": rm, "show": show, "open": open_cmd,
                 "sort": sort, "exec": exec_cmd, "eval": eval_cmd,
                 "mkdir": mkdir, "md": mkdir, "move": mv, "rename": mv, 
                 "ren": mv, "rmdir": rmdir, 
-                "rd": rmdir, "echo": echo, 
+                "rd": rmdir, "echo": printf, 
                 "edit": open_cmd, "switch": switch}
 commands = unix_commands
 command_set = "unix"

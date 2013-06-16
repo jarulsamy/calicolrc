@@ -24,10 +24,10 @@
  THE SOFTWARE. -->
  
 <SyntaxMode name = "Console" mimeTypes="text/x-text">
-	<Property name="LineComment">REM</Property>
+	<Property name="LineComment">#</Property>
 	<Property name="StringQuote">"</Property>
 	
-	<EolSpan color = "comment" rule="Comment" tagColor="comment.tag">REM</EolSpan>
+	<EolSpan color = "comment" rule="Comment" tagColor="comment.tag">#</EolSpan>
 	
 	<Span color = "string" rule="String" stopateol = "true" escape='\'>
 		<Begin>"</Begin>
