@@ -27,7 +27,7 @@ lastcd = [os.getcwd()]
 
 def cd(incoming, tty, args):
     """
-    cd - change directory
+    change directory
 
     To change directories, use cd folder, where folder is either
     relative or absolute.
@@ -55,7 +55,7 @@ def cd(incoming, tty, args):
 
 def rm(incoming, tty, args):
     """
-    rm - remove file or folders
+    remove file or folders
 
     Use rm to delete files.
     """
@@ -66,7 +66,7 @@ def rm(incoming, tty, args):
 
 def mkdir(incoming, ttyp, args):
     """
-    mkdir - make a directory
+    make a directory
     """
     args, flags = splitArgs(args)
     for filename in args:
@@ -75,7 +75,7 @@ def mkdir(incoming, ttyp, args):
 
 def rmdir(incoming, tty, args):
     """
-    rmdir - remove folders
+    remove folders
 
     Use rmdir to delete folders.
     """
@@ -86,7 +86,7 @@ def rmdir(incoming, tty, args):
 
 def cp(incoming, tty, args):
     """
-    cp - copy files and folders
+    copy files and folders
 
     Use cp to copy files.
     """
@@ -96,7 +96,7 @@ def cp(incoming, tty, args):
 
 def mv(incoming, tty, args):
     """
-    mv - move files and folders
+    move files and folders
 
     Use mv to move files.
     """
@@ -106,7 +106,7 @@ def mv(incoming, tty, args):
 
 def pwd(incoming, tty, args):
     """
-    pwd - print working directory
+    print working directory
 
     Use pwd to see your current directory.
     """
@@ -154,7 +154,7 @@ def list_dir(d, flags, tty):
 
 def ls(incoming, tty, args):
     """
-    ls - list files
+    list files
 
     Use ls to list the files in a folder.
 
@@ -181,7 +181,7 @@ def ls(incoming, tty, args):
 
 def grep(incoming, tty, args):
     """
-    grep - search for matches
+    search for matches
 
     Grep through arguments, searching for matches.
     """
@@ -208,7 +208,7 @@ def grep(incoming, tty, args):
 
 def more(incoming, tty, args):
     """
-    more - see output one page at a time
+    see output one page at a time
     """
     args, flags = splitArgs(args)
     count = 0
@@ -241,7 +241,7 @@ def more(incoming, tty, args):
 
 def cat(incoming, tty, args):
     """
-    cat - concatenate files
+    concatenate files
     """
     args, flags = splitArgs(args)
     count = 0
@@ -254,6 +254,8 @@ def cat(incoming, tty, args):
                 yield i
     else:
         for filename in args:
+            if not os.path.exists(filename) or not os.path.isfile(filename):
+                raise Exception("cat: file does not exist: '%s'" % filename)
             fp = open(filename)
             for line in fp:
                 i = line.strip()
@@ -265,14 +267,14 @@ def cat(incoming, tty, args):
 
 def sort(incoming, tty, args):
     """
-    sort - sort data
+    sort data
     """
     args, flags = splitArgs(args)
     return sorted(list(args) + list(incoming))
 
 def help_cmd(incoming, tty, args):
     """
-    help - get help on commands
+    get help on commands
     """
     args, flags = splitArgs(args)
     if "--help" in flags:
@@ -280,15 +282,21 @@ def help_cmd(incoming, tty, args):
         return
     if len(args) == 0:
         for command in sorted(commands.keys()):
-            yield commands[command].__doc__.strip().split("\n")[0].strip()
+            command_name = command
+            if command_set == "dos":
+                command_name = command.upper()
+            yield "%s - %s" % (command_name, commands[command].__doc__.strip().split("\n")[0].strip())
     elif args[0] in commands:
-        yield commands[args[0]].__doc__.strip()
+        command_name = args[0]
+        if command_set == "dos":
+            command_name = args[0].upper()
+        yield ("%s: " % command_name) + commands[args[0]].__doc__.strip()
     else:
-        raise Exception("I don't have help on '%s'" % args[0])
+        raise Exception("help: I don't have help on '%s'" % args[0])
 
 def show(incoming, tty, args):
     """
-    show - show an image graphically
+    show an image graphically
     """
     args, flags = splitArgs(args)
     import Myro
@@ -306,7 +314,7 @@ def show(incoming, tty, args):
 
 def open_cmd(incoming, tty, args):
     """
-    open - open a file in Calico
+    open a file in Calico
     """
     args, flags = splitArgs(args)
     if incoming:
@@ -321,7 +329,7 @@ def open_cmd(incoming, tty, args):
 
 def exec_cmd(incoming, tty, args):
     """
-    exec - execute a file in Calico
+    execute a file in Calico
     """
     if incoming:
         for item in incoming:
@@ -330,7 +338,7 @@ def exec_cmd(incoming, tty, args):
                 if os.path.isfile(parts[0]):
                     calico.ExecuteFile(parts[0])
                 else:
-                    raise Exception("no such file: '%s'" % parts[0])
+                    raise Exception("exec: no such file: '%s'" % parts[0])
             else:
                 calico.Execute(parts[0], parts[1])
     else:
@@ -338,14 +346,14 @@ def exec_cmd(incoming, tty, args):
             if os.path.isfile(args[0]):
                 calico.ExecuteFile(args[0])
             else:
-                raise Exception("no such file: '%s'" % args[0])
+                raise Exception("exec: no such file: '%s'" % args[0])
         else:
             calico.Execute(args[0], args[1])
     return []
 
 def eval_cmd(incoming, tty, args):
     """
-    eval - evaluate text in Calico
+    evaluate text in Calico
     """
     args, flags = splitArgs(args)
     if incoming:
@@ -354,7 +362,7 @@ def eval_cmd(incoming, tty, args):
             if len(parts) == 2:
                 calico.Evaluate(parts[0], parts[1])
             else:
-                raise Exception("no such file: '%s'" % parts[0])
+                raise Exception("eval: need to specify a language with '%s'" % parts[0])
     else:
         text = args[0]
         language = args[1]
@@ -362,21 +370,21 @@ def eval_cmd(incoming, tty, args):
 
 def echo(incoming, tty, args):
     """
-    echo - create output
+    create output
     """
     args, flags = splitArgs(args)
     return [" ".join(args)]
 
 def printf(incoming, tty, args):
     """
-    print - display output
+    display output
     """
     args, flags = splitArgs(args)
     return []
 
 def switch(incoming, tty, args):
     """
-    switch - to unix or dos
+    to unix or dos
     """
     global commands, command_set
     args, flags = splitArgs(args)
@@ -513,11 +521,11 @@ def splitParts(text):
         if mode == "start":
             retval.extend(expand(current))
         elif mode == "quote":
-            raise Exception("Unended quote")
+            raise Exception("console: unended quote")
         elif mode == "double-quote":
-            raise Exception("Unended double-quote")
+            raise Exception("console: unended double-quote")
         elif mode == "back-quote":
-            raise Exception("Unended back-quote: leftover: '%s'" % current)
+            raise Exception("console: unended back-quote: leftover: '%s'" % current)
     return retval
 
 def splitLines(command_list):
@@ -561,6 +569,7 @@ def execute(calico, text, return_value=False):
         else:
             continue
         if command_name:
+            command_name = command_name.lower()
             if command_set == "unix" and command_name.startswith("#"):
                 continue
             elif command_set == "dos" and command_name == "rem":
@@ -572,7 +581,7 @@ def execute(calico, text, return_value=False):
             if command_name in commands:
                 command = commands[command_name]
             else:
-                raise Exception("No such command: '%s'. Try 'help'" % command_name)
+                raise Exception("console: no such command: '%s'. Try 'help'" % command_name)
             incoming = command(incoming, tty, args)
         count += 1
     # and display the output

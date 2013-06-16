@@ -3,6 +3,7 @@
 
 # ls | grep .sh | open
 
+switch unix # comment to end of line
 pwd
 more ./Tests.sh
 
