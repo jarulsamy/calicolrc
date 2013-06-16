@@ -121,6 +121,8 @@ def list_file(f, flags, tty):
         return os.path.abspath(f)
     elif tty:
         return os.path.basename(f)
+    else:
+        return os.path.abspath(f)
 
 def list_dir(d, flags, tty):
     """
@@ -184,15 +186,24 @@ def grep(incoming, tty, args):
     Grep through arguments, searching for matches.
     """
     args, flags = splitArgs(args)
-    if incoming:
-        if len(args) > 0:
-            pattern = args[0]
-            for i in incoming:
-                if match(pattern, i):
-                    yield i
+    if len(args) > 0:
+        pattern = args[0]
     else:
-        ## FIXME: look in the contents of args
-        pass 
+        raise Exception("grep: error, no pattern given")
+    if incoming:
+        for i in incoming:
+            if match(pattern, i):
+                yield i
+    else:
+        for f in args[1:]:
+            if os.path.exists(f) and os.path.isfile(f):
+                text = open(f).readlines()
+                for line in text:
+                    line = line.strip()
+                    if match(pattern, line):
+                        yield "%s: %s" % (f, line)
+            else:
+                calico.ErrorLine("grep: no such file '%s'" % f)
     return # ends yields
 
 def more(incoming, tty, args):
@@ -212,9 +223,21 @@ def more(incoming, tty, args):
                 yn = calico.yesno("More?")
                 if not yn:
                     return
-    #FIXME: cat file contents
-    #else: # 
-    #    for arg in args:
+    else:
+        for f in args:
+            if os.path.exists(f) and os.path.isfile(f):
+                text = open(f).readlines()
+                for line in text:
+                    count += 1
+                    yield line.strip()
+                    if tty and (count % lines == 0):
+                        # can you tell if there are more?
+                        print("--more--")
+                        yn = calico.yesno("More?")
+                        if not yn:
+                            return
+            else:
+                raise Exception("more: no such file '%s'" % f)
 
 def cat(incoming, tty, args):
     """
@@ -349,7 +372,6 @@ def printf(incoming, tty, args):
     print - display output
     """
     args, flags = splitArgs(args)
-    print(" ".join(args))
     return []
 
 def switch(incoming, tty, args):
@@ -405,14 +427,20 @@ def expand(pattern):
     Looks to see if pattern has file-matching characters. If so,
     expand now.
     """
-    if ("*" in pattern or 
-        "?" in pattern or
-        "~" in pattern):
-        pattern = pattern.replace("~", os.path.expanduser("~"))
-        return match(pattern, glob.glob("*"))
+    if pattern.startswith("`"):
+        return execute(calico, pattern[1:], True)
     elif pattern.startswith("$"):
         ## expand variable, which could be a pattern:
         return expand(str(calico.Evaluate(pattern[1:], "python")))
+    elif ("*" in pattern or 
+        "?" in pattern or
+        "~" in pattern):
+        pattern = pattern.replace("~", os.path.expanduser("~"))
+        retval = []
+        for f in glob.glob("*"):
+            if match(pattern, f):
+                retval.append(f)
+        return retval
     elif pattern == ".":
         return [os.getcwd()]
     elif pattern == "..":
@@ -438,10 +466,8 @@ def splitParts(text):
                     pass ## skip
             elif text[i] == "=":
                 if current:
-                    retval.extend(expand(current))
+                    retval.append(current)
                     current = ""
-                else:
-                    pass ## skip
                 retval.append('=')
             elif text[i] == "'":
                 if current:
@@ -453,6 +479,12 @@ def splitParts(text):
                     retval.append(current)
                     current = ""
                 mode = "double-quote"
+            elif text[i] == '`':
+                if current:
+                    retval.append(current)
+                    # signal expand that this is an expr:
+                current = "`"
+                mode = "back-quote"
             else:
                 current += text[i]
         elif mode == "quote":
@@ -469,32 +501,39 @@ def splitParts(text):
                 mode = "start"
             else:
                 current += text[i]
+        elif mode == "back-quote":
+            if text[i] == '`':
+                retval.extend(expand(current))
+                current = ""
+                mode = "start"
+            else:
+                current += text[i]
         i += 1
-    if current:
+    if current: # some still left:
         if mode == "start":
             retval.extend(expand(current))
         elif mode == "quote":
             raise Exception("Unended quote")
         elif mode == "double-quote":
             raise Exception("Unended double-quote")
+        elif mode == "back-quote":
+            raise Exception("Unended back-quote: leftover: '%s'" % current)
     return retval
 
-def parse(command_text):
-    """
-    Break the command_text up into the command, and args + flags.
-    """
-    command_line = splitParts(command_text)
-    if command_line:
-        command_name = command_line[0]
-        args = command_line[1:]
-        # Make lower-case and clean up:
-        command_name = command_name.lower()
-        command_name = command_name.strip()
-        return command_name, args
-    else:
-        return []
-
-def execute(calico, text):
+def splitLines(command_list):
+    commands = []
+    command = []
+    for symbol in splitParts(command_list):
+        if symbol in ["|"]:
+            commands.append([command[0], command[1:]])
+            command = []
+        else:
+            command.append(symbol)
+    if command:
+        commands.append([command[0], command[1:]])
+    return commands
+            
+def execute(calico, text, return_value=False):
     """
     Execute a shell command line.
     """
@@ -507,18 +546,16 @@ def execute(calico, text):
     globals()["width"] = int(w/(scale - 2))
     globals()["height"] = int(h/(scale * 1.7))
     # Break the command into parts:
-    line = text.split("|")
+    line = splitLines(text)
     incoming = None
     count = 0
     # Process each command, chaining to the next:
     incoming = None
-    for command_text in line:
-        command_text = command_text.strip()
-        if not command_text:
+    for data in line:
+        if not data:
             continue
         # only last one is a tty
-        tty = (count == len(line) - 1) # pipe to a tty or not
-        data = parse(command_text)
+        tty = (count == len(line) - 1) and not return_value # pipe to a tty or not
         if len(data) == 2:
             command_name, args = data
         else:
@@ -529,7 +566,8 @@ def execute(calico, text):
             elif command_set == "dos" and command_name == "rem":
                 continue
             if len(args) > 1 and args[0] == "=":
-                calico.Execute("%s = %s" % (command_name, " ".join(args[1:])), "python")
+                expr = args[1:]
+                calico.Execute("%s = %s" % (command_name, " ".join(expr)), "python")
                 continue
             if command_name in commands:
                 command = commands[command_name]
@@ -538,8 +576,11 @@ def execute(calico, text):
             incoming = command(incoming, tty, args)
         count += 1
     # and display the output
-    if incoming:
-        display(incoming)
+    if return_value:
+        return incoming
+    else:
+        if incoming:
+            display(incoming)
 
 def display(g):
     """

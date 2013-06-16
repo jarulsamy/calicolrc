@@ -4,6 +4,8 @@
 # ls | grep .sh | open
 
 pwd
+more ./Tests.sh
+
 ls -l ../../../examples/images/chess/ | show
 ls -l | grep Hello | open
 exec "HelloWorld.sh"
@@ -12,10 +14,10 @@ cd -
 x = 42
 echo $x
 
-more ../cash.py
-
 switch
 switch dos
 dir
 switch unix
 ls
+
+grep Hello `ls | grep .sh`

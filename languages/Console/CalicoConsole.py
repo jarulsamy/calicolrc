@@ -33,6 +33,7 @@ class MyLanguageEngine(Calico.Engine):
             except Exception, e:
                 self.calico.ErrorLine(e.message)
                 retval = False
+                break
         return retval
 
     def ExecuteFile(self, filename):
