@@ -296,7 +296,12 @@ public class Finch: Myro.Robot
 	    // Windows:
 	    // WriteBytes: [0, 76, 0, 0, 0, 0, 0, 0, 6]
 	    // ReadBytes: [0, 51, 59, 63, 21, 1, 1, 0, 6]
+		
+		// Mac:
+		// WriteBytes: [76, 0, 0, 0, 0, 0, 0, 67]
+		// ReadBytes: [76, 13, 12, 0, 0, 0, 0, 0]
 
+		
 		if (robot != null) {
 			List list = new List ();
 
@@ -384,7 +389,12 @@ public class Finch: Myro.Robot
 	    // Windows:
 	    // WriteBytes: [0, 65, 0, 0, 0, 0, 0, 0, 4]
 	    // ReadBytes: [0, 153, 63, 63, 21, 1, 1, 0, 4]
+		
+		// Mac:
+		// WriteBytes: [65, 0, 0, 0, 0, 0, 0, 69]
+		// ReadBytes: [65, 153, 61, 62, 20, 1, 1, 0]
 
+		
 		if (robot != null) {
 			List list = new List ();
 			byte[] report = makePacket((byte)'A');
@@ -545,7 +555,11 @@ public class Finch: Myro.Robot
 	    // Window:
 	    // WriteBytes: [0, 84, 0, 0, 0, 0, 0, 0, 123]
 	    // ReadBytes: [0, 126, 59, 62, 20, 1, 1, 0, 123]
-
+		
+		// Mac:
+		// WriteBytes: [84, 0, 0, 0, 0, 0, 0, 70]
+		// ReadBytes: [84, 126, 61, 62, 20, 1, 1, 0]
+		
 		if (robot != null) {
 			byte[] report = makePacket((byte)'T');
 			byte[] readData = WriteBytesRead (report);
@@ -575,7 +589,12 @@ public class Finch: Myro.Robot
 	    // Windows:
 	    // WriteBytes: [0, 73, 0, 0, 0, 0, 0, 0, 5]
 	    // ReadBytes: [0, 0, 0, 63, 21, 1, 1, 0, 5]
+		
+		// Mac:
+		// WriteBytes: [73, 0, 0, 0, 0, 0, 0, 68]
+		// ReadBytes: [73, 1, 1, 0, 0, 0, 0, 0]
 
+		
 		if (robot != null) {
 			List list = new List ();
 
