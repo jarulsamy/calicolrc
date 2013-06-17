@@ -290,9 +290,12 @@ public class Finch: Myro.Robot
 	{ // position can be: 0, "left"; 2, "right"; "all" "both"
 
 	    // Linux:
-	    // python>>> robot.getLight()
 	    // WriteBytes: [0, 76, 0, 0, 0, 0, 0, 0, 84]
 	    // ReadBytes: [0, 76, 52, 62, 57, 19, 1, 1, 0, 0, 84]
+
+	    // Windows:
+	    // WriteBytes: [0, 76, 0, 0, 0, 0, 0, 0, 6]
+	    // ReadBytes: [0, 51, 59, 63, 21, 1, 1, 0, 6]
 
 		if (robot != null) {
 			List list = new List ();
@@ -375,9 +378,12 @@ public class Finch: Myro.Robot
 	{
 
 	    // Linux:
-	    // python>>> robot.getAcceleration()
 	    // WriteBytes: [0, 65, 0, 0, 0, 0, 0, 0, 150]
 	    // ReadBytes: [0, 65, 153, 61, 63, 21, 133, 1, 0, 0, 150]
+
+	    // Windows:
+	    // WriteBytes: [0, 65, 0, 0, 0, 0, 0, 0, 4]
+	    // ReadBytes: [0, 153, 63, 63, 21, 1, 1, 0, 4]
 
 		if (robot != null) {
 			List list = new List ();
@@ -533,9 +539,12 @@ public class Finch: Myro.Robot
 	public override object getTemperature ()
 	{
 	    // Linux:
-	    // python>>> robot.getTemperature()
 	    // WriteBytes: [0, 84, 0, 0, 0, 0, 0, 0, 196]
 	    // ReadBytes: [0, 84, 125, 61, 63, 21, 133, 1, 0, 0, 196]
+
+	    // Window:
+	    // WriteBytes: [0, 84, 0, 0, 0, 0, 0, 0, 123]
+	    // ReadBytes: [0, 126, 59, 62, 20, 1, 1, 0, 123]
 
 		if (robot != null) {
 			byte[] report = makePacket((byte)'T');
@@ -559,11 +568,13 @@ public class Finch: Myro.Robot
 	/// <returns>A bool or an array of bools containing Finch obstacle data</returns>
 	public override object getObstacle (params object[] position)
 	{
-
 	    // Linux:
-	    // python>>> robot.getObstacle()
 	    // WriteBytes: [0, 73, 0, 0, 0, 0, 0, 0, 237]
 	    // ReadBytes: [0, 73, 0, 0, 63, 21, 133, 1, 0, 0, 237]
+
+	    // Windows:
+	    // WriteBytes: [0, 73, 0, 0, 0, 0, 0, 0, 5]
+	    // ReadBytes: [0, 0, 0, 63, 21, 1, 1, 0, 5]
 
 		if (robot != null) {
 			List list = new List ();
