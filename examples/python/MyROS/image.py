@@ -10,6 +10,7 @@ class ImageViewer(NodeMain):
   def getDefaultNodeName(self):
     return GraphName.of("calico_image_viewer")
 
+
   def onStart(self, node):
     class myListener(MessageListener):
         def onNewMessage(self, image):
@@ -17,10 +18,13 @@ class ImageViewer(NodeMain):
             show(p)
 
     self.subscriber = node.newSubscriber("/usb_cam/image_raw", sensor_msgs.Image._TYPE)
-    self.subscriber.addMessageListener(myListener())
+    queue_size=1
+    self.subscriber.addMessageListener(myListener(), queue_size)
 
 
 iv = ImageViewer()
 nodeMainExecutor = DefaultNodeMainExecutor.newDefault()
 nodeConfig = NodeConfiguration.newPrivate()
 nodeMainExecutor.execute(iv, nodeConfig);
+
+#iv.subscriber.shutdown()
