@@ -469,7 +469,10 @@ def splitParts(text):
     mode = "start"
     while i < len(text):
         if mode == "start":
-            if text[i].startswith("#"):
+            if text[i] == "\\":
+                i += 1
+                current += text[i]
+            elif text[i].startswith("#"):
                 # ignore here to end of line
                 break
             elif text[i] == " ":
