@@ -9,6 +9,7 @@ all: ../MyROS.dll
 		-unsafe \
 		-r:ros \
 		-r:Graphics.dll \
+		-r:System.Drawing \
 		-r:IKVM.OpenJDK.Beans \
 		-r:IKVM.OpenJDK.Charsets \
 		-r:IKVM.OpenJDK.Corba \

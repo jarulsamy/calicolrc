@@ -17,7 +17,18 @@ public static class MyROS
   {
     byte[] buffer = new byte[cbuffer.capacity()];
     cbuffer.getBytes(0, buffer, 0, cbuffer.capacity());
-    return new Graphics.Picture(width, height, buffer);
+    return new Graphics.Picture (width, height, buffer);
+  }
+
+  public static Graphics.Picture rosRGBToPicture(org.jboss.netty.buffer.SlicedChannelBuffer cbuffer,
+						 int width,
+						 int height)
+  {
+    byte[] buffer = new byte[cbuffer.capacity()];
+    cbuffer.getBytes(0, buffer, 0, cbuffer.capacity());
+    System.IO.MemoryStream ms = new System.IO.MemoryStream (buffer);
+    System.Drawing.Bitmap bitmap = (System.Drawing.Bitmap)System.Drawing.Bitmap.FromStream (ms);    
+    return new Graphics.Picture (bitmap, width, height, false);
   }
   
   public class CSharpTurtleTest: NodeMain

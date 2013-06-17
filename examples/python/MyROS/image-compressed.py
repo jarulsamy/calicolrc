@@ -7,17 +7,19 @@ from Myro import show
 
 class ImageViewer(NodeMain):
 
+  def __init__(self):
+    self.lastP = None
+
   def getDefaultNodeName(self):
     return GraphName.of("calico_image_viewer")
-
 
   def onStart(self, node):
     class myListener(MessageListener):
         def onNewMessage(self, image):
-            p = MyROS.rosRawRGBToPicture(image.getData(), image.getWidth(), image.getHeight())
+            p = MyROS.rosRGBToPicture(image.getData(), 640, 480)
             show(p)
 
-    self.subscriber = node.newSubscriber("/usb_cam/image_raw", sensor_msgs.Image._TYPE)
+    self.subscriber = node.newSubscriber("/usb_cam/image_raw/compressed", sensor_msgs.CompressedImage._TYPE)
 
     queue_size=1
     self.subscriber.addMessageListener(myListener(), queue_size)
