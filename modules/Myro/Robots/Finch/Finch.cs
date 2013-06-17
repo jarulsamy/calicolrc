@@ -191,7 +191,7 @@ public class Finch: Myro.Robot
 					red = Int32.Parse (color.Substring (1, 2), System.Globalization.NumberStyles.HexNumber);
 					green = Int32.Parse (color.Substring (3, 2), System.Globalization.NumberStyles.HexNumber);
 					blue = Int32.Parse (color.Substring (5, 2), System.Globalization.NumberStyles.HexNumber);
-					byte[] report = makePacket((byte)'O', red, green, blue);
+					byte[] report = makePacket((byte)'O', (byte)red, (byte)green, (byte)blue);
 					WriteBytes (report);
 				} catch {
 					//Do nothing
@@ -221,7 +221,7 @@ public class Finch: Myro.Robot
 			}
 			int left1 = Math.Min (Math.Abs (left), 255);
 			int right1 = Math.Min (Math.Abs (right), 255);
-			byte[] report = makePacket((byte)'M', dir_left, left1, dir_right, right1);
+			byte[] report = makePacket((byte)'M', (byte)dir_left, (byte)left1, (byte)dir_right, (byte)right1);
 			WriteBytes (report);
 		}
 	}
