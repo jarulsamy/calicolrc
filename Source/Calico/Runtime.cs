@@ -210,6 +210,12 @@ namespace Calico {
             executeThread.Start();
         }
 
+	public new static bool yesno(string question) {
+	    System.Console.WriteLine(question);
+	    string answer = System.Console.ReadLine();
+	    return (answer.Substring(0,1).ToLower() == "y");
+	}
+
         public new void Print(Tag tag, string format) {
             System.Console.Write(format);
         }

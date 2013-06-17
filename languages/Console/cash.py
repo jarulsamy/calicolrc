@@ -247,7 +247,7 @@ def wc(incoming, tty, args):
             chars += c + 1
         yield "%6d %6d %6d" % (lines, words, chars)
     else:
-        for f in args[1:]:
+        for f in args:
             if os.path.exists(f) and os.path.isfile(f):
                 text = open(f).readlines()
                 for line in text:
