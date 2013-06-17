@@ -14,24 +14,20 @@ sys.path.append(os.path.dirname(__file__))
 
 # Now, define the Document, Engine, and Language classes:
 class MyLanguageEngine(Calico.Engine):
-    def RequestPause(self):
-        print("RequestPause")
-        #self.trace_pause = True
+    def SetTraceOn(self, calico):
+        import cash
+        cash.setTrace(True)
 
-    def OnTraceBack(self, frame, ttype, retval):
-        #returns IronPython.Runtime.Exceptions.TracebackDelegate 
-        print("OnTraceBack")
-        return self.OnTraceBack
+    def SetTraceOff(self):
+        import cash
+        cash.setTrace(False)
+
+    def RequestPause(self):
+        import cash
+        cash.setPause(True)
 
     def ConfigureTrace(self):
-        print("ConfigureTrace")
-        #try:
-        #    if (trace):
-        #        trace_filename = calico.CurrentDocument.filename
-        #        trace_pause = False
-                ##IronPython.Hosting.Python.SetTrace (engine, OnTraceBack);
-        #except:
-        #    Console.Error.WriteLine("Error in setting trace.")
+        pass
 
     def PostSetup(self, calico):
         """

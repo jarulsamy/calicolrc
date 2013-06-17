@@ -12,12 +12,24 @@ import re
 import shutil
 import inspect
 import traceback
+import Calico
+import time
 
 ## ------------------------------------------------------------
 ## Globals:
 
 lastcd = [os.getcwd()]
 stack = []
+trace = False
+trace_pause = False
+
+def setTrace(value):
+    global trace
+    trace = value
+
+def setPause(value):
+    global trace_pause
+    trace_pause = value
 
 class ConsoleException(Exception):
     def __init__(self, message, stack):
@@ -678,6 +690,7 @@ def execute(text, return_value=False, stack=None):
             else:
                 raise ConsoleException("console: no such command: '%s'. Try 'help'" % command_name, stack)
             stack.append([stack[-1][0], stack[-1][1], command_name])
+            handleDebug(stack[-1][0], stack[-1][1])
             incoming = command(incoming, tty, args, stack)
         count += 1
     # and display the output
@@ -686,6 +699,40 @@ def execute(text, return_value=False, stack=None):
     else:
         if incoming:
             display(incoming)
+
+def setTraceButtons(filename, lineno):
+    document = calico.GetDocument(filename)
+    if document:
+        calico.playResetEvent.Reset()
+        calico.PlayButton.Sensitive = True
+        calico.PauseButton.Sensitive = False
+        document.GotoLine(lineno)
+        ##document.texteditor.SetSelection(lineno, start_col, end_line, end_col + 1)
+        document.SelectLine(lineno)
+
+def handleDebug(filename, lineno):
+    ## First, see if we need to do something:
+    try:
+        if (calico.CurrentDocument == None):
+            return
+        elif (calico.CurrentDocument.HasBreakpointSetAtLine(lineno)):
+            # don't return! Fall through and wait
+            pass
+        elif (calico.ProgramSpeedValue == 100):
+            return
+    except:
+        return
+    # Ok, we have something to do:
+    Calico.MainWindow.Invoke(lambda: setTraceButtons(filename, lineno))
+    psv = calico.ProgramSpeedValue
+    if (psv == 0 or
+        calico.CurrentDocument.HasBreakpointSetAtLine(lineno) or
+        trace_pause):
+        calico.playResetEvent.WaitOne()
+    elif (psv < 100): ## then we are in a delay:
+        pause = (2.0 / psv)
+        ## Force at least a slight sleep, else no GUI controls
+        time.sleep(pause)
 
 def display(g):
     """
