@@ -1520,7 +1520,8 @@ namespace Calico {
 		    if (manager[lang].engine != null)
 			manager[lang].engine.Close();
 		}
-		if (OS == "Windows") {
+		if (OS == "Windows" || OS == "Mac") {
+		    // FIXME: it would be better not to do this, but some threads are still running:
 		    foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcesses()) {
 			try {
 			    if (process.ProcessName.EndsWith("mono")) {
