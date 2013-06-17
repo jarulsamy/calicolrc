@@ -499,7 +499,7 @@ public class Finch: Myro.Robot
 		}
 		byte [] readData = ReadBytes (READSIZE);
 		if (OS == "Mac") {
-			while (readData[0] != bytes[0] && bytes[1] != (byte)'z') {
+			while (readData[0] != bytes[0] && bytes[0] != (byte)'z') {
 				readData = ReadBytes (READSIZE);
 			}
 		} else {
