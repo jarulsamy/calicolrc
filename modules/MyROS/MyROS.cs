@@ -10,6 +10,16 @@ using turtlesim;
 
 public static class MyROS
 {
+  
+  public static Graphics.Picture rosRawRGBToPicture(org.jboss.netty.buffer.SlicedChannelBuffer cbuffer,
+						    int width,
+						    int height)
+  {
+    byte[] buffer = new byte[cbuffer.capacity()];
+    cbuffer.getBytes(0, buffer, 0, cbuffer.capacity());
+    return new Graphics.Picture(width, height, buffer);
+  }
+  
   public class CSharpTurtleTest: NodeMain
   {
     Publisher publisher;

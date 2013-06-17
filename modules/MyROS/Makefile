@@ -8,6 +8,7 @@ all: ../MyROS.dll
 		-lib:.. \
 		-unsafe \
 		-r:ros \
+		-r:Graphics.dll \
 		-r:IKVM.OpenJDK.Beans \
 		-r:IKVM.OpenJDK.Charsets \
 		-r:IKVM.OpenJDK.Corba \
@@ -32,7 +33,7 @@ all: ../MyROS.dll
 		-r:IKVM.OpenJDK.XML.XPath \
 		-r:IKVM.Reflection \
 		-r:IKVM.Runtime \
-		-r:IKVM.Runtime.JNI \
+		-r:IKVM.Runtime.JNI\
 		-out:../MyROS.dll \
 
 clean::
