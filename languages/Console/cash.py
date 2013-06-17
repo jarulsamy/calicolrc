@@ -11,11 +11,18 @@ import os
 import re
 import shutil
 import inspect
+import traceback
 
 ## ------------------------------------------------------------
 ## Globals:
 
 lastcd = [os.getcwd()]
+stack = []
+
+class ConsoleException(Exception):
+    def __init__(self, message, stack):
+        self.message = message
+        self.stack = stack
 
 ## ------------------------------------------------------------
 ## Commands:
@@ -25,7 +32,7 @@ lastcd = [os.getcwd()]
 ## __doc__ : first line, summary; rest for a complete help doc
 ## all should handle --help
 
-def cd(incoming, tty, args):
+def cd(incoming, tty, args, stack):
     """
     change directory
 
@@ -53,7 +60,7 @@ def cd(incoming, tty, args):
     lastcd.append(os.getcwd())
     return [lastcd[-1]]
 
-def rm(incoming, tty, args):
+def rm(incoming, tty, args, stack):
     """
     remove file or folders
 
@@ -64,7 +71,7 @@ def rm(incoming, tty, args):
     #shutil.rmtree() # removes directory and contents
     return []
 
-def mkdir(incoming, ttyp, args):
+def mkdir(incoming, ttyp, args, stack):
     """
     make a directory
     """
@@ -73,7 +80,7 @@ def mkdir(incoming, ttyp, args):
         os.makedirs(filename)
     return []
 
-def rmdir(incoming, tty, args):
+def rmdir(incoming, tty, args, stack):
     """
     remove folders
 
@@ -84,7 +91,7 @@ def rmdir(incoming, tty, args):
         os.rmdir(folder) # removes an empty directory
     return []
 
-def cp(incoming, tty, args):
+def cp(incoming, tty, args, stack):
     """
     copy files and folders
 
@@ -94,7 +101,7 @@ def cp(incoming, tty, args):
     shutil.copy(args[0], args[1])
     return []
 
-def mv(incoming, tty, args):
+def mv(incoming, tty, args, stack):
     """
     move files and folders
 
@@ -104,7 +111,7 @@ def mv(incoming, tty, args):
     os.rename(args[0], args[1])
     return []
 
-def pwd(incoming, tty, args):
+def pwd(incoming, tty, args, stack):
     """
     print working directory
 
@@ -158,7 +165,7 @@ def list_dir(d, flags, tty):
         yield retval
     yield ""
 
-def ls(incoming, tty, args):
+def ls(incoming, tty, args, stack):
     """
     list files
 
@@ -185,7 +192,7 @@ def ls(incoming, tty, args):
             for item in list_dir(f, flags, tty):
                 yield item
 
-def grep(incoming, tty, args):
+def grep(incoming, tty, args, stack):
     """
     search for matches
 
@@ -195,7 +202,7 @@ def grep(incoming, tty, args):
     if len(args) > 0:
         pattern = args[0]
     else:
-        raise Exception("grep: error, no pattern given")
+        raise ConsoleException("grep: error, no pattern given", stack)
     if incoming:
         for i in incoming:
             if match(pattern, i):
@@ -231,7 +238,7 @@ def counts(text):
                 state = "word"
     return words, chars
 
-def wc(incoming, tty, args):
+def wc(incoming, tty, args, stack):
     """
     word count; counts characters, words, and lines
     """
@@ -260,7 +267,7 @@ def wc(incoming, tty, args):
         yield "%6d %6d %6d total" % (lines, words, chars)
     return # ends yields
 
-def more(incoming, tty, args):
+def more(incoming, tty, args, stack):
     """
     see output one page at a time
     """
@@ -291,9 +298,9 @@ def more(incoming, tty, args):
                         if not yn:
                             return
             else:
-                raise Exception("more: no such file '%s'" % f)
+                raise ConsoleException("more: no such file '%s'" % f, stack)
 
-def cat(incoming, tty, args):
+def cat(incoming, tty, args, stack):
     """
     concatenate files
     """
@@ -309,7 +316,7 @@ def cat(incoming, tty, args):
     else:
         for filename in args:
             if not os.path.exists(filename) or not os.path.isfile(filename):
-                raise Exception("cat: file does not exist: '%s'" % filename)
+                raise ConsoleException("cat: file does not exist: '%s'" % filename, stack)
             fp = open(filename)
             for line in fp:
                 i = line.strip()
@@ -319,14 +326,14 @@ def cat(incoming, tty, args):
                 else:
                     yield i
 
-def sort(incoming, tty, args):
+def sort(incoming, tty, args, stack):
     """
     sort data
     """
     args, flags = splitArgs(args)
     return sorted(list(args) + list(incoming))
 
-def help_cmd(incoming, tty, args):
+def help_cmd(incoming, tty, args, stack):
     """
     get help on commands
     """
@@ -346,9 +353,9 @@ def help_cmd(incoming, tty, args):
             command_name = args[0].upper()
         yield ("%s: " % command_name) + commands[args[0]].__doc__.strip()
     else:
-        raise Exception("help: I don't have help on '%s'" % args[0])
+        raise ConsoleException("help: I don't have help on '%s'" % args[0], stack)
 
-def show(incoming, tty, args):
+def show(incoming, tty, args, stack):
     """
     show an image graphically
     """
@@ -366,7 +373,7 @@ def show(incoming, tty, args):
                 Myro.show(pic, filename)
     return []
 
-def open_cmd(incoming, tty, args):
+def open_cmd(incoming, tty, args, stack):
     """
     open a file in Calico
     """
@@ -381,18 +388,18 @@ def open_cmd(incoming, tty, args):
                 calico.Open(filename)
     return []
 
-def exec_cmd(incoming, tty, args):
+def exec_cmd(incoming, tty, args, stack):
     """
     execute a file in Calico
     """
     if incoming:
         for item in incoming:
-            parts = splitParts(item)
+            parts = splitParts(item, stack)
             if len(parts) == 1:
                 if os.path.isfile(parts[0]):
                     calico.ExecuteFile(parts[0])
                 else:
-                    raise Exception("exec: no such file: '%s'" % parts[0])
+                    raise ConsoleException("exec: no such file: '%s'" % parts[0], stack)
             else:
                 calico.Execute(parts[0], parts[1])
     else:
@@ -400,29 +407,29 @@ def exec_cmd(incoming, tty, args):
             if os.path.isfile(args[0]):
                 calico.ExecuteFile(args[0])
             else:
-                raise Exception("exec: no such file: '%s'" % args[0])
+                raise ConsoleException("exec: no such file: '%s'" % args[0], stack)
         else:
             calico.Execute(args[0], args[1])
     return []
 
-def eval_cmd(incoming, tty, args):
+def eval_cmd(incoming, tty, args, stack):
     """
     evaluate text in Calico
     """
     args, flags = splitArgs(args)
     if incoming:
         for item in incoming:
-            parts = splitParts(item)
+            parts = splitParts(item, stack)
             if len(parts) == 2:
                 calico.Evaluate(parts[0], parts[1])
             else:
-                raise Exception("eval: need to specify a language with '%s'" % parts[0])
+                raise ConsoleException("eval: need to specify a language with '%s'" % parts[0], stack)
     else:
         text = args[0]
         language = args[1]
         return [calico.Evaluate(text, language)]
 
-def echo(incoming, tty, args):
+def echo(incoming, tty, args, stack):
     """
     create output
     """
@@ -432,14 +439,15 @@ def echo(incoming, tty, args):
         return data.split("\\n")
     return [data]
 
-def printf(incoming, tty, args):
+def printf(incoming, tty, args, stack):
     """
     display output
     """
     args, flags = splitArgs(args)
+    print(args)
     return []
 
-def switch(incoming, tty, args):
+def switch(incoming, tty, args, stack):
     """
     to unix or dos
     """
@@ -487,16 +495,16 @@ def splitArgs(arg_list):
             args.append(arg)
     return args, flags
 
-def expand(pattern):
+def expand(pattern, stack):
     """
     Looks to see if pattern has file-matching characters. If so,
     expand now.
     """
     if pattern.startswith("`"):
-        return execute(calico, pattern[1:], True)
+        return execute(pattern[1:], True, stack[:])
     elif pattern.startswith("$"):
         ## expand variable, which could be a pattern:
-        return expand(str(calico.Evaluate(pattern[1:], "python")))
+        return expand(str(calico.Evaluate(pattern[1:], "python")), stack)
     elif ("*" in pattern or 
         "?" in pattern or
         "~" in pattern):
@@ -513,7 +521,7 @@ def expand(pattern):
     else:
         return [pattern]
 
-def splitParts(text):
+def splitParts(text, stack):
     retval = []
     i = 0
     current = ""
@@ -528,7 +536,7 @@ def splitParts(text):
                 break
             elif text[i] == " ":
                 if current:
-                    retval.extend(expand(current))
+                    retval.extend(expand(current, stack))
                     current = ""
                 else:
                     pass ## skip
@@ -571,7 +579,7 @@ def splitParts(text):
                 current += text[i]
         elif mode == "back-quote":
             if text[i] == '`':
-                retval.extend(expand(current))
+                retval.extend(expand(current, stack))
                 current = ""
                 mode = "start"
             else:
@@ -579,19 +587,19 @@ def splitParts(text):
         i += 1
     if current: # some still left:
         if mode == "start":
-            retval.extend(expand(current))
+            retval.extend(expand(current, stack))
         elif mode == "quote":
-            raise Exception("console: unended quote")
+            raise ConsoleException("console: unended quote", stack)
         elif mode == "double-quote":
-            raise Exception("console: unended double-quote")
+            raise ConsoleException("console: unended double-quote", stack)
         elif mode == "back-quote":
-            raise Exception("console: unended back-quote: leftover: '%s'" % current)
+            raise ConsoleException("console: unended back-quote: leftover: '%s'" % current, stack)
     return retval
 
-def splitLines(command_list):
+def splitLines(command_list, stack):
     commands = []
     command = []
-    for symbol in splitParts(command_list):
+    for symbol in splitParts(command_list, stack):
         if symbol in ["|"]:
             commands.append([command[0], command[1:]])
             command = []
@@ -601,12 +609,10 @@ def splitLines(command_list):
         commands.append([command[0], command[1:]])
     return commands
             
-def execute(calico, text, return_value=False):
-    """
-    Execute a shell command line.
-    """
+def executeLines(calico, text, stack):
     # put calico in the environment:
     globals()["calico"] = calico
+    # compute the width, height of the output window:
     try:
         w = calico.Output.Allocation.Width
         h = calico.Output.Allocation.Height
@@ -616,10 +622,35 @@ def execute(calico, text, return_value=False):
     except:
         globals()["width"] = 80
         globals()["height"] = 24
-    # compute the width, height of the output window:
+    retval = True
+    lineno = stack[-1][1] # last lineno
+    for line in text.split("\n"):
+        try:
+            execute(line, stack=stack[:])
+        except ConsoleException, e:
+            calico.ErrorLine("Console stack trace:")
+            calico.ErrorLine("Traceback (most recent call last):")
+            for s in e.stack:
+                calico.ErrorLine("  File \"%s\", line %s, from %s" % (s[0], s[1], s[2]))
+            calico.ErrorLine(e.message)
+            retval = False
+            break
+        except Exception, e:
+            calico.ErrorLine("".join(traceback.format_exc()))
+            retval = False
+            break
+        lineno += 1
+        stack[-1][1] = lineno # increment
+    return retval
+
+def execute(text, return_value=False, stack=None):
+    """
+    Execute a shell command line.
+    """
+    if not stack:
+        raise Exception("execute called without stack")
     # Break the command into parts:
-    line = splitLines(text)
-    incoming = None
+    line = splitLines(text, stack)
     count = 0
     # Process each command, chaining to the next:
     incoming = None
@@ -645,8 +676,9 @@ def execute(calico, text, return_value=False):
             if command_name in commands:
                 command = commands[command_name]
             else:
-                raise Exception("console: no such command: '%s'. Try 'help'" % command_name)
-            incoming = command(incoming, tty, args)
+                raise ConsoleException("console: no such command: '%s'. Try 'help'" % command_name, stack)
+            stack.append([stack[-1][0], stack[-1][1], command_name])
+            incoming = command(incoming, tty, args, stack)
         count += 1
     # and display the output
     if return_value:

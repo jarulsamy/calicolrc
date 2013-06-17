@@ -14,6 +14,25 @@ sys.path.append(os.path.dirname(__file__))
 
 # Now, define the Document, Engine, and Language classes:
 class MyLanguageEngine(Calico.Engine):
+    def RequestPause(self):
+        print("RequestPause")
+        #self.trace_pause = True
+
+    def OnTraceBack(self, frame, ttype, retval):
+        #returns IronPython.Runtime.Exceptions.TracebackDelegate 
+        print("OnTraceBack")
+        return self.OnTraceBack
+
+    def ConfigureTrace(self):
+        print("ConfigureTrace")
+        #try:
+        #    if (trace):
+        #        trace_filename = calico.CurrentDocument.filename
+        #        trace_pause = False
+                ##IronPython.Hosting.Python.SetTrace (engine, OnTraceBack);
+        #except:
+        #    Console.Error.WriteLine("Error in setting trace.")
+
     def PostSetup(self, calico):
         """
         Do things here that you want to do once (initializations).
@@ -26,25 +45,17 @@ class MyLanguageEngine(Calico.Engine):
         the interpreter.
         """
         import cash
-        retval = True
-        for line in text.split("\n"):
-            try:
-                cash.execute(self.calico, line)
-            except Exception, e:
-                self.calico.ErrorLine(e.message)
-                retval = False
-                break
-        return retval
+        return cash.executeLines(self.calico, text, [["<module>", 1, "'Calico Shell'"]])
 
     def ExecuteFile(self, filename):
         """
         This is the code that will interprete a file.
         """
+        import cash
         fp = open(filename)
         text = "".join(fp.readlines())
         fp.close()
-        result = self.Execute(text, feedback=False)
-        return result
+        return cash.executeLines(self.calico, text, [[filename, 1, "'Calico Run file'"]])
 
     def ReadyToExecute(self, text):
         """
@@ -52,7 +63,7 @@ class MyLanguageEngine(Calico.Engine):
         to execute. If you return False, then the user can still
         interactively type text into the Calico Shell.
         """
-        return True
+        return True # because every line is a valid command
 
 class MyLanguageDocument(Calico.TextDocument):
     """
