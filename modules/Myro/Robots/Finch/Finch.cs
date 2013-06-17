@@ -108,6 +108,8 @@ public class Finch: Myro.Robot
 	{
 		if (System.IO.Directory.Exists("/Applications")) {
 			OS = "Mac";
+			READSIZE = 8;
+			WRITESIZE = 8;
 		} else if (System.Environment.OSVersion.Platform.ToString ().Contains ("Unix")) {
 			READSIZE = 11;
 			OS = "Linux";
@@ -286,6 +288,12 @@ public class Finch: Myro.Robot
 	/// <returns>An int, or a two element array containing the the left and right light sensor values (0 to 255)</returns>
 	public override object getLight (params object[] position)
 	{ // position can be: 0, "left"; 2, "right"; "all" "both"
+
+	    // Linux:
+	    // python>>> robot.getLight()
+	    // WriteBytes: [0, 76, 0, 0, 0, 0, 0, 0, 84]
+	    // ReadBytes: [0, 76, 52, 62, 57, 19, 1, 1, 0, 0, 84]
+
 		if (robot != null) {
 			List list = new List ();
 
@@ -295,8 +303,12 @@ public class Finch: Myro.Robot
 
 			// Collect and format data - note that the first element in readData is always value 0, so we're off by one when returning
 			int[] returnData = new int[2];
-			returnData [0] = readData [1];
-			returnData [1] = readData [2];
+			int START = 1;
+			if (OS == "Linux") 
+			    START = 2;
+
+			returnData [0] = readData [START];
+			returnData [1] = readData [START + 1];
 
 			if (position.Length == 0)
 				position = new object [] {"all"};
@@ -361,17 +373,27 @@ public class Finch: Myro.Robot
 	/// <returns>A double, or an array of 3 doubles holding X, Y, and Z acceleration, null if the read failed.</returns>
 	public override object getAcceleration (params object[] position)
 	{
+
+	    // Linux:
+	    // python>>> robot.getAcceleration()
+	    // WriteBytes: [0, 65, 0, 0, 0, 0, 0, 0, 150]
+	    // ReadBytes: [0, 65, 153, 61, 63, 21, 133, 1, 0, 0, 150]
+
 		if (robot != null) {
 			List list = new List ();
 			byte[] report = makePacket((byte)'A');
 			byte[] readData = WriteBytesRead (report);
-			double[] returnData = new double[3];
+			double[] returnData = new double[5];
 			// Convert to g's. Acceleration data starts at element 2 of the array
-			for (int i = 2; i < 5; i++) {
-				if (readData [i] > 31)
-					returnData [i - 2] = ((double)readData [i] - 64) * 1.5 / 32;
+			int START = 2; // position in readData
+			if (OS == "Linux") {
+			    START = 3;
+			}
+			for (int i = 0; i < 5; i++) {
+				if (readData [i + START] > 31)
+					returnData [i] = ((double)readData [i + START] - 64) * 1.5 / 32;
 				else
-					returnData [i - 2] = ((double)readData [i]) * 1.5 / 32;
+					returnData [i] = ((double)readData [i + START]) * 1.5 / 32;
 			}
 
 			if (position.Length == 0)
@@ -510,11 +532,21 @@ public class Finch: Myro.Robot
 	/// <returns>A double, which is the ambient temperature in Celcius</returns>
 	public override object getTemperature ()
 	{
+	    // Linux:
+	    // python>>> robot.getTemperature()
+	    // WriteBytes: [0, 84, 0, 0, 0, 0, 0, 0, 196]
+	    // ReadBytes: [0, 84, 125, 61, 63, 21, 133, 1, 0, 0, 196]
+
 		if (robot != null) {
 			byte[] report = makePacket((byte)'T');
 			byte[] readData = WriteBytesRead (report);
 			// Converts data to Celcius
-			double returnData = ((double)readData [1] - 127) / 2.4 + 25;
+			double returnData;
+			if (OS == "Linux") {
+			    returnData = ((double)readData [2] - 127) / 2.4 + 25;
+			} else {
+			    returnData = ((double)readData [1] - 127) / 2.4 + 25;
+			}
 			return returnData;
 		}
 		return 0;
@@ -527,18 +559,28 @@ public class Finch: Myro.Robot
 	/// <returns>A bool or an array of bools containing Finch obstacle data</returns>
 	public override object getObstacle (params object[] position)
 	{
+
+	    // Linux:
+	    // python>>> robot.getObstacle()
+	    // WriteBytes: [0, 73, 0, 0, 0, 0, 0, 0, 237]
+	    // ReadBytes: [0, 73, 0, 0, 63, 21, 133, 1, 0, 0, 237]
+
 		if (robot != null) {
 			List list = new List ();
 
 			byte[] report = makePacket((byte)'I');
 			byte[] readData = WriteBytesRead (report);
 
+			int START = 1;
+			if (OS == "Linux")
+			    START = 2;
+
 			bool[] returnData = new bool[2];
-			if (readData [1] == 1)
+			if (readData [START] == 1)
 				returnData [0] = true;
 			else
 				returnData [0] = false;
-			if (readData [2] == 1)
+			if (readData [START + 1] == 1)
 				returnData [1] = true;
 			else
 				returnData [1] = false;
