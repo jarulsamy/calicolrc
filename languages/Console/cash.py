@@ -212,6 +212,54 @@ def grep(incoming, tty, args):
                 calico.ErrorLine("grep: no such file '%s'" % f)
     return # ends yields
 
+def counts(text):
+    chars = 0
+    words = 0
+    state = "non-word"
+    for ch in text:
+        chars += 1
+        if ch in [" ", "\n", "\t"]:
+            if state == "non-word":
+                pass # still in non-word
+            else:
+                state = "non-word"
+        else:
+            if state == "word":
+                pass # still in word
+            else:
+                words += 1
+                state = "word"
+    return words, chars
+
+def wc(incoming, tty, args):
+    """
+    word count; counts characters, words, and lines
+    """
+    args, flags = splitArgs(args)
+    lines = 0
+    chars = 0
+    words = 0
+    if incoming:
+        for line in incoming:
+            w, c = counts(line)
+            lines += 1
+            words += w
+            chars += c + 1
+        yield "%6d %6d %6d" % (lines, words, chars)
+    else:
+        for f in args[1:]:
+            if os.path.exists(f) and os.path.isfile(f):
+                text = open(f).readlines()
+                for line in text:
+                    w, c = counts(line)
+                    lines += 1
+                    words += w
+                    chars += c + 1
+            else:
+                calico.ErrorLine("wc: no such file '%s'" % f)
+        yield "%6d %6d %6d total" % (lines, words, chars)
+    return # ends yields
+
 def more(incoming, tty, args):
     """
     see output one page at a time
@@ -379,7 +427,10 @@ def echo(incoming, tty, args):
     create output
     """
     args, flags = splitArgs(args)
-    return [" ".join(args)]
+    data = " ".join(args)
+    if "-e" in flags:
+        return data.split("\\n")
+    return [data]
 
 def printf(incoming, tty, args):
     """
@@ -620,7 +671,8 @@ unix_commands = {"ls": ls, "more": more, "cd": cd, "grep": grep,
                  "rm": rm, "less": more, "show": show, "open": open_cmd,
                  "sort": sort, "exec": exec_cmd, "eval": eval_cmd,
                  "mkdir": mkdir, "mv": mv, "rmdir": rmdir, "echo": echo, 
-                 "edit": open_cmd, "switch": switch, "printf": printf}
+                 "edit": open_cmd, "switch": switch, "printf": printf, 
+                 "wc": wc}
 dos_commands = {"dir": ls, "more": more, "cd": cd, "chdir": cd,
                 "help": help_cmd, "pwd": pwd, "copy": cp,
                 "del": rm, "erase": rm, "show": show, "open": open_cmd,
