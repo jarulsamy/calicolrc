@@ -6112,7 +6112,7 @@ public static class Graphics
 		if (window == null) {
 		    string label;
 		    if (options.ContainsKey("label")) {
-                	label = (string)options["label"];
+                	label = options["label"].ToString();
 		    } else if (graph.Attributes.ContainsKey("label")) {
                 	label = graph.Attributes["label"].Trim().Split('\n')[0].Trim();
 		    } else {
@@ -6147,19 +6147,19 @@ public static class Graphics
 		    int height = (int)(((double)v.Height) * 72 * scale);
 		    string shape;
 		    if (options.ContainsKey("shape")) {
-	                shape = (string)options["shape"];
+			shape = options["shape"].ToString();
 		    } else if (v.Attributes.ContainsKey("shape")) {
 	                shape = v.Attributes["shape"];
 		    } else {
-	                shape = (string)options["default_shape"];
+	                shape = options["default_shape"].ToString();
 		    }
 		    Graphics.Color outline;
 		    if (options.ContainsKey("outline")) {
-	                outline = new Graphics.Color((string)options["outline"]);
+	                outline = new Graphics.Color(options["outline"].ToString());
 		    } else if  (v.Attributes.ContainsKey("color")) {
 	                outline = new Graphics.Color(v.Attributes["color"]);
 		    } else {
-	                outline = new Graphics.Color((string)options["default_outline"]);
+	                outline = new Graphics.Color(options["default_outline"].ToString());
 		    }
 	            // Shapes:
 		    Shape obj1 = null;
@@ -6178,13 +6178,13 @@ public static class Graphics
 		    }
 	            if (obj1 != null) {
 	                obj1.outline = new Graphics.Color(outline);
-	                obj1.fill = new Graphics.Color((string)options["fill"]);
+	                obj1.fill = new Graphics.Color(options["fill"].ToString());
 	                obj1.border = 2;
 	                obj1.draw(window);
 		    }
 	            if (obj2 != null) {
 	                obj2.outline = new Graphics.Color(outline);
-	                obj2.fill = new Graphics.Color((string)options["fill"]);
+	                obj2.fill = new Graphics.Color(options["fill"].ToString());
 	                obj2.border = 2;
 	                obj2.draw(window);
 		    }
@@ -6251,7 +6251,7 @@ public static class Graphics
 	                color = "black";
 		    }
 	            // Line:
-	            if ((string)options["line_type"] == "curve") {
+	            if (options["line_type"].ToString() == "curve") {
 	                for (int i = 0; i < points.Count/3; i++) {
 	                    int j = i * 3;
 	                    Curve line = new Graphics.Curve(points[j], points[j + 1], points[j + 2], points[j + 3]);
@@ -6272,7 +6272,7 @@ public static class Graphics
 		    double h;
 		    if (e.SourceArrowEnd != null) {
 	                Arrow arrow = new Graphics.Arrow(points[0]);
-	                if ((string)options["line_type"] == "curve") {
+	                if (options["line_type"].ToString() == "curve") {
 	                    w = points[0].x - points[1].x;
 	                    h = points[0].y - points[1].y;
 			} else {
@@ -6288,7 +6288,7 @@ public static class Graphics
 		    }
 	            if (e.DestinationArrowEnd != null) {
 	                Arrow arrow = new Graphics.Arrow(points[points.Count - 1]);
-	                if ((string)options["line_type"] == "curve") { // FIXME: these may be backwards:
+	                if (options["line_type"].ToString() == "curve") { // FIXME: these may be backwards:
 	                    w = points[points.Count - 2].x - points[points.Count - 1].x;
 	                    h = points[points.Count - 2].y - points[points.Count - 1].y;
 			} else {
