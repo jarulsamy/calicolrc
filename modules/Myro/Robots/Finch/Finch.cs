@@ -178,11 +178,14 @@ public class Finch: Myro.Robot
 		setLED ("back", value);
 	}
 
+
 	/// <summary>
 	/// Sets the color of the LED
 	/// </summary>
-	/// <param name="position">Type "finch" for this parameter, it does not do anything but is necessary for inheritance</param>
-	/// <param name="value">A string containing '#' followed by the hex value of the color.
+	/// <param name="position">Type "front" for this parameter, it
+	/// does not do anything but is necessary for inheritance</param>
+	/// <param name="value">A string containing '#' followed by the
+	/// hex  value of the color.
 	/// Example: "#00FF00"</param>
 	public override void setLED (string position, object value)
 	{
@@ -406,10 +409,14 @@ public class Finch: Myro.Robot
 			    START = 3;
 			}
 			for (int i = 0; i < 5; i++) {
+			  if (i < 2) { // number of sensors to get directly
+				returnData [i] = (double)readData [i + START];
+			  } else {
 				if (readData [i + START] > 31)
-					returnData [i] = ((double)readData [i + START] - 64) * 1.5 / 32;
+				  returnData [i] = ((double)readData [i + START] - 64) * 1.5 / 32;
 				else
-					returnData [i] = ((double)readData [i + START]) * 1.5 / 32;
+				  returnData [i] = ((double)readData [i + START]) * 1.5 / 32;
+			  }
 			}
 
 			if (position.Length == 0)
