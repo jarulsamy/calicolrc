@@ -216,7 +216,7 @@ def ls(name, incoming, tty, args, stack):
         data = ["."]
     for f in data:
         if not os.path.exists(f):
-            calico.ErrorLine("ls: cannot access '%s': no such file for directory" % f)
+            calico.ErrorLine("ls: cannot access '%s': no such file or directory" % f)
             continue
         if os.path.isfile(f):
             yield list_file(f, flags, tty)
@@ -703,7 +703,9 @@ def executeLines(calico, text, stack):
             retval = False
             break
         except Exception, e:
-            calico.ErrorLine("".join(traceback.format_exc()))
+            if debug:
+                calico.ErrorLine("".join(traceback.format_exc()))
+            calico.ErrorLine(str(e))
             retval = False
             break
         except SystemExit, e:
