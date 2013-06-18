@@ -45,13 +45,13 @@ class ConsoleException(Exception):
 ## ------------------------------------------------------------
 ## Commands:
 
-## command(incoming-sequence, tty?, arguments, stack)
+## command(name, incoming-sequence, tty?, arguments, stack)
 ## -> returns a sequence [eg, returns a seq, or defines a generator]
 ## __doc__ : first line, summary; rest for a complete help doc
 ## all should handle -h --help
 ## 
 
-def cd(incoming, tty, args, stack):
+def cd(name, incoming, tty, args, stack):
     """
     change directory
 
@@ -66,26 +66,33 @@ def cd(incoming, tty, args, stack):
     See also: pwd, mkdir
     """
     global lastcd
-    args, flags = splitArgs(args)
-    
-    directory = None
-    if len(args) > 0:
-        directory = args[0]
+    parser = argparse.ArgumentParser(
+        prog=name, 
+        epilog="No argument will %(prog)s to HOME")
+    parser.add_argument('--number', '-n', action="store_true", 
+                        help='%(prog)s will prefix each line with its line number')
+    parser.add_argument('directory', nargs="?", 
+                        help='the directory to change to')
+    parser.add_argument('-', action="store_true", 
+                        dest="goback",
+                        help='go back to the previous directory')
+    pargs = parser.parse_args(args)
+    if debug: print(name, pargs)
     # ---
-    if directory == "-":
+    if pargs.goback:
         if len(lastcd) > 1:
-            directory = lastcd[-2]
+            pargs.directory = lastcd[-2]
         else:
-            directory = None
+            pargs.directory = None
         # else pass
-    if directory:
-        os.chdir(directory)
+    if pargs.directory:
+        os.chdir(pargs.directory)
     else:
         os.chdir(os.path.expanduser("~"))
     lastcd.append(os.getcwd())
     return [lastcd[-1]]
 
-def rm(incoming, tty, args, stack):
+def rm(name, incoming, tty, args, stack):
     """
     remove file or folders
 
@@ -96,7 +103,7 @@ def rm(incoming, tty, args, stack):
     #shutil.rmtree() # removes directory and contents
     return []
 
-def mkdir(incoming, ttyp, args, stack):
+def mkdir(name, incoming, ttyp, args, stack):
     """
     make a directory
     """
@@ -105,7 +112,7 @@ def mkdir(incoming, ttyp, args, stack):
         os.makedirs(filename)
     return []
 
-def rmdir(incoming, tty, args, stack):
+def rmdir(name, incoming, tty, args, stack):
     """
     remove folders
 
@@ -116,7 +123,7 @@ def rmdir(incoming, tty, args, stack):
         os.rmdir(folder) # removes an empty directory
     return []
 
-def cp(incoming, tty, args, stack):
+def cp(name, incoming, tty, args, stack):
     """
     copy files and folders
 
@@ -126,7 +133,7 @@ def cp(incoming, tty, args, stack):
     shutil.copy(args[0], args[1])
     return []
 
-def mv(incoming, tty, args, stack):
+def mv(name, incoming, tty, args, stack):
     """
     move files and folders
 
@@ -136,7 +143,7 @@ def mv(incoming, tty, args, stack):
     os.rename(args[0], args[1])
     return []
 
-def pwd(incoming, tty, args, stack):
+def pwd(name, incoming, tty, args, stack):
     """
     print working directory
 
@@ -190,7 +197,7 @@ def list_dir(d, flags, tty):
         yield retval
     yield ""
 
-def ls(incoming, tty, args, stack):
+def ls(name, incoming, tty, args, stack):
     """
     list files
 
@@ -217,7 +224,7 @@ def ls(incoming, tty, args, stack):
             for item in list_dir(f, flags, tty):
                 yield item
 
-def grep(incoming, tty, args, stack):
+def grep(name, incoming, tty, args, stack):
     """
     search for matches
 
@@ -269,7 +276,7 @@ def counts(text):
                 state = "word"
     return words, chars
 
-def wc(incoming, tty, args, stack):
+def wc(name, incoming, tty, args, stack):
     """
     word count; counts characters, words, and lines
     """
@@ -298,7 +305,7 @@ def wc(incoming, tty, args, stack):
         yield "%6d %6d %6d total" % (lines, words, chars)
     return # ends yields
 
-def more(incoming, tty, args, stack):
+def more(name, incoming, tty, args, stack):
     """
     see output one page at a time
     """
@@ -331,7 +338,7 @@ def more(incoming, tty, args, stack):
             else:
                 raise ConsoleException("more: no such file '%s'" % f, stack)
 
-def cat(incoming, tty, args, stack):
+def cat(name, incoming, tty, args, stack):
     """
     concatenate files
     """
@@ -357,14 +364,14 @@ def cat(incoming, tty, args, stack):
                 else:
                     yield i
 
-def sort(incoming, tty, args, stack):
+def sort(name, incoming, tty, args, stack):
     """
     sort data
     """
     args, flags = splitArgs(args)
     return sorted(list(args) + list(incoming))
 
-def help_cmd(incoming, tty, args, stack):
+def help_cmd(name, incoming, tty, args, stack):
     """
     get help on commands
     """
@@ -386,7 +393,7 @@ def help_cmd(incoming, tty, args, stack):
     else:
         raise ConsoleException("help: I don't have help on '%s'" % args[0], stack)
 
-def show(incoming, tty, args, stack):
+def show(name, incoming, tty, args, stack):
     """
     show an image graphically
     """
@@ -404,7 +411,7 @@ def show(incoming, tty, args, stack):
                 Myro.show(pic, filename)
     return []
 
-def open_cmd(incoming, tty, args, stack):
+def open_cmd(name, incoming, tty, args, stack):
     """
     open a file in Calico
     """
@@ -419,7 +426,7 @@ def open_cmd(incoming, tty, args, stack):
                 calico.Open(filename)
     return []
 
-def exec_cmd(incoming, tty, args, stack):
+def exec_cmd(name, incoming, tty, args, stack):
     """
     execute a file in Calico
     """
@@ -443,7 +450,7 @@ def exec_cmd(incoming, tty, args, stack):
             return [calico.Execute(args[0], args[1])]
     return []
 
-def eval_cmd(incoming, tty, args, stack):
+def eval_cmd(name, incoming, tty, args, stack):
     """
     evaluate text in Calico
     """
@@ -460,7 +467,7 @@ def eval_cmd(incoming, tty, args, stack):
         language = args[1]
         return [calico.Evaluate(text, language)]
 
-def echo(incoming, tty, args, stack):
+def echo(name, incoming, tty, args, stack):
     """
     create output
     """
@@ -470,7 +477,7 @@ def echo(incoming, tty, args, stack):
         return data.split("\\n")
     return [data]
 
-def printf(incoming, tty, args, stack):
+def printf(name, incoming, tty, args, stack):
     """
     display output
     """
@@ -478,7 +485,7 @@ def printf(incoming, tty, args, stack):
     print(" ".join(args))
     return []
 
-def switch(incoming, tty, args, stack):
+def switch(name, incoming, tty, args, stack):
     """
     to unix or dos
     """
@@ -742,7 +749,7 @@ def execute(text, return_value=False, stack=None, offset=0):
                 expr = args[1:]
                 calico.Execute("%s = %s" % (command_name, " ".join(expr)), "python")
                 continue
-            if command_name in commands:
+            if command_name.lower() in commands:
                 command = commands[command_name.lower()]
             else:
                 raise ConsoleException("console: no such command: '%s'. Try 'help'" % command_name, stack)
@@ -750,7 +757,7 @@ def execute(text, return_value=False, stack=None, offset=0):
                 stack.append([stack[-1][0], stack[-1][1], command_name.start + offset, command_name.end + offset, command_name])
             else:
                 stack.append([stack[-1][0], stack[-1][1], offset, offset + len(command_name), command_name])
-            incoming = command(incoming, tty, args, stack)
+            incoming = command(command_name, incoming, tty, args, stack)
         count += 1
     # and display the output
     if return_value:
