@@ -1,3 +1,5 @@
+from __future__ import print_function, division
+
 ## Calico Shell: Console
 
 ## A cross-platform bash-like shell, integrated with Calico
@@ -12,6 +14,8 @@ import re
 import shutil
 import inspect
 import traceback
+import clr
+clr.AddReference("Calico")
 import Calico
 import time
 
@@ -22,6 +26,7 @@ lastcd = [os.getcwd()]
 stack = []
 trace = False
 trace_pause = False
+debug = False
 
 def setTrace(value):
     global trace
@@ -495,16 +500,17 @@ def splitArgs(arg_list):
     """
     Split into command and args
     """
+    if debug: print("splitArgs:", arg_list)
     args = []
     flags = []
     for arg in arg_list:
-        arg = arg.strip()
         if arg in ["-", "--"]:
             args.append(arg)
         elif arg.startswith("-"):
             flags.append(arg)
         else:
             args.append(arg)
+    if debug: print("returning:", args, flags)
     return args, flags
 
 def expand(pattern, stack):
@@ -513,7 +519,7 @@ def expand(pattern, stack):
     expand now.
     """
     if pattern.startswith("`"):
-        return execute(pattern[1:], True, stack[:])
+        return execute(pattern[1:], True, stack[:], pattern.start + 1) # offset
     elif pattern.startswith("$"):
         ## expand variable, which could be a pattern:
         return expand(str(calico.Evaluate(pattern[1:], "python")), stack)
@@ -533,72 +539,100 @@ def expand(pattern, stack):
     else:
         return [pattern]
 
+class AnnotatedString(str):
+    pass
+
+def makeAnnotatedString(s, start=-1, end=-1):
+    retval = AnnotatedString(s)
+    retval.start = start
+    retval.end = end
+    return retval
+
+def addAnnotatedStrings(annotatedString, string, start):
+    retval = makeAnnotatedString(annotatedString + string)
+    retval.end = annotatedString.end
+    if annotatedString.start == -1:
+        retval.start = start
+    else:
+        retval.start = annotatedString.start
+    return retval
+
 def splitParts(text, stack):
+    if debug: print("splitParts:", text, stack)
     retval = []
     i = 0
-    current = ""
+    current = makeAnnotatedString("")
     mode = "start"
     while i < len(text):
         if mode == "start":
             if text[i] == "\\":
                 i += 1
-                current += text[i]
+                current = addAnnotatedStrings(current, text[i], i)
             elif text[i].startswith("#"):
                 # ignore here to end of line
                 break
             elif text[i] == " ":
                 if current:
+                    current.end = i
                     retval.extend(expand(current, stack))
-                    current = ""
+                    current = makeAnnotatedString("")
                 else:
                     pass ## skip
             elif text[i] == "=":
                 if current:
+                    current.end = i
                     retval.append(current)
-                    current = ""
-                retval.append('=')
+                    current = makeAnnotatedString("")
+                retval.append(makeAnnotatedString('=', i, i + 1))
             elif text[i] == "'":
                 if current:
+                    current.end = i
                     retval.append(current)
-                    current = ""
+                    current = makeAnnotatedString("", i)
                 mode = "quote"
             elif text[i] == '"':
                 if current:
+                    current.end = i
                     retval.append(current)
-                    current = ""
+                    current = makeAnnotatedString("", i)
                 mode = "double-quote"
             elif text[i] == '`':
                 if current:
+                    current.end = i
                     retval.append(current)
                     # signal expand that this is an expr:
-                current = "`"
+                current = makeAnnotatedString("`", i)
                 mode = "back-quote"
             else:
-                current += text[i]
+                current = addAnnotatedStrings(current, text[i], i)
         elif mode == "quote":
             if text[i] == "'":
+                current.end = i
                 retval.append(current)
-                current = ""
+                current = makeAnnotatedString("", -1)
                 mode = "start"
             else:
-                current += text[i]
+                current = addAnnotatedStrings(current, text[i], i)
         elif mode == "double-quote":
             if text[i] == '"':
+                current.end = i
                 retval.append(current)
-                current = ""
+                current = makeAnnotatedString("", -1)
                 mode = "start"
             else:
-                current += text[i]
+                current = addAnnotatedStrings(current, text[i], i)
         elif mode == "back-quote":
             if text[i] == '`':
+                current.end = i
                 retval.extend(expand(current, stack))
-                current = ""
+                current = makeAnnotatedString("", -1)
                 mode = "start"
             else:
-                current += text[i]
+                current = addAnnotatedStrings(current, text[i], i)
         i += 1
     if current: # some still left:
         if mode == "start":
+            current.end = i
             retval.extend(expand(current, stack))
         elif mode == "quote":
             raise ConsoleException("console: unended quote", stack)
@@ -616,7 +650,7 @@ def splitLines(command_list, stack):
             commands.append([command[0], command[1:]])
             command = []
         else:
-            command.append(symbol)
+            command.append(symbol) 
     if command:
         commands.append([command[0], command[1:]])
     return commands
@@ -655,10 +689,11 @@ def executeLines(calico, text, stack):
         stack[-1][1] = lineno # increment
     return retval
 
-def execute(text, return_value=False, stack=None):
+def execute(text, return_value=False, stack=None, offset=0):
     """
     Execute a shell command line.
     """
+    if debug: print("execute:", text, stack)
     if not stack:
         raise Exception("execute called without stack")
     # Break the command into parts:
@@ -676,21 +711,21 @@ def execute(text, return_value=False, stack=None):
         else:
             continue
         if command_name:
-            command_name = command_name.lower()
-            if command_set == "unix" and command_name.startswith("#"):
+            handleDebug(stack[-1][0], stack[-1][1], command_name.start + offset, command_name.end + offset)
+            lcommand_name = command_name.lower()
+            if command_set == "unix" and lcommand_name.startswith("#"):
                 continue
-            elif command_set == "dos" and command_name == "rem":
+            elif command_set == "dos" and lcommand_name == "rem":
                 continue
             if len(args) > 1 and args[0] == "=":
                 expr = args[1:]
                 calico.Execute("%s = %s" % (command_name, " ".join(expr)), "python")
                 continue
             if command_name in commands:
-                command = commands[command_name]
+                command = commands[command_name.lower()]
             else:
                 raise ConsoleException("console: no such command: '%s'. Try 'help'" % command_name, stack)
-            stack.append([stack[-1][0], stack[-1][1], command_name])
-            handleDebug(stack[-1][0], stack[-1][1])
+            stack.append([stack[-1][0], stack[-1][1], command_name.start + offset, command_name.end + offset, command_name])
             incoming = command(incoming, tty, args, stack)
         count += 1
     # and display the output
@@ -700,17 +735,19 @@ def execute(text, return_value=False, stack=None):
         if incoming:
             display(incoming)
 
-def setTraceButtons(filename, lineno):
+def setTraceButtons(filename, lineno, start, end):
     document = calico.GetDocument(filename)
     if document:
         calico.playResetEvent.Reset()
         calico.PlayButton.Sensitive = True
         calico.PauseButton.Sensitive = False
         document.GotoLine(lineno)
-        ##document.texteditor.SetSelection(lineno, start_col, end_line, end_col + 1)
-        document.SelectLine(lineno)
+        if (start == -1 or end == -1):
+            document.SelectLine(lineno)
+        else:
+            document.texteditor.SetSelection(lineno, start + 1, lineno, end + 1)
 
-def handleDebug(filename, lineno):
+def handleDebug(filename, lineno, start, end):
     ## First, see if we need to do something:
     try:
         if (calico.CurrentDocument == None):
@@ -723,7 +760,7 @@ def handleDebug(filename, lineno):
     except:
         return
     # Ok, we have something to do:
-    Calico.MainWindow.Invoke(lambda: setTraceButtons(filename, lineno))
+    Calico.MainWindow.Invoke(lambda: setTraceButtons(filename, lineno, start, end))
     psv = calico.ProgramSpeedValue
     if (psv == 0 or
         calico.CurrentDocument.HasBreakpointSetAtLine(lineno) or

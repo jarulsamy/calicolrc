@@ -41,7 +41,7 @@ class MyLanguageEngine(Calico.Engine):
         the interpreter.
         """
         import cash
-        return cash.executeLines(self.calico, text, [["<module>", 1, "'Calico Shell'"]])
+        return cash.executeLines(self.calico, text, [["<module>", 1, 0, len(text), "'Calico Shell'"]])
 
     def ExecuteFile(self, filename):
         """
@@ -51,7 +51,7 @@ class MyLanguageEngine(Calico.Engine):
         fp = open(filename)
         text = "".join(fp.readlines())
         fp.close()
-        return cash.executeLines(self.calico, text, [[filename, 1, "'Calico Run file'"]])
+        return cash.executeLines(self.calico, text, [[filename, 1, 0, len(text), "'Calico Run file'"]])
 
     def ReadyToExecute(self, text):
         """

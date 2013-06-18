@@ -5,11 +5,11 @@
 
 switch unix # comment to end of line
 pwd
-more ./Tests.sh
+#more ./Tests.sh
 
 ls -l ../../../examples/images/chess/ | show
-ls -l | grep Hello | open
-exec "HelloWorld.sh"
+#ls -l | grep Hello | open
+#exec "HelloWorld.sh"
 cd
 cd -
 x = 42
