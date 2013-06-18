@@ -216,7 +216,7 @@ def ls(name, incoming, tty, args, stack):
         data = ["."]
     for f in data:
         if not os.path.exists(f):
-            calico.ErrorLine("ls: cannot access '%s': no such file or directory" % f)
+            calico.ErrorLine("ls: cannot access '%s': no such file for directory" % f)
             continue
         if os.path.isfile(f):
             yield list_file(f, flags, tty)
@@ -435,7 +435,7 @@ def exec_cmd(name, incoming, tty, args, stack):
             parts = splitParts(item, stack)
             if len(parts) == 1:
                 if os.path.isfile(parts[0]):
-                    calico.ExecuteFile(parts[0])
+                    return [calico.ExecuteFile(parts[0])]
                 else:
                     raise ConsoleException("exec: no such file: '%s'" % parts[0], stack)
             else:
@@ -443,12 +443,12 @@ def exec_cmd(name, incoming, tty, args, stack):
     else:
         if len(args) == 1:
             if os.path.isfile(args[0]):
-                calico.ExecuteFile(args[0])
+                return [calico.ExecuteFile(args[0])]
             else:
                 raise ConsoleException("exec: no such file: '%s'" % args[0], stack)
         else:
             return [calico.Execute(args[0], args[1])]
-    return []
+    return [1]
 
 def eval_cmd(name, incoming, tty, args, stack):
     """
@@ -747,7 +747,12 @@ def execute(text, return_value=False, stack=None, offset=0):
             elif command_set == "dos" and lcommand_name == "rem":
                 continue
             if debug: print("args:", args)
-            if len(args) > 1 and args[0] == "=":
+            if command_name.lower() == "set" and args[1] == "=": # SET x = y
+                expr = " ".join(args[2:])
+                var = args[0]
+                calico.Execute("%s = '%s'" % (var, expr), "python")
+                continue
+            elif len(args) > 1 and args[0] == "=":
                 expr = args[1:]
                 calico.Execute("%s = %s" % (command_name, " ".join(expr)), "python")
                 continue
