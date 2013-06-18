@@ -3073,6 +3073,15 @@ public static class Myro
 		public double _lastTranslate = 0;
 		public double _lastRotate = 0;
 
+	        public static bool is_string(object thing) {
+		    if (thing is string)
+			return true;
+		    System.Type myType = thing.GetType();
+		    // Ruby String has a CreateMutable
+		    System.Reflection.MemberInfo[] myMembers = myType.GetMember("CreateMutable");
+		    return (myMembers.Length > 0);
+		}
+
 		public virtual void setOption (string key, object value)
 		{
 		}

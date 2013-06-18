@@ -651,7 +651,7 @@ public class Scribbler: Myro.Robot
                         retvals.append ((int)values [1]);
                     } else if (Myro.Contains (pos, 2, "right")) {
                         retvals.append ((int)values [2]);
-                    } else if (pos == null | (string)pos == "all") {
+                    } else if (pos == null | pos.ToString() == "all") {
                         retvals.append (values);
                     } 
                 } else if (sensor == "ir") {
@@ -661,7 +661,7 @@ public class Scribbler: Myro.Robot
                         retvals.append ((int)values [0]);
                     } else if (Myro.Contains (pos, 1, "right")) {
                         retvals.append ((int)values [1]);
-                    } else if (pos == null | (string)pos == "all") {
+                    } else if (pos == null | pos.ToString() == "all") {
                         retvals.append (values);
                     }
                 } else if (sensor == "line") {
@@ -678,7 +678,7 @@ public class Scribbler: Myro.Robot
                 } else if (sensor == "distance") {
                     retvals.append (getDistance1 (pos));
                 } else if (sensor == "bright") {
-                    retvals.append (getBright ((string)pos));
+                    retvals.append (getBright (pos.ToString()));
                 } else {
                     throw new Exception (String.Format ("invalid sensor name: '{0}'",
                                                         sensor));
@@ -846,9 +846,9 @@ public class Scribbler: Myro.Robot
 
     public bool isTrue (object value)
     {
-        if (value as string != null) {
-            return ((string)value == "on" ||
-                    (string)value == "1");
+        if (is_string(value)) {
+            return (value.ToString() == "on" ||
+                    value.ToString() == "1");
         } else if (value as int? != null) {
             return ((int)value == 1);
         } else 
@@ -886,27 +886,28 @@ public class Scribbler: Myro.Robot
 
     public void set (string item, object position, object value)
     {
+	string sposition = position.ToString();
         if (item == "led") {
-            if ((string)position == "center" || (string)position == "middle") {
+            if (sposition == "center" || sposition == "middle") {
                 if (isTrue (value))
                     set (Scribbler.SET_LED_CENTER_ON);
                 else
                     set (Scribbler.SET_LED_CENTER_OFF);
-            } else if ((string)position == "left") {
+            } else if (sposition == "left") {
                 if (isTrue (value)) 
                     set (Scribbler.SET_LED_LEFT_ON);
                 else             
                     set (Scribbler.SET_LED_LEFT_OFF);
-            } else if ((string)position == "right") {
+            } else if (sposition == "right") {
                 if (isTrue (value)) 
                     set (Scribbler.SET_LED_RIGHT_ON);
                 else
                     set (Scribbler.SET_LED_RIGHT_OFF);
-            } else if ((string)position == "front") {
+            } else if (sposition == "front") {
                 setLEDFront (value);
-            } else if ((string)position == "back") {
+            } else if (sposition == "back") {
                 setLEDBack (System.Convert.ToDouble (value));
-            } else if ((string)position == "all") {
+            } else if (sposition == "all") {
                 if (isTrue (value)) 
                     set (Scribbler.SET_LED_ALL_ON);
                 else
@@ -915,9 +916,9 @@ public class Scribbler: Myro.Robot
                 throw new Exception (String.Format ("no such LED: '{0}'", position));
             }
         } else if (item == "name") {
-            setName ((string)position);
+            setName (sposition);
         } else if (item == "whitebalance") {
-            setWhiteBalance ((string)position);
+            setWhiteBalance (sposition);
         } else if (item == "irpower") {
             setIRPower ((int)position);
         } else if (item == "volume") {
@@ -929,15 +930,15 @@ public class Scribbler: Myro.Robot
                 set (Scribbler.SET_QUIET);
             }
         } else if (item == "startsong") {
-            startsong = (string)position;
+            startsong = sposition;
         } else if (item == "echomode") {
             setEchoMode ((int)position);
         } else if (item == "data") {
             setData ((int)position, (byte)value);
         } else if (item == "password") {
-            setPassword ((string)position);
+            setPassword (sposition);
         } else if (item == "forwardness") {
-            setForwardness ((string)position);
+            setForwardness (sposition);
         } else {
             throw new Exception (String.Format ("invalid set item name: '{0}'", item));
         }
@@ -954,8 +955,8 @@ public class Scribbler: Myro.Robot
 
     int getObstacle1 (object position)
     {
-        if (position as string != null) {
-            string value = (string)position;
+        if (is_string(position)) {
+            string value = position.ToString();
             if (value == "left") {
                 write (Scribbler.GET_DONGLE_L_IR);
             } else if (value == "middle" || value == "center") {
@@ -996,8 +997,8 @@ public class Scribbler: Myro.Robot
         byte [] buffer = new byte [Scribbler.PACKET_LENGTH]; 
         buffer [0] = Scribbler.GET_DISTANCE_EX;
 
-        if (position as string != null) {
-            string value = (string)position;
+        if (is_string(position)) {
+            string value = position.ToString();
             if (value == "left") {
                 buffer[1] = 0;
             } else if (value == "right") {
@@ -1065,14 +1066,15 @@ public class Scribbler: Myro.Robot
     public override object getBright (string window)
     {
         byte byte_window = 0;
-        if (window == null || (string)window == "all") {
+        if (window == null || window.ToString() == "all") {
             return get ("bright");
-        } else if (window as string != null) {
-            if ((string)window == "left") {
+        } else if (is_string(window)) {
+	    string swindow = window.ToString();
+            if (swindow == "left") {
                 byte_window = 0;
-            } else if ((string)window == "middle" || (string)window == "center") {
+            } else if (swindow == "middle" || swindow == "center") {
                 byte_window = 1;
-            } else if ((string)window == "right") {
+            } else if (swindow == "right") {
                 byte_window = 2;
             } else {
                 throw new Exception ("invalid bright argument");

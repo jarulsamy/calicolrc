@@ -562,7 +562,7 @@ public class SimScribbler : Myro.Robot
 			List retval = new List ();
 			if (positions.Length == 0)
 				positions = new object[3] {0, 1, 2};
-			else if ((positions.Length == 1) && (positions [0] is string) && ((string)(positions [0]) == "all"))
+			else if ((positions.Length == 1) && (is_string(positions [0]) && (positions [0].ToString()) == "all"))
 				positions = new object[3] {0, 1, 2};
 			foreach (object position in positions) {
 			    if (position is int) {

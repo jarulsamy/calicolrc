@@ -189,7 +189,7 @@ public class Finch: Myro.Robot
 		if (robot != null) {
 			if (position == "front" || position == "center" || position == "middle" || position == "all") {
 				try {
-					color = (string)value;
+				        color = value.ToString();
 					red = Int32.Parse (color.Substring (1, 2), System.Globalization.NumberStyles.HexNumber);
 					green = Int32.Parse (color.Substring (3, 2), System.Globalization.NumberStyles.HexNumber);
 					blue = Int32.Parse (color.Substring (5, 2), System.Globalization.NumberStyles.HexNumber);
@@ -322,8 +322,8 @@ public class Finch: Myro.Robot
 				position = new object [] {"all"};
 
 			foreach (object item in position) {
-				if (item is string) {
-					string temp = (string)item;
+			       if (is_string(item)) {
+				    string temp = item.ToString();
 					if (temp == "left") {
 						list.append (returnData [0]);
 					} else if (temp == "right") {
@@ -416,8 +416,8 @@ public class Finch: Myro.Robot
 				position = new object [] {"all"};
 
 			foreach (object item in position) {
-				if (item is string) {
-					string temp = (string)item;
+			         if (is_string(item)) {
+				    string temp = item.ToString();
 					if (temp == "x") {
 						list.append (returnData [0]);
 					} else if (temp == "y") {
@@ -619,8 +619,8 @@ public class Finch: Myro.Robot
 				position = new object [] {"all"};
 
 			foreach (object item in position) {
-				if (item is string) {
-					string temp = (string)item;
+			        if (is_string(item)) {
+				        string temp = item.ToString();
 					if (temp == "left") {
 						list.append (returnData [0]);
 					} else if (temp == "right") {
