@@ -68,10 +68,10 @@ namespace HidSharp.Platform.Linux
             creationState = null;
             string syspath = (string)key; var hidDevice = new LinuxHidDevice(syspath);
 			bool info = hidDevice.GetInfo();
-			//if (info) {
-			//	device = null; 
-			//	return false; 
-			//}
+			if (!info) {
+				device = null; 
+				return false; 
+			}
             device = hidDevice; 
 			return true;
         }
