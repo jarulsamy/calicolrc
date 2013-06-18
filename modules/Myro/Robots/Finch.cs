@@ -94,7 +94,7 @@ public class Finch: Myro.Robot
 	private int red = 0; // stores red LED setting
 	private int green = 0; // stores green LED setting 
 	private int blue = 0; // stores blue LED setting
-	private string color = "#000000"; // stores the color of the LED
+	public string color = "#000000"; // stores the color of the LED
 	private byte changeByte = 1; //counter
 	private string name = "Finchy";
 	public bool debug = false;
@@ -103,6 +103,8 @@ public class Finch: Myro.Robot
 	public bool loop = true;
 	public bool STARTBYTE = false;
 	public static string OS = "Unknown";
+	public int deviceID = 0x1111;
+	public string robotType = "Finch";
 	
 	public Finch ()
 	{
@@ -128,10 +130,10 @@ public class Finch: Myro.Robot
 	{
 		try {
 			loader = new HidDeviceLoader ();
-			robot = loader.GetDeviceOrDefault (0x2354, 0x1111);
+			robot = loader.GetDeviceOrDefault (0x2354, deviceID);
 			stream = robot.Open ();
 		} catch {
-			Console.Error.WriteLine ("Could not find the finch");
+		    Console.Error.WriteLine ("Could not find the {0}", robotType);
 		}
 		if (robot != null) {
 			if (keepAliveThread == null) {
@@ -660,19 +662,23 @@ public class Finch: Myro.Robot
 		return null;
 	}
 
+	private void keepAliveFunction() {
+	    byte[] report = makePacket((byte)'z');
+	    WriteBytesRead (report);
+	}
+
 	private void keepAlive ()
 	{
 		while (loop) {
 			if (robot != null) {
 				try {
-					byte[] report = makePacket((byte)'z');
-					WriteBytesRead (report);
+				    keepAliveFunction();
 				} catch (Exception e) {
 					System.Console.Error.WriteLine ("warning in keepAlive, continuing...: " + e.Message);
 				}
 				wait (2000); // do this again in 2 seconds
 			} else {
-				System.Console.Error.WriteLine ("Looking for the Finch...");
+			    System.Console.Error.WriteLine ("Looking for the {0}...", robotType);
 			}
 		}
 		System.Console.WriteLine ("Done!");

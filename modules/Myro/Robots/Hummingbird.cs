@@ -5,42 +5,11 @@ using System.Text;
 using System.Threading;
 using HidSharp;
 
-public class Hummingbird : Myro.Robot
+public class Hummingbird : Finch
 {
-    private HidStream stream = null;
-    private HidDevice robot = null;
-    private HidDeviceLoader loader = null;
-    private Thread keepAliveThread = null;
-    private string tri_color1 = "#000000";
-    private byte changeByte = 1; //counter
 
-
-    public Hummingbird()
-    {
-        open();
-    }
-
-    /// <summary>
-    /// Open's connection to the Hummingbird.
-    /// </summary>
-    public void open()
-    {
-        try
-        {
-            loader = new HidDeviceLoader();
-            robot = loader.GetDeviceOrDefault(0x2354, 0x2222);
-            stream = robot.Open();
-        }
-        catch
-        {
-            Console.Error.WriteLine("Could not find the hummingbird");
-        }
-        if (robot != null && keepAliveThread == null)
-        {
-            keepAliveThread = new Thread(new ThreadStart(keepAlive)); // Start the thread that keeps Finch out of idle mode while program is running
-            keepAliveThread.Start();
-        }
-    }
+    public new int deviceID = 0x2222;
+    public new string robotType = "Hummingbird";
 
     /// <summary>
     /// Sets the color of an LED port
@@ -51,56 +20,56 @@ public class Hummingbird : Myro.Robot
     /// containing the intensity. Example(tri): "#00FF00", Example(single): 200</param>
     public override void setLED(string position, object value)
     {
-        if (stream != null)
+        if (robot != null)
         {
             try
             {
                 if (position == "t1")
                 {
-                    tri_color1 = (string)value;
-                    int red = Int32.Parse(tri_color1.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
-                    int green = Int32.Parse(tri_color1.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
-                    int blue = Int32.Parse(tri_color1.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
-                    byte[] report = { (byte)0, (byte)'O', (byte)48, (byte)red, (byte)green, (byte)blue };
-                    stream.Write(report);
-                }
-                else if (position == "t2")
-                {
-                    string color = (string)value;
+                    color = value.ToString();
                     int red = Int32.Parse(color.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
                     int green = Int32.Parse(color.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
                     int blue = Int32.Parse(color.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
-                    byte[] report = { (byte)0, (byte)'O', (byte)49, (byte)red, (byte)green, (byte)blue };
-                    stream.Write(report);
+                    byte[] report = makePacket((byte)'O', (byte)48, (byte)red, (byte)green, (byte)blue );
+                    WriteBytes(report);
+                }
+                else if (position == "t2")
+                {
+                    string color = value.ToString();
+                    int red = Int32.Parse(color.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+                    int green = Int32.Parse(color.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+                    int blue = Int32.Parse(color.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+                    byte[] report = makePacket((byte)'O', (byte)49, (byte)red, (byte)green, (byte)blue );
+                    WriteBytes(report);
                 }
                 else if (position == "s1")
                 {
                     int intensity = (int)value;
-                    byte[] report = { (byte)0, (byte)'L', (byte)48, (byte)intensity };
-                    stream.Write(report);
+                    byte[] report = makePacket((byte)'L', (byte)48, (byte)intensity );
+                    WriteBytes(report);
                 }
                 else if (position == "s2")
                 {
                     int intensity = (int)value;
-                    byte[] report = { (byte)0, (byte)'L', (byte)49, (byte)intensity };
-                    stream.Write(report);
+                    byte[] report = makePacket((byte)'L', (byte)49, (byte)intensity );
+                    WriteBytes(report);
                 }
                 else if (position == "s3")
                 {
                     int intensity = (int)value;
-                    byte[] report = { (byte)0, (byte)'L', (byte)50, (byte)intensity };
-                    stream.Write(report);
+                    byte[] report = makePacket((byte)'L', (byte)50, (byte)intensity );
+                    WriteBytes(report);
                 }
                 else if (position == "s4")
                 {
                     int intensity = (int)value;
-                    byte[] report = { (byte)0, (byte)'L', (byte)51, (byte)intensity };
-                    stream.Write(report);
+                    byte[] report = makePacket((byte)'L', (byte)51, (byte)intensity );
+                    WriteBytes(report);
                 }
             }
-            catch (Exception e)
+            catch 
             {
-                Console.Write("Bad input");
+                Console.Error.WriteLine("Bad input");
             }
         }
     }
@@ -113,7 +82,7 @@ public class Hummingbird : Myro.Robot
         int left = (int)(_lastTranslate * 255 - _lastRotate * 255);
         int right = (int)(_lastTranslate * 255 + _lastRotate * 255);
 
-        if (stream != null)
+        if (robot != null)
         {
             int dir_left = 48;
             int dir_right = 48;
@@ -127,24 +96,17 @@ public class Hummingbird : Myro.Robot
             }
             int left1 = Math.Min(Math.Abs(left), 255);
             int right1 = Math.Min(Math.Abs(right), 255);
-            byte[] report = { (byte)0, (byte)'M', (byte)48, (byte)dir_left, (byte)left1};
-            stream.Write(report);
-            byte[] report1 = { (byte)0, (byte)'M', (byte)49, (byte)dir_right, (byte)right1 };
-            stream.Write(report1);
+            byte[] report = makePacket((byte)'M', (byte)48, (byte)dir_left, (byte)left1);
+            WriteBytes(report);
+            byte[] report1 = makePacket((byte)'M', (byte)49, (byte)dir_right, (byte)right1 );
+            WriteBytes(report1);
         }
     }
 
-    private void keepAlive()
-    {
-        while (true)
-        {
-            if (stream != null)
-            {
-                setLED("t1", tri_color1); // Set the LED to the current values (doesn't change the LED color)
-                wait(2000); // do this again in 2 seconds
-            }
-        }
+    private void keepAliveFunction() {
+	setLED("t1", color); // Set the LED to the current values (doesn't change the LED color)
     }
+
     /// <summary>
     /// Sets the intensity of a vibration motor
     /// </summary>
@@ -152,23 +114,22 @@ public class Hummingbird : Myro.Robot
     /// Example: "v1255" (sets vibration port 1 to 255), "v20" (sets vibration port 2 to 0), "v225" (sets vibration port 2 to 25)</param>
     public override void setVolume(object volume)
     {
-        try
+        if (robot != null)
         {
-            string vib = (string)volume;
-            int port = 48;
-            if(vib.Substring(0,2) == "v2")
-            {
-                port++;
-            }
-            int intensity = Convert.ToInt32(vib.Substring(2, vib.Length - 2));
-            Console.Write(intensity);
-            byte[] report = { (byte)0, (byte)'V', (byte)port, (byte)intensity };
-            stream.Write(report);
-        }
-        catch (Exception e)
-        {
-            Console.Write("Bad input");
-        }
+	    try	{
+		string vib = volume.ToString();
+		int port = 48;
+		if(vib.Substring(0,2) == "v2")
+		    {
+			port++;
+		    }
+		int intensity = Convert.ToInt32(vib.Substring(2, vib.Length - 2));
+		byte[] report = makePacket((byte)'V', (byte)port, (byte)intensity );
+		WriteBytes(report);
+	    } catch {
+		Console.Error.WriteLine("Bad input");
+	    }
+	}
     }
 
     /// <summary>
@@ -181,20 +142,16 @@ public class Hummingbird : Myro.Robot
         if (robot != null)
         {
 
-            byte[] report = { (byte)0, (byte)'G', (byte)51, 0x00, 0x00, 0x00, 0x00, 0x00, changeByte };
-            stream.Write(report);
-            byte[] readData = stream.Read();
-            // Keep reading until you get back to the report that matches to the one you wrote (hopefully this loop isn't triggered, but just in case
-            while (readData[8] != changeByte)
-            {
-                stream.Write(report);
-                readData = stream.Read();
-            }
-            changeByte++;
+            byte[] report = makePacket((byte)'G', (byte)51);
+            byte[] readData = WriteBytesRead(report);
+
             double[] returnData = new double[4];
+
+	    int START = 1; // Windows
+
             for (int x = 0; x < 4; x++)
             {
-                returnData[x] = readData[x+1];
+                returnData[x] = readData[x+START];
             }
             if (sensor == "1")
             {
@@ -215,7 +172,10 @@ public class Hummingbird : Myro.Robot
             else if (sensor == "all")
             {
                 return returnData;
-            }
+            } else {
+		throw new Exception(String.Format("get: invalid sensor name: '{0}'", sensor));
+
+	    }
         }
         return null;
     }
@@ -227,16 +187,16 @@ public class Hummingbird : Myro.Robot
     /// </summary>
     public override object get(string sensor, params object[] position)
     {
-        if (stream != null)
+        if (robot != null)
         {
             string temp = "";
             try
             {
-                temp = (string)position[0];
+                temp = position[0].ToString();
             }
-            catch (Exception e)
+            catch 
             {
-                Console.Write("Incorrect input");
+                Console.Error.WriteLine("Incorrect input");
             }
             double returnData = (double)get(sensor);
             if (temp == "temperature")
@@ -272,49 +232,12 @@ public class Hummingbird : Myro.Robot
     /// </summary>
     public override void servo(int id, int value)
     {
-        if (stream != null && id >= 1 && id <= 4)
+        if (robot != null && id >= 1 && id <= 4)
         {
             int angle = (value * 234 / 180) % 235;
-            byte[] buffer = { (byte)0, (byte)'S', (byte)(47 + id), (byte)angle };
-            stream.Write(buffer);
+            byte[] buffer = makePacket((byte)'S', (byte)(47 + id), (byte)angle );
+            WriteBytes(buffer);
         }
     }
 
-    /// <summary>
-    /// Sets the robot into idle mode. Use this function rather than halt in most cases.
-    /// </summary>
-    public void idle()
-    {
-        if (stream != null)
-        {
-
-            byte[] report = { (byte)0, (byte)'R' };
-            stream.Write(report);
-            stream = null;
-            robot = null;
-            loader = null;
-            keepAliveThread.Abort();
-        }
-    }
-
-    /// <summary>
-    /// Turns off all motors, LEDs and disconnects.
-    /// </summary>
-    public void halt()
-    {
-        if (stream != null)
-        {
-            byte[] report = { (byte)0, (byte)'X' };
-            stream.Write(report);
-            stream = null;
-            robot = null;
-            loader = null;
-            keepAliveThread.Abort();
-        }
-    }
-
-    public void wait(int ms)
-    {
-        System.Threading.Thread.Sleep(ms);
-    }
 }
