@@ -105,22 +105,33 @@ public class Finch: Myro.Robot
 	public static string OS = "Unknown";
 	public int deviceID = 0x1111;
 	public string robotType = "Finch";
+
+	public virtual void initialize_birdbrain() {
+	    deviceID = 0x1111;
+	    robotType = "Finch";
+	}
+	
+	public virtual void post_initialize_birdbrain() {
+	    if (robot != null) {
+		setLED ("front", color); // Set the LED to the current values (doesn't change the LED color)
+	    }
+	}
 	
 	public Finch ()
 	{
-		if (System.IO.Directory.Exists("/Applications")) {
-			OS = "Mac";
-			READSIZE = 8;
-			WRITESIZE = 8;
-		} else if (System.Environment.OSVersion.Platform.ToString ().Contains ("Unix")) {
-			READSIZE = 11;
-			OS = "Linux";
-		} else {
-			OS = "Windows";
-		}
-		open ();
-		flush ();
-		setLED ("front", color); // Set the LED to the current values (doesn't change the LED color)
+	    initialize_birdbrain();
+	    if (System.IO.Directory.Exists("/Applications")) {
+		OS = "Mac";
+		READSIZE = 8;
+		WRITESIZE = 8;
+	    } else if (System.Environment.OSVersion.Platform.ToString ().Contains ("Unix")) {
+		READSIZE = 11;
+		OS = "Linux";
+	    } else {
+		OS = "Windows";
+	    }
+	    open ();
+	    flush ();
 	}
 
 	/// <summary>
@@ -662,7 +673,7 @@ public class Finch: Myro.Robot
 		return null;
 	}
 
-	private void keepAliveFunction() {
+	public virtual void keepAliveFunction() {
 	    byte[] report = makePacket((byte)'z');
 	    WriteBytesRead (report);
 	}

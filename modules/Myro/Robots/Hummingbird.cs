@@ -8,9 +8,14 @@ using HidSharp;
 public class Hummingbird : Finch
 {
 
-    public new int deviceID = 0x2222;
-    public new string robotType = "Hummingbird";
+    public override void initialize_birdbrain() {
+	deviceID = 0x2222;
+	robotType = "Hummingbird";
+    }
 
+    public override void post_initialize_birdbrain() {
+    }
+	
     /// <summary>
     /// Sets the color of an LED port
     /// </summary>
@@ -103,7 +108,7 @@ public class Hummingbird : Finch
         }
     }
 
-    private void keepAliveFunction() {
+    public override void keepAliveFunction() {
 	setLED("t1", color); // Set the LED to the current values (doesn't change the LED color)
     }
 
