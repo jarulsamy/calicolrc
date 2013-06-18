@@ -456,6 +456,10 @@ namespace Calico {
             return System.IO.Path.Combine(path, path_file);
         }
 
+        public string relativePath() {
+            return path;
+        }
+
         void configureIO() {
             if (! Debug) {
                 CustomStream nout = new CustomStream(this, Tag.Normal);

@@ -18,6 +18,7 @@ import clr
 clr.AddReference("Calico")
 import Calico
 import time
+import argparse
 
 ## ------------------------------------------------------------
 ## Globals:
@@ -44,10 +45,11 @@ class ConsoleException(Exception):
 ## ------------------------------------------------------------
 ## Commands:
 
-## command(incoming-sequence, tty?, arguments)
+## command(incoming-sequence, tty?, arguments, stack)
 ## -> returns a sequence [eg, returns a seq, or defines a generator]
 ## __doc__ : first line, summary; rest for a complete help doc
-## all should handle --help
+## all should handle -h --help
+## 
 
 def cd(incoming, tty, args, stack):
     """
@@ -56,10 +58,16 @@ def cd(incoming, tty, args, stack):
     To change directories, use cd folder, where folder is either
     relative or absolute.
 
-    see also: pwd, mkdir
+    cd
+    cd -
+    cd ..
+    cd /
+
+    See also: pwd, mkdir
     """
     global lastcd
     args, flags = splitArgs(args)
+    
     directory = None
     if len(args) > 0:
         directory = args[0]
@@ -222,7 +230,10 @@ def grep(incoming, tty, args, stack):
         raise ConsoleException("grep: error, no pattern given", stack)
     if incoming:
         for i in incoming:
-            if match(pattern, i):
+            if "-v" in flags:
+                if not match(pattern, i):
+                    yield i
+            elif match(pattern, i):
                 yield i
     else:
         for f in args[1:]:
@@ -230,7 +241,10 @@ def grep(incoming, tty, args, stack):
                 text = open(f).readlines()
                 for line in text:
                     line = line.strip()
-                    if match(pattern, line):
+                    if "-v" in flags:
+                        if not match(pattern, line):
+                            yield "%s: %s" % (f, line)
+                    elif match(pattern, line):
                         yield "%s: %s" % (f, line)
             else:
                 calico.ErrorLine("grep: no such file '%s'" % f)
@@ -418,7 +432,7 @@ def exec_cmd(incoming, tty, args, stack):
                 else:
                     raise ConsoleException("exec: no such file: '%s'" % parts[0], stack)
             else:
-                calico.Execute(parts[0], parts[1])
+                return [calico.Execute(parts[0], parts[1])]
     else:
         if len(args) == 1:
             if os.path.isfile(args[0]):
@@ -426,7 +440,7 @@ def exec_cmd(incoming, tty, args, stack):
             else:
                 raise ConsoleException("exec: no such file: '%s'" % args[0], stack)
         else:
-            calico.Execute(args[0], args[1])
+            return [calico.Execute(args[0], args[1])]
     return []
 
 def eval_cmd(incoming, tty, args, stack):
@@ -438,7 +452,7 @@ def eval_cmd(incoming, tty, args, stack):
         for item in incoming:
             parts = splitParts(item, stack)
             if len(parts) == 2:
-                calico.Evaluate(parts[0], parts[1])
+                return [calico.Evaluate(parts[0], parts[1])]
             else:
                 raise ConsoleException("eval: need to specify a language with '%s'" % parts[0], stack)
     else:
@@ -461,7 +475,7 @@ def printf(incoming, tty, args, stack):
     display output
     """
     args, flags = splitArgs(args)
-    print(args)
+    print(" ".join(args))
     return []
 
 def switch(incoming, tty, args, stack):
@@ -677,12 +691,15 @@ def executeLines(calico, text, stack):
             calico.ErrorLine("Console stack trace:")
             calico.ErrorLine("Traceback (most recent call last):")
             for s in e.stack:
-                calico.ErrorLine("  File \"%s\", line %s, from %s" % (s[0], s[1], s[2]))
+                calico.ErrorLine("  File \"%s\", line %s, from %s" % (s[0], s[1], s[4]))
             calico.ErrorLine(e.message)
             retval = False
             break
         except Exception, e:
             calico.ErrorLine("".join(traceback.format_exc()))
+            retval = False
+            break
+        except SystemExit, e:
             retval = False
             break
         lineno += 1
@@ -711,12 +728,16 @@ def execute(text, return_value=False, stack=None, offset=0):
         else:
             continue
         if command_name:
-            handleDebug(stack[-1][0], stack[-1][1], command_name.start + offset, command_name.end + offset)
+            if hasattr(command_name, "start") and hasattr(command_name, "end"):
+                handleDebug(stack[-1][0], stack[-1][1], command_name.start + offset, command_name.end + offset)
+            else:
+                handleDebug(stack[-1][0], stack[-1][1], offset, offset + len(command_name))
             lcommand_name = command_name.lower()
             if command_set == "unix" and lcommand_name.startswith("#"):
                 continue
             elif command_set == "dos" and lcommand_name == "rem":
                 continue
+            if debug: print("args:", args)
             if len(args) > 1 and args[0] == "=":
                 expr = args[1:]
                 calico.Execute("%s = %s" % (command_name, " ".join(expr)), "python")
@@ -725,7 +746,10 @@ def execute(text, return_value=False, stack=None, offset=0):
                 command = commands[command_name.lower()]
             else:
                 raise ConsoleException("console: no such command: '%s'. Try 'help'" % command_name, stack)
-            stack.append([stack[-1][0], stack[-1][1], command_name.start + offset, command_name.end + offset, command_name])
+            if hasattr(command_name, "start") and hasattr(command_name, "end"):
+                stack.append([stack[-1][0], stack[-1][1], command_name.start + offset, command_name.end + offset, command_name])
+            else:
+                stack.append([stack[-1][0], stack[-1][1], offset, offset + len(command_name), command_name])
             incoming = command(incoming, tty, args, stack)
         count += 1
     # and display the output
