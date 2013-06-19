@@ -21,6 +21,7 @@ Hummingbird.dll: Hummingbird.cs Finch.cs
 	dmcs -sdk:4 -lib:../../../bin \
 		-lib:../../../bin/linux \
 		-r:../../Myro.dll \
+		-r:Finch.dll \
 		-r:../../Graphics.dll \
 		-r:../../../bin/IronPython.dll \
 		-r:../../../bin/Microsoft.Scripting.dll \
@@ -30,7 +31,7 @@ Hummingbird.dll: Hummingbird.cs Finch.cs
 		-pkg:gtk-sharp-2.0 \
 		-out:Hummingbird.dll \
 		-target:library \
-		$^ 
+		Hummingbird.cs
 
 NxtRobot.dll: NxtRobot/NxtRobot.cs NxtRobot/NxtNet.cs NxtRobot/MotorPort.cs \
 	NxtRobot/SensorState.cs NxtRobot/Command.cs \

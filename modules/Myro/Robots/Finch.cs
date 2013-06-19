@@ -87,10 +87,10 @@ Ascii Command Codes:
 
 public class Finch: Myro.Robot
 {
-	public static HidStream stream = null;
-	public static HidDevice robot = null;
+        public static Dictionary<String,HidStream>streams = new Dictionary<String,HidStream>();
+	public HidDevice robot = null;
 	private HidDeviceLoader loader = null;
-	private static Thread keepAliveThread = null;
+	private Thread keepAliveThread = null;
 	private int red = 0; // stores red LED setting
 	private int green = 0; // stores green LED setting 
 	private int blue = 0; // stores blue LED setting
@@ -102,7 +102,7 @@ public class Finch: Myro.Robot
 	public byte WRITESIZE = 9;
 	public bool loop = true;
 	public bool STARTBYTE = false;
-	public static string OS = "Unknown";
+	public string OS = "Unknown";
 	public int deviceID = 0x1111;
 	public string robotType = "Finch";
 
@@ -112,7 +112,7 @@ public class Finch: Myro.Robot
 	}
 	
 	public virtual void post_initialize_birdbrain() {
-	    if (robot != null) {
+	    if (streams[robotType] != null) {
 		setLED ("front", color); // Set the LED to the current values (doesn't change the LED color)
 	    }
 	}
@@ -132,6 +132,7 @@ public class Finch: Myro.Robot
 	    }
 	    open ();
 	    flush ();
+	    post_initialize_birdbrain();
 	}
 
 	/// <summary>
@@ -139,14 +140,15 @@ public class Finch: Myro.Robot
 	/// </summary>
 	public void open ()
 	{
+	    streams[robotType] = null;;
 		try {
 			loader = new HidDeviceLoader ();
 			robot = loader.GetDeviceOrDefault (0x2354, deviceID);
-			stream = robot.Open ();
+			streams[robotType] = robot.Open ();
 		} catch {
 		    Console.Error.WriteLine ("Could not find the {0}", robotType);
 		}
-		if (robot != null) {
+		if (streams[robotType] != null) {
 			if (keepAliveThread == null) {
 				startKeepAlive ();
 			} else {
@@ -202,7 +204,7 @@ public class Finch: Myro.Robot
 	/// Example: "#00FF00"</param>
 	public override void setLED (string position, object value)
 	{
-		if (robot != null) {
+		if (streams[robotType] != null) {
 			if (position == "front" || position == "center" || position == "middle" || position == "all") {
 				try {
 				        color = value.ToString();
@@ -228,7 +230,7 @@ public class Finch: Myro.Robot
 		int left = (int)(_lastTranslate * 255 - _lastRotate * 255);
 		int right = (int)(_lastTranslate * 255 + _lastRotate * 255);
 
-		if (robot != null) {
+		if (streams[robotType] != null) {
 			int dir_left = 0;
 			int dir_right = 0;
 			if (left < 0) {
@@ -249,11 +251,11 @@ public class Finch: Myro.Robot
 	/// </summary>
 	public void idle ()
 	{
-		if (robot != null) {
+		if (streams[robotType] != null) {
 
 			byte[] report = makePacket((byte)'R');
 			WriteBytes (report);
-			stream = null;
+			streams[robotType] = null;
 			robot = null;
 			loader = null;
 			keepAliveThread.Abort ();
@@ -265,10 +267,10 @@ public class Finch: Myro.Robot
 	/// </summary>
 	public void halt ()
 	{
-		if (robot != null) {
+		if (streams[robotType] != null) {
 			byte[] report = makePacket((byte)'X');
 			WriteBytes (report);
-			stream = null;
+			streams[robotType] = null;
 			robot = null;
 			loader = null;
 			keepAliveThread.Abort ();
@@ -287,7 +289,7 @@ public class Finch: Myro.Robot
 	/// <param name="frequency">The frequency of the beep in Hz</param>
 	public override void beep (double duration, double frequency)
 	{
-		if (robot != null) {
+		if (streams[robotType] != null) {
 			int milliseconds = (int)(duration * 1000);
 			int freq = (int)frequency;
 			byte[] report = makePacket((byte)'B', (byte)((milliseconds & 0xff00) / 256), (byte)(milliseconds & 0x00ff), 
@@ -318,7 +320,7 @@ public class Finch: Myro.Robot
 		// ReadBytes: [76, 13, 12, 0, 0, 0, 0, 0]
 
 		
-		if (robot != null) {
+		if (streams[robotType] != null) {
 			List list = new List ();
 
 			// Add the "changeByte" into the report to force every returning report to be slightly different - otherwise read won't work
@@ -373,7 +375,7 @@ public class Finch: Myro.Robot
 	}
 
 
-	public static byte [] makePacket(params byte [] report) {
+	public byte [] makePacket(params byte [] report) {
 		byte [] array = null;
 		if (OS == "Mac") {
 			array = new byte[report.Length];
@@ -411,7 +413,7 @@ public class Finch: Myro.Robot
 		// ReadBytes: [65, 153, 61, 62, 20, 1, 1, 0]
 
 		
-		if (robot != null) {
+		if (streams[robotType] != null) {
 			List list = new List ();
 			byte[] report = makePacket((byte)'A');
 			byte[] readData = WriteBytesRead (report);
@@ -476,15 +478,17 @@ public class Finch: Myro.Robot
 	{
 		if (debug)
 			System.Console.WriteLine ("stream.flush");
-		lock (stream) {
-			stream.Flush ();
+		if (streams[robotType] != null) {
+		    lock (streams[robotType]) {
+			streams[robotType].Flush ();
 			try {
 				while (true) {
-					stream.Read ();
+					streams[robotType].Read ();
 				}
 			} catch { // catch a timeout
 				// Ok, done
 			}
+		    }
 		}
 	}
 
@@ -498,8 +502,10 @@ public class Finch: Myro.Robot
 		changeByte++;
 		if (debug)
 			System.Console.WriteLine ("WriteBytes: " + arrayToString (tbuffer));
-		lock (stream) {
-			stream.Write (tbuffer);
+		if (streams[robotType] != null) {
+		    lock (streams[robotType]) {
+			streams[robotType].Write (tbuffer);
+		    }
 		}
 	}
 
@@ -514,40 +520,46 @@ public class Finch: Myro.Robot
 		changeByte++;
 		if (debug)
 			System.Console.WriteLine ("WriteBytes: " + arrayToString (tbuffer));
-		lock (stream) {
-			stream.Write (tbuffer);
-		}
-		byte [] readData = ReadBytes (READSIZE);
-		if (OS == "Mac") {
+		if (streams[robotType] != null) {
+		    lock (robot) {
+			streams[robotType].Write (tbuffer);
+		    }
+		    byte [] readData = ReadBytes (READSIZE);
+		    if (OS == "Mac") {
 			while (readData[0] != bytes[0] && bytes[0] != (byte)'z') {
-				readData = ReadBytes (READSIZE);
+			    readData = ReadBytes (READSIZE);
 			}
-		} else {
+		    } else {
 			while (readData[READSIZE - 1] != lastChangeByte && bytes[1] != (byte)'z') {
-				readData = ReadBytes (READSIZE);
+			    readData = ReadBytes (READSIZE);
 			}
+		    }
+		    return readData;
+		} else {
+		    return null;
 		}
-		return readData;
 	}
 
 	public byte [] ReadBytes (int size)
 	{
 		byte [] retval = new byte[size];
 		int r = 0;
-		while (r < size) {
+		if (streams[robotType] != null) {
+		    while (r < size) {
 			byte [] buffer = null;
-			lock (stream) {
-				buffer = stream.Read ();
+			lock (robot) {
+			    buffer = streams[robotType].Read ();
 			}
 			for (int b = 0; b < buffer.Length; b++) {
-				if (r < size)
-					retval [r++] = buffer [b];
-				else
-					System.Console.Error.WriteLine ("Leftover byte on buffer: " + buffer [b]);
+			    if (r < size)
+				retval [r++] = buffer [b];
+			    else
+				System.Console.Error.WriteLine ("Leftover byte on buffer: " + buffer [b]);
 			}
+		    }
 		}
 		if (debug)
-			System.Console.WriteLine ("ReadBytes: " + arrayToString (retval));
+		    System.Console.WriteLine ("ReadBytes: " + arrayToString (retval));
 		return retval;
 	}
 
@@ -580,7 +592,7 @@ public class Finch: Myro.Robot
 		// WriteBytes: [84, 0, 0, 0, 0, 0, 0, 70]
 		// ReadBytes: [84, 126, 61, 62, 20, 1, 1, 0]
 		
-		if (robot != null) {
+		if (streams[robotType] != null) {
 			byte[] report = makePacket((byte)'T');
 			byte[] readData = WriteBytesRead (report);
 			// Converts data to Celcius
@@ -615,7 +627,7 @@ public class Finch: Myro.Robot
 		// ReadBytes: [73, 1, 1, 0, 0, 0, 0, 0]
 
 		
-		if (robot != null) {
+		if (streams[robotType] != null) {
 			List list = new List ();
 
 			byte[] report = makePacket((byte)'I');
@@ -681,16 +693,16 @@ public class Finch: Myro.Robot
 	private void keepAlive ()
 	{
 		while (loop) {
-			if (robot != null) {
-				try {
-				    keepAliveFunction();
-				} catch (Exception e) {
-					System.Console.Error.WriteLine ("warning in keepAlive, continuing...: " + e.Message);
-				}
-				wait (2000); // do this again in 2 seconds
-			} else {
-			    System.Console.Error.WriteLine ("Looking for the {0}...", robotType);
+		    if (streams[robotType] != null) {
+			try {
+			    keepAliveFunction();
+			} catch (Exception e) {
+			    System.Console.Error.WriteLine ("warning in keepAlive, continuing...: " + e.Message);
 			}
+		    } else {
+			System.Console.Error.WriteLine ("Looking for the {0}...", robotType);
+		    }
+		    wait (2000); // do this again in 2 seconds
 		}
 		System.Console.WriteLine ("Done!");
 	}
