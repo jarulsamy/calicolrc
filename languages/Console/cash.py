@@ -8,17 +8,26 @@ from __future__ import print_function, division
 ## GPL, version 3 or greater
 ## Doug Blank
 
+## TODO: add argparse to all commands
+
+## Commands are written below in the following style:
+## command(name, incoming-sequence or [], tty?, arguments, stack)
+## -> returns a sequence [eg, returns a seq, or defines a generator]
+## __doc__ : first line, summary; rest for a complete help doc
+
 import glob
 import os
 import re
 import shutil
 import inspect
 import traceback
-import clr
-clr.AddReference("Calico")
-import Calico
 import time
 import argparse
+# Needed in case you want to run this in Calico Python interactively:
+import clr
+clr.AddReference("Calico")
+# Above not needed, unless interactive
+import Calico
 
 ## ------------------------------------------------------------
 ## Globals:
@@ -29,6 +38,15 @@ trace = False
 trace_pause = False
 debug = False
 
+# Reset below:
+unix_commands = {}
+dos_commands = {}
+commands = {}
+command_set = None
+
+## ------------------------------------------------------------
+## API to Calico:
+
 def setTrace(value):
     global trace
     trace = value
@@ -37,126 +55,159 @@ def setPause(value):
     global trace_pause
     trace_pause = value
 
+def executeLines(calico, text, stack):
+    # put calico in the environment:
+    globals()["calico"] = calico
+    # compute the width, height of the output window:
+    try:
+        w = calico.Output.Allocation.Width
+        h = calico.Output.Allocation.Height
+        scale = (calico.GetFont().Size/1024)
+        globals()["width"] = int(w/(scale - 2))
+        globals()["height"] = int(h/(scale * 1.7))
+    except:
+        globals()["width"] = 80
+        globals()["height"] = 24
+    retval = True
+    lineno = stack[-1][1] # last lineno
+    for line in text.split("\n"):
+        try:
+            execute(line, stack=stack[:])
+        except ConsoleException, e:
+            calico.ErrorLine("Console stack trace:")
+            calico.ErrorLine("Traceback (most recent call last):")
+            for s in e.stack:
+                calico.ErrorLine("  File \"%s\", line %s, from %s" % (s[0], s[1], s[4]))
+            calico.ErrorLine(e.message)
+            retval = False
+            break
+        except Exception, e:
+            if debug:
+                calico.ErrorLine("".join(traceback.format_exc()))
+            calico.ErrorLine(str(e))
+            retval = False
+            break
+        except SystemExit, e:
+            retval = False
+            break
+        lineno += 1
+        stack[-1][1] = lineno # increment
+    return retval
+
+def execute(text, return_value=False, stack=None, offset=0):
+    """
+    Execute a shell command line.
+    """
+    if debug: print("execute:", text, stack)
+    if not stack:
+        raise Exception("execute called without stack")
+    # Break the command into parts:
+    line = splitLines(text, stack)
+    count = 0
+    # Process each command, chaining to the next:
+    incoming = None
+    for data in line:
+        if not data:
+            continue
+        # only last one is a tty
+        tty = (count == len(line) - 1) and not return_value # pipe to a tty or not
+        if len(data) == 2:
+            command_name, args = data
+        else:
+            continue
+        if command_name:
+            if hasattr(command_name, "start") and hasattr(command_name, "end"):
+                handleDebug(stack[-1][0], stack[-1][1], command_name.start + offset, command_name.end + offset)
+            else:
+                handleDebug(stack[-1][0], stack[-1][1], offset, offset + len(command_name))
+            lcommand_name = command_name.lower()
+            if command_set == "unix" and lcommand_name.startswith("#"):
+                continue
+            elif command_set == "dos" and lcommand_name == "rem":
+                continue
+            if debug: print("args:", args)
+            if command_name.lower() == "set" and args[1] == "=": # SET x = y
+                expr = " ".join(args[2:])
+                var = args[0]
+                calico.Execute("%s = '%s'" % (var, expr), "python")
+                continue
+            elif len(args) > 1 and args[0] == "=":
+                expr = args[1:]
+                calico.Execute("%s = %s" % (command_name, " ".join(expr)), "python")
+                continue
+            if command_name.lower() in commands:
+                command = commands[command_name.lower()]
+            else:
+                raise ConsoleException("Console: no such command: '%s'. Try 'help'" % command_name, stack)
+            if hasattr(command_name, "start") and hasattr(command_name, "end"):
+                stack.append([stack[-1][0], stack[-1][1], command_name.start + offset, command_name.end + offset, command_name])
+            else:
+                stack.append([stack[-1][0], stack[-1][1], offset, offset + len(command_name), command_name])
+            incoming = command(command_name, incoming, tty, args, stack)
+        count += 1
+    # and display the output
+    if return_value:
+        return incoming
+    else:
+        if incoming:
+            display(incoming)
+
+def setTraceButtons(filename, lineno, start, end):
+    document = calico.GetDocument(filename)
+    if document:
+        calico.playResetEvent.Reset()
+        calico.PlayButton.Sensitive = True
+        calico.PauseButton.Sensitive = False
+        document.GotoLine(lineno)
+        if (start == -1 or end == -1):
+            document.SelectLine(lineno)
+        else:
+            document.texteditor.SetSelection(lineno, start + 1, lineno, end + 1)
+
+def handleDebug(filename, lineno, start, end):
+    ## First, see if we need to do something:
+    try:
+        if (calico.CurrentDocument == None):
+            return
+        elif (calico.CurrentDocument.HasBreakpointSetAtLine(lineno)):
+            # don't return! Fall through and wait
+            pass
+        elif (calico.ProgramSpeedValue == 100):
+            return
+    except:
+        return
+    # Ok, we have something to do:
+    Calico.MainWindow.Invoke(lambda: setTraceButtons(filename, lineno, start, end))
+    psv = calico.ProgramSpeedValue
+    if (psv == 0 or
+        calico.CurrentDocument.HasBreakpointSetAtLine(lineno) or
+        trace_pause):
+        calico.playResetEvent.WaitOne()
+    elif (psv < 100): ## then we are in a delay:
+        pause = (2.0 / psv)
+        ## Force at least a slight sleep, else no GUI controls
+        time.sleep(pause)
+
+## ------------------------------------------------------------
+## General functions and classes:
+
 class ConsoleException(Exception):
     def __init__(self, message, stack):
         self.message = message
         self.stack = stack
 
-## ------------------------------------------------------------
-## Commands:
-
-## command(name, incoming-sequence, tty?, arguments, stack)
-## -> returns a sequence [eg, returns a seq, or defines a generator]
-## __doc__ : first line, summary; rest for a complete help doc
-## all should handle -h --help
-## 
-
-def cd(name, incoming, tty, args, stack):
+def display(g):
     """
-    change directory
-
-    To change directories, use cd folder, where folder is either
-    relative or absolute.
-
-    cd
-    cd -
-    cd ..
-    cd /
-
-    See also: pwd, mkdir
+    The terminal emulator for displaying output.
     """
-    global lastcd
-    parser = argparse.ArgumentParser(
-        prog=name, 
-        epilog="No argument will %(prog)s to HOME")
-    parser.add_argument('--number', '-n', action="store_true", 
-                        help='%(prog)s will prefix each line with its line number')
-    parser.add_argument('directory', nargs="?", 
-                        help='the directory to change to')
-    parser.add_argument('-', action="store_true", 
-                        dest="goback",
-                        help='go back to the previous directory')
-    pargs = parser.parse_args(args)
-    if debug: print(name, pargs)
-    # ---
-    if pargs.goback:
-        if len(lastcd) > 1:
-            pargs.directory = lastcd[-2]
-        else:
-            pargs.directory = None
-        # else pass
-    if pargs.directory:
-        os.chdir(pargs.directory)
-    else:
-        os.chdir(os.path.expanduser("~"))
-    lastcd.append(os.getcwd())
-    return [lastcd[-1]]
+    for item in g:
+        print(item)
 
-def rm(name, incoming, tty, args, stack):
-    """
-    remove file or folders
-
-    Use rm to delete files.
-    """
-    args, flags = splitArgs(args)
-    os.remove(args[0])
-    #shutil.rmtree() # removes directory and contents
-    return []
-
-def mkdir(name, incoming, ttyp, args, stack):
-    """
-    make a directory
-    """
-    args, flags = splitArgs(args)
-    for filename in args:
-        os.makedirs(filename)
-    return []
-
-def rmdir(name, incoming, tty, args, stack):
-    """
-    remove folders
-
-    Use rmdir to delete folders.
-    """
-    args, flags = splitArgs(args)
-    for folder in args:
-        os.rmdir(folder) # removes an empty directory
-    return []
-
-def cp(name, incoming, tty, args, stack):
-    """
-    copy files and folders
-
-    Use cp to copy files.
-    """
-    args, flags = splitArgs(args)
-    shutil.copy(args[0], args[1])
-    return []
-
-def mv(name, incoming, tty, args, stack):
-    """
-    move files and folders
-
-    Use mv to move files.
-    """
-    args, flags = splitArgs(args)
-    os.rename(args[0], args[1])
-    return []
-
-def pwd(name, incoming, tty, args, stack):
-    """
-    print working directory
-
-    Use pwd to see your current directory.
-    """
-    args, flags = splitArgs(args)
-    return [os.getcwd()]
-
-def list_file(f, flags, tty):
+def list_file(f, pargs, tty):
     """
     List a file
     """
-    if "-l" in flags:
+    if pargs.long:
         return os.path.abspath(f)
     elif tty:
         return os.path.basename(f)
@@ -169,17 +220,17 @@ def make_line(retval, item):
     retval += str(item)
     return retval
 
-def list_dir(d, flags, tty):
+def list_dir(d, pargs, tty):
     """
     List the contents of a directory
     """
     retval = ""
-    if "-l" in flags or not tty:
+    if pargs.long or not tty:
         pass
     else:
         yield "%s:" % os.path.relpath(d)
     for f in glob.glob(os.path.join(d, "*")):
-        if "-l" in flags or not tty:
+        if pargs.long or not tty:
             yield os.path.abspath(f)
         else:
             i = os.path.basename(f)
@@ -195,67 +246,7 @@ def list_dir(d, flags, tty):
                 retval = str(i)
     if retval:
         yield retval
-    yield ""
-
-def ls(name, incoming, tty, args, stack):
-    """
-    list files
-
-    Use ls to list the files in a folder.
-
-    Flags:
-       -a   see all
-       -l   long format
-    """
-    args, flags = splitArgs(args)
-    if incoming:
-        data = incoming
-    else:
-        data = args
-    if not data:
-        data = ["."]
-    for f in data:
-        if not os.path.exists(f):
-            calico.ErrorLine("ls: cannot access '%s': no such file for directory" % f)
-            continue
-        if os.path.isfile(f):
-            yield list_file(f, flags, tty)
-        else:
-            for item in list_dir(f, flags, tty):
-                yield item
-
-def grep(name, incoming, tty, args, stack):
-    """
-    search for matches
-
-    Grep through arguments, searching for matches.
-    """
-    args, flags = splitArgs(args)
-    if len(args) > 0:
-        pattern = args[0]
-    else:
-        raise ConsoleException("grep: error, no pattern given", stack)
-    if incoming:
-        for i in incoming:
-            if "-v" in flags:
-                if not match(pattern, i):
-                    yield i
-            elif match(pattern, i):
-                yield i
-    else:
-        for f in args[1:]:
-            if os.path.exists(f) and os.path.isfile(f):
-                text = open(f).readlines()
-                for line in text:
-                    line = line.strip()
-                    if "-v" in flags:
-                        if not match(pattern, line):
-                            yield "%s: %s" % (f, line)
-                    elif match(pattern, line):
-                        yield "%s: %s" % (f, line)
-            else:
-                calico.ErrorLine("grep: no such file '%s'" % f)
-    return # ends yields
+    return
 
 def counts(text):
     chars = 0
@@ -276,236 +267,6 @@ def counts(text):
                 state = "word"
     return words, chars
 
-def wc(name, incoming, tty, args, stack):
-    """
-    word count; counts characters, words, and lines
-    """
-    args, flags = splitArgs(args)
-    lines = 0
-    chars = 0
-    words = 0
-    if incoming:
-        for line in incoming:
-            w, c = counts(line)
-            lines += 1
-            words += w
-            chars += c + 1
-        yield "%6d %6d %6d" % (lines, words, chars)
-    else:
-        for f in args:
-            if os.path.exists(f) and os.path.isfile(f):
-                text = open(f).readlines()
-                for line in text:
-                    w, c = counts(line)
-                    lines += 1
-                    words += w
-                    chars += c + 1
-            else:
-                calico.ErrorLine("wc: no such file '%s'" % f)
-        yield "%6d %6d %6d total" % (lines, words, chars)
-    return # ends yields
-
-def more(name, incoming, tty, args, stack):
-    """
-    see output one page at a time
-    """
-    args, flags = splitArgs(args)
-    count = 0
-    lines = height - 2
-    if incoming:
-        for i in incoming:
-            count += 1
-            yield i
-            if tty and (count % lines == 0):
-                # can you tell if there are more?
-                print("--more--")
-                yn = calico.yesno("More?")
-                if not yn:
-                    return
-    else:
-        for f in args:
-            if os.path.exists(f) and os.path.isfile(f):
-                text = open(f).readlines()
-                for line in text:
-                    count += 1
-                    yield line.strip()
-                    if tty and (count % lines == 0):
-                        # can you tell if there are more?
-                        print("--more--")
-                        yn = calico.yesno("More?")
-                        if not yn:
-                            return
-            else:
-                raise ConsoleException("more: no such file '%s'" % f, stack)
-
-def cat(name, incoming, tty, args, stack):
-    """
-    concatenate files
-    """
-    args, flags = splitArgs(args)
-    count = 0
-    if incoming:
-        for i in incoming:
-            count += 1
-            if "-n" in flags:
-                yield "%6d %s" % (count, i)
-            else:
-                yield i
-    else:
-        for filename in args:
-            if not os.path.exists(filename) or not os.path.isfile(filename):
-                raise ConsoleException("cat: file does not exist: '%s'" % filename, stack)
-            fp = open(filename)
-            for line in fp:
-                i = line.strip()
-                count += 1
-                if "-n" in flags:
-                    yield "%6d %s" % (count, i)
-                else:
-                    yield i
-
-def sort(name, incoming, tty, args, stack):
-    """
-    sort data
-    """
-    args, flags = splitArgs(args)
-    return sorted(list(args) + list(incoming))
-
-def help_cmd(name, incoming, tty, args, stack):
-    """
-    get help on commands
-    """
-    args, flags = splitArgs(args)
-    if "--help" in flags:
-        yield inspect.getdoc(help_cmd)
-        return
-    if len(args) == 0:
-        for command in sorted(commands.keys()):
-            command_name = command
-            if command_set == "dos":
-                command_name = command.upper()
-            yield "%s - %s" % (command_name, commands[command].__doc__.strip().split("\n")[0].strip())
-    elif args[0] in commands:
-        command_name = args[0]
-        if command_set == "dos":
-            command_name = args[0].upper()
-        yield ("%s: " % command_name) + commands[args[0]].__doc__.strip()
-    else:
-        raise ConsoleException("help: I don't have help on '%s'" % args[0], stack)
-
-def show(name, incoming, tty, args, stack):
-    """
-    show an image graphically
-    """
-    args, flags = splitArgs(args)
-    import Myro
-    if incoming:
-        for filename in incoming:
-            if os.path.isfile(filename):
-                pic = Myro.makePicture(filename)
-                Myro.show(pic, filename)
-    else:
-        for filename in args:
-            if os.path.isfile(filename):
-                pic = Myro.makePicture(filename)
-                Myro.show(pic, filename)
-    return []
-
-def open_cmd(name, incoming, tty, args, stack):
-    """
-    open a file in Calico
-    """
-    args, flags = splitArgs(args)
-    if incoming:
-        for filename in incoming:
-            if os.path.isfile(filename):
-                calico.Open(filename)
-    else:
-        for filename in args:
-            if os.path.isfile(filename):
-                calico.Open(filename)
-    return []
-
-def exec_cmd(name, incoming, tty, args, stack):
-    """
-    execute a file in Calico
-    """
-    if incoming:
-        for item in incoming:
-            parts = splitParts(item, stack)
-            if len(parts) == 1:
-                if os.path.isfile(parts[0]):
-                    return [calico.ExecuteFile(parts[0])]
-                else:
-                    raise ConsoleException("exec: no such file: '%s'" % parts[0], stack)
-            else:
-                return [calico.Execute(parts[0], parts[1])]
-    else:
-        if len(args) == 1:
-            if os.path.isfile(args[0]):
-                return [calico.ExecuteFile(args[0])]
-            else:
-                raise ConsoleException("exec: no such file: '%s'" % args[0], stack)
-        else:
-            return [calico.Execute(args[0], args[1])]
-    return [1]
-
-def eval_cmd(name, incoming, tty, args, stack):
-    """
-    evaluate text in Calico
-    """
-    args, flags = splitArgs(args)
-    if incoming:
-        for item in incoming:
-            parts = splitParts(item, stack)
-            if len(parts) == 2:
-                return [calico.Evaluate(parts[0], parts[1])]
-            else:
-                raise ConsoleException("eval: need to specify a language with '%s'" % parts[0], stack)
-    else:
-        text = args[0]
-        language = args[1]
-        return [calico.Evaluate(text, language)]
-
-def echo(name, incoming, tty, args, stack):
-    """
-    create output
-    """
-    args, flags = splitArgs(args)
-    data = " ".join(args)
-    if "-e" in flags:
-        return data.split("\\n")
-    return [data]
-
-def printf(name, incoming, tty, args, stack):
-    """
-    display output
-    """
-    args, flags = splitArgs(args)
-    print(" ".join(args))
-    return []
-
-def switch(name, incoming, tty, args, stack):
-    """
-    to unix or dos
-    """
-    global commands, command_set
-    args, flags = splitArgs(args)
-    if len(args) > 0:
-        if args[0] == "unix":
-            commands = unix_commands
-            command_set = "unix"
-        elif args[0] == "dos":
-            commands = dos_commands
-            command_set = "dos"
-        else:
-            calico.ErrorLine("switch: cannot switch to '%s': use 'unix' or 'dos'" % args[0])
-    else:
-        return [command_set]
-    return []
-
-## ------------------------------------------------------------
-
 def match(pattern, item):
     # Dots are literal:
     pattern = pattern.replace(".", "\.")
@@ -521,6 +282,7 @@ def splitArgs(arg_list):
     """
     Split into command and args
     """
+    ## FIXME: remove this function, and replace this with argsparse
     if debug: print("splitArgs:", arg_list)
     args = []
     flags = []
@@ -656,11 +418,11 @@ def splitParts(text, stack):
             current.end = i
             retval.extend(expand(current, stack))
         elif mode == "quote":
-            raise ConsoleException("console: unended quote", stack)
+            raise ConsoleException("Console: unended quote", stack)
         elif mode == "double-quote":
-            raise ConsoleException("console: unended double-quote", stack)
+            raise ConsoleException("Console: unended double-quote", stack)
         elif mode == "back-quote":
-            raise ConsoleException("console: unended back-quote: leftover: '%s'" % current, stack)
+            raise ConsoleException("Console: unended back-quote: leftover: '%s'" % current, stack)
     return retval
 
 def splitLines(command_list, stack):
@@ -675,151 +437,467 @@ def splitLines(command_list, stack):
     if command:
         commands.append([command[0], command[1:]])
     return commands
-            
-def executeLines(calico, text, stack):
-    # put calico in the environment:
-    globals()["calico"] = calico
-    # compute the width, height of the output window:
-    try:
-        w = calico.Output.Allocation.Width
-        h = calico.Output.Allocation.Height
-        scale = (calico.GetFont().Size/1024)
-        globals()["width"] = int(w/(scale - 2))
-        globals()["height"] = int(h/(scale * 1.7))
-    except:
-        globals()["width"] = 80
-        globals()["height"] = 24
-    retval = True
-    lineno = stack[-1][1] # last lineno
-    for line in text.split("\n"):
-        try:
-            execute(line, stack=stack[:])
-        except ConsoleException, e:
-            calico.ErrorLine("Console stack trace:")
-            calico.ErrorLine("Traceback (most recent call last):")
-            for s in e.stack:
-                calico.ErrorLine("  File \"%s\", line %s, from %s" % (s[0], s[1], s[4]))
-            calico.ErrorLine(e.message)
-            retval = False
-            break
-        except Exception, e:
-            if debug:
-                calico.ErrorLine("".join(traceback.format_exc()))
-            calico.ErrorLine(str(e))
-            retval = False
-            break
-        except SystemExit, e:
-            retval = False
-            break
-        lineno += 1
-        stack[-1][1] = lineno # increment
-    return retval
 
-def execute(text, return_value=False, stack=None, offset=0):
+## ------------------------------------------------------------
+## Commands:
+
+def cd(name, incoming, tty, args, stack):
     """
-    Execute a shell command line.
+    change directory
+
+    To change directories, use cd folder, where folder is either
+    relative or absolute.
+
+    cd
+    cd -
+    cd ..
+    cd /
+
+    See also: pwd, mkdir
     """
-    if debug: print("execute:", text, stack)
-    if not stack:
-        raise Exception("execute called without stack")
-    # Break the command into parts:
-    line = splitLines(text, stack)
-    count = 0
-    # Process each command, chaining to the next:
-    incoming = None
-    for data in line:
-        if not data:
-            continue
-        # only last one is a tty
-        tty = (count == len(line) - 1) and not return_value # pipe to a tty or not
-        if len(data) == 2:
-            command_name, args = data
+    global lastcd
+    parser = argparse.ArgumentParser(
+        prog=name, 
+        epilog="No argument will %(prog)s to HOME")
+    parser.add_argument('--number', '-n', action="store_true", 
+                        help='%(prog)s will prefix each line with its line number')
+    parser.add_argument('directory', nargs="?", 
+                        help='the directory to change to')
+    parser.add_argument('-', action="store_true", 
+                        dest="goback",
+                        help='go back to the previous directory')
+    pargs = parser.parse_args(args)
+    if debug: print(name, pargs)
+    # ---
+    if pargs.goback:
+        if len(lastcd) > 1:
+            pargs.directory = lastcd[-2]
         else:
-            continue
-        if command_name:
-            if hasattr(command_name, "start") and hasattr(command_name, "end"):
-                handleDebug(stack[-1][0], stack[-1][1], command_name.start + offset, command_name.end + offset)
-            else:
-                handleDebug(stack[-1][0], stack[-1][1], offset, offset + len(command_name))
-            lcommand_name = command_name.lower()
-            if command_set == "unix" and lcommand_name.startswith("#"):
-                continue
-            elif command_set == "dos" and lcommand_name == "rem":
-                continue
-            if debug: print("args:", args)
-            if command_name.lower() == "set" and args[1] == "=": # SET x = y
-                expr = " ".join(args[2:])
-                var = args[0]
-                calico.Execute("%s = '%s'" % (var, expr), "python")
-                continue
-            elif len(args) > 1 and args[0] == "=":
-                expr = args[1:]
-                calico.Execute("%s = %s" % (command_name, " ".join(expr)), "python")
-                continue
-            if command_name.lower() in commands:
-                command = commands[command_name.lower()]
-            else:
-                raise ConsoleException("console: no such command: '%s'. Try 'help'" % command_name, stack)
-            if hasattr(command_name, "start") and hasattr(command_name, "end"):
-                stack.append([stack[-1][0], stack[-1][1], command_name.start + offset, command_name.end + offset, command_name])
-            else:
-                stack.append([stack[-1][0], stack[-1][1], offset, offset + len(command_name), command_name])
-            incoming = command(command_name, incoming, tty, args, stack)
-        count += 1
-    # and display the output
-    if return_value:
-        return incoming
+            pargs.directory = None
+        # else pass
+    if pargs.directory:
+        os.chdir(pargs.directory)
     else:
-        if incoming:
-            display(incoming)
+        os.chdir(os.path.expanduser("~"))
+    lastcd.append(os.getcwd())
+    return [lastcd[-1]]
 
-def setTraceButtons(filename, lineno, start, end):
-    document = calico.GetDocument(filename)
-    if document:
-        calico.playResetEvent.Reset()
-        calico.PlayButton.Sensitive = True
-        calico.PauseButton.Sensitive = False
-        document.GotoLine(lineno)
-        if (start == -1 or end == -1):
-            document.SelectLine(lineno)
+def rm(name, incoming, tty, args, stack):
+    """
+    remove file or folders
+
+    Use rm to delete files.
+    """
+    args, flags = splitArgs(args)
+    os.remove(args[0])
+    #shutil.rmtree() # removes directory and contents
+    return []
+
+def mkdir(name, incoming, ttyp, args, stack):
+    """
+    make a directory
+    """
+    args, flags = splitArgs(args)
+    for filename in args:
+        os.makedirs(filename)
+    return []
+
+def rmdir(name, incoming, tty, args, stack):
+    """
+    remove folders
+
+    Use rmdir to delete folders.
+    """
+    args, flags = splitArgs(args)
+    for folder in args:
+        os.rmdir(folder) # removes an empty directory
+    return []
+
+def cp(name, incoming, tty, args, stack):
+    """
+    copy files and folders
+
+    Use cp to copy files.
+    """
+    args, flags = splitArgs(args)
+    shutil.copy(args[0], args[1])
+    return []
+
+def mv(name, incoming, tty, args, stack):
+    """
+    move files and folders
+
+    Use mv to move files.
+    """
+    args, flags = splitArgs(args)
+    os.rename(args[0], args[1])
+    return []
+
+def pwd(name, incoming, tty, args, stack):
+    """
+    print working directory
+
+    Use pwd to see your current directory.
+    """
+    args, flags = splitArgs(args)
+    return [os.getcwd()]
+
+def ls(name, incoming, tty, args, stack):
+    """
+    list files
+
+    Use ls to list the files in a folder.
+
+    Flags:
+       -a   see all
+       -l   long format
+    """
+    parser = argparse.ArgumentParser(
+        prog=name)
+    parser.add_argument('--long', '-l', action="store_true", 
+                        help='use a long listing format')
+    parser.add_argument('--all', '-a', action="store_true", 
+                        help='do not ignore files starting with .')
+    parser.add_argument('file', nargs="*", 
+                        help='files to list')
+    pargs = parser.parse_args(args)
+    if incoming:
+        data = incoming
+    else:
+        data = pargs.file
+    if not data:
+        data = ["."]
+    for f in data:
+        if not os.path.exists(f):
+            calico.ErrorLine("%s: cannot access '%s': no such file or directory" % (name, f))
+            continue
+        if os.path.isfile(f):
+            yield list_file(f, pargs, tty)
         else:
-            document.texteditor.SetSelection(lineno, start + 1, lineno, end + 1)
+            for item in list_dir(f, pargs, tty):
+                yield item
 
-def handleDebug(filename, lineno, start, end):
-    ## First, see if we need to do something:
-    try:
-        if (calico.CurrentDocument == None):
-            return
-        elif (calico.CurrentDocument.HasBreakpointSetAtLine(lineno)):
-            # don't return! Fall through and wait
-            pass
-        elif (calico.ProgramSpeedValue == 100):
-            return
-    except:
-        return
-    # Ok, we have something to do:
-    Calico.MainWindow.Invoke(lambda: setTraceButtons(filename, lineno, start, end))
-    psv = calico.ProgramSpeedValue
-    if (psv == 0 or
-        calico.CurrentDocument.HasBreakpointSetAtLine(lineno) or
-        trace_pause):
-        calico.playResetEvent.WaitOne()
-    elif (psv < 100): ## then we are in a delay:
-        pause = (2.0 / psv)
-        ## Force at least a slight sleep, else no GUI controls
-        time.sleep(pause)
+def grep(name, incoming, tty, args, stack):
+    """
+    search for matches
 
-def display(g):
+    Grep through arguments, searching for matches.
     """
-    The terminal emulator for displaying output.
+    parser = argparse.ArgumentParser(
+        prog=name)
+    parser.add_argument('--invert-match', '-v', action="store_true", 
+                        help='Invert the sense of matching, to select non-matching lines.')
+    parser.add_argument('pattern', help='pattern to use in matching')
+    parser.add_argument('file', nargs="*", 
+                        help='files to list')
+    pargs = parser.parse_args(args)
+    if incoming:
+        for i in incoming:
+            if pargs.invert_match:
+                if not match(pargs.pattern, i):
+                    yield i
+            elif match(pargs.pattern, i):
+                yield i
+    else:
+        for f in pargs.file:
+            if os.path.exists(f) and os.path.isfile(f):
+                text = open(f).readlines()
+                for line in text:
+                    line = line.strip()
+                    if pargs.invert_match:
+                        if not match(pargs.pattern, line):
+                            yield "%s: %s" % (f, line)
+                    elif match(pargs.pattern, line):
+                        yield "%s: %s" % (f, line)
+            elif os.path.isdir(f):
+                calico.ErrorLine("%s: '%s' is a directory" % (name, f))
+            else:
+                calico.ErrorLine("%s: no such file '%s'" % (name, f))
+    return # ends yields
+
+def wc(name, incoming, tty, args, stack):
     """
-    for item in g:
-        print(item)
+    word count; counts characters, words, and lines
+    """
+    args, flags = splitArgs(args)
+    lines = 0
+    chars = 0
+    words = 0
+    if incoming:
+        for line in incoming:
+            w, c = counts(line)
+            lines += 1
+            words += w
+            chars += c + 1
+        yield "%6d %6d %6d" % (lines, words, chars)
+    else:
+        for f in args:
+            if os.path.exists(f) and os.path.isfile(f):
+                text = open(f).readlines()
+                for line in text:
+                    w, c = counts(line)
+                    lines += 1
+                    words += w
+                    chars += c + 1
+            elif os.path.isdir(f):
+                calico.ErrorLine("%s: '%s' is a directory" % (name, f))
+            else:
+                calico.ErrorLine("%s: no such file '%s'" % (name, f))
+        yield "%6d %6d %6d total" % (lines, words, chars)
+    return # ends yields
+
+def more(name, incoming, tty, args, stack):
+    """
+    see output one page at a time
+    """
+    args, flags = splitArgs(args)
+    count = 0
+    lines = height - 2
+    if incoming:
+        for i in incoming:
+            count += 1
+            yield i
+            if tty and (count % lines == 0):
+                # can you tell if there are more?
+                print("--more--")
+                yn = calico.yesno("More?")
+                if not yn:
+                    return
+    else:
+        for f in args:
+            if os.path.exists(f) and os.path.isfile(f):
+                text = open(f).readlines()
+                for line in text:
+                    count += 1
+                    yield line.strip()
+                    if tty and (count % lines == 0):
+                        # can you tell if there are more?
+                        print("--more--")
+                        yn = calico.yesno("More?")
+                        if not yn:
+                            return
+            elif os.path.isdir(f):
+                calico.ErrorLine("%s: '%s' is a directory" % (name, f))
+            else:
+                raise ConsoleException("%s: no such file '%s'" % (name, f), stack)
+
+def cat(name, incoming, tty, args, stack):
+    """
+    concatenate files
+    """
+    parser = argparse.ArgumentParser(
+        prog=name)
+    parser.add_argument('--number', '-n', action="store_true", 
+                        help='number all output lines')
+    parser.add_argument('file', nargs="*", 
+                        help='files to concatenate')
+    pargs = parser.parse_args(args)
+    count = 0
+    if incoming:
+        for i in incoming:
+            count += 1
+            if pargs.number:
+                yield "%6d %s" % (count, i)
+            else:
+                yield i
+    else:
+        for filename in pargs.file:
+            if os.path.isdir(filename):
+                raise ConsoleException("%s: '%s' is a directory" % (name, filename), stack)
+            if not os.path.exists(filename) or not os.path.isfile(filename):
+                raise ConsoleException("%s: file does not exist: '%s'" % (name, filename), stack)
+            fp = open(filename)
+            for line in fp:
+                i = line.strip()
+                count += 1
+                if pargs.number:
+                    yield "%6d %s" % (count, i)
+                else:
+                    yield i
+
+def sort(name, incoming, tty, args, stack):
+    """
+    sort data
+    """
+    args, flags = splitArgs(args)
+    return sorted(list(args) + list(incoming))
+
+def help_cmd(name, incoming, tty, args, stack):
+    """
+    get help on commands
+    """
+    parser = argparse.ArgumentParser(
+        prog=name)
+    parser.add_argument('command', nargs="*", 
+                        help='commands on which to get help')
+    pargs = parser.parse_args(args)
+    #yield inspect.getdoc(help_cmd)
+    if incoming:
+        for command_name in incoming:
+            command_name = command_name.strip()
+            pcommand_name = command_name
+            rcommand_name = command_name
+            if command_set == "dos":
+                pcommand_name = command_name.lower()
+                rcommand_name = command_name.upper()
+            if pcommand_name not in commands.keys():
+                raise ConsoleException("%s: no such command '%s'" % (name, command_name), stack)
+            yield ("%s: " % rcommand_name) + commands[pcommand_name].__doc__.strip()
+    elif len(pargs.command) == 0:
+        for command in sorted(commands.keys()):
+            if command_set == "dos":
+                command_name = command.upper()
+            else:
+                command_name = command
+            yield "%s - %s" % (command_name, commands[command].__doc__.strip().split("\n")[0].strip())
+    elif len(pargs.command) > 0:
+        for command_name in pargs.command:
+            pcommand_name = command_name
+            rcommand_name = command_name
+            if command_set == "dos":
+                pcommand_name = command_name.lower()
+                rcommand_name = command_name.upper()
+            if pcommand_name not in commands.keys():
+                raise ConsoleException("%s: no such command '%s'" % (name, command_name), stack)
+            yield ("%s: " % rcommand_name) + commands[pcommand_name].__doc__.strip()
+
+def show(name, incoming, tty, args, stack):
+    """
+    show an image graphically
+    """
+    args, flags = splitArgs(args)
+    import Myro
+    if incoming:
+        for filename in incoming:
+            if os.path.isfile(filename):
+                pic = Myro.makePicture(filename)
+                Myro.show(pic, filename)
+            else:
+                calico.ErrorLine("%s: ignoring '%s'; no such file" % (name, filename))
+    else:
+        for filename in args:
+            if os.path.isfile(filename):
+                pic = Myro.makePicture(filename)
+                Myro.show(pic, filename)
+            else:
+                calico.ErrorLine("%s: ignoring '%s'; no such file" % (name, filename))
+    return []
+
+def open_cmd(name, incoming, tty, args, stack):
+    """
+    open a file in Calico
+    """
+    args, flags = splitArgs(args)
+    if incoming:
+        for filename in incoming:
+            if os.path.isfile(filename):
+                calico.Open(filename)
+            else:
+                calico.ErrorLine("%s: ignoring '%s'; no such file" % (name, filename))
+    else:
+        for filename in args:
+            if os.path.isfile(filename):
+                calico.Open(filename)
+            else:
+                calico.ErrorLine("%s: ignoring '%s'; no such file" % (name, filename))
+    return []
+
+def exec_cmd(name, incoming, tty, args, stack):
+    """
+    execute a file in Calico
+    """
+    if incoming:
+        for item in incoming:
+            parts = splitParts(item, stack)
+            if len(parts) == 1:
+                if os.path.isfile(parts[0]):
+                    return [calico.ExecuteFile(parts[0])]
+                elif os.path.isdir(f):
+                    raise ConsoleException("%s: '%s' is a directory" % (name, f), stack)
+                else:
+                    raise ConsoleException("%s: no such file: '%s'" % (name, parts[0]), stack)
+            else:
+                return [calico.Execute(parts[0], parts[1])]
+    else:
+        if len(args) == 1:
+            if os.path.isfile(args[0]):
+                return [calico.ExecuteFile(args[0])]
+            elif os.path.isdir(f):
+                raise ConsoleException("%s: '%s' is a directory" % (name, f), stack)
+            else:
+                raise ConsoleException("%s: no such file: '%s'" % (name, args[0]), stack)
+        else:
+            return [calico.Execute(args[0], args[1])]
+    return [1]
+
+def eval_cmd(name, incoming, tty, args, stack):
+    """
+    evaluate text in Calico
+    """
+    args, flags = splitArgs(args)
+    if incoming:
+        for item in incoming:
+            parts = splitParts(item, stack)
+            if len(parts) == 2:
+                return [calico.Evaluate(parts[0], parts[1])]
+            else:
+                raise ConsoleException("%s: need to specify a language with '%s'" % (name, parts[0]), stack)
+    else:
+        text = args[0]
+        language = args[1]
+        return [calico.Evaluate(text, language)]
+
+def echo(name, incoming, tty, args, stack):
+    """
+    create output
+    """
+    parser = argparse.ArgumentParser(
+        prog=name)
+    parser.add_argument('-e', action="store_true", 
+                        help='enable interpretation of backslash escapes')
+    parser.add_argument('arg', nargs="*", 
+                        help='arguments to echo')
+    pargs = parser.parse_args(args)
+    data = " ".join(pargs.arg)
+    if pargs.e:
+        return data.split("\\n")
+    return [data]
+
+def printf(name, incoming, tty, args, stack):
+    """
+    display output
+    """
+    args, flags = splitArgs(args)
+    print(" ".join(args))
+    return []
+
+def switch(name, incoming, tty, args, stack):
+    """
+    to unix or dos
+    """
+    global commands, command_set
+    args, flags = splitArgs(args)
+    if len(args) > 0:
+        if args[0] == "unix":
+            commands = unix_commands
+            command_set = "unix"
+        elif args[0] == "dos":
+            commands = dos_commands
+            command_set = "dos"
+        else:
+            calico.ErrorLine("%s: cannot switch to '%s': use 'unix' or 'dos'" % (name, args[0]))
+    else:
+        return [command_set]
+    return []
 
 # FIXME add these: head tail find pushd popd wget wc cal date du df
 # uname cut plot time hostname id < > cls TAB-completion
 
+### Add new commands above this point
+
+## ------------------------------------------------------------
 # Commands
+
 unix_commands = {"ls": ls, "more": more, "cd": cd, "grep": grep,
                  "cat": cat, "help": help_cmd, "pwd": pwd, "cp": cp,
                  "rm": rm, "less": more, "show": show, "open": open_cmd,
