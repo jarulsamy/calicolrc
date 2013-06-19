@@ -5315,7 +5315,7 @@ public class PJScheme:Scheme
 		     (object) symbol ("<proc-24>"))))
 	   {
 	      value2_reg = fail_reg;
-	      value1_reg = apply (char_to_string_proc, (object) args_reg);
+	      value1_reg = apply (make_string_proc, (object) args_reg);
 	      k_reg = k2_reg;
 	      pc = (Function) apply_cont2;
 

@@ -1100,8 +1100,7 @@
       (<proc-23> ()
        (for-each safe-print args)
        (apply-cont2 k2 void-value fail))
-      (<proc-24> ()
-       (apply-cont2 k2 (apply char->string args) fail))
+      (<proc-24> () (apply-cont2 k2 (apply string args) fail))
       (<proc-25> ()
        (apply-cont2
          k2

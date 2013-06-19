@@ -294,83 +294,85 @@ public class Scheme {
       4. = compares numbers
       
     */
-  public static Proc Equal_proc = new Proc("equal?", (Procedure1Bool) Equal, -1, 2);
-  public static Proc Eq_proc = new Proc("eq?", (Procedure1Bool) Eq, -1, 2);
-  public static Proc Eqv_proc = new Proc("eqv?", (Procedure1Bool) Eqv, -1, 2);
-  public static Proc EqualSign_proc = new Proc("=", (Procedure1Bool) EqualSign, -1, 2);
-  public static Proc GreaterThan_proc = new Proc(">", (Procedure1Bool) GreaterThan, -1, 2);
-  public static Proc LessThan_proc = new Proc("<", (Procedure1Bool) LessThan, -1, 2);
-  public static Proc LessThan_is__proc = new Proc("<=", (Procedure1Bool) LessThanOrEqual, -1, 2);
-  public static Proc GreaterOrEqual_proc = new Proc(">=", (Procedure1Bool) GreaterThanOrEqual, -1, 2);
-  public static Proc Multiply_proc = new Proc("*", (Procedure1) Multiply, -1, 1);
-  public static Proc modulo_proc = new Proc("%", (Procedure1) modulo, -1, 1);
-  public static Proc Divide_proc = new Proc("/", (Procedure1) Divide, -1, 1);
+
+  // public static Proc append_proc = new Proc("append", (Procedure1) append, -1, 1);
+  // public static Proc make_binding_proc = new Proc("make-binding",(Procedure2)make_binding, 2, 1);
   public static Proc Add_proc = new Proc("+", (Procedure1)Add, -1, 1);
+  public static Proc Divide_proc = new Proc("/", (Procedure1) Divide, -1, 1);
+  public static Proc Eq_proc = new Proc("eq?", (Procedure1Bool) Eq, -1, 2);
+  public static Proc EqualSign_proc = new Proc("=", (Procedure1Bool) EqualSign, -1, 2);
+  public static Proc Equal_proc = new Proc("equal?", (Procedure1Bool) Equal, -1, 2);
+  public static Proc Eqv_proc = new Proc("eqv?", (Procedure1Bool) Eqv, -1, 2);
+  public static Proc GreaterOrEqual_proc = new Proc(">=", (Procedure1Bool) GreaterThanOrEqual, -1, 2);
+  public static Proc GreaterThan_proc = new Proc(">", (Procedure1Bool) GreaterThan, -1, 2);
+  public static Proc LessThan_is__proc = new Proc("<=", (Procedure1Bool) LessThanOrEqual, -1, 2);
+  public static Proc LessThan_proc = new Proc("<", (Procedure1Bool) LessThan, -1, 2);
+  public static Proc Multiply_proc = new Proc("*", (Procedure1) Multiply, -1, 1);
   public static Proc Subtract_proc = new Proc("-", (Procedure1) Subtract, -1, 1);
-  public static Proc car_proc = new Proc("car", (Procedure1) car, 1, 1);
-  public static Proc cdr_proc = new Proc("cdr", (Procedure1) cdr, 1, 1);
-  public static Proc cadr_proc = new Proc("cadr", (Procedure1) cadr, 1, 1);
-  public static Proc make_external_proc_proc = new Proc("make-external-proc", (Procedure1) make_external_proc, 1, 1);
-  public static Proc vector_proc = new Proc("vector", (ProcedureN) vector, -1, 1);
-  public static Proc vector_native_proc = new Proc("vector", (Procedure1) vector_native, -1, 1);
-  public static Proc caddr_proc = new Proc("caddr", (Procedure1) caddr, 1, 1);
-  public static Proc cons_proc = new Proc("cons", (Procedure2) cons, 2, 1);
-  public static Proc make_vector_proc = new Proc("make-vector", (Procedure1) make_vector, 1, 1);
-  public static Proc list_to_vector_proc = new Proc("list->vector", (Procedure1) list_to_vector, 1, 1);
-  public static Proc vector_ref_proc = new Proc("vector-ref", (Procedure2) vector_ref, 2, 1);
-  public static Proc vector_length_proc = new Proc("vector-length", (Procedure1) vector_length, 1, 1);
-  public static Proc memq_proc = new Proc("memq", (Procedure2) memq, 2, 1);
-  public static Proc range_proc = new Proc("range", (Procedure1) range, -1, 1);
-  public static Proc reverse_proc = new Proc("reverse", (Procedure1) reverse, 1, 1);
-  public static Proc sort_proc = new Proc("sort", (Procedure2) sort, 2, 1);
-  public static Proc set_car_b_proc = new Proc("set-car!", (Procedure2Void) set_car_b, 2, 0);
-  public static Proc set_cdr_b_proc = new Proc("set-cdr!", (Procedure2Void) set_cdr_b, 2, 0);
-  public static Proc sqrt_proc = new Proc("sqrt", (Procedure1) sqrt, -1, 1);
   public static Proc abs_proc = new Proc("abs", (Procedure1) abs, -1, 1);
-  public static Proc string_to_symbol_proc = new Proc("string->symbol", (Procedure1) string_to_symbol, 1, 1);
-  public static Proc string_to_number_proc = new Proc("string->number", (Procedure1) string_to_number, 1, 1);
-  public static Proc stringLessThan_q_proc = new Proc("string<?", (Procedure2Bool) stringLessThan_q, 2, 2);
-  public static Proc symbol_q_proc = new Proc("symbol?", (Procedure1Bool) symbol_q, 1, 2);
-  public static Proc number_q_proc = new Proc("number?", (Procedure1Bool) number_q, 1, 2);
+  public static Proc assq_proc = new Proc("assq", (Procedure2) assq, 2, 1);
+  public static Proc atom_q_proc = new Proc("atom?", (Procedure1Bool) atom_q, 1, 2);
+  public static Proc aunparse_proc = new Proc("unparse", (Procedure1) PJScheme.aunparse, 1, 1);
   public static Proc boolean_q_proc = new Proc("boolean?", (Procedure1Bool) boolean_q, 1, 2);
-  public static Proc string_q_proc = new Proc("string?", (Procedure1Bool) string_q, 1, 2);
+  public static Proc cadddr_hat_proc = new Proc("cadddr^",(Procedure1)PJScheme.cadddr_hat, 1, 1);
+  public static Proc caddr_hat_proc = new Proc("caddr^",(Procedure1)PJScheme.caddr_hat, 1, 1);
+  public static Proc caddr_proc = new Proc("caddr", (Procedure1) caddr, 1, 1);
+  public static Proc cadr_hat_proc = new Proc("cadr^",(Procedure1)PJScheme.cadr_hat, 1, 1);
+  public static Proc cadr_proc = new Proc("cadr", (Procedure1) cadr, 1, 1);
+  public static Proc car_hat_proc = new Proc("car^",(Procedure1)PJScheme.car_hat, 1, 1);
+  public static Proc car_proc = new Proc("car", (Procedure1) car, 1, 1);
+  public static Proc cdddr_hat_proc = new Proc("cdddr^",(Procedure1)PJScheme.cdddr_hat, 1, 1);
+  public static Proc cddr_hat_proc = new Proc("cddr^",(Procedure1)PJScheme.cddr_hat, 1, 1);
+  public static Proc cdr_hat_proc = new Proc("cdr^",(Procedure1)PJScheme.cdr_hat, 1, 1);
+  public static Proc cdr_proc = new Proc("cdr", (Procedure1) cdr, 1, 1);
+  public static Proc char_alphabetic_q_proc = new Proc("char-alphabetic?", (Procedure1Bool) char_alphabetic_q, 1, 2);
+  public static Proc char_is__q_proc = new Proc("char=?", (Procedure2Bool) char_eq_q, 2, 2);
+  public static Proc char_numeric_q_proc = new Proc("char-numeric?", (Procedure1Bool) char_numeric_q, 1, 2);
   public static Proc char_q_proc = new Proc("char?", (Procedure1Bool) char_q, 1, 2);
   public static Proc char_to_string_proc = new Proc("char->string", (Procedure1) char_to_string, 1, 1);
   public static Proc char_whitespace_q_proc = new Proc("char-whitespace?", (Procedure1Bool) char_whitespace_q, 1, 2);
-  public static Proc char_alphabetic_q_proc = new Proc("char-alphabetic?", (Procedure1Bool) char_alphabetic_q, 1, 2);
-  public static Proc char_numeric_q_proc = new Proc("char-numeric?", (Procedure1Bool) char_numeric_q, 1, 2);
-  public static Proc char_is__q_proc = new Proc("char=?", (Procedure2Bool) char_eq_q, 2, 2);
-  public static Proc list_to_string_proc = new Proc("list->string", (Procedure1) list_to_string, 1, 1);
-  public static Proc pair_q_proc = new Proc("pair?", (Procedure1Bool) pair_q, 1, 2);
-  public static Proc format_proc = new Proc("format", (Procedure1) format_prim, -1, 1);
-  public static Proc null_q_proc = new Proc("null?", (Procedure1Bool) null_q, 1, 2);
-  public static Proc atom_q_proc = new Proc("atom?", (Procedure1Bool) atom_q, 1, 2);
-  public static Proc assq_proc = new Proc("assq", (Procedure2) assq, 2, 1);
-  public static Proc string_append_proc = new Proc("string-append", (Procedure1) string_append, -1, 1);
-  public static Proc string_length_proc = new Proc("string-length", (Procedure1) string_length, 1, 1);
-  public static Proc string_ref_proc = new Proc("string-ref", (Procedure2) string_ref, 2, 1);
+  public static Proc cons_proc = new Proc("cons", (Procedure2) cons, 2, 1);
   public static Proc display_proc = new Proc("display", (Procedure1Void) display, 1, 0);
-  public static Proc pretty_print_proc = new Proc("pretty-print", (Procedure1Void) pretty_print, -1, 0);
-  //  public static Proc append_proc = new Proc("append", (Procedure1) append, -1, 1);
-  //public static Proc make_binding_proc = new Proc("make-binding",(Procedure2)make_binding, 2, 1);
-  public static Proc make_binding_proc = new Proc("make-binding",(Procedure1)PJScheme.make_binding, 1, 1);
-  public static Proc printf_prim_proc = new Proc("printf",(Procedure1)printf_prim, -1, 1);
   public static Proc dlr_env_contains_proc = new Proc("dlr-env-contains",(Procedure1Bool)dlr_env_contains, 1, 2);
   public static Proc dlr_env_lookup_proc = new Proc("dlr-env-lookup",(Procedure1)dlr_env_lookup, 1, 1);
-  public static Proc quotient_proc = new Proc("quotient", (Procedure2) quotient, 2, 1);
-  public static Proc remainder_proc = new Proc("modulo", (Procedure2) modulo, 2, 1);
-  public static Proc car_hat_proc = new Proc("car^",(Procedure1)PJScheme.car_hat, 1, 1);
-  public static Proc cdr_hat_proc = new Proc("cdr^",(Procedure1)PJScheme.cdr_hat, 1, 1);
-  public static Proc cadr_hat_proc = new Proc("cadr^",(Procedure1)PJScheme.cadr_hat, 1, 1);
-  public static Proc cddr_hat_proc = new Proc("cddr^",(Procedure1)PJScheme.cddr_hat, 1, 1);
-  public static Proc caddr_hat_proc = new Proc("caddr^",(Procedure1)PJScheme.caddr_hat, 1, 1);
-  public static Proc cdddr_hat_proc = new Proc("cdddr^",(Procedure1)PJScheme.cdddr_hat, 1, 1);
-  public static Proc cadddr_hat_proc = new Proc("cadddr^",(Procedure1)PJScheme.cadddr_hat, 1, 1);
-  public static Proc safe_print_proc = new Proc("safe-print", (Procedure1Void)safe_print, 1, 0);
-  public static Proc list_ref_proc = new Proc("list-ref", (Procedure2) list_ref, 2, 1);
-  public static Proc aunparse_proc = new Proc("unparse", (Procedure1) PJScheme.aunparse, 1, 1);
-  public static Proc string_is__q_proc = new Proc("string=?", (Procedure1Bool) PJScheme.string_eq_q, -1, 2);
+  public static Proc format_proc = new Proc("format", (Procedure1) format_prim, -1, 1);
   public static Proc format_stack_trace_proc = new Proc("format-stack-trace", (Procedure1) PJScheme.format_stack_trace, 1, 1);
+  public static Proc list_ref_proc = new Proc("list-ref", (Procedure2) list_ref, 2, 1);
+  public static Proc list_to_string_proc = new Proc("list->string", (Procedure1) list_to_string, 1, 1);
+  public static Proc list_to_vector_proc = new Proc("list->vector", (Procedure1) list_to_vector, 1, 1);
+  public static Proc make_binding_proc = new Proc("make-binding",(Procedure1)PJScheme.make_binding, 1, 1);
+  public static Proc make_external_proc_proc = new Proc("make-external-proc", (Procedure1) make_external_proc, 1, 1);
+  public static Proc make_vector_proc = new Proc("make-vector", (Procedure1) make_vector, 1, 1);
+  public static Proc make_string_proc = new Proc("make-string", (Procedure1) make_string, -1, 1);
+  public static Proc memq_proc = new Proc("memq", (Procedure2) memq, 2, 1);
+  public static Proc modulo_proc = new Proc("%", (Procedure1) modulo, -1, 1);
+  public static Proc null_q_proc = new Proc("null?", (Procedure1Bool) null_q, 1, 2);
+  public static Proc number_q_proc = new Proc("number?", (Procedure1Bool) number_q, 1, 2);
+  public static Proc pair_q_proc = new Proc("pair?", (Procedure1Bool) pair_q, 1, 2);
+  public static Proc pretty_print_proc = new Proc("pretty-print", (Procedure1Void) pretty_print, -1, 0);
+  public static Proc printf_prim_proc = new Proc("printf",(Procedure1)printf_prim, -1, 1);
+  public static Proc quotient_proc = new Proc("quotient", (Procedure2) quotient, 2, 1);
+  public static Proc range_proc = new Proc("range", (Procedure1) range, -1, 1);
+  public static Proc remainder_proc = new Proc("modulo", (Procedure2) modulo, 2, 1);
+  public static Proc reverse_proc = new Proc("reverse", (Procedure1) reverse, 1, 1);
+  public static Proc safe_print_proc = new Proc("safe-print", (Procedure1Void)safe_print, 1, 0);
+  public static Proc set_car_b_proc = new Proc("set-car!", (Procedure2Void) set_car_b, 2, 0);
+  public static Proc set_cdr_b_proc = new Proc("set-cdr!", (Procedure2Void) set_cdr_b, 2, 0);
+  public static Proc sort_proc = new Proc("sort", (Procedure2) sort, 2, 1);
+  public static Proc sqrt_proc = new Proc("sqrt", (Procedure1) sqrt, -1, 1);
+  public static Proc stringLessThan_q_proc = new Proc("string<?", (Procedure2Bool) stringLessThan_q, 2, 2);
+  public static Proc string_append_proc = new Proc("string-append", (Procedure1) string_append, -1, 1);
+  public static Proc string_is__q_proc = new Proc("string=?", (Procedure1Bool) PJScheme.string_eq_q, -1, 2);
+  public static Proc string_length_proc = new Proc("string-length", (Procedure1) string_length, 1, 1);
+  public static Proc string_q_proc = new Proc("string?", (Procedure1Bool) string_q, 1, 2);
+  public static Proc string_ref_proc = new Proc("string-ref", (Procedure2) string_ref, 2, 1);
+  public static Proc string_to_number_proc = new Proc("string->number", (Procedure1) string_to_number, 1, 1);
+  public static Proc string_to_symbol_proc = new Proc("string->symbol", (Procedure1) string_to_symbol, 1, 1);
+  public static Proc symbol_q_proc = new Proc("symbol?", (Procedure1Bool) symbol_q, 1, 2);
+  public static Proc vector_length_proc = new Proc("vector-length", (Procedure1) vector_length, 1, 1);
+  public static Proc vector_native_proc = new Proc("vector", (Procedure1) vector_native, -1, 1);
+  public static Proc vector_proc = new Proc("vector", (ProcedureN) vector, -1, 1);
+  public static Proc vector_ref_proc = new Proc("vector-ref", (Procedure2) vector_ref, 2, 1);
 
     //  public static Proc binding_variable_proc = new Proc("binding_variable", 
     //							(Procedure1) PJScheme.binding_variable,
@@ -480,6 +482,7 @@ public class Scheme {
 	       list(symbol("cddddr"), new Proc("cddddr", (Procedure1)cddddr, 1, 1)),
 	       list(symbol("cdddr"), new Proc("cdddr", (Procedure1)cdddr, 1, 1)),
 	       list(symbol("cddr"), new Proc("cddr", (Procedure1)cddr, 1, 1)),
+	       list(symbol("char->string"), char_to_string_proc),
 	       list(symbol("eqv?"), Eqv_proc),
 	       list(symbol("float"), new Proc("float", (Procedure1)ToDouble, 1, 1)),
 	       list(symbol("format"), new Proc("format", (Procedure1)format_list, -1, 1)),
@@ -1053,10 +1056,19 @@ public class Scheme {
   }
 
   public static object make_string(object obj) {
-	if (obj == null || obj == (object) NULL) {
+      if (obj == null || obj == (object) NULL) {
 	  return (object) "\0";
-	}
-	return obj.ToString();
+      } else if (obj is Cons || obj == EmptyList) {
+	  string retval = "";
+	  while (obj != EmptyList) {
+	      object car_lst = car(obj);
+	      retval += char_to_string(car_lst);
+	      obj = cdr(obj);
+	  }
+	  return retval;
+      } else {
+	  return obj.ToString();
+      }
   }
 
   public static bool number_q(object datum) {
@@ -2390,8 +2402,8 @@ public class Scheme {
 	return ((number != null) ? number.ToString() : "");
     }
 
-    public static object char_to_string(object number) {
-	return ((number != null) ? number.ToString() : "");
+    public static object char_to_string(object thing) {
+	return ((thing != null) ? thing.ToString() : "");
     }
 
   public static object list_ref(object obj, object pos) {

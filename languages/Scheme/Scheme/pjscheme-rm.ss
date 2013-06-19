@@ -3213,7 +3213,7 @@
                                                                                                   (if (eq? (car temp_1) '<proc-24>)
                                                                                                       (begin
                                                                                                         (set! value2_reg fail_reg)
-                                                                                                        (set! value1_reg (apply char->string args_reg))
+                                                                                                        (set! value1_reg (apply string args_reg))
                                                                                                         (set! k_reg k2_reg)
                                                                                                         (set! pc apply-cont2))
                                                                                                       (if (eq? (car temp_1) '<proc-25>)

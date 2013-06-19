@@ -799,7 +799,7 @@
   ;; turns a list of char into a string
   (lambda-proc (args env2 info handler fail k2)
      ;;(k2 (apply string-append (map (lambda (c) (format "~s" c)) args)) fail)))
-     (k2 (apply char->string args) fail)))
+     (k2 (apply string args) fail)))
 
 ;; substring
 (define substring-prim 
