@@ -380,6 +380,7 @@ namespace Jigsaw
 					ev.Set();
 				  }
 				});
+			t.IsBackground = true;
 			t.Start();
 			while (!ev.WaitOne(0)) { // Are we done?
 			  while (Gtk.Application.EventsPending ())
