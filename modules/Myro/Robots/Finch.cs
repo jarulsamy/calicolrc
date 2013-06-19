@@ -393,11 +393,25 @@ public class Finch: Myro.Robot
 		return array;
 	}
 
+
 	/// <summary>
-	/// Returns the accelerations experienced by Finch's accelerometer. Values are -1.5g to 1.5g.
-	/// </summary>
-	/// <param name="position">"x" to return the x acceleration, "y" to return the y accerleration, "z" to return the z acceleration, and "all" to return all three.</param>
-	/// <returns>A double, or an array of 3 doubles holding X, Y, and Z acceleration, null if the read failed.</returns>
+        /// Returns the accelerations experienced by Finch's
+        /// accelerometer, as well as tap and shake info. Values are
+        /// -1.5g to 1.5g.
+        /// </summary>
+        /// <param name="position">
+	/// "x" to return the x acceleration, "y" to return the y
+        /// accerleration, "z" to return the z acceleration, "tap" to
+        /// return if the finch was tapped( 1 for yes, 0 for no),
+        /// "shake" to return if the finch was shook, and "all" to
+        /// return all five.
+	/// </param>
+        /// <returns>
+	/// A double, or an array of 5 doubles holding X, Y, and Z
+	/// acceleration, and tap and shake info, null if the read
+	/// failed.
+	///</returns>
+
 	public override object getAcceleration (params object[] position)
 	{
 
@@ -424,16 +438,19 @@ public class Finch: Myro.Robot
 			if (OS == "Linux") {
 			    START = 3;
 			}
-			for (int i = 0; i < 5; i++) {
-			  if (i < 2) { // number of sensors to get directly
-				returnData [i] = (double)readData [i + START];
-			  } else {
-				if (readData [i + START] > 31)
-				  returnData [i] = ((double)readData [i + START] - 64) * 1.5 / 32;
-				else
-				  returnData [i] = ((double)readData [i + START]) * 1.5 / 32;
-			  }
+
+			for (int i = 0; i < 3; i++) {
+			    if (readData[i+START] > 31)
+				returnData[i] = ((double)readData[i+START] - 64) * 1.5 / 32;
+			    else
+				returnData[i] = ((double)readData[i+START]) * 1.5 / 32;
 			}
+			returnData[3] = 0;
+			returnData[4] = 0;
+			if (((int)readData[3+START] & 0x80) == 0x80)
+			    returnData[3] = 1;
+			if (((int)readData[3+START] & 0x20) == 0x20)
+			    returnData[4] = 1;
 
 			if (position.Length == 0)
 				position = new object [] {"all"};
