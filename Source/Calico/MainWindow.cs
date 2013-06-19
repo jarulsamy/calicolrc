@@ -2721,7 +2721,8 @@ del _invoke, _
 
         public void switchToShell() {
             Gtk.Notebook nb = searchForNotebook(ShellEditor);
-            int idx = findTabByWidget(ShellEditor);
+	    Gtk.Widget widget = searchForPage(ShellEditor);
+            int idx = findTabByWidget(widget);
             nb.Page = idx;
             ShellEditor.GrabFocus();
         }
