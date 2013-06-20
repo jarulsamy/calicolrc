@@ -708,7 +708,7 @@ def cat(name, incoming, tty, args, stack):
                 raise ConsoleException("%s: file does not exist: '%s'" % (name, filename), stack)
             fp = open(filename)
             for line in fp:
-                i = line.strip()
+                i = line
                 count += 1
                 if pargs.number:
                     yield "%6d %s" % (count, i)

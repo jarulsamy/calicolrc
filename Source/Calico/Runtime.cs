@@ -134,6 +134,7 @@ namespace Calico {
                 dumb = false;
             }
 
+            string oldCurrentLanguage = CurrentLanguage;
             while ((line = getline(le, prompt, indent, dumb, isatty)) != null) {
                 if (line.StartsWith(":")) {
                     string[] t = line.Split();
@@ -141,12 +142,17 @@ namespace Calico {
                         if (Array.Find(manager.getLanguages(), delegate(string lang) {
                             return lang == t [1];
                         }) != null) {
-                            CurrentLanguage = t [1];
-                            manager.Register(manager[CurrentLanguage], true);
-                            manager[CurrentLanguage].engine.Setup(path);
-                            manager[CurrentLanguage].engine.Start(path);
-			    manager[CurrentLanguage].engine.PostSetup(this);
-                        }
+			    CurrentLanguage = t [1];
+			    if (manager[CurrentLanguage].engine == null) {
+				manager.Register(manager[CurrentLanguage], true);
+				manager[CurrentLanguage].engine.Setup(path);
+				manager[CurrentLanguage].engine.Start(path);
+				manager[CurrentLanguage].engine.PostSetup(this);
+			    }
+			    if (manager[CurrentLanguage].engine == null) {
+				CurrentLanguage = oldCurrentLanguage;
+			    }
+                        } 
                         expr = "";
                         prompt = CurrentLanguage + "> ";
                         indent = "";
