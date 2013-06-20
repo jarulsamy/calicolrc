@@ -3073,6 +3073,7 @@ public static class Myro
 		public double _lastTranslate = 0;
 		public double _lastRotate = 0;
 
+	        [method: JigsawTab(null)]
 	        public static bool is_string(object thing) {
 		    if (thing is string)
 			return true;
