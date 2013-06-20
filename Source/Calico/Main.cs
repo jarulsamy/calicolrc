@@ -254,7 +254,7 @@ namespace Calico {
 			System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
 				Application.Run();
 			    });
-			thread.IsBackground = true;
+			//thread.IsBackground = true;
 			thread.Start();
 		    }
 		    win = new CalicoConsole(args, manager, Debug, config, ((IList<string>)args).Contains("--repl")); 
@@ -272,7 +272,7 @@ namespace Calico {
 		    System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
 			    Application.Run();
 			});
-		    thread.IsBackground = true;
+		    //thread.IsBackground = true;
 		    thread.Start();
 		    win = new CalicoConsole(args, manager, Debug, config, true);  
 		} else {
