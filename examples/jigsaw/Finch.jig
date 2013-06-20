@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<jigsaw>
+    <module name="Common.dll" />
+    <module name="Myro.dll" />
+    <block id="1" typeName="Jigsaw.CControlStart" left="435" top="86">
+        <edge id="1" name="Start" linkedTo="4" />
+        <property name="Label" value="when script starts" />
+        <property name="Message" value="" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="2" typeName="Jigsaw.CMethodBlock" left="445" top="21">
+        <method assembly_name="Myro" type_name="Myro" method_name="makeRobot" return_type="System.Object">
+            <parameter name="robot_type" type="System.String" default="" />
+            <parameter name="args" type="System.Object[]" default="" />
+        </method>
+        <edge id="2" name="In" linkedTo="-1" />
+        <edge id="3" name="Out" linkedTo="-1" />
+        <property name="Label" value="makeRobot(&quot;Finch&quot;)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="" />
+        <property name="robot_type" value="&quot;Finch&quot;" />
+        <property name="args" value="" />
+        <fill_color R="0.883574224954273" G="0.604734136073261" B="0.660629647393073" A="1" />
+        <line_color R="0.353429689981709" G="0.241893654429304" B="0.264251858957229" A="1" />
+    </block>
+    <block id="3" typeName="Jigsaw.CControlRepeat" left="455" top="116">
+        <edge id="4" name="In" linkedTo="1" />
+        <edge id="5" name="Out" linkedTo="-1" />
+        <edge id="6" name="Loop" linkedTo="7" />
+        <property name="Label" value="repeat 3 times" />
+        <property name="Message" value="" />
+        <property name="Repetitions" value="3" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="4" typeName="Jigsaw.CMethodBlock" left="475" top="136">
+        <method assembly_name="Myro" type_name="Myro" method_name="forward" return_type="System.Void">
+            <parameter name="power" type="System.Double" default="" />
+            <parameter name="time" type="System.Double" default="" />
+        </method>
+        <edge id="7" name="In" linkedTo="6" />
+        <edge id="8" name="Out" linkedTo="9" />
+        <property name="Label" value="forward(-1, 1)" />
+        <property name="Message" value="" />
+        <property name="power" value="-1" />
+        <property name="time" value="1" />
+        <fill_color R="0.660426946431597" G="0.89032359788675" B="0.786681081534681" A="1" />
+        <line_color R="0.264170778572639" G="0.3561294391547" B="0.314672432613872" A="1" />
+    </block>
+    <block id="5" typeName="Jigsaw.CMethodBlock" left="475" top="156">
+        <method assembly_name="Myro" type_name="Myro" method_name="backward" return_type="System.Void">
+            <parameter name="power" type="System.Double" default="" />
+            <parameter name="time" type="System.Double" default="" />
+        </method>
+        <edge id="9" name="In" linkedTo="8" />
+        <edge id="10" name="Out" linkedTo="-1" />
+        <property name="Label" value="backward(1, 1)" />
+        <property name="Message" value="" />
+        <property name="power" value="1" />
+        <property name="time" value="1" />
+        <fill_color R="0.660426946431597" G="0.89032359788675" B="0.786681081534681" A="1" />
+        <line_color R="0.264170778572639" G="0.3561294391547" B="0.314672432613872" A="1" />
+    </block>
+</jigsaw>

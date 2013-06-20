@@ -25,7 +25,7 @@ public class Hummingbird : Finch
     /// containing the intensity. Example(tri): "#00FF00", Example(single): 200</param>
     public override void setLED(string position, object value)
     {
-        if (robot != null)
+        if (streams[robotType] != null)
         {
             try
             {
@@ -87,7 +87,7 @@ public class Hummingbird : Finch
         int left = (int)(_lastTranslate * 255 - _lastRotate * 255);
         int right = (int)(_lastTranslate * 255 + _lastRotate * 255);
 
-        if (robot != null)
+        if (streams[robotType] != null)
         {
             int dir_left = 48;
             int dir_right = 48;
@@ -119,7 +119,7 @@ public class Hummingbird : Finch
     /// Example: "v1255" (sets vibration port 1 to 255), "v20" (sets vibration port 2 to 0), "v225" (sets vibration port 2 to 25)</param>
     public override void setVolume(object volume)
     {
-        if (robot != null)
+        if (streams[robotType] != null)
         {
 	    try	{
 		string vib = volume.ToString();
@@ -144,7 +144,7 @@ public class Hummingbird : Finch
     /// </summary>
     public override object get(string sensor)
     {
-        if (robot != null)
+        if (streams[robotType] != null)
         {
 
             byte[] report = makePacket((byte)'G', (byte)51);
@@ -194,7 +194,7 @@ public class Hummingbird : Finch
     /// </summary>
     public override object get(string sensor, params object[] position)
     {
-        if (robot != null)
+        if (streams[robotType] != null)
         {
             string temp = "";
             try
@@ -239,7 +239,7 @@ public class Hummingbird : Finch
     /// </summary>
     public override void servo(int id, int value)
     {
-        if (robot != null && id >= 1 && id <= 4)
+        if (streams[robotType] != null && id >= 1 && id <= 4)
         {
             int angle = (value * 234 / 180) % 235;
             byte[] buffer = makePacket((byte)'S', (byte)(47 + id), (byte)angle );

@@ -88,7 +88,7 @@ Ascii Command Codes:
 public class Finch: Myro.Robot
 {
         public static Dictionary<String,HidStream>streams = new Dictionary<String,HidStream>();
-	public HidDevice robot = null;
+	public HidDevice device = null;
 	private HidDeviceLoader loader = null;
 	private Thread keepAliveThread = null;
 	private int red = 0; // stores red LED setting
@@ -140,22 +140,20 @@ public class Finch: Myro.Robot
 	/// </summary>
 	public void open ()
 	{
-	    streams[robotType] = null;;
-		try {
+	        if (!streams.ContainsKey(robotType)) {
+		    try {
 			loader = new HidDeviceLoader ();
-			robot = loader.GetDeviceOrDefault (0x2354, deviceID);
-			streams[robotType] = robot.Open ();
-		} catch {
-		    Console.Error.WriteLine ("Could not find the {0}", robotType);
-		}
-		if (streams[robotType] != null) {
-			if (keepAliveThread == null) {
-				startKeepAlive ();
-			} else {
-				System.Console.WriteLine ("Restarting keep alive thread...");
-				stopKeepAlive ();
-				startKeepAlive ();
-			}
+			device = loader.GetDeviceOrDefault (0x2354, deviceID);
+			streams[robotType] = device.Open ();
+		    } catch {
+			Console.Error.WriteLine ("Could not find the {0}", robotType);
+		    }
+		    if (streams[robotType] != null) {
+			System.Console.WriteLine ("Starting keep alive thread...");
+			startKeepAlive ();
+		    }
+		} else {
+		    System.Console.WriteLine ("Joining keep alive thread...");
 		}
 	}
 
@@ -256,8 +254,9 @@ public class Finch: Myro.Robot
 
 			byte[] report = makePacket((byte)'R');
 			WriteBytes (report);
+			stopKeepAlive();
 			streams[robotType] = null;
-			robot = null;
+			device = null;
 			loader = null;
 			keepAliveThread.Abort ();
 		}
@@ -271,10 +270,10 @@ public class Finch: Myro.Robot
 		if (streams[robotType] != null) {
 			byte[] report = makePacket((byte)'X');
 			WriteBytes (report);
+			stopKeepAlive();
 			streams[robotType] = null;
-			robot = null;
+			device = null;
 			loader = null;
-			keepAliveThread.Abort ();
 		}
 	}
 
@@ -539,7 +538,7 @@ public class Finch: Myro.Robot
 		if (debug)
 			System.Console.WriteLine ("WriteBytes: " + arrayToString (tbuffer));
 		if (streams[robotType] != null) {
-		    lock (robot) {
+		    lock (streams[robotType]) {
 			streams[robotType].Write (tbuffer);
 		    }
 		    byte [] readData = ReadBytes (READSIZE);
@@ -565,7 +564,7 @@ public class Finch: Myro.Robot
 		if (streams[robotType] != null) {
 		    while (r < size) {
 			byte [] buffer = null;
-			lock (robot) {
+			lock (streams[robotType]) {
 			    buffer = streams[robotType].Read ();
 			}
 			for (int b = 0; b < buffer.Length; b++) {
