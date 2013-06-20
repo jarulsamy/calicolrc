@@ -1,0 +1,4 @@
+/home/keithohara/gitCalico/modules/Common.dll.mdb
+/home/keithohara/gitCalico/modules/Common.dll
+/home/keithohara/gitCalico/modules/Common/obj/Debug/Common.dll
+/home/keithohara/gitCalico/modules/Common/obj/Debug/Common.dll.mdb

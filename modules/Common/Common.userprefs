@@ -8,9 +8,7 @@
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="Common" expanded="True">
-            <Node name="References" expanded="True">
-              <Node name="/home/dblank/Calico/trunk/modules/Myro.dll" selected="True" />
-            </Node>
+            <Node name="References" expanded="True" />
           </Node>
         </State>
       </Pad>
