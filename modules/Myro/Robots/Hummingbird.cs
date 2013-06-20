@@ -153,6 +153,8 @@ public class Hummingbird : Finch
             double[] returnData = new double[4];
 
 	    int START = 1; // Windows
+	    if (OS == "Linux") 
+		START = 2;
 
             for (int x = 0; x < 4; x++)
             {
@@ -244,5 +246,4 @@ public class Hummingbird : Finch
             WriteBytes(buffer);
         }
     }
-
 }

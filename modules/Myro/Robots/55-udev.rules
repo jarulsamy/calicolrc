@@ -1,6 +1,5 @@
 SUBSYSTEM=="usb", ATTR{idVendor}=="2354", ATTR{idProduct}=="1111", MODE="0660", GROUP="plugdev"
-
 SUBSYSTEM=="usb", ATTR{idVendor}=="2354", ATTR{idProduct}=="2222", MODE="0660", GROUP="plugdev"
-
 KERNEL=="hidraw*", ATTRS{idVendor}=="2354", ATTRS{idProduct}=="1111", MODE="0666", GROUP="plugdev"
+KERNEL=="hidraw*", ATTRS{idVendor}=="2354", ATTRS{idProduct}=="2222", MODE="0666", GROUP="plugdev"
 
