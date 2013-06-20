@@ -37,7 +37,7 @@ public static class MyROS
     Subscriber subscriber;
     
     public GraphName getDefaultNodeName() {
-      return GraphName.of("my_node");
+      return GraphName.of("calico_node");
     }  
 
     private class MessageHandler: MessageListener
