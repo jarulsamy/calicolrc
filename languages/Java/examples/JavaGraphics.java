@@ -1,8 +1,8 @@
-import static Graphics.*;
+import Graphics.*;
 
 public class JavaGraphics {
     public static void main(String[] args) {
-	    WindowClass window = Window("Testing", 400, 100);
+	    Window window = Window("Testing", 400, 100);
     }
 }
 
