@@ -1487,7 +1487,8 @@ public class Scheme {
 		  retobj = _dlr_runtime.Operations.GetMember(retobj, car(parts_list).ToString());
 		  //retobj = IronPython.Runtime.Types.DynamicHelpers.GetPythonTypeFromType(retobj.GetType());
 	      } catch {
-		  throw new Exception(String.Format("invalid member of {0}: '{1}'", retobj, car(parts_list).ToString()));
+		  return get_external_member(result, car(parts_list).ToString());
+		  //throw new Exception(String.Format("invalid member of {0}: '{1}'", retobj, car(parts_list).ToString()));
 	      }
 	      parts_list = cdr(parts_list);
 	  }
