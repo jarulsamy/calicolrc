@@ -489,6 +489,7 @@ def rm(name, incoming, tty, args, stack):
     Use rm to delete files.
     """
     args, flags = splitArgs(args)
+    # FIXME: remove files or directories
     os.remove(args[0])
     #shutil.rmtree() # removes directory and contents
     return []
@@ -530,6 +531,7 @@ def mv(name, incoming, tty, args, stack):
     Use mv to move files.
     """
     args, flags = splitArgs(args)
+    # FIXME: mv can also move
     os.rename(args[0], args[1])
     return []
 
@@ -539,7 +541,7 @@ def pwd(name, incoming, tty, args, stack):
 
     Use pwd to see your current directory.
     """
-    args, flags = splitArgs(args)
+    #args, flags = splitArgs(args)
     return [os.getcwd()]
 
 def ls(name, incoming, tty, args, stack):
@@ -603,7 +605,7 @@ def grep(name, incoming, tty, args, stack):
             if os.path.exists(f) and os.path.isfile(f):
                 text = open(f).readlines()
                 for line in text:
-                    line = line.strip()
+                    line = line.rstrip()
                     if pargs.invert_match:
                         if not match(pargs.pattern, line):
                             yield "%s: %s" % (f, line)
@@ -669,7 +671,7 @@ def more(name, incoming, tty, args, stack):
                 text = open(f).readlines()
                 for line in text:
                     count += 1
-                    yield line.strip()
+                    yield line
                     if tty and (count % lines == 0):
                         # can you tell if there are more?
                         print("--more--")
