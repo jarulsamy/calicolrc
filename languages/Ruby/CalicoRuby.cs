@@ -61,9 +61,18 @@ public class CalicoRubyEngine : DLREngine {
     DirectoryInfo dir = new System.IO.DirectoryInfo(System.IO.Path.Combine(calico.path, 
 									   System.IO.Path.Combine("..", "modules")));
 
-    System.Collections.Generic.ICollection<string> paths = new List<string>();
-    paths.Add(String.Format("{0}", dir));
-    engine.SetSearchPaths(paths);
+    try
+      {
+	if (engine != null)
+	  {
+	    System.Collections.Generic.ICollection<string> paths = new List<string>();
+	    paths.Add(String.Format("{0}", dir));
+	    engine.SetSearchPaths(paths);
+	  }
+      }catch(Exception e)
+      {
+	Console.WriteLine(e);
+      }
   }
 
   public override bool Execute(string text, bool ok) {
