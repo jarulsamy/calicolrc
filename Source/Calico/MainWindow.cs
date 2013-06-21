@@ -614,6 +614,11 @@ namespace Calico {
                     Gtk.MenuItem fmenu = new Gtk.MenuItem(f.Name.Replace("_", "__"));
                     ((Gtk.Menu)menu.Submenu).Add(fmenu);
                     var fullname = f.FullName;
+                    // If on home page, it is button pressed:
+                    fmenu.ButtonPressEvent += delegate {
+                        Open(fullname);
+                    };
+                    // if in the menu, it is activated:
                     fmenu.Activated += delegate {
                         Open(fullname);
                     };
@@ -995,8 +1000,10 @@ namespace Calico {
             return retval;
         }
 
-        protected void OnButtonWhatsNewClicked(object sender, System.EventArgs e) {
-            System.Diagnostics.Process.Start("http://calicoproject.org/Calico:_Whats_New");
+        protected void OnButtonExamplesClicked(object sender, System.EventArgs e) {
+            // Examples
+            Gtk.MenuItem recents_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExamplesAction");
+            ((Gtk.Menu)recents_menu.Submenu).Popup();
         }
 
         protected void OnButtonRecentlyUsedClicked(object sender, System.EventArgs e) {

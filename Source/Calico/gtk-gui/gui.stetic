@@ -1535,17 +1535,17 @@
                                                   </packing>
                                                 </child>
                                                 <child>
-                                                  <widget class="Gtk.Button" id="buttonWhatsNew">
+                                                  <widget class="Gtk.Button" id="buttonExamples">
                                                     <property name="MemberName" />
-                                                    <property name="Tooltip" translatable="yes">Go to What's new webpage</property>
+                                                    <property name="Tooltip" translatable="yes">Show Examples</property>
                                                     <property name="CanFocus">True</property>
                                                     <property name="Type">TextAndIcon</property>
                                                     <property name="Icon">stock:gtk-dialog-info LargeToolbar</property>
-                                                    <property name="Label" translatable="yes">What's new...</property>
+                                                    <property name="Label" translatable="yes">Examples...</property>
                                                     <property name="UseUnderline">True</property>
                                                     <property name="Relief">None</property>
                                                     <property name="Xalign">0</property>
-                                                    <signal name="Clicked" handler="OnButtonWhatsNewClicked" />
+                                                    <signal name="Clicked" handler="OnButtonExamplesClicked" />
                                                   </widget>
                                                   <packing>
                                                     <property name="Position">1</property>

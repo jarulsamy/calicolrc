@@ -266,7 +266,7 @@ namespace Calico {
 		
 		private global::Gtk.Button buttonRecentlyUsed;
 		
-		private global::Gtk.Button buttonWhatsNew;
+		private global::Gtk.Button buttonExamples;
 		
 		private global::Gtk.Label label2;
 		
@@ -404,7 +404,7 @@ namespace Calico {
 			w1.Add(this.undoAction, GetControlString() + "<Mod2>z");
 			this.redoAction = new global::Gtk.Action("redoAction", global::Mono.Unix.Catalog.GetString("_Redo"), null, "gtk-redo");
 			this.redoAction.ShortLabel = global::Mono.Unix.Catalog.GetString("_Redo");
-			w1.Add(this.redoAction, GetControlString() +"<Shift>z");
+			w1.Add(this.redoAction, GetControlString() + "<Shift>z");
 			this.selectAllAction = new global::Gtk.Action("selectAllAction", global::Mono.Unix.Catalog.GetString("Select _All"), null, "gtk-select-all");
 			this.selectAllAction.ShortLabel = global::Mono.Unix.Catalog.GetString("Select _All");
 			w1.Add(this.selectAllAction, GetControlString() + "<Mod2>a");
@@ -1550,14 +1550,14 @@ namespace Calico {
 			w257.Expand = false;
 			w257.Fill = false;
 			// Container child vbuttonbox3.Gtk.ButtonBox+ButtonBoxChild
-			this.buttonWhatsNew = new global::Gtk.Button();
-			this.buttonWhatsNew.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Go to What's new webpage");
-			this.buttonWhatsNew.CanFocus = true;
-			this.buttonWhatsNew.Name = "buttonWhatsNew";
-			this.buttonWhatsNew.UseUnderline = true;
-			this.buttonWhatsNew.Relief = ((global::Gtk.ReliefStyle)(2));
-			this.buttonWhatsNew.Xalign = 0F;
-			// Container child buttonWhatsNew.Gtk.Container+ContainerChild
+			this.buttonExamples = new global::Gtk.Button();
+			this.buttonExamples.TooltipMarkup = global::Mono.Unix.Catalog.GetString("Show Examples");
+			this.buttonExamples.CanFocus = true;
+			this.buttonExamples.Name = "buttonExamples";
+			this.buttonExamples.UseUnderline = true;
+			this.buttonExamples.Relief = ((global::Gtk.ReliefStyle)(2));
+			this.buttonExamples.Xalign = 0F;
+			// Container child buttonExamples.Gtk.Container+ContainerChild
 			global::Gtk.Alignment w258 = new global::Gtk.Alignment(0F, 0.5F, 0F, 0F);
 			// Container child GtkAlignment.Gtk.Container+ContainerChild
 			global::Gtk.HBox w259 = new global::Gtk.HBox();
@@ -1568,13 +1568,13 @@ namespace Calico {
 			w259.Add(w260);
 			// Container child GtkHBox.Gtk.Container+ContainerChild
 			global::Gtk.Label w262 = new global::Gtk.Label();
-			w262.LabelProp = global::Mono.Unix.Catalog.GetString("What's new...");
+			w262.LabelProp = global::Mono.Unix.Catalog.GetString("Examples...");
 			w262.UseUnderline = true;
 			w259.Add(w262);
 			w258.Add(w259);
-			this.buttonWhatsNew.Add(w258);
-			this.vbuttonbox3.Add(this.buttonWhatsNew);
-			global::Gtk.ButtonBox.ButtonBoxChild w266 = ((global::Gtk.ButtonBox.ButtonBoxChild)(this.vbuttonbox3[this.buttonWhatsNew]));
+			this.buttonExamples.Add(w258);
+			this.vbuttonbox3.Add(this.buttonExamples);
+			global::Gtk.ButtonBox.ButtonBoxChild w266 = ((global::Gtk.ButtonBox.ButtonBoxChild)(this.vbuttonbox3[this.buttonExamples]));
 			w266.Position = 1;
 			w266.Expand = false;
 			w266.Fill = false;
@@ -2045,7 +2045,7 @@ namespace Calico {
 			this.button3.Clicked += new global::System.EventHandler(this.OnButton3Clicked);
 			this.button7.Clicked += new global::System.EventHandler(this.OnButton7Clicked);
 			this.buttonRecentlyUsed.Clicked += new global::System.EventHandler(this.OnButtonRecentlyUsedClicked);
-			this.buttonWhatsNew.Clicked += new global::System.EventHandler(this.OnButtonWhatsNewClicked);
+			this.buttonExamples.Clicked += new global::System.EventHandler(this.OnButtonExamplesClicked);
 			this.history_up.Clicked += new global::System.EventHandler(this.OnHistoryUpClicked);
 			this.history_down.Clicked += new global::System.EventHandler(this.OnHistoryDownClicked);
 		}
