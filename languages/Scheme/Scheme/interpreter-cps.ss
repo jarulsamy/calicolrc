@@ -996,6 +996,22 @@
        (runtime-error "incorrect number of arguments to char-whitespace?" info handler fail))
       (else (k2 (apply char-whitespace? args) fail)))))
 
+;; char->integer
+(define char->integer-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to char->integer" info handler fail))
+      (else (k2 (apply char->integer args) fail)))))
+
+;; integer->char
+(define integer->char-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to integer->char" info handler fail))
+      (else (k2 (apply integer->char args) fail)))))
+
 ;; char-alphabetic?
 (define char-alphabetic?-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -1772,6 +1788,7 @@
 	    (list 'char-whitespace? char-whitespace?-prim)
 	    (list 'char-alphabetic? char-alphabetic?-prim)
 	    (list 'char-numeric? char-numeric?-prim)
+	    (list 'char->integer char->integer-prim)
 	    (list 'cons cons-prim)
 	    (list 'current-time current-time-prim)
 	    (list 'cut cut-prim)
@@ -1788,6 +1805,7 @@
 	    (list 'get get-prim)
 	    (list 'get-stack-trace get-stack-trace-prim)
 	    (list 'import import-prim)
+	    (list 'integer->char integer->char-prim)
 	    (list 'length length-prim)
 	    (list 'list list-prim)
 	    (list 'list->vector list-to-vector-prim)

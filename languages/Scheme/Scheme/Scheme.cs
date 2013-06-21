@@ -330,6 +330,8 @@ public class Scheme {
   public static Proc char_numeric_q_proc = new Proc("char-numeric?", (Procedure1Bool) char_numeric_q, 1, 2);
   public static Proc char_q_proc = new Proc("char?", (Procedure1Bool) char_q, 1, 2);
   public static Proc char_to_string_proc = new Proc("char->string", (Procedure1) char_to_string, 1, 1);
+  public static Proc char_to_integer_proc = new Proc("char->integer", (Procedure1) char_to_integer, 1, 1);
+  public static Proc integer_to_char_proc = new Proc("integer->char", (Procedure1) integer_to_char, 1, 1);
   public static Proc char_whitespace_q_proc = new Proc("char-whitespace?", (Procedure1Bool) char_whitespace_q, 1, 2);
   public static Proc cons_proc = new Proc("cons", (Procedure2) cons, 2, 1);
   public static Proc display_proc = new Proc("display", (Procedure1Void) display, 1, 0);
@@ -1604,6 +1606,8 @@ public class Scheme {
     public static string repr(object obj, Dictionary<int,bool> ids) {
 	if (obj == null) {
 	  return "<void>"; // FIXME: should give void when forced
+	} else if (obj is System.Char) {
+          return String.Format("#\\{0}", obj.ToString());
 	} else if (obj is System.Boolean) {
 	  return ((bool)obj) ? "#t" : "#f";
 	} else if (obj is IronPython.Runtime.List) {
@@ -2404,6 +2408,22 @@ public class Scheme {
 
     public static object char_to_string(object thing) {
 	return ((thing != null) ? thing.ToString() : "");
+    }
+
+    public static object char_to_integer(object thing) {
+	if (thing is char) {
+	    return Convert.ToInt32(thing);
+	} else {
+	    throw new Exception(String.Format("char->integer: invalid character: '{0}'", thing));
+	}
+    }
+
+    public static object integer_to_char(object thing) {
+	if (thing is int) {
+	    return Convert.ToChar(thing);
+	} else {
+	    throw new Exception(String.Format("integer->char: invalid integer: '{0}'", thing));
+	}
     }
 
   public static object list_ref(object obj, object pos) {
