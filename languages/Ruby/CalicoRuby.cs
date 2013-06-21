@@ -60,8 +60,10 @@ public class CalicoRubyEngine : DLREngine {
     // "require 'stringio'; ostdout = $stdout; $stdout = fake = StringIO.new; $stdout = ostdout", 
     DirectoryInfo dir = new System.IO.DirectoryInfo(System.IO.Path.Combine(calico.path, 
 									   System.IO.Path.Combine("..", "modules")));
-    Execute(String.Format("$:.unshift File.join('{0}'); 'Ruby Loaded'", dir),
-	    false);
+
+    System.Collections.Generic.ICollection<string> paths = new List<string>();
+    paths.Add(String.Format("{0}", dir));
+    engine.SetSearchPaths(paths);
   }
 
   public override bool Execute(string text, bool ok) {
