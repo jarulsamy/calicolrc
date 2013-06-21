@@ -605,7 +605,7 @@ def grep(name, incoming, tty, args, stack):
             if os.path.exists(f) and os.path.isfile(f):
                 text = open(f).readlines()
                 for line in text:
-                    line = line.rstrip()
+                    line = line[:-1]
                     if pargs.invert_match:
                         if not match(pargs.pattern, line):
                             yield "%s: %s" % (f, line)
@@ -710,7 +710,7 @@ def cat(name, incoming, tty, args, stack):
                 raise ConsoleException("%s: file does not exist: '%s'" % (name, filename), stack)
             fp = open(filename)
             for line in fp:
-                i = line
+                i = line[:-1]
                 count += 1
                 if pargs.number:
                     yield "%6d %s" % (count, i)
