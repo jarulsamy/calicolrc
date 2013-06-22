@@ -31,10 +31,19 @@ public class CalicoCSharpEngine : Engine
     Mono.CSharp.Evaluator evaluator;
     
     public CalicoCSharpEngine (LanguageManager manager) : base(manager) {
-	settings = new CompilerSettings();
+	settings = new CompilerSettings() { Unsafe = true };
 	reportPrinter = new ConsoleReportPrinter();
 	ctx = new CompilerContext(settings, reportPrinter);
 	evaluator = new Evaluator(ctx);
+
+	string path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
+	if (path.StartsWith("\\")) {
+	    path = path.Substring(1);
+	}
+	System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(System.IO.Path.Combine(path, "..", "..", "modules"));
+	foreach (System.IO.FileInfo f in dir.GetFiles("*.dll")) {
+	    evaluator.LoadAssembly(f.FullName);
+	}
     }
     
     /*
@@ -45,7 +54,25 @@ public class CalicoCSharpEngine : Engine
     */
     
     public override bool Execute(string text) {
-	evaluator.Run(text);
+	string program = "";
+        foreach(string line in text.Split('\n')) {
+            if (line.StartsWith("using ")) {
+                evaluator.Run(line);
+            } else {
+                program += line + "\n";
+	    }
+	}
+	// Next, everything else:
+        if (program != "") {
+	    try {
+		object retval = evaluator.Evaluate(program);
+		if (retval != null) {
+		    System.Console.WriteLine(retval);
+		}
+	    } catch {
+		// no result;
+	    }
+	}
 	return true;
     }
 
@@ -59,8 +86,8 @@ public class CalicoCSharpEngine : Engine
             return false;
         }
         if (text != null) {
-            evaluator.Run(text);
-	        return true;
+            Execute(text);
+	    return true;
         }
         return false;
     }
