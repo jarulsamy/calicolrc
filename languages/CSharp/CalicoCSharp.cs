@@ -26,9 +26,9 @@ using Calico;
 public class CalicoCSharpEngine : Engine
 {
     Mono.CSharp.CompilerSettings settings;
-    ConsoleReportPrinter reportPrinter;
-    CompilerContext ctx;
-    Evaluator evaluator;
+    Mono.CSharp.ConsoleReportPrinter reportPrinter;
+    Mono.CSharp.CompilerContext ctx;
+    Mono.CSharp.Evaluator evaluator;
     
     public CalicoCSharpEngine (LanguageManager manager) : base(manager) {
 	settings = new CompilerSettings();
@@ -50,9 +50,19 @@ public class CalicoCSharpEngine : Engine
     }
 
     public override bool ExecuteFile(string filename) {
-	System.Console.WriteLine("Run filename '{0}'!", filename);
-	// FIXME: howto?
-	return true;
+        string text = null;
+        if (System.IO.File.Exists(filename)) {
+            System.IO.TextReader reader = new System.IO.StreamReader(filename);
+            text = reader.ReadToEnd();
+            reader.Close();
+        } else {
+            return false;
+        }
+        if (text != null) {
+            evaluator.Run(text);
+	        return true;
+        }
+        return false;
     }
     
     public override bool ReadyToExecute(string text) {

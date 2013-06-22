@@ -4,7 +4,7 @@ CalicoCSharp.dll: CalicoCSharp.cs ../../bin/Calico.exe
 		-lib:. \
 		-lib:../../bin \
 		-r:Calico.exe \
-		-r:Mono.CSharp.dll \
+		-r:../../bin/Mono.CSharp.dll \
 		-pkg:gtk-sharp-2.0 \
 		-r:Microsoft.Dynamic \
 		-r:Microsoft.Scripting.dll \
