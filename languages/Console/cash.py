@@ -126,12 +126,12 @@ def execute(text, return_value=False, stack=None, offset=0):
             elif command_set == "dos" and lcommand_name == "rem":
                 continue
             if debug: print("args:", args)
-            if command_name.lower() == "set" and args[1] == "=": # SET x = y
+            if command_name.lower() == "set" and args[1] == "=": # SET x = y; Python evaluates RHS as string
                 expr = " ".join(args[2:])
                 var = args[0]
                 calico.Execute("%s = '%s'" % (var, expr), "python")
                 continue
-            elif len(args) > 1 and args[0] == "=":
+            elif len(args) > 1 and args[0] == "=": # Console evalutes RHS, then Python
                 expr = args[1:]
                 calico.Execute("%s = %s" % (command_name, " ".join(expr)), "python")
                 continue
@@ -341,12 +341,17 @@ def addAnnotatedStrings(annotatedString, string, start):
     return retval
 
 def splitParts(text, stack):
+    # OOP, needed to protect raw-objects
     if debug: print("splitParts:", text, stack)
+    try:
+        length = len(text)
+    except:
+        return [text]
     retval = []
     i = 0
     current = makeAnnotatedString("")
     mode = "start"
-    while i < len(text):
+    while i < length:
         if mode == "start":
             if text[i] == "\\":
                 i += 1
@@ -693,7 +698,13 @@ def cat(name, incoming, tty, args, stack):
                         help='number all output lines')
     parser.add_argument('file', nargs="*", 
                         help='files to concatenate')
-    pargs = parser.parse_args(args)
+    try: 
+        pargs = parser.parse_args(args)
+    except: # OOP: arg is a generator?
+        from collections import namedtuple
+        makePargs = namedtuple("Pargs", "number")
+        pargs = makePargs(number=False) # FIXME: handle args better
+        incoming = args[0] # FIXME: make more flexible
     count = 0
     if incoming:
         for i in incoming:
@@ -838,16 +849,30 @@ def eval_cmd(name, incoming, tty, args, stack):
     """
     args, flags = splitArgs(args)
     if incoming:
-        for item in incoming:
-            parts = splitParts(item, stack)
-            if len(parts) == 2:
-                return [calico.Evaluate(parts[0], parts[1])]
-            else:
-                raise ConsoleException("%s: need to specify a language with '%s'" % (name, parts[0]), stack)
+        # if there are args, then eval to a function
+        if len(args) > 0:
+            for item in incoming:
+                # Can be dangerous, treating line as command-line args:
+                try:
+                    parts = splitParts(item, stack)
+                except:
+                    parts = [item]
+                f = calico.Evaluate(args[0], args[1])
+                # Can return objects, and other non-string things
+                # OOP, pass raw-object
+                yield f(*parts)
+        # else, make the incoming be the "expr language"
+        else:
+            for item in incoming:
+                parts = splitParts(item, stack)
+                if len(parts) == 2:
+                    yield calico.Evaluate(parts[0], parts[1])
+                else:
+                    raise ConsoleException("%s: need to specify a language with '%s'" % (name, parts[0]), stack)
     else:
         text = args[0]
         language = args[1]
-        return [calico.Evaluate(text, language)]
+        yield calico.Evaluate(text, language)
 
 def echo(name, incoming, tty, args, stack):
     """
@@ -859,6 +884,12 @@ def echo(name, incoming, tty, args, stack):
                         help='enable interpretation of backslash escapes')
     parser.add_argument('arg', nargs="*", 
                         help='arguments to echo')
+    ## OOP, if we wanted to allow every function to handle raw objects:
+    #try: # can't parse objects
+    #    pargs = parser.parse_args(args)
+    #    data = " ".join(pargs.arg)
+    #except:
+    #    return args
     pargs = parser.parse_args(args)
     data = " ".join(pargs.arg)
     if pargs.e:
