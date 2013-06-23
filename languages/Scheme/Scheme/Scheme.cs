@@ -619,8 +619,13 @@ public class Scheme {
 	} catch {
 	  if (obj is Rational) {
 		return (int)((Rational)obj);
-	  } else	  
-		throw new Exception(string.Format("can't convert object of type '{0}' to int", obj.GetType()));
+	  } else {
+	      try {
+		  return Convert.ToInt32(obj.ToString());
+	      } catch {
+		  throw new Exception(string.Format("can't convert object of type '{0}' to int", obj.GetType()));
+	      }
+	  }
 	}
   }
   
