@@ -42,7 +42,9 @@ public class CalicoCSharpEngine : Engine
 	}
 	System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(System.IO.Path.Combine(path, "..", "..", "modules"));
 	foreach (System.IO.FileInfo f in dir.GetFiles("*.dll")) {
-	    evaluator.LoadAssembly(f.FullName);
+	    // FIXME: this causes interaction with ROS loading:
+	    //evaluator.LoadAssembly(f.FullName);
+	    // Without it, you can't access Myro, etc.? Maybe need to do on the fly?
 	}
     }
     
