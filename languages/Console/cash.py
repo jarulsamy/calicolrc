@@ -923,6 +923,64 @@ def switch(name, incoming, tty, args, stack):
         return [command_set]
     return []
 
+def head(name, incoming, tty, args, stack):
+    """
+    Get the first N lines from files.
+    """
+    parser = argparse.ArgumentParser(
+        prog=name)
+    parser.add_argument('--lines', '-n', nargs=1, type=int, default=[10],
+                        help='how many lines to show')
+    parser.add_argument('file', nargs="*", 
+                        help='files to list')
+    pargs = parser.parse_args(args)
+    lines = pargs.lines[0]
+    count = 0
+    if incoming:
+        for line in incoming:
+            if count < lines:
+                yield line
+            else:
+                break
+            count += 1
+    else:
+        for filename in pargs.file:
+            count = 0
+            fp = open(filename)
+            for line in fp:
+                if count < lines:
+                    yield line
+                else:
+                    break
+                count += 1
+
+def tail(name, incoming, tty, args, stack):
+    """
+    Get the last N lines from files.
+    """
+    parser = argparse.ArgumentParser(
+        prog=name)
+    parser.add_argument('--lines', '-n', nargs=1, type=int, default=[10],
+                        help='how many lines to show')
+    parser.add_argument('file', nargs="*", 
+                        help='files to list')
+    pargs = parser.parse_args(args)
+    lines = pargs.lines[0]
+    count = 0
+    if incoming:
+        # FIXME: too expensive; holds all in memory:
+        for line in list(incoming)[-lines:]:
+            yield line
+            count += 1
+    else:
+        for filename in pargs.file:
+            count = 0
+            fp = open(filename)
+            # FIXME: too expensive; holds all in memory:
+            for line in fp.readlines()[-lines:]:
+                yield line
+                count += 1
+
 # FIXME add these: head tail find pushd popd wget wc cal date du df
 # uname cut plot time hostname id < > cls TAB-completion
 
@@ -937,7 +995,7 @@ unix_commands = {"ls": ls, "more": more, "cd": cd, "grep": grep,
                  "sort": sort, "exec": exec_cmd, "eval": eval_cmd,
                  "mkdir": mkdir, "mv": mv, "rmdir": rmdir, "echo": echo, 
                  "edit": open_cmd, "switch": switch, "printf": printf, 
-                 "wc": wc}
+                 "wc": wc, "head": head, "tail": tail}
 dos_commands = {"dir": ls, "more": more, "cd": cd, "chdir": cd,
                 "help": help_cmd, "pwd": pwd, "copy": cp,
                 "del": rm, "erase": rm, "show": show, "open": open_cmd,

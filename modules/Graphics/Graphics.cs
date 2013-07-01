@@ -2750,7 +2750,11 @@ public static class Graphics
     
 		public double rotation {
 			get {
-				return _rotation * 180.0 / Math.PI;
+			    double temp = (_rotation * 180.0 / Math.PI);
+			    if (temp == 0)
+				return 0.0;
+			    else
+				return -temp;
 			}
 			set {
 				rotateTo (value);

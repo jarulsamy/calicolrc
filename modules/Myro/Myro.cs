@@ -2779,6 +2779,9 @@ public static class Myro
 				hbox.PackStart (entry);
 				fc.VBox.PackStart (hbox);
 			  }
+ 
+ 
+			  //fc.TypeHint = Gdk.WindowTypeHint.Utility;
 			  fc.ShowAll();
 			  if (fc.Run() == (int)Gtk.ResponseType.Ok) {
 				if (question is List) {

@@ -42,7 +42,11 @@ public class CalicoCSharpEngine : Engine
 	}
 	System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(System.IO.Path.Combine(path, "..", "..", "modules"));
 	foreach (System.IO.FileInfo f in dir.GetFiles("*.dll")) {
-	    evaluator.LoadAssembly(f.FullName);
+	    // FIXME: this causes interaction with ROS loading, so we don't load it:
+	    if (!f.FullName.EndsWith("ros.dll")) {
+		//System.Console.WriteLine(f.FullName);
+		evaluator.LoadAssembly(f.FullName);
+	    }
 	}
     }
     
