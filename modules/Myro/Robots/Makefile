@@ -1,6 +1,86 @@
 
 all: Scribbler.dll SimScribbler.dll SimPioneer.dll NxtRobot.dll \
-	Finch.dll Hummingbird.dll
+	Finch.dll Hummingbird.dll ROSRobot.dll ROSARDrone.dll
+
+ROSARDrone.dll: ROSARDrone.cs ROSRobot.dll
+	MONO_PATH=../../bin:../../../languages/Java/lib dmcs -sdk:4 \
+		-r:../../Myro.dll \
+		-r:../../Graphics.dll \
+		-r:../../../bin/IronPython.dll \
+		-r:../../../bin/Microsoft.Scripting.dll \
+		-r:../../../bin/Microsoft.Dynamic.dll \
+		-r:System.Drawing \
+		-r:../../ros.dll \
+		-r:../../MyROS.dll \
+		-r:ROSRobot.dll \
+		-r:IKVM.OpenJDK.Beans \
+		-r:IKVM.OpenJDK.Charsets \
+		-r:IKVM.OpenJDK.Corba \
+		-r:IKVM.OpenJDK.Core \
+		-r:IKVM.OpenJDK.Jdbc \
+		-r:IKVM.OpenJDK.Management \
+		-r:IKVM.OpenJDK.Media \
+		-r:IKVM.OpenJDK.Misc \
+		-r:IKVM.OpenJDK.Naming \
+		-r:IKVM.OpenJDK.Remoting \
+		-r:IKVM.OpenJDK.Security \
+		-r:IKVM.OpenJDK.SwingAWT \
+		-r:IKVM.OpenJDK.Text \
+		-r:IKVM.OpenJDK.Tools \
+		-r:IKVM.OpenJDK.Util \
+		-r:IKVM.OpenJDK.XML.API \
+		-r:IKVM.OpenJDK.XML.Bind \
+		-r:IKVM.OpenJDK.XML.Crypto \
+		-r:IKVM.OpenJDK.XML.Parse \
+		-r:IKVM.OpenJDK.XML.Transform \
+		-r:IKVM.OpenJDK.XML.WebServices \
+		-r:IKVM.OpenJDK.XML.XPath \
+		-r:IKVM.Reflection \
+		-r:IKVM.Runtime \
+		-r:IKVM.Runtime.JNI\
+		-pkg:gtk-sharp-2.0 \
+		-out:ROSARDrone.dll \
+		-target:library \
+		ROSARDrone.cs
+
+ROSRobot.dll: ROSRobot.cs
+	MONO_PATH=../../bin:../../../languages/Java/lib dmcs -sdk:4 \
+		-r:../../Myro.dll \
+		-r:../../Graphics.dll \
+		-r:../../../bin/IronPython.dll \
+		-r:../../../bin/Microsoft.Scripting.dll \
+		-r:../../../bin/Microsoft.Dynamic.dll \
+		-r:System.Drawing \
+		-r:../../ros.dll \
+		-r:IKVM.OpenJDK.Beans \
+		-r:IKVM.OpenJDK.Charsets \
+		-r:IKVM.OpenJDK.Corba \
+		-r:IKVM.OpenJDK.Core \
+		-r:IKVM.OpenJDK.Jdbc \
+		-r:IKVM.OpenJDK.Management \
+		-r:IKVM.OpenJDK.Media \
+		-r:IKVM.OpenJDK.Misc \
+		-r:IKVM.OpenJDK.Naming \
+		-r:IKVM.OpenJDK.Remoting \
+		-r:IKVM.OpenJDK.Security \
+		-r:IKVM.OpenJDK.SwingAWT \
+		-r:IKVM.OpenJDK.Text \
+		-r:IKVM.OpenJDK.Tools \
+		-r:IKVM.OpenJDK.Util \
+		-r:IKVM.OpenJDK.XML.API \
+		-r:IKVM.OpenJDK.XML.Bind \
+		-r:IKVM.OpenJDK.XML.Crypto \
+		-r:IKVM.OpenJDK.XML.Parse \
+		-r:IKVM.OpenJDK.XML.Transform \
+		-r:IKVM.OpenJDK.XML.WebServices \
+		-r:IKVM.OpenJDK.XML.XPath \
+		-r:IKVM.Reflection \
+		-r:IKVM.Runtime \
+		-r:IKVM.Runtime.JNI\
+		-pkg:gtk-sharp-2.0 \
+		-out:ROSRobot.dll \
+		-target:library \
+		ROSRobot.cs
 
 Finch.dll: Finch.cs
 	dmcs -sdk:4 -lib:../../../bin \

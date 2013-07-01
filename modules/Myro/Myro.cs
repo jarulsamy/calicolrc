@@ -1633,6 +1633,33 @@ public static class Myro
 	}
   
 	[method: JigsawTab("M/Movement")]
+	public static void takeoff ()
+	{
+	    if (robot != null) 
+	        robot.takeoff();
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Movement")]
+	public static void land ()
+	{
+	    if (robot != null) 
+	        robot.land();
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Movement")]
+	public static void reset ()
+	{
+	    if (robot != null) 
+	        robot.reset();
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Movement")]
 	public static void move (double translate, double rotate)
 	{
 	    if (robot != null) 
@@ -1673,6 +1700,78 @@ public static class Myro
 	{
 	    if (robot != null) 
 		robot.turnRight (power, time);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Movement")]
+        public static void left (double power)
+	{
+	    if (robot != null) 
+		robot.left (power);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Movement")]
+	public static void right (double power)
+	{
+	    if (robot != null) 
+		robot.right (power);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Movement")]
+	public static void up (double power)
+	{
+	    if (robot != null) 
+		robot.up (power);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+ 	[method: JigsawTab("M/Movement")]
+        public static void down (double power)
+	{
+	    if (robot != null) 
+		robot.down (power);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Movement")]
+	public static void left (double power, double time)
+	{
+	    if (robot != null) 
+		robot.left (power, time);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Movement")]
+	public static void right (double power, double time)
+	{
+	    if (robot != null) 
+		robot.right (power, time);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Movement")]
+	public static void up (double power, double time)
+	{
+	    if (robot != null) 
+		robot.up (power, time);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Movement")]
+	public static void down (double power, double time)
+	{
+	    if (robot != null) 
+		robot.down (power, time);
 	    else
 		throw new Exception("Robot has not been initialized");
 	}
@@ -3429,6 +3528,65 @@ public static class Myro
 		{
 		}
 
+
+ 	        // 3d robots
+	        public virtual void takeoff ()
+	        {
+		}
+
+	        public virtual void land()
+	        {
+		}
+
+	        public virtual void reset()
+	        {
+		}
+
+	        public virtual void up (double speed)
+	        {
+		}
+
+   	        public void up (double speed, double duration)
+	        {
+			up(speed);
+			wait (duration);
+			stop ();
+		}
+
+	        public virtual void down (double speed)
+	        {
+		}
+
+   	        public void down (double speed, double duration)
+	        {
+			down(speed);
+			wait (duration);
+			stop ();
+		}
+
+ 	        // holonomic robots
+	        public virtual void left (double speed)
+	        {
+		}
+
+   	        public void left (double speed, double duration)
+	        {
+			left(speed);
+			wait (duration);
+			stop ();
+		}
+
+	        public virtual void right (double speed)
+	        {
+		}
+
+   	        public virtual void right (double speed, double duration)
+	        {
+			right(speed);
+			wait (duration);
+			stop ();
+		}
+
 		public void penDown ()
 		{
 			penDown ("black");
@@ -3449,6 +3607,18 @@ public static class Myro
 		    _lastTranslate = translate;
 		    _lastRotate = rotate;
 		    adjustSpeed ();
+		}
+
+	        public void move (double translate, double rotate, double interval)
+		{
+		  _lastTranslate = translate;
+		  _lastRotate = rotate;
+		  double start = currentTime ();
+		  while (currentTime() - start < interval) {
+		    wait (.1);
+		    adjustSpeed();
+		  }		  	       
+		  stop ();		  
 		}
     
 		public void playSong (List song)
@@ -3480,10 +3650,8 @@ public static class Myro
 		}
     
 		public void forward (double speed, double interval)
-		{
-			move (speed, 0);
-			wait (interval);
-			stop ();
+	        {
+		  move (speed, 0, interval);
 		}
     
 		public void forward (double speed)
@@ -3500,8 +3668,11 @@ public static class Myro
 		public void translate (double speed, double interval)
 		{
 			_lastTranslate = speed;
-			adjustSpeed ();
-			wait (interval);
+			double start = currentTime ();
+			while (currentTime() - start < interval) {
+			  wait (.1);
+			  adjustSpeed();
+			}
 			_lastTranslate = 0;
 			adjustSpeed ();
 		}
@@ -3515,8 +3686,11 @@ public static class Myro
 		public void rotate (double speed, double interval)
 		{
 			_lastRotate = speed;
-			adjustSpeed ();
-			wait (interval);
+			double start = currentTime ();
+			while (currentTime() - start < interval) {
+			  adjustSpeed ();
+			  wait (.1);
+			}			
 			_lastRotate = 0;
 			adjustSpeed ();
 		}
@@ -3540,9 +3714,8 @@ public static class Myro
 
 		public void turnLeft (double speed, double interval)
 		{
-			move (0, speed);
-			wait (interval);
-			stop ();
+		        move (0, speed, interval);
+			stop();
 		}
 
 		public void turnRight (double speed)
@@ -3552,10 +3725,10 @@ public static class Myro
     
 		public void turnRight (double speed, double interval)
 		{
-			move (0, -speed);
-			wait (interval);
+  		        move (0, -speed, interval);
 			stop ();
 		}
+
     
 		public void motors (double left, double right)
 		{
@@ -3564,24 +3737,27 @@ public static class Myro
 			move (trans, rotate);
 		}
 
-	    public void motors (double left, double right, double time)
+	    public void motors (double left, double right, double interval)
 		{
 			double trans = (right + left) / 2.0;
 			double rotate = (right - left) / 2.0;
-			move (trans, rotate);
-			wait(time);
+			double start = currentTime ();
+			while (currentTime() - start < interval) {
+			  move(trans, rotate);
+			  wait (.1);
+			}			
 			stop();
 		}
-
-		public virtual void draw_simulation ()
-		{
-			throw new NotImplementedException ();
-		}
-
-		public virtual void update ()
-		{
-		    throw new NotImplementedException ();
-		}
+	  
+	  public virtual void draw_simulation ()
+	  {
+	    throw new NotImplementedException ();
+	  }
+	  
+	  public virtual void update ()
+	  {
+	    throw new NotImplementedException ();
+	  }
 	}
 
         [method: JigsawTab(null)]

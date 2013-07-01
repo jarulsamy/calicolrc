@@ -11,7 +11,7 @@ using turtlesim;
 public static class MyROS
 {
   
-  public static Graphics.Picture rosRawRGBToPicture(org.jboss.netty.buffer.SlicedChannelBuffer cbuffer,
+  public static Graphics.Picture rosRawRGBToPicture(org.jboss.netty.buffer.ChannelBuffer cbuffer,
 						    int width,
 						    int height)
   {
@@ -20,7 +20,7 @@ public static class MyROS
     return new Graphics.Picture (width, height, buffer);
   }
 
-  public static Graphics.Picture rosRGBToPicture(org.jboss.netty.buffer.SlicedChannelBuffer cbuffer,
+  public static Graphics.Picture rosRGBToPicture(org.jboss.netty.buffer.ChannelBuffer cbuffer,
 						 int width,
 						 int height)
   {
