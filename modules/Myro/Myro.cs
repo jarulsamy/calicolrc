@@ -2682,7 +2682,7 @@ public static class Myro
 			  }
  
  
-			  fc.TypeHint = Gdk.WindowTypeHint.Utility;
+			  //fc.TypeHint = Gdk.WindowTypeHint.Utility;
 			  fc.ShowAll();
 			  if (fc.Run() == (int)Gtk.ResponseType.Ok) {
 				if (question is List) {
