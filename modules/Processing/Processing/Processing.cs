@@ -537,7 +537,13 @@ public static class Processing
 
         if (handler != null)
         {
-            handler(o, a);
+	    try {
+		handler(o, a);
+	    } catch (Exception e) {
+		Console.Error.WriteLine("Error in onLoop: " + e.Message);
+		Console.Error.WriteLine("loop is now stopping.");
+		stopLoop();
+	    }
         }
     }
 
@@ -549,7 +555,11 @@ public static class Processing
         // Event will be null if there are no subscribers
         if (handler != null)
         {	// Use the () operator to raise the event.
-            handler(null, e);
+	    try {
+		handler(null, e);
+	    } catch (Exception exc) {
+		Console.Error.WriteLine("Error in onMouseMoved: " + exc.Message);
+	    }
         }
     }
 
@@ -561,7 +571,11 @@ public static class Processing
         // Event will be null if there are no subscribers
         if (handler != null)
         {	// Use the () operator to raise the event.
-            handler(null, e);
+	    try {
+		handler(null, e);
+	    } catch (Exception exc) {
+		Console.Error.WriteLine("Error in onMouseDragged: " + exc.Message);
+	    }
         }
     }
 
@@ -573,7 +587,11 @@ public static class Processing
         // Event will be null if there are no subscribers
         if (handler != null)
         {	// Use the () operator to raise the event.
-            handler(null, e);
+	    try {
+		handler(null, e);
+	    } catch (Exception exc) {
+		Console.Error.WriteLine("Error in onMousePressed: " + exc.Message);
+	    }
         }
     }
 
@@ -585,7 +603,11 @@ public static class Processing
 		// Event will be null if there are no subscribers
 		if (handler != null)
 		{
+		    try {
 			handler(null, e);
+		    } catch (Exception exc) {
+			Console.Error.WriteLine("Error in onMouseClicked: " + exc.Message);
+		    }
 		}
 	}
 
@@ -597,7 +619,11 @@ public static class Processing
         // Event will be null if there are no subscribers
         if (handler != null)
         {	// Use the () operator to raise the event.
-            handler(null, e);
+	    try {
+		handler(null, e);
+	    } catch (Exception exc) {
+		Console.Error.WriteLine("Error in onMouseReleased: " + exc.Message);
+	    }
         }
     }
 
@@ -607,7 +633,11 @@ public static class Processing
         KeyPressEventHandler handler = onKeyPressed;
         if (handler != null)
         {
-            handler(null, e);
+	    try {
+		handler(null, e);
+	    } catch (Exception exc) {
+		Console.Error.WriteLine("Error in onKeyPressed: " + exc.Message);
+	    }
         }
     }
 
@@ -617,7 +647,11 @@ public static class Processing
         KeyReleaseEventHandler handler = onKeyReleased;
         if (handler != null)
         {
-            handler(null, e);
+	    try {
+		handler(null, e);
+	    } catch (Exception exc) {
+		Console.Error.WriteLine("Error in onKeyReleased: " + exc.Message);
+	    }
         }
     }
 
@@ -2171,9 +2205,15 @@ internal class PTimer
 		System.Threading.Interlocked.Increment(ref _tickCount);
 
 		// Raise onLoop event
-        EventHandler<PElapsedEventArgs> handler = Elapsed;
+		EventHandler<PElapsedEventArgs> handler = Elapsed;
 		PElapsedEventArgs args = new PElapsedEventArgs(_tickCount);
-        if (handler != null) handler(this, args);
+		if (handler != null) { 
+		    try {
+			handler(this, args);
+		    } catch (Exception e) {
+			Console.Error.WriteLine("Error in Elapsed: " + e.Message);
+		    }
+		}
 		
 		_inTimeout = false;
 		return true;
