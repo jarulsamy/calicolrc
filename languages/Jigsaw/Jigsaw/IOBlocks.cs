@@ -98,11 +98,13 @@ namespace Jigsaw
 		{
 			// Executing a print involves evaluting the given exression
 			CExpressionProperty Expr = (CExpressionProperty)_properties["Expression"];
-			try {
+			if (Expr.Text != "") { // allow no expression too
+			    try {
 				Expr.Compile(engine);
-			} catch (Exception ex) {
-				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+			    } catch (Exception ex) {
+				Console.Error.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
+			    }
 			}
 			return true;
 		}
@@ -227,9 +229,26 @@ namespace Jigsaw
 
 			try {
 				CExpressionProperty Expr = (CExpressionProperty)_properties["Expression"];
-				object o = Expr.Evaluate(scope);
-				string toPrint = Repr(o);
-				Console.WriteLine(toPrint);
+				object o = null;
+				if (Expr.Text != "") { // allow no expressions as well
+				    o = Expr.Evaluate(scope);
+				}
+				if (o == null) {
+				    Console.WriteLine();
+				/* Can't do this because it doesn't distinguish between list-as-arg
+				   and list-of-args:
+				} else if (o is IList) {
+				    foreach (object o2 in (IList)o) {
+					string toPrint = Repr(o2);
+					Console.Write(toPrint);
+					Console.Write(" ");
+				    }
+				    Console.WriteLine();
+				*/
+				} else {
+				    string toPrint = Repr(o);
+				    Console.WriteLine(toPrint);
+				}
 				//((InspectorWindow)builtins["Inspector"]).WriteLine(toPrint);
 				//((InspectorWindow)scope.GetVariable("_inspector")).WriteLine(toPrint);
 			} catch (Exception ex) {
@@ -317,7 +336,7 @@ namespace Jigsaw
 			try {
 				Ask.Compile(engine);
 			} catch (Exception ex) {
-				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				Console.Error.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
 			}
 			return true;
@@ -437,7 +456,7 @@ namespace Jigsaw
 			try {
 				Tell.Compile(engine);
 			} catch (Exception ex) {
-				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				Console.Error.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
 			}
 			return true;
@@ -586,7 +605,7 @@ namespace Jigsaw
 			try {
 				Stat.Compile(engine);
 			} catch (Exception ex) {
-				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				Console.Error.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
 			}
 			return true;
@@ -710,7 +729,7 @@ namespace Jigsaw
 				Expr1.Compile(engine);
 				Expr2.Compile(engine);
 			} catch (Exception ex) {
-				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				Console.Error.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
 			}
 			return true;
@@ -843,7 +862,7 @@ namespace Jigsaw
 				Expr2.Compile(engine);
 				Expr3.Compile(engine);
 			} catch (Exception ex) {
-				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				Console.Error.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
 			}
 			return true;
@@ -965,7 +984,7 @@ namespace Jigsaw
 			try {
 				Expr.Compile(engine);
 			} catch (Exception ex) {
-				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				Console.Error.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
 			}
 			return true;

@@ -306,7 +306,7 @@ namespace Jigsaw
 			
 			// If not found, fail
 			if (assemblyName.Length == 0) {
-				Console.WriteLine ("(Engine.LoadAssembly) Assembly name not found in module path {0}", dllPath);
+				Console.Error.WriteLine ("(Engine.LoadAssembly) Assembly name not found in module path {0}", dllPath);
 				return null;
 			}
 			
@@ -314,7 +314,7 @@ namespace Jigsaw
 			try {
 				assembly = Assembly.LoadFrom(dllPath);
 			} catch (Exception ex){ //(System.IO.FileNotFoundException) {
-				Console.WriteLine ("(Engine.LoadAssembly) Failed to load assembly from module path {0}: {1}", dllPath, ex.Message);
+				Console.Error.WriteLine ("(Engine.LoadAssembly) Failed to load assembly from module path {0}: {1}", dllPath, ex.Message);
 				return null;
 //#pragma warning disable 612
 //					assembly = Assembly.LoadWithPartialName (tname);
@@ -324,7 +324,7 @@ namespace Jigsaw
 			try {
 				scriptRuntime.LoadAssembly(assembly);
 			} catch (Exception ex){
-				Console.WriteLine ("(Engine.LoadAssembly) Failed to load assembly {0} into script runtime: {1}", assemblyName, ex.Message);
+				Console.Error.WriteLine ("(Engine.LoadAssembly) Failed to load assembly {0} into script runtime: {1}", assemblyName, ex.Message);
 				return null;
 			}
 
@@ -336,7 +336,7 @@ namespace Jigsaw
 				source = engine.CreateScriptSourceFromString(importStatement, SourceCodeKind.Statements);
 				source.Execute(scope);
 			} catch (Exception ex) {
-				Console.WriteLine ("(Engine.LoadAssembly) Error importing assembly {0} into global scope: {1}", assemblyName, ex.Message);
+				Console.Error.WriteLine ("(Engine.LoadAssembly) Error importing assembly {0} into global scope: {1}", assemblyName, ex.Message);
 				return null;
 			}
 			
@@ -527,11 +527,11 @@ namespace Jigsaw
 						{
 							engine.Execute(py, ss);
 						} catch (Exception ex) {
-							Console.WriteLine ("Error in Engine.Reset: {0}", ex.Message);
+							Console.Error.WriteLine ("Error in Engine.Reset: {0}", ex.Message);
 						}
 					}
 				} else {
-					Console.WriteLine ("Error in Engine.Reset: Could not generate source code for procedure {0}", ps.ProcedureName);
+					Console.Error.WriteLine ("Error in Engine.Reset: Could not generate source code for procedure {0}", ps.ProcedureName);
 				}
 			}
 
@@ -563,7 +563,7 @@ namespace Jigsaw
 				
 				return true;
 			} catch (Exception ex) {
-				Console.WriteLine ("Error on Engine.CompileStack: {0}", ex.Message);
+				Console.Error.WriteLine ("Error on Engine.CompileStack: {0}", ex.Message);
 				return false;
 			}
 		}

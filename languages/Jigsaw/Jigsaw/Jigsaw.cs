@@ -581,7 +581,7 @@ namespace Jigsaw
 				return sb;
 				
 			} catch (Exception ex) {
-				Console.WriteLine("Map file created failed: {0}", ex.Message);
+				Console.Error.WriteLine("Map file created failed: {0}", ex.Message);
 				return null;
 			}
 		}
@@ -1944,7 +1944,7 @@ namespace Jigsaw
 				} catch (DirectoryNotFoundException ex) {
 					Console.WriteLine("The specified directory does not exist. {0}", ex);
 				} catch (Exception ex) {
-					Console.WriteLine("Error saving file: {0}", ex);
+					Console.Error.WriteLine("Error saving file: {0}", ex);
 				}
 			
 			} else {
@@ -2262,7 +2262,7 @@ namespace Jigsaw
 							tBlock[name] = val;
 
 						} catch (Exception ex) {
-							Console.WriteLine("Error in Jigsaw.Canvas.ProcessXml while reading property {0}: {1}", name, ex.Message);
+							Console.Error.WriteLine("Error in Jigsaw.Canvas.ProcessXml while reading property {0}: {1}", name, ex.Message);
 						}
 						break;
 					

@@ -422,7 +422,7 @@ namespace Jigsaw
 			if (procStartBlock == null) {
 				string errmsg = "Compile error. Cannot find procedure named " + pname;
 				_properties["Message"].Text = errmsg;
-				Console.WriteLine(errmsg);
+				Console.Error.WriteLine(errmsg);
 				return false;
 			}
 			
@@ -594,7 +594,7 @@ namespace Jigsaw
 			try {
 				Expr.Compile(engine);
 			} catch (Exception ex) {
-				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				Console.Error.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
 			}
 			return true;

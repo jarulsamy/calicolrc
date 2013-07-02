@@ -460,7 +460,7 @@ namespace Jigsaw
 			try {
 				Repetitions.Compile(engine);
 			} catch (Exception ex) {
-				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				Console.Error.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
 			}
 			return true;
@@ -748,7 +748,7 @@ namespace Jigsaw
 			try {
 				IfTest.Compile(engine);
 			} catch (Exception ex) {
-				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				Console.Error.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
 			}
 			return true;
@@ -1063,7 +1063,7 @@ namespace Jigsaw
 			try {
 				IfTest.Compile(engine);
 			} catch (Exception ex) {
-				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				Console.Error.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
 			}
 			return true;
@@ -1463,7 +1463,7 @@ namespace Jigsaw
 			try {
 				WhileTest.Compile(engine);
 			} catch (Exception ex) {
-				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				Console.Error.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
 			}
 			return true;
@@ -1866,7 +1866,7 @@ namespace Jigsaw
 			try {
 				Sequence.Compile(engine);
 			} catch (Exception ex) {
-				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				Console.Error.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
 			}
 			return true;

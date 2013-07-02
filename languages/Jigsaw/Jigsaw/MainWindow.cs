@@ -490,7 +490,7 @@ public class MainWindow : Gtk.Window
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 	protected void OnJigsawError(object sender, EventArgs a)
 	{
-		Console.WriteLine ("Jigsaw error");
+		Console.Error.WriteLine ("Jigsaw error");
 	}
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

@@ -103,7 +103,7 @@ namespace Jigsaw
 			try {
 				RHS.Compile(engine);
 			} catch (Exception ex) {
-				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				Console.Error.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
 			}
 			return true;
@@ -273,7 +273,7 @@ namespace Jigsaw
 				Min.Compile(engine);
 				Max.Compile(engine);
 			} catch (Exception ex) {
-				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				Console.Error.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
 			}
 			return true;
@@ -396,7 +396,7 @@ namespace Jigsaw
 			try {
 				Stat.Compile(engine);
 			} catch (Exception ex) {
-				Console.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
+				Console.Error.WriteLine ("Block {0} failed compilation: {1}", this.Name, ex.Message);
 				return false;
 			}
 			return true;
