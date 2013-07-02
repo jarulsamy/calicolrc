@@ -698,13 +698,7 @@ def cat(name, incoming, tty, args, stack):
                         help='number all output lines')
     parser.add_argument('file', nargs="*", 
                         help='files to concatenate')
-    try: 
-        pargs = parser.parse_args(args)
-    except: # OOP: arg is a generator?
-        from collections import namedtuple
-        makePargs = namedtuple("Pargs", "number")
-        pargs = makePargs(number=False) # FIXME: handle args better
-        incoming = args[0] # FIXME: make more flexible
+    pargs = parser.parse_args(args)
     count = 0
     if incoming:
         for i in incoming:
@@ -890,11 +884,31 @@ def echo(name, incoming, tty, args, stack):
     #    data = " ".join(pargs.arg)
     #except:
     #    return args
-    pargs = parser.parse_args(args)
-    data = " ".join(pargs.arg)
-    if pargs.e:
-        return data.split("\\n")
-    return [data]
+    normal = True
+    try: 
+        pargs = parser.parse_args(args)
+    except: # OOP: arg is a generator?
+        normal = False
+        from collections import namedtuple
+        makePargs = namedtuple("Pargs", "e arg")
+        pargs = makePargs(e="-e" in args, 
+                          arg=[arg for arg in args 
+                               if ((isinstance(arg, str) and not arg.startswith("-")) or
+                                   (not isinstance(arg, str)))])
+    if normal:
+        data = " ".join(pargs.arg)
+        if pargs.e:
+            for line in data.split("\\n"):
+                yield line
+        else:
+            yield data
+    else: # OOP: arg is a generator
+        for data in pargs.arg[0]:
+            if pargs.e:
+                for line in data.split("\\n"):
+                    yield line
+            else:
+                yield data
 
 def printf(name, incoming, tty, args, stack):
     """
