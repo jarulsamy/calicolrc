@@ -221,7 +221,6 @@ namespace Calico {
             }
             file_menu.Submenu.ShowAll();
 
-
             // Use Library menu:
             Gtk.MenuItem library_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/EditAction/UseALibraryAction");
             if (library_menu == null) {
@@ -244,6 +243,11 @@ namespace Calico {
             }
             library_menu.Submenu.ShowAll();
 
+            // Remove Module menu:
+            Gtk.MenuItem removemodule_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/EditAction/RemoveModuleAction");
+            if (removemodule_menu == null) {
+                throw new Exception("/menubar2/EditAction/RemoveModuleAction");
+            }
             // Languages to menu items:
             Gtk.MenuItem switch_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ShellAction1/LanguageAction");
             if (switch_menu == null) {
@@ -2499,118 +2503,125 @@ del _invoke, _
         }
 
         public virtual void OnNotebookDocsSwitchPage(object o, Gtk.SwitchPageArgs args) {
-	    Invoke(delegate {
-		    // Always start by wiping out and hiding properties
-		    Gtk.Widget widget = searchForPage((Gtk.Widget)o);
-		    if (widget == null) // || widget == lastSelectedPage)
-			return;
-		    lastSelectedPage = widget;
-		    Gtk.Notebook nb = this.PropertyNotebook;
-		    while (nb.NPages > 0) {
-			nb.RemovePage(0);
-		    }
-		    nb.Visible = false;
-		    Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
-		    if (lastSelectedPage == searchForPage(Home)) {
-			ProgramSpeed.Sensitive = false;
-			saveaspython_menu.Sensitive = false;
-			if (! ProgramRunning) {
-			    StartButton.Sensitive = false;
-			    StartAction.Sensitive = false;
-			}
-			Title = String.Format("Calico - {0}", System.Environment.UserName);
-		    } else if (lastSelectedPage == searchForPage(ShellEditor)) {
-			//} else if (MainNotebook.Page == findTabByLabel(MainNotebook, "Shell")) {
-			//else if (Focus == Shell) {
-			ProgramSpeed.Sensitive = false;
-			saveaspython_menu.Sensitive = false;
-			if (! ProgramRunning) {
-			    if (ShellEditor.Document.Text != "") {
-				StartAction.Sensitive = true;
-				StartButton.Sensitive = true;
-			    } else {
-				StartAction.Sensitive = false;
-				StartButton.Sensitive = false;
-			    }
-			}
-			SetLanguage(ShellLanguage);
-			// Workaround: had to add this for notebook page selection:
-			Title = String.Format("{0} - Calico - {1}", CurrentProperLanguage, System.Environment.UserName);
-			GLib.Timeout.Add(0, delegate {
-				ShellEditor.GrabFocus();
-				updateShellControls(ShellEditor.Document, null);
-				return false;
-			    });
-		    } else if (CurrentDocument != null) {
-			// Set save as python menu:
-			saveaspython_menu.Sensitive = CurrentDocument.CanSaveAsPython();
-			ProgramSpeed.Value = CurrentDocument.SpeedValue;
-			// Set options menu:
-			if (! ProgramRunning) {
-			    if (CurrentDocument.HasContent) {
-				ProgramSpeed.Sensitive = true;
-				StartButton.Sensitive = true;
-				StartAction.Sensitive = true;
-			    } else {
-				ProgramSpeed.Sensitive = false;
-				StartButton.Sensitive = false;
-				StartAction.Sensitive = false;
-			    }
-			}
-			SetLanguage(CurrentDocument.language);
-			Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ScriptAction/ScriptOptionsAction");
-			CurrentDocument.SetOptionsMenu(options_menu);
-			CurrentDocument.focus_widget.GrabFocus();
-			//CurrentDocument.tab_label.Text =
-			Title = String.Format(_("{0} - Calico - {1}"), CurrentDocument.basename, System.Environment.UserName);
-			
-			// Looks for property notebook widget from current document.
-			// Adds as new page in property notebook if one is provided.
-			Gtk.Widget propWidget = CurrentDocument.GetPropertyNotebookWidget();
-			if (propWidget != null) {
-			    nb.AppendPage(propWidget, new Gtk.Label(_("Properties")));
-			    nb.Visible = true;
-			    nb.ShowAll();
-			}
-		    } else {
-			ProgramSpeed.Sensitive = false;
-			saveaspython_menu.Sensitive = false;
-			if (! ProgramRunning) {
-			    StartButton.Sensitive = false;
-			    StartAction.Sensitive = false;
-			}
-			// Some other page
-			Title = String.Format("Calico - {0}", System.Environment.UserName);
-		    }
-		});
-	}
-
+		  Invoke(delegate {
+				// Always start by wiping out and hiding properties
+				Gtk.Widget widget = searchForPage((Gtk.Widget)o);
+				if (widget == null) // || widget == lastSelectedPage)
+				  return;
+				lastSelectedPage = widget;
+				Gtk.Notebook nb = this.PropertyNotebook;
+				while (nb.NPages > 0) {
+				  nb.RemovePage(0);
+				}
+				nb.Visible = false;
+				Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
+				Gtk.MenuItem removemodule_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/EditAction/RemoveModuleAction");
+				if (lastSelectedPage == searchForPage(Home)) {
+				  ProgramSpeed.Sensitive = false;
+				  saveaspython_menu.Sensitive = false;
+				  removemodule_menu.Sensitive = false;
+				  if (! ProgramRunning) {
+					StartButton.Sensitive = false;
+					StartAction.Sensitive = false;
+				  }
+				  Title = String.Format("Calico - {0}", System.Environment.UserName);
+				} else if (lastSelectedPage == searchForPage(ShellEditor)) {
+				  //} else if (MainNotebook.Page == findTabByLabel(MainNotebook, "Shell")) {
+				  //else if (Focus == Shell) {
+				  ProgramSpeed.Sensitive = false;
+				  saveaspython_menu.Sensitive = false;
+				  removemodule_menu.Sensitive = false;
+				  if (! ProgramRunning) {
+					if (ShellEditor.Document.Text != "") {
+					  StartAction.Sensitive = true;
+					  StartButton.Sensitive = true;
+					} else {
+					  StartAction.Sensitive = false;
+					  StartButton.Sensitive = false;
+					}
+				  }
+				  SetLanguage(ShellLanguage);
+				  // Workaround: had to add this for notebook page selection:
+				  Title = String.Format("{0} - Calico - {1}", CurrentProperLanguage, System.Environment.UserName);
+				  GLib.Timeout.Add(0, delegate {
+						ShellEditor.GrabFocus();
+						updateShellControls(ShellEditor.Document, null);
+						return false;
+					  });
+				} else if (CurrentDocument != null) {
+				  // Set save as python menu:
+				  saveaspython_menu.Sensitive = CurrentDocument.CanSaveAsPython();
+				  removemodule_menu.Sensitive = CurrentDocument.CanRemoveModule();
+				  ProgramSpeed.Value = CurrentDocument.SpeedValue;
+				  // Set options menu:
+				  if (! ProgramRunning) {
+					if (CurrentDocument.HasContent) {
+					  ProgramSpeed.Sensitive = true;
+					  StartButton.Sensitive = true;
+					  StartAction.Sensitive = true;
+					} else {
+					  ProgramSpeed.Sensitive = false;
+					  StartButton.Sensitive = false;
+					  StartAction.Sensitive = false;
+					}
+				  }
+				  SetLanguage(CurrentDocument.language);
+				  Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/ScriptAction/ScriptOptionsAction");
+				  CurrentDocument.SetOptionsMenu(options_menu);
+				  CurrentDocument.focus_widget.GrabFocus();
+				  //CurrentDocument.tab_label.Text =
+				  Title = String.Format(_("{0} - Calico - {1}"), CurrentDocument.basename, System.Environment.UserName);
+				  
+				  // Looks for property notebook widget from current document.
+				  // Adds as new page in property notebook if one is provided.
+				  Gtk.Widget propWidget = CurrentDocument.GetPropertyNotebookWidget();
+				  if (propWidget != null) {
+					nb.AppendPage(propWidget, new Gtk.Label(_("Properties")));
+					nb.Visible = true;
+					nb.ShowAll();
+				  }
+				} else {
+				  ProgramSpeed.Sensitive = false;
+				  saveaspython_menu.Sensitive = false;
+				  removemodule_menu.Sensitive = false;
+				  if (! ProgramRunning) {
+					StartButton.Sensitive = false;
+					StartAction.Sensitive = false;
+				  }
+				  // Some other page
+				  Title = String.Format("Calico - {0}", System.Environment.UserName);
+				}
+			  });
+		}
+		
         public void updateShellControls(object obj, System.EventArgs args) {
-	    // When Shell is selected by clicking in it, or changes
-            Invoke( delegate {
-		    //System.Console.WriteLine("updateShellControls...");
-		    Gtk.Widget retval = searchForPage(ShellEditor);
-		    if (retval == null || retval == lastSelectedPage)
-			    return;
-		    //System.Console.WriteLine("...set!");
-		    lastSelectedPage = retval;
-		    Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
-                    ProgramSpeed.Sensitive = false;
-                    saveaspython_menu.Sensitive = false;
-                    if (! ProgramRunning) {
-                        if (ShellEditor.Document.Text != "") {
-                            StartAction.Sensitive = true;
-                            StartButton.Sensitive = true;
-                        } else {
-                            StartAction.Sensitive = false;
-                            StartButton.Sensitive = false;
-                        }
-                    }
-                    SetLanguage(ShellLanguage);
-                    // Workaround: had to add this for notebook page selection:
-                    Title = String.Format("{0} - Calico - {1}", CurrentProperLanguage, System.Environment.UserName);
-		});
-	}
+		  // When Shell is selected by clicking in it, or changes
+		  Invoke( delegate {
+				//System.Console.WriteLine("updateShellControls...");
+				Gtk.Widget retval = searchForPage(ShellEditor);
+				if (retval == null || retval == lastSelectedPage)
+				  return;
+				//System.Console.WriteLine("...set!");
+				lastSelectedPage = retval;
+				Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
+				Gtk.MenuItem removemodule_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/EditAction/RemoveModuleAction");
+				ProgramSpeed.Sensitive = false;
+				saveaspython_menu.Sensitive = false;
+				removemodule_menu.Sensitive = false;
+				if (! ProgramRunning) {
+				  if (ShellEditor.Document.Text != "") {
+					StartAction.Sensitive = true;
+					StartButton.Sensitive = true;
+				  } else {
+					StartAction.Sensitive = false;
+					StartButton.Sensitive = false;
+				  }
+				}
+				SetLanguage(ShellLanguage);
+				// Workaround: had to add this for notebook page selection:
+				Title = String.Format("{0} - Calico - {1}", CurrentProperLanguage, System.Environment.UserName);
+			  });
+		}
 
         public void updateControls(Document document, bool force=false) { 
 	    // When a document is selected by clicking in it, or changes
@@ -2627,8 +2638,10 @@ del _invoke, _
                 }
                 nb.Visible = false;
                 Gtk.MenuItem saveaspython_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/FileAction/ExportAsPythonAction");
+				Gtk.MenuItem removemodule_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/EditAction/RemoveModuleAction");
                 // Set save as python menu:
                 saveaspython_menu.Sensitive = document.CanSaveAsPython();
+                removemodule_menu.Sensitive = document.CanRemoveModule();
                 ProgramSpeed.Value = document.SpeedValue;
                 // Set options menu:
                 if (! ProgramRunning) {
@@ -3997,6 +4010,11 @@ del _invoke, _
 		ErrorLine(_("You need to login before using the Calico Cloud."));
 	    }
 	}
+
+        protected void OnRemoveModuleActionActivated (object sender, System.EventArgs e) {
+		  if (CurrentDocument != null)
+			CurrentDocument.RemoveModule();
+		}
 
         protected void OnSaveToCloudActionActivated (object sender, System.EventArgs e)
         {

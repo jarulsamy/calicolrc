@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <stetic-interface>
   <configuration>
     <images-root-path>..</images-root-path>
@@ -327,6 +327,12 @@
         <property name="Label" translatable="yes">Use a Module</property>
         <property name="ShortLabel" translatable="yes">Use a Module</property>
       </action>
+      <action id="RemoveModuleAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Remove a Module...</property>
+        <property name="ShortLabel" translatable="yes">Remove a Module...</property>
+        <signal name="Activated" handler="OnRemoveModuleActionActivated" />
+      </action>
       <action id="GettingStartedAction">
         <property name="Type">Action</property>
         <property name="Label" translatable="yes">Getting started...</property>
@@ -533,6 +539,7 @@
               </node>
               <node type="Menu" action="EditAction">
                 <node type="Menu" action="UseALibraryAction" />
+                <node type="Menu" action="RemoveModuleAction" />
                 <node type="Separator" />
                 <node type="Menuitem" action="copyAction" />
                 <node type="Menuitem" action="pasteAction" />

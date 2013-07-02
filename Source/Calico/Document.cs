@@ -389,6 +389,14 @@ namespace Calico {
             return false;
         }
 
+        public virtual bool CanRemoveModule() {
+            return false;
+        }
+
+	    public virtual void RemoveModule() {
+		  // nothing to do
+		}
+
         public virtual double SpeedValue {
             get { return _speedValue; }
             set { _speedValue = value; }
