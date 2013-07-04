@@ -635,15 +635,50 @@ namespace Jigsaw
 		    }
 		}
 
+		public bool WorkspaceContainsModule(string module) {
+		    foreach (CBlock b in AllBlocks()) {
+			if (b is CMethodBlock) {
+			    if (((CMethodBlock)b).AssemblyName == module) {
+				return true;
+			    }
+			}
+		    }
+		    return false;
+		}
+
 		public void RemoveModule(string dllname) {
-		    Dictionary<string,object> things = addedModule[dllname];
-		    Widgets.CRoundedTab tab = (Widgets.CRoundedTab) things["tab"];
-		    string dllfile = (string) things["dllfile"];
-		    // FIXME: check if there are any blocks on the workspace
-		    // if there aren't, delete the tab:
-		    DeleteShape(tab);
-		    engine.loadedAssemblies.Remove(dllfile);
-		    // FIXME: reposition tabs
+		    Dictionary<string,object> module = addedModule[dllname];
+		    List<Widgets.CRoundedTab> tabs = (List<Widgets.CRoundedTab>) module["tabs"];
+		    string dllfile = (string) module["dllfile"];
+		    // FIXME: check if there are not any blocks on the workspace
+		    if (! WorkspaceContainsModule(dllname)) {
+			// if there aren't any blocks in workspace delete the tab:
+			double tabY = 0.0;
+			foreach (Widgets.CRoundedTab tab in tabs) {
+			    if (tabY == 0.0)
+				tabY = tab.Top;
+			    allTabs.Remove(tab);
+			    DeleteShape(tab);
+			    // FIXME: delete palatte blocks, etc
+			}
+			// Reposition remaining below tabs
+			foreach (Widgets.CRoundedTab tt in allTabs) {
+			    if (tt.Top > tabY) {
+				tt.Top = tabY;
+				tabY += tabHeight;
+			    }
+			}
+			// Update the display:
+			allTabs[0].SetToggle (this, true);
+			pnlTab.YScrollbar.BringToFront(this);
+			pnlTab.DoConfigure(this);
+			this.Invalidate ();
+			// Remove from system:
+			engine.loadedAssemblies.Remove(dllfile);
+			addedModule.Remove(dllname);
+		    } else {
+			Console.Error.WriteLine("Cannot remove module because there are module blocks in the script.");
+		    }
 		}
 	
 		// - - - Use Library and assign random color - - - - - - - - - - - - - - - - - - - -
@@ -652,6 +687,7 @@ namespace Jigsaw
 			// Load and build blocks from assembly dllfile
 			List<CBlock > blocks = new List<CBlock> ();								// List of new blocks
 			List<String> tabNames = new List<string>();								// List of new tab names
+			List<Widgets.CRoundedTab> tabs = new List<Widgets.CRoundedTab>();								// List of new tab names
 			Dictionary<CBlock, String> tabMap = new Dictionary<CBlock, String>();	// Assign blocks to new tab names
 			Dictionary<String,int> blockCount = new Dictionary<string, int>();		// Count number of blocks on tab
 			Dictionary<String,int> blockPos = new Dictionary<string, int>();		// Track position of new blocks in a tab
@@ -790,6 +826,7 @@ namespace Jigsaw
 				tabY += tabHeight;
 				List<Color> colors = makeColor(tabName);
 				tab = new Widgets.CRoundedTab (0, tabY, tabWidth, tabHeight-3, tabName, pnlBlock, pnlTab, colors[0], colors[1]);
+				tabs.Add(tab);
 				tab.Dock = Diagram.DockSide.Left;
 				this.AddShape (tab);
 				pnlBlock.BringToFront (this);
@@ -817,13 +854,12 @@ namespace Jigsaw
 			// Redraw
 			this.Invalidate ();
 
-
 			// structure to keep track of loaded modules:
 			string dllname = System.IO.Path.GetFileNameWithoutExtension(dllfile).Replace("_", "__");
 		        addedModule[dllname] = new Dictionary<string,object>();
 			addedModule[dllname]["tabMap"] = tabMap;
 			addedModule[dllname]["tabNames"] = tabNames;
-			addedModule[dllname]["tab"] = tab;
+			addedModule[dllname]["tabs"] = tabs;
 			addedModule[dllname]["dllfile"] = dllfile;
 
 			return true;
