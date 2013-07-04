@@ -186,6 +186,8 @@ namespace Jigsaw
 		protected int _Y;
 		protected int paletteWidth = 110;
 
+		public Dictionary<string,Dictionary<string,object>> addedModule = new Dictionary<string,Dictionary<string,object>>();
+
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public Canvas(string modulePath, int width, int height, double worldWidth, double worldHeight) : base(width, height, worldWidth, worldHeight) 
 		{
@@ -605,6 +607,44 @@ namespace Jigsaw
 				Console.Error.WriteLine ("Error loading library: {0}", ex.Message);
 			}
 		}
+
+		public void RemoveModule() {
+		    if (addedModule.Count > 0) {
+			string dialogResponse = null;
+			Gtk.Window toplevel = null;
+			if (this.Toplevel.IsTopLevel) toplevel = (Gtk.Window)this.Toplevel;
+			Gtk.Dialog fc = new Gtk.Dialog("Select module to remove", toplevel, 0);
+			fc.SetSizeRequest(200, -1);
+			fc.VBox.PackStart(new Gtk.Label(("Remove a module")));
+			foreach (string dllname in addedModule.Keys) {
+			    Gtk.Button button = new Gtk.Button(dllname);
+			    button.Clicked += (obj, evt) => {
+				dialogResponse = ((Gtk.Button)obj).Label;
+				fc.Respond(Gtk.ResponseType.Ok);
+			    };
+			    fc.VBox.PackStart(button, true, true, 5);
+			}
+			fc.ShowAll();
+			fc.Run();
+			fc.Destroy();
+			if (dialogResponse != null) {
+			    RemoveModule(dialogResponse);
+			}
+		    } else {
+			System.Console.Error.WriteLine("No modules to remove");
+		    }
+		}
+
+		public void RemoveModule(string dllname) {
+		    Dictionary<string,object> things = addedModule[dllname];
+		    Widgets.CRoundedTab tab = (Widgets.CRoundedTab) things["tab"];
+		    string dllfile = (string) things["dllfile"];
+		    // FIXME: check if there are any blocks on the workspace
+		    // if there aren't, delete the tab:
+		    DeleteShape(tab);
+		    engine.loadedAssemblies.Remove(dllfile);
+		    // FIXME: reposition tabs
+		}
 	
 		// - - - Use Library and assign random color - - - - - - - - - - - - - - - - - - - -
 		public bool UseLibraryDLL(string dllfile)
@@ -776,6 +816,15 @@ namespace Jigsaw
 
 			// Redraw
 			this.Invalidate ();
+
+
+			// structure to keep track of loaded modules:
+			string dllname = System.IO.Path.GetFileNameWithoutExtension(dllfile).Replace("_", "__");
+		        addedModule[dllname] = new Dictionary<string,object>();
+			addedModule[dllname]["tabMap"] = tabMap;
+			addedModule[dllname]["tabNames"] = tabNames;
+			addedModule[dllname]["tab"] = tab;
+			addedModule[dllname]["dllfile"] = dllfile;
 
 			return true;
 		}

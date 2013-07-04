@@ -252,6 +252,14 @@ del _invoke, _
 		}
 	}
        
+	public override bool CanRemoveModule() {
+	    return true;
+	}
+	
+	public override void RemoveModule() {
+	    cvs.RemoveModule();
+        }
+
 	public override bool SaveDocument ()
 	{
 		bool retval = cvs.SaveDocument (filename);
