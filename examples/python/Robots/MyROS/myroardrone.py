@@ -1,18 +1,19 @@
 from Myro import *
+
 makeRobot("ROSARDrone")
-wait(4)
-from Myro import robot
+speak("Please prepare for liftoff")
+for i in range(5, 0, -1):
+    speak(str(i))
 
 reset()
-
 show(takePicture())
 takeoff()
+
 lst = []
 for t in timer(10):
     p = takePicture()
     lst.append(p)
-
+    show(p)
 land()
 
-savePicture(lst[4], "calicros1.jpg")
-savePicture(lst, "calicoros1.gif")
+savePicture(lst, "scienceposse.gif")
