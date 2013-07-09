@@ -194,6 +194,7 @@ public static class Events {
 		}
 		queue.Clear();
 	  }
+	  Thread.Sleep(100);
 	}
   }
 
