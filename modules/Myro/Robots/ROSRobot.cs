@@ -45,6 +45,18 @@ public class ROSRobot: Myro.Robot, NodeMain
     velocity.getAngular().setZ(_lastRotate);
     vel_publisher.publish(velocity);	  
   }    
+  
+  
+  public override void waitForMove (double interval)
+  {
+    double start = Myro.currentTime ();
+    while (Myro.currentTime() - start < interval)
+      {	
+	Myro.wait (.1);
+	adjustSpeed();
+      }
+  }
+
 
   public override void up (double speed)
   {
@@ -73,4 +85,5 @@ public class ROSRobot: Myro.Robot, NodeMain
     velocity.getLinear().setY(-speed);
     vel_publisher.publish(velocity);	  
   }
+  
 }

@@ -1789,9 +1789,7 @@ public static class Myro
 	public static void motors (double left, double right, double time)
 	{
 	    if (robot != null) {
-		robot.motors (left, right);
-		wait(time);
-		robot.stop();
+  	        robot.motors (left, right, time);
 	    }
 	
 	    else
@@ -3551,20 +3549,20 @@ public static class Myro
 
    	        public void up (double speed, double duration)
 	        {
-			up(speed);
-			wait (duration);
-			stop ();
+		  up(speed);
+		  waitForMove (duration);
+		  stop ();
 		}
 
 	        public virtual void down (double speed)
 	        {
 		}
-
+	  
    	        public void down (double speed, double duration)
 	        {
-			down(speed);
-			wait (duration);
-			stop ();
+		  down(speed);
+		  waitForMove (duration);
+		  stop ();
 		}
 
  	        // holonomic robots
@@ -3574,20 +3572,20 @@ public static class Myro
 
    	        public void left (double speed, double duration)
 	        {
-			left(speed);
-			wait (duration);
-			stop ();
+		  left(speed);
+		  waitForMove (duration);
+		  stop ();
 		}
 
 	        public virtual void right (double speed)
 	        {
 		}
-
-   	        public virtual void right (double speed, double duration)
+	   
+	        public void right (double speed, double duration)
 	        {
-			right(speed);
-			wait (duration);
-			stop ();
+		  right(speed);
+		  waitForMove (duration);
+		  stop ();
 		}
 
 		public void penDown ()
@@ -3602,7 +3600,12 @@ public static class Myro
 
 		public virtual Graphics.Line penUp ()
 		{
-			return null;
+		  return null;
+		}
+
+	        public virtual void waitForMove(double interval)
+	        {
+		  wait(interval);
 		}
 
 		public void move (double translate, double rotate)
@@ -3616,17 +3619,14 @@ public static class Myro
 		{
 		  _lastTranslate = translate;
 		  _lastRotate = rotate;
-		  double start = currentTime ();
-		  while (currentTime() - start < interval) {
-		    wait (.1);
-		    adjustSpeed();
-		  }		  	       
+		  move (translate, rotate);
+		  waitForMove(interval);
 		  stop ();		  
 		}
     
 		public void playSong (List song)
 		{
-			playSong (song, 1.0);
+		  playSong (song, 1.0);
 		}
     
 		public void playSong (List song, double speed)
@@ -3654,7 +3654,9 @@ public static class Myro
     
 		public void forward (double speed, double interval)
 	        {
-		  move (speed, 0, interval);
+ 		        move (speed, 0); 
+			waitForMove (interval);
+			stop ();
 		}
     
 		public void forward (double speed)
@@ -3671,11 +3673,8 @@ public static class Myro
 		public void translate (double speed, double interval)
 		{
 			_lastTranslate = speed;
-			double start = currentTime ();
-			while (currentTime() - start < interval) {
-			  wait (.1);
-			  adjustSpeed();
-			}
+			adjustSpeed();
+			waitForMove(interval);
 			_lastTranslate = 0;
 			adjustSpeed ();
 		}
@@ -3689,11 +3688,8 @@ public static class Myro
 		public void rotate (double speed, double interval)
 		{
 			_lastRotate = speed;
-			double start = currentTime ();
-			while (currentTime() - start < interval) {
-			  adjustSpeed ();
-			  wait (.1);
-			}			
+			adjustSpeed();
+			waitForMove(interval);
 			_lastRotate = 0;
 			adjustSpeed ();
 		}
@@ -3705,8 +3701,8 @@ public static class Myro
     
 		public void backward (double speed, double interval)
 		{
-			move (-speed, 0);
-			wait (interval);
+ 		        move (-speed, 0); 
+			waitForMove(interval);
 			stop ();
 		}
 
@@ -3717,7 +3713,8 @@ public static class Myro
 
 		public void turnLeft (double speed, double interval)
 		{
-		        move (0, speed, interval);
+		        move (0, speed); 
+			waitForMove (interval);
 			stop();
 		}
 
@@ -3728,8 +3725,9 @@ public static class Myro
     
 		public void turnRight (double speed, double interval)
 		{
-  		        move (0, -speed, interval);
-			stop ();
+		        move (0, -speed); 
+			waitForMove (interval);
+			stop();
 		}
 
     
@@ -3740,15 +3738,12 @@ public static class Myro
 			move (trans, rotate);
 		}
 
-	    public void motors (double left, double right, double interval)
+ 	        public void motors (double left, double right, double interval)
 		{
 			double trans = (right + left) / 2.0;
 			double rotate = (right - left) / 2.0;
-			double start = currentTime ();
-			while (currentTime() - start < interval) {
-			  move(trans, rotate);
-			  wait (.1);
-			}			
+			move(trans, rotate);
+			waitForMove(interval);
 			stop();
 		}
 	  
