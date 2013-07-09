@@ -1,0 +1,26 @@
+BUILDING rosjava.dll
+
+
+download rosjava
+
+./gradlew install
+tests will fail, that'sok
+
+cd rosjava_tutorial_pubsub
+
+./gradelw installApp
+
+cd rosjava_tutorial_pubsub/build/install/rosjava_tutorial_pubsub/lib
+mkdir tmp
+sh ~/createBigjar.sh 
+
+
+That's fine for Calico. For processing a few things need to be deleted.
+
+
+rm -rf org/apache/commons/lang/enum
+
+
+Then ikvm the jar file:
+
+bin/ikvmc.exe -target:library ros.jar
