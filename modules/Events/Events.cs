@@ -160,14 +160,35 @@ public static class Events {
 		foreach(Event evt in queue) {
 		  if (handler.ContainsKey(evt.type)) {
 			Event lastEvent = null;
+			List<Thread> threads = new List<Thread>();
 			foreach (Tuple<Func<object,Event,object>,object> tuple in handler[evt.type]) {
 			  Func<object,Event,object> code = tuple.Item1;
 			  object obj = tuple.Item2;
-			  evt.value = code(obj, evt);
+			  Thread codethread = new Thread (new ThreadStart ( delegate {
+				      evt.value = code(obj, evt);
+				  }));
+			  threads.Add(codethread);
+			  codethread.IsBackground = true;
+			  codethread.Start();
 			  lastEvent = evt;
 			}
 			if (lastEvent != null && lastEvent.wait) {
-			  lastEvent.ev.Set();
+			    // Wait for them all to finish
+			    try {
+				foreach (Thread t in threads) {
+				    t.Join ();
+				}
+			    } catch { 
+				// error in joining, probably an abort
+			    } finally {
+				foreach (Thread t in threads) {
+				    try {
+					t.Abort ();
+				    } catch {
+				    }
+				}
+			    }
+			    lastEvent.ev.Set();
 			}
 		  }
 		}
