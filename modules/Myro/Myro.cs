@@ -1632,7 +1632,7 @@ public static class Myro
 		throw new Exception("Robot has not been initialized");
 	}
   
-	[method: JigsawTab("M/Movement")]
+	[method: JigsawTab("M/Advanced 3")]
 	public static void takeoff ()
 	{
 	    if (robot != null) 
@@ -1641,7 +1641,7 @@ public static class Myro
 		throw new Exception("Robot has not been initialized");
 	}
 
-	[method: JigsawTab("M/Movement")]
+	[method: JigsawTab("M/Advanced 3")]
 	public static void land ()
 	{
 	    if (robot != null) 
@@ -1704,7 +1704,7 @@ public static class Myro
 		throw new Exception("Robot has not been initialized");
 	}
 
-	[method: JigsawTab("M/Movement")]
+	[method: JigsawTab("M/Advanced 3")]
         public static void left (double power)
 	{
 	    if (robot != null) 
@@ -1713,7 +1713,7 @@ public static class Myro
 		throw new Exception("Robot has not been initialized");
 	}
 
-	[method: JigsawTab("M/Movement")]
+	[method: JigsawTab("M/Advanced 3")]
 	public static void right (double power)
 	{
 	    if (robot != null) 
@@ -1722,7 +1722,7 @@ public static class Myro
 		throw new Exception("Robot has not been initialized");
 	}
 
-	[method: JigsawTab("M/Movement")]
+	[method: JigsawTab("M/Advanced 3")]
 	public static void up (double power)
 	{
 	    if (robot != null) 
@@ -1731,7 +1731,7 @@ public static class Myro
 		throw new Exception("Robot has not been initialized");
 	}
 
- 	[method: JigsawTab("M/Movement")]
+ 	[method: JigsawTab("M/Advanced 3")]
         public static void down (double power)
 	{
 	    if (robot != null) 
@@ -1740,7 +1740,7 @@ public static class Myro
 		throw new Exception("Robot has not been initialized");
 	}
 
-	[method: JigsawTab("M/Movement")]
+	[method: JigsawTab("M/Advanced 3")]
 	public static void left (double power, double time)
 	{
 	    if (robot != null) 
@@ -1749,7 +1749,7 @@ public static class Myro
 		throw new Exception("Robot has not been initialized");
 	}
 
-	[method: JigsawTab("M/Movement")]
+	[method: JigsawTab("M/Advanced 3")]
 	public static void right (double power, double time)
 	{
 	    if (robot != null) 
@@ -1758,7 +1758,7 @@ public static class Myro
 		throw new Exception("Robot has not been initialized");
 	}
 
-	[method: JigsawTab("M/Movement")]
+	[method: JigsawTab("M/Advanced 3")]
 	public static void up (double power, double time)
 	{
 	    if (robot != null) 
@@ -1767,7 +1767,7 @@ public static class Myro
 		throw new Exception("Robot has not been initialized");
 	}
 
-	[method: JigsawTab("M/Movement")]
+	[method: JigsawTab("M/Advanced 3")]
 	public static void down (double power, double time)
 	{
 	    if (robot != null) 
