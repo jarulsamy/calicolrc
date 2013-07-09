@@ -183,7 +183,7 @@ public static class Events {
 	lock (handler) {
 	  handler.Clear();
 	}
-	if (thread != null) {
+	if (thread == null) {
 	  thread = new Thread (new ThreadStart (loop));
 	  thread.IsBackground = true;
 	  thread.Start();
