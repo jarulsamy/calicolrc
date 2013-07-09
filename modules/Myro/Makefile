@@ -8,6 +8,7 @@ all: ../Myro.dll
 		-lib:.. \
 		-unsafe \
 		-r:Graphics.dll \
+		-r:Events.dll \
 		-r:Tao.Sdl.dll \
 		-r:SdlDotNet \
 		-r:System.Drawing \

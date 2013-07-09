@@ -7,6 +7,7 @@ all: ../Graphics.dll ../Shapes.dll
 		-lib:../../bin \
 		-lib:../ \
 		-r:Mono.Cairo.dll \
+		-r:Events.dll \
 		-r:IronPython \
 		-r:Graphviz4Net.dll\
 		-r:Microsoft.Dynamic \
@@ -23,6 +24,7 @@ all: ../Graphics.dll ../Shapes.dll
 		Shapes.cs  \
 		-lib:../../bin \
 		-lib:../ \
+		-r:Events.dll \
 		-r:Mono.Cairo.dll \
 		-r:IronPython \
 		-r:Graphics \

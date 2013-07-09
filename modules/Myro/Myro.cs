@@ -4533,31 +4533,31 @@ public static class Myro
 	// Callbacks:
 
 	[method: JigsawTab("M/Graphics")]
-	public static void onMouseUp (Func<object,Graphics.Event,object> function)
+	public static void onMouseUp (Func<object,Event,object> function)
 	{
 		Graphics.onMouseUp (function);
 	}
 
 	[method: JigsawTab("M/Graphics")]
-	public static void onMouseDown (Func<object,Graphics.Event,object> function)
+	public static void onMouseDown (Func<object,Event,object> function)
 	{
 		Graphics.onMouseDown (function);
 	}
 
 	[method: JigsawTab("M/Graphics")]
-	public static void onMouseMovement (Func<object,Graphics.Event,object> function)
+	public static void onMouseMovement (Func<object,Event,object> function)
 	{
 		Graphics.onMouseMovement (function);
 	}
 
 	[method: JigsawTab("M/Graphics")]
-	public static void onKeyPress (Func<object,Graphics.Event,object> function)
+	public static void onKeyPress (Func<object,Event,object> function)
 	{
 		Graphics.onKeyPress (function);
 	}
 
 	[method: JigsawTab("M/Graphics")]
-	public static void onKeyRelease (Func<object,Graphics.Event,object> function)
+	public static void onKeyRelease (Func<object,Event,object> function)
 	{
 		Graphics.onKeyRelease (function);
 	}
