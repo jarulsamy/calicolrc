@@ -121,7 +121,9 @@ public class Event {
 public static class Events {
   
   public static List<Event> queue = new List<Event>();
-  public static Dictionary<string,List<Tuple<Func<object,Event,object>,object>>> handler = new Dictionary<string,List<Tuple<Func<object,Event,object>,object>>>();
+  public static Dictionary<string,List<Tuple<Func<object,Event,object>,object>>> handler = 
+	  new Dictionary<string,List<Tuple<Func<object,Event,object>,object>>>();
+  public static Thread thread = null;
   
   public static void publish (string message) {
 	lock (queue) {
@@ -135,10 +137,13 @@ public static class Events {
 	  queue.Add(evt);
 	}
 	evt.ev.WaitOne();
-	// FIXME: return value?
-	return null;
+	return evt.value;
   }
 
+  public static void subscribe (string message, Func<object,Event,object> function) {
+	subscribe(message, function, null);
+  }
+  
   public static void subscribe (string message, Func<object,Event,object> function, 
 	  object obj) {
 	lock (handler) {
@@ -154,18 +159,34 @@ public static class Events {
 	  lock (queue) {
 		foreach(Event evt in queue) {
 		  if (handler.ContainsKey(evt.type)) {
+			Event lastEvent = null;
 			foreach (Tuple<Func<object,Event,object>,object> tuple in handler[evt.type]) {
 			  Func<object,Event,object> code = tuple.Item1;
 			  object obj = tuple.Item2;
 			  evt.value = code(obj, evt);
-			  if (evt.wait) {
-				evt.ev.Set();
-			  }
+			  lastEvent = evt;
+			}
+			if (lastEvent != null && lastEvent.wait) {
+			  lastEvent.ev.Set();
 			}
 		  }
 		}
 		queue.Clear();
 	  }
+	}
+  }
+
+  public static void init() {
+	lock (queue) {
+	  queue.Clear();
+	}
+	lock (handler) {
+	  handler.Clear();
+	}
+	if (thread != null) {
+	  thread = new Thread (new ThreadStart (loop));
+	  thread.IsBackground = true;
+	  thread.Start();
 	}
   }
 }
