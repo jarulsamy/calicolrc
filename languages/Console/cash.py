@@ -902,13 +902,22 @@ def echo(name, incoming, tty, args, stack):
                 yield line
         else:
             yield data
-    else: # OOP: arg is a generator
-        for data in pargs.arg[0]:
-            if pargs.e:
-                for line in data.split("\\n"):
-                    yield line
-            else:
-                yield data
+    else: # OOP: arg is a generator, or list of generators
+        if len(pargs.arg) == 1:
+            for data in pargs.arg[0]:
+                if pargs.e:
+                    for line in data.split("\\n"):
+                        yield line
+                else:
+                    yield data
+        else: # OOP: list of generators
+            # -e is ignored here; what would it mean?
+            while True:
+                try:
+                    items = [g.next() for g in pargs.arg]
+                except StopIteration:
+                    break
+                yield items
 
 def printf(name, incoming, tty, args, stack):
     """
