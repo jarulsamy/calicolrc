@@ -3576,6 +3576,108 @@ public static class Graphics
 		}
 	}
 
+        public class SpeechBubble : Text {
+	    Point anchor;
+	    Point point2;
+	    string [] words;
+	    int _textYOffset = 12;  // Y offset for when a block's text
+
+	    public SpeechBubble (IList iterable, IList point2, string text, IList anchor) : base(iterable, text) {
+		this.words = text.Split(' ');
+		this.point2 = new Point(point2);
+		this.anchor = new Point(anchor);
+		this.border = 2;
+	    }
+
+	    public override void render (Cairo.Context g) {
+		double x = center.x;
+		double y = center.y;
+		double w = point2.x - center.x;
+		double h = point2.y - center.y;
+		double r = 6.0;
+		double hpi = 0.5*Math.PI;
+	
+		g.Save();
+		// SetPath:
+		g.MoveTo( x, y+r );
+		g.Arc(    x+r, y+r, r, Math.PI, -hpi );
+		// Top:
+		g.LineTo( x+w-r, y );
+		g.Arc(    x+w-r, y+r, r, -hpi, 0.0 );
+		// Right:
+		g.LineTo( x+w, y+h-r );
+		g.Arc(    x+w-r, y+h-r, r, 0.0, hpi);
+		// Bottom:
+		g.LineTo( x+r +20, y+h );
+		g.LineTo( anchor.x, anchor.y );
+		g.LineTo( x+r +10, y+h );
+		g.LineTo( x+r, y+h );
+		g.Arc(    x+r, y+h-r, r, hpi, Math.PI );
+		// Left
+		g.LineTo( x, y+r );
+		g.ClosePath();
+		// end
+		g.Color = new Cairo.Color(255, 255, 255);
+		g.FillPreserve();
+		g.Color = new Cairo.Color(0, 0, 0);
+		g.LineWidth = border;
+		g.Stroke();
+
+		// draw text:
+		if (this.text.Length > 0 && words.Length > 0) {
+		    g.Save ();
+		    g.Rectangle(x, y, w-1.0, h-1.0);
+		    g.Clip ();
+		    if (_fill != null)
+			g.Color = _fill._cairo;
+		    else
+			g.Color = new Cairo.Color (0, 0, 0); // default color when none given
+		    g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
+		    g.SetFontSize(this.fontSize);
+		    
+		    // Do word wrap. Slightly insane.
+		    
+		    // @@@ Note that in the following there are several hard-coded 
+		    // size tweaks that probably ought to be a function of the font size, 
+		    // not fixed values. Some day this should be fixed.
+		    double xx = x+10.0;
+		    double yy = y+3.0+_textYOffset;
+		    double ws = 5.0;						// Word spacing
+		    double ls = this.fontSize + 2.0;		// Line spacing
+		    int i = 0;								// Word counter
+		    string word = words[i];					// First word
+		    TextExtents te = g.TextExtents(word);	// Word extents
+		    
+		    for (;;) {
+			// Render one word at next position
+			g.MoveTo(xx, yy);
+			g.ShowText(word);
+			
+			// Move to next x position and next word
+			xx = xx + te.Width + ws;
+			i++;
+			if (i < words.Length) {
+			    word = words[i];
+			    
+			    // Get extents for next word
+			    te = g.TextExtents(word);
+			    
+			    // If the next word would be rendered outside the clip region, 
+			    // move to next line. Otherwise, continue.
+			    if ( xx + te.Width > x + w ) {
+				xx = x + 10.0;
+				yy = yy + ls;
+			    }
+			} else {
+			    break;
+			}
+		    }
+		    g.Restore();
+		}
+		g.Restore();
+	    }
+	}
+
 	public class Line : Shape
 	{
 		public Line (params object [] points) : base(true)
