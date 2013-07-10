@@ -97,6 +97,15 @@ public class Event {
 	this.time = time;
   }
 
+  public void setWait (bool wait) {
+	this.wait = wait;
+	if (this.wait) {
+	  ev = new ManualResetEvent(false);
+	} else {
+	  ev = null;
+	}
+  }
+
   public override string ToString () {
 	if (time == 0 && x == 0 && y == 0) {
 	  return String.Format ("<Event \"{0}\">", type);
@@ -155,10 +164,26 @@ public static class Events {
 	return evt.value;
   }
 
-  public static void subscribe (string message, Func<object,Event,object> function) {
-	subscribe(message, function, null);
+  public static object publishAndWait (string message, object obj) {
+	Event evt = new Event(message, true);
+	evt.obj = obj;
+	lock (queue) {
+	  queue.Add(evt);
+	}
+	evt.ev.WaitOne();
+	return evt.value;
   }
-  
+
+  public static object publishAndWait (Event evt) {
+      // Event for a particular obj, already set
+      evt.setWait(true);
+      lock (queue) {
+	  queue.Add(evt);
+      }
+      evt.ev.WaitOne();
+      return evt.value;
+  }
+
   public static string getID(object obj, string message) {
       if (obj == null) {
 	  return message;
@@ -167,6 +192,10 @@ public static class Events {
       }
   }
 
+  public static void subscribe (string message, Func<object,Event,object> function) {
+	subscribe(message, function, null);
+  }
+  
   public static void subscribe (string message, Func<object,Event,object> function, 
 	  object obj) {
       string id = getID(obj, message);
@@ -236,6 +265,13 @@ public static class Events {
 	  thread = new Thread (new ThreadStart (loop));
 	  thread.IsBackground = true;
 	  thread.Start();
+	}
+  }
+
+  public static void stop() {
+	if (thread != null) {
+	    thread.Abort();
+	    thread = null;
 	}
   }
 }
