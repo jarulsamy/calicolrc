@@ -125,9 +125,24 @@ public static class Events {
 	  new Dictionary<string,List<Tuple<Func<object,Event,object>,object>>>();
   public static Thread thread = null;
   
+  public static void publish (Event evt) {
+      // Event for a particular obj, already set
+      lock (queue) {
+	  queue.Add(evt);
+      }
+  }
+
   public static void publish (string message) {
 	lock (queue) {
 	  queue.Add(new Event(message));
+	}
+  }
+  
+    public static void publish (string message, object obj) {
+	Event evt = new Event(message);
+	evt.obj = obj;
+	lock (queue) {
+	  queue.Add(evt);
 	}
   }
   
@@ -144,24 +159,34 @@ public static class Events {
 	subscribe(message, function, null);
   }
   
+  public static string getID(object obj, string message) {
+      if (obj == null) {
+	  return message;
+      } else {
+	  return (obj.GetHashCode().ToString() + "-" + message);
+      }
+  }
+
   public static void subscribe (string message, Func<object,Event,object> function, 
 	  object obj) {
-	lock (handler) {
-	  if (!handler.ContainsKey(message)) {
-		handler[message] = new List<Tuple<Func<object,Event,object>,object>>();
+      string id = getID(obj, message);
+      lock (handler) {
+	  if (!handler.ContainsKey(id)) {
+	      handler[id] = new List<Tuple<Func<object,Event,object>,object>>();
 	  }
-	  handler[message].Add(Tuple.Create(function, obj));
-	}
+	  handler[id].Add(Tuple.Create(function, obj));
+      }
   }
 
   public static void loop() {
 	while (true) {
 	  lock (queue) {
 		foreach(Event evt in queue) {
-		  if (handler.ContainsKey(evt.type)) {
+		  string id = getID(evt.obj, evt.type);
+		  if (handler.ContainsKey(id)) {
 			Event lastEvent = null;
 			List<Thread> threads = new List<Thread>();
-			foreach (Tuple<Func<object,Event,object>,object> tuple in handler[evt.type]) {
+			foreach (Tuple<Func<object,Event,object>,object> tuple in handler[id]) {
 			  Func<object,Event,object> code = tuple.Item1;
 			  object obj = tuple.Item2;
 			  Thread codethread = new Thread (new ThreadStart ( delegate {
@@ -190,6 +215,8 @@ public static class Events {
 			    }
 			    lastEvent.ev.Set();
 			}
+		  } else {
+		      //Console.Error.WriteLine("Event not handled by a subscribe: " + evt);
 		  }
 		}
 		queue.Clear();

@@ -44,6 +44,9 @@ using System.Drawing.Imaging;
 // Extensions:
 using System.ComponentModel;
 
+// Events
+using EventsManager=Events;
+
 public static class Extensions
 {
     // Can't use extension methods to override existing methods
@@ -1250,6 +1253,7 @@ public static class Graphics
 			AddEvents ((int)Gdk.EventMask.PointerMotionMask);
 			AddEvents ((int)Gdk.EventMask.KeyReleaseMask);
 			AddEvents ((int)Gdk.EventMask.KeyPressMask);
+			// ------------------------------------------
 			ButtonPressEvent += HandleClickCallbacks;
 			ButtonReleaseEvent += HandleMouseUpCallbacks;
 			ButtonPressEvent += saveLastClick;
@@ -1257,6 +1261,11 @@ public static class Graphics
 			MotionNotifyEvent += HandleMouseMovementCallbacks;
 			KeyPressEvent += HandleKeyPressCallbacks;
 			KeyReleaseEvent += HandleKeyReleaseCallbacks;
+			// ------------------------------------------
+			ButtonPressEvent += HandleClickOnShape;
+			ButtonReleaseEvent += HandleMouseUpOnShape;
+			MotionNotifyEvent += HandleMouseMovementOnShape;
+			// ------------------------------------------
 			//ConfigureEvent += configureEventBefore;
 			DeleteEvent += OnDelete;
 			Add(_canvas);
@@ -1513,6 +1522,46 @@ public static class Graphics
 			}
 		}
     
+		private void HandleMouseMovementOnShape (object obj,
+                      Gtk.MotionNotifyEventArgs args)
+		{
+		    Event evt = new Event (args);
+		    lock (canvas.shapes) {
+			foreach (Shape shape in canvas.shapes) {
+			    if (shape.hit(evt.x, evt.y)) {
+				evt.obj = shape;
+				EventsManager.publish(evt);
+			    }
+			}
+		    }
+		}
+
+		private void HandleClickOnShape (object obj, Gtk.ButtonPressEventArgs args)
+		{
+		    Event evt = new Event (args);
+		    lock (canvas.shapes) {
+			foreach (Shape shape in canvas.shapes) {
+			    if (shape.hit(evt.x, evt.y)) {
+				evt.obj = shape;
+				EventsManager.publish(evt);
+			    }
+			}
+		    }
+		}
+
+		private void HandleMouseUpOnShape (object obj,
+						   Gtk.ButtonReleaseEventArgs args) {
+		    Event evt = new Event (args);
+		    lock (canvas.shapes) {
+			foreach (Shape shape in canvas.shapes) {
+			    if (shape.hit(evt.x, evt.y)) {
+				evt.obj = shape;
+				EventsManager.publish(evt);
+			    }
+			}
+		    }
+		}
+    
 		private void HandleClickCallbacks (object obj,
                                       Gtk.ButtonPressEventArgs args)
 		{
@@ -1529,7 +1578,7 @@ public static class Graphics
 				}        
 			}
 		}
-    
+
 		private void HandleMouseUpCallbacks (object obj,
                                       Gtk.ButtonReleaseEventArgs args)
 		{
@@ -1547,7 +1596,7 @@ public static class Graphics
 			}
 		}
     
-    [GLib.ConnectBefore]
+		[GLib.ConnectBefore]
 		private void HandleKeyPressCallbacks (object obj,
                                       Gtk.KeyPressEventArgs args)
 		{
@@ -2296,6 +2345,15 @@ public static class Graphics
 		// FIXME: set x,y of points should go from screen_coords to relative
 		// FIXME: should call QueueDraw on set
 	    
+	    public void subscribe(string message, Func<object,Event,object> procedure) {
+		List<string> messages = new List<string>() {"mouse-press", "mouse-release", "mouse-motion"};
+		if (messages.Contains(message)) {
+		    Events.subscribe(message, procedure, this);
+		} else {
+		    throw new Exception(String.Format("Shape cannot subscribe to message: '{0}'", message));
+		}
+	    }
+
 	    public virtual object makeJointTo(Shape other, string joint_type, params float [] args) {
 		if (joint_type != "angle" &&
 		    joint_type != "distance" &&
@@ -2435,11 +2493,6 @@ public static class Graphics
 		}
 		return null;
 	    }
-
-		public virtual bool hit (double x, double y)
-		{
-			return false;
-		}
 
 	        public virtual void setPenColor(Color color) {
 		    penUp();
@@ -2762,33 +2815,33 @@ public static class Graphics
 		    }
 		}
     
-		public bool contains (IList iterable)
+	        public virtual bool hit (double x, double y)
 		{
-			Point p = new Point (iterable);
-			int counter = 0;
-			double xinters;
-			Point p1, p2;
-			if (points != null) {
-				p1 = points [0];
-				for (int i=1; i<=points.Length; i++) {
-					p2 = points [i % points.Length];
-					if (p.y > Math.Min (p1.y, p2.y)) {
-						if (p.y <= Math.Max (p1.y, p2.y)) {
-							if (p.x <= Math.Max (p1.x, p2.x)) {
-								if (p1.y != p2.y) {
-									xinters = (p.y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x;
-									if (p1.x == p2.x || p.x <= xinters)
-										counter++;
-								}
-							}
-						}
+		    Point p = new Point (x, y);
+		    int counter = 0;
+		    double xinters;
+		    Point p1, p2;
+		    if (points != null) {
+			p1 = points [0];
+			for (int i=1; i<=points.Length; i++) {
+			    p2 = points [i % points.Length];
+			    if (p.y > (Math.Min (p1.y, p2.y) + center.y)) {
+				if (p.y <= (Math.Max (p1.y, p2.y) + center.y)) {
+				    if (p.x <= (Math.Max (p1.x, p2.x) + center.x)) {
+					if (p1.y != p2.y) {
+					    xinters = (p.y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x + center.x;
+					    if (p1.x == p2.x || p.x <= xinters)
+						counter++;
 					}
-					p1 = p2;
+				    }
 				}
-				return (counter % 2 == 0); // hit?
-			} else {
-				return false;
+			    }
+			    p1 = p2;
 			}
+			return (counter % 2 != 0); // hit?
+		    } else {
+			return false;
+		    }
 		}
 
 		public void set_points (params Point [] ps)
@@ -5258,6 +5311,11 @@ public static class Graphics
 		{
 			set_points (new Point (iterable));
 			_radius = radius;
+		}
+
+		public override bool hit (double x, double y)
+		{
+		    return (Math.Sqrt(Math.Pow(center.x - x, 2) + Math.Pow(center.y - y, 2)) < _radius);
 		}
 
 		public override void addToPhysics ()
