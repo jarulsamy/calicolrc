@@ -8,6 +8,7 @@ all: ../Sprites.dll
 		-lib:../../bin \
 		-lib:.. \
 		-unsafe \
+		-r:Events.dll \
 		-r:Graphics.dll \
 		-r:Myro.dll \
 		-r:Tao.Sdl.dll \
