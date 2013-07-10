@@ -1,3 +1,6 @@
+# assuming this ros service is running:
+# rosrun usb_cam usb_cam_node _pixel_format:=yuyv _image_width:=320 _image_height:=240 
+
 from org.ros.namespace import GraphName
 from org.ros.node import *
 from org.ros.message import MessageListener

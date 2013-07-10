@@ -17,11 +17,6 @@ class ImageViewer(NodeMain):
     class myListener(MessageListener):
         def onNewMessage(self, image):
             p = MyROS.rosRGBToPicture(image.getData(), 320, 240)
-            for px in getPixels(p):
-                setRed(px, 255-getRed(px))
-                setGreen(px, 255-getGreen(px))
-                setBlue(px, 255-getBlue(px))
-
             show(p)
 
     self.subscriber = node.newSubscriber("/usb_cam/image_raw/compressed", sensor_msgs.CompressedImage._TYPE)
