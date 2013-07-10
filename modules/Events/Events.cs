@@ -215,7 +215,7 @@ public static class Events {
       subscribe(message, function, obj, null);
   }
 
-  public static void subscribe (string message, Func<object,Event,object> function, 
+  private static void subscribe (string message, Func<object,Event,object> function, 
 				object obj, Calico.MainWindow calico) {
       string id = getID(obj, message);
       lock (handler) {
