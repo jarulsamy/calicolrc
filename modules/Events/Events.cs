@@ -133,6 +133,7 @@ public static class Events {
   public static Dictionary<string,List<Tuple<Func<object,Event,object>,object>>> handler = 
 	  new Dictionary<string,List<Tuple<Func<object,Event,object>,object>>>();
   public static Thread thread = null;
+  public static Calico.MainWindow calico = null;
   
   public static void publish (Event evt) {
       // Event for a particular obj, already set
@@ -141,6 +142,15 @@ public static class Events {
       }
   }
 
+  public static void publish (Calico.MainWindow calico, string message) {
+      calico.SendEvent("all", message);
+  }
+  
+  public static void publishAndWait (Calico.MainWindow calico, string message, string to) {
+      calico.SendEvent(to, message);
+      // FIXME: wait for what?
+  }
+  
   public static void publish (string message) {
 	lock (queue) {
 	  queue.Add(new Event(message));
@@ -193,13 +203,23 @@ public static class Events {
   }
 
   public static void subscribe (string message, Func<object,Event,object> function) {
-	subscribe(message, function, null);
+      subscribe(message, function, null, null);
+  }
+  
+  public static void subscribe (Calico.MainWindow calico, string message, Func<object,Event,object> function) {
+	subscribe(message, function, null, calico);
   }
   
   public static void subscribe (string message, Func<object,Event,object> function, 
 	  object obj) {
+      subscribe(message, function, obj, null);
+  }
+
+  public static void subscribe (string message, Func<object,Event,object> function, 
+				object obj, Calico.MainWindow calico) {
       string id = getID(obj, message);
       lock (handler) {
+	  Events.calico = calico;
 	  if (!handler.ContainsKey(id)) {
 	      handler[id] = new List<Tuple<Func<object,Event,object>,object>>();
 	  }
@@ -210,6 +230,15 @@ public static class Events {
   public static void loop() {
 	while (true) {
 	  lock (queue) {
+	      // check with calico if any system events
+	        if (Events.calico != null) {
+		    List<List<string>> evts = Events.calico.ReceiveEvents();
+		    foreach (List<string> evt in evts) {
+			lock (queue) {
+			    queue.Add(new Event(evt[1]));
+			}
+		    }
+	        }
 		foreach(Event evt in queue) {
 		  string id = getID(evt.obj, evt.type);
 		  if (handler.ContainsKey(id)) {

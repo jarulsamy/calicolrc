@@ -8,6 +8,7 @@ namespace Calico {
         string server = "myro.roboteducation.org";
         int port = 5222;
         List<List<string>> messages = new List<List<string>>();
+        List<List<string>> events = new List<List<string>>();
         agsXMPP.XmppClientConnection client;
         Calico.MainWindow calico;
         public string user;
@@ -64,6 +65,13 @@ namespace Calico {
                                                     "[data]\n" + text));
         }
 
+        public void SendEvent(string to, string text) {
+            client.Send(
+                new agsXMPP.protocol.client.Message(String.Format("{0}@{1}", to, server),
+                                                    agsXMPP.protocol.client.MessageType.chat,
+                                                    "[event]\n" + text));
+        }
+
         public List<List<string>> ReceiveData() {
             List<List<string>> retval = new List<List<string>>();
             lock (messages) {
@@ -71,6 +79,17 @@ namespace Calico {
                     retval.Add(message);
                 }
                 messages.Clear();
+            }
+            return retval;
+        }
+    
+        public List<List<string>> ReceiveEvents() {
+            List<List<string>> retval = new List<List<string>>();
+            lock (events) {
+                foreach(List<string> message in events) {
+                    retval.Add(message);
+                }
+                events.Clear();
             }
             return retval;
         }
@@ -162,6 +181,17 @@ namespace Calico {
 		message.Append(lines[lines.Length - 1]);
 		lock (messages) {
 		    messages.Add(new List<string>() {msg.From, message.ToString()});
+		}
+            } else if (msg.Body.ToString().StartsWith("[event]\n")) {
+                string [] lines = msg.Body.ToString().Split('\n');             // [event]
+		System.Text.StringBuilder message = new System.Text.StringBuilder();
+		for (int i = 1; i < lines.Length - 1; i++) {
+		    message.AppendLine(lines[i]);           
+		}
+		// Last line, no return:
+		message.Append(lines[lines.Length - 1]);
+		lock (events) {
+		    events.Add(new List<string>() {msg.From, message.ToString()});
 		}
             } else if (msg.Body.ToString().StartsWith("[info]")) {
                 calico.Print(Tag.Info,

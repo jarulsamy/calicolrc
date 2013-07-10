@@ -6,6 +6,7 @@ all: ../Events.dll
 		Events.cs  \
 		-lib:../../bin \
 		-lib:../ \
+		-r:Calico.exe \
 		-r:Microsoft.Dynamic \
 		-r:JigsawAttributes \
 		-pkg:gtk-sharp-2.0 \

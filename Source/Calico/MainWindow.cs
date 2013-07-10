@@ -3904,6 +3904,14 @@ del _invoke, _
 	    }
         }
 
+        public void SendEvent(string to, string text) {
+	    if (connection != null) {
+		connection.SendEvent(to, text);
+	    } else {
+		throw new Exception(_("You need to login before using the Calico Cloud."));
+	    }
+        }
+
         public void SendMessage(string to, string text) {
 	    if (connection != null) {
 		connection.Send(to, text);
@@ -3915,6 +3923,14 @@ del _invoke, _
         public List<List<string>> ReceiveData() {
 	    if (connection != null) {
 		return connection.ReceiveData();
+	    } else {
+		throw new Exception(_("You need to login before using the Calico Cloud."));
+	    }
+	}
+
+        public List<List<string>> ReceiveEvents() {
+	    if (connection != null) {
+		return connection.ReceiveEvents();
 	    } else {
 		throw new Exception(_("You need to login before using the Calico Cloud."));
 	    }
