@@ -161,6 +161,16 @@ public static class Myro
 	public readonly static Computer computer = new Computer ();
 
 
+        // arduino
+        public readonly static int INPUT            = 0;
+        public readonly static int OUTPUT           = 1;
+        public readonly static int ANALOG           = 2;
+        public readonly static int PWM              = 3;
+        public readonly static int SERVO            = 4;
+
+        public readonly static int LOW              = 0; 
+        public readonly static int HIGH             = 1;
+
 	[method: JigsawTab(null)]
 	public static void initialize_module (string path, string os)
 	{
@@ -1582,28 +1592,28 @@ public static class Myro
 	}
 
 	[method: JigsawTab("M/Advanced 3")]
-        public static void makeOutput (int port)
+        public static void makeDigitalOutput (int port)
 	{
 	    if (robot != null) 
-	        robot.makeOutput (port);
+	        robot.makeDigitalOutput (port);
 	    else
 		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Advanced 3")]
-        public static void makePWM (int port)
+        public static void makePWMOutput (int port)
 	{
 	    if (robot != null) 
-	        robot.makePWM (port);
+	        robot.makePWMOutput (port);
 	    else
 		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Advanced 3")]
-        public static void makeServo (int port)
+        public static void makeServoOutput (int port)
 	{
 	    if (robot != null) 
-	        robot.makeServo (port);
+	        robot.makeServoOutput (port);
 	    else
 		throw new Exception("Robot has not been initialized");
 	}
@@ -3696,15 +3706,15 @@ public static class Myro
    	       {
 	       }
 
-	       public virtual void makeOutput (int port)
+	       public virtual void makeDigitalOutput (int port)
    	       {
 	       }
 
-	       public virtual void makePWM (int port)
+	       public virtual void makePWMOutput (int port)
    	       {
 	       }
 
-	       public virtual void makeServo (int port)
+	       public virtual void makeServoOutput (int port)
    	       {
 	       }
 

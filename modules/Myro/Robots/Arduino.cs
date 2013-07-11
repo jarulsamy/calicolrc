@@ -250,12 +250,12 @@ public class Arduino:Myro.Robot
   }
 
 
-  public override  void makePWM(int pin)
+  public override  void makePWMOutput(int pin)
   {
     pinMode(pin, PWM);
   }
 
-  public override void makeServo(int pin)
+  public override void makeServoOutput(int pin)
   {
     pinMode(pin, SERVO);
   }
@@ -265,7 +265,7 @@ public class Arduino:Myro.Robot
     pinMode(pin, INPUT);
   }
 
-  public override void makeOutput(int pin)
+  public override void makeDigitalOutput(int pin)
   {
     pinMode(pin, OUTPUT);
   }
