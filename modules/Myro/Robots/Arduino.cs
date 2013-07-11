@@ -70,6 +70,7 @@ public class Arduino:Myro.Robot
   private const int END_SYSEX             = 0xF7; // end a MIDI SysEx message
   
   private SerialPort _serialPort;
+  public static  SerialPort _lastSerial;
   private int delay;
 
   private int waitForData = 0;
@@ -100,15 +101,22 @@ public class Arduino:Myro.Robot
   ///                     when autoStart is true.</param>
   public Arduino(string serialPortName, Int32 baudRate, bool autoStart, int delay)
   {
+
+    if (_lastSerial != null)
+      {
+	_lastSerial.Close();
+	_lastSerial = null;
+      }
+    
     _serialPort = new SerialPort(serialPortName, baudRate);
     _serialPort.DataBits = 8;
     _serialPort.Parity = Parity.None;
     _serialPort.StopBits = StopBits.One;
-
+    _lastSerial = _serialPort;
     if (autoStart)
       {
-	this.delay = delay;
-	this.Open();
+		this.delay = delay;
+		this.Open();
       }
   }
 
@@ -143,10 +151,8 @@ public class Arduino:Myro.Robot
   /// </summary>
   public void Open()
   {
-
     try
       {
-
 	_serialPort.Open();
 	
 	Thread.Sleep(delay);
@@ -177,6 +183,12 @@ public class Arduino:Myro.Robot
       {
 	Console.WriteLine(e);
       }
+  }
+
+  public override void stop()
+  {    
+    Console.WriteLine("stopping");
+    this.Close();
   }
 
   /// <summary>
