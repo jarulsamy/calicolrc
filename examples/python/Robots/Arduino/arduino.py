@@ -18,7 +18,7 @@ def blink():
         wait(.5)
 
 
-makeOutput(13)        #led
-makePWM(3)            #led + resistor
+makeDigitalOut(13)        #led
+makePWMOut(3)             #led + resistor
 blink()
 pulse()

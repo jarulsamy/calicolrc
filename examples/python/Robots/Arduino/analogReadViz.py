@@ -2,7 +2,7 @@ from Processing import *
 from Myro import *
 import Processing
 
-ard = makeRobot("Arduino", "/dev/ttyUSB0")
+makeRobot("Arduino", "/dev/ttyUSB0")
 window(800, 200)
 smooth()
 background(0)
@@ -11,7 +11,7 @@ noStroke()
 x = 0
 def draw(o, e):
     global x
-    v = ard.analogRead(0)
+    v = analogRead(0)
     y3 = Processing.map(v, 512, 0, 0, height())
 
     fill(255, 0, 196)
