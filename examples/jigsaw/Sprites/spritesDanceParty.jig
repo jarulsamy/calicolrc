@@ -1,0 +1,484 @@
+<?xml version="1.0" encoding="us-ascii"?>
+<jigsaw>
+    <module name="Common.dll" />
+    <module name="Sprites.dll" />
+    <block id="1" typeName="Jigsaw.CControlStart" left="420" top="36">
+        <edge id="1" name="Start" linkedTo="2" />
+        <property name="Label" value="when script starts" />
+        <property name="Message" value="" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="2" typeName="Jigsaw.CComment" left="715" top="106">
+        <property name="Label" value="After adding an image to Calico/examples/images/SpriteCostumes, you can use your own images in the script with the addBackground and addCostume functions." />
+        <property name="Message" value="" />
+        <property name="Comment" value="After adding an image to Calico/examples/images/SpriteCostumes, you can use your own images in the script with the addBackground and addCostume functions." />
+        <property name="Width" value="275" />
+        <property name="Height" value="80" />
+        <fill_color R="1" G="1" B="0.875" A="1" />
+        <line_color R="0.5" G="0.5" B="0.5" A="1" />
+    </block>
+    <block id="3" typeName="Jigsaw.CComment" left="715" top="196">
+        <property name="Label" value="Sprite1 is the default Sprite.  It may be removed using removeSprite(spriteName)." />
+        <property name="Message" value="" />
+        <property name="Comment" value="Sprite1 is the default Sprite.  It may be removed using removeSprite(spriteName)." />
+        <property name="Width" value="275" />
+        <property name="Height" value="39" />
+        <fill_color R="1" G="1" B="0.875" A="1" />
+        <line_color R="0.5" G="0.5" B="0.5" A="1" />
+    </block>
+    <block id="4" typeName="Jigsaw.CComment" left="720" top="286">
+        <property name="Label" value="Use the imitateSprite function to make one Sprite copy the forward, backward, glide, show, rotate, and flip movements of another Sprite." />
+        <property name="Message" value="" />
+        <property name="Comment" value="Use the imitateSprite function to make one Sprite copy the forward, backward, glide, show, rotate, and flip movements of another Sprite." />
+        <property name="Width" value="275" />
+        <property name="Height" value="64" />
+        <fill_color R="1" G="1" B="0.875" A="1" />
+        <line_color R="0.5" G="0.5" B="0.5" A="1" />
+    </block>
+    <block id="5" typeName="Jigsaw.CComment" left="721" top="350">
+        <property name="Label" value="Here, Cally (pink one) will imitate Alex (green one) when Alex moves forward and down the screen." />
+        <property name="Message" value="" />
+        <property name="Comment" value="Here, Cally (pink one) will imitate Alex (green one) when Alex moves forward and down the screen." />
+        <property name="Width" value="275" />
+        <property name="Height" value="50" />
+        <fill_color R="1" G="1" B="0.875" A="1" />
+        <line_color R="0.5" G="0.5" B="0.5" A="1" />
+    </block>
+    <block id="6" typeName="Jigsaw.CComment" left="720" top="536">
+        <property name="Label" value="Now Cally will glide down the screen, after which Alex will imitate Cally when Cally rotates and flips. " />
+        <property name="Message" value="" />
+        <property name="Comment" value="Now Cally will glide down the screen, after which Alex will imitate Cally when Cally rotates and flips. " />
+        <property name="Width" value="275" />
+        <property name="Height" value="50" />
+        <fill_color R="1" G="1" B="0.875" A="1" />
+        <line_color R="0.5" G="0.5" B="0.5" A="1" />
+    </block>
+    <block id="7" typeName="Jigsaw.CComment" left="721" top="500">
+        <property name="Label" value="Now Cally (pink) will stop imitating Alex (green). " />
+        <property name="Message" value="" />
+        <property name="Comment" value="Now Cally (pink) will stop imitating Alex (green). " />
+        <property name="Width" value="275" />
+        <property name="Height" value="35" />
+        <fill_color R="1" G="1" B="0.875" A="1" />
+        <line_color R="0.5" G="0.5" B="0.5" A="1" />
+    </block>
+    <block id="8" typeName="Jigsaw.CMethodBlock" left="440" top="66">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="init" return_type="System.Void">
+            <parameter name="spritesVisibleOnCreation" type="System.Boolean" default="" />
+        </method>
+        <edge id="2" name="In" linkedTo="1" />
+        <edge id="3" name="Out" linkedTo="4" />
+        <property name="Label" value="init(False)" />
+        <property name="Message" value="" />
+        <property name="spritesVisibleOnCreation" value="False" />
+        <fill_color R="0.813532796601547" G="0.541795381597148" B="0.796041617540662" A="1" />
+        <line_color R="0.325413118640619" G="0.216718152638859" B="0.318416647016265" A="1" />
+    </block>
+    <block id="9" typeName="Jigsaw.CMethodBlock" left="440" top="86">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="addBackground" return_type="System.Void">
+            <parameter name="filename" type="System.String" default="" />
+        </method>
+        <edge id="4" name="In" linkedTo="3" />
+        <edge id="5" name="Out" linkedTo="6" />
+        <property name="Label" value="addBackground(&quot;stage.png&quot;)" />
+        <property name="Message" value="" />
+        <property name="filename" value="&quot;stage.png&quot;" />
+        <fill_color R="0.883910406559664" G="0.847254991693075" B="0.507290215467704" A="1" />
+        <line_color R="0.353564162623866" G="0.33890199667723" B="0.202916086187081" A="1" />
+    </block>
+    <block id="10" typeName="Jigsaw.CMethodBlock" left="440" top="106">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="changeBackground" return_type="System.Void">
+            <parameter name="backdropName" type="System.String" default="" />
+        </method>
+        <edge id="6" name="In" linkedTo="5" />
+        <edge id="7" name="Out" linkedTo="8" />
+        <property name="Label" value="changeBackground(&quot;stage&quot;)" />
+        <property name="Message" value="" />
+        <property name="backdropName" value="&quot;stage&quot;" />
+        <fill_color R="0.883910406559664" G="0.847254991693075" B="0.507290215467704" A="1" />
+        <line_color R="0.353564162623866" G="0.33890199667723" B="0.202916086187081" A="1" />
+    </block>
+    <block id="11" typeName="Jigsaw.CMethodBlock" left="440" top="126">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="makeSprite" return_type="Sprites+Sprite">
+            <parameter name="name" type="System.String" default="" />
+        </method>
+        <edge id="8" name="In" linkedTo="7" />
+        <edge id="9" name="Out" linkedTo="10" />
+        <property name="Label" value="makeSprite(&quot;Alex&quot;)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="" />
+        <property name="name" value="&quot;Alex&quot;" />
+        <fill_color R="0.813532796601547" G="0.541795381597148" B="0.796041617540662" A="1" />
+        <line_color R="0.325413118640619" G="0.216718152638859" B="0.318416647016265" A="1" />
+    </block>
+    <block id="12" typeName="Jigsaw.CMethodBlock" left="440" top="146">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="makeSprite" return_type="Sprites+Sprite">
+            <parameter name="name" type="System.String" default="" />
+        </method>
+        <edge id="10" name="In" linkedTo="9" />
+        <edge id="11" name="Out" linkedTo="12" />
+        <property name="Label" value="makeSprite(&quot;Cally&quot;)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="" />
+        <property name="name" value="&quot;Cally&quot;" />
+        <fill_color R="0.813532796601547" G="0.541795381597148" B="0.796041617540662" A="1" />
+        <line_color R="0.325413118640619" G="0.216718152638859" B="0.318416647016265" A="1" />
+    </block>
+    <block id="13" typeName="Jigsaw.CMethodBlock" left="440" top="166">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="removeSprite" return_type="System.Boolean">
+            <parameter name="name" type="System.String" default="" />
+        </method>
+        <edge id="12" name="In" linkedTo="11" />
+        <edge id="13" name="Out" linkedTo="14" />
+        <property name="Label" value="removeSprite(&quot;Sprite1&quot;)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="" />
+        <property name="name" value="&quot;Sprite1&quot;" />
+        <fill_color R="0.813532796601547" G="0.541795381597148" B="0.796041617540662" A="1" />
+        <line_color R="0.325413118640619" G="0.216718152638859" B="0.318416647016265" A="1" />
+    </block>
+    <block id="14" typeName="Jigsaw.CMethodBlock" left="440" top="186">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="selectSprite" return_type="Sprites+Sprite">
+            <parameter name="name" type="System.String" default="" />
+        </method>
+        <edge id="14" name="In" linkedTo="13" />
+        <edge id="15" name="Out" linkedTo="16" />
+        <property name="Label" value="selectSprite(&quot;Alex&quot;)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="" />
+        <property name="name" value="&quot;Alex&quot;" />
+        <fill_color R="0.813532796601547" G="0.541795381597148" B="0.796041617540662" A="1" />
+        <line_color R="0.325413118640619" G="0.216718152638859" B="0.318416647016265" A="1" />
+    </block>
+    <block id="15" typeName="Jigsaw.CMethodBlock" left="440" top="206">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="changeCostume" return_type="System.Void">
+            <parameter name="costumeName" type="System.String" default="" />
+        </method>
+        <edge id="16" name="In" linkedTo="15" />
+        <edge id="17" name="Out" linkedTo="18" />
+        <property name="Label" value="changeCostume(&quot;greenHair&quot;)" />
+        <property name="Message" value="" />
+        <property name="costumeName" value="&quot;greenHair&quot;" />
+        <fill_color R="0.883910406559664" G="0.847254991693075" B="0.507290215467704" A="1" />
+        <line_color R="0.353564162623866" G="0.33890199667723" B="0.202916086187081" A="1" />
+    </block>
+    <block id="16" typeName="Jigsaw.CMethodBlock" left="440" top="226">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="moveTo" return_type="System.Void">
+            <parameter name="x" type="System.Double" default="" />
+            <parameter name="y" type="System.Double" default="" />
+        </method>
+        <edge id="18" name="In" linkedTo="17" />
+        <edge id="19" name="Out" linkedTo="20" />
+        <property name="Label" value="moveTo(200, 250)" />
+        <property name="Message" value="" />
+        <property name="x" value="200" />
+        <property name="y" value="250" />
+        <fill_color R="0.577413842118072" G="0.651490091416747" B="0.609901894633613" A="1" />
+        <line_color R="0.230965536847229" G="0.260596036566699" B="0.243960757853445" A="1" />
+    </block>
+    <block id="17" typeName="Jigsaw.CMethodBlock" left="440" top="246">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="selectSprite" return_type="Sprites+Sprite">
+            <parameter name="name" type="System.String" default="" />
+        </method>
+        <edge id="20" name="In" linkedTo="19" />
+        <edge id="21" name="Out" linkedTo="22" />
+        <property name="Label" value="selectSprite(&quot;Cally&quot;)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="" />
+        <property name="name" value="&quot;Cally&quot;" />
+        <fill_color R="0.813532796601547" G="0.541795381597148" B="0.796041617540662" A="1" />
+        <line_color R="0.325413118640619" G="0.216718152638859" B="0.318416647016265" A="1" />
+    </block>
+    <block id="18" typeName="Jigsaw.CMethodBlock" left="440" top="266">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="changeCostume" return_type="System.Void">
+            <parameter name="costumeName" type="System.String" default="" />
+        </method>
+        <edge id="22" name="In" linkedTo="21" />
+        <edge id="23" name="Out" linkedTo="24" />
+        <property name="Label" value="changeCostume(&quot;pinkHair&quot;)" />
+        <property name="Message" value="" />
+        <property name="costumeName" value="&quot;pinkHair&quot;" />
+        <fill_color R="0.883910406559664" G="0.847254991693075" B="0.507290215467704" A="1" />
+        <line_color R="0.353564162623866" G="0.33890199667723" B="0.202916086187081" A="1" />
+    </block>
+    <block id="19" typeName="Jigsaw.CMethodBlock" left="440" top="286">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="moveTo" return_type="System.Void">
+            <parameter name="x" type="System.Double" default="" />
+            <parameter name="y" type="System.Double" default="" />
+        </method>
+        <edge id="24" name="In" linkedTo="23" />
+        <edge id="25" name="Out" linkedTo="26" />
+        <property name="Label" value="moveTo(300, 250)" />
+        <property name="Message" value="" />
+        <property name="x" value="300" />
+        <property name="y" value="250" />
+        <fill_color R="0.577413842118072" G="0.651490091416747" B="0.609901894633613" A="1" />
+        <line_color R="0.230965536847229" G="0.260596036566699" B="0.243960757853445" A="1" />
+    </block>
+    <block id="20" typeName="Jigsaw.CMethodBlock" left="440" top="306">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="imitateSprite" return_type="System.Void">
+            <parameter name="otherSpriteName" type="System.String" default="" />
+        </method>
+        <edge id="26" name="In" linkedTo="25" />
+        <edge id="27" name="Out" linkedTo="28" />
+        <property name="Label" value="imitateSprite(&quot;Alex&quot;)" />
+        <property name="Message" value="" />
+        <property name="otherSpriteName" value="&quot;Alex&quot;" />
+        <fill_color R="0.571701106648753" G="0.861441740235985" B="0.822339029667126" A="1" />
+        <line_color R="0.228680442659501" G="0.344576696094394" B="0.32893561186685" A="1" />
+    </block>
+    <block id="21" typeName="Jigsaw.CMethodBlock" left="440" top="326">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="selectSprite" return_type="Sprites+Sprite">
+            <parameter name="name" type="System.String" default="" />
+        </method>
+        <edge id="28" name="In" linkedTo="27" />
+        <edge id="29" name="Out" linkedTo="30" />
+        <property name="Label" value="selectSprite(&quot;Alex&quot;)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="" />
+        <property name="name" value="&quot;Alex&quot;" />
+        <fill_color R="0.813532796601547" G="0.541795381597148" B="0.796041617540662" A="1" />
+        <line_color R="0.325413118640619" G="0.216718152638859" B="0.318416647016265" A="1" />
+    </block>
+    <block id="22" typeName="Jigsaw.CMethodBlock" left="440" top="346">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="show" return_type="System.Void" />
+        <edge id="30" name="In" linkedTo="29" />
+        <edge id="31" name="Out" linkedTo="32" />
+        <property name="Label" value="show()" />
+        <property name="Message" value="" />
+        <fill_color R="0.883910406559664" G="0.847254991693075" B="0.507290215467704" A="1" />
+        <line_color R="0.353564162623866" G="0.33890199667723" B="0.202916086187081" A="1" />
+    </block>
+    <block id="23" typeName="Jigsaw.CMethodBlock" left="440" top="366">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="glideForward" return_type="System.Void">
+            <parameter name="pixels" type="System.Double" default="" />
+            <parameter name="seconds" type="System.Double" default="" />
+        </method>
+        <edge id="32" name="In" linkedTo="31" />
+        <edge id="33" name="Out" linkedTo="34" />
+        <property name="Label" value="glideForward(50, 1)" />
+        <property name="Message" value="" />
+        <property name="pixels" value="50" />
+        <property name="seconds" value="1" />
+        <fill_color R="0.577413842118072" G="0.651490091416747" B="0.609901894633613" A="1" />
+        <line_color R="0.230965536847229" G="0.260596036566699" B="0.243960757853445" A="1" />
+    </block>
+    <block id="24" typeName="Jigsaw.CMethodBlock" left="440" top="386">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="flipHorizontal" return_type="System.Void" />
+        <edge id="34" name="In" linkedTo="33" />
+        <edge id="35" name="Out" linkedTo="36" />
+        <property name="Label" value="flipHorizontal()" />
+        <property name="Message" value="" />
+        <fill_color R="0.883910406559664" G="0.847254991693075" B="0.507290215467704" A="1" />
+        <line_color R="0.353564162623866" G="0.33890199667723" B="0.202916086187081" A="1" />
+    </block>
+    <block id="25" typeName="Jigsaw.CControlRepeat" left="440" top="406">
+        <edge id="36" name="In" linkedTo="35" />
+        <edge id="37" name="Out" linkedTo="39" />
+        <edge id="38" name="Loop" linkedTo="41" />
+        <property name="Label" value="repeat 4 times" />
+        <property name="Message" value="" />
+        <property name="Repetitions" value="4" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="26" typeName="Jigsaw.CMethodBlock" left="440" top="466">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="selectSprite" return_type="Sprites+Sprite">
+            <parameter name="name" type="System.String" default="" />
+        </method>
+        <edge id="39" name="In" linkedTo="37" />
+        <edge id="40" name="Out" linkedTo="43" />
+        <property name="Label" value="selectSprite(&quot;Cally&quot;)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="" />
+        <property name="name" value="&quot;Cally&quot;" />
+        <fill_color R="0.813532796601547" G="0.541795381597148" B="0.796041617540662" A="1" />
+        <line_color R="0.325413118640619" G="0.216718152638859" B="0.318416647016265" A="1" />
+    </block>
+    <block id="27" typeName="Jigsaw.CMethodBlock" left="460" top="426">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="changeYPositionBy" return_type="System.Void">
+            <parameter name="pixels" type="System.Double" default="" />
+        </method>
+        <edge id="41" name="In" linkedTo="38" />
+        <edge id="42" name="Out" linkedTo="-1" />
+        <property name="Label" value="changeYPositionBy(5)" />
+        <property name="Message" value="" />
+        <property name="pixels" value="5" />
+        <fill_color R="0.577413842118072" G="0.651490091416747" B="0.609901894633613" A="1" />
+        <line_color R="0.230965536847229" G="0.260596036566699" B="0.243960757853445" A="1" />
+    </block>
+    <block id="28" typeName="Jigsaw.CMethodBlock" left="440" top="486">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="stopImitating" return_type="System.Boolean" />
+        <edge id="43" name="In" linkedTo="40" />
+        <edge id="44" name="Out" linkedTo="45" />
+        <property name="Label" value="stopImitating()" />
+        <property name="Message" value="" />
+        <property name="Variable" value="" />
+        <fill_color R="0.571701106648753" G="0.861441740235985" B="0.822339029667126" A="1" />
+        <line_color R="0.228680442659501" G="0.344576696094394" B="0.32893561186685" A="1" />
+    </block>
+    <block id="29" typeName="Jigsaw.CMethodBlock" left="440" top="506">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="glideTo" return_type="System.Void">
+            <parameter name="x" type="System.Double" default="" />
+            <parameter name="y" type="System.Double" default="" />
+            <parameter name="seconds" type="System.Double" default="" />
+        </method>
+        <edge id="45" name="In" linkedTo="44" />
+        <edge id="46" name="Out" linkedTo="47" />
+        <property name="Label" value="glideTo(250, 350, 2)" />
+        <property name="Message" value="" />
+        <property name="x" value="250" />
+        <property name="y" value="350" />
+        <property name="seconds" value="2" />
+        <fill_color R="0.577413842118072" G="0.651490091416747" B="0.609901894633613" A="1" />
+        <line_color R="0.230965536847229" G="0.260596036566699" B="0.243960757853445" A="1" />
+    </block>
+    <block id="30" typeName="Jigsaw.CMethodBlock" left="440" top="526">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="selectSprite" return_type="Sprites+Sprite">
+            <parameter name="name" type="System.String" default="" />
+        </method>
+        <edge id="47" name="In" linkedTo="46" />
+        <edge id="48" name="Out" linkedTo="49" />
+        <property name="Label" value="selectSprite(&quot;Alex&quot;)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="" />
+        <property name="name" value="&quot;Alex&quot;" />
+        <fill_color R="0.813532796601547" G="0.541795381597148" B="0.796041617540662" A="1" />
+        <line_color R="0.325413118640619" G="0.216718152638859" B="0.318416647016265" A="1" />
+    </block>
+    <block id="31" typeName="Jigsaw.CMethodBlock" left="440" top="546">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="imitateSprite" return_type="System.Void">
+            <parameter name="otherSpriteName" type="System.String" default="" />
+        </method>
+        <edge id="49" name="In" linkedTo="48" />
+        <edge id="50" name="Out" linkedTo="51" />
+        <property name="Label" value="imitateSprite(&quot;Cally&quot;)" />
+        <property name="Message" value="" />
+        <property name="otherSpriteName" value="&quot;Cally&quot;" />
+        <fill_color R="0.571701106648753" G="0.861441740235985" B="0.822339029667126" A="1" />
+        <line_color R="0.228680442659501" G="0.344576696094394" B="0.32893561186685" A="1" />
+    </block>
+    <block id="32" typeName="Jigsaw.CMethodBlock" left="440" top="566">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="selectSprite" return_type="Sprites+Sprite">
+            <parameter name="name" type="System.String" default="" />
+        </method>
+        <edge id="51" name="In" linkedTo="50" />
+        <edge id="52" name="Out" linkedTo="53" />
+        <property name="Label" value="selectSprite(&quot;Cally&quot;)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="" />
+        <property name="name" value="&quot;Cally&quot;" />
+        <fill_color R="0.813532796601547" G="0.541795381597148" B="0.796041617540662" A="1" />
+        <line_color R="0.325413118640619" G="0.216718152638859" B="0.318416647016265" A="1" />
+    </block>
+    <block id="33" typeName="Jigsaw.CControlRepeat" left="440" top="586">
+        <edge id="53" name="In" linkedTo="52" />
+        <edge id="54" name="Out" linkedTo="56" />
+        <edge id="55" name="Loop" linkedTo="58" />
+        <property name="Label" value="repeat 20 times" />
+        <property name="Message" value="" />
+        <property name="Repetitions" value="20" />
+        <fill_color R="0.9297" G="0.9062" B="0.6641" A="1" />
+        <line_color R="0.7187" G="0.5234" B="0.043" A="1" />
+    </block>
+    <block id="34" typeName="Jigsaw.CMethodBlock" left="440" top="646">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="flipVertical" return_type="System.Void" />
+        <edge id="56" name="In" linkedTo="54" />
+        <edge id="57" name="Out" linkedTo="60" />
+        <property name="Label" value="flipVertical()" />
+        <property name="Message" value="" />
+        <fill_color R="0.883910406559664" G="0.847254991693075" B="0.507290215467704" A="1" />
+        <line_color R="0.353564162623866" G="0.33890199667723" B="0.202916086187081" A="1" />
+    </block>
+    <block id="35" typeName="Jigsaw.CMethodBlock" left="460" top="606">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="rotate" return_type="System.Void">
+            <parameter name="degrees" type="System.Double" default="" />
+        </method>
+        <edge id="58" name="In" linkedTo="55" />
+        <edge id="59" name="Out" linkedTo="-1" />
+        <property name="Label" value="rotate(-9)" />
+        <property name="Message" value="" />
+        <property name="degrees" value="-9" />
+        <fill_color R="0.577413842118072" G="0.651490091416747" B="0.609901894633613" A="1" />
+        <line_color R="0.230965536847229" G="0.260596036566699" B="0.243960757853445" A="1" />
+    </block>
+    <block id="36" typeName="Jigsaw.CMethodBlock" left="440" top="666">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="selectSprite" return_type="Sprites+Sprite">
+            <parameter name="spriteName" type="System.String" default="" />
+        </method>
+        <edge id="60" name="In" linkedTo="57" />
+        <edge id="61" name="Out" linkedTo="62" />
+        <property name="Label" value="selectSprite(&quot;Alex&quot;)" />
+        <property name="Message" value="" />
+        <property name="Variable" value="" />
+        <property name="spriteName" value="&quot;Alex&quot;" />
+        <fill_color R="0.813532796601547" G="0.541795381597148" B="0.796041617540662" A="1" />
+        <line_color R="0.325413118640619" G="0.216718152638859" B="0.318416647016265" A="1" />
+    </block>
+    <block id="37" typeName="Jigsaw.CMethodBlock" left="440" top="686">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="stopImitating" return_type="System.Boolean" />
+        <edge id="62" name="In" linkedTo="61" />
+        <edge id="63" name="Out" linkedTo="64" />
+        <property name="Label" value="stopImitating()" />
+        <property name="Message" value="" />
+        <property name="Variable" value="" />
+        <fill_color R="0.571701106648753" G="0.861441740235985" B="0.822339029667126" A="1" />
+        <line_color R="0.228680442659501" G="0.344576696094394" B="0.32893561186685" A="1" />
+    </block>
+    <block id="38" typeName="Jigsaw.CMethodBlock" left="440" top="706">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="glideTo" return_type="System.Void">
+            <parameter name="x" type="System.Double" default="" />
+            <parameter name="y" type="System.Double" default="" />
+            <parameter name="seconds" type="System.Double" default="" />
+        </method>
+        <edge id="64" name="In" linkedTo="63" />
+        <edge id="65" name="Out" linkedTo="-1" />
+        <property name="Label" value="glideTo(200, 350, 1)" />
+        <property name="Message" value="" />
+        <property name="x" value="200" />
+        <property name="y" value="350" />
+        <property name="seconds" value="1" />
+        <fill_color R="0.577413842118072" G="0.651490091416747" B="0.609901894633613" A="1" />
+        <line_color R="0.230965536847229" G="0.260596036566699" B="0.243960757853445" A="1" />
+    </block>
+    <block id="39" typeName="Jigsaw.CComment" left="715" top="6">
+        <property name="Label" value="init() and init(True) automatically draw Sprites to the screen when they are created.  If you want to control when Sprites appear on the screen use init(False) and then the show() function when ready." />
+        <property name="Message" value="" />
+        <property name="Comment" value="init() and init(True) automatically draw Sprites to the screen when they are created.  If you want to control when Sprites appear on the screen use init(False) and then the show() function when ready." />
+        <property name="Width" value="275" />
+        <property name="Height" value="80" />
+        <fill_color R="1" G="1" B="0.875" A="1" />
+        <line_color R="0.5" G="0.5" B="0.5" A="1" />
+    </block>
+    <block id="40" typeName="Jigsaw.CMethodBlock" left="970" top="54">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="init" return_type="System.Void" />
+        <edge id="66" name="In" linkedTo="-1" />
+        <edge id="67" name="Out" linkedTo="68" />
+        <property name="Label" value="init()" />
+        <property name="Message" value="" />
+        <fill_color R="0.813532796601547" G="0.541795381597148" B="0.796041617540662" A="1" />
+        <line_color R="0.325413118640619" G="0.216718152638859" B="0.318416647016265" A="1" />
+    </block>
+    <block id="41" typeName="Jigsaw.CMethodBlock" left="970" top="74">
+        <method assembly_name="Sprites" type_name="Sprites" method_name="init" return_type="System.Void">
+            <parameter name="spritesVisibleOnCreation" type="System.Boolean" default="" />
+        </method>
+        <edge id="68" name="In" linkedTo="67" />
+        <edge id="69" name="Out" linkedTo="-1" />
+        <property name="Label" value="init(0)" />
+        <property name="Message" value="" />
+        <property name="spritesVisibleOnCreation" value="0" />
+        <fill_color R="0.813532796601547" G="0.541795381597148" B="0.796041617540662" A="1" />
+        <line_color R="0.325413118640619" G="0.216718152638859" B="0.318416647016265" A="1" />
+    </block>
+    <block id="42" typeName="Jigsaw.CComment" left="1020" top="11">
+        <property name="Label" value="See spritesInitDemo.jig example for details on init() vs init(visibleOnCreation)" />
+        <property name="Message" value="" />
+        <property name="Comment" value="See spritesInitDemo.jig example for details on init() vs init(visibleOnCreation)" />
+        <property name="Width" value="275" />
+        <property name="Height" value="40" />
+        <fill_color R="1" G="1" B="0.875" A="1" />
+        <line_color R="0.5" G="0.5" B="0.5" A="1" />
+    </block>
+</jigsaw>
