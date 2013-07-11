@@ -1,5 +1,6 @@
 /******************************************************************************
 Sprites Module - Bryn Mawr College, Summer Research 2013
+Documentation: http://calicoproject.org/Calico_Sprites
 *******************************************************************************/
 
 /*
@@ -30,7 +31,7 @@ using System;
 using System.IO;
 
 // Events
-using EventsManager = Events;
+//using EventsManager = Events;
 
 public static class Sprites
 {
@@ -115,11 +116,9 @@ public static class Sprites
 	private Graphics.Picture currentCostume; 
 	private Dictionary<string, Graphics.Picture> costumeDictionary;	
 	
-	
-	
 	private bool isVisible;
 	private string voiceName;
-	private int fontSize;
+	//private int fontSize;
 	private bool hasFlippedHorizontal;
 	private bool hasFlippedVertical;
 	private string copying;
@@ -130,7 +129,7 @@ public static class Sprites
 	public Sprite(string filename){
 		isVisible = true;
 		voiceName = "default";
-		fontSize = 18;
+		//fontSize = 18;
 		hasFlippedHorizontal = false;
 		hasFlippedVertical = false;
 
@@ -147,7 +146,7 @@ public static class Sprites
 		costumeDictionary.Add(Path.GetFileNameWithoutExtension("greenHair.png"), new Graphics.Picture(getImagePath("greenHair.png")));
 			
 		currentCostume = costumeDictionary[Path.GetFileNameWithoutExtension(filename)];
-	    //costume = new Picture(costumeDict[nameNewCostume]) 
+	    	//costume = new Picture(costumeDict[nameNewCostume]) 
 	
 	
 		currentCostume.border = 0;
@@ -162,8 +161,12 @@ public static class Sprites
 
 	}
 	
+	//TODO really needs to be private, it could mess up the associations in sprites (dictionary) if the names were reset
 	public void setName(string name){
 		myName = name;
+	}
+	public string getName(){
+		return myName;
 	}	
 	public void setCopying(string newCopying){
 		copying = newCopying;
@@ -172,7 +175,7 @@ public static class Sprites
 		copiedBy = newCopiedBy;
 	}
 
-	public bool isClicked(){
+	private bool isClicked(){
 		if(window != null){
 			if(window.getMouseState() == "down"){
 				IronPython.Runtime.PythonTuple mousePos = window.getMouseNow();
@@ -271,7 +274,7 @@ public static class Sprites
 		}
 	}
 
-	public void transparency(int value){
+	private void transparency(int value){
 		currentCostume.setAlpha((byte)(int)(255*value));
 	}
 	
@@ -279,8 +282,7 @@ public static class Sprites
 	public void changeCostume(string costumeName){
 		if(costumeDictionary.ContainsKey(costumeName)){
 			//currentCostume  = dictionaryPossible[costumeName];
-		
-		
+	
 			bool origIsVisible = getIsVisible();
 			double origRotation = currentCostume.rotation;
 			double origScaleFactor = currentCostume.scaleFactor;
@@ -331,14 +333,11 @@ public static class Sprites
 		}
 	}
 
-	public void setFontSize(int newFontSize){
+	/*public void setFontSize(int newFontSize){
 		fontSize = newFontSize;
-	}
-
-
-	//public void speechBubble(double upperLeftX, double upperLeftY, double lowerRightX, double lowerRightY, string message, double arrowX, double arrowY, double seconds){
+	}*/
 	
-	public void speechBubble(string message, double seconds){
+	public void speak(string message, double seconds){
 		double halfWidth = currentCostume.getWidth()/2;
 		double halfHeight = currentCostume.getHeight()/2;
 
@@ -351,24 +350,12 @@ public static class Sprites
 		Graphics.Point origin = new Graphics.Point(costO.x - (halfWidth/1.5), costO.y - (halfHeight));
 		Graphics.SpeechBubble sb = new Graphics.SpeechBubble(upperLeft, lowerRight, message, origin);
 		sb.draw(window);
-		speak(message);
+		speakOnly(message);
 		wait(seconds);
 		sb.undraw();
 	}
 
-	public void speakAndShowText(string message, double seconds){
-		Graphics.Text t = new Graphics.Text(currentCostume.center, message);
-		t.fontSize = fontSize;
-		t.x = currentCostume.center.x;
-		t.y = currentCostume.center.y - (currentCostume.height/1.5);
-		t.fill = new Graphics.Color("white");
-		t.draw(window);
-		speak(message);
-		wait(seconds);
-		t.undraw();
-	}
-
-	public void speak(string message){
+	private void speakOnly(string message){
 		if(voiceName == "default"){
 			Myro.setVoice(voiceName);
 		}
@@ -595,14 +582,27 @@ public static class Sprites
 	}
 	
 
-	public void printStatus(string name){
-		System.Console.WriteLine("\t" + name + " is at (" + currentCostume.x + ", " + currentCostume.y + ")");
-		System.Console.WriteLine("\t" + name + "'s rotation is " + currentCostume.rotation);
-		System.Console.Write("\t" + name + " is ");
-		if(!isVisible()){
+	public void printStatus(){
+		System.Console.WriteLine("\t" + myName + " is at (" + currentCostume.x + ", " + currentCostume.y + ")");
+		System.Console.WriteLine("\t" + myName + "'s rotation is " + currentCostume.rotation);
+		System.Console.Write("\t" + myName + " is ");
+		if(!isVisible){
 			System.Console.Write("NOT ");
 		}
 		System.Console.WriteLine("visible. ");
+	}
+
+	public double getX(){
+		return currentCostume.x;
+	}
+
+
+	public double getY(){
+		return currentCostume.y;
+	}
+
+	public double getRotation(){
+		return currentCostume.rotation;
 	}
 
     }
@@ -623,8 +623,6 @@ public static class Sprites
 		return str;
 	}
 
-		
-		
 	[JigsawTab("Sprites Look")]
 	public static void show(){
 		if(sprites.ContainsKey(default_sprite)){
@@ -662,12 +660,13 @@ public static class Sprites
 		}
 	}
 
-	[JigsawTab("Sprites Look")]
+	//see issue #9 in tracker
+	/*[JigsawTab("Sprites Look")]
 	private static void transparency(int value){
 		if(sprites.ContainsKey(default_sprite)){
 			sprites[default_sprite].transparency(value);
 		}
-	}
+	}*/
 
 	[JigsawTab("Sprites Look")]
 	public static void changeCostume(string costumeName){
@@ -696,41 +695,20 @@ public static class Sprites
 			backgroundObjs[default_background].addBackground(filename);
 		}
 	}
-		
+	
+	//TODO needs to hide all sprites so that their isVisibles are updated
+	/*	
 	[method: JigsawTab("Sprites Look")]
 	public static void clearWindow(){
 		if(window != null){
 			window.clear();
 		}
-	}
-
-	[JigsawTab("Sprites Sound")]
-	private static void setFontSize(int fontSize){
-		if(sprites.ContainsKey(default_sprite)){
-			sprites[default_sprite].setFontSize(fontSize);
-		}
-	}
-
-	[JigsawTab("Sprites Sound")]
-	private static void speechBubble(double upperLeftX, double upperLeftY, double lowerRightX, double lowerRightY, string message, double arrowX, double arrowY, double seconds){
-		if(sprites.ContainsKey(default_sprite)){
-			sprites[default_sprite].speechBubble(message, seconds);// upperLeftX,  upperLeftY,  lowerRightX,  lowerRightY,  message,  arrowX,  arrowY,  seconds); 
-		}
-	}
-
-	[JigsawTab("Sprites Sound")]
-	private static void speakAndShowText(string message, double seconds){
-		if(sprites.ContainsKey(default_sprite)){
-			sprites[default_sprite].speakAndShowText(message, seconds);
-		}
-	}
-
-
+	}*/
 
 	[JigsawTab("Sprites Sound")]
 	public static void speak(string message, double seconds){
 		if(sprites.ContainsKey(default_sprite)){
-			sprites[default_sprite].speechBubble(message, seconds);
+			sprites[default_sprite].speak(message, seconds);
 		}
 	}
 
@@ -745,7 +723,7 @@ public static class Sprites
 	}
 
 	[JigsawTab("Sprites Sound")]
-	public static void playInBackground(string filename){
+	private static void playInBackground(string filename){
 		//Prevents multiple tracks playing on the background channel at once
 		if(backgroundChannel != null){
 			backgroundChannel.Pause();
@@ -756,22 +734,17 @@ public static class Sprites
 	}
 
 	[JigsawTab("Sprites Sound")]
-	public static void setBackgroundVolume(int volume){
+	private static void setBackgroundVolume(int volume){
 		if(backgroundChannel != null){
 			backgroundChannel.Volume = volume;
 		}
 	}
 
 	[JigsawTab("Sprites Sound")]
-	public static void stopBackgroundSound(){
+	private static void stopBackgroundSound(){
 		if(backgroundChannel != null){
 			backgroundChannel.Pause();
 		}
-	}
-
-	[JigsawTab("Sprites Sound")]
-	public static void setBackgroundVolume(double volume){
-		
 	}
 	
 	[JigsawTab("Sprites Sound")]
@@ -888,7 +861,7 @@ public static class Sprites
 	[JigsawTab("Sprites")]
 	public static void printSpriteStatus(){
 		if(sprites.ContainsKey(default_sprite)){
-			sprites[default_sprite].printStatus(default_sprite);		
+			sprites[default_sprite].printStatus();		
 		}
 		if(sprites.Count == 0){
 			System.Console.WriteLine("\tThere are no sprites.");		
@@ -896,18 +869,19 @@ public static class Sprites
 	}
 
  	[method: JigsawTab("Sprites")]
-    	public static Sprite selectSprite(string name) {
-		if (sprites.ContainsKey(name)) {
-	  		default_sprite = name;
-	    		return sprites[name];
+    	public static Sprite selectSprite(string spriteName) {
+		if (sprites.ContainsKey(spriteName)) {
+	  		default_sprite = spriteName;
+	    		return sprites[spriteName];
 		} 
-		throw new Exception("\'" + name + "\' is not a valid Sprite name.");
+		throw new Exception("\'" + spriteName + "\' is not a valid Sprite name.");
 	}
 
 	[method: JigsawTab("Sprites")]
-	public static bool removeSprite(string name){
-		if(sprites.ContainsKey(name)){
-			return sprites.Remove(name);
+	public static bool removeSprite(string spriteName){
+		if(sprites.ContainsKey(spriteName)){
+			sprites[spriteName].hide();
+			return sprites.Remove(spriteName);
 		}
 		
 		return false;
@@ -931,9 +905,9 @@ public static class Sprites
 	}	
 
 	[method: JigsawTab("Sprites Interact")]
-	public static void imitateSprite(string otherSpriteName){
+	public static void imitateSprite(string spriteName){
 		if(sprites.ContainsKey(default_sprite)){
-			sprites[default_sprite].imitateSprite(otherSpriteName);		
+			sprites[default_sprite].imitateSprite(spriteName);		
 		}
 	}
 	
@@ -947,7 +921,7 @@ public static class Sprites
 	}
 
 	//true if any sprite is clicked
-	[method: JigsawTab("Sprites Interact")]
+	/*[method: JigsawTab("Sprites Interact")]
 	private static bool isSpriteClicked(){
 		if(sprites.Count == 0){
 			throw new Exception("There are no Sprites at present.");
@@ -973,7 +947,7 @@ public static class Sprites
 			return sprites[spriteName].isClicked();		
 		}
 		return false;
-	}
+	}*/
 
 	
 
@@ -1032,46 +1006,47 @@ public static class Sprites
 	}
 
 	[JigsawTab("Sprites")]
-	public static Sprite makeSprite(string name){
-		if(sprites.ContainsKey(name)){
-			sprites[name].hide();
-			sprites.Remove(name);
+	public static Sprite makeSprite(string spriteName){
+		if(sprites.ContainsKey(spriteName)){
+			sprites[spriteName].hide();
+			sprites.Remove(spriteName);
 		}
-		if(name == "none"){
+		if(spriteName == "none"){
 			throw new Exception("\'none\' is an invalid Sprite name.");
 		}
 
-		Sprite sprite = makeSprite(name, getImagePath("default.png"));
+		Sprite sprite = makeSprite(spriteName, getImagePath("default.png"));
 		sprite.moveTo(80, 200);
 		return sprite;
 	}
 
 	[JigsawTab("Sprites")]
-	public static Sprite makeSprite(string name, string filename){
-		if(sprites.ContainsKey(name)){
-			sprites[name].hide();
-			sprites.Remove(name);
+	public static Sprite makeSprite(string spriteName, string filename){
+		if(sprites.ContainsKey(spriteName)){
+			sprites[spriteName].hide();
+			sprites.Remove(spriteName);
 		}
 
-		if(name == "none"){
+		if(spriteName == "none"){
 			throw new Exception("\'none\' is an invalid Sprite name.");
 		}		
 
 		Sprite sprite = new Sprite(filename);
-		sprite.setName(name);
-		sprites.Add(name, sprite);
+		sprite.setName(spriteName);
+		sprites.Add(spriteName, sprite);
 		sprite.moveTo(80, 200);
-		default_sprite = name;
+		default_sprite = spriteName;
 		return sprite;
 	}
 
 
     [method: JigsawTab("Sprites")]
     public static void init() {
+	visibleOnStart = true;
 
 	//TODO might need to move this?
 	Events.init();
-
+	ManualResetEvent ev = new ManualResetEvent(false);
 	Invoke( delegate {
 		System.Console.WriteLine(AssemblyDirectory);
 		if (window == null) {
@@ -1089,8 +1064,43 @@ public static class Sprites
 		if(backgroundChannel != null){
 			backgroundChannel.Pause();
 		}
+		ev.Set();
 	    });
+	ev.WaitOne();
     }
+
+
+  [method: JigsawTab("Sprites")]
+    public static void init(bool spritesVisibleOnCreation) {
+	visibleOnStart = spritesVisibleOnCreation;
+
+
+	//TODO might need to move this?
+	Events.init();
+	ManualResetEvent ev = new ManualResetEvent(false);
+	Invoke( delegate {
+		System.Console.WriteLine(AssemblyDirectory);
+		if (window == null) {
+		    window = new Window();
+		}
+	
+		window.clear();
+		sprites.Clear();
+		Background b = makeBackground();
+		b.reset();
+		Sprite sprite = makeSprite();
+		sprite.moveTo(80, 200);
+		window.ShowAll();
+
+		if(backgroundChannel != null){
+			backgroundChannel.Pause();
+		}
+		ev.Set();
+	    });
+	ev.WaitOne();
+    }
+
+
 
     [method: JigsawTab("Sprites")]
     public static void makeSpritesVisibleOnCreation(bool visible) {
