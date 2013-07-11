@@ -2,7 +2,7 @@ from Processing import *
 from Myro import *
 import Processing
 
-ard = makeRobot("Arduino", "/dev/ttyACM0")
+ard = makeRobot("Arduino", "/dev/ttyUSB0")
 ard.pinMode(6, ard.SERVO)        #servo on 6
 ard.pinMode(3, ard.PWM)          #led on 3
 window(800, 200)

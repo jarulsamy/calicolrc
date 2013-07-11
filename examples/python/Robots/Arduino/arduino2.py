@@ -2,7 +2,7 @@ from Processing import *
 from Myro import *
 import Processing
 
-ard = makeRobot("Arduino", "/dev/ttyACM0")
+ard = makeRobot("Arduino", "/dev/ttyUSB0")
 window(800, 200)
 smooth()
 background(0)
