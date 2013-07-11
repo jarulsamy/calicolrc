@@ -1,6 +1,16 @@
 
 all: Scribbler.dll SimScribbler.dll SimPioneer.dll NxtRobot.dll \
-	Finch.dll Hummingbird.dll ROSRobot.dll ROSARDrone.dll
+	Finch.dll Hummingbird.dll ROSRobot.dll ROSARDrone.dll Arduino.dll\
+
+Arduino.dll: Arduino.cs 
+	MONO_PATH=../../bin:../../../languages/Java/lib dmcs -sdk:4 \
+		-r:../../Myro.dll \
+		-r:../../../bin/IronPython.dll \
+		-r:../../../bin/Microsoft.Scripting.dll \
+		-r:../../../bin/Microsoft.Dynamic.dll \
+		-out:Arduino.dll \
+		-target:library \
+		Arduino.cs
 
 ROSARDrone.dll: ROSARDrone.cs ROSRobot.dll
 	MONO_PATH=../../bin:../../../languages/Java/lib dmcs -sdk:4 \
