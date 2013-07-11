@@ -220,6 +220,13 @@ public static class Shapes
 	}
 
         [method: JigsawTab("S/Shapes")]
+	public static Graphics.SpeechBubble makeSpeechBubble (IList p1, IList p2, string text, IList p3)
+	{
+		_shape = new Graphics.SpeechBubble (p1, p2, text, p3);
+		return (Graphics.SpeechBubble)_shape;
+	}
+
+        [method: JigsawTab("S/Shapes")]
 	public static Graphics.Line makeLine (IList p1, IList p2)
 	{
 		_shape = new Graphics.Line (p1, p2);
