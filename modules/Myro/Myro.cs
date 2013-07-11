@@ -160,6 +160,7 @@ public static class Myro
 	public readonly static Gamepads gamepads = new Gamepads ();
 	public readonly static Computer computer = new Computer ();
 
+
 	[method: JigsawTab(null)]
 	public static void initialize_module (string path, string os)
 	{
@@ -1522,6 +1523,89 @@ public static class Myro
         Math.Max (Math.Min (Y, 255), 0),
         Math.Max (Math.Min (U, 255), 0),
         Math.Max (Math.Min (V, 255), 0));
+	}
+
+	[method: JigsawTab("M/Advanced 3")]
+        public static int analogRead (int port)
+	{
+	    if (robot != null) 
+	        return robot.analogRead (port);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Advanced 3")]
+        public static int digitalRead (int port)
+	{
+	    if (robot != null) 
+		return robot.digitalRead (port);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+
+	[method: JigsawTab("M/Advanced 3")]
+        public static void analogWrite (int port, int value)
+	{
+	    if (robot != null) 
+	        robot.analogWrite (port, value);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Advanced 3")]
+        public static void digitalWrite (int port, int value)
+	{
+	    if (robot != null) 
+	        robot.digitalWrite (port, value);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+
+	[method: JigsawTab("M/Advanced 3")]
+        public static void pinMode (int port, int mode)
+	{
+	    if (robot != null) 
+	        robot.pinMode (port, mode);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Advanced 3")]
+        public static void makeInput (int port)
+	{
+	    if (robot != null) 
+	        robot.makeInput (port);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Advanced 3")]
+        public static void makeOutput (int port)
+	{
+	    if (robot != null) 
+	        robot.makeOutput (port);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Advanced 3")]
+        public static void makePWM (int port)
+	{
+	    if (robot != null) 
+	        robot.makePWM (port);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Advanced 3")]
+        public static void makeServo (int port)
+	{
+	    if (robot != null) 
+	        robot.makeServo (port);
+	    else
+		throw new Exception("Robot has not been initialized");
 	}
 
 	[method: JigsawTab("M/Movement")]
@@ -3602,6 +3686,46 @@ public static class Myro
 		{
 		  return null;
 		}
+	  
+	       //arduino
+	       public virtual void pinMode (int port, int mode)
+   	       {
+	       }
+
+	       public virtual void makeInput (int port)
+   	       {
+	       }
+
+	       public virtual void makeOutput (int port)
+   	       {
+	       }
+
+	       public virtual void makePWM (int port)
+   	       {
+	       }
+
+	       public virtual void makeServo (int port)
+   	       {
+	       }
+
+	       public virtual void digitalWrite (int port, int value)
+   	       {
+	       }
+
+	       public virtual void analogWrite (int port, int value)
+   	       {
+	       }
+
+	       public virtual int digitalRead (int port)
+   	       {
+		 return -1;
+	       }
+
+	       public virtual int analogRead (int port)
+   	       {
+		 return -1;
+	       }
+
 
 	        public virtual void waitForMove(double interval)
 	        {
@@ -3645,7 +3769,7 @@ public static class Myro
 			}
 		}
     
-		public void stop ()
+		public virtual void stop ()
 		{
 			if (! isConnected ()) 
 				return;

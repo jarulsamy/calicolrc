@@ -181,7 +181,8 @@ public class Arduino:Myro.Robot
 	  }
       }catch (Exception e)
       {
-	Console.WriteLine(e);
+		    throw new Exception (String.Format ("Arduino open error: '{0}'", 
+                                                        e));
       }
   }
 
@@ -215,7 +216,7 @@ public class Arduino:Myro.Robot
   /// </summary>
   /// <param name="pin">The arduino digital input pin.</param>
   /// <returns>Arduino.HIGH or Arduino.LOW</returns>
-  public int digitalRead(int pin)
+  public override int digitalRead(int pin)
   {
     return (digitalInputData[pin >> 3] >> (pin & 0x07)) & 0x01;
   }
@@ -225,7 +226,7 @@ public class Arduino:Myro.Robot
   /// </summary>
   /// <param name="pin">The arduino analog input pin.</param>
   /// <returns>A value representing the analog value between 0 (0V) and 1023 (5V).</returns>
-  public int analogRead(int pin)
+  public override int analogRead(int pin)
   {
     return analogInputData[pin];
   }
@@ -235,7 +236,7 @@ public class Arduino:Myro.Robot
   /// </summary>
   /// <param name="pin">The arduino pin.</param>
   /// <param name="mode">Mode Arduino.INPUT or Arduino.OUTPUT.</param>
-  public void pinMode(int pin, int mode)
+  public override  void pinMode(int pin, int mode)
   {
     byte[] message = new byte[3];
     message[0] = (byte)(SET_PIN_MODE);
@@ -245,12 +246,34 @@ public class Arduino:Myro.Robot
     message = null;
   }
 
+
+  public override  void makePWM(int pin)
+  {
+    pinMode(pin, PWM);
+  }
+
+  public override void makeServo(int pin)
+  {
+    pinMode(pin, SERVO);
+  }
+
+  public override  void makeInput(int pin)
+  {
+    pinMode(pin, INPUT);
+  }
+
+  public override void makeOutput(int pin)
+  {
+    Console.WriteLine(pin + " is an output");
+    pinMode(pin, OUTPUT);
+  }
+
   /// <summary>
   /// Write to a digital pin that has been toggled to output mode with pinMode() method.
   /// </summary>
   /// <param name="pin">The digital pin to write to.</param>
   /// <param name="value">Value either Arduino.LOW or Arduino.HIGH.</param>
-  public void digitalWrite(int pin, int value)
+  public override void digitalWrite(int pin, int value)
   {
     int portNumber = (pin >> 3) & 0x0F;
     byte[] message = new byte[3];
@@ -271,7 +294,7 @@ public class Arduino:Myro.Robot
   /// </summary>
   /// <param name="pin">Analog output pin.</param>
   /// <param name="value">PWM frequency from 0 (always off) to 255 (always on).</param>
-  public void analogWrite(int pin, int value)
+  public override void analogWrite(int pin, int value)
   {
     byte[] message = new byte[3];
     message[0] = (byte)(ANALOG_MESSAGE | (pin & 0x0F));
@@ -317,8 +340,8 @@ public class Arduino:Myro.Robot
 		  }
 		catch (Exception e)
 		  {
-		    Console.WriteLine(e);
-		    return;
+		    throw new Exception (String.Format ("Arduino write error: '{0}'", 
+                                                        e));
 		  }
 		int command;
 
