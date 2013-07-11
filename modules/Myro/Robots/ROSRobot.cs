@@ -6,16 +6,27 @@ using org.ros.@internal.loader;
 using org.ros.node.topic;
 using org.ros.message;
 using geometry_msgs;
-using turtlesim;
+using sensor_msgs;
+using java.net;
 
 public class ROSRobot: Myro.Robot, NodeMain
 {
   Publisher vel_publisher;
+  public Image lastImg;
+  private Subscriber imgSub;
   
   public ROSRobot ()
   {
     NodeMainExecutor nodeMainExecutor = DefaultNodeMainExecutor.newDefault();
       nodeMainExecutor.execute(this, NodeConfiguration.newPrivate());
+  }
+
+  public ROSRobot (String ourIP, String ROSIP)
+  {    
+    NodeMainExecutor nodeMainExecutor = DefaultNodeMainExecutor.newDefault();
+    NodeConfiguration nodeConfig = NodeConfiguration.newPublic(ourIP);
+    nodeConfig.setMasterUri(new URI("http://" + ROSIP + ":11311"));    
+    nodeMainExecutor.execute(this, nodeConfig);
   }
   
   public virtual GraphName getDefaultNodeName() 
@@ -26,6 +37,10 @@ public class ROSRobot: Myro.Robot, NodeMain
   public virtual void onStart(ConnectedNode node) 
   {
     vel_publisher = node.newPublisher("/cmd_vel", Twist._TYPE);
+
+    imgSub = node.newSubscriber("/usb_cam/image_raw", Image._TYPE);
+    imgSub.addMessageListener(new ImageHandler(this), 1);    
+
   }
       
   public virtual void onShutdown(Node node) {
@@ -37,6 +52,21 @@ public class ROSRobot: Myro.Robot, NodeMain
   public virtual void onError(Node node, System.Exception throwable) {
   }
 
+  private class ImageHandler: MessageListener
+  {
+    private ROSRobot outer;
+    public ImageHandler(ROSRobot ar): base()
+    {
+      outer = ar;   
+    }
+
+    public void onNewMessage(object o)
+    {
+      Image p = (Image)o;
+      outer.lastImg = p;
+    }
+  }
+
   public override void adjustSpeed ()
   {
     // set motors based on_lastTranslate and _lastRotate
@@ -45,8 +75,7 @@ public class ROSRobot: Myro.Robot, NodeMain
     velocity.getAngular().setZ(_lastRotate);
     vel_publisher.publish(velocity);	  
   }    
-  
-  
+    
   public override void waitForMove (double interval)
   {
     double start = Myro.currentTime ();
@@ -56,7 +85,6 @@ public class ROSRobot: Myro.Robot, NodeMain
 	adjustSpeed();
       }
   }
-
 
   public override void up (double speed)
   {
@@ -84,6 +112,10 @@ public class ROSRobot: Myro.Robot, NodeMain
     Twist velocity = (Twist)vel_publisher.newMessage();      
     velocity.getLinear().setY(-speed);
     vel_publisher.publish(velocity);	  
+  }
+  public override Graphics.Picture takePicture (string mode="jpeg")
+  {
+    return MyROS.rosRawRGBToPicture(lastImg.getData(), lastImg.getWidth(), lastImg.getHeight());
   }
   
 }

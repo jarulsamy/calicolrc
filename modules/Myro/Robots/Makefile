@@ -61,6 +61,7 @@ ROSRobot.dll: ROSRobot.cs
 		-r:../../../bin/Microsoft.Scripting.dll \
 		-r:../../../bin/Microsoft.Dynamic.dll \
 		-r:System.Drawing \
+		-r:../../MyROS.dll \
 		-r:../../ros.dll \
 		-r:IKVM.OpenJDK.Beans \
 		-r:IKVM.OpenJDK.Charsets \

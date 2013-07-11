@@ -16,7 +16,7 @@ using org.ros.exception;
 
 public class ROSARDrone: ROSRobot
 {
-  public Image lastImg;
+  public new Image lastImg;
   public Navdata lastNav;
   private Subscriber imgSub, navSub;
   Publisher takeoffPub, landPub, resetPub;
