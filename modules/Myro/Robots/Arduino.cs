@@ -187,8 +187,8 @@ public class Arduino:Myro.Robot
 
   public override void stop()
   {    
-    Console.WriteLine("stopping");
-    this.Close();
+    Console.WriteLine("stopping arduino");
+    //this.Close();
   }
 
   /// <summary>
