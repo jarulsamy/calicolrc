@@ -326,6 +326,9 @@ public class Arduino:Myro.Robot
     return _serialPort.BytesToRead;
   }
 
+  private readonly static int BUFFER_SIZE = 65536;
+  private byte []buffer = new byte[BUFFER_SIZE];
+  
   public void processInput()
   {
     while (_serialPort.IsOpen)
@@ -334,79 +337,85 @@ public class Arduino:Myro.Robot
 	  {
 	    lock (this)
 	      {
-		int inputData = 0;
+		int bytesRead = 0;
 		try
 		  {
-		    inputData = _serialPort.ReadByte();
+		    //inputData = _serialPort.ReadByte();
+		    bytesRead = _serialPort.Read(buffer, 0, 
+						 Math.Min(_serialPort.BytesToRead, BUFFER_SIZE));
 		  }
 		catch (Exception e)
 		  {
 		    Console.WriteLine(String.Format ("Arduino write error: '{0}'", 
 						     e));
 		  }
-		int command;
-
-		if (parsingSysex)
+		for (int i = 0; i < bytesRead; i++)
 		  {
-		    if (inputData == END_SYSEX)
+		    int inputData = buffer[i];
+		    int command;
+		    
+		    if (parsingSysex)
 		      {
-			parsingSysex = false;
-			//processSysexMessage();
+			if (inputData == END_SYSEX)
+			  {
+			    parsingSysex = false;
+			    //processSysexMessage();
+			  }
+			else
+			  {
+			    storedInputData[sysexBytesRead] = inputData;
+			    sysexBytesRead++;
+			  }
+		      }
+		    else if (waitForData > 0 && inputData < 128)
+		      {
+			waitForData--;
+			storedInputData[waitForData] = inputData;
+			
+			if (executeMultiByteCommand != 0 && waitForData == 0)
+			  {
+			    //we got everything
+			    switch (executeMultiByteCommand)
+			      {
+			      case DIGITAL_MESSAGE:
+				setDigitalInputs(multiByteChannel, (storedInputData[0] << 7) + storedInputData[1]);
+				break;
+			      case ANALOG_MESSAGE:
+				setAnalogInput(multiByteChannel, (storedInputData[0] << 7) + storedInputData[1]);
+				break;
+			      case REPORT_VERSION:
+				setVersion(storedInputData[1], storedInputData[0]);
+				break;
+			      }
+			  }
 		      }
 		    else
 		      {
-			storedInputData[sysexBytesRead] = inputData;
-			sysexBytesRead++;
-		      }
-		  }
-		else if (waitForData > 0 && inputData < 128)
-		  {
-		    waitForData--;
-		    storedInputData[waitForData] = inputData;
-                            
-		    if (executeMultiByteCommand != 0 && waitForData == 0)
-		      {
-			//we got everything
-			switch (executeMultiByteCommand)
+			if (inputData < 0xF0)
+			  {
+			    command = inputData & 0xF0;
+			    multiByteChannel = inputData & 0x0F;
+			  }
+			else
+			  {
+			    command = inputData;
+			    // commands in the 0xF* range don't use channel data
+			  }
+			switch (command)
 			  {
 			  case DIGITAL_MESSAGE:
-			    setDigitalInputs(multiByteChannel, (storedInputData[0] << 7) + storedInputData[1]);
-			    break;
+			    
 			  case ANALOG_MESSAGE:
-			    setAnalogInput(multiByteChannel, (storedInputData[0] << 7) + storedInputData[1]);
-			    break;
 			  case REPORT_VERSION:
-			    setVersion(storedInputData[1], storedInputData[0]);
+			    waitForData = 2;
+			    executeMultiByteCommand = command;
 			    break;
 			  }
 		      }
 		  }
-		else
-		  {
-		    if (inputData < 0xF0)
-		      {
-			command = inputData & 0xF0;
-			multiByteChannel = inputData & 0x0F;
-		      }
-		    else
-		      {
-			command = inputData;
-			// commands in the 0xF* range don't use channel data
-		      }
-		    switch (command)
-		      {
-		      case DIGITAL_MESSAGE:
-
-		      case ANALOG_MESSAGE:
-		      case REPORT_VERSION:
-			waitForData = 2;
-			executeMultiByteCommand = command;
-			break;
-		      }
-		  }
 	      }
 	  } 
-	Thread.Sleep(10);
+	Thread.Sleep(1);
       }
   }
 
