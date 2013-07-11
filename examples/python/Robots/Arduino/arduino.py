@@ -20,9 +20,8 @@ def blink():
         wait(.5)
 
 
-ard.pinMode(13, ard.OUTPUT)
-ard.pinMode(3, ard.PWM)
+ard.pinMode(13, ard.OUTPUT)        #led
+ard.pinMode(3, ard.PWM)            #led + resistor
 blink()
 pulse()
-
 ard.Close()
