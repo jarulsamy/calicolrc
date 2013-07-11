@@ -1535,7 +1535,7 @@ public static class Myro
         Math.Max (Math.Min (V, 255), 0));
 	}
 
-	[method: JigsawTab("M/Advanced 3")]
+	[method: JigsawTab("M/Advanced 4")]
         public static int analogRead (int port)
 	{
 	    if (robot != null) 
@@ -1544,7 +1544,7 @@ public static class Myro
 		throw new Exception("Robot has not been initialized");
 	}
 
-	[method: JigsawTab("M/Advanced 3")]
+	[method: JigsawTab("M/Advanced 4")]
         public static int digitalRead (int port)
 	{
 	    if (robot != null) 
@@ -1554,7 +1554,7 @@ public static class Myro
 	}
 
 
-	[method: JigsawTab("M/Advanced 3")]
+	[method: JigsawTab("M/Advanced 4")]
         public static void analogWrite (int port, int value)
 	{
 	    if (robot != null) 
@@ -1563,7 +1563,7 @@ public static class Myro
 		throw new Exception("Robot has not been initialized");
 	}
 
-	[method: JigsawTab("M/Advanced 3")]
+	[method: JigsawTab("M/Advanced 4")]
         public static void digitalWrite (int port, int value)
 	{
 	    if (robot != null) 
@@ -1573,7 +1573,7 @@ public static class Myro
 	}
 
 
-	[method: JigsawTab("M/Advanced 3")]
+	[method: JigsawTab("M/Advanced 4")]
         public static void pinMode (int port, int mode)
 	{
 	    if (robot != null) 
@@ -1582,7 +1582,7 @@ public static class Myro
 		throw new Exception("Robot has not been initialized");
 	}
 
-	[method: JigsawTab("M/Advanced 3")]
+	[method: JigsawTab("M/Advanced 4")]
         public static void makeInput (int port)
 	{
 	    if (robot != null) 
@@ -1591,7 +1591,7 @@ public static class Myro
 		throw new Exception("Robot has not been initialized");
 	}
 
-	[method: JigsawTab("M/Advanced 3")]
+	[method: JigsawTab("M/Advanced 4")]
         public static void makeDigitalOutput (int port)
 	{
 	    if (robot != null) 
@@ -1600,7 +1600,7 @@ public static class Myro
 		throw new Exception("Robot has not been initialized");
 	}
 
-	[method: JigsawTab("M/Advanced 3")]
+	[method: JigsawTab("M/Advanced 4")]
         public static void makePWMOutput (int port)
 	{
 	    if (robot != null) 
@@ -1609,7 +1609,7 @@ public static class Myro
 		throw new Exception("Robot has not been initialized");
 	}
 
-	[method: JigsawTab("M/Advanced 3")]
+	[method: JigsawTab("M/Advanced 4")]
         public static void makeServoOutput (int port)
 	{
 	    if (robot != null) 
