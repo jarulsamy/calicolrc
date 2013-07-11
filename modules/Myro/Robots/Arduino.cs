@@ -301,7 +301,7 @@ public class Arduino:Myro.Robot
     byte[] message = new byte[3];
     message[0] = (byte)(ANALOG_MESSAGE | (pin & 0x0F));
     message[1] = (byte)(value & 0x7F);
-    message[2] = (byte)(value >> 7);
+    message[2] = (byte)((value >> 7) & 0x7F);
     _serialPort.Write(message, 0, 3);
   }
 
