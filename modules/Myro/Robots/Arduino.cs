@@ -70,7 +70,7 @@ public class Arduino:Myro.Robot
   private const int END_SYSEX             = 0xF7; // end a MIDI SysEx message
   
   private SerialPort _serialPort;
-  public static  SerialPort _lastSerial;
+  public static  Arduino _last;
   private int delay;
 
   private int waitForData = 0;
@@ -84,8 +84,8 @@ public class Arduino:Myro.Robot
   private volatile int[] digitalInputData  = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
   private volatile int[] analogInputData   = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-  private int majorVersion = 0;
-  private int minorVersion = 0;
+  private int minorVersion, majorVersion;
+
   private Thread readThread = null;
   private object locker = new object();
 
@@ -102,17 +102,16 @@ public class Arduino:Myro.Robot
   public Arduino(string serialPortName, Int32 baudRate, bool autoStart, int delay)
   {
 
-    if (_lastSerial != null)
+    if (_last != null)
       {
-	_lastSerial.Close();
-	_lastSerial = null;
+	_last.Close();
       }
     
     _serialPort = new SerialPort(serialPortName, baudRate);
     _serialPort.DataBits = 8;
     _serialPort.Parity = Parity.None;
     _serialPort.StopBits = StopBits.One;
-    _lastSerial = _serialPort;
+    _last = this;
     if (autoStart)
       {
 		this.delay = delay;
@@ -188,8 +187,11 @@ public class Arduino:Myro.Robot
 
   public override void stop()
   {    
-    Console.WriteLine("stopping arduino");
-    //this.Close();
+  }
+
+  public override void uninit()
+  {    
+    Close();
   }
 
   /// <summary>
@@ -200,6 +202,7 @@ public class Arduino:Myro.Robot
     readThread.Join(500);
     readThread = null;
     _serialPort.Close();
+    _last = null;
   }
 
   /// <summary>
@@ -264,7 +267,6 @@ public class Arduino:Myro.Robot
 
   public override void makeOutput(int pin)
   {
-    Console.WriteLine(pin + " is an output");
     pinMode(pin, OUTPUT);
   }
 
@@ -332,7 +334,6 @@ public class Arduino:Myro.Robot
 	  {
 	    lock (this)
 	      {
-
 		int inputData = 0;
 		try
 		  {
@@ -340,8 +341,8 @@ public class Arduino:Myro.Robot
 		  }
 		catch (Exception e)
 		  {
-		    throw new Exception (String.Format ("Arduino write error: '{0}'", 
-                                                        e));
+		    Console.WriteLine(String.Format ("Arduino write error: '{0}'", 
+						     e));
 		  }
 		int command;
 
@@ -405,6 +406,7 @@ public class Arduino:Myro.Robot
 		  }
 	      }
 	  } 
+	Thread.Sleep(10);
       }
   }
 
