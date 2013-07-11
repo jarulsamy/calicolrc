@@ -4,7 +4,7 @@ import Processing
 
 makeRobot("Arduino", "/dev/ttyUSB0")
 makeServoOutput(6)                      #servo on 6
-makeDigitalOutput.pinMode(3)            #led on 3
+makePWMOutput(3)                   #led on 3
 window(800, 200)
 smooth()
 background(0)
@@ -14,8 +14,8 @@ x = 0
 def draw(o, e):
     global x
     v = analogRead(0)       #photoresistor on analog 0
-    y3 = Processing.map(v, 320, 0, 0, height())
-    servo = Processing.map(v, 0, 320, 255, 0)
+    y3 = Processing.map(v, 1024, 0, 0, height())
+    servo = Processing.map(v, 0, 1024, 255, 0)
     analogWrite(3, servo)
     analogWrite(6, servo)
     fill(255, 0, 196)

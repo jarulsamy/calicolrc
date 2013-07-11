@@ -12,7 +12,7 @@ x = 0
 def draw(o, e):
     global x
     v = analogRead(0)
-    y3 = Processing.map(v, 512, 0, 0, height())
+    y3 = Processing.map(v, 1024, 0, 0, height())
 
     fill(255, 0, 196)
     ellipse(x, y3, 3, 3)
