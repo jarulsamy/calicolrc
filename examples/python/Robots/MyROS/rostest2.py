@@ -5,6 +5,7 @@ from org.ros.address import *
 from org.ros.message import MessageListener
 from turtlesim import *
 from std_srvs import *
+import MyROS
 
 class ROSTurtle(NodeMain):
 
@@ -45,6 +46,8 @@ class ROSTurtle(NodeMain):
 #roscore = RosCore.newPublic()
 #roscore.start()
 #time.sleep(5)
+
+MyROS.ROSRun("turtlesim", "turtlesim_node")
 
 turtle = ROSTurtle()
 nodeMainExecutor = DefaultNodeMainExecutor.newDefault()

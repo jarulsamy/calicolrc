@@ -8,7 +8,6 @@ import sensor_msgs
 from geometry_msgs import Twist
 from ardrone_autonomy import Navdata
 from Myro import *
-
 import MyROS
 
 class ARDrone(NodeMain):
@@ -193,6 +192,8 @@ class ARDrone(NodeMain):
 #roscore = RosCore.newPublic()
 #roscore.start()
 #time.sleep(5)
+
+MyROS.ROSRun("ardrone_autonomy", "ardrone_driver")
 
 drone = ARDrone()
 nodeMainExecutor = DefaultNodeMainExecutor.newDefault()

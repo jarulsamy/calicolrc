@@ -2,6 +2,7 @@ from org.ros.namespace import GraphName
 from org.ros.node import *
 from turtlesim import *
 import time
+import MyROS
 
 class ROSTurtle(NodeMain):
 
@@ -33,6 +34,8 @@ class ROSTurtle(NodeMain):
 #roscore = RosCore.newPublic()
 #roscore.start()
 #time.sleep(5)
+
+MyROS.ROSRun("turtlesim", "turtlesim_node")
 
 turtle = ROSTurtle()
 nodeMainExecutor = DefaultNodeMainExecutor.newDefault()
