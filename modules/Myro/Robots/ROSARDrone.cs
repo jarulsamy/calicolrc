@@ -23,7 +23,10 @@ public class ROSARDrone: ROSRobot
   private int msginterval = 5;
   private ConnectedNode node;
   
-  public ROSARDrone ():base(){}
+  public ROSARDrone ():base(){
+      MyROS.ROSRun("ardrone_autonomy", "ardrone_driver");
+  }
+
   public ROSARDrone  (String ourIP, String ROSIP):base(ourIP, ROSIP){}
   
   public override GraphName getDefaultNodeName() 

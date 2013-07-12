@@ -1,8 +1,5 @@
 from Myro import *
 
-calico.ROSCore()
-calico.ROSRun("ardrone_autonomy", "ardrone_driver")
-
 makeRobot("ROSARDrone")
 speak("Please prepare for liftoff")
 for i in range(5, 0, -1):

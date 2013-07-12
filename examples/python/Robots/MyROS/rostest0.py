@@ -1,6 +1,7 @@
 from org.ros.namespace import GraphName
 from org.ros.node import *
 from turtlesim import *
+import MyROS
 
 class ROSTurtle(NodeMain):
 
@@ -16,8 +17,7 @@ class ROSTurtle(NodeMain):
   def onStart(self, node):
     self.publisher = node.newPublisher("/turtle1/command_velocity", Velocity._TYPE);
 
-calico.ROSCore()
-calico.ROSRun("turtlesim", "turtlesim_node")
+MyROS.ROSRun("turtlesim", "turtlesim_node")
 
 turtle = ROSTurtle()
 nodeMainExecutor = DefaultNodeMainExecutor.newDefault()
