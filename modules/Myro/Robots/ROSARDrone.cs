@@ -24,6 +24,7 @@ public class ROSARDrone: ROSRobot
   private ConnectedNode node;
   
   public ROSARDrone ():base(){}
+  public ROSARDrone  (String ourIP, String ROSIP):base(ourIP, ROSIP){}
   
   public override GraphName getDefaultNodeName() 
   {
