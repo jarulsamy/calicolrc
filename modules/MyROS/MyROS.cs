@@ -129,8 +129,12 @@ public static class MyROS
 	// look for a running process
 	foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcesses()) {
 	    // System.Console.WriteLine(process.ProcessName);
-	    if (process.ProcessName == package) {
-		return true;
+	    try {
+		if (process.ProcessName == package) {
+		    return true;
+		}
+	    } catch {
+		// process no longer around
 	    }
 	}
 	return false;
