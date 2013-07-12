@@ -100,7 +100,11 @@ public static class MyROS
 	myProcess.StartInfo.FileName = "roscore";
 	myProcess.StartInfo.CreateNoWindow = true;
 	myProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-	myProcess.Start();
+	try {
+	    myProcess.Start();
+	} catch {
+	    System.Console.Error.WriteLine("ROSCore: unable to start roscore");
+	}
     }
     
     public static void ROSRun(string package, string executable, params string [] arguments) {
@@ -113,7 +117,11 @@ public static class MyROS
 	    myProcess.StartInfo.Arguments = (package + " " + executable + " " + String.Join(" ", arguments));
 	    myProcess.StartInfo.CreateNoWindow = true;
 	    myProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-	    myProcess.Start();
+	    try {
+		myProcess.Start();
+	    } catch {
+		System.Console.Error.WriteLine("ROSRun: unable to start 'rosrun {0} {1}...'", package, executable);
+	    }
 	}
     }
     
