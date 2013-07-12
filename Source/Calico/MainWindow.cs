@@ -22,6 +22,7 @@
 using Mono.Unix;
 using System;
 using System.IO;
+using System.Diagnostics;
 
 // Path
 using System.Threading;
@@ -2249,6 +2250,41 @@ namespace Calico {
             }
             return true;
         }
+
+	public void ROSCore() {
+	    // It is ok to try to start roscore more than once
+	    Process myProcess = new Process ();
+	    myProcess.StartInfo.UseShellExecute = false;
+	    myProcess.StartInfo.FileName = "roscore";
+	    myProcess.StartInfo.CreateNoWindow = true;
+	    myProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+	    myProcess.Start();
+	}
+
+	public void ROSRun(string package, string executable, params string [] arguments) {
+	    // Only run if not already running
+	    if (!ROSRunning(executable)) {
+		Process myProcess = new Process ();
+		myProcess.StartInfo.UseShellExecute = false;
+		myProcess.StartInfo.FileName = "rosrun";
+		myProcess.StartInfo.Arguments = (package + " " + executable + " " + String.Join(" ", arguments));
+		myProcess.StartInfo.CreateNoWindow = true;
+		myProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+		myProcess.Start();
+	    }
+	}
+
+
+	public bool ROSRunning(string package) {
+	    // look for a running process
+	    foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcesses()) {
+		// System.Console.WriteLine(process.ProcessName);
+		if (process.ProcessName == package) {
+		    return true;
+		}
+	    }
+	    return false;
+	}
 
         public bool Execute(string text, string language) {
             return manager [language].engine.Execute(text, false);
