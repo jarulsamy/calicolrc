@@ -8,9 +8,11 @@ using org.ros.node.topic;
 using org.ros.message;
 using geometry_msgs;
 using turtlesim;
+using System.Collections.Generic;
 
 public static class MyROS
 {
+    public static readonly ProcessManager processManager = new ProcessManager();
   
   public static Graphics.Picture rosRawRGBToPicture(org.jboss.netty.buffer.ChannelBuffer cbuffer,
 						    int width,
@@ -105,6 +107,22 @@ public static class MyROS
 	} catch {
 	    System.Console.Error.WriteLine("ROSCore: unable to start roscore");
 	}
+	// Can't find by process:
+	//processManager.Add(myProcess);
+    }
+    
+    public static void KillROSCore() {
+	Process myProcess = new Process ();
+	myProcess.StartInfo.UseShellExecute = false;
+	myProcess.StartInfo.FileName = "killall";
+	myProcess.StartInfo.Arguments = "roscore";
+	myProcess.StartInfo.CreateNoWindow = true;
+	myProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+	try {
+	    myProcess.Start();
+	} catch {
+	    System.Console.Error.WriteLine("KillROSCore: unable to kill roscore");
+	}
     }
     
     public static void ROSRun(string package, string executable, params string [] arguments) {
@@ -122,6 +140,7 @@ public static class MyROS
 	    } catch {
 		System.Console.Error.WriteLine("ROSRun: unable to start 'rosrun {0} {1}...'", package, executable);
 	    }
+	    processManager.Add(executable);
 	}
     }
     
@@ -138,5 +157,46 @@ public static class MyROS
 	    }
 	}
 	return false;
+    }
+}
+
+public class ProcessManager {
+    List<string> sprocesses = null;
+    List<Process> pprocesses = null;
+    public ProcessManager() {
+	sprocesses = new List<string>();
+	pprocesses = new List<Process>();
+    }
+    ~ProcessManager() {
+	// Manually kill roscore:
+	MyROS.KillROSCore();
+	// Next kill direct processes:
+	foreach(Process pprocess in pprocesses) {
+	    try {
+		if (!pprocess.HasExited) {
+		    pprocess.Kill();
+		}
+	    } catch {
+		// failed for some reason
+	    }
+	}
+	// Next, search by name:
+	foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcesses()) {
+	    try {
+		foreach (string name in sprocesses) {
+		    if (process.ProcessName.EndsWith(name)) {
+			process.Kill();
+		    }
+		}
+	    } catch {
+		// pass, doesn't exist anymore
+	    }
+	}
+    }
+    public void Add(string process) {
+	sprocesses.Add(process);
+    }
+    public void Add(Process process) {
+	pprocesses.Add(process);
     }
 }
