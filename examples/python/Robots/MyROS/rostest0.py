@@ -16,6 +16,8 @@ class ROSTurtle(NodeMain):
   def onStart(self, node):
     self.publisher = node.newPublisher("/turtle1/command_velocity", Velocity._TYPE);
 
+calico.ROSCore()
+calico.ROSRun("turtlesim", "turtlesim_node")
 
 turtle = ROSTurtle()
 nodeMainExecutor = DefaultNodeMainExecutor.newDefault()

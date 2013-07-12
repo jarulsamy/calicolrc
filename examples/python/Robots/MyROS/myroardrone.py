@@ -1,5 +1,8 @@
 from Myro import *
 
+calico.ROSCore()
+calico.ROSRun("ardrone_autonomy", "ardrone_driver")
+
 makeRobot("ROSARDrone")
 speak("Please prepare for liftoff")
 for i in range(5, 0, -1):
@@ -16,4 +19,4 @@ for t in timer(10):
     show(p)
 land()
 
-savePicture(lst, "scienceposse.gif")
+savePicture(lst, "animation.gif")
