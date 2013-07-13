@@ -3278,29 +3278,33 @@ public static class Graphics
     
 	    public void undraw ()
 	    {
-		if (drawn_on_shape != null && drawn_on_shape.shapes != null) {
-		    lock (drawn_on_shape.shapes) {
-			if (drawn_on_shape.shapes.Contains (this)) {
-			    drawn_on_shape.shapes.Remove (this);
-			    //System.Console.Error.WriteLine("Removed from shape!");
-			}
-		    }
-		    drawn_on_shape = null;
-		}
-		if (window != null) {
-		    if (window._canvas != null && window._canvas.shapes != null) {
-			lock (window.getCanvas().shapes) {
-			    if (window._canvas.world != null) {
-				removeFromPhysics ();
+		InvokeBlocking( delegate {
+			if (drawn_on_shape != null && drawn_on_shape.shapes != null) {
+			    lock (drawn_on_shape.shapes) {
+				if (drawn_on_shape.shapes.Contains (this)) {
+				    drawn_on_shape.shapes.Remove (this);
+				    drawn_on_shape.QueueDraw();
+				    //System.Console.Error.WriteLine("Removed from shape!");
+				}
 			    }
-			    if (window.getCanvas ().shapes.Contains (this)) {
-				window.getCanvas ().shapes.Remove (this);
-				//System.Console.Error.WriteLine("Removed from win!");
-				window = null;
+			    drawn_on_shape = null;
+			}
+			if (window != null) {
+			    if (window._canvas != null && window._canvas.shapes != null) {
+				lock (window.getCanvas().shapes) {
+				    if (window._canvas.world != null) {
+					removeFromPhysics ();
+				    }
+				    if (window.getCanvas ().shapes.Contains (this)) {
+					window.getCanvas ().shapes.Remove (this);
+					//System.Console.Error.WriteLine("Removed from win!");
+					window.QueueDraw();
+					window = null;
+				    }
+				}
 			    }
 			}
-		    }
-		}
+		    });
 	    }
 	    
 	    public Gradient gradient {
