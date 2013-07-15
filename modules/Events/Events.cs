@@ -134,6 +134,9 @@ public static class Events {
 	  new Dictionary<string,List<Tuple<Func<object,Event,object>,object>>>();
   public static Thread thread = null;
   public static Calico.MainWindow calico = null;
+  static Dictionary<int,Tuple<Func<object,Event,object>,object>> assoc = 
+	new Dictionary<int,Tuple<Func<object,Event,object>,object>>();
+  static int counter = 0;
   
   public static void publish (Event evt) {
       // Event for a particular obj, already set
@@ -202,20 +205,20 @@ public static class Events {
       }
   }
 
-  public static void subscribe (string message, Func<object,Event,object> function) {
-      subscribe(message, function, null, null);
+  public static int subscribe (string message, Func<object,Event,object> function) {
+      return subscribe(message, function, null, null);
   }
   
-  public static void subscribe (Calico.MainWindow calico, string message, Func<object,Event,object> function) {
-	subscribe(message, function, null, calico);
+  public static int subscribe (Calico.MainWindow calico, string message, Func<object,Event,object> function) {
+	return subscribe(message, function, null, calico);
   }
   
-  public static void subscribe (string message, Func<object,Event,object> function, 
+  public static int subscribe (string message, Func<object,Event,object> function, 
 	  object obj) {
-      subscribe(message, function, obj, null);
+      return subscribe(message, function, obj, null);
   }
 
-  private static void subscribe (string message, Func<object,Event,object> function, 
+  private static int subscribe (string message, Func<object,Event,object> function, 
 				object obj, Calico.MainWindow calico) {
       string id = getID(obj, message);
       lock (handler) {
@@ -223,9 +226,25 @@ public static class Events {
 	  if (!handler.ContainsKey(id)) {
 	      handler[id] = new List<Tuple<Func<object,Event,object>,object>>();
 	  }
-	  handler[id].Add(Tuple.Create(function, obj));
+	  var tuple = Tuple.Create(function, obj);
+	  handler[id].Add(tuple);
+	  counter++;
+	  assoc[counter] = tuple;
       }
+      return counter;
   }
+
+    public static void unsubscribe(int id) {
+	foreach(string key in handler.Keys) {
+	    List<Tuple<Func<object,Event,object>,object>> list = handler[key];
+	    foreach (Tuple<Func<object,Event,object>,object> tuple in list) {
+		if (tuple == assoc[id]) {
+		    list.Remove(tuple);
+		    return;
+		}
+	    }
+	}
+    }
 
   public static void loop() {
 	while (true) {
