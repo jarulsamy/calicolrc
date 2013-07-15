@@ -27,56 +27,68 @@ public class Hummingbird : Finch
     {
         if (streams[robotType] != null)
         {
-            try
-            {
-                if (position == "t1")
+	    if (position == "t1")
                 {
-                    color = value.ToString();
-                    int red = Int32.Parse(color.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
-                    int green = Int32.Parse(color.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
-                    int blue = Int32.Parse(color.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
-                    byte[] report = makePacket((byte)'O', (byte)48, (byte)red, (byte)green, (byte)blue );
-                    WriteBytes(report);
+		    try {
+			color = value.ToString();
+			int red = Int32.Parse(color.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+			int green = Int32.Parse(color.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+			int blue = Int32.Parse(color.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+			byte[] report = makePacket((byte)'O', (byte)48, (byte)red, (byte)green, (byte)blue );
+			WriteBytes(report);
+		    } catch {
+			try { // a tuple?
+			    IList<object> list = (IList<object>)value;
+			    int red = (int)list[0];
+			    int green = (int)list[1];
+			    int blue = (int)list[2];
+			    color = String.Format("#{0}{1}{2}", red.ToString("X"), green.ToString("X"), blue.ToString("X"));
+			    byte[] report = makePacket((byte)'O', (byte)red, (byte)green, (byte)blue);
+			    WriteBytes (report);
+			} catch {
+			    throw new Exception (String.Format ("invalid color: '{0}', use '#RRGGBB' or (0-255,0-255,0-255)", value));
+			}
+		    }
+		    
                 }
-                else if (position == "t2")
+	    else if (position == "t2")
                 {
-                    string color = value.ToString();
-                    int red = Int32.Parse(color.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
-                    int green = Int32.Parse(color.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
-                    int blue = Int32.Parse(color.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
-                    byte[] report = makePacket((byte)'O', (byte)49, (byte)red, (byte)green, (byte)blue );
-                    WriteBytes(report);
+		    try {
+			string color = value.ToString();
+			int red = Int32.Parse(color.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+			int green = Int32.Parse(color.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+			int blue = Int32.Parse(color.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+			byte[] report = makePacket((byte)'O', (byte)49, (byte)red, (byte)green, (byte)blue );
+			WriteBytes(report);
+		    } catch {
+			throw new Exception (String.Format ("invalid color: '{0}', use '#RRGGBB' or (0-255,0-255,0-255)", value));
+		    }
                 }
-                else if (position == "s1")
+	    else if (position == "s1")
                 {
                     int intensity = (int)value;
                     byte[] report = makePacket((byte)'L', (byte)48, (byte)intensity );
                     WriteBytes(report);
                 }
-                else if (position == "s2")
+	    else if (position == "s2")
                 {
                     int intensity = (int)value;
                     byte[] report = makePacket((byte)'L', (byte)49, (byte)intensity );
                     WriteBytes(report);
                 }
-                else if (position == "s3")
+	    else if (position == "s3")
                 {
                     int intensity = (int)value;
                     byte[] report = makePacket((byte)'L', (byte)50, (byte)intensity );
                     WriteBytes(report);
                 }
-                else if (position == "s4")
+	    else if (position == "s4")
                 {
                     int intensity = (int)value;
                     byte[] report = makePacket((byte)'L', (byte)51, (byte)intensity );
                     WriteBytes(report);
                 }
-            }
-            catch 
-            {
-                Console.Error.WriteLine("Bad input");
-            }
-        }
+	}
     }
 
     /// <summary>
@@ -206,6 +218,7 @@ public class Hummingbird : Finch
                 Console.Error.WriteLine("Incorrect input");
             }
             double returnData = (double)get(sensor);
+	    // return data
             if (temp == "temperature")
             {
                 return (returnData - 127) / 2.4 + 25;
@@ -223,10 +236,13 @@ public class Hummingbird : Finch
                 dist -= 1.9442731496914311 * Math.Pow(10, -8) * Math.Pow(returnData, 5);
                 return dist;
             }
-            else
-            {
+            else if (temp == "light") {
                 return returnData;
-            }
+	    } else if (temp == "rotary") {
+                return returnData;
+            } else {
+		throw new Exception(String.Format("invalid sensor '{0}: should be: 'temperature', 'light', 'distance', or 'rotary'", temp));
+	    }
 
         }
         return null;

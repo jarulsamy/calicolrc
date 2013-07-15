@@ -203,22 +203,32 @@ public class Finch: Myro.Robot
 	/// Example: "#00FF00"</param>
 	public override void setLED (string position, object value)
 	{
-		if (streams[robotType] != null) {
-			if (position == "front" || position == "center" || position == "middle" || position == "all") {
-				try {
-				        color = value.ToString();
-					red = Int32.Parse (color.Substring (1, 2), System.Globalization.NumberStyles.HexNumber);
-					green = Int32.Parse (color.Substring (3, 2), System.Globalization.NumberStyles.HexNumber);
-					blue = Int32.Parse (color.Substring (5, 2), System.Globalization.NumberStyles.HexNumber);
-					byte[] report = makePacket((byte)'O', (byte)red, (byte)green, (byte)blue);
-					WriteBytes (report);
-				} catch {
-					//Do nothing
-				}
-			} else {
-				throw new Exception (String.Format ("no such LED: '{0}'", position));
+	    if (streams[robotType] != null) {
+		if (position == "front" || position == "center" || position == "middle" || position == "all") {
+		    try { // a string representation?
+			color = value.ToString();
+			red = Int32.Parse (color.Substring (1, 2), System.Globalization.NumberStyles.HexNumber);
+			green = Int32.Parse (color.Substring (3, 2), System.Globalization.NumberStyles.HexNumber);
+			blue = Int32.Parse (color.Substring (5, 2), System.Globalization.NumberStyles.HexNumber);
+			byte[] report = makePacket((byte)'O', (byte)red, (byte)green, (byte)blue);
+			WriteBytes (report);
+		    } catch {
+			try { // a tuple?
+			    IList<object> list = (IList<object>)value;
+			    red = (int)list[0];
+			    green = (int)list[1];
+			    blue = (int)list[2];
+			    color = String.Format("#{0}{1}{2}", red.ToString("X"), green.ToString("X"), blue.ToString("X"));
+			    byte[] report = makePacket((byte)'O', (byte)red, (byte)green, (byte)blue);
+			    WriteBytes (report);
+			} catch {
+			    throw new Exception (String.Format ("invalid color: '{0}', use '#RRGGBB' or (0-255,0-255,0-255)", value));
 			}
+		    }
+		} else {
+		    throw new Exception (String.Format ("no such LED: '{0}'", position));
 		}
+	    }
 	}
 
 	/// <summary>
