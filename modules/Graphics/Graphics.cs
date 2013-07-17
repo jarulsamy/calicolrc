@@ -1262,10 +1262,6 @@ public static class Graphics
 			KeyPressEvent += HandleKeyPressCallbacks;
 			KeyReleaseEvent += HandleKeyReleaseCallbacks;
 			// ------------------------------------------
-			ButtonPressEvent += HandleClickOnShape;
-			ButtonReleaseEvent += HandleMouseUpOnShape;
-			MotionNotifyEvent += HandleMouseMovementOnShape;
-			// ------------------------------------------
 			//ConfigureEvent += configureEventBefore;
 			DeleteEvent += OnDelete;
 			Add(_canvas);
@@ -1522,6 +1518,16 @@ public static class Graphics
 			}
 		}
     
+		public void listen(string evt) {
+		    if (evt == "mouse-motion") {
+			MotionNotifyEvent += HandleMouseMovementOnShape;
+		    } else if (evt == "mouse-press") {
+			ButtonPressEvent += HandleClickOnShape;
+		    } else if (evt == "mouse-release") {
+			ButtonReleaseEvent += HandleMouseUpOnShape;
+		    }
+		}
+
 		private void HandleMouseMovementOnShape (object obj,
                       Gtk.MotionNotifyEventArgs args)
 		{
