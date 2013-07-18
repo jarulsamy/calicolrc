@@ -1099,7 +1099,6 @@ public static class Processing
 	[JigsawTab("P/Environ")]
 	public static int second()
 	{	// Gets the number of seconds on the system clock [0, 59]
-		if (_p == null) return 0;
 		return DateTime.Now.Second;
 	}
 
@@ -1107,7 +1106,6 @@ public static class Processing
 	[JigsawTab("P/Environ")]
 	public static int minute()
 	{	// Gets the number of minutes on the system clock [0, 59]
-		if (_p == null) return 0;
 		return DateTime.Now.Minute;
 	}
 
@@ -1115,7 +1113,6 @@ public static class Processing
 	[JigsawTab("P/Environ")]
 	public static int hour()
 	{	// Gets the number of hours on the system clock [0, 23]
-		if (_p == null) return 0;
 		return DateTime.Now.Hour;
 	}
 	
@@ -1123,7 +1120,6 @@ public static class Processing
 	[JigsawTab("P/Environ")]
 	public static int day()
 	{	// Gets the number of days on the system clock [1, 31]
-		if (_p == null) return 0;
 		return DateTime.Now.Day;
 	}
 	
@@ -1131,7 +1127,6 @@ public static class Processing
 	[JigsawTab("P/Environ")]
 	public static int month()
 	{	// Gets the number of months on the system clock [1, 12]
-		if (_p == null) return 0;
 		return DateTime.Now.Month;
 	}
 		
@@ -1139,7 +1134,6 @@ public static class Processing
 	[JigsawTab("P/Environ")]
 	public static int year()
 	{	// Gets the year
-		if (_p == null) return 0;
 		return DateTime.Now.Year;
 	}
 
