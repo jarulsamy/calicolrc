@@ -1087,18 +1087,28 @@ public class Scribbler: Myro.Robot
 
     public override List getBlob ()
     {
-        write (Scribbler.GET_BLOB);
-        int numpixs = read_2byte ();
-        int xloc = (int)read_byte ();
-        int yloc = (int)read_byte ();
-        if (isFluke2()){
-            xloc <<= 3;
-            yloc <<= 2;
+        int old = serial.ReadTimeout; // milliseconds
+
+        if (isFluke2()){ // image functions can take a long time
+            serial.ReadTimeout = 10000; // milliseconds
         }
+
+	write (Scribbler.GET_BLOB);
+	int numpixs = read_2byte ();
+	int xloc = (int)read_byte ();
+	int yloc = (int)read_byte ();
+	if (isFluke2()){
+	  xloc <<= 3;
+	  yloc <<= 2;
+	}
+	
+	if (isFluke2()){ // image functions can take a long time
+	  serial.ReadTimeout = old; // milliseconds
+	}
         return list (numpixs, xloc, yloc);
     }
-
-    public int read_2byte ()
+	
+	public int read_2byte ()
     {
         byte hbyte = read_byte ();
         byte lbyte = read_byte ();
