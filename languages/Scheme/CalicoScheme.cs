@@ -48,7 +48,6 @@ public class CalicoSchemeEngine : Engine
 	  use_stack_trace = true;
       }
       PJScheme.set_use_stack_trace(use_stack_trace);
-      PJScheme.initialize_execute();
   }
 
   public override bool Execute(string text, bool ok) {
@@ -64,14 +63,17 @@ public class CalicoSchemeEngine : Engine
   public void format_trace_back(object list) {
       object current = list;
       while (current != Scheme.EmptyList) {
-	  Scheme.Cons info = (Scheme.Cons)Scheme.car(current);
-	  object message = Scheme.car(info);
-	  object line = Scheme.cadr(info);
-	  object column = Scheme.caddr(info);
-	  object proc_name = Scheme.cadddr(info);
-	  System.Console.Error.WriteLine(
-	       String.Format("  File \"{0}\", line {1}, col {2}, calling '{3}'", 
-			     message, line, column, proc_name));
+          object info = Scheme.car(current);
+	  if (info.ToString() == "macro-generated-exp") {
+              // nothing to print
+          } else {
+              object message = Scheme.car(info);
+              object line = Scheme.cadr(info);
+              object column = Scheme.caddr(info);
+              object proc_name = Scheme.cadddr(info);
+              System.Console.Error.WriteLine(String.Format("  File \"{0}\", line {1}, col {2}, in {3}", 
+                                                           message, line, column, proc_name));
+          }
 	  current = Scheme.cdr(current);
       }
   }
@@ -185,7 +187,6 @@ public class CalicoSchemeEngine : Engine
 	      else
 		  expr = line;
 	      if (scheme.engine.ReadyToExecute(expr)) {
-		  PJScheme.initialize_execute();
 		  scheme.engine.Execute(expr, true);
 		  expr = "";
 		  prompt = "scheme>>> ";

@@ -10,8 +10,8 @@
 (define *class* 'PJScheme) ;; 'undefined to use filename
 
 (define *ignore-definitions*
-  '(void-value scheme-REP-k scheme-REP-handler scheme-REP-fail start restart read-line
-	       raw-read-line Main read-content string->integer string->decimal
+  '(void-value start-rm restart-rm read-eval-print-loop-rm read-line raw-read-line
+	       Main read-content string->integer string->decimal
 	       string->rational tagged-list testall string-split get-current-time
 	       type? make-initial-env-extended 
 	       make-proc 
@@ -37,7 +37,12 @@
     (increment-scan-counters "void" ())
     (initialize-scan-counters "void" ())
     (mark-token-start "void" ())
+    (execute-string "void" ("string"))
+    (execute-file "void" ("string"))
     (execute-next-expression "void" ())
+    (execute-next-expression-rm "void" ())
+    (execute-rm "object" ("string" "object"))
+    (execute-loop-rm "object" ("object"))
     (symbol<? "bool" ())
     (string<? "bool" ())
     (apply-extension "void" ())
@@ -52,10 +57,6 @@
 ;;    (read-file "void" ("object"))
     (pc "Function" ("null"))
     (Main "void" ("string []"))
-    (execute-rm "object" ("string" "object"))
-    (execute-loop-rm "object" ("object"))
-    (execute-string "void" ("string"))
-    (execute-file "void" ("string"))
     (make-toplevel-env "object" ())
     (make-macro-env^ "object" ())
     (make-empty-environment "object" ())
@@ -111,6 +112,7 @@
     (format-stack-trace "object" ())
     (set-use-stack-trace "void" ())
     (get-use-stack-trace "object" ())
+    (initialize-execute "void" ())
     ))
 
 (define *system-ignore-definitions*
@@ -264,13 +266,6 @@
    public static void decrement_closure_depth ()
    {
       _closure_depth--;
-   }
-
-   public static void initialize_execute ()
-   {
-      _closure_depth = 0;
-      _trace_pause = false;
-      initialize_stack_trace();
    }
 
    public static object repeat(object item, object times) {

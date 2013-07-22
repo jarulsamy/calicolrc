@@ -161,6 +161,7 @@
     (test-loop)
     (test-macros)
     (test-quasiquote)
+    (test-try)
     ))
 
 (define verify
@@ -194,9 +195,9 @@
       ((lambda (a b . z) (list a b z)) 1 2 3))
     (verify '(1 2 ())
       ((lambda (a b . z) (list a b z)) 1 2))
-    (verify "runtime error: not enough arguments in application at line 198, char 12 of examples.ss"
+    (verify "not enough arguments in application"
       (try ((lambda (a b . z) (list a b z)) 1)
-           (catch e e)))
+           (catch e (car (cdr e)))))
     ))
 
 (define test-define
@@ -257,7 +258,7 @@
            (catch x (print 'hello) 77)))
     (verify 3
       (try 3 (finally (print 'hi) 4)))
-    (verify 'ok
+    (verify (void)
       (define div (lambda (x y) (if (= y 0) (raise "division by zero") (/ x y)))))
     (verify 5
       (div 10 2))
@@ -333,5 +334,5 @@
         ((orange) () 'no)
         (else 2 3 4)))))
 
-(test-all)
-(exit)
+;;(test-all)
+;;(exit)

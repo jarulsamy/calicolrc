@@ -392,9 +392,9 @@
 	   ((and (= (length^ adatum) 3) (catch?^ (caddr^ adatum)))
 	    (aparse (try-body^ adatum) senv handler fail
 	      (lambda-cont2 (body fail)
-		(aparse-all (catch-exps^ adatum) senv handler fail
-		  (lambda-cont2 (cexps fail)
-		    (let ((cvar (catch-var^ adatum)))
+		 (let ((cvar (catch-var^ adatum)))
+		   (aparse-all (catch-exps^ adatum) (cons (list cvar) senv) handler fail
+		     (lambda-cont2 (cexps fail)
 		      (k (try-catch-aexp body cvar cexps info) fail)))))))
 	   ;; (try <body> (finally <exp> ...))
 	   ((and (= (length^ adatum) 3) (finally?^ (caddr^ adatum)))
@@ -407,11 +407,11 @@
 	   ((and (= (length^ adatum) 4) (catch?^ (caddr^ adatum)) (finally?^ (cadddr^ adatum)))
 	    (aparse (try-body^ adatum) senv handler fail
 	      (lambda-cont2 (body fail)
-		(aparse-all (catch-exps^ adatum) senv handler fail
-		  (lambda-cont2 (cexps fail)
-		    (aparse-all (try-catch-finally-exps^ adatum) senv handler fail
-		      (lambda-cont2 (fexps fail)
-			(let ((cvar (catch-var^ adatum)))
+		(let ((cvar (catch-var^ adatum)))
+		  (aparse-all (catch-exps^ adatum) (cons (list cvar) senv) handler fail
+		    (lambda-cont2 (cexps fail)
+		      (aparse-all (try-catch-finally-exps^ adatum) senv handler fail
+			(lambda-cont2 (fexps fail)
 			  (k (try-catch-finally-aexp body cvar cexps fexps info) fail)))))))))
 	   (else (aparse-error "bad try syntax:" adatum handler fail))))
 	((raise?^ adatum)
@@ -911,7 +911,9 @@
       (let ((macro (get-first-frame-value macro-keyword macro-env)))
 	(if (pattern-macro? macro)
 	    (process-macro-clauses^
-	      (macro-clauses macro) (macro-aclauses macro) adatum handler fail k)
+	      (macro-clauses macro) (macro-aclauses macro) adatum handler fail
+	      (lambda-cont2 (asexp fail)
+		(k (replace-info asexp (snoc macro-keyword (get-source-info asexp))) fail)))
 	    ;; macro transformer functions take 1-arg continuations:
 	    (macro adatum handler fail
 	      (lambda-cont (v)

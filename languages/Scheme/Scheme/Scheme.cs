@@ -451,7 +451,7 @@ public class Scheme {
 	return (path, args) => call_external_proc(tname, path, args);
   }
   
-  public static object make_initial_env_extended (object env) {
+    public static object make_initial_env_extended (object names, object procs) {
       // ProcedureN - N is arg count coming in
       // -1, 1, 2 - number of pieces to call app with (-1 is all)
       // 0, 1, 2 - return type 0 = void, 1 = object, 2 = bool
@@ -514,17 +514,18 @@ public class Scheme {
       /// -------------------
       // FIXME: remove check when done
       // Check to see if overwriting a previously defined primitive:
-      object scheme_primitives = PJScheme.dir(EmptyList, env);
       object current = primitives;
       while (current != EmptyList) {
       	  object sym = caar(current);
-	  if (true_q(member(sym, scheme_primitives))) {
+	  if (true_q(member(sym, names))) {
 	      printf("WARNING: C# overwrites Scheme function '{0}'\n", sym);
 	  }
 	  current = cdr(current);
       }
       /// -------------------
-      return PJScheme.extend(env,  map(car_proc, primitives), map(make_external_proc_proc, map(cadr_proc, primitives)));
+      names = PJScheme.append(names, map(car_proc, primitives));
+      procs = PJScheme.append(procs, map(make_external_proc_proc, map(cadr_proc, primitives)));
+      return PJScheme.make_initial_environment(names, procs);
   }
   
   public static void reset_toplevel_env() {

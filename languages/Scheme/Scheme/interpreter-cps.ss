@@ -11,8 +11,38 @@
 (load "parser-cps.ss")
 
 ;;----------------------------------------------------------------------------
-;; these definitions enable the interpreter code to run in Petite Chez
-;; Scheme, independently of C#
+;; to run the scheme register machine within Petite:
+;; % petite pjscheme-rm.ss
+;; > (start-rm)
+;; > (trampoline)
+
+;;----------------------------------------------------------------------------
+;; used by scheme CPS, DS, RM, and C# RM code
+
+(define REP-k
+  (lambda-cont2 (v fail)
+    (set! *last-fail* fail)
+    (halt* v)))
+
+(define REP-handler
+  (lambda-handler2 (e fail)
+    (set! *last-fail* fail)
+    (halt* (list 'exception e))))
+
+(define REP-fail
+  (lambda-fail ()
+    (halt* "no more choices")))
+
+(define *last-fail* REP-fail)
+
+(define *tokens-left* 'undefined)
+
+(define exception?
+  (lambda (x)
+    (and (pair? x) (eq? (car x) 'exception))))
+
+;;----------------------------------------------------------------------------
+;; used only by scheme CPS, DS, and RM code
 
 ;; dummy versions of functions defined in C# code
 (define-native dlr-proc? (lambda (x) #f))
@@ -28,8 +58,6 @@
 (define-native using-prim (lambda ignore #f))
 (define-native iterator? (lambda ignore #f))
 (define-native get_type (lambda (x) 'unknown))
-
-;;----------------------------------------------------------------------------
 
 (define read-line
   (lambda (prompt)
@@ -57,7 +85,7 @@
 	  (loop (read)))))))
 
 ;;----------------------------------------------------------------------------
-;; read-eval-print loop
+;; used only by scheme CPS and DS code
 
 (define start
   (lambda ()
@@ -72,7 +100,7 @@
     (printf "Restarting...\n")
     (read-eval-print-loop)))
 
-(define* read-eval-print-loop
+(define read-eval-print-loop
   (lambda ()
     (let ((input (raw-read-line "==> ")))  ;; read-line or raw-read-line
       ;; execute gets redefined as execute-rm when no-csharp-support.ss is loaded
@@ -85,28 +113,6 @@
 	  (halt* 'goodbye)
 	  (read-eval-print-loop))))))
 
-(define REP-k
-  (lambda-cont2 (v fail)
-    (set! *last-fail* fail)
-    (halt* v)))
-
-(define REP-handler
-  (lambda-handler2 (e fail)
-    (set! *last-fail* fail)
-    (halt* (list 'exception e))))
-
-(define REP-fail
-  (lambda-fail ()
-    (halt* "no more choices")))
-
-(define *last-fail* REP-fail)
-
-(define *tokens-left* 'undefined)
-
-(define exception?
-  (lambda (x)
-    (and (pair? x) (eq? (car x) 'exception))))
-
 (define execute-string
   (lambda (input)
     (execute input 'stdin)))
@@ -118,6 +124,7 @@
 (define execute
   (lambda (input src)
     (set! load-stack '())
+    (initialize-execute)
     (let ((result (scan-input input src REP-handler *last-fail* REP-k)))
       (if (exception? result)
 	result
@@ -145,17 +152,37 @@
 	  (lambda-cont2 (exp fail)
 	    (m exp toplevel-env REP-handler fail REP-k)))))))
 
-;; not used
-(define initialize-globals
+;;----------------------------------------------------------------------------
+;; used only by scheme RM code
+
+(define start-rm
   (lambda ()
+    ;; start with fresh environments
     (set! toplevel-env (make-toplevel-env))
     (set! macro-env (make-macro-env^))
-    (set! load-stack '())
-    (initialize-execute)
-    (set! *last-fail* REP-fail)))
+    (read-eval-print-loop-rm)))
+
+;; avoids reinitializing environments on startup (useful for crash recovery)
+(define restart-rm
+  (lambda ()
+    (printf "Restarting...\n")
+    (read-eval-print-loop-rm)))
+
+(define read-eval-print-loop-rm
+  (lambda ()
+    (let ((input (raw-read-line "==> ")))  ;; read-line or raw-read-line
+      ;; execute gets redefined as execute-rm when no-csharp-support.ss is loaded
+      (let ((result (execute-rm input 'stdin)))
+	(if (not (void? result))
+	    (safe-print result))
+	(if *need-newline*
+	  (newline))
+	(if (end-of-session? result)
+	  (halt* 'goodbye)
+	  (read-eval-print-loop-rm))))))
 
 ;;----------------------------------------------------------------------------
-;; for register machine only
+;; used only by scheme RM and C# RM code
 
 (define execute-string-rm
   (lambda (input)
@@ -168,6 +195,7 @@
 (define execute-rm
   (lambda (input src)
     (set! load-stack '())
+    (initialize-execute)
     (scan-input input src REP-handler *last-fail* REP-k)
     (let ((result (trampoline)))
       (if (exception? result)
@@ -180,13 +208,25 @@
 
 (define execute-loop-rm
   (lambda (src)
-    (execute-next-expression src)
+    (execute-next-expression-rm src)
     (let ((result (trampoline)))
       (if (or (exception? result)
 	      (end-of-session? result)
 	      (token-type? (first *tokens-left*) 'end-marker))
 	result
 	(execute-loop-rm src)))))
+
+(define execute-next-expression-rm
+  (lambda (src)
+    (read-sexp *tokens-left* src REP-handler *last-fail*
+      (lambda-cont4 (datum end tokens-left fail)
+	(set! *tokens-left* tokens-left)
+	(aparse datum (initial-contours toplevel-env) REP-handler fail
+	  (lambda-cont2 (exp fail)
+	    (m exp toplevel-env REP-handler fail REP-k)))))))
+
+;;----------------------------------------------------------------------------
+;; used only by C# RM code
 
 (define try-parse-handler
   (lambda-handler2 (e fail)
@@ -201,6 +241,14 @@
 	  (lambda-cont2 (result fail)
 	    (halt* #t)))))
     (trampoline)))
+
+(define initialize-globals
+  (lambda ()
+    (set! toplevel-env (make-toplevel-env))
+    (set! macro-env (make-macro-env^))
+    (set! load-stack '())
+    (initialize-execute)
+    (set! *last-fail* REP-fail)))
 
 ;;----------------------------------------------------------------------------
 ;; old read-eval-print loop
@@ -251,11 +299,9 @@
 
 (define make-debugging-k
   (lambda (exp k)
-    (if (not *tracing-on?*)
-	k
-	(lambda-cont2 (v fail)
-	  (handle-debug-info exp v)
-	  (k v fail)))))
+    (lambda-cont2 (v fail)
+      (handle-debug-info exp v)
+      (k v fail))))
 
 (define-native highlight-expression
   (lambda (exp)
@@ -289,8 +335,11 @@
   (lambda ()
     (set-car! *stack-trace* '())))
 
-(define-native initialize-execute
-  (lambda () 'Ok))
+(define initialize-execute
+  (lambda () 
+    (set! _closure_depth  0)
+    (set! _trace_pause #f)
+    (initialize-stack-trace)))
 
 (define push-stack-trace
   (lambda (exp)
@@ -437,6 +486,22 @@
       (reverse (map format-stack-trace trace)))))
 
 (define get-procedure-name
+  (lambda (aexp)
+    (if (macro-derived-source-info? aexp)
+	(rac (get-source-info aexp))
+	(cases aexpression aexp
+	  (app-aexp (operator operands info)
+	    (cases aexpression operator
+	      (lexical-address-aexp (depth offset id info) id)
+	      (var-aexp (id info) id)
+	      (lambda-aexp (formals bodies info) `(lambda ,formals ...))
+	      (mu-lambda-aexp (formals runt bodies info) `(lambda ,(append formals runt) ...))
+	      (trace-lambda-aexp (name formals bodies info) name)
+	      (mu-trace-lambda-aexp (name formals runt bodies info) name)
+	      (else 'application)))
+	  (else 'unknown)))))
+
+(define old-get-procedure-name
   (lambda (exp)
     (cases aexpression exp
       (lexical-address-aexp (depth offset id info) id)
@@ -448,10 +513,12 @@
 (define format-stack-trace
   (lambda (exp)
     (let ((info (rac exp)))
-      (list (get-srcfile info)
-	    (get-start-line info)
-	    (get-start-char info)
-	    (get-procedure-name exp)))))
+      (if (eq? info 'none)
+	  'macro-generated-exp
+	  (list (get-srcfile info)
+		(get-start-line info)
+		(get-start-char info)
+		(get-procedure-name exp))))))
 
 (define* runtime-error
   (lambda (msg info handler fail)
@@ -1753,10 +1820,6 @@
 ;; Then, add NAME to env
 ;; Then, add NAME_proc to Scheme.cs (if you use map or apply on it internally)
 
-;; this is here as a hook for extending environments in C# etc.
-(define make-initial-env-extended
-  (lambda (env) env))
-
 (define make-toplevel-env
   (lambda ()
     (let ((primitives 
@@ -1859,9 +1922,13 @@
 	    (list 'cd current-directory-prim)
 	    (list 'round round-prim)
 	    )))
-      (make-initial-env-extended
-        (make-initial-environment (map car primitives) (map cadr primitives))))))
-	
+      (make-initial-env-extended (map car primitives) (map cadr primitives)))))
+
+;; this is here as a hook for extending environments in C# etc.
+(define make-initial-env-extended
+  (lambda (names procs)
+    (make-initial-environment names procs)))
+
 (define toplevel-env (make-toplevel-env))
 
 ;;------------------------------------------------------------------------

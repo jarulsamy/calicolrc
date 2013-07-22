@@ -17,7 +17,8 @@
 
 ;; these definitions will not be included in the transformed output code
 (define *ignore-definitions*
-  '(execute execute-string execute-file execute-loop
+  '(start restart read-eval-print-loop execute execute-string execute-file execute-loop
+     execute-next-expression
      ))
 
 ;; default transformer settings
