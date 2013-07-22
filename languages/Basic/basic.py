@@ -742,6 +742,7 @@ class BasicInterpreter:
                     if s[0]>=0:
                         self.linenos[s[0]] = i
         except Exception as e:
+            self.calico.Error(repr(e) + "\n")
             self.calico.Error(e.message + "\n")
             self.calico.Error(tk.string + "\n")
             self.calico.Error(" " * tk.cp + "^\n")
@@ -769,7 +770,7 @@ class BasicInterpreter:
                     s.run()
                 except Exception as e:
                     if "Thread was being aborted" not in e.message:
-                        self.calico.Error(e.message + "\n")
+                        self.calico.Error(repr(e) + "\n")
                         self.calico.Error("Error in line %i\n" % self.last_line)
                     return
 
@@ -787,11 +788,12 @@ class BasicInterpreter:
                 self.ip += 1
                 try:
                     s.run()
-                except:
+                except Exception as e:
+                    print(repr(e))
                     print("Error in line %i" % last_line)
                     self.ip = -1
 
-## basic = BasicInterpreter(calico)
+##basic = BasicInterpreter(calico)
 ## basic.Execute("""NEW
 ## 10 n = 5
 ## 20 total = 1
@@ -802,3 +804,4 @@ class BasicInterpreter:
 ## 100 print total
 ## RUN
 ## """)
+##basic.Execute("""print chr$(129)""")
