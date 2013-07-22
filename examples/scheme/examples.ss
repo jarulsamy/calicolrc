@@ -208,8 +208,7 @@
 
 (define test-try
   (lambda ()
-    (print "\nTesting try")
-    (newline)
+    (display "\nTesting try: ")
     (verify 3
       (try 3))
     (verify 3

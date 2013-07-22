@@ -1870,7 +1870,7 @@ public class Scheme {
   }
 
   public static bool Equal(object obj1, object obj2) {
-	if ((obj1 is Symbol) || (obj2 is Symbol)) { 
+        if ((obj1 is Symbol) || (obj2 is Symbol)) { 
 	  if ((obj1 is Symbol) && (obj2 is Symbol))
 		return ((Symbol)obj1).Equals(obj2);
 	  else return false;
@@ -2452,7 +2452,9 @@ public class Scheme {
   }
 
   public static bool null_q(object o1) {
-	return ((o1 is Symbol) && (((Symbol)o1) == EmptyList));
+      if (o1 == null)
+	  return true;
+      return ((o1 is Symbol) && (((Symbol)o1) == EmptyList));
   }
 
   public static bool pair_q(object x) {
