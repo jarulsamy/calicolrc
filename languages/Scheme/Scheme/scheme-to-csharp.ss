@@ -471,11 +471,11 @@
 	   (if (test-part . conseqs)  ;true-part false-part)
 	       (let ((true-part (car conseqs)))
 		 (if (null? (cdr conseqs))
-		     (format "if (true_q(~a)) ~a"
+		     (format "if (true_q(~a)) { ~a }"
 			     (convert-exp test-part proc-name)
 			     (convert-statement true-part proc-name))
 		     (let ((false-part (cadr conseqs)))
-		       (format "if (true_q(~a)) ~a else ~a"
+		       (format "if (true_q(~a)) { ~a } else { ~a }"
 			       (convert-exp test-part proc-name)
 			       (convert-statement true-part proc-name)
 			       (convert-statement false-part proc-name))))))

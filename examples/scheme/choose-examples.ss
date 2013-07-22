@@ -405,9 +405,9 @@
                         (require (distinct? (list c1 c2 c3 c4 c5 c6 c7 c8)))
                         (let ((c9 (choose 1 2 3 4 5 6 7 8 9)))
                            (require (distinct? (list c1 c2 c3 c4 c5 c6 c7 c8 c9)))
-                           (display "check sum:")
-                           (display (list c1 c2 c3 c4 c5 c6 c7 c8 c9))
-                           (newline)
+                           ;(display "check sum:")
+                           ;(display (list c1 c2 c3 c4 c5 c6 c7 c8 c9))
+                           ;(newline)
                            (require (same?
                                (list (sum c1 c2 c3) ;; rows
                                      (sum c4 c5 c6)

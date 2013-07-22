@@ -14,7 +14,6 @@
 ;; to run the scheme register machine within Petite:
 ;; % petite pjscheme-rm.ss
 ;; > (start-rm)
-;; > (trampoline)
 
 ;;----------------------------------------------------------------------------
 ;; used by scheme CPS, DS, RM, and C# RM code
@@ -1307,6 +1306,7 @@
 	   (and (symbol? x) (symbol? y) (eq? x y))
 	   (and (number? x) (number? y) (= x y))
 	   (and (char? x) (char? y) (char=? x y))
+	   (and (eq? x void-value) (eq? y void-value))
 	   (and (string? x) (string? y) (string=? x y)))
        (k #t))
       ((and (pair? x) (pair? y))

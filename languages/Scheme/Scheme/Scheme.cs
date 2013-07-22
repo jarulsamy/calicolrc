@@ -1870,38 +1870,43 @@ public class Scheme {
   }
 
   public static bool Equal(object obj1, object obj2) {
-        if ((obj1 is Symbol) || (obj2 is Symbol)) { 
-	  if ((obj1 is Symbol) && (obj2 is Symbol))
-		return ((Symbol)obj1).Equals(obj2);
-	  else return false;
-	} else if (pair_q(obj1) && pair_q(obj2)) {
-	  if (null_q(obj1) && null_q(obj2))
-		return true;
-	  else if (null_q(obj1))
-		return false;
-	  else if (null_q(obj2))
-		return false;
-	  else if (Equal(car(obj1),  car(obj2)))
-		return Equal(cdr(obj1), cdr(obj2));
-	  else
-		return false;
-    } if (pair_q(obj1) || pair_q(obj2)) {
-			return false;
-	} else {
-	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
-        try {
-          return (ObjectType.ObjTst(obj1, obj2, false) == 0);
-        } catch {
+      if (obj1 == null) {
+          return (obj2 == null);
+      } else if (obj2 == null) {
           return false;
-        }
-      } else {
-        if (obj1 is BigInteger) {
-          return ((BigInteger)obj1).Equals(obj2);
-        } else {
-          return ((BigInteger)obj2).Equals(obj1);
-        }
+      } else if ((obj1 is Symbol) || (obj2 is Symbol)) { 
+	  if ((obj1 is Symbol) && (obj2 is Symbol))
+              return ((Symbol)obj1).Equals(obj2);
+	  else return false;
+      } else if (pair_q(obj1) && pair_q(obj2)) {
+	  if (null_q(obj1) && null_q(obj2))
+              return true;
+	  else if (null_q(obj1))
+              return false;
+	  else if (null_q(obj2))
+              return false;
+	  else if (Equal(car(obj1),  car(obj2)))
+              return Equal(cdr(obj1), cdr(obj2));
+	  else
+              return false;
       }
-	}
+      if (pair_q(obj1) || pair_q(obj2)) {
+          return false;
+      } else {
+	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+              try {
+                  return (ObjectType.ObjTst(obj1, obj2, false) == 0);
+              } catch {
+                  return false;
+              }
+          } else {
+              if (obj1 is BigInteger) {
+                  return ((BigInteger)obj1).Equals(obj2);
+              } else {
+                  return ((BigInteger)obj2).Equals(obj1);
+              }
+          }
+      }
   }
 
   public static bool EqualSign(object obj1, object obj2) {
@@ -2452,8 +2457,6 @@ public class Scheme {
   }
 
   public static bool null_q(object o1) {
-      if (o1 == null)
-	  return true;
       return ((o1 is Symbol) && (((Symbol)o1) == EmptyList));
   }
 
