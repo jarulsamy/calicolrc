@@ -1810,9 +1810,10 @@ public class Scheme {
       if (obj1 is Symbol) {
 	  if (obj2 is Symbol) { 
 	      return ((Symbol)obj1).Equals(obj2);
-	  } else 
+	  } else {
 	      return false;
-      } if (obj2 is Symbol) {
+          }
+      } else if (obj2 is Symbol) {
 	  return false;
       } else if (pair_q(obj1)) {
 	  if (pair_q(obj2)) {
@@ -1822,20 +1823,20 @@ public class Scheme {
 	  }
       } else if (pair_q(obj2)) {
 	  return false;
+      } else if ((obj1 == null) || (obj2 == null)) {  // (void) object is null
+          return (obj1 == obj2);
+      } else if (!(obj1 is BigInteger) && !(obj2 is BigInteger)) {
+          try {
+              return (ObjectType.ObjTst(obj1, obj2, false) == 0);
+          } catch {
+              return false;
+          }
       } else {
-	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
-	      try {
-		  return (ObjectType.ObjTst(obj1, obj2, false) == 0);
-	      } catch {
-		  return false;
-	      }
-	  } else {
-	      if (obj1 is BigInteger) {
-		  return ((BigInteger)obj1).Equals(obj2);
-	      } else {
-		  return ((BigInteger)obj2).Equals(obj1);
-	      }
-	  }
+          if (obj1 is BigInteger) {
+              return ((BigInteger)obj1).Equals(obj2);
+          } else {
+              return ((BigInteger)obj2).Equals(obj1);
+          }
       }
   }
 
