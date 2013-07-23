@@ -545,8 +545,10 @@ public class Scheme {
   }
 
   public static object get_type(object obj) {
-	// implements "typeof"
-	return obj.GetType();
+      // implements "typeof"
+      if (obj == null)
+	  return null;
+      return obj.GetType();
   }
 
   public static string[] get_parts(String filename, String delimiter) {
