@@ -1525,6 +1525,8 @@ public static class Graphics
 			ButtonPressEvent += HandleClickOnShape;
 		    } else if (evt == "mouse-release") {
 			ButtonReleaseEvent += HandleMouseUpOnShape;
+		    } else {
+			throw new Exception(String.Format("invalid event '{0}': use 'mouse-motion', 'mouse-press', or 'mouse-release'", evt));
 		    }
 		}
 
