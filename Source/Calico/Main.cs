@@ -240,9 +240,9 @@ namespace Calico {
             if (((IList<string>)args).Contains("--debug")) {
                 Debug = true;
             }
-            bool withGraphics = true;
-            if (((IList<string>)args).Contains("--nographics")) {
-                withGraphics = false;
+            bool withGraphics = false;
+            if (((IList<string>)args).Contains("--graphics")) {
+                withGraphics = true;
             }
             // Process executable commands here:
             if (((IList<string>)args).Contains("--exec")) {
@@ -327,18 +327,20 @@ namespace Calico {
             Print("  " + _("Using Mono runtime version {0}"), MonoRuntimeVersion);
             Print("----------------------------------------------------------------------------");
             Print(_("Start calico with the following options:"));
-            Print(_("  StartCalico                     Standard GUI"));
-            Print(_("  StartCalico FILENAME:LINE ...   Edits FILENAMEs, positioned on LINEs"));
-            Print(_("  StartCalico --lang=LANGUAGE     Sets default language (python, etc.)"));
-            Print(_("  StartCalico --exec FILENAMEs    Run FILENAMEs"));
-            Print(_("  StartCalico --repl FILENAMEs    Run FILENAMEs and starts read-eval loop"));
-            Print(_("  StartCalico --nographics        Run without graphics (with --exec or --repl)"));
-	    Print(_("  StartCalico --nomodules         Does not load the modules from modules/*.dll"));
-            Print(_("  StartCalico --version           Displays the version number ({0})"), Version);
-            Print(_("  StartCalico --verbose           Displays detailed information (for debugging)"));
-            Print(_("  StartCalico --debug             Calico output goes to console rather than GUI"));
-            Print(_("  StartCalico --reset             Resets config settings to factory defaults"));
-            Print(_("  StartCalico --help              Displays this message"));
+            Print(_("  StartCalico                    Standard GUI"));
+            Print(_("  StartCalico FILENAME:LINE ...  Edits FILENAMEs, positioned on LINEs"));
+            Print(_("  StartCalico --lang=LANGUAGE    Sets default language (python, etc.)"));
+            Print(_("  StartCalico --exec FILENAMEs   Run FILENAMEs"));
+            Print(_("  StartCalico --repl FILENAMEs   Run FILENAMEs and starts read-eval-print loop"));
+            Print(_("  StartCalico   --graphics       Run with graphics (with --exec or --repl)"));
+	    Print(_("  StartCalico   --noquit         Does not quit after executing file with --exec"));
+	    Print(_("  StartCalico --nomodules        Does not load the modules from modules/*.dll"));
+            Print(_("  StartCalico --version          Displays the version number ({0})"), Version);
+            Print(_("  StartCalico --verbose          Displays detailed information (for debugging)"));
+            Print(_("  StartCalico --debug            Calico output goes to console rather than GUI"));
+            Print(_("  StartCalico --debug-handler    Calico will not catch system errors"));
+            Print(_("  StartCalico --reset            Resets config settings to factory defaults"));
+            Print(_("  StartCalico --help             Displays this message"));
             Print("");
         }
     }

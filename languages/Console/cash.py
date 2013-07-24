@@ -340,6 +340,20 @@ def addAnnotatedStrings(annotatedString, string, start):
         retval.start = annotatedString.start
     return retval
 
+def escaped(char, remove_special=False):
+    if char == "n":
+        if remove_special:
+            return "n"
+        else:
+            return "\n"
+    elif char == "t":
+        if remove_special:
+            return "t"
+        else:
+            return "\t"
+    else:
+        return char
+
 def splitParts(text, stack):
     # OOP, needed to protect raw-objects
     if debug: print("splitParts:", text, stack)
@@ -353,9 +367,17 @@ def splitParts(text, stack):
     mode = "start"
     while i < length:
         if mode == "start":
-            if text[i] == "\\":
+            if text[i] == '\\': ## remove special chars
                 i += 1
-                current = addAnnotatedStrings(current, text[i], i)
+                current = addAnnotatedStrings(current, escaped(text[i], remove_special=True), i)
+            #if text[i] == "\\":
+            #    if text[i+1] == "n":
+            #        current = addAnnotatedStrings(current, "\n", i)
+            #    elif text[i+1] == "t":
+            #        current = addAnnotatedStrings(current, "\t", i)
+            #    else:
+            #        current = addAnnotatedStrings(current, "\\" + text[i+1], i)
+            #    i += 1
             elif text[i].startswith("#"):
                 # ignore here to end of line
                 break
@@ -399,6 +421,18 @@ def splitParts(text, stack):
                 retval.append(current)
                 current = makeAnnotatedString("", -1)
                 mode = "start"
+            elif text[i] == '\\': ## replace with special char
+                i += 1
+                current = addAnnotatedStrings(current, escaped(text[i]), i)
+            #elif text[i] == '\\':
+            #    if text[i+1] == "n":
+            #        current = addAnnotatedStrings(current, "\n", i)
+            #        i += 1
+            #    elif text[i+1] == "t":
+            #        current = addAnnotatedStrings(current, "\t", i)
+            #        i += 1
+            #    else:
+            #        current = addAnnotatedStrings(current, text[i], i)
             else:
                 current = addAnnotatedStrings(current, text[i], i)
         elif mode == "double-quote":
@@ -407,6 +441,17 @@ def splitParts(text, stack):
                 retval.append(current)
                 current = makeAnnotatedString("", -1)
                 mode = "start"
+            elif text[i] == '\\': ## replace with special char
+                i += 1
+                current = addAnnotatedStrings(current, escaped(text[i]), i)
+            #    if text[i+1] == "n":
+            #        current = addAnnotatedStrings(current, "\n", i)
+            #        i += 1
+            #    elif text[i+1] == "t":
+            #        current = addAnnotatedStrings(current, "\t", i)
+            #        i += 1
+            #    else:
+            #        current = addAnnotatedStrings(current, text[i], i)
             else:
                 current = addAnnotatedStrings(current, text[i], i)
         elif mode == "back-quote":
@@ -415,6 +460,18 @@ def splitParts(text, stack):
                 retval.extend(expand(current, stack))
                 current = makeAnnotatedString("", -1)
                 mode = "start"
+            elif text[i] == '\\': ## replace with special char
+                i += 1
+                current = addAnnotatedStrings(current, escaped(text[i]), i)
+            #elif text[i] == '\\':
+            #    if text[i+1] == "n":
+            #        current = addAnnotatedStrings(current, "\n", i)
+            #        i += 1
+            #    elif text[i+1] == "t":
+            #        current = addAnnotatedStrings(current, "\t", i)
+            #        i += 1
+            #    else:
+            #        current = addAnnotatedStrings(current, text[i], i)
             else:
                 current = addAnnotatedStrings(current, text[i], i)
         i += 1
@@ -897,17 +954,15 @@ def echo(name, incoming, tty, args, stack):
                                    (not isinstance(arg, str)))])
     if normal:
         data = " ".join(pargs.arg)
-        if pargs.e:
-            for line in data.split("\\n"):
-                yield line
+        if not pargs.e:
+            yield repr(data)[1:-1]
         else:
             yield data
     else: # OOP: arg is a generator, or list of generators
         if len(pargs.arg) == 1:
             for data in pargs.arg[0]:
                 if pargs.e:
-                    for line in data.split("\\n"):
-                        yield line
+                    yield repr(data)[1:-1]
                 else:
                     yield data
         else: # OOP: list of generators

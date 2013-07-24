@@ -663,6 +663,11 @@
     (and (has-source-info? asexp)
 	 (= (length (get-source-info asexp)) 7))))
 
+(define macro-derived-source-info?
+  (lambda (asexp)
+    (and (has-source-info? asexp)
+	 (= (length (get-source-info asexp)) 8))))
+
 ;;------------------------------------------------------------------------
 ;; recursive descent parser
 ;;

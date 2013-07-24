@@ -55,47 +55,31 @@ namespace Calico {
 
             GLib.ExceptionManager.UnhandledException += HandleException;
             
-            //manager.SetCalico(this);
-            // FIXME: move to Python language
-	    /*
-            manager ["python"].engine.Execute("from __future__ import division, with_statement, print_function;" +
-                "import sys as _sys; _sys.setrecursionlimit(1000);" +
-                "del division, with_statement, print_function, _sys", false);
-	    */
-            //Build();
-            // Run this in in the GUI thread, after we start:
-            //manager.PostSetup(this); 
-
             // Run this in in the GUI thread, after we start:
 	    if (!((IList<string>)args).Contains("--nomodules")) {
-		Gtk.Application.Invoke(delegate {
-			manager.PostSetup(this); });
+		manager.PostSetup(this); 
 	    }
-	    manager ["python"].engine.Execute("from __builtin__ import raw_input, input", false);
 
-            // All done, show if minimized:
-            //this.Present();
+	    manager ["python"].engine.Execute("from __builtin__ import raw_input, input", false);
 
             foreach (string arg in args) {
                 if (arg.StartsWith("--")) {
                     // skip
                 } else {
                     CurrentLanguage = manager.GetLanguageFromExtension(arg);
-                    //Console.WriteLine("NO GUI MODE" + CurrentLanguage + " "  + arg);
 		    string dirname = System.IO.Path.GetDirectoryName(arg);
 		    if (dirname != "" && dirname != null) {
-			DirectoryInfo dirInfo = new DirectoryInfo(dirname);
-			if (dirInfo.Exists) {
+			if (System.IO.File.Exists(arg)) {
 			    System.IO.Directory.SetCurrentDirectory(dirname);
-			    //System.Console.WriteLine("cd: " + dirname);
-			    ExecuteFileInBackground(arg, CurrentLanguage);
+			    string filename = System.IO.Path.GetFileName(arg);
+			    ExecuteFileInBackground(filename, CurrentLanguage);
+			} else {
+			    Console.Error.WriteLine("Error: no such file '{0}'; skipping...", arg);
 			}
 		    }
-                    //manager [CurrentLanguage].engine.ExecuteFile(arg);
                 }
             }
 
-  
             // Start up background updater
             GLib.Timeout.Add(500, UpdateGUI);
 
@@ -105,7 +89,9 @@ namespace Calico {
                 }));
                 executeThread.IsBackground = true;
                 executeThread.Start();
-            } 
+            } else if (!((IList<string>)this.args).Contains("--noquit")) {
+		Environment.Exit(0);
+	    }
         }
 
         public new void HandleException(GLib.UnhandledExceptionArgs args) {
@@ -181,8 +167,8 @@ namespace Calico {
                     }
 		}
             }
-	    // Need to exit from here for some reason
-	    if (!((IList<string>)this.args).Contains("--nographics")) {
+	    // If running with graphics, we need to tell everything to stop:
+	    if (((IList<string>)this.args).Contains("--graphics")) {
 		Environment.Exit(0);
 	    }
         }
@@ -255,12 +241,6 @@ namespace Calico {
                 path = path.Substring(1);
             }
 
-            // FIXME: move to Python language
-	    /*
-            manager ["python"].engine.Execute("from __future__ import division, with_statement, print_function;" +
-                "import sys as _sys; _sys.setrecursionlimit(1000);" +
-                "del division, with_statement, print_function, _sys", false);
-	    */
 	    if (!((IList<string>)args).Contains("--nomodules")) {
 		manager.PostSetup(this); 
 	    }
@@ -270,11 +250,13 @@ namespace Calico {
                     CurrentLanguage = manager.GetLanguageFromExtension(arg);
 		    string dirname = System.IO.Path.GetDirectoryName(arg);
 		    if (dirname != "" && dirname != null) {
-			DirectoryInfo dirInfo = new DirectoryInfo(dirname);
-			if (dirInfo.Exists) {
+			if (System.IO.File.Exists(arg)) {
 			    System.IO.Directory.SetCurrentDirectory(dirname);
 			    //System.Console.WriteLine("cd: " + dirname);
-			    manager [CurrentLanguage].engine.ExecuteFile(arg);
+			    string filename = System.IO.Path.GetFileName(arg);
+			    manager [CurrentLanguage].engine.ExecuteFile(filename);
+			} else {
+			    Console.Error.WriteLine("Error: no such file '{0}'; skipping...", arg);
 			}
 		    }
                 }
@@ -282,7 +264,9 @@ namespace Calico {
 
             if (startREPL) {
                 REPL();
-            }
+            } else if (!((IList<string>)this.args).Contains("--noquit")) {
+		Environment.Exit(0);
+	    }
         }
     }
 }

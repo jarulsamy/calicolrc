@@ -10,8 +10,8 @@
 (define *class* 'PJScheme) ;; 'undefined to use filename
 
 (define *ignore-definitions*
-  '(void-value scheme-REP-k scheme-REP-handler scheme-REP-fail start restart read-line
-	       raw-read-line Main read-content string->integer string->decimal
+  '(void-value start-rm restart-rm read-eval-print-loop-rm read-line raw-read-line
+	       Main read-content string->integer string->decimal
 	       string->rational tagged-list testall string-split get-current-time
 	       type? make-initial-env-extended 
 	       make-proc 
@@ -37,7 +37,12 @@
     (increment-scan-counters "void" ())
     (initialize-scan-counters "void" ())
     (mark-token-start "void" ())
+    (execute-string "void" ("string"))
+    (execute-file "void" ("string"))
     (execute-next-expression "void" ())
+    (execute-next-expression-rm "void" ())
+    (execute-rm "object" ("string" "object"))
+    (execute-loop-rm "object" ("object"))
     (symbol<? "bool" ())
     (string<? "bool" ())
     (apply-extension "void" ())
@@ -52,10 +57,6 @@
 ;;    (read-file "void" ("object"))
     (pc "Function" ("null"))
     (Main "void" ("string []"))
-    (execute-rm "object" ("string" "object"))
-    (execute-loop-rm "object" ("object"))
-    (execute-string "void" ("string"))
-    (execute-file "void" ("string"))
     (make-toplevel-env "object" ())
     (make-macro-env^ "object" ())
     (make-empty-environment "object" ())
@@ -100,6 +101,7 @@
     (highlight-expression "void" ())
     (get-closure-depth "int" ())
     (*use-lexical-address* "bool" ())
+    (*use-stack-trace* "bool" ())
     (*tracing-on?* "bool" ())
     (unparse-prim "object" ())
     (initialize-stack-trace "void" ())
@@ -109,8 +111,65 @@
     (m* "void" ())
     (make-stack-trace "object" ())
     (format-stack-trace "object" ())
-    (set-use-stack-trace "void" ())
-    (get-use-stack-trace "object" ())
+    (initialize-execute "void" ())
+    
+    ;; changing object to bool
+    (atom?^ "bool" ())
+    (pair?^ "bool" ())
+    (null?^ "bool" ())
+    (symbol?^ "bool" ())
+    (string?^ "bool" ())
+    (vector?^ "bool" ())
+    (eq?^ "bool" ())
+    (list?^ "bool" ())
+    (application?^ "bool" ())
+    (mit-style-define?^ "bool" ())
+    (literal?^ "bool" ())
+    (syntactic-sugar?^ "bool" ())
+    (define-syntax-clause?^ "bool" ())
+    (list-of-define-syntax-clauses?^ "bool" ())
+
+    (token-type? "bool" ())
+    (char-delimiter? "bool" ())
+    (char-initial? "bool" ())
+    (char-special-subsequent? "bool" ())
+    (char-subsequent? "bool" ())
+    (char-sign? "bool" ())
+    (char-boolean? "bool" ())
+    (aatom? "bool" ())
+    (apair? "bool" ())
+    (source-info? "bool" ())
+    (has-source-info? "bool" ())
+    (original-source-info? "bool" ())
+    (macro-derived-source-info? "bool" ())
+    (empty-frame? "bool" ())
+    (environment? "bool" ())
+    (in-first-frame? "bool" ())
+    (anything? "bool" ())
+    (reserved-keyword? "bool" ())
+    (literal? "bool" ())
+    (pattern-macro? "bool" ())
+    (define-syntax-clause? "bool" ())
+    (apattern? "bool" ())
+    (exception? "bool" ())
+    (continuation-object? "bool" ())
+    (length-one? "bool" ())
+    (length-two? "bool" ())
+    (length-at-least? "bool" ())
+    (all-numeric? "bool" ())
+    (all-char? "bool" ())
+    (void? "bool" ())
+    (end-of-session? "bool" ())
+    (procedure-object? "bool" ())
+    (environment-object? "bool" ())
+    (pattern? "bool" ())
+    (pattern-variable? "bool" ())
+    (constant? "bool" ())
+
+    ;; functions
+    (not "bool" ())
+    (get-use-stack-trace "bool" ())
+    (set-use-stack-trace "void" ("bool"))
     ))
 
 (define *system-ignore-definitions*
@@ -266,13 +325,6 @@
       _closure_depth--;
    }
 
-   public static void initialize_execute ()
-   {
-      _closure_depth = 0;
-      _trace_pause = false;
-      initialize_stack_trace();
-   }
-
    public static object repeat(object item, object times) {
       object retval = EmptyList;
       for (int i=0; i < ((int)times); i++) {
@@ -281,14 +333,12 @@
       return retval;
    }
 
-   public static object use_lexical_address(object value) {
-	if (null_q(value)) {
-	    return _staruse_lexical_address_star;
-	} else {
+   public static bool use_lexical_address(object value) {
+	if (!null_q(value)) {
 	    value = car(value);
-	    _staruse_lexical_address_star = (bool)value;
-	    return null;
+	    _staruse_lexical_address_star = true_q(value);
 	}
+	return _staruse_lexical_address_star;
    }
 
    // *tracing-on?*
@@ -362,7 +412,7 @@
 		(format "return((~a) ~a) " 
 			proc-return-type 
 			(convert-exp (car args) proc-name)))
-	    (format "return((~a) ~a) " 
+	    (format "return((~a) ~a)" 
 		    return-cast 
 		    sargs)))
        ((or (eq? name 'apply) (eq? name 'map) (eq? name 'map^) (eq? name 'for-each) (eq? name 'apply*))
@@ -383,11 +433,39 @@
     (let ((name (symbol->string sym)))
       (eq? (string-ref name (- (string-length name) 1)) c))))
 
+(define string-starts-with
+  (lambda (sym s)
+    (let ((name (string->list sym))
+	  (str (string->list s)))
+      (match-start name str))))
+
+(define match-start
+  (lambda (l1 l2)
+    (cond
+     ((null? l2) #t)
+     ((null? l1) #f)
+     (else (and (eq? (car l1) (car l2))
+		(match-start (cdr l1) (cdr l2)))))))
+
+(define string-contains
+  (lambda (sym s)
+    (let ((name (string->list sym))
+	  (str (string->list s)))
+      (match-contains name str))))
+
+(define match-contains
+  (lambda (l1 l2)
+    (cond
+     ((null? l2) #t)
+     ((null? l1) #f)
+     ((match-start l1 l2) #t)
+     (else (match-contains (cdr l1) l2)))))
+
 (define get-return-type
   (lambda (name params)
     (db "get-return-type: ~a(~a) ~%" name)
     ;; pick a good default
-    (let ((return-type (if (ends-with name #\?)
+    (let ((return-type (if (need-cast? name)
 			   "bool"
 			   (if (null? params)
 			       "void"
@@ -402,7 +480,7 @@
     ;;(printf "get-definition-parameter-types: ~a(~a) ~%" name params)
     (if (pair? name)
 	(list '() '())
-	(let ((return-type (if (ends-with name #\?)
+	(let ((return-type (if (need-cast? name)
 			       "bool"
 			       "object")))
 	  (cond
@@ -445,7 +523,7 @@
 		;;(printf " adding static variable ~a...~%" name)
 		(set! *variable-definitions* (cons name *variable-definitions*))
 		(let ((ret-type (if (null? (car types))
-				    (if (ends-with name #\?)
+				    (if (need-cast? name)
 					"bool"
 					"object")
 				    (car types)))
@@ -467,6 +545,25 @@
        (else
 	(error 'convert-define "unrecognized form: ~a" def))))))
 
+(define need-cast?
+  (lambda (name)
+    (let ((sname (symbol->string name)))
+      (or (and (string-contains sname "_q") 
+	       (not (string-contains sname "_prim")))))))
+	  
+
+(define need-true
+  (lambda (exp)
+    (cond
+     ((or (string=? exp "value_reg")
+	  (string=? exp "value1_reg")
+	  (string=? exp "binding")
+	  (string-starts-with exp "PJScheme.member")
+	  (string-starts-with exp "PJScheme.memq"))
+      (begin
+	(format "true_q(~a)" exp)))
+     (else exp))))
+
 (define convert-statement
   (lambda (statement proc-name)
     (db "convert-statement: '~s'~%" statement)
@@ -476,12 +573,12 @@
 	   (if (test-part . conseqs)  ;true-part false-part)
 	       (let ((true-part (car conseqs)))
 		 (if (null? (cdr conseqs))
-		     (format "if (true_q(~a)) ~a"
-			     (convert-exp test-part proc-name)
+		     (format "if (~a) { ~a }"
+			     (need-true (convert-exp test-part proc-name))
 			     (convert-statement true-part proc-name))
 		     (let ((false-part (cadr conseqs)))
-		       (format "if (true_q(~a)) ~a else ~a"
-			       (convert-exp test-part proc-name)
+		       (format "if (~a) { ~a } else { ~a }"
+			       (need-true (convert-exp test-part proc-name))
 			       (convert-statement true-part proc-name)
 			       (convert-statement false-part proc-name))))))
 	   (set! (sym exp)
@@ -495,7 +592,7 @@
 	     (let* ((vars (map car bindings))
 		    (temps (map (lambda (v) (format "object ~a = null;\n"
 						    (proper-name v))) vars)))
-	       (format "{\n ~a ~a }\n"
+	       (format " ~a ~a \n"
 		       (apply string-append temps)
 		       (apply string-append 
 			      (map 
@@ -512,7 +609,7 @@
 (define convert-block
   (lambda (statements proc-name)
     (db "convert-block: '~s'~%" statements)
-    (format "{\n ~a\n }\n" (apply string-append 
+    (format "{ ~a }" (apply string-append 
 				  (map (lambda (s)
 					 (convert-statement s proc-name))
 				       statements)))))

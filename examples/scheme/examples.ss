@@ -153,6 +153,7 @@
     (test-call/cc)
     (test-loop)
     (test-macros)
+    (test-try)
     (newline)))
 
 (define verify
@@ -207,8 +208,7 @@
 
 (define test-try
   (lambda ()
-    (print "\nTesting try")
-    (newline)
+    (display "\nTesting try: ")
     (verify 3
       (try 3))
     (verify 3
@@ -241,7 +241,7 @@
 	   (catch x 'hello 77)))
     (verify 3
       (try 3 (finally 'hi 4)))
-    (verify 'ok
+    (verify (void)
       (define div (lambda (x y) (if (= y 0) (raise "division by zero") (/ x y)))))
     (verify 5
       (div 10 2))

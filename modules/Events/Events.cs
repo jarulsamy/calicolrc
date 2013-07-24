@@ -267,7 +267,11 @@ public static class Events {
 			  Func<object,Event,object> code = tuple.Item1;
 			  object obj = tuple.Item2;
 			  Thread codethread = new Thread (new ThreadStart ( delegate {
-				      evt.value = code(obj, evt);
+				      try {
+					  evt.value = code(obj, evt);
+				      } catch (Exception e) {
+					  System.Console.Error.WriteLine("Error in receiving message: '{0}': {1}", evt.type, e.Message);
+				      }
 				  }));
 			  threads.Add(codethread);
 			  codethread.IsBackground = true;

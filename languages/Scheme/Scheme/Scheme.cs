@@ -451,7 +451,7 @@ public class Scheme {
 	return (path, args) => call_external_proc(tname, path, args);
   }
   
-  public static object make_initial_env_extended (object env) {
+    public static object make_initial_env_extended (object names, object procs) {
       // ProcedureN - N is arg count coming in
       // -1, 1, 2 - number of pieces to call app with (-1 is all)
       // 0, 1, 2 - return type 0 = void, 1 = object, 2 = bool
@@ -506,7 +506,7 @@ public class Scheme {
 	       list(symbol("typeof"), new Proc("typeof", (Procedure1)get_type, 1, 1)),
 	       list(symbol("vector->list"), new Proc("vector->list", (Procedure1)vector_to_list, 1, 1)),
 	       list(symbol("vector?"), new Proc("vector?", (Procedure1Bool)vector_q, 1, 2)),
-	       list(symbol("use-lexical-address"), new Proc("use-lexical-address", (Procedure1)PJScheme.use_lexical_address, -1, 1)),
+	       list(symbol("use-lexical-address"), new Proc("use-lexical-address", (Procedure1Bool)PJScheme.use_lexical_address, -1, 1)),
 	       list(symbol("reset-toplevel-env"), new Proc("reset-toplevel-env", (Procedure0Void)reset_toplevel_env, 0, 0)),
 	       list(symbol("dict"), new Proc("dict", (Procedure1) make_dict, -1, 1)),
 	       list(symbol("apply-with-keywords"), new Proc("apply-with-keywords", (Procedure1) apply_with_keywords, -1, 1))
@@ -514,17 +514,18 @@ public class Scheme {
       /// -------------------
       // FIXME: remove check when done
       // Check to see if overwriting a previously defined primitive:
-      object scheme_primitives = PJScheme.dir(EmptyList, env);
       object current = primitives;
       while (current != EmptyList) {
       	  object sym = caar(current);
-	  if (true_q(member(sym, scheme_primitives))) {
+	  if (true_q(member(sym, names))) {
 	      printf("WARNING: C# overwrites Scheme function '{0}'\n", sym);
 	  }
 	  current = cdr(current);
       }
       /// -------------------
-      return PJScheme.extend(env,  map(car_proc, primitives), map(make_external_proc_proc, map(cadr_proc, primitives)));
+      names = PJScheme.append(names, map(car_proc, primitives));
+      procs = PJScheme.append(procs, map(make_external_proc_proc, map(cadr_proc, primitives)));
+      return PJScheme.make_initial_environment(names, procs);
   }
   
   public static void reset_toplevel_env() {
@@ -544,8 +545,10 @@ public class Scheme {
   }
 
   public static object get_type(object obj) {
-	// implements "typeof"
-	return obj.GetType();
+      // implements "typeof"
+      if (obj == null)
+	  return null;
+      return obj.GetType();
   }
 
   public static string[] get_parts(String filename, String delimiter) {
@@ -1066,13 +1069,13 @@ public class Scheme {
       if (obj == null || obj == (object) NULL) {
 	  return (object) "\0";
       } else if (obj is Cons || obj == EmptyList) {
-	  string retval = "";
+	  System.Text.StringBuilder retval = new System.Text.StringBuilder();
 	  while (obj != EmptyList) {
 	      object car_lst = car(obj);
-	      retval += char_to_string(car_lst);
+	      retval.Append(char_to_string(car_lst));
 	      obj = cdr(obj);
 	  }
-	  return retval;
+	  return retval.ToString();
       } else {
 	  return obj.ToString();
       }
@@ -1374,7 +1377,7 @@ public class Scheme {
       return retval;
   }
 
-  public static object dlr_proc_q(object rator) {
+  public static bool dlr_proc_q(object rator) {
       // Works with Python Types
       //Console.WriteLine("dlr-proc? {0}");
       //return (! pair_q(rator));
@@ -1442,7 +1445,7 @@ public class Scheme {
     return retval;
   }
 
-  public static object dlr_object_contains(object result, object components) {
+  public static bool dlr_object_contains(object result, object components) {
       // checks to see if a dlr_object contains the parts_list
       //printf("dlr_object_contains: {0}, {1}\n", result, components);
       object parts_list = cdr(components); // skip the first component, the object
@@ -1571,33 +1574,34 @@ public class Scheme {
 		return "#<environment>"; //, car(obj));
 	  } else {
 	      //System.Console.WriteLine("Here 4");
-	      string retval = "";
+	      System.Text.StringBuilder retval = new System.Text.StringBuilder();
 	      object current = (Cons)obj;
 	      Dictionary<int,bool> ids = new Dictionary<int,bool>();
 	      ids[((Cons)current).id] = true;
 	      while (pair_q(current)) {
 		  //System.Console.WriteLine("Here 5");
-		  if (retval != "") {
-		      retval += " ";
+		  if (!retval.Equals("")) {
+		      retval.Append(" ");
 		  } 
 		  object car_current = car(current);
 		  if (pair_q(car_current) && ids.ContainsKey(((Cons)car_current).id)) {
-		      retval += " ...";
+		      retval.Append(" ...");
 		      current = null;
 		  } else {
-		      retval += repr(car_current);
+		      retval.Append(repr(car_current));
 		      current = cdr(current);
 		      if (pair_q(current) && ids.ContainsKey(((Cons)current).id)) {
-			  retval += " ...";
+			  retval.Append(" ...");
 			  current = null;
 		      } else {
 			  if (!pair_q(current) && !Eq(current, EmptyList)) {
-			      retval += " . " + repr(current); // ...
+			      retval.Append(" . ");
+			      retval.Append(repr(current)); // ...
 			  }
 		      }
 		  }
 	      }
-	      return "(" + retval + ")";
+	      return retval.Insert(0, "(").Append(")").ToString();
 	  }
 	} else {
 	    return obj.ToString();
@@ -1712,32 +1716,30 @@ public class Scheme {
   }
 
   public static string format(object msg, params object[] rest) {
-	string retval = "";
-	string new_msg = "";
+	System.Text.StringBuilder new_msg = new System.Text.StringBuilder();
 	string smsg = msg.ToString();
 	int count = 0;
 	for (int i = 0; i < smsg.Length; i++) {
 	    if (smsg[i] == TILDE) {
 		if (smsg[i+1] == 's') {
-		    new_msg += string.Format("{0}", ToString(rest[count]));
+		    new_msg.Append(string.Format("{0}", ToString(rest[count])));
 		    count += 1;
 		    i++;
 		} else if (smsg[i+1] == 'a') {
-		    new_msg += string.Format("{0}", ToString(rest[count]));
+		    new_msg.Append(string.Format("{0}", ToString(rest[count])));
 		    count += 1;
 		    i++;
 		} else if (smsg[i+1] == '%') {
-		    new_msg += "\n";
+		    new_msg.Append("\n");
 		    i++;
 		} else
 		    throw new Exception(string.Format("format needs to handle: \"{0}\"", 
 						      smsg));
 	    } else {
-		new_msg += smsg[i];
+		new_msg.Append(smsg[i]);
 	    }
 	}
-	retval = String.Format(new_msg, rest);
-	return retval;
+	return String.Format(new_msg.ToString(), rest);
   }
 
     public static bool string_eq_q(object args) {
@@ -1809,9 +1811,10 @@ public class Scheme {
       if (obj1 is Symbol) {
 	  if (obj2 is Symbol) { 
 	      return ((Symbol)obj1).Equals(obj2);
-	  } else 
+	  } else {
 	      return false;
-      } if (obj2 is Symbol) {
+          }
+      } else if (obj2 is Symbol) {
 	  return false;
       } else if (pair_q(obj1)) {
 	  if (pair_q(obj2)) {
@@ -1821,20 +1824,20 @@ public class Scheme {
 	  }
       } else if (pair_q(obj2)) {
 	  return false;
+      } else if ((obj1 == null) || (obj2 == null)) {  // (void) object is null
+          return (obj1 == obj2);
+      } else if (!(obj1 is BigInteger) && !(obj2 is BigInteger)) {
+          try {
+              return (ObjectType.ObjTst(obj1, obj2, false) == 0);
+          } catch {
+              return false;
+          }
       } else {
-	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
-	      try {
-		  return (ObjectType.ObjTst(obj1, obj2, false) == 0);
-	      } catch {
-		  return false;
-	      }
-	  } else {
-	      if (obj1 is BigInteger) {
-		  return ((BigInteger)obj1).Equals(obj2);
-	      } else {
-		  return ((BigInteger)obj2).Equals(obj1);
-	      }
-	  }
+          if (obj1 is BigInteger) {
+              return ((BigInteger)obj1).Equals(obj2);
+          } else {
+              return ((BigInteger)obj2).Equals(obj1);
+          }
       }
   }
 
@@ -1869,38 +1872,43 @@ public class Scheme {
   }
 
   public static bool Equal(object obj1, object obj2) {
-	if ((obj1 is Symbol) || (obj2 is Symbol)) { 
-	  if ((obj1 is Symbol) && (obj2 is Symbol))
-		return ((Symbol)obj1).Equals(obj2);
-	  else return false;
-	} else if (pair_q(obj1) && pair_q(obj2)) {
-	  if (null_q(obj1) && null_q(obj2))
-		return true;
-	  else if (null_q(obj1))
-		return false;
-	  else if (null_q(obj2))
-		return false;
-	  else if (Equal(car(obj1),  car(obj2)))
-		return Equal(cdr(obj1), cdr(obj2));
-	  else
-		return false;
-    } if (pair_q(obj1) || pair_q(obj2)) {
-			return false;
-	} else {
-	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
-        try {
-          return (ObjectType.ObjTst(obj1, obj2, false) == 0);
-        } catch {
+      if (obj1 == null) {
+          return (obj2 == null);
+      } else if (obj2 == null) {
           return false;
-        }
-      } else {
-        if (obj1 is BigInteger) {
-          return ((BigInteger)obj1).Equals(obj2);
-        } else {
-          return ((BigInteger)obj2).Equals(obj1);
-        }
+      } else if ((obj1 is Symbol) || (obj2 is Symbol)) { 
+	  if ((obj1 is Symbol) && (obj2 is Symbol))
+              return ((Symbol)obj1).Equals(obj2);
+	  else return false;
+      } else if (pair_q(obj1) && pair_q(obj2)) {
+	  if (null_q(obj1) && null_q(obj2))
+              return true;
+	  else if (null_q(obj1))
+              return false;
+	  else if (null_q(obj2))
+              return false;
+	  else if (Equal(car(obj1),  car(obj2)))
+              return Equal(cdr(obj1), cdr(obj2));
+	  else
+              return false;
       }
-	}
+      if (pair_q(obj1) || pair_q(obj2)) {
+          return false;
+      } else {
+	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+              try {
+                  return (ObjectType.ObjTst(obj1, obj2, false) == 0);
+              } catch {
+                  return false;
+              }
+          } else {
+              if (obj1 is BigInteger) {
+                  return ((BigInteger)obj1).Equals(obj2);
+              } else {
+                  return ((BigInteger)obj2).Equals(obj1);
+              }
+          }
+      }
   }
 
   public static bool EqualSign(object obj1, object obj2) {
@@ -2053,7 +2061,7 @@ public class Scheme {
 			obj1.GetType().ToString(), obj2.GetType().ToString()));
   }
 
-  public static object not(object obj) {
+  public static bool not(object obj) {
 	return (! true_q(obj));
   }
 
@@ -2451,7 +2459,7 @@ public class Scheme {
   }
 
   public static bool null_q(object o1) {
-	return ((o1 is Symbol) && (((Symbol)o1) == EmptyList));
+      return ((o1 is Symbol) && (((Symbol)o1) == EmptyList));
   }
 
   public static bool pair_q(object x) {
@@ -2530,15 +2538,15 @@ public class Scheme {
   }
 
   public static object list_to_string(object lyst) {
-	String retval = "";
-	if (lyst is Cons) {
+      System.Text.StringBuilder retval = new System.Text.StringBuilder();
+      if (lyst is Cons) {
 	  object current = lyst;
 	  while (!Eq(current, EmptyList)) {
-		retval += make_string(car(current));
-		current = cdr(current);
+	      retval.Append(make_string(car(current)));
+	      current = cdr(current);
 	  }
-	}
-	return retval;
+      }
+      return retval.ToString();
   }
 
     public static object pivot (object p, object l) {
@@ -2612,20 +2620,20 @@ public class Scheme {
   }
 
   public static object array_to_string(object[] args) {
-	string retval = "";
-	if (args != null) {
+      System.Text.StringBuilder retval = new System.Text.StringBuilder();
+      if (args != null) {
 	  int count = ((Array)args).Length;
 	  for (int i = 0; i < count; i++) {
-		  if (args[i] is object[]) {
-			retval += array_to_string((object[])args[i]);
-		  } else {
-			if (retval != "")
-			  retval += " ";
-			retval += args[i];
-		  }
+	      if (args[i] is object[]) {
+		  retval.Append(array_to_string((object[])args[i]));
+	      } else {
+		  if (!retval.Equals(""))
+		      retval.Append(" ");
+		  retval.Append(args[i]);
+	      }
 	  }
-	}
-	return "(vector " + retval + ")";
+      }
+      return retval.Insert(0, "(vector ").Append(")").ToString();
   }
   
 
@@ -2858,12 +2866,12 @@ public class Scheme {
       return (x);
   }
 
-// FIXME: Rewrite without recursion
   public static string string_append(object x) {
-      if (null_q(x))
-	  return "";
-      else 
-	  return (car(x).ToString() + string_append(cdr(x)));
+      System.Text.StringBuilder text = new System.Text.StringBuilder();
+      while (! null_q(x)) {
+	  text.Append(car(x).ToString());
+      }
+      return text.ToString();
   }
 
 // FIXME: Rewrite without recursion
@@ -2917,13 +2925,13 @@ public class Scheme {
   }
   
   public static string arrayToString(object[] array) {
-	string retval = "";
-	foreach (object item in array) {
-	  if (retval != "")
-		retval += " ";
-	  retval += item.ToString();
-	}
-	return retval;
+      System.Text.StringBuilder retval = new System.Text.StringBuilder();
+      foreach (object item in array) {
+	  if (!retval.Equals(""))
+	      retval.Append(" ");
+	  retval.Append(item.ToString());
+      }
+      return retval.ToString();
   }
 
   public static object memq(object obj) {
@@ -3253,18 +3261,19 @@ public class Scheme {
 		((Cons)this.cdr).cdr == EmptyList) {
 	  return String.Format(",@{0}", ((Cons)this.cdr).car);
 	} else {
-	  string s = String.Format("({0}", this.car);
+	  System.Text.StringBuilder s = new System.Text.StringBuilder("(");
+	  s.Append(this.car.ToString());
 	  object sexp = this.cdr;
 	  while (sexp is Cons) {
-		s += String.Format(" {0}", ((Cons)sexp).car);
-		sexp = ((Cons)sexp).cdr;
+	      s.Append((((Cons)sexp).car).ToString());
+	      sexp = ((Cons)sexp).cdr;
 	  }
 	  if (Eq(sexp, EmptyList)) {
-		s += ")";
+	      s.Append(")");
 	  } else {
-		s += String.Format(" . {0})", sexp);
+	      s.Append(" . ").Append(sexp).Append(")");
 	  }
-	  return s;
+	  return s.ToString();
 	}
   }
 }
@@ -3294,14 +3303,14 @@ public class Scheme {
   }
 
   public override string ToString() {
-    string retval = "";
-    for (int i = 0; i < values.Length; i++) {
-      retval += values[i].ToString();
-      if (i < values.Length-1) {
-	retval += " ";
+      System.Text.StringBuilder retval = new System.Text.StringBuilder();
+      for (int i = 0; i < values.Length; i++) {
+	  retval.Append(values[i].ToString());
+	  if (i < values.Length-1) {
+	      retval.Append(" ");
+	  }
       }
-    }
-    return String.Format("#{0}({1})", values.Length, retval);
+      return String.Format("#{0}({1})", values.Length, retval);
   }
 
   public String __repr__() {

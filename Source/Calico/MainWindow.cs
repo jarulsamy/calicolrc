@@ -66,6 +66,30 @@ namespace Calico {
         Gtk.Widget _lastSelectedPage = null;
         private bool searchMode; // true: search-only; false: replace
 	public string[] args = null;
+	public bool toolSwapped {
+	    get {
+		return (bool) config.GetValue("config", "toolSwapped");
+	    }
+	    set {
+		config.SetValue("config", "toolSwapped", value);
+	    }
+	}
+	public bool verticalSwapped  {
+	    get {
+		return (bool) config.GetValue("config", "verticalSwapped");
+	    }
+	    set {
+		config.SetValue("config", "verticalSwapped", value);
+	    }
+	}
+	public bool horizontalSwapped  {
+	    get {
+		return (bool) config.GetValue("config", "horizontalSwapped");
+	    }
+	    set {
+		config.SetValue("config", "horizontalSwapped", value);
+	    }
+	}
 	
 	public double ProgramSpeedValue {
 	    get {
@@ -119,6 +143,16 @@ namespace Calico {
             if (path.StartsWith("\\")) {
                 path = path.Substring(1);
             }
+	    int x = (int)config.GetValue("config", "window-x");
+	    int y = (int)config.GetValue("config", "window-y");
+	    int w = (int)config.GetValue("config", "window-width");
+	    int h = (int)config.GetValue("config", "window-height");
+	    if (x != -1 || y != -1) {
+		Move(x, y);
+	    }
+	    if (w != -1 || h != -1) {
+		Resize(w, h);
+	    }
             // FIXME: URI to path
             // string path = Uri.UnescapeDataString(uri.Path);
             // Path.GetDirectoryName(path);
@@ -381,6 +415,23 @@ namespace Calico {
             butterfly.Image = animationImages [0];
             this.KeepAbove = false;
 
+	    if (toolSwapped) {
+		SwapTool();
+	    }
+	    if (verticalSwapped) {
+		SwapVertical();
+	    }
+	    if (horizontalSwapped) {
+		SwapHorizontal();
+	    }
+	    int sw = (int)config.GetValue("config", "shell-width");
+	    int sh = (int)config.GetValue("config", "shell-height");
+	    if (sh != -1) { // hpaned divider between Shell and Output
+		VPaned2.Position = sh;
+	    }
+	    if (sw != -1) { // vpaned divider between Shell and Tools
+		hpaned2.Position = sw;
+	    }
             // Start up background updater
             GLib.Timeout.Add(500, UpdateGUI);
         }
@@ -1383,6 +1434,15 @@ namespace Calico {
                 }
             }
             try {
+		int x, y, w, h;
+		GetPosition(out x, out y);
+		GetSize(out w, out h);
+		config.SetValue("config", "window-x", x);
+		config.SetValue("config", "window-y", y);
+		config.SetValue("config", "window-width", w);
+		config.SetValue("config", "window-height", h);
+		config.SetValue("config", "shell-width", hpaned2.Position);
+		config.SetValue("config", "shell-height", VPaned2.Position);
                 config.Save();
             } catch {
                 // Something is no longer valid. Let's just make a new one then
@@ -3810,8 +3870,8 @@ del _invoke, _
 	    EditorNotebook.Hide();
 	}
 
-        protected void OnButton11Clicked(object sender, System.EventArgs e) {
-            // Move all editor tabs back and forth between EditorNotebook and MainNotebook
+
+	public void SwapTool() {
             Invoke( delegate {
                 if (EditorNotebook.Visible) {
                     // Empty it to MainNoteBook
@@ -3835,10 +3895,15 @@ del _invoke, _
                     EditorNotebook.Show();
                 }
             });
+	}
+
+        protected void OnButton11Clicked(object sender, System.EventArgs e) {
+            // Move all editor tabs back and forth between EditorNotebook and MainNotebook
+	    toolSwapped = ! toolSwapped;
+	    SwapTool();
         }
 
-        protected void OnSwapVerticalClicked(object sender, System.EventArgs e) {
-            // Swap the vertical parts of MainNotebook
+        public void SwapVertical() {
             Invoke(delegate {
                 if (vpaned2.Child1 == notebook_docs) { // normal
                     vpaned2.Remove(NotebookPane);
@@ -3852,10 +3917,15 @@ del _invoke, _
                     vpaned2.Add2(NotebookPane);
                 }
             });
+	}
+
+        protected void OnSwapVerticalClicked(object sender, System.EventArgs e) {
+            // Swap the vertical parts of MainNotebook
+	    verticalSwapped = ! verticalSwapped;
+	    SwapVertical();
         }
 
-        protected void OnSwapHorizontalClicked(object sender, System.EventArgs e) {
-            // Swap MainNotebook and EditorNotebook
+        public void SwapHorizontal() {
             if (!EditorNotebook.Visible) {
                 OnButton11Clicked(null, null); // show EditorNotebook
             }
@@ -3872,6 +3942,12 @@ del _invoke, _
                     hpaned2.Add2(editor_docs);
                 }
             });
+	}
+
+        protected void OnSwapHorizontalClicked(object sender, System.EventArgs e) {
+            // Swap MainNotebook and EditorNotebook
+	    horizontalSwapped = ! horizontalSwapped;
+	    SwapHorizontal();
         }
 
         protected void OnFindNextActionActivated(object sender, EventArgs e) {
