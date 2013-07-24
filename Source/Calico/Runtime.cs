@@ -167,8 +167,8 @@ namespace Calico {
                     }
 		}
             }
-	    // Need to exit from here for some reason
-	    if (!((IList<string>)this.args).Contains("--nographics")) {
+	    // If running with graphics, we need to tell everything to stop:
+	    if (((IList<string>)this.args).Contains("--graphics")) {
 		Environment.Exit(0);
 	    }
         }
