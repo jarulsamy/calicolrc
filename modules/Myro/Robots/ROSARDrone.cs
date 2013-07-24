@@ -81,7 +81,7 @@ public class ROSARDrone: ROSRobot
     emptyService("/ardrone/flattrim");    
   }
 
-  public void togglecam()
+  public override void togglecam()
   {
     emptyService("/ardrone/togglecam");    
   }

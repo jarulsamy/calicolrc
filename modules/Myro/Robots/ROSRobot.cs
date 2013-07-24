@@ -14,7 +14,9 @@ public class ROSRobot: Myro.Robot, NodeMain
   Publisher vel_publisher;
   public Image lastImg;
   private Subscriber imgSub;
-  
+  private double _lastZvel;
+  private double _lastYvel;
+
   public ROSRobot ()
   {
     NodeMainExecutor nodeMainExecutor = DefaultNodeMainExecutor.newDefault();
@@ -73,6 +75,8 @@ public class ROSRobot: Myro.Robot, NodeMain
     Twist velocity = (Twist)vel_publisher.newMessage();      
     velocity.getLinear().setX(_lastTranslate);
     velocity.getAngular().setZ(_lastRotate);
+    velocity.getLinear().setY(_lastYvel);
+    velocity.getLinear().setZ(_lastZvel);
     vel_publisher.publish(velocity);	  
   }    
     
@@ -89,28 +93,32 @@ public class ROSRobot: Myro.Robot, NodeMain
   public override void up (double speed)
   {
     Twist velocity = (Twist)vel_publisher.newMessage();      
-    velocity.getLinear().setZ(speed);
+    _lastZvel = speed;
+    velocity.getLinear().setZ(_lastZvel);
     vel_publisher.publish(velocity);	  
   }    
 
   public override void down (double speed)
   {
     Twist velocity = (Twist)vel_publisher.newMessage();      
-    velocity.getLinear().setZ(-speed);
+    _lastZvel = -speed;
+    velocity.getLinear().setZ(_lastZvel);
     vel_publisher.publish(velocity);	  
   }    
 
   public override void left (double speed)
   {
     Twist velocity = (Twist)vel_publisher.newMessage();      
-    velocity.getLinear().setY(speed);
+    _lastYvel = speed;
+    velocity.getLinear().setY(_lastYvel);
     vel_publisher.publish(velocity);	  
   }    
 
   public override void right (double speed)
   {
     Twist velocity = (Twist)vel_publisher.newMessage();      
-    velocity.getLinear().setY(-speed);
+    _lastYvel = -speed;
+    velocity.getLinear().setY(_lastYvel);
     vel_publisher.publish(velocity);	  
   }
   public override Graphics.Picture takePicture (string mode="jpeg")
