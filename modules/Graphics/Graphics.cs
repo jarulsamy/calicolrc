@@ -1359,6 +1359,11 @@ public static class Graphics
 			    onMouseUpCallbacks = new List ();
 			    onKeyPressCallbacks = new List ();
 			    onKeyReleaseCallbacks = new List ();
+			    // clear listeners:
+			    MotionNotifyEvent -= HandleMouseMovementOnShape;
+			    ButtonPressEvent -= HandleClickOnShape;
+			    ButtonReleaseEvent -= HandleMouseUpOnShape;
+
 			    _lastKey = "";
 			    _mouseState = "up";
 			    _keyState = "up";
