@@ -88,7 +88,8 @@ namespace Calico {
 			if (dirInfo.Exists) {
 			    System.IO.Directory.SetCurrentDirectory(dirname);
 			    //System.Console.WriteLine("cd: " + dirname);
-			    ExecuteFileInBackground(arg, CurrentLanguage);
+			    string filename = System.IO.Path.GetFileName(arg);
+			    ExecuteFileInBackground(filename, CurrentLanguage);
 			}
 		    }
                     //manager [CurrentLanguage].engine.ExecuteFile(arg);
@@ -274,7 +275,8 @@ namespace Calico {
 			if (dirInfo.Exists) {
 			    System.IO.Directory.SetCurrentDirectory(dirname);
 			    //System.Console.WriteLine("cd: " + dirname);
-			    manager [CurrentLanguage].engine.ExecuteFile(arg);
+			    string filename = System.IO.Path.GetFileName(arg);
+			    manager [CurrentLanguage].engine.ExecuteFile(filename);
 			}
 		    }
                 }

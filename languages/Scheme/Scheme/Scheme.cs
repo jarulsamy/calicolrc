@@ -1069,13 +1069,13 @@ public class Scheme {
       if (obj == null || obj == (object) NULL) {
 	  return (object) "\0";
       } else if (obj is Cons || obj == EmptyList) {
-	  string retval = "";
+	  System.Text.StringBuilder retval = new System.Text.StringBuilder();
 	  while (obj != EmptyList) {
 	      object car_lst = car(obj);
-	      retval += char_to_string(car_lst);
+	      retval.Append(char_to_string(car_lst));
 	      obj = cdr(obj);
 	  }
-	  return retval;
+	  return retval.ToString();
       } else {
 	  return obj.ToString();
       }
@@ -1574,33 +1574,34 @@ public class Scheme {
 		return "#<environment>"; //, car(obj));
 	  } else {
 	      //System.Console.WriteLine("Here 4");
-	      string retval = "";
+	      System.Text.StringBuilder retval = new System.Text.StringBuilder();
 	      object current = (Cons)obj;
 	      Dictionary<int,bool> ids = new Dictionary<int,bool>();
 	      ids[((Cons)current).id] = true;
 	      while (pair_q(current)) {
 		  //System.Console.WriteLine("Here 5");
-		  if (retval != "") {
-		      retval += " ";
+		  if (!retval.Equals("")) {
+		      retval.Append(" ");
 		  } 
 		  object car_current = car(current);
 		  if (pair_q(car_current) && ids.ContainsKey(((Cons)car_current).id)) {
-		      retval += " ...";
+		      retval.Append(" ...");
 		      current = null;
 		  } else {
-		      retval += repr(car_current);
+		      retval.Append(repr(car_current));
 		      current = cdr(current);
 		      if (pair_q(current) && ids.ContainsKey(((Cons)current).id)) {
-			  retval += " ...";
+			  retval.Append(" ...");
 			  current = null;
 		      } else {
 			  if (!pair_q(current) && !Eq(current, EmptyList)) {
-			      retval += " . " + repr(current); // ...
+			      retval.Append(" . ");
+			      retval.Append(repr(current)); // ...
 			  }
 		      }
 		  }
 	      }
-	      return "(" + retval + ")";
+	      return retval.Insert(0, "(").Append(")").ToString();
 	  }
 	} else {
 	    return obj.ToString();
@@ -1715,32 +1716,30 @@ public class Scheme {
   }
 
   public static string format(object msg, params object[] rest) {
-	string retval = "";
-	string new_msg = "";
+	System.Text.StringBuilder new_msg = new System.Text.StringBuilder();
 	string smsg = msg.ToString();
 	int count = 0;
 	for (int i = 0; i < smsg.Length; i++) {
 	    if (smsg[i] == TILDE) {
 		if (smsg[i+1] == 's') {
-		    new_msg += string.Format("{0}", ToString(rest[count]));
+		    new_msg.Append(string.Format("{0}", ToString(rest[count])));
 		    count += 1;
 		    i++;
 		} else if (smsg[i+1] == 'a') {
-		    new_msg += string.Format("{0}", ToString(rest[count]));
+		    new_msg.Append(string.Format("{0}", ToString(rest[count])));
 		    count += 1;
 		    i++;
 		} else if (smsg[i+1] == '%') {
-		    new_msg += "\n";
+		    new_msg.Append("\n");
 		    i++;
 		} else
 		    throw new Exception(string.Format("format needs to handle: \"{0}\"", 
 						      smsg));
 	    } else {
-		new_msg += smsg[i];
+		new_msg.Append(smsg[i]);
 	    }
 	}
-	retval = String.Format(new_msg, rest);
-	return retval;
+	return String.Format(new_msg.ToString(), rest);
   }
 
     public static bool string_eq_q(object args) {
@@ -2539,15 +2538,15 @@ public class Scheme {
   }
 
   public static object list_to_string(object lyst) {
-	String retval = "";
-	if (lyst is Cons) {
+      System.Text.StringBuilder retval = new System.Text.StringBuilder();
+      if (lyst is Cons) {
 	  object current = lyst;
 	  while (!Eq(current, EmptyList)) {
-		retval += make_string(car(current));
-		current = cdr(current);
+	      retval.Append(make_string(car(current)));
+	      current = cdr(current);
 	  }
-	}
-	return retval;
+      }
+      return retval.ToString();
   }
 
     public static object pivot (object p, object l) {
@@ -2621,20 +2620,20 @@ public class Scheme {
   }
 
   public static object array_to_string(object[] args) {
-	string retval = "";
-	if (args != null) {
+      System.Text.StringBuilder retval = new System.Text.StringBuilder();
+      if (args != null) {
 	  int count = ((Array)args).Length;
 	  for (int i = 0; i < count; i++) {
-		  if (args[i] is object[]) {
-			retval += array_to_string((object[])args[i]);
-		  } else {
-			if (retval != "")
-			  retval += " ";
-			retval += args[i];
-		  }
+	      if (args[i] is object[]) {
+		  retval.Append(array_to_string((object[])args[i]));
+	      } else {
+		  if (!retval.Equals(""))
+		      retval.Append(" ");
+		  retval.Append(args[i]);
+	      }
 	  }
-	}
-	return "(vector " + retval + ")";
+      }
+      return retval.Insert(0, "(vector ").Append(")").ToString();
   }
   
 
@@ -2867,12 +2866,12 @@ public class Scheme {
       return (x);
   }
 
-// FIXME: Rewrite without recursion
   public static string string_append(object x) {
-      if (null_q(x))
-	  return "";
-      else 
-	  return (car(x).ToString() + string_append(cdr(x)));
+      System.Text.StringBuilder text = new System.Text.StringBuilder();
+      while (! null_q(x)) {
+	  text.Append(car(x).ToString());
+      }
+      return text.ToString();
   }
 
 // FIXME: Rewrite without recursion
@@ -2926,13 +2925,13 @@ public class Scheme {
   }
   
   public static string arrayToString(object[] array) {
-	string retval = "";
-	foreach (object item in array) {
-	  if (retval != "")
-		retval += " ";
-	  retval += item.ToString();
-	}
-	return retval;
+      System.Text.StringBuilder retval = new System.Text.StringBuilder();
+      foreach (object item in array) {
+	  if (!retval.Equals(""))
+	      retval.Append(" ");
+	  retval.Append(item.ToString());
+      }
+      return retval.ToString();
   }
 
   public static object memq(object obj) {
@@ -3262,18 +3261,19 @@ public class Scheme {
 		((Cons)this.cdr).cdr == EmptyList) {
 	  return String.Format(",@{0}", ((Cons)this.cdr).car);
 	} else {
-	  string s = String.Format("({0}", this.car);
+	  System.Text.StringBuilder s = new System.Text.StringBuilder("(");
+	  s.Append(this.car.ToString());
 	  object sexp = this.cdr;
 	  while (sexp is Cons) {
-		s += String.Format(" {0}", ((Cons)sexp).car);
-		sexp = ((Cons)sexp).cdr;
+	      s.Append((((Cons)sexp).car).ToString());
+	      sexp = ((Cons)sexp).cdr;
 	  }
 	  if (Eq(sexp, EmptyList)) {
-		s += ")";
+	      s.Append(")");
 	  } else {
-		s += String.Format(" . {0})", sexp);
+	      s.Append(" . ").Append(sexp).Append(")");
 	  }
-	  return s;
+	  return s.ToString();
 	}
   }
 }
@@ -3303,14 +3303,14 @@ public class Scheme {
   }
 
   public override string ToString() {
-    string retval = "";
-    for (int i = 0; i < values.Length; i++) {
-      retval += values[i].ToString();
-      if (i < values.Length-1) {
-	retval += " ";
+      System.Text.StringBuilder retval = new System.Text.StringBuilder();
+      for (int i = 0; i < values.Length; i++) {
+	  retval.Append(values[i].ToString());
+	  if (i < values.Length-1) {
+	      retval.Append(" ");
+	  }
       }
-    }
-    return String.Format("#{0}({1})", values.Length, retval);
+      return String.Format("#{0}({1})", values.Length, retval);
   }
 
   public String __repr__() {
