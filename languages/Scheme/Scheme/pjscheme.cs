@@ -208,10 +208,9 @@ public class PJScheme:Scheme
    {
       object temp_1 = null;
       temp_1 = PJScheme.cdr ((object) k_reg);
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) temp_1),
-	       (object) symbol ("<cont-1>"))))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) temp_1),
+	      (object) symbol ("<cont-1>")))
 	{
 	   object chars = null;
 	   object fail = null;
@@ -228,10 +227,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) temp_1),
-		    (object) symbol ("<cont-2>"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) temp_1),
+		   (object) symbol ("<cont-2>")))
 	     {
 		object v1 = null;
 		object info = null;
@@ -248,10 +246,9 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) PJScheme.car ((object) temp_1),
-			 (object) symbol ("<cont-3>"))))
+		if (PJScheme.
+		    Eq ((object) PJScheme.car ((object) temp_1),
+			(object) symbol ("<cont-3>")))
 		  {
 		     object x = null;
 		     object info = null;
@@ -270,10 +267,9 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  Eq ((object) PJScheme.car ((object) temp_1),
-			      (object) symbol ("<cont-4>"))))
+		     if (PJScheme.
+			 Eq ((object) PJScheme.car ((object) temp_1),
+			     (object) symbol ("<cont-4>")))
 		       {
 			  object k = null;
 			  k = PJScheme.list_ref ((object) temp_1, (object) 1);
@@ -285,10 +281,9 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       Eq ((object) PJScheme.car ((object) temp_1),
-				   (object) symbol ("<cont-5>"))))
+			  if (PJScheme.
+			      Eq ((object) PJScheme.car ((object) temp_1),
+				  (object) symbol ("<cont-5>")))
 			    {
 			       object v1 = null;
 			       object k = null;
@@ -306,11 +301,10 @@ public class PJScheme:Scheme
 			    }
 			  else
 			    {
-			       if (true_q
-				   (PJScheme.
-				    Eq ((object) PJScheme.
-					car ((object) temp_1),
-					(object) symbol ("<cont-6>"))))
+			       if (PJScheme.
+				   Eq ((object) PJScheme.
+				       car ((object) temp_1),
+				       (object) symbol ("<cont-6>")))
 				 {
 				    object x = null;
 				    object k = null;
@@ -330,11 +324,10 @@ public class PJScheme:Scheme
 				 }
 			       else
 				 {
-				    if (true_q
-					(PJScheme.
-					 Eq ((object) PJScheme.
-					     car ((object) temp_1),
-					     (object) symbol ("<cont-7>"))))
+				    if (PJScheme.
+					Eq ((object) PJScheme.
+					    car ((object) temp_1),
+					    (object) symbol ("<cont-7>")))
 				      {
 					 object x = null;
 					 object k = null;
@@ -356,12 +349,11 @@ public class PJScheme:Scheme
 				      }
 				    else
 				      {
-					 if (true_q
-					     (PJScheme.
-					      Eq ((object) PJScheme.
-						  car ((object) temp_1),
-						  (object)
-						  symbol ("<cont-8>"))))
+					 if (PJScheme.
+					     Eq ((object) PJScheme.
+						 car ((object) temp_1),
+						 (object)
+						 symbol ("<cont-8>")))
 					   {
 					      object end = null;
 					      object tokens_left = null;
@@ -392,12 +384,11 @@ public class PJScheme:Scheme
 					   }
 					 else
 					   {
-					      if (true_q
-						  (PJScheme.
-						   Eq ((object) PJScheme.
-						       car ((object) temp_1),
-						       (object)
-						       symbol ("<cont-9>"))))
+					      if (PJScheme.
+						  Eq ((object) PJScheme.
+						      car ((object) temp_1),
+						      (object)
+						      symbol ("<cont-9>")))
 						{
 						   object end = null;
 						   object tokens = null;
@@ -436,14 +427,13 @@ public class PJScheme:Scheme
 						}
 					      else
 						{
-						   if (true_q
-						       (PJScheme.
-							Eq ((object) PJScheme.
-							    car ((object)
-								 temp_1),
-							    (object)
-							    symbol
-							    ("<cont-10>"))))
+						   if (PJScheme.
+						       Eq ((object) PJScheme.
+							   car ((object)
+								temp_1),
+							   (object)
+							   symbol
+							   ("<cont-10>")))
 						     {
 							object src = null;
 							object start = null;
@@ -503,15 +493,14 @@ public class PJScheme:Scheme
 						     }
 						   else
 						     {
-							if (true_q
-							    (PJScheme.
-							     Eq ((object)
-								 PJScheme.
-								 car ((object)
-								      temp_1),
-								 (object)
-								 symbol
-								 ("<cont-11>"))))
+							if (PJScheme.
+							    Eq ((object)
+								PJScheme.
+								car ((object)
+								     temp_1),
+								(object)
+								symbol
+								("<cont-11>")))
 							  {
 							     {
 								final_reg =
@@ -521,11 +510,10 @@ public class PJScheme:Scheme
 							  }
 							else
 							  {
-							     if (true_q
-								 (PJScheme.
-								  Eq ((object)
-								      PJScheme.
-								      car ((object) temp_1), (object) symbol ("<cont-12>"))))
+							     if (PJScheme.
+								 Eq ((object)
+								     PJScheme.
+								     car ((object) temp_1), (object) symbol ("<cont-12>")))
 							       {
 								  object
 								     adatum =
@@ -628,9 +616,7 @@ public class PJScheme:Scheme
 							       }
 							     else
 							       {
-								  if (true_q
-								      (PJScheme.
-								       Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-13>"))))
+								  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-13>")))
 								    {
 								       object
 									  adatum
@@ -713,7 +699,7 @@ public class PJScheme:Scheme
 								    }
 								  else
 								    {
-								       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-14>"))))
+								       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-14>")))
 									 {
 									    object
 									       aclauses
@@ -772,7 +758,7 @@ public class PJScheme:Scheme
 									 }
 								       else
 									 {
-									    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-15>"))))
+									    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-15>")))
 									      {
 										 object
 										    senv
@@ -837,7 +823,7 @@ public class PJScheme:Scheme
 									      }
 									    else
 									      {
-										 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-16>"))))
+										 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-16>")))
 										   {
 										      object
 											 senv
@@ -897,7 +883,7 @@ public class PJScheme:Scheme
 										   }
 										 else
 										   {
-										      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-17>"))))
+										      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-17>")))
 											{
 											   object
 											      adatum
@@ -949,7 +935,7 @@ public class PJScheme:Scheme
 											      PJScheme.
 											      list_ref
 											      ((object) temp_1, (object) 1);
-											   if (true_q (PJScheme.original_source_info_q ((object) adatum)))
+											   if (PJScheme.original_source_info_q ((object) adatum))
 											     {
 												{
 												   k_reg
@@ -998,7 +984,7 @@ public class PJScheme:Scheme
 											}
 										      else
 											{
-											   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-18>"))))
+											   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-18>")))
 											     {
 												object
 												   adatum
@@ -1067,7 +1053,7 @@ public class PJScheme:Scheme
 											     }
 											   else
 											     {
-												if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-19>"))))
+												if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-19>")))
 												  {
 												     object
 													info
@@ -1108,7 +1094,7 @@ public class PJScheme:Scheme
 												  }
 												else
 												  {
-												     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-20>"))))
+												     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-20>")))
 												       {
 													  object
 													     info
@@ -1149,7 +1135,7 @@ public class PJScheme:Scheme
 												       }
 												     else
 												       {
-													  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-21>"))))
+													  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-21>")))
 													    {
 													       object
 														  msg
@@ -1199,7 +1185,7 @@ public class PJScheme:Scheme
 													    }
 													  else
 													    {
-													       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-22>"))))
+													       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-22>")))
 														 {
 														    object
 														       bindings
@@ -1228,7 +1214,7 @@ public class PJScheme:Scheme
 														 }
 													       else
 														 {
-														    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-23>"))))
+														    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-23>")))
 														      {
 															 object
 															    clauses
@@ -1258,7 +1244,7 @@ public class PJScheme:Scheme
 															    PJScheme.
 															    car_hat
 															    ((object) clauses);
-															 if (true_q (PJScheme.eq_q_hat ((object) PJScheme.car_hat ((object) clause), (object) symbol ("else"))))
+															 if (PJScheme.eq_q_hat ((object) PJScheme.car_hat ((object) clause), (object) symbol ("else")))
 															   {
 															      {
 																 value_reg
@@ -1274,7 +1260,7 @@ public class PJScheme:Scheme
 															   }
 															 else
 															   {
-															      if (true_q (PJScheme.symbol_q_hat ((object) PJScheme.car_hat ((object) clause))))
+															      if (PJScheme.symbol_q_hat ((object) PJScheme.car_hat ((object) clause)))
 																{
 																   {
 																      value_reg
@@ -1307,7 +1293,7 @@ public class PJScheme:Scheme
 														      }
 														    else
 														      {
-															 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-24>"))))
+															 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-24>")))
 															   {
 															      object
 																 fields
@@ -1356,7 +1342,7 @@ public class PJScheme:Scheme
 															   }
 															 else
 															   {
-															      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-25>"))))
+															      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-25>")))
 																{
 																   object
 																      cdrs
@@ -1403,7 +1389,7 @@ public class PJScheme:Scheme
 																}
 															      else
 																{
-																   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-26>"))))
+																   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-26>")))
 																     {
 																	object
 																	   adatum
@@ -1437,7 +1423,7 @@ public class PJScheme:Scheme
 																	   PJScheme.
 																	   list_ref
 																	   ((object) temp_1, (object) 1);
-																	if (true_q (PJScheme.has_source_info_q ((object) value_reg)))
+																	if (PJScheme.has_source_info_q ((object) value_reg))
 																	  {
 																	     {
 																		value2_reg
@@ -1463,7 +1449,7 @@ public class PJScheme:Scheme
 																		PJScheme.
 																		get_source_info
 																		((object) adatum);
-																	     if (true_q (PJScheme.original_source_info_q ((object) adatum)))
+																	     if (PJScheme.original_source_info_q ((object) adatum))
 																	       {
 																		  {
 																		     value2_reg
@@ -1501,7 +1487,7 @@ public class PJScheme:Scheme
 																     }
 																   else
 																     {
-																	if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-27>"))))
+																	if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-27>")))
 																	  {
 																	     object
 																		adatum
@@ -1552,7 +1538,7 @@ public class PJScheme:Scheme
 																	  }
 																	else
 																	  {
-																	     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-28>"))))
+																	     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-28>")))
 																	       {
 																		  object
 																		     aclauses
@@ -1673,7 +1659,7 @@ public class PJScheme:Scheme
 																	       }
 																	     else
 																	       {
-																		  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-29>"))))
+																		  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-29>")))
 																		    {
 																		       object
 																			  aclauses
@@ -1783,7 +1769,7 @@ public class PJScheme:Scheme
 																		    }
 																		  else
 																		    {
-																		       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-30>"))))
+																		       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-30>")))
 																			 {
 																			    object
 																			       v1
@@ -1808,7 +1794,7 @@ public class PJScheme:Scheme
 																			 }
 																		       else
 																			 {
-																			    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-31>"))))
+																			    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-31>")))
 																			      {
 																				 object
 																				    ax
@@ -1847,7 +1833,7 @@ public class PJScheme:Scheme
 																			      }
 																			    else
 																			      {
-																				 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-32>"))))
+																				 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-32>")))
 																				   {
 																				      object
 																					 k
@@ -1867,7 +1853,7 @@ public class PJScheme:Scheme
 																				   }
 																				 else
 																				   {
-																				      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-33>"))))
+																				      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-33>")))
 																					{
 																					   object
 																					      depth
@@ -1899,7 +1885,7 @@ public class PJScheme:Scheme
 																					}
 																				      else
 																					{
-																					   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-34>"))))
+																					   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-34>")))
 																					     {
 																						object
 																						   ax
@@ -1924,7 +1910,7 @@ public class PJScheme:Scheme
 																					     }
 																					   else
 																					     {
-																						if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-35>"))))
+																						if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-35>")))
 																						  {
 																						     object
 																							k
@@ -1944,7 +1930,7 @@ public class PJScheme:Scheme
 																						  }
 																						else
 																						  {
-																						     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-36>"))))
+																						     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-36>")))
 																						       {
 																							  object
 																							     v1
@@ -1969,7 +1955,7 @@ public class PJScheme:Scheme
 																						       }
 																						     else
 																						       {
-																							  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-37>"))))
+																							  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-37>")))
 																							    {
 																							       object
 																								  ax
@@ -2008,7 +1994,7 @@ public class PJScheme:Scheme
 																							    }
 																							  else
 																							    {
-																							       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-38>"))))
+																							       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-38>")))
 																								 {
 																								    object
 																								       k
@@ -2028,7 +2014,7 @@ public class PJScheme:Scheme
 																								 }
 																							       else
 																								 {
-																								    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-39>"))))
+																								    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-39>")))
 																								      {
 																									 object
 																									    ax
@@ -2053,7 +2039,7 @@ public class PJScheme:Scheme
 																								      }
 																								    else
 																								      {
-																									 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-40>"))))
+																									 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-40>")))
 																									   {
 																									      object
 																										 k
@@ -2073,7 +2059,7 @@ public class PJScheme:Scheme
 																									   }
 																									 else
 																									   {
-																									      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-41>"))))
+																									      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-41>")))
 																										{
 																										   object
 																										      args
@@ -2131,7 +2117,7 @@ public class PJScheme:Scheme
 																										}
 																									      else
 																										{
-																										   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-42>"))))
+																										   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-42>")))
 																										     {
 																											object
 																											   handler
@@ -2180,7 +2166,7 @@ public class PJScheme:Scheme
 																										     }
 																										   else
 																										     {
-																											if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-43>"))))
+																											if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-43>")))
 																											  {
 																											     object
 																												handler
@@ -2227,7 +2213,7 @@ public class PJScheme:Scheme
 																											  }
 																											else
 																											  {
-																											     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-44>"))))
+																											     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-44>")))
 																											       {
 																												  object
 																												     fail
@@ -2257,7 +2243,7 @@ public class PJScheme:Scheme
 																											       }
 																											     else
 																											       {
-																												  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-45>"))))
+																												  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-45>")))
 																												    {
 																												       object
 																													  x
@@ -2308,7 +2294,7 @@ public class PJScheme:Scheme
 																												    }
 																												  else
 																												    {
-																												       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-46>"))))
+																												       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-46>")))
 																													 {
 																													    object
 																													       i
@@ -2365,7 +2351,7 @@ public class PJScheme:Scheme
 																													 }
 																												       else
 																													 {
-																													    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-47>"))))
+																													    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-47>")))
 																													      {
 																														 object
 																														    ls
@@ -2461,7 +2447,7 @@ public class PJScheme:Scheme
 																													      }
 																													    else
 																													      {
-																														 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-48>"))))
+																														 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-48>")))
 																														   {
 																														      object
 																															 pattern
@@ -2514,7 +2500,7 @@ public class PJScheme:Scheme
 																														   }
 																														 else
 																														   {
-																														      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-49>"))))
+																														      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-49>")))
 																															{
 																															   object
 																															      ap2
@@ -2565,7 +2551,7 @@ public class PJScheme:Scheme
 																															}
 																														      else
 																															{
-																															   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-50>"))))
+																															   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-50>")))
 																															     {
 																																object
 																																   s_car
@@ -2581,7 +2567,7 @@ public class PJScheme:Scheme
 																																   PJScheme.
 																																   list_ref
 																																   ((object) temp_1, (object) 1);
-																																if (true_q (PJScheme.not ((object) value_reg)))
+																																if (PJScheme.not ((object) value_reg))
 																																  {
 																																     {
 																																	value_reg
@@ -2610,7 +2596,7 @@ public class PJScheme:Scheme
 																															     }
 																															   else
 																															     {
-																																if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-51>"))))
+																																if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont-51>")))
 																																  {
 																																     object
 																																	apair1
@@ -2653,7 +2639,7 @@ public class PJScheme:Scheme
 																																	PJScheme.
 																																	list_ref
 																																	((object) temp_1, (object) 1);
-																																     if (true_q (PJScheme.not ((object) value_reg)))
+																																     if (PJScheme.not ((object) value_reg))
 																																       {
 																																	  {
 																																	     value_reg
@@ -2764,10 +2750,9 @@ public class PJScheme:Scheme
    {
       object temp_1 = null;
       temp_1 = PJScheme.cdr ((object) k_reg);
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) temp_1),
-	       (object) symbol ("<cont2-1>"))))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) temp_1),
+	      (object) symbol ("<cont2-1>")))
 	{
 	   object token = null;
 	   object k = null;
@@ -2780,10 +2765,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) temp_1),
-		    (object) symbol ("<cont2-2>"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) temp_1),
+		   (object) symbol ("<cont2-2>")))
 	     {
 		{
 		   final_reg = value1_reg;
@@ -2792,10 +2776,9 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) PJScheme.car ((object) temp_1),
-			 (object) symbol ("<cont2-3>"))))
+		if (PJScheme.
+		    Eq ((object) PJScheme.car ((object) temp_1),
+			(object) symbol ("<cont2-3>")))
 		  {
 		     object k = null;
 		     k = PJScheme.list_ref ((object) temp_1, (object) 1);
@@ -2807,10 +2790,9 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  Eq ((object) PJScheme.car ((object) temp_1),
-			      (object) symbol ("<cont2-4>"))))
+		     if (PJScheme.
+			 Eq ((object) PJScheme.car ((object) temp_1),
+			     (object) symbol ("<cont2-4>")))
 		       {
 			  object k = null;
 			  k = PJScheme.list_ref ((object) temp_1, (object) 1);
@@ -2822,10 +2804,9 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       Eq ((object) PJScheme.car ((object) temp_1),
-				   (object) symbol ("<cont2-5>"))))
+			  if (PJScheme.
+			      Eq ((object) PJScheme.car ((object) temp_1),
+				  (object) symbol ("<cont2-5>")))
 			    {
 			       object v1 = null;
 			       object info = null;
@@ -2848,11 +2829,10 @@ public class PJScheme:Scheme
 			    }
 			  else
 			    {
-			       if (true_q
-				   (PJScheme.
-				    Eq ((object) PJScheme.
-					car ((object) temp_1),
-					(object) symbol ("<cont2-6>"))))
+			       if (PJScheme.
+				   Eq ((object) PJScheme.
+				       car ((object) temp_1),
+				       (object) symbol ("<cont2-6>")))
 				 {
 				    object adatum = null;
 				    object senv = null;
@@ -2889,11 +2869,10 @@ public class PJScheme:Scheme
 				 }
 			       else
 				 {
-				    if (true_q
-					(PJScheme.
-					 Eq ((object) PJScheme.
-					     car ((object) temp_1),
-					     (object) symbol ("<cont2-7>"))))
+				    if (PJScheme.
+					Eq ((object) PJScheme.
+					    car ((object) temp_1),
+					    (object) symbol ("<cont2-7>")))
 				      {
 					 object info = null;
 					 object k = null;
@@ -2914,12 +2893,11 @@ public class PJScheme:Scheme
 				      }
 				    else
 				      {
-					 if (true_q
-					     (PJScheme.
-					      Eq ((object) PJScheme.
-						  car ((object) temp_1),
-						  (object)
-						  symbol ("<cont2-8>"))))
+					 if (PJScheme.
+					     Eq ((object) PJScheme.
+						 car ((object) temp_1),
+						 (object)
+						 symbol ("<cont2-8>")))
 					   {
 					      object info = null;
 					      object k = null;
@@ -2941,12 +2919,11 @@ public class PJScheme:Scheme
 					   }
 					 else
 					   {
-					      if (true_q
-						  (PJScheme.
-						   Eq ((object) PJScheme.
-						       car ((object) temp_1),
-						       (object)
-						       symbol ("<cont2-9>"))))
+					      if (PJScheme.
+						  Eq ((object) PJScheme.
+						      car ((object) temp_1),
+						      (object)
+						      symbol ("<cont2-9>")))
 						{
 						   object cexps = null;
 						   object cvar = null;
@@ -2987,14 +2964,13 @@ public class PJScheme:Scheme
 						}
 					      else
 						{
-						   if (true_q
-						       (PJScheme.
-							Eq ((object) PJScheme.
-							    car ((object)
-								 temp_1),
-							    (object)
-							    symbol
-							    ("<cont2-10>"))))
+						   if (PJScheme.
+						       Eq ((object) PJScheme.
+							   car ((object)
+								temp_1),
+							   (object)
+							   symbol
+							   ("<cont2-10>")))
 						     {
 							object adatum = null;
 							object cvar = null;
@@ -3061,15 +3037,14 @@ public class PJScheme:Scheme
 						     }
 						   else
 						     {
-							if (true_q
-							    (PJScheme.
-							     Eq ((object)
-								 PJScheme.
-								 car ((object)
-								      temp_1),
-								 (object)
-								 symbol
-								 ("<cont2-11>"))))
+							if (PJScheme.
+							    Eq ((object)
+								PJScheme.
+								car ((object)
+								     temp_1),
+								(object)
+								symbol
+								("<cont2-11>")))
 							  {
 							     object adatum =
 								null;
@@ -3126,11 +3101,10 @@ public class PJScheme:Scheme
 							  }
 							else
 							  {
-							     if (true_q
-								 (PJScheme.
-								  Eq ((object)
-								      PJScheme.
-								      car ((object) temp_1), (object) symbol ("<cont2-12>"))))
+							     if (PJScheme.
+								 Eq ((object)
+								     PJScheme.
+								     car ((object) temp_1), (object) symbol ("<cont2-12>")))
 							       {
 								  object body
 								     = null;
@@ -3170,9 +3144,7 @@ public class PJScheme:Scheme
 							       }
 							     else
 							       {
-								  if (true_q
-								      (PJScheme.
-								       Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-13>"))))
+								  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-13>")))
 								    {
 								       object
 									  adatum
@@ -3237,7 +3209,7 @@ public class PJScheme:Scheme
 								    }
 								  else
 								    {
-								       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-14>"))))
+								       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-14>")))
 									 {
 									    object
 									       cvar
@@ -3284,7 +3256,7 @@ public class PJScheme:Scheme
 									 }
 								       else
 									 {
-									    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-15>"))))
+									    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-15>")))
 									      {
 										 object
 										    adatum
@@ -3363,7 +3335,7 @@ public class PJScheme:Scheme
 									      }
 									    else
 									      {
-										 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-16>"))))
+										 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-16>")))
 										   {
 										      object
 											 name
@@ -3397,7 +3369,7 @@ public class PJScheme:Scheme
 											 PJScheme.
 											 list_ref
 											 ((object) temp_1, (object) 1);
-										      if (true_q (PJScheme.list_q ((object) formals)))
+										      if (PJScheme.list_q ((object) formals))
 											{
 											   {
 											      value1_reg
@@ -3428,7 +3400,7 @@ public class PJScheme:Scheme
 										   }
 										 else
 										   {
-										      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-17>"))))
+										      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-17>")))
 											{
 											   object
 											      formals
@@ -3453,7 +3425,7 @@ public class PJScheme:Scheme
 											      PJScheme.
 											      list_ref
 											      ((object) temp_1, (object) 1);
-											   if (true_q (PJScheme.list_q ((object) formals)))
+											   if (PJScheme.list_q ((object) formals))
 											     {
 												{
 												   value1_reg
@@ -3484,7 +3456,7 @@ public class PJScheme:Scheme
 											}
 										      else
 											{
-											   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-18>"))))
+											   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-18>")))
 											     {
 												object
 												   info
@@ -3513,7 +3485,7 @@ public class PJScheme:Scheme
 											     }
 											   else
 											     {
-												if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-19>"))))
+												if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-19>")))
 												  {
 												     object
 													adatum
@@ -3551,7 +3523,7 @@ public class PJScheme:Scheme
 												  }
 												else
 												  {
-												     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-20>"))))
+												     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-20>")))
 												       {
 													  object
 													     adatum
@@ -3589,7 +3561,7 @@ public class PJScheme:Scheme
 												       }
 												     else
 												       {
-													  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-21>"))))
+													  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-21>")))
 													    {
 													       object
 														  adatum
@@ -3627,7 +3599,7 @@ public class PJScheme:Scheme
 													    }
 													  else
 													    {
-													       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-22>"))))
+													       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-22>")))
 														 {
 														    object
 														       adatum
@@ -3665,7 +3637,7 @@ public class PJScheme:Scheme
 														 }
 													       else
 														 {
-														    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-23>"))))
+														    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-23>")))
 														      {
 															 object
 															    info
@@ -3694,7 +3666,7 @@ public class PJScheme:Scheme
 														      }
 														    else
 														      {
-															 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-24>"))))
+															 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-24>")))
 															   {
 															      object
 																 adatum
@@ -3742,7 +3714,7 @@ public class PJScheme:Scheme
 															   }
 															 else
 															   {
-															      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-25>"))))
+															      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-25>")))
 																{
 																   object
 																      v1
@@ -3781,7 +3753,7 @@ public class PJScheme:Scheme
 																}
 															      else
 																{
-																   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-26>"))))
+																   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-26>")))
 																     {
 																	object
 																	   adatum
@@ -3853,7 +3825,7 @@ public class PJScheme:Scheme
 																     }
 																   else
 																     {
-																	if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-27>"))))
+																	if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-27>")))
 																	  {
 																	     object
 																		adatum
@@ -3920,7 +3892,7 @@ public class PJScheme:Scheme
 																	  }
 																	else
 																	  {
-																	     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-28>"))))
+																	     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-28>")))
 																	       {
 																		  object
 																		     v1
@@ -3954,7 +3926,7 @@ public class PJScheme:Scheme
 																	       }
 																	     else
 																	       {
-																		  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-29>"))))
+																		  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-29>")))
 																		    {
 																		       object
 																			  adatum
@@ -4021,7 +3993,7 @@ public class PJScheme:Scheme
 																		    }
 																		  else
 																		    {
-																		       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-30>"))))
+																		       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-30>")))
 																			 {
 																			    object
 																			       senv
@@ -4066,7 +4038,7 @@ public class PJScheme:Scheme
 																			 }
 																		       else
 																			 {
-																			    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-31>"))))
+																			    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-31>")))
 																			      {
 																				 object
 																				    a
@@ -4091,7 +4063,7 @@ public class PJScheme:Scheme
 																			      }
 																			    else
 																			      {
-																				 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-32>"))))
+																				 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-32>")))
 																				   {
 																				      object
 																					 adatum_list
@@ -4149,7 +4121,7 @@ public class PJScheme:Scheme
 																				   }
 																				 else
 																				   {
-																				      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-33>"))))
+																				      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-33>")))
 																					{
 																					   object
 																					      v1
@@ -4174,7 +4146,7 @@ public class PJScheme:Scheme
 																					}
 																				      else
 																					{
-																					   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-34>"))))
+																					   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-34>")))
 																					     {
 																						object
 																						   senv
@@ -4238,7 +4210,7 @@ public class PJScheme:Scheme
 																					     }
 																					   else
 																					     {
-																						if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-35>"))))
+																						if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-35>")))
 																						  {
 																						     object
 																							bodies
@@ -4267,7 +4239,7 @@ public class PJScheme:Scheme
 																						  }
 																						else
 																						  {
-																						     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-36>"))))
+																						     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-36>")))
 																						       {
 																							  object
 																							     procs
@@ -4310,7 +4282,7 @@ public class PJScheme:Scheme
 																						       }
 																						     else
 																						       {
-																							  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-37>"))))
+																							  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-37>")))
 																							    {
 																							       object
 																								  exp
@@ -4335,7 +4307,7 @@ public class PJScheme:Scheme
 																							    }
 																							  else
 																							    {
-																							       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-38>"))))
+																							       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-38>")))
 																								 {
 																								    object
 																								       clauses
@@ -4365,7 +4337,7 @@ public class PJScheme:Scheme
 																								       PJScheme.
 																								       car_hat
 																								       ((object) clauses);
-																								    if (true_q (PJScheme.eq_q_hat ((object) PJScheme.car_hat ((object) clause), (object) symbol ("else"))))
+																								    if (PJScheme.eq_q_hat ((object) PJScheme.car_hat ((object) clause), (object) symbol ("else")))
 																								      {
 																									 {
 																									    value2_reg
@@ -4386,7 +4358,7 @@ public class PJScheme:Scheme
 																								      }
 																								    else
 																								      {
-																									 if (true_q (PJScheme.symbol_q_hat ((object) PJScheme.car_hat ((object) clause))))
+																									 if (PJScheme.symbol_q_hat ((object) PJScheme.car_hat ((object) clause)))
 																									   {
 																									      object
 																										 name
@@ -4445,7 +4417,7 @@ public class PJScheme:Scheme
 																								 }
 																							       else
 																								 {
-																								    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-39>"))))
+																								    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-39>")))
 																								      {
 																									 object
 																									    clauses
@@ -4475,7 +4447,7 @@ public class PJScheme:Scheme
 																									    PJScheme.
 																									    car_hat
 																									    ((object) clauses);
-																									 if (true_q (PJScheme.eq_q_hat ((object) PJScheme.car_hat ((object) clause), (object) symbol ("else"))))
+																									 if (PJScheme.eq_q_hat ((object) PJScheme.car_hat ((object) clause), (object) symbol ("else")))
 																									   {
 																									      {
 																										 value2_reg
@@ -4496,7 +4468,7 @@ public class PJScheme:Scheme
 																									   }
 																									 else
 																									   {
-																									      if (true_q (PJScheme.symbol_q_hat ((object) PJScheme.car_hat ((object) clause))))
+																									      if (PJScheme.symbol_q_hat ((object) PJScheme.car_hat ((object) clause)))
 																										{
 																										   object
 																										      name
@@ -4555,7 +4527,7 @@ public class PJScheme:Scheme
 																								      }
 																								    else
 																								      {
-																									 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-40>"))))
+																									 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-40>")))
 																									   {
 																									      object
 																										 type_tester_name
@@ -4594,7 +4566,7 @@ public class PJScheme:Scheme
 																									   }
 																									 else
 																									   {
-																									      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-41>"))))
+																									      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-41>")))
 																										{
 																										   object
 																										      def
@@ -4633,7 +4605,7 @@ public class PJScheme:Scheme
 																										}
 																									      else
 																										{
-																										   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-42>"))))
+																										   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-42>")))
 																										     {
 																											object
 																											   variants
@@ -4664,7 +4636,7 @@ public class PJScheme:Scheme
 																										     }
 																										   else
 																										     {
-																											if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-43>"))))
+																											if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-43>")))
 																											  {
 																											     object
 																												exp
@@ -4707,7 +4679,7 @@ public class PJScheme:Scheme
 																											  }
 																											else
 																											  {
-																											     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-44>"))))
+																											     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-44>")))
 																											       {
 																												  object
 																												     macro_keyword
@@ -4736,7 +4708,7 @@ public class PJScheme:Scheme
 																											       }
 																											     else
 																											       {
-																												  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-45>"))))
+																												  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-45>")))
 																												    {
 																												       object
 																													  fail
@@ -4766,7 +4738,7 @@ public class PJScheme:Scheme
 																												    }
 																												  else
 																												    {
-																												       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-46>"))))
+																												       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-46>")))
 																													 {
 																													    {
 																													       _starlast_fail_star
@@ -4780,7 +4752,7 @@ public class PJScheme:Scheme
 																													 }
 																												       else
 																													 {
-																													    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-47>"))))
+																													    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-47>")))
 																													      {
 																														 {
 																														    k_reg
@@ -4803,7 +4775,7 @@ public class PJScheme:Scheme
 																													      }
 																													    else
 																													      {
-																														 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-48>"))))
+																														 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-48>")))
 																														   {
 																														      {
 																															 final_reg
@@ -4814,7 +4786,7 @@ public class PJScheme:Scheme
 																														   }
 																														 else
 																														   {
-																														      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-49>"))))
+																														      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-49>")))
 																															{
 																															   {
 																															      k_reg
@@ -4845,7 +4817,7 @@ public class PJScheme:Scheme
 																															}
 																														      else
 																															{
-																															   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-50>"))))
+																															   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-50>")))
 																															     {
 																																object
 																																   exp
@@ -4868,7 +4840,7 @@ public class PJScheme:Scheme
 																															     }
 																															   else
 																															     {
-																																if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-51>"))))
+																																if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-51>")))
 																																  {
 																																     object
 																																	exp
@@ -4891,7 +4863,7 @@ public class PJScheme:Scheme
 																																  }
 																																else
 																																  {
-																																     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-52>"))))
+																																     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-52>")))
 																																       {
 																																	  object
 																																	     args
@@ -4935,13 +4907,13 @@ public class PJScheme:Scheme
 																																	     PJScheme.
 																																	     list_ref
 																																	     ((object) temp_1, (object) 1);
-																																	  if (true_q (_staruse_stack_trace_star))
+																																	  if (_staruse_stack_trace_star)
 																																	    {
 																																	       PJScheme.
 																																		  push_stack_trace
 																																		  ((object) exp);
 																																	    }
-																																	  if (true_q (PJScheme.dlr_proc_q ((object) value1_reg)))
+																																	  if (PJScheme.dlr_proc_q ((object) value1_reg))
 																																	    {
 																																	       object
 																																		  result
@@ -4952,7 +4924,7 @@ public class PJScheme:Scheme
 																																		  PJScheme.
 																																		  dlr_apply
 																																		  ((object) value1_reg, (object) args);
-																																	       if (true_q (_staruse_stack_trace_star))
+																																	       if (_staruse_stack_trace_star)
 																																		 {
 																																		    PJScheme.
 																																		       pop_stack_trace
@@ -4969,9 +4941,9 @@ public class PJScheme:Scheme
 																																	    }
 																																	  else
 																																	    {
-																																	       if (true_q (PJScheme.procedure_object_q ((object) value1_reg)))
+																																	       if (PJScheme.procedure_object_q ((object) value1_reg))
 																																		 {
-																																		    if (true_q (_staruse_stack_trace_star))
+																																		    if (_staruse_stack_trace_star)
 																																		      {
 																																			 {
 																																			    k2_reg
@@ -5052,7 +5024,7 @@ public class PJScheme:Scheme
 																																       }
 																																     else
 																																       {
-																																	  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-53>"))))
+																																	  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-53>")))
 																																	    {
 																																	       object
 																																		  exp
@@ -5118,7 +5090,7 @@ public class PJScheme:Scheme
 																																	    }
 																																	  else
 																																	    {
-																																	       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-54>"))))
+																																	       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-54>")))
 																																		 {
 																																		    object
 																																		       handler
@@ -5143,7 +5115,7 @@ public class PJScheme:Scheme
 																																		 }
 																																	       else
 																																		 {
-																																		    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-55>"))))
+																																		    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-55>")))
 																																		      {
 																																			 object
 																																			    v
@@ -5166,7 +5138,7 @@ public class PJScheme:Scheme
 																																		      }
 																																		    else
 																																		      {
-																																			 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-56>"))))
+																																			 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-56>")))
 																																			   {
 																																			      object
 																																				 fexps
@@ -5218,7 +5190,7 @@ public class PJScheme:Scheme
 																																			   }
 																																			 else
 																																			   {
-																																			      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-57>"))))
+																																			      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-57>")))
 																																				{
 																																				   object
 																																				      aclauses
@@ -5257,7 +5229,7 @@ public class PJScheme:Scheme
 																																				}
 																																			      else
 																																				{
-																																				   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-58>"))))
+																																				   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-58>")))
 																																				     {
 																																					object
 																																					   docstring
@@ -5295,7 +5267,7 @@ public class PJScheme:Scheme
 																																				     }
 																																				   else
 																																				     {
-																																					if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-59>"))))
+																																					if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-59>")))
 																																					  {
 																																					     object
 																																						docstring
@@ -5337,7 +5309,7 @@ public class PJScheme:Scheme
 																																					  }
 																																					else
 																																					  {
-																																					     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-60>"))))
+																																					     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-60>")))
 																																					       {
 																																						  object
 																																						     docstring
@@ -5394,7 +5366,7 @@ public class PJScheme:Scheme
 																																					       }
 																																					     else
 																																					       {
-																																						  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-61>"))))
+																																						  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-61>")))
 																																						    {
 																																						       object
 																																							  rhs_value
@@ -5447,7 +5419,7 @@ public class PJScheme:Scheme
 																																						    }
 																																						  else
 																																						    {
-																																						       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-62>"))))
+																																						       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-62>")))
 																																							 {
 																																							    object
 																																							       rhs_value
@@ -5500,7 +5472,7 @@ public class PJScheme:Scheme
 																																							 }
 																																						       else
 																																							 {
-																																							    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-63>"))))
+																																							    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-63>")))
 																																							      {
 																																								 object
 																																								    var
@@ -5570,7 +5542,7 @@ public class PJScheme:Scheme
 																																							      }
 																																							    else
 																																							      {
-																																								 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-64>"))))
+																																								 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-64>")))
 																																								   {
 																																								      object
 																																									 else_exp
@@ -5654,7 +5626,7 @@ public class PJScheme:Scheme
 																																								   }
 																																								 else
 																																								   {
-																																								      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-65>"))))
+																																								      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-65>")))
 																																									{
 																																									   object
 																																									      k
@@ -5674,7 +5646,7 @@ public class PJScheme:Scheme
 																																									}
 																																								      else
 																																									{
-																																									   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-66>"))))
+																																									   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-66>")))
 																																									     {
 																																										object
 																																										   exps
@@ -5728,7 +5700,7 @@ public class PJScheme:Scheme
 																																									     }
 																																									   else
 																																									     {
-																																										if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-67>"))))
+																																										if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-67>")))
 																																										  {
 																																										     object
 																																											exps
@@ -5780,7 +5752,7 @@ public class PJScheme:Scheme
 																																										  }
 																																										else
 																																										  {
-																																										     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-68>"))))
+																																										     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-68>")))
 																																										       {
 																																											  object
 																																											     e
@@ -5810,7 +5782,7 @@ public class PJScheme:Scheme
 																																										       }
 																																										     else
 																																										       {
-																																											  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-69>"))))
+																																											  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-69>")))
 																																											    {
 																																											       object
 																																												  trace_depth
@@ -5842,7 +5814,7 @@ public class PJScheme:Scheme
 																																											    }
 																																											  else
 																																											    {
-																																											       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-70>"))))
+																																											       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-70>")))
 																																												 {
 																																												    object
 																																												       args
@@ -5889,7 +5861,7 @@ public class PJScheme:Scheme
 																																												 }
 																																											       else
 																																												 {
-																																												    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-71>"))))
+																																												    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-71>")))
 																																												      {
 																																													 object
 																																													    handler
@@ -5925,7 +5897,7 @@ public class PJScheme:Scheme
 																																												      }
 																																												    else
 																																												      {
-																																													 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-72>"))))
+																																													 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-72>")))
 																																													   {
 																																													      object
 																																														 handler
@@ -5964,7 +5936,7 @@ public class PJScheme:Scheme
 																																													   }
 																																													 else
 																																													   {
-																																													      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-73>"))))
+																																													      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-73>")))
 																																														{
 																																														   object
 																																														      handler
@@ -6003,14 +5975,14 @@ public class PJScheme:Scheme
 																																														}
 																																													      else
 																																														{
-																																														   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-74>"))))
+																																														   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-74>")))
 																																														     {
 																																															object
 																																															   k
 																																															   =
 																																															   null;
 																																															k = PJScheme.list_ref ((object) temp_1, (object) 1);
-																																															if (true_q (PJScheme.null_q ((object) load_stack)))
+																																															if (PJScheme.null_q ((object) load_stack))
 																																															  {
 																																															     PJScheme.
 																																																printf
@@ -6035,7 +6007,7 @@ public class PJScheme:Scheme
 																																														     }
 																																														   else
 																																														     {
-																																															if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-75>"))))
+																																															if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-75>")))
 																																															  {
 																																															     object
 																																																filename
@@ -6094,7 +6066,7 @@ public class PJScheme:Scheme
 																																															  }
 																																															else
 																																															  {
-																																															     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-76>"))))
+																																															     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-76>")))
 																																															       {
 																																																  object
 																																																     src
@@ -6133,7 +6105,7 @@ public class PJScheme:Scheme
 																																																     list_ref
 																																																     ((object) temp_1, (object) 2);
 																																																  src = PJScheme.list_ref ((object) temp_1, (object) 1);
-																																																  if (true_q (PJScheme.token_type_q ((object) PJScheme.first ((object) tokens_left), (object) symbol ("end-marker"))))
+																																																  if (PJScheme.token_type_q ((object) PJScheme.first ((object) tokens_left), (object) symbol ("end-marker")))
 																																																    {
 																																																       {
 																																																	  k_reg
@@ -6169,7 +6141,7 @@ public class PJScheme:Scheme
 																																															       }
 																																															     else
 																																															       {
-																																																  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-77>"))))
+																																																  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-77>")))
 																																																    {
 																																																       object
 																																																	  src
@@ -6230,7 +6202,7 @@ public class PJScheme:Scheme
 																																																    }
 																																																  else
 																																																    {
-																																																       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-78>"))))
+																																																       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-78>")))
 																																																	 {
 																																																	    object
 																																																	       filenames
@@ -6298,7 +6270,7 @@ public class PJScheme:Scheme
 																																																	 }
 																																																       else
 																																																	 {
-																																																	    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-79>"))))
+																																																	    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-79>")))
 																																																	      {
 																																																		 object
 																																																		    lst
@@ -6336,7 +6308,7 @@ public class PJScheme:Scheme
 																																																	      }
 																																																	    else
 																																																	      {
-																																																		 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-80>"))))
+																																																		 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-80>")))
 																																																		   {
 																																																		      object
 																																																			 filename
@@ -6398,7 +6370,7 @@ public class PJScheme:Scheme
 																																																		   }
 																																																		 else
 																																																		   {
-																																																		      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-81>"))))
+																																																		      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-81>")))
 																																																			{
 																																																			   object
 																																																			      args
@@ -6437,7 +6409,7 @@ public class PJScheme:Scheme
 																																																			      PJScheme.
 																																																			      list_ref
 																																																			      ((object) temp_1, (object) 1);
-																																																			   if (true_q (PJScheme.null_q ((object) PJScheme.cdr ((object) args))))
+																																																			   if (PJScheme.null_q ((object) PJScheme.cdr ((object) args)))
 																																																			     {
 																																																				{
 																																																				   k_reg
@@ -6448,7 +6420,7 @@ public class PJScheme:Scheme
 																																																			     }
 																																																			   else
 																																																			     {
-																																																				if (true_q (PJScheme.not ((object) PJScheme.environment_q ((object) value1_reg))))
+																																																				if (PJScheme.not ((object) PJScheme.environment_q ((object) value1_reg)))
 																																																				  {
 																																																				     {
 																																																					fail_reg
@@ -6498,7 +6470,7 @@ public class PJScheme:Scheme
 																																																			}
 																																																		      else
 																																																			{
-																																																			   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-82>"))))
+																																																			   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-82>")))
 																																																			     {
 																																																				object
 																																																				   ls1
@@ -6523,7 +6495,7 @@ public class PJScheme:Scheme
 																																																			     }
 																																																			   else
 																																																			     {
-																																																				if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-83>"))))
+																																																				if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-83>")))
 																																																				  {
 																																																				     object
 																																																					lists
@@ -6558,7 +6530,7 @@ public class PJScheme:Scheme
 																																																				  }
 																																																				else
 																																																				  {
-																																																				     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-84>"))))
+																																																				     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-84>")))
 																																																				       {
 																																																					  object
 																																																					     iterator
@@ -6620,7 +6592,7 @@ public class PJScheme:Scheme
 																																																				       }
 																																																				     else
 																																																				       {
-																																																					  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-85>"))))
+																																																					  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-85>")))
 																																																					    {
 																																																					       object
 																																																						  iterator
@@ -6684,7 +6656,7 @@ public class PJScheme:Scheme
 																																																					    }
 																																																					  else
 																																																					    {
-																																																					       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-86>"))))
+																																																					       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-86>")))
 																																																						 {
 																																																						    object
 																																																						       list1
@@ -6750,7 +6722,7 @@ public class PJScheme:Scheme
 																																																						 }
 																																																					       else
 																																																						 {
-																																																						    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-87>"))))
+																																																						    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-87>")))
 																																																						      {
 																																																							 object
 																																																							    list1
@@ -6788,7 +6760,7 @@ public class PJScheme:Scheme
 																																																						      }
 																																																						    else
 																																																						      {
-																																																							 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-88>"))))
+																																																							 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-88>")))
 																																																							   {
 																																																							      object
 																																																								 list1
@@ -6868,7 +6840,7 @@ public class PJScheme:Scheme
 																																																							   }
 																																																							 else
 																																																							   {
-																																																							      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-89>"))))
+																																																							      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-89>")))
 																																																								{
 																																																								   object
 																																																								      list1
@@ -6915,7 +6887,7 @@ public class PJScheme:Scheme
 																																																								}
 																																																							      else
 																																																								{
-																																																								   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-90>"))))
+																																																								   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-90>")))
 																																																								     {
 																																																									object
 																																																									   lists
@@ -6982,7 +6954,7 @@ public class PJScheme:Scheme
 																																																								     }
 																																																								   else
 																																																								     {
-																																																									if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-91>"))))
+																																																									if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-91>")))
 																																																									  {
 																																																									     object
 																																																										lists
@@ -7020,7 +6992,7 @@ public class PJScheme:Scheme
 																																																									  }
 																																																									else
 																																																									  {
-																																																									     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-92>"))))
+																																																									     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-92>")))
 																																																									       {
 																																																										  object
 																																																										     arg_list
@@ -7085,7 +7057,7 @@ public class PJScheme:Scheme
 																																																									       }
 																																																									     else
 																																																									       {
-																																																										  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-93>"))))
+																																																										  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-93>")))
 																																																										    {
 																																																										       object
 																																																											  new_acdr1
@@ -7141,7 +7113,7 @@ public class PJScheme:Scheme
 																																																										    }
 																																																										  else
 																																																										    {
-																																																										       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-94>"))))
+																																																										       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-94>")))
 																																																											 {
 																																																											    object
 																																																											       apair2
@@ -7198,7 +7170,7 @@ public class PJScheme:Scheme
 																																																											 }
 																																																										       else
 																																																											 {
-																																																											    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-95>"))))
+																																																											    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-95>")))
 																																																											      {
 																																																												 object
 																																																												    a
@@ -7238,7 +7210,7 @@ public class PJScheme:Scheme
 																																																											      }
 																																																											    else
 																																																											      {
-																																																												 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-96>"))))
+																																																												 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-96>")))
 																																																												   {
 																																																												      object
 																																																													 ap
@@ -7287,7 +7259,7 @@ public class PJScheme:Scheme
 																																																												   }
 																																																												 else
 																																																												   {
-																																																												      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-97>"))))
+																																																												      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont2-97>")))
 																																																													{
 																																																													   object
 																																																													      s2
@@ -7434,10 +7406,9 @@ public class PJScheme:Scheme
    {
       object temp_1 = null;
       temp_1 = PJScheme.cdr ((object) k_reg);
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) temp_1),
-	       (object) symbol ("<cont3-1>"))))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) temp_1),
+	      (object) symbol ("<cont3-1>")))
 	{
 	   object src = null;
 	   object handler = null;
@@ -7445,10 +7416,9 @@ public class PJScheme:Scheme
 	   k = PJScheme.list_ref ((object) temp_1, (object) 3);
 	   handler = PJScheme.list_ref ((object) temp_1, (object) 2);
 	   src = PJScheme.list_ref ((object) temp_1, (object) 1);
-	   if (true_q
-	       (PJScheme.
-		token_type_q ((object) value1_reg,
-			      (object) symbol ("end-marker"))))
+	   if (PJScheme.
+	       token_type_q ((object) value1_reg,
+			     (object) symbol ("end-marker")))
 	     {
 		{
 		   value2_reg = value3_reg;
@@ -7473,10 +7443,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) temp_1),
-		    (object) symbol ("<cont3-2>"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) temp_1),
+		   (object) symbol ("<cont3-2>")))
 	     {
 		{
 		   final_reg = value1_reg;
@@ -7485,10 +7454,9 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) PJScheme.car ((object) temp_1),
-			 (object) symbol ("<cont3-3>"))))
+		if (PJScheme.
+		    Eq ((object) PJScheme.car ((object) temp_1),
+			(object) symbol ("<cont3-3>")))
 		  {
 		     object k = null;
 		     k = PJScheme.list_ref ((object) temp_1, (object) 1);
@@ -7502,10 +7470,9 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  Eq ((object) PJScheme.car ((object) temp_1),
-			      (object) symbol ("<cont3-4>"))))
+		     if (PJScheme.
+			 Eq ((object) PJScheme.car ((object) temp_1),
+			     (object) symbol ("<cont3-4>")))
 		       {
 			  object rhs_value = null;
 			  object k = null;
@@ -7555,10 +7522,9 @@ public class PJScheme:Scheme
    {
       object temp_1 = null;
       temp_1 = PJScheme.cdr ((object) k_reg);
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) temp_1),
-	       (object) symbol ("<cont4-1>"))))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) temp_1),
+	      (object) symbol ("<cont4-1>")))
 	{
 	   object src = null;
 	   object start = null;
@@ -7579,10 +7545,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) temp_1),
-		    (object) symbol ("<cont4-2>"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) temp_1),
+		   (object) symbol ("<cont4-2>")))
 	     {
 		object src = null;
 		object start = null;
@@ -7604,10 +7569,9 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) PJScheme.car ((object) temp_1),
-			 (object) symbol ("<cont4-3>"))))
+		if (PJScheme.
+		    Eq ((object) PJScheme.car ((object) temp_1),
+			(object) symbol ("<cont4-3>")))
 		  {
 		     object src = null;
 		     object start = null;
@@ -7631,10 +7595,9 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  Eq ((object) PJScheme.car ((object) temp_1),
-			      (object) symbol ("<cont4-4>"))))
+		     if (PJScheme.
+			 Eq ((object) PJScheme.car ((object) temp_1),
+			     (object) symbol ("<cont4-4>")))
 		       {
 			  object sexp1 = null;
 			  object k = null;
@@ -7650,10 +7613,9 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       Eq ((object) PJScheme.car ((object) temp_1),
-				   (object) symbol ("<cont4-5>"))))
+			  if (PJScheme.
+			      Eq ((object) PJScheme.car ((object) temp_1),
+				  (object) symbol ("<cont4-5>")))
 			    {
 			       object src = null;
 			       object handler = null;
@@ -7680,11 +7642,10 @@ public class PJScheme:Scheme
 			    }
 			  else
 			    {
-			       if (true_q
-				   (PJScheme.
-				    Eq ((object) PJScheme.
-					car ((object) temp_1),
-					(object) symbol ("<cont4-6>"))))
+			       if (PJScheme.
+				   Eq ((object) PJScheme.
+				       car ((object) temp_1),
+				       (object) symbol ("<cont4-6>")))
 				 {
 				    object expected_terminator = null;
 				    object sexp1 = null;
@@ -7720,11 +7681,10 @@ public class PJScheme:Scheme
 				 }
 			       else
 				 {
-				    if (true_q
-					(PJScheme.
-					 Eq ((object) PJScheme.
-					     car ((object) temp_1),
-					     (object) symbol ("<cont4-7>"))))
+				    if (PJScheme.
+					Eq ((object) PJScheme.
+					    car ((object) temp_1),
+					    (object) symbol ("<cont4-7>")))
 				      {
 					 object expected_terminator = null;
 					 object src = null;
@@ -7745,13 +7705,12 @@ public class PJScheme:Scheme
 					    PJScheme.
 					    list_ref ((object) temp_1,
 						      (object) 1);
-					 if (true_q
-					     (PJScheme.
-					      token_type_q ((object) PJScheme.
-							    first ((object)
-								   value3_reg),
-							    (object)
-							    symbol ("dot"))))
+					 if (PJScheme.
+					     token_type_q ((object) PJScheme.
+							   first ((object)
+								  value3_reg),
+							   (object)
+							   symbol ("dot")))
 					   {
 					      {
 						 k_reg =
@@ -7802,12 +7761,11 @@ public class PJScheme:Scheme
 				      }
 				    else
 				      {
-					 if (true_q
-					     (PJScheme.
-					      Eq ((object) PJScheme.
-						  car ((object) temp_1),
-						  (object)
-						  symbol ("<cont4-8>"))))
+					 if (PJScheme.
+					     Eq ((object) PJScheme.
+						 car ((object) temp_1),
+						 (object)
+						 symbol ("<cont4-8>")))
 					   {
 					      {
 						 final_reg = value1_reg;
@@ -7816,12 +7774,11 @@ public class PJScheme:Scheme
 					   }
 					 else
 					   {
-					      if (true_q
-						  (PJScheme.
-						   Eq ((object) PJScheme.
-						       car ((object) temp_1),
-						       (object)
-						       symbol ("<cont4-9>"))))
+					      if (PJScheme.
+						  Eq ((object) PJScheme.
+						      car ((object) temp_1),
+						      (object)
+						      symbol ("<cont4-9>")))
 						{
 						   object senv = null;
 						   object src = null;
@@ -7869,14 +7826,13 @@ public class PJScheme:Scheme
 						}
 					      else
 						{
-						   if (true_q
-						       (PJScheme.
-							Eq ((object) PJScheme.
-							    car ((object)
-								 temp_1),
-							    (object)
-							    symbol
-							    ("<cont4-10>"))))
+						   if (PJScheme.
+						       Eq ((object) PJScheme.
+							   car ((object)
+								temp_1),
+							   (object)
+							   symbol
+							   ("<cont4-10>")))
 						     {
 							{
 							   _startokens_left_star
@@ -7902,15 +7858,14 @@ public class PJScheme:Scheme
 						     }
 						   else
 						     {
-							if (true_q
-							    (PJScheme.
-							     Eq ((object)
-								 PJScheme.
-								 car ((object)
-								      temp_1),
-								 (object)
-								 symbol
-								 ("<cont4-11>"))))
+							if (PJScheme.
+							    Eq ((object)
+								PJScheme.
+								car ((object)
+								     temp_1),
+								(object)
+								symbol
+								("<cont4-11>")))
 							  {
 							     object handler =
 								null;
@@ -7921,12 +7876,11 @@ public class PJScheme:Scheme
 							     handler =
 								PJScheme.
 								list_ref ((object) temp_1, (object) 1);
-							     if (true_q
-								 (PJScheme.
-								  token_type_q
-								  ((object)
-								   PJScheme.
-								   first ((object) value3_reg), (object) symbol ("end-marker"))))
+							     if (PJScheme.
+								 token_type_q
+								 ((object)
+								  PJScheme.
+								  first ((object) value3_reg), (object) symbol ("end-marker")))
 							       {
 								  {
 								     k_reg =
@@ -7975,11 +7929,10 @@ public class PJScheme:Scheme
 							  }
 							else
 							  {
-							     if (true_q
-								 (PJScheme.
-								  Eq ((object)
-								      PJScheme.
-								      car ((object) temp_1), (object) symbol ("<cont4-12>"))))
+							     if (PJScheme.
+								 Eq ((object)
+								     PJScheme.
+								     car ((object) temp_1), (object) symbol ("<cont4-12>")))
 							       {
 								  object
 								     handler =
@@ -8000,10 +7953,7 @@ public class PJScheme:Scheme
 								      temp_1,
 								      (object)
 								      1);
-								  if (true_q
-								      (PJScheme.
-								       token_type_q
-								       ((object) PJScheme.first ((object) value3_reg), (object) symbol ("end-marker"))))
+								  if (PJScheme.token_type_q ((object) PJScheme.first ((object) value3_reg), (object) symbol ("end-marker")))
 								    {
 								       {
 									  value2_reg
@@ -8044,9 +7994,7 @@ public class PJScheme:Scheme
 							       }
 							     else
 							       {
-								  if (true_q
-								      (PJScheme.
-								       Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont4-13>"))))
+								  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<cont4-13>")))
 								    {
 								       object
 									  src
@@ -8136,10 +8084,9 @@ public class PJScheme:Scheme
    {
       object temp_1 = null;
       temp_1 = PJScheme.cdr ((object) fail_reg);
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) temp_1),
-	       (object) symbol ("<fail-1>"))))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) temp_1),
+	      (object) symbol ("<fail-1>")))
 	{
 	   {
 	      final_reg = "no more choices";
@@ -8148,10 +8095,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) temp_1),
-		    (object) symbol ("<fail-2>"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) temp_1),
+		   (object) symbol ("<fail-2>")))
 	     {
 		object binding = null;
 		object old_value = null;
@@ -8167,10 +8113,9 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) PJScheme.car ((object) temp_1),
-			 (object) symbol ("<fail-3>"))))
+		if (PJScheme.
+		    Eq ((object) PJScheme.car ((object) temp_1),
+			(object) symbol ("<fail-3>")))
 		  {
 		     object components = null;
 		     object dlr_obj = null;
@@ -8192,10 +8137,9 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  Eq ((object) PJScheme.car ((object) temp_1),
-			      (object) symbol ("<fail-4>"))))
+		     if (PJScheme.
+			 Eq ((object) PJScheme.car ((object) temp_1),
+			     (object) symbol ("<fail-4>")))
 		       {
 			  object old_value = null;
 			  object var = null;
@@ -8214,10 +8158,9 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       Eq ((object) PJScheme.car ((object) temp_1),
-				   (object) symbol ("<fail-5>"))))
+			  if (PJScheme.
+			      Eq ((object) PJScheme.car ((object) temp_1),
+				  (object) symbol ("<fail-5>")))
 			    {
 			       object exps = null;
 			       object env = null;
@@ -8268,10 +8211,9 @@ public class PJScheme:Scheme
    {
       object temp_1 = null;
       temp_1 = PJScheme.cdr ((object) handler_reg);
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) temp_1),
-	       (object) symbol ("<handler-1>"))))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) temp_1),
+	      (object) symbol ("<handler-1>")))
 	{
 	   {
 	      final_reg =
@@ -8297,10 +8239,9 @@ public class PJScheme:Scheme
    {
       object temp_1 = null;
       temp_1 = PJScheme.cdr ((object) handler_reg);
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) temp_1),
-	       (object) symbol ("<handler2-1>"))))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) temp_1),
+	      (object) symbol ("<handler2-1>")))
 	{
 	   {
 	      final_reg =
@@ -8311,10 +8252,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) temp_1),
-		    (object) symbol ("<handler2-2>"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) temp_1),
+		   (object) symbol ("<handler2-2>")))
 	     {
 		{
 		   _starlast_fail_star = fail_reg;
@@ -8326,10 +8266,9 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) PJScheme.car ((object) temp_1),
-			 (object) symbol ("<handler2-3>"))))
+		if (PJScheme.
+		    Eq ((object) PJScheme.car ((object) temp_1),
+			(object) symbol ("<handler2-3>")))
 		  {
 		     {
 			final_reg = false;
@@ -8338,10 +8277,9 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  Eq ((object) PJScheme.car ((object) temp_1),
-			      (object) symbol ("<handler2-4>"))))
+		     if (PJScheme.
+			 Eq ((object) PJScheme.car ((object) temp_1),
+			     (object) symbol ("<handler2-4>")))
 		       {
 			  object cexps = null;
 			  object cvar = null;
@@ -8374,10 +8312,9 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       Eq ((object) PJScheme.car ((object) temp_1),
-				   (object) symbol ("<handler2-5>"))))
+			  if (PJScheme.
+			      Eq ((object) PJScheme.car ((object) temp_1),
+				  (object) symbol ("<handler2-5>")))
 			    {
 			       object fexps = null;
 			       object env = null;
@@ -8404,11 +8341,10 @@ public class PJScheme:Scheme
 			    }
 			  else
 			    {
-			       if (true_q
-				   (PJScheme.
-				    Eq ((object) PJScheme.
-					car ((object) temp_1),
-					(object) symbol ("<handler2-6>"))))
+			       if (PJScheme.
+				   Eq ((object) PJScheme.
+				       car ((object) temp_1),
+				       (object) symbol ("<handler2-6>")))
 				 {
 				    object cexps = null;
 				    object cvar = null;
@@ -8481,10 +8417,9 @@ public class PJScheme:Scheme
    {
       object temp_1 = null;
       temp_1 = PJScheme.cdr ((object) proc_reg);
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) temp_1),
-	       (object) symbol ("<proc-1>"))))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) temp_1),
+	      (object) symbol ("<proc-1>")))
 	{
 	   object bodies = null;
 	   object formals = null;
@@ -8492,10 +8427,9 @@ public class PJScheme:Scheme
 	   env = PJScheme.list_ref ((object) temp_1, (object) 3);
 	   formals = PJScheme.list_ref ((object) temp_1, (object) 2);
 	   bodies = PJScheme.list_ref ((object) temp_1, (object) 1);
-	   if (true_q
-	       (PJScheme.
-		EqualSign ((object) PJScheme.length ((object) args_reg),
-			   (object) PJScheme.length ((object) formals))))
+	   if (PJScheme.
+	       EqualSign ((object) PJScheme.length ((object) args_reg),
+			  (object) PJScheme.length ((object) formals)))
 	     {
 		{
 		   k_reg = k2_reg;
@@ -8516,10 +8450,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) temp_1),
-		    (object) symbol ("<proc-2>"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) temp_1),
+		   (object) symbol ("<proc-2>")))
 	     {
 		object bodies = null;
 		object formals = null;
@@ -8529,12 +8462,11 @@ public class PJScheme:Scheme
 		runt = PJScheme.list_ref ((object) temp_1, (object) 3);
 		formals = PJScheme.list_ref ((object) temp_1, (object) 2);
 		bodies = PJScheme.list_ref ((object) temp_1, (object) 1);
-		if (true_q
-		    (PJScheme.
-		     GreaterOrEqual ((object) PJScheme.
-				     length ((object) args_reg),
-				     (object) PJScheme.
-				     length ((object) formals))))
+		if (PJScheme.
+		    GreaterOrEqual ((object) PJScheme.
+				    length ((object) args_reg),
+				    (object) PJScheme.
+				    length ((object) formals)))
 		  {
 		     object new_env = null;
 		     new_env =
@@ -8569,10 +8501,9 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) PJScheme.car ((object) temp_1),
-			 (object) symbol ("<proc-3>"))))
+		if (PJScheme.
+		    Eq ((object) PJScheme.car ((object) temp_1),
+			(object) symbol ("<proc-3>")))
 		  {
 		     object bodies = null;
 		     object name = null;
@@ -8586,12 +8517,11 @@ public class PJScheme:Scheme
 			PJScheme.list_ref ((object) temp_1, (object) 3);
 		     name = PJScheme.list_ref ((object) temp_1, (object) 2);
 		     bodies = PJScheme.list_ref ((object) temp_1, (object) 1);
-		     if (true_q
-			 (PJScheme.
-			  EqualSign ((object) PJScheme.
-				     length ((object) args_reg),
-				     (object) PJScheme.
-				     length ((object) formals))))
+		     if (PJScheme.
+			 EqualSign ((object) PJScheme.
+				    length ((object) args_reg),
+				    (object) PJScheme.
+				    length ((object) formals)))
 		       {
 			  {
 			     PJScheme.printf ((object) "~acall: ~s~%",
@@ -8624,10 +8554,9 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  Eq ((object) PJScheme.car ((object) temp_1),
-			      (object) symbol ("<proc-4>"))))
+		     if (PJScheme.
+			 Eq ((object) PJScheme.car ((object) temp_1),
+			     (object) symbol ("<proc-4>")))
 		       {
 			  object bodies = null;
 			  object name = null;
@@ -8647,12 +8576,11 @@ public class PJScheme:Scheme
 			     PJScheme.list_ref ((object) temp_1, (object) 2);
 			  bodies =
 			     PJScheme.list_ref ((object) temp_1, (object) 1);
-			  if (true_q
-			      (PJScheme.
-			       GreaterOrEqual ((object) PJScheme.
-					       length ((object) args_reg),
-					       (object) PJScheme.
-					       length ((object) formals))))
+			  if (PJScheme.
+			      GreaterOrEqual ((object) PJScheme.
+					      length ((object) args_reg),
+					      (object) PJScheme.
+					      length ((object) formals)))
 			    {
 			       object new_env = null;
 			       new_env =
@@ -8694,10 +8622,9 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       Eq ((object) PJScheme.car ((object) temp_1),
-				   (object) symbol ("<proc-5>"))))
+			  if (PJScheme.
+			      Eq ((object) PJScheme.car ((object) temp_1),
+				  (object) symbol ("<proc-5>")))
 			    {
 			       {
 				  value2_reg = fail_reg;
@@ -8708,11 +8635,10 @@ public class PJScheme:Scheme
 			    }
 			  else
 			    {
-			       if (true_q
-				   (PJScheme.
-				    Eq ((object) PJScheme.
-					car ((object) temp_1),
-					(object) symbol ("<proc-6>"))))
+			       if (PJScheme.
+				   Eq ((object) PJScheme.
+				       car ((object) temp_1),
+				       (object) symbol ("<proc-6>")))
 				 {
 				    {
 				       value2_reg = fail_reg;
@@ -8727,11 +8653,10 @@ public class PJScheme:Scheme
 				 }
 			       else
 				 {
-				    if (true_q
-					(PJScheme.
-					 Eq ((object) PJScheme.
-					     car ((object) temp_1),
-					     (object) symbol ("<proc-7>"))))
+				    if (PJScheme.
+					Eq ((object) PJScheme.
+					    car ((object) temp_1),
+					    (object) symbol ("<proc-7>")))
 				      {
 					 {
 					    final_reg = end_of_session;
@@ -8740,17 +8665,15 @@ public class PJScheme:Scheme
 				      }
 				    else
 				      {
-					 if (true_q
-					     (PJScheme.
-					      Eq ((object) PJScheme.
-						  car ((object) temp_1),
-						  (object)
-						  symbol ("<proc-8>"))))
+					 if (PJScheme.
+					     Eq ((object) PJScheme.
+						 car ((object) temp_1),
+						 (object)
+						 symbol ("<proc-8>")))
 					   {
-					      if (true_q
-						  (PJScheme.
-						   length_one_q ((object)
-								 args_reg)))
+					      if (PJScheme.
+						  length_one_q ((object)
+								args_reg))
 						{
 						   {
 						      k_reg =
@@ -8777,10 +8700,9 @@ public class PJScheme:Scheme
 						}
 					      else
 						{
-						   if (true_q
-						       (PJScheme.
-							length_two_q ((object)
-								      args_reg)))
+						   if (PJScheme.
+						       length_two_q ((object)
+								     args_reg))
 						     {
 							{
 							   k_reg =
@@ -8811,18 +8733,15 @@ public class PJScheme:Scheme
 					   }
 					 else
 					   {
-					      if (true_q
-						  (PJScheme.
-						   Eq ((object) PJScheme.
-						       car ((object) temp_1),
-						       (object)
-						       symbol ("<proc-9>"))))
+					      if (PJScheme.
+						  Eq ((object) PJScheme.
+						      car ((object) temp_1),
+						      (object)
+						      symbol ("<proc-9>")))
 						{
-						   if (true_q
-						       (PJScheme.
-							not ((object)
-							     PJScheme.
-							     length_one_q ((object) args_reg))))
+						   if (PJScheme.
+						       not ((object) PJScheme.
+							    length_one_q ((object) args_reg)))
 						     {
 							{
 							   msg_reg =
@@ -8834,11 +8753,10 @@ public class PJScheme:Scheme
 						     }
 						   else
 						     {
-							if (true_q
-							    (PJScheme.
-							     not ((object)
-								  PJScheme.
-								  list_q ((object) PJScheme.car ((object) args_reg)))))
+							if (PJScheme.
+							    not ((object)
+								 PJScheme.
+								 list_q ((object) PJScheme.car ((object) args_reg))))
 							  {
 							     {
 								msg_reg =
@@ -8867,14 +8785,13 @@ public class PJScheme:Scheme
 						}
 					      else
 						{
-						   if (true_q
-						       (PJScheme.
-							Eq ((object) PJScheme.
-							    car ((object)
-								 temp_1),
-							    (object)
-							    symbol
-							    ("<proc-10>"))))
+						   if (PJScheme.
+						       Eq ((object) PJScheme.
+							   car ((object)
+								temp_1),
+							   (object)
+							   symbol
+							   ("<proc-10>")))
 						     {
 							{
 							   k_reg =
@@ -8893,19 +8810,20 @@ public class PJScheme:Scheme
 						     }
 						   else
 						     {
-							if (true_q
-							    (PJScheme.
-							     Eq ((object)
-								 PJScheme.
-								 car ((object)
-								      temp_1),
-								 (object)
-								 symbol
-								 ("<proc-11>"))))
+							if (PJScheme.
+							    Eq ((object)
+								PJScheme.
+								car ((object)
+								     temp_1),
+								(object)
+								symbol
+								("<proc-11>")))
 							  {
-							     if (true_q
-								 (PJScheme.
-								  not ((object) PJScheme.length_one_q ((object) args_reg))))
+							     if (PJScheme.
+								 not ((object)
+								      PJScheme.
+								      length_one_q
+								      ((object) args_reg)))
 							       {
 								  {
 								     msg_reg =
@@ -8917,9 +8835,7 @@ public class PJScheme:Scheme
 							       }
 							     else
 							       {
-								  if (true_q
-								      (PJScheme.
-								       not ((object) PJScheme.string_q ((object) PJScheme.car ((object) args_reg)))))
+								  if (PJScheme.not ((object) PJScheme.string_q ((object) PJScheme.car ((object) args_reg))))
 								    {
 								       {
 									  msg_reg
@@ -8954,15 +8870,12 @@ public class PJScheme:Scheme
 							  }
 							else
 							  {
-							     if (true_q
-								 (PJScheme.
-								  Eq ((object)
-								      PJScheme.
-								      car ((object) temp_1), (object) symbol ("<proc-12>"))))
+							     if (PJScheme.
+								 Eq ((object)
+								     PJScheme.
+								     car ((object) temp_1), (object) symbol ("<proc-12>")))
 							       {
-								  if (true_q
-								      (PJScheme.
-								       not ((object) PJScheme.length_two_q ((object) args_reg))))
+								  if (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg)))
 								    {
 								       {
 									  msg_reg
@@ -8975,7 +8888,7 @@ public class PJScheme:Scheme
 								    }
 								  else
 								    {
-								       if (true_q (PJScheme.not ((object) PJScheme.string_q ((object) PJScheme.car ((object) args_reg)))))
+								       if (PJScheme.not ((object) PJScheme.string_q ((object) PJScheme.car ((object) args_reg))))
 									 {
 									    {
 									       msg_reg
@@ -8986,7 +8899,7 @@ public class PJScheme:Scheme
 									 }
 								       else
 									 {
-									    if (true_q (PJScheme.not ((object) PJScheme.number_q ((object) PJScheme.cadr ((object) args_reg)))))
+									    if (PJScheme.not ((object) PJScheme.number_q ((object) PJScheme.cadr ((object) args_reg))))
 									      {
 										 {
 										    msg_reg
@@ -9018,9 +8931,7 @@ public class PJScheme:Scheme
 							       }
 							     else
 							       {
-								  if (true_q
-								      (PJScheme.
-								       Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-13>"))))
+								  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-13>")))
 								    {
 								       {
 									  value2_reg
@@ -9041,7 +8952,7 @@ public class PJScheme:Scheme
 								    }
 								  else
 								    {
-								       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-14>"))))
+								       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-14>")))
 									 {
 									    {
 									       value2_reg
@@ -9060,7 +8971,7 @@ public class PJScheme:Scheme
 									 }
 								       else
 									 {
-									    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-15>"))))
+									    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-15>")))
 									      {
 										 {
 										    k_reg
@@ -9082,7 +8993,7 @@ public class PJScheme:Scheme
 									      }
 									    else
 									      {
-										 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-16>"))))
+										 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-16>")))
 										   {
 										      {
 											 k_reg
@@ -9104,7 +9015,7 @@ public class PJScheme:Scheme
 										   }
 										 else
 										   {
-										      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-17>"))))
+										      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-17>")))
 											{
 											   object
 											      proc
@@ -9135,9 +9046,9 @@ public class PJScheme:Scheme
 											}
 										      else
 											{
-											   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-18>"))))
+											   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-18>")))
 											     {
-												if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+												if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 												  {
 												     {
 													msg_reg
@@ -9148,7 +9059,7 @@ public class PJScheme:Scheme
 												  }
 												else
 												  {
-												     if (true_q (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg))))
+												     if (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg)))
 												       {
 													  {
 													     msg_reg
@@ -9179,9 +9090,9 @@ public class PJScheme:Scheme
 											     }
 											   else
 											     {
-												if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-19>"))))
+												if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-19>")))
 												  {
-												     if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+												     if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 												       {
 													  {
 													     msg_reg
@@ -9210,9 +9121,9 @@ public class PJScheme:Scheme
 												  }
 												else
 												  {
-												     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-20>"))))
+												     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-20>")))
 												       {
-													  if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+													  if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 													    {
 													       {
 														  msg_reg
@@ -9241,9 +9152,9 @@ public class PJScheme:Scheme
 												       }
 												     else
 												       {
-													  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-21>"))))
+													  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-21>")))
 													    {
-													       if (true_q (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg))))
+													       if (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg)))
 														 {
 														    {
 														       msg_reg
@@ -9273,9 +9184,9 @@ public class PJScheme:Scheme
 													    }
 													  else
 													    {
-													       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-22>"))))
+													       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-22>")))
 														 {
-														    if (true_q (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg))))
+														    if (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg)))
 														      {
 															 {
 															    msg_reg
@@ -9305,7 +9216,7 @@ public class PJScheme:Scheme
 														 }
 													       else
 														 {
-														    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-23>"))))
+														    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-23>")))
 														      {
 															 {
 															    for_each
@@ -9326,7 +9237,7 @@ public class PJScheme:Scheme
 														      }
 														    else
 														      {
-															 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-24>"))))
+															 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-24>")))
 															   {
 															      {
 																 value2_reg
@@ -9346,7 +9257,7 @@ public class PJScheme:Scheme
 															   }
 															 else
 															   {
-															      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-25>"))))
+															      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-25>")))
 																{
 																   {
 																      value2_reg
@@ -9365,7 +9276,7 @@ public class PJScheme:Scheme
 																}
 															      else
 																{
-																   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-26>"))))
+																   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-26>")))
 																     {
 																	{
 																	   value2_reg
@@ -9384,7 +9295,7 @@ public class PJScheme:Scheme
 																     }
 																   else
 																     {
-																	if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-27>"))))
+																	if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-27>")))
 																	  {
 																	     {
 																		value2_reg
@@ -9403,7 +9314,7 @@ public class PJScheme:Scheme
 																	  }
 																	else
 																	  {
-																	     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-28>"))))
+																	     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-28>")))
 																	       {
 																		  {
 																		     value2_reg
@@ -9422,7 +9333,7 @@ public class PJScheme:Scheme
 																	       }
 																	     else
 																	       {
-																		  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-29>"))))
+																		  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-29>")))
 																		    {
 																		       object
 																			  s
@@ -9452,7 +9363,7 @@ public class PJScheme:Scheme
 																		    }
 																		  else
 																		    {
-																		       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-30>"))))
+																		       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-30>")))
 																			 {
 																			    {
 																			       config.
@@ -9476,9 +9387,9 @@ public class PJScheme:Scheme
 																			 }
 																		       else
 																			 {
-																			    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-31>"))))
+																			    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-31>")))
 																			      {
-																				 if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																				 if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																				   {
 																				      {
 																					 msg_reg
@@ -9507,9 +9418,9 @@ public class PJScheme:Scheme
 																			      }
 																			    else
 																			      {
-																				 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-32>"))))
+																				 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-32>")))
 																				   {
-																				      if (true_q (PJScheme.length_one_q ((object) args_reg)))
+																				      if (PJScheme.length_one_q ((object) args_reg))
 																					{
 																					   {
 																					      ls_reg
@@ -9540,9 +9451,9 @@ public class PJScheme:Scheme
 																				   }
 																				 else
 																				   {
-																				      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-33>"))))
+																				      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-33>")))
 																					{
-																					   if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																					   if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																					     {
 																						{
 																						   msg_reg
@@ -9574,9 +9485,9 @@ public class PJScheme:Scheme
 																					}
 																				      else
 																					{
-																					   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-34>"))))
+																					   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-34>")))
 																					     {
-																						if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																						if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																						  {
 																						     {
 																							msg_reg
@@ -9606,9 +9517,9 @@ public class PJScheme:Scheme
 																					     }
 																					   else
 																					     {
-																						if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-35>"))))
+																						if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-35>")))
 																						  {
-																						     if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																						     if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																						       {
 																							  {
 																							     msg_reg
@@ -9638,9 +9549,9 @@ public class PJScheme:Scheme
 																						  }
 																						else
 																						  {
-																						     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-36>"))))
+																						     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-36>")))
 																						       {
-																							  if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																							  if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																							    {
 																							       {
 																								  msg_reg
@@ -9670,9 +9581,9 @@ public class PJScheme:Scheme
 																						       }
 																						     else
 																						       {
-																							  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-37>"))))
+																							  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-37>")))
 																							    {
-																							       if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																							       if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																								 {
 																								    {
 																								       msg_reg
@@ -9702,9 +9613,9 @@ public class PJScheme:Scheme
 																							    }
 																							  else
 																							    {
-																							       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-38>"))))
+																							       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-38>")))
 																								 {
-																								    if (true_q (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg))))
+																								    if (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg)))
 																								      {
 																									 {
 																									    msg_reg
@@ -9715,7 +9626,7 @@ public class PJScheme:Scheme
 																								      }
 																								    else
 																								      {
-																									 if (true_q ((((bool) PJScheme.not ((object) PJScheme.char_q ((object) PJScheme.car ((object) args_reg)))) || ((bool) PJScheme.not ((object) PJScheme.char_q ((object) PJScheme.cadr ((object) args_reg)))))))
+																									 if ((((bool) PJScheme.not ((object) PJScheme.char_q ((object) PJScheme.car ((object) args_reg)))) || ((bool) PJScheme.not ((object) PJScheme.char_q ((object) PJScheme.cadr ((object) args_reg))))))
 																									   {
 																									      {
 																										 msg_reg
@@ -9746,9 +9657,9 @@ public class PJScheme:Scheme
 																								 }
 																							       else
 																								 {
-																								    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-39>"))))
+																								    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-39>")))
 																								      {
-																									 if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																									 if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																									   {
 																									      {
 																										 msg_reg
@@ -9778,9 +9689,9 @@ public class PJScheme:Scheme
 																								      }
 																								    else
 																								      {
-																									 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-40>"))))
+																									 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-40>")))
 																									   {
-																									      if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																									      if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																										{
 																										   {
 																										      msg_reg
@@ -9810,9 +9721,9 @@ public class PJScheme:Scheme
 																									   }
 																									 else
 																									   {
-																									      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-41>"))))
+																									      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-41>")))
 																										{
-																										   if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																										   if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																										     {
 																											{
 																											   msg_reg
@@ -9842,9 +9753,9 @@ public class PJScheme:Scheme
 																										}
 																									      else
 																										{
-																										   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-42>"))))
+																										   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-42>")))
 																										     {
-																											if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																											if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																											  {
 																											     {
 																												msg_reg
@@ -9874,9 +9785,9 @@ public class PJScheme:Scheme
 																										     }
 																										   else
 																										     {
-																											if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-43>"))))
+																											if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-43>")))
 																											  {
-																											     if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																											     if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																											       {
 																												  {
 																												     msg_reg
@@ -9906,9 +9817,9 @@ public class PJScheme:Scheme
 																											  }
 																											else
 																											  {
-																											     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-44>"))))
+																											     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-44>")))
 																											       {
-																												  if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																												  if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																												    {
 																												       {
 																													  msg_reg
@@ -9938,9 +9849,9 @@ public class PJScheme:Scheme
 																											       }
 																											     else
 																											       {
-																												  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-45>"))))
+																												  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-45>")))
 																												    {
-																												       if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																												       if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																													 {
 																													    {
 																													       msg_reg
@@ -9970,9 +9881,9 @@ public class PJScheme:Scheme
 																												    }
 																												  else
 																												    {
-																												       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-46>"))))
+																												       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-46>")))
 																													 {
-																													    if (true_q (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg))))
+																													    if (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg)))
 																													      {
 																														 {
 																														    msg_reg
@@ -10002,9 +9913,9 @@ public class PJScheme:Scheme
 																													 }
 																												       else
 																													 {
-																													    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-47>"))))
+																													    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-47>")))
 																													      {
-																														 if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																														 if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																														   {
 																														      {
 																															 msg_reg
@@ -10015,7 +9926,7 @@ public class PJScheme:Scheme
 																														   }
 																														 else
 																														   {
-																														      if (true_q (PJScheme.not ((object) PJScheme.pair_q ((object) PJScheme.car ((object) args_reg)))))
+																														      if (PJScheme.not ((object) PJScheme.pair_q ((object) PJScheme.car ((object) args_reg))))
 																															{
 																															   {
 																															      msg_reg
@@ -10048,9 +9959,9 @@ public class PJScheme:Scheme
 																													      }
 																													    else
 																													      {
-																														 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-48>"))))
+																														 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-48>")))
 																														   {
-																														      if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																														      if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																															{
 																															   {
 																															      msg_reg
@@ -10061,7 +9972,7 @@ public class PJScheme:Scheme
 																															}
 																														      else
 																															{
-																															   if (true_q (PJScheme.not ((object) PJScheme.pair_q ((object) PJScheme.car ((object) args_reg)))))
+																															   if (PJScheme.not ((object) PJScheme.pair_q ((object) PJScheme.car ((object) args_reg))))
 																															     {
 																																{
 																																   msg_reg
@@ -10094,9 +10005,9 @@ public class PJScheme:Scheme
 																														   }
 																														 else
 																														   {
-																														      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-49>"))))
+																														      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-49>")))
 																															{
-																															   if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																															   if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																															     {
 																																{
 																																   msg_reg
@@ -10107,7 +10018,7 @@ public class PJScheme:Scheme
 																															     }
 																															   else
 																															     {
-																																if (true_q (PJScheme.not ((object) PJScheme.length_at_least_q ((object) 2, (object) PJScheme.car ((object) args_reg)))))
+																																if (PJScheme.not ((object) PJScheme.length_at_least_q ((object) 2, (object) PJScheme.car ((object) args_reg))))
 																																  {
 																																     {
 																																	msg_reg
@@ -10140,9 +10051,9 @@ public class PJScheme:Scheme
 																															}
 																														      else
 																															{
-																															   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-50>"))))
+																															   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-50>")))
 																															     {
-																																if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																																if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																																  {
 																																     {
 																																	msg_reg
@@ -10153,7 +10064,7 @@ public class PJScheme:Scheme
 																																  }
 																																else
 																																  {
-																																     if (true_q (PJScheme.not ((object) PJScheme.length_at_least_q ((object) 3, (object) PJScheme.car ((object) args_reg)))))
+																																     if (PJScheme.not ((object) PJScheme.length_at_least_q ((object) 3, (object) PJScheme.car ((object) args_reg))))
 																																       {
 																																	  {
 																																	     msg_reg
@@ -10186,7 +10097,7 @@ public class PJScheme:Scheme
 																															     }
 																															   else
 																															     {
-																																if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-51>"))))
+																																if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-51>")))
 																																  {
 																																     {
 																																	value2_reg
@@ -10203,9 +10114,9 @@ public class PJScheme:Scheme
 																																  }
 																																else
 																																  {
-																																     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-52>"))))
+																																     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-52>")))
 																																       {
-																																	  if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																																	  if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																																	    {
 																																	       {
 																																		  msg_reg
@@ -10228,9 +10139,9 @@ public class PJScheme:Scheme
 																																       }
 																																     else
 																																       {
-																																	  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-53>"))))
+																																	  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-53>")))
 																																	    {
-																																	       if (true_q (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg))))
+																																	       if (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg)))
 																																		 {
 																																		    {
 																																		       msg_reg
@@ -10260,9 +10171,9 @@ public class PJScheme:Scheme
 																																	    }
 																																	  else
 																																	    {
-																																	       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-54>"))))
+																																	       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-54>")))
 																																		 {
-																																		    if (true_q (PJScheme.null_q ((object) args_reg)))
+																																		    if (PJScheme.null_q ((object) args_reg))
 																																		      {
 																																			 {
 																																			    msg_reg
@@ -10273,7 +10184,7 @@ public class PJScheme:Scheme
 																																		      }
 																																		    else
 																																		      {
-																																			 if (true_q (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg))))
+																																			 if (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg)))
 																																			   {
 																																			      {
 																																				 msg_reg
@@ -10304,9 +10215,9 @@ public class PJScheme:Scheme
 																																		 }
 																																	       else
 																																		 {
-																																		    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-55>"))))
+																																		    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-55>")))
 																																		      {
-																																			 if (true_q (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg))))
+																																			 if (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg)))
 																																			   {
 																																			      {
 																																				 msg_reg
@@ -10336,9 +10247,9 @@ public class PJScheme:Scheme
 																																		      }
 																																		    else
 																																		      {
-																																			 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-56>"))))
+																																			 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-56>")))
 																																			   {
-																																			      if (true_q (PJScheme.null_q ((object) args_reg)))
+																																			      if (PJScheme.null_q ((object) args_reg))
 																																				{
 																																				   {
 																																				      msg_reg
@@ -10349,7 +10260,7 @@ public class PJScheme:Scheme
 																																				}
 																																			      else
 																																				{
-																																				   if (true_q (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg))))
+																																				   if (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg)))
 																																				     {
 																																					{
 																																					   msg_reg
@@ -10392,9 +10303,9 @@ public class PJScheme:Scheme
 																																			   }
 																																			 else
 																																			   {
-																																			      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-57>"))))
+																																			      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-57>")))
 																																				{
-																																				   if (true_q (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg))))
+																																				   if (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg)))
 																																				     {
 																																					{
 																																					   msg_reg
@@ -10405,7 +10316,7 @@ public class PJScheme:Scheme
 																																				     }
 																																				   else
 																																				     {
-																																					if (true_q (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg))))
+																																					if (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg)))
 																																					  {
 																																					     {
 																																						msg_reg
@@ -10416,7 +10327,7 @@ public class PJScheme:Scheme
 																																					  }
 																																					else
 																																					  {
-																																					     if (true_q (PJScheme.EqualSign ((object) PJScheme.cadr ((object) args_reg), (object) 0)))
+																																					     if (PJScheme.EqualSign ((object) PJScheme.cadr ((object) args_reg), (object) 0))
 																																					       {
 																																						  {
 																																						     msg_reg
@@ -10448,9 +10359,9 @@ public class PJScheme:Scheme
 																																				}
 																																			      else
 																																				{
-																																				   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-58>"))))
+																																				   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-58>")))
 																																				     {
-																																					if (true_q (PJScheme.not ((object) PJScheme.length_at_least_q ((object) 2, (object) args_reg))))
+																																					if (PJScheme.not ((object) PJScheme.length_at_least_q ((object) 2, (object) args_reg)))
 																																					  {
 																																					     {
 																																						msg_reg
@@ -10461,7 +10372,7 @@ public class PJScheme:Scheme
 																																					  }
 																																					else
 																																					  {
-																																					     if (true_q (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg))))
+																																					     if (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg)))
 																																					       {
 																																						  {
 																																						     msg_reg
@@ -10492,9 +10403,9 @@ public class PJScheme:Scheme
 																																				     }
 																																				   else
 																																				     {
-																																					if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-59>"))))
+																																					if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-59>")))
 																																					  {
-																																					     if (true_q (PJScheme.not ((object) PJScheme.length_at_least_q ((object) 2, (object) args_reg))))
+																																					     if (PJScheme.not ((object) PJScheme.length_at_least_q ((object) 2, (object) args_reg)))
 																																					       {
 																																						  {
 																																						     msg_reg
@@ -10505,7 +10416,7 @@ public class PJScheme:Scheme
 																																					       }
 																																					     else
 																																					       {
-																																						  if (true_q (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg))))
+																																						  if (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg)))
 																																						    {
 																																						       {
 																																							  msg_reg
@@ -10536,9 +10447,9 @@ public class PJScheme:Scheme
 																																					  }
 																																					else
 																																					  {
-																																					     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-60>"))))
+																																					     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-60>")))
 																																					       {
-																																						  if (true_q (PJScheme.not ((object) PJScheme.length_at_least_q ((object) 2, (object) args_reg))))
+																																						  if (PJScheme.not ((object) PJScheme.length_at_least_q ((object) 2, (object) args_reg)))
 																																						    {
 																																						       {
 																																							  msg_reg
@@ -10549,7 +10460,7 @@ public class PJScheme:Scheme
 																																						    }
 																																						  else
 																																						    {
-																																						       if (true_q (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg))))
+																																						       if (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg)))
 																																							 {
 																																							    {
 																																							       msg_reg
@@ -10580,9 +10491,9 @@ public class PJScheme:Scheme
 																																					       }
 																																					     else
 																																					       {
-																																						  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-61>"))))
+																																						  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-61>")))
 																																						    {
-																																						       if (true_q (PJScheme.not ((object) PJScheme.length_at_least_q ((object) 2, (object) args_reg))))
+																																						       if (PJScheme.not ((object) PJScheme.length_at_least_q ((object) 2, (object) args_reg)))
 																																							 {
 																																							    {
 																																							       msg_reg
@@ -10593,7 +10504,7 @@ public class PJScheme:Scheme
 																																							 }
 																																						       else
 																																							 {
-																																							    if (true_q (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg))))
+																																							    if (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg)))
 																																							      {
 																																								 {
 																																								    msg_reg
@@ -10624,9 +10535,9 @@ public class PJScheme:Scheme
 																																						    }
 																																						  else
 																																						    {
-																																						       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-62>"))))
+																																						       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-62>")))
 																																							 {
-																																							    if (true_q (PJScheme.not ((object) PJScheme.length_at_least_q ((object) 2, (object) args_reg))))
+																																							    if (PJScheme.not ((object) PJScheme.length_at_least_q ((object) 2, (object) args_reg)))
 																																							      {
 																																								 {
 																																								    msg_reg
@@ -10637,7 +10548,7 @@ public class PJScheme:Scheme
 																																							      }
 																																							    else
 																																							      {
-																																								 if (true_q (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg))))
+																																								 if (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg)))
 																																								   {
 																																								      {
 																																									 msg_reg
@@ -10668,9 +10579,9 @@ public class PJScheme:Scheme
 																																							 }
 																																						       else
 																																							 {
-																																							    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-63>"))))
+																																							    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-63>")))
 																																							      {
-																																								 if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																																								 if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																																								   {
 																																								      {
 																																									 msg_reg
@@ -10681,7 +10592,7 @@ public class PJScheme:Scheme
 																																								   }
 																																								 else
 																																								   {
-																																								      if (true_q (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg))))
+																																								      if (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg)))
 																																									{
 																																									   {
 																																									      msg_reg
@@ -10712,9 +10623,9 @@ public class PJScheme:Scheme
 																																							      }
 																																							    else
 																																							      {
-																																								 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-64>"))))
+																																								 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-64>")))
 																																								   {
-																																								      if (true_q (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg))))
+																																								      if (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg)))
 																																									{
 																																									   {
 																																									      msg_reg
@@ -10747,9 +10658,9 @@ public class PJScheme:Scheme
 																																								   }
 																																								 else
 																																								   {
-																																								      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-65>"))))
+																																								      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-65>")))
 																																									{
-																																									   if (true_q (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg))))
+																																									   if (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg)))
 																																									     {
 																																										{
 																																										   msg_reg
@@ -10779,9 +10690,9 @@ public class PJScheme:Scheme
 																																									}
 																																								      else
 																																									{
-																																									   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-66>"))))
+																																									   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-66>")))
 																																									     {
-																																										if (true_q (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg))))
+																																										if (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg)))
 																																										  {
 																																										     {
 																																											msg_reg
@@ -10811,9 +10722,9 @@ public class PJScheme:Scheme
 																																									     }
 																																									   else
 																																									     {
-																																										if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-67>"))))
+																																										if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-67>")))
 																																										  {
-																																										     if (true_q (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg))))
+																																										     if (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg)))
 																																										       {
 																																											  {
 																																											     msg_reg
@@ -10849,9 +10760,9 @@ public class PJScheme:Scheme
 																																										  }
 																																										else
 																																										  {
-																																										     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-68>"))))
+																																										     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-68>")))
 																																										       {
-																																											  if (true_q ((((bool) PJScheme.null_q ((object) args_reg)) || ((bool) PJScheme.length_at_least_q ((object) 4, (object) args_reg)))))
+																																											  if ((((bool) PJScheme.null_q ((object) args_reg)) || ((bool) PJScheme.length_at_least_q ((object) 4, (object) args_reg))))
 																																											    {
 																																											       {
 																																												  msg_reg
@@ -10862,7 +10773,7 @@ public class PJScheme:Scheme
 																																											    }
 																																											  else
 																																											    {
-																																											       if (true_q (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg))))
+																																											       if (PJScheme.not ((object) PJScheme.all_numeric_q ((object) args_reg)))
 																																												 {
 																																												    {
 																																												       msg_reg
@@ -10893,9 +10804,9 @@ public class PJScheme:Scheme
 																																										       }
 																																										     else
 																																										       {
-																																											  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-69>"))))
+																																											  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-69>")))
 																																											    {
-																																											       if (true_q (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg))))
+																																											       if (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg)))
 																																												 {
 																																												    {
 																																												       msg_reg
@@ -10906,7 +10817,7 @@ public class PJScheme:Scheme
 																																												 }
 																																											       else
 																																												 {
-																																												    if (true_q (PJScheme.not ((object) PJScheme.pair_q ((object) PJScheme.car ((object) args_reg)))))
+																																												    if (PJScheme.not ((object) PJScheme.pair_q ((object) PJScheme.car ((object) args_reg))))
 																																												      {
 																																													 {
 																																													    msg_reg
@@ -10939,9 +10850,9 @@ public class PJScheme:Scheme
 																																											    }
 																																											  else
 																																											    {
-																																											       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-70>"))))
+																																											       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-70>")))
 																																												 {
-																																												    if (true_q (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg))))
+																																												    if (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg)))
 																																												      {
 																																													 {
 																																													    msg_reg
@@ -10952,7 +10863,7 @@ public class PJScheme:Scheme
 																																												      }
 																																												    else
 																																												      {
-																																													 if (true_q (PJScheme.not ((object) PJScheme.pair_q ((object) PJScheme.car ((object) args_reg)))))
+																																													 if (PJScheme.not ((object) PJScheme.pair_q ((object) PJScheme.car ((object) args_reg))))
 																																													   {
 																																													      {
 																																														 msg_reg
@@ -10985,7 +10896,7 @@ public class PJScheme:Scheme
 																																												 }
 																																											       else
 																																												 {
-																																												    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-71>"))))
+																																												    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-71>")))
 																																												      {
 																																													 object
 																																													    filename
@@ -10996,7 +10907,7 @@ public class PJScheme:Scheme
 																																													    PJScheme.
 																																													    car
 																																													    ((object) args_reg);
-																																													 if (true_q (PJScheme.null_q ((object) PJScheme.cdr ((object) args_reg))))
+																																													 if (PJScheme.null_q ((object) PJScheme.cdr ((object) args_reg)))
 																																													   {
 																																													      {
 																																														 k_reg
@@ -11040,7 +10951,7 @@ public class PJScheme:Scheme
 																																												      }
 																																												    else
 																																												      {
-																																													 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-72>"))))
+																																													 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-72>")))
 																																													   {
 																																													      {
 																																														 value2_reg
@@ -11059,7 +10970,7 @@ public class PJScheme:Scheme
 																																													   }
 																																													 else
 																																													   {
-																																													      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-73>"))))
+																																													      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-73>")))
 																																														{
 																																														   {
 																																														      k_reg
@@ -11073,7 +10984,7 @@ public class PJScheme:Scheme
 																																														}
 																																													      else
 																																														{
-																																														   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-74>"))))
+																																														   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-74>")))
 																																														     {
 																																															object
 																																															   k
@@ -11096,9 +11007,9 @@ public class PJScheme:Scheme
 																																														     }
 																																														   else
 																																														     {
-																																															if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-75>"))))
+																																															if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-75>")))
 																																															  {
-																																															     if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																																															     if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																																															       {
 																																																  {
 																																																     msg_reg
@@ -11118,7 +11029,7 @@ public class PJScheme:Scheme
 																																																     PJScheme.
 																																																     car
 																																																     ((object) args_reg);
-																																																  if (true_q (PJScheme.not ((object) PJScheme.procedure_object_q ((object) proc))))
+																																																  if (PJScheme.not ((object) PJScheme.procedure_object_q ((object) proc)))
 																																																    {
 																																																       {
 																																																	  msg_reg
@@ -11138,7 +11049,7 @@ public class PJScheme:Scheme
 																																																	  PJScheme.
 																																																	  make_proc
 																																																	  ((object) symbol ("<proc-74>"), (object) k2_reg);
-																																																       if (true_q (PJScheme.dlr_proc_q ((object) proc)))
+																																																       if (PJScheme.dlr_proc_q ((object) proc))
 																																																	 {
 																																																	    {
 																																																	       value2_reg
@@ -11174,9 +11085,9 @@ public class PJScheme:Scheme
 																																															  }
 																																															else
 																																															  {
-																																															     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-76>"))))
+																																															     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-76>")))
 																																															       {
-																																																  if (true_q (PJScheme.null_q ((object) args_reg)))
+																																																  if (PJScheme.null_q ((object) args_reg))
 																																																    {
 																																																       {
 																																																	  value2_reg
@@ -11211,9 +11122,9 @@ public class PJScheme:Scheme
 																																															       }
 																																															     else
 																																															       {
-																																																  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-77>"))))
+																																																  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-77>")))
 																																																    {
-																																																       if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																																																       if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																																																	 {
 																																																	    {
 																																																	       msg_reg
@@ -11224,7 +11135,7 @@ public class PJScheme:Scheme
 																																																	 }
 																																																       else
 																																																	 {
-																																																	    if (true_q (PJScheme.true_q ((object) PJScheme.car ((object) args_reg))))
+																																																	    if (PJScheme.true_q ((object) PJScheme.car ((object) args_reg)))
 																																																	      {
 																																																		 {
 																																																		    value2_reg
@@ -11248,9 +11159,9 @@ public class PJScheme:Scheme
 																																																    }
 																																																  else
 																																																    {
-																																																       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-78>"))))
+																																																       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-78>")))
 																																																	 {
-																																																	    if (true_q (PJScheme.not ((object) PJScheme.null_q ((object) args_reg))))
+																																																	    if (PJScheme.not ((object) PJScheme.null_q ((object) args_reg)))
 																																																	      {
 																																																		 {
 																																																		    msg_reg
@@ -11278,9 +11189,9 @@ public class PJScheme:Scheme
 																																																	 }
 																																																       else
 																																																	 {
-																																																	    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-79>"))))
+																																																	    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-79>")))
 																																																	      {
-																																																		 if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																																																		 if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																																																		   {
 																																																		      {
 																																																			 msg_reg
@@ -11291,7 +11202,7 @@ public class PJScheme:Scheme
 																																																		   }
 																																																		 else
 																																																		   {
-																																																		      if (true_q (PJScheme.not ((object) PJScheme.list_q ((object) args_reg))))
+																																																		      if (PJScheme.not ((object) PJScheme.list_q ((object) args_reg)))
 																																																			{
 																																																			   {
 																																																			      msg_reg
@@ -11324,7 +11235,7 @@ public class PJScheme:Scheme
 																																																	      }
 																																																	    else
 																																																	      {
-																																																		 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-80>"))))
+																																																		 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-80>")))
 																																																		   {
 																																																		      {
 																																																			 lists_reg
@@ -11335,9 +11246,9 @@ public class PJScheme:Scheme
 																																																		   }
 																																																		 else
 																																																		   {
-																																																		      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-81>"))))
+																																																		      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-81>")))
 																																																			{
-																																																			   if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																																																			   if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																																																			     {
 																																																				{
 																																																				   msg_reg
@@ -11367,9 +11278,9 @@ public class PJScheme:Scheme
 																																																			}
 																																																		      else
 																																																			{
-																																																			   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-82>"))))
+																																																			   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-82>")))
 																																																			     {
-																																																				if (true_q (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg))))
+																																																				if (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg)))
 																																																				  {
 																																																				     {
 																																																					msg_reg
@@ -11399,9 +11310,9 @@ public class PJScheme:Scheme
 																																																			     }
 																																																			   else
 																																																			     {
-																																																				if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-83>"))))
+																																																				if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-83>")))
 																																																				  {
-																																																				     if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																																																				     if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																																																				       {
 																																																					  {
 																																																					     msg_reg
@@ -11412,7 +11323,7 @@ public class PJScheme:Scheme
 																																																				       }
 																																																				     else
 																																																				       {
-																																																					  if (true_q (PJScheme.not ((object) PJScheme.list_q ((object) PJScheme.car ((object) args_reg)))))
+																																																					  if (PJScheme.not ((object) PJScheme.list_q ((object) PJScheme.car ((object) args_reg))))
 																																																					    {
 																																																					       {
 																																																						  msg_reg
@@ -11445,9 +11356,9 @@ public class PJScheme:Scheme
 																																																				  }
 																																																				else
 																																																				  {
-																																																				     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-84>"))))
+																																																				     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-84>")))
 																																																				       {
-																																																					  if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																																																					  if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																																																					    {
 																																																					       {
 																																																						  msg_reg
@@ -11458,7 +11369,7 @@ public class PJScheme:Scheme
 																																																					    }
 																																																					  else
 																																																					    {
-																																																					       if (true_q (PJScheme.not ((object) PJScheme.list_q ((object) PJScheme.car ((object) args_reg)))))
+																																																					       if (PJScheme.not ((object) PJScheme.list_q ((object) PJScheme.car ((object) args_reg))))
 																																																						 {
 																																																						    {
 																																																						       msg_reg
@@ -11471,7 +11382,7 @@ public class PJScheme:Scheme
 																																																						 }
 																																																					       else
 																																																						 {
-																																																						    if (true_q (PJScheme.not ((object) PJScheme.all_char_q ((object) PJScheme.car ((object) args_reg)))))
+																																																						    if (PJScheme.not ((object) PJScheme.all_char_q ((object) PJScheme.car ((object) args_reg))))
 																																																						      {
 																																																							 {
 																																																							    msg_reg
@@ -11505,7 +11416,7 @@ public class PJScheme:Scheme
 																																																				       }
 																																																				     else
 																																																				       {
-																																																					  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-85>"))))
+																																																					  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-85>")))
 																																																					    {
 																																																					       {
 																																																						  lst_reg
@@ -11518,7 +11429,7 @@ public class PJScheme:Scheme
 																																																					    }
 																																																					  else
 																																																					    {
-																																																					       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-86>"))))
+																																																					       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-86>")))
 																																																						 {
 																																																						    {
 																																																						       value2_reg
@@ -11537,7 +11448,7 @@ public class PJScheme:Scheme
 																																																						 }
 																																																					       else
 																																																						 {
-																																																						    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-87>"))))
+																																																						    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-87>")))
 																																																						      {
 																																																							 {
 																																																							    k_reg
@@ -11561,7 +11472,7 @@ public class PJScheme:Scheme
 																																																						      }
 																																																						    else
 																																																						      {
-																																																							 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-88>"))))
+																																																							 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-88>")))
 																																																							   {
 																																																							      {
 																																																								 k_reg
@@ -11585,7 +11496,7 @@ public class PJScheme:Scheme
 																																																							   }
 																																																							 else
 																																																							   {
-																																																							      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-89>"))))
+																																																							      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-89>")))
 																																																								{
 																																																								   {
 																																																								      value2_reg
@@ -11602,7 +11513,7 @@ public class PJScheme:Scheme
 																																																								}
 																																																							      else
 																																																								{
-																																																								   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-90>"))))
+																																																								   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-90>")))
 																																																								     {
 																																																									{
 																																																									   value2_reg
@@ -11621,9 +11532,9 @@ public class PJScheme:Scheme
 																																																								     }
 																																																								   else
 																																																								     {
-																																																									if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-91>"))))
+																																																									if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-91>")))
 																																																									  {
-																																																									     if (true_q (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg))))
+																																																									     if (PJScheme.not ((object) PJScheme.length_one_q ((object) args_reg)))
 																																																									       {
 																																																										  {
 																																																										     msg_reg
@@ -11652,7 +11563,7 @@ public class PJScheme:Scheme
 																																																									  }
 																																																									else
 																																																									  {
-																																																									     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-92>"))))
+																																																									     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-92>")))
 																																																									       {
 																																																										  {
 																																																										     apply
@@ -11673,7 +11584,7 @@ public class PJScheme:Scheme
 																																																									       }
 																																																									     else
 																																																									       {
-																																																										  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-93>"))))
+																																																										  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-93>")))
 																																																										    {
 																																																										       {
 																																																											  value2_reg
@@ -11693,7 +11604,7 @@ public class PJScheme:Scheme
 																																																										    }
 																																																										  else
 																																																										    {
-																																																										       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-94>"))))
+																																																										       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-94>")))
 																																																											 {
 																																																											    {
 																																																											       value2_reg
@@ -11712,7 +11623,7 @@ public class PJScheme:Scheme
 																																																											 }
 																																																										       else
 																																																											 {
-																																																											    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-95>"))))
+																																																											    if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-95>")))
 																																																											      {
 																																																												 {
 																																																												    value2_reg
@@ -11732,7 +11643,7 @@ public class PJScheme:Scheme
 																																																											      }
 																																																											    else
 																																																											      {
-																																																												 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-96>"))))
+																																																												 if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-96>")))
 																																																												   {
 																																																												      {
 																																																													 value2_reg
@@ -11752,9 +11663,9 @@ public class PJScheme:Scheme
 																																																												   }
 																																																												 else
 																																																												   {
-																																																												      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-97>"))))
+																																																												      if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-97>")))
 																																																													{
-																																																													   if (true_q (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg))))
+																																																													   if (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg)))
 																																																													     {
 																																																														{
 																																																														   msg_reg
@@ -11792,9 +11703,9 @@ public class PJScheme:Scheme
 																																																													}
 																																																												      else
 																																																													{
-																																																													   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-98>"))))
+																																																													   if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-98>")))
 																																																													     {
-																																																														if (true_q (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg))))
+																																																														if (PJScheme.not ((object) PJScheme.length_two_q ((object) args_reg)))
 																																																														  {
 																																																														     {
 																																																															msg_reg
@@ -11824,9 +11735,9 @@ public class PJScheme:Scheme
 																																																													     }
 																																																													   else
 																																																													     {
-																																																														if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-99>"))))
+																																																														if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-99>")))
 																																																														  {
-																																																														     if (true_q (PJScheme.null_q ((object) args_reg)))
+																																																														     if (PJScheme.null_q ((object) args_reg))
 																																																														       {
 																																																															  {
 																																																															     value2_reg
@@ -11845,9 +11756,9 @@ public class PJScheme:Scheme
 																																																														       }
 																																																														     else
 																																																														       {
-																																																															  if (true_q (PJScheme.length_one_q ((object) args_reg)))
+																																																															  if (PJScheme.length_one_q ((object) args_reg))
 																																																															    {
-																																																															       if (true_q (PJScheme.string_q ((object) PJScheme.car ((object) args_reg))))
+																																																															       if (PJScheme.string_q ((object) PJScheme.car ((object) args_reg)))
 																																																																 {
 																																																																    {
 																																																																       value2_reg
@@ -11887,9 +11798,9 @@ public class PJScheme:Scheme
 																																																														  }
 																																																														else
 																																																														  {
-																																																														     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-100>"))))
+																																																														     if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-100>")))
 																																																														       {
-																																																															  if (true_q ((((bool) PJScheme.length_one_q ((object) args_reg)) && ((bool) PJScheme.number_q ((object) PJScheme.car ((object) args_reg))))))
+																																																															  if ((((bool) PJScheme.length_one_q ((object) args_reg)) && ((bool) PJScheme.number_q ((object) PJScheme.car ((object) args_reg)))))
 																																																															    {
 																																																															       {
 																																																																  value2_reg
@@ -11918,7 +11829,7 @@ public class PJScheme:Scheme
 																																																														       }
 																																																														     else
 																																																														       {
-																																																															  if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-101>"))))
+																																																															  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("<proc-101>")))
 																																																															    {
 																																																															       object
 																																																																  external_function_object
@@ -12068,15 +11979,12 @@ public class PJScheme:Scheme
    {
       object temp_1 = null;
       temp_1 = PJScheme.cdr ((object) macro_reg);
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) temp_1),
-	       (object) symbol ("<macro-1>"))))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) temp_1),
+	      (object) symbol ("<macro-1>")))
 	{
-	   if (true_q
-	       (PJScheme.
-		symbol_q_hat ((object) PJScheme.
-			      cadr_hat ((object) datum_reg))))
+	   if (PJScheme.
+	       symbol_q_hat ((object) PJScheme.cadr_hat ((object) datum_reg)))
 	     {
 		object name = null;
 		object bindings = null;
@@ -12137,10 +12045,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) temp_1),
-		    (object) symbol ("<macro-2>"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) temp_1),
+		   (object) symbol ("<macro-2>")))
 	     {
 		object decls = null;
 		object vars = null;
@@ -12160,10 +12067,9 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) PJScheme.car ((object) temp_1),
-			 (object) symbol ("<macro-3>"))))
+		if (PJScheme.
+		    Eq ((object) PJScheme.car ((object) temp_1),
+			(object) symbol ("<macro-3>")))
 		  {
 		     object name = null;
 		     object formals = null;
@@ -12192,14 +12098,13 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  Eq ((object) PJScheme.car ((object) temp_1),
-			      (object) symbol ("<macro-4>"))))
+		     if (PJScheme.
+			 Eq ((object) PJScheme.car ((object) temp_1),
+			     (object) symbol ("<macro-4>")))
 		       {
 			  object exps = null;
 			  exps = PJScheme.cdr_hat ((object) datum_reg);
-			  if (true_q (PJScheme.null_q_hat ((object) exps)))
+			  if (PJScheme.null_q_hat ((object) exps))
 			    {
 			       {
 				  value_reg = true;
@@ -12208,10 +12113,9 @@ public class PJScheme:Scheme
 			    }
 			  else
 			    {
-			       if (true_q
-				   (PJScheme.
-				    null_q_hat ((object) PJScheme.
-						cdr_hat ((object) exps))))
+			       if (PJScheme.
+				   null_q_hat ((object) PJScheme.
+					       cdr_hat ((object) exps)))
 				 {
 				    {
 				       value_reg =
@@ -12238,15 +12142,13 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       Eq ((object) PJScheme.car ((object) temp_1),
-				   (object) symbol ("<macro-5>"))))
+			  if (PJScheme.
+			      Eq ((object) PJScheme.car ((object) temp_1),
+				  (object) symbol ("<macro-5>")))
 			    {
 			       object exps = null;
 			       exps = PJScheme.cdr_hat ((object) datum_reg);
-			       if (true_q
-				   (PJScheme.null_q_hat ((object) exps)))
+			       if (PJScheme.null_q_hat ((object) exps))
 				 {
 				    {
 				       value_reg = false;
@@ -12255,11 +12157,9 @@ public class PJScheme:Scheme
 				 }
 			       else
 				 {
-				    if (true_q
-					(PJScheme.
-					 null_q_hat ((object) PJScheme.
-						     cdr_hat ((object)
-							      exps))))
+				    if (PJScheme.
+					null_q_hat ((object) PJScheme.
+						    cdr_hat ((object) exps)))
 				      {
 					 {
 					    value_reg =
@@ -12289,18 +12189,16 @@ public class PJScheme:Scheme
 			    }
 			  else
 			    {
-			       if (true_q
-				   (PJScheme.
-				    Eq ((object) PJScheme.
-					car ((object) temp_1),
-					(object) symbol ("<macro-6>"))))
+			       if (PJScheme.
+				   Eq ((object) PJScheme.
+				       car ((object) temp_1),
+				       (object) symbol ("<macro-6>")))
 				 {
 				    object clauses = null;
 				    clauses =
 				       PJScheme.cdr_hat ((object) datum_reg);
-				    if (true_q
-					(PJScheme.
-					 null_q_hat ((object) clauses)))
+				    if (PJScheme.
+					null_q_hat ((object) clauses))
 				      {
 					 {
 					    adatum_reg = datum_reg;
@@ -12319,14 +12217,13 @@ public class PJScheme:Scheme
 					 first_clause =
 					    PJScheme.
 					    car_hat ((object) clauses);
-					 if (true_q
-					     ((((bool) PJScheme.
-						null_q_hat ((object)
-							    first_clause))
-					       || ((bool) PJScheme.
-						   not ((object) PJScheme.
-							list_q_hat ((object)
-								    first_clause))))))
+					 if ((((bool) PJScheme.
+					       null_q_hat ((object)
+							   first_clause))
+					      || ((bool) PJScheme.
+						  not ((object) PJScheme.
+						       list_q_hat ((object)
+								   first_clause)))))
 					   {
 					      {
 						 adatum_reg = first_clause;
@@ -12347,18 +12244,14 @@ public class PJScheme:Scheme
 						 PJScheme.
 						 car_hat ((object)
 							  first_clause);
-					      if (true_q
-						  (PJScheme.
-						   eq_q_hat ((object)
-							     test_exp,
-							     (object)
-							     symbol
-							     ("else"))))
+					      if (PJScheme.
+						  eq_q_hat ((object) test_exp,
+							    (object)
+							    symbol ("else")))
 						{
-						   if (true_q
-						       (PJScheme.
-							null_q_hat ((object)
-								    then_exps)))
+						   if (PJScheme.
+						       null_q_hat ((object)
+								   then_exps))
 						     {
 							{
 							   adatum_reg =
@@ -12372,9 +12265,8 @@ public class PJScheme:Scheme
 						     }
 						   else
 						     {
-							if (true_q
-							    (PJScheme.
-							     null_q_hat ((object) PJScheme.cdr_hat ((object) then_exps))))
+							if (PJScheme.
+							    null_q_hat ((object) PJScheme.cdr_hat ((object) then_exps)))
 							  {
 							     {
 								value_reg =
@@ -12400,14 +12292,12 @@ public class PJScheme:Scheme
 						}
 					      else
 						{
-						   if (true_q
-						       (PJScheme.
-							null_q_hat ((object)
-								    then_exps)))
+						   if (PJScheme.
+						       null_q_hat ((object)
+								   then_exps))
 						     {
-							if (true_q
-							    (PJScheme.
-							     null_q_hat ((object) other_clauses)))
+							if (PJScheme.
+							    null_q_hat ((object) other_clauses))
 							  {
 							     {
 								value_reg =
@@ -12432,13 +12322,14 @@ public class PJScheme:Scheme
 						     }
 						   else
 						     {
-							if (true_q
-							    (PJScheme.
-							     eq_q_hat ((object) PJScheme.car_hat ((object) then_exps), (object) symbol ("=>"))))
+							if (PJScheme.
+							    eq_q_hat ((object)
+								      PJScheme.
+								      car_hat
+								      ((object) then_exps), (object) symbol ("=>")))
 							  {
-							     if (true_q
-								 (PJScheme.
-								  null_q_hat ((object) PJScheme.cdr_hat ((object) then_exps))))
+							     if (PJScheme.
+								 null_q_hat ((object) PJScheme.cdr_hat ((object) then_exps)))
 							       {
 								  {
 								     adatum_reg
@@ -12453,10 +12344,7 @@ public class PJScheme:Scheme
 							       }
 							     else
 							       {
-								  if (true_q
-								      (PJScheme.
-								       null_q_hat
-								       ((object) other_clauses)))
+								  if (PJScheme.null_q_hat ((object) other_clauses))
 								    {
 								       {
 									  value_reg
@@ -12486,14 +12374,10 @@ public class PJScheme:Scheme
 							  }
 							else
 							  {
-							     if (true_q
-								 (PJScheme.
-								  null_q_hat ((object) other_clauses)))
+							     if (PJScheme.
+								 null_q_hat ((object) other_clauses))
 							       {
-								  if (true_q
-								      (PJScheme.
-								       null_q_hat
-								       ((object) PJScheme.cdr_hat ((object) then_exps))))
+								  if (PJScheme.null_q_hat ((object) PJScheme.cdr_hat ((object) then_exps)))
 								    {
 								       {
 									  value_reg
@@ -12522,10 +12406,7 @@ public class PJScheme:Scheme
 							       }
 							     else
 							       {
-								  if (true_q
-								      (PJScheme.
-								       null_q_hat
-								       ((object) PJScheme.cdr_hat ((object) then_exps))))
+								  if (PJScheme.null_q_hat ((object) PJScheme.cdr_hat ((object) then_exps)))
 								    {
 								       {
 									  value_reg
@@ -12560,11 +12441,10 @@ public class PJScheme:Scheme
 				 }
 			       else
 				 {
-				    if (true_q
-					(PJScheme.
-					 Eq ((object) PJScheme.
-					     car ((object) temp_1),
-					     (object) symbol ("<macro-7>"))))
+				    if (PJScheme.
+					Eq ((object) PJScheme.
+					    car ((object) temp_1),
+					    (object) symbol ("<macro-7>")))
 				      {
 					 object bindings = null;
 					 object bodies = null;
@@ -12583,12 +12463,11 @@ public class PJScheme:Scheme
 				      }
 				    else
 				      {
-					 if (true_q
-					     (PJScheme.
-					      Eq ((object) PJScheme.
-						  car ((object) temp_1),
-						  (object)
-						  symbol ("<macro-8>"))))
+					 if (PJScheme.
+					     Eq ((object) PJScheme.
+						 car ((object) temp_1),
+						 (object)
+						 symbol ("<macro-8>")))
 					   {
 					      object exp = null;
 					      object clauses = null;
@@ -12616,12 +12495,11 @@ public class PJScheme:Scheme
 					   }
 					 else
 					   {
-					      if (true_q
-						  (PJScheme.
-						   Eq ((object) PJScheme.
-						       car ((object) temp_1),
-						       (object)
-						       symbol ("<macro-9>"))))
+					      if (PJScheme.
+						  Eq ((object) PJScheme.
+						      car ((object) temp_1),
+						      (object)
+						      symbol ("<macro-9>")))
 						{
 						   object exp = null;
 						   object clauses = null;
@@ -12651,14 +12529,13 @@ public class PJScheme:Scheme
 						}
 					      else
 						{
-						   if (true_q
-						       (PJScheme.
-							Eq ((object) PJScheme.
-							    car ((object)
-								 temp_1),
-							    (object)
-							    symbol
-							    ("<macro-10>"))))
+						   if (PJScheme.
+						       Eq ((object) PJScheme.
+							   car ((object)
+								temp_1),
+							   (object)
+							   symbol
+							   ("<macro-10>")))
 						     {
 							object datatype_name =
 							   null;
@@ -12672,11 +12549,10 @@ public class PJScheme:Scheme
 							type_tester_name =
 							   PJScheme.
 							   string_to_symbol ((object) PJScheme.string_append ((object) PJScheme.symbol_to_string_hat ((object) datatype_name), (object) "?"));
-							if (true_q
-							    (PJScheme.
-							     not ((object)
-								  PJScheme.
-								  eq_q_hat ((object) PJScheme.caddr_hat ((object) datum_reg), (object) type_tester_name))))
+							if (PJScheme.
+							    not ((object)
+								 PJScheme.
+								 eq_q_hat ((object) PJScheme.caddr_hat ((object) datum_reg), (object) type_tester_name)))
 							  {
 							     {
 								adatum_reg =
@@ -12710,15 +12586,14 @@ public class PJScheme:Scheme
 						     }
 						   else
 						     {
-							if (true_q
-							    (PJScheme.
-							     Eq ((object)
-								 PJScheme.
-								 car ((object)
-								      temp_1),
-								 (object)
-								 symbol
-								 ("<macro-11>"))))
+							if (PJScheme.
+							    Eq ((object)
+								PJScheme.
+								car ((object)
+								     temp_1),
+								(object)
+								symbol
+								("<macro-11>")))
 							  {
 							     object type_name
 								= null;
@@ -12809,10 +12684,9 @@ public class PJScheme:Scheme
       last_scan_line = scan_line;
       last_scan_char = scan_char;
       last_scan_position = scan_position;
-      if (true_q
-	  (PJScheme.
-	   char_is__q ((object) PJScheme.next_avail ((object) chars),
-		       (object) NEWLINE)))
+      if (PJScheme.
+	  char_is__q ((object) PJScheme.next_avail ((object) chars),
+		      (object) NEWLINE))
 	{
 	   {
 	      scan_line = PJScheme.Add ((object) 1, (object) scan_line);
@@ -12854,10 +12728,9 @@ public class PJScheme:Scheme
    }
    new public static void apply_action ()
    {
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) action_reg),
-	       (object) symbol ("shift"))))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) action_reg),
+	      (object) symbol ("shift")))
 	{
 	   object next = null;
 	   next = PJScheme.list_ref ((object) action_reg, (object) 1);
@@ -12873,10 +12746,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) action_reg),
-		    (object) symbol ("replace"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) action_reg),
+		   (object) symbol ("replace")))
 	     {
 		object new_char = null;
 		object next = null;
@@ -12893,10 +12765,9 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) PJScheme.car ((object) action_reg),
-			 (object) symbol ("drop"))))
+		if (PJScheme.
+		    Eq ((object) PJScheme.car ((object) action_reg),
+			(object) symbol ("drop")))
 		  {
 		     object next = null;
 		     next =
@@ -12909,19 +12780,17 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  Eq ((object) PJScheme.car ((object) action_reg),
-			      (object) symbol ("goto"))))
+		     if (PJScheme.
+			 Eq ((object) PJScheme.car ((object) action_reg),
+			     (object) symbol ("goto")))
 		       {
 			  object state = null;
 			  state =
 			     PJScheme.list_ref ((object) action_reg,
 						(object) 1);
-			  if (true_q
-			      (PJScheme.
-			       Eq ((object) state,
-				   (object) symbol ("token-start-state"))))
+			  if (PJScheme.
+			      Eq ((object) state,
+				  (object) symbol ("token-start-state")))
 			    {
 			       PJScheme.mark_token_start ();
 			    }
@@ -12931,10 +12800,8 @@ public class PJScheme:Scheme
 						   (object) PJScheme.
 						   next_avail ((object)
 							       chars_reg));
-			  if (true_q
-			      (PJScheme.
-			       Eq ((object) action,
-				   (object) symbol ("error"))))
+			  if (PJScheme.
+			      Eq ((object) action, (object) symbol ("error")))
 			    {
 			       pc = (Function) unexpected_char_error;
 			    }
@@ -12949,11 +12816,9 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       Eq ((object) PJScheme.
-				   car ((object) action_reg),
-				   (object) symbol ("emit"))))
+			  if (PJScheme.
+			      Eq ((object) PJScheme.car ((object) action_reg),
+				  (object) symbol ("emit")))
 			    {
 			       object token_type = null;
 			       token_type =
@@ -12994,7 +12859,7 @@ public class PJScheme:Scheme
    {
       object c = null;
       c = PJScheme.next_avail ((object) chars_reg);
-      if (true_q (PJScheme.char_is__q ((object) c, (object) NULL)))
+      if (PJScheme.char_is__q ((object) c, (object) NULL))
 	{
 	   {
 	      char_reg = scan_char;
@@ -13020,9 +12885,8 @@ public class PJScheme:Scheme
    {
       object buffer = null;
       buffer = PJScheme.reverse ((object) buffer_reg);
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) token_type_reg, (object) symbol ("end-marker"))))
+      if (PJScheme.
+	  Eq ((object) token_type_reg, (object) symbol ("end-marker")))
 	{
 	   {
 	      value_reg =
@@ -13032,9 +12896,8 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) token_type_reg, (object) symbol ("integer"))))
+	   if (PJScheme.
+	       Eq ((object) token_type_reg, (object) symbol ("integer")))
 	     {
 		{
 		   value_reg =
@@ -13046,10 +12909,8 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) token_type_reg,
-			 (object) symbol ("decimal"))))
+		if (PJScheme.
+		    Eq ((object) token_type_reg, (object) symbol ("decimal")))
 		  {
 		     {
 			value_reg =
@@ -13062,10 +12923,9 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  Eq ((object) token_type_reg,
-			      (object) symbol ("rational"))))
+		     if (PJScheme.
+			 Eq ((object) token_type_reg,
+			     (object) symbol ("rational")))
 		       {
 			  {
 			     value_reg =
@@ -13079,10 +12939,9 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       Eq ((object) token_type_reg,
-				   (object) symbol ("identifier"))))
+			  if (PJScheme.
+			      Eq ((object) token_type_reg,
+				  (object) symbol ("identifier")))
 			    {
 			       {
 				  value_reg =
@@ -13100,10 +12959,9 @@ public class PJScheme:Scheme
 			    }
 			  else
 			    {
-			       if (true_q
-				   (PJScheme.
-				    Eq ((object) token_type_reg,
-					(object) symbol ("boolean"))))
+			       if (PJScheme.
+				   Eq ((object) token_type_reg,
+				       (object) symbol ("boolean")))
 				 {
 				    {
 				       value_reg =
@@ -13118,10 +12976,9 @@ public class PJScheme:Scheme
 				 }
 			       else
 				 {
-				    if (true_q
-					(PJScheme.
-					 Eq ((object) token_type_reg,
-					     (object) symbol ("character"))))
+				    if (PJScheme.
+					Eq ((object) token_type_reg,
+					    (object) symbol ("character")))
 				      {
 					 {
 					    value_reg =
@@ -13137,24 +12994,20 @@ public class PJScheme:Scheme
 				      }
 				    else
 				      {
-					 if (true_q
-					     (PJScheme.
-					      Eq ((object) token_type_reg,
-						  (object)
-						  symbol
-						  ("named-character"))))
+					 if (PJScheme.
+					     Eq ((object) token_type_reg,
+						 (object)
+						 symbol ("named-character")))
 					   {
 					      object name = null;
 					      name =
 						 PJScheme.
 						 list_to_string ((object)
 								 buffer);
-					      if (true_q
-						  (PJScheme.
-						   string_is__q ((object)
-								 name,
-								 (object)
-								 "nul")))
+					      if (PJScheme.
+						  string_is__q ((object) name,
+								(object)
+								"nul"))
 						{
 						   {
 						      value_reg =
@@ -13171,12 +13024,11 @@ public class PJScheme:Scheme
 						}
 					      else
 						{
-						   if (true_q
-						       (PJScheme.
-							string_is__q ((object)
-								      name,
-								      (object)
-								      "space")))
+						   if (PJScheme.
+						       string_is__q ((object)
+								     name,
+								     (object)
+								     "space"))
 						     {
 							{
 							   value_reg =
@@ -13189,9 +13041,8 @@ public class PJScheme:Scheme
 						     }
 						   else
 						     {
-							if (true_q
-							    (PJScheme.
-							     string_is__q ((object) name, (object) "tab")))
+							if (PJScheme.
+							    string_is__q ((object) name, (object) "tab"))
 							  {
 							     {
 								value_reg =
@@ -13209,13 +13060,12 @@ public class PJScheme:Scheme
 							  }
 							else
 							  {
-							     if (true_q
-								 (PJScheme.
-								  string_is__q
-								  ((object)
-								   name,
-								   (object)
-								   "newline")))
+							     if (PJScheme.
+								 string_is__q
+								 ((object)
+								  name,
+								  (object)
+								  "newline"))
 							       {
 								  {
 								     value_reg
@@ -13230,10 +13080,7 @@ public class PJScheme:Scheme
 							       }
 							     else
 							       {
-								  if (true_q
-								      (PJScheme.
-								       string_is__q
-								       ((object) name, (object) "linefeed")))
+								  if (PJScheme.string_is__q ((object) name, (object) "linefeed"))
 								    {
 								       {
 									  value_reg
@@ -13248,7 +13095,7 @@ public class PJScheme:Scheme
 								    }
 								  else
 								    {
-								       if (true_q (PJScheme.string_is__q ((object) name, (object) "backspace")))
+								       if (PJScheme.string_is__q ((object) name, (object) "backspace"))
 									 {
 									    {
 									       value_reg
@@ -13261,7 +13108,7 @@ public class PJScheme:Scheme
 									 }
 								       else
 									 {
-									    if (true_q (PJScheme.string_is__q ((object) name, (object) "return")))
+									    if (PJScheme.string_is__q ((object) name, (object) "return"))
 									      {
 										 {
 										    value_reg
@@ -13274,7 +13121,7 @@ public class PJScheme:Scheme
 									      }
 									    else
 									      {
-										 if (true_q (PJScheme.string_is__q ((object) name, (object) "page")))
+										 if (PJScheme.string_is__q ((object) name, (object) "page"))
 										   {
 										      {
 											 value_reg
@@ -13312,12 +13159,10 @@ public class PJScheme:Scheme
 					   }
 					 else
 					   {
-					      if (true_q
-						  (PJScheme.
-						   Eq ((object)
-						       token_type_reg,
-						       (object)
-						       symbol ("string"))))
+					      if (PJScheme.
+						  Eq ((object) token_type_reg,
+						      (object)
+						      symbol ("string")))
 						{
 						   {
 						      value_reg =
@@ -13365,8 +13210,7 @@ public class PJScheme:Scheme
       start =
 	 PJScheme.list ((object) token_start_line, (object) token_start_char,
 			(object) token_start_position);
-      if (true_q
-	  (PJScheme.Eq ((object) token_type, (object) symbol ("end-marker"))))
+      if (PJScheme.Eq ((object) token_type, (object) symbol ("end-marker")))
 	{
 	   return ((object) PJScheme.
 		   list ((object) token_type, (object) end, (object) end));
@@ -13419,7 +13263,7 @@ public class PJScheme:Scheme
    }
    new public static object rac (object ls)
    {
-      if (true_q (PJScheme.null_q ((object) PJScheme.cdr ((object) ls))))
+      if (PJScheme.null_q ((object) PJScheme.cdr ((object) ls)))
 	{
 	   return ((object) PJScheme.car ((object) ls));
 	}
@@ -13431,7 +13275,7 @@ public class PJScheme:Scheme
    }
    new public static object rdc (object ls)
    {
-      if (true_q (PJScheme.null_q ((object) PJScheme.cdr ((object) ls))))
+      if (PJScheme.null_q ((object) PJScheme.cdr ((object) ls)))
 	{
 	   return ((object) EmptyList);
 	}
@@ -13445,7 +13289,7 @@ public class PJScheme:Scheme
    }
    new public static object snoc (object x, object ls)
    {
-      if (true_q (PJScheme.null_q ((object) ls)))
+      if (PJScheme.null_q ((object) ls))
 	{
 	   return ((object) PJScheme.list ((object) x));
 	}
@@ -13524,10 +13368,9 @@ public class PJScheme:Scheme
    }
    new public static object apply_state (object state, object c)
    {
-      if (true_q
-	  (PJScheme.Eq ((object) state, (object) symbol ("start-state"))))
+      if (PJScheme.Eq ((object) state, (object) symbol ("start-state")))
 	{
-	   if (true_q (PJScheme.char_whitespace_q ((object) c)))
+	   if (PJScheme.char_whitespace_q ((object) c))
 	     {
 		return ((object) PJScheme.
 			list ((object) symbol ("drop"),
@@ -13537,7 +13380,7 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q (PJScheme.char_is__q ((object) c, (object) ';')))
+		if (PJScheme.char_is__q ((object) c, (object) ';'))
 		  {
 		     return ((object) PJScheme.
 			     list ((object) symbol ("drop"),
@@ -13547,8 +13390,7 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.char_is__q ((object) c, (object) NULL)))
+		     if (PJScheme.char_is__q ((object) c, (object) NULL))
 		       {
 			  return ((object) PJScheme.
 				  list ((object) symbol ("drop"),
@@ -13569,11 +13411,10 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) state, (object) symbol ("token-start-state"))))
+	   if (PJScheme.
+	       Eq ((object) state, (object) symbol ("token-start-state")))
 	     {
-		if (true_q (PJScheme.char_is__q ((object) c, (object) '(')))
+		if (PJScheme.char_is__q ((object) c, (object) '('))
 		  {
 		     return ((object) PJScheme.
 			     list ((object) symbol ("drop"),
@@ -13583,8 +13424,7 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.char_is__q ((object) c, (object) '[')))
+		     if (PJScheme.char_is__q ((object) c, (object) '['))
 		       {
 			  return ((object) PJScheme.
 				  list ((object) symbol ("drop"),
@@ -13594,9 +13434,7 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       char_is__q ((object) c, (object) ')')))
+			  if (PJScheme.char_is__q ((object) c, (object) ')'))
 			    {
 			       return ((object) PJScheme.
 				       list ((object) symbol ("drop"),
@@ -13607,9 +13445,8 @@ public class PJScheme:Scheme
 			    }
 			  else
 			    {
-			       if (true_q
-				   (PJScheme.
-				    char_is__q ((object) c, (object) ']')))
+			       if (PJScheme.
+				   char_is__q ((object) c, (object) ']'))
 				 {
 				    return ((object) PJScheme.
 					    list ((object) symbol ("drop"),
@@ -13622,10 +13459,9 @@ public class PJScheme:Scheme
 				 }
 			       else
 				 {
-				    if (true_q
-					(PJScheme.
-					 char_is__q ((object) c,
-						     (object) SINGLEQUOTE)))
+				    if (PJScheme.
+					char_is__q ((object) c,
+						    (object) SINGLEQUOTE))
 				      {
 					 return ((object) PJScheme.
 						 list ((object)
@@ -13639,11 +13475,9 @@ public class PJScheme:Scheme
 				      }
 				    else
 				      {
-					 if (true_q
-					     (PJScheme.
-					      char_is__q ((object) c,
-							  (object)
-							  BACKQUOTE)))
+					 if (PJScheme.
+					     char_is__q ((object) c,
+							 (object) BACKQUOTE))
 					   {
 					      return ((object) PJScheme.
 						      list ((object)
@@ -13658,10 +13492,9 @@ public class PJScheme:Scheme
 					   }
 					 else
 					   {
-					      if (true_q
-						  (PJScheme.
-						   char_is__q ((object) c,
-							       (object) ',')))
+					      if (PJScheme.
+						  char_is__q ((object) c,
+							      (object) ','))
 						{
 						   return ((object) PJScheme.
 							   list ((object)
@@ -13673,12 +13506,10 @@ public class PJScheme:Scheme
 						}
 					      else
 						{
-						   if (true_q
-						       (PJScheme.
-							char_is__q ((object)
-								    c,
-								    (object)
-								    '#')))
+						   if (PJScheme.
+						       char_is__q ((object) c,
+								   (object)
+								   '#'))
 						     {
 							return ((object)
 								PJScheme.
@@ -13691,9 +13522,8 @@ public class PJScheme:Scheme
 						     }
 						   else
 						     {
-							if (true_q
-							    (PJScheme.
-							     char_is__q ((object) c, (object) DOUBLEQUOTE)))
+							if (PJScheme.
+							    char_is__q ((object) c, (object) DOUBLEQUOTE))
 							  {
 							     return ((object)
 								     PJScheme.
@@ -13701,34 +13531,29 @@ public class PJScheme:Scheme
 							  }
 							else
 							  {
-							     if (true_q
-								 (PJScheme.
-								  char_initial_q
-								  ((object)
-								   c)))
+							     if (PJScheme.
+								 char_initial_q
+								 ((object) c))
 							       {
 								  return ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("identifier-state"))));
 							       }
 							     else
 							       {
-								  if (true_q
-								      (PJScheme.
-								       char_sign_q
-								       ((object) c)))
+								  if (PJScheme.char_sign_q ((object) c))
 								    {
 								       return
 									  ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("signed-state"))));
 								    }
 								  else
 								    {
-								       if (true_q (PJScheme.char_is__q ((object) c, (object) '.')))
+								       if (PJScheme.char_is__q ((object) c, (object) '.'))
 									 {
 									    return
 									       ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("decimal-point-state"))));
 									 }
 								       else
 									 {
-									    if (true_q (PJScheme.char_numeric_q ((object) c)))
+									    if (PJScheme.char_numeric_q ((object) c))
 									      {
 										 return
 										    ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("whole-number-state"))));
@@ -13753,12 +13578,10 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) state, (object) symbol ("comment-state"))))
+		if (PJScheme.
+		    Eq ((object) state, (object) symbol ("comment-state")))
 		  {
-		     if (true_q
-			 (PJScheme.char_is__q ((object) c, (object) NEWLINE)))
+		     if (PJScheme.char_is__q ((object) c, (object) NEWLINE))
 		       {
 			  return ((object) PJScheme.
 				  list ((object) symbol ("drop"),
@@ -13769,9 +13592,7 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       char_is__q ((object) c, (object) NULL)))
+			  if (PJScheme.char_is__q ((object) c, (object) NULL))
 			    {
 			       return ((object) PJScheme.
 				       list ((object) symbol ("drop"),
@@ -13794,14 +13615,10 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  Eq ((object) state,
-			      (object) symbol ("comma-state"))))
+		     if (PJScheme.
+			 Eq ((object) state, (object) symbol ("comma-state")))
 		       {
-			  if (true_q
-			      (PJScheme.
-			       char_is__q ((object) c, (object) '@')))
+			  if (PJScheme.char_is__q ((object) c, (object) '@'))
 			    {
 			       return ((object) PJScheme.
 				       list ((object) symbol ("drop"),
@@ -13819,13 +13636,11 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       Eq ((object) state,
-				   (object) symbol ("hash-prefix-state"))))
+			  if (PJScheme.
+			      Eq ((object) state,
+				  (object) symbol ("hash-prefix-state")))
 			    {
-			       if (true_q
-				   (PJScheme.char_boolean_q ((object) c)))
+			       if (PJScheme.char_boolean_q ((object) c))
 				 {
 				    return ((object) PJScheme.
 					    list ((object) symbol ("shift"),
@@ -13837,10 +13652,9 @@ public class PJScheme:Scheme
 				 }
 			       else
 				 {
-				    if (true_q
-					(PJScheme.
-					 char_is__q ((object) c,
-						     (object) BACKSLASH)))
+				    if (PJScheme.
+					char_is__q ((object) c,
+						    (object) BACKSLASH))
 				      {
 					 return ((object) PJScheme.
 						 list ((object)
@@ -13854,10 +13668,9 @@ public class PJScheme:Scheme
 				      }
 				    else
 				      {
-					 if (true_q
-					     (PJScheme.
-					      char_is__q ((object) c,
-							  (object) '(')))
+					 if (PJScheme.
+					     char_is__q ((object) c,
+							 (object) '('))
 					   {
 					      return ((object) PJScheme.
 						      list ((object)
@@ -13880,14 +13693,12 @@ public class PJScheme:Scheme
 			    }
 			  else
 			    {
-			       if (true_q
-				   (PJScheme.
-				    Eq ((object) state,
-					(object) symbol ("character-state"))))
+			       if (PJScheme.
+				   Eq ((object) state,
+				       (object) symbol ("character-state")))
 				 {
-				    if (true_q
-					(PJScheme.
-					 char_alphabetic_q ((object) c)))
+				    if (PJScheme.
+					char_alphabetic_q ((object) c))
 				      {
 					 return ((object) PJScheme.
 						 list ((object)
@@ -13901,12 +13712,10 @@ public class PJScheme:Scheme
 				      }
 				    else
 				      {
-					 if (true_q
-					     (PJScheme.
-					      not ((object) PJScheme.
-						   char_is__q ((object) c,
-							       (object)
-							       NULL))))
+					 if (PJScheme.
+					     not ((object) PJScheme.
+						  char_is__q ((object) c,
+							      (object) NULL)))
 					   {
 					      return ((object) PJScheme.
 						      list ((object)
@@ -13928,16 +13737,14 @@ public class PJScheme:Scheme
 				 }
 			       else
 				 {
-				    if (true_q
-					(PJScheme.
-					 Eq ((object) state,
-					     (object)
-					     symbol
-					     ("alphabetic-character-state"))))
+				    if (PJScheme.
+					Eq ((object) state,
+					    (object)
+					    symbol
+					    ("alphabetic-character-state")))
 				      {
-					 if (true_q
-					     (PJScheme.
-					      char_alphabetic_q ((object) c)))
+					 if (PJScheme.
+					     char_alphabetic_q ((object) c))
 					   {
 					      return ((object) PJScheme.
 						      list ((object)
@@ -13962,17 +13769,15 @@ public class PJScheme:Scheme
 				      }
 				    else
 				      {
-					 if (true_q
-					     (PJScheme.
-					      Eq ((object) state,
-						  (object)
-						  symbol
-						  ("named-character-state"))))
+					 if (PJScheme.
+					     Eq ((object) state,
+						 (object)
+						 symbol
+						 ("named-character-state")))
 					   {
-					      if (true_q
-						  (PJScheme.
-						   char_delimiter_q ((object)
-								     c)))
+					      if (PJScheme.
+						  char_delimiter_q ((object)
+								    c))
 						{
 						   return ((object) PJScheme.
 							   list ((object)
@@ -13995,19 +13800,16 @@ public class PJScheme:Scheme
 					   }
 					 else
 					   {
-					      if (true_q
-						  (PJScheme.
-						   Eq ((object) state,
-						       (object)
-						       symbol
-						       ("string-state"))))
+					      if (PJScheme.
+						  Eq ((object) state,
+						      (object)
+						      symbol
+						      ("string-state")))
 						{
-						   if (true_q
-						       (PJScheme.
-							char_is__q ((object)
-								    c,
-								    (object)
-								    DOUBLEQUOTE)))
+						   if (PJScheme.
+						       char_is__q ((object) c,
+								   (object)
+								   DOUBLEQUOTE))
 						     {
 							return ((object)
 								PJScheme.
@@ -14020,9 +13822,8 @@ public class PJScheme:Scheme
 						     }
 						   else
 						     {
-							if (true_q
-							    (PJScheme.
-							     char_is__q ((object) c, (object) BACKSLASH)))
+							if (PJScheme.
+							    char_is__q ((object) c, (object) BACKSLASH))
 							  {
 							     return ((object)
 								     PJScheme.
@@ -14030,9 +13831,11 @@ public class PJScheme:Scheme
 							  }
 							else
 							  {
-							     if (true_q
-								 (PJScheme.
-								  not ((object) PJScheme.char_is__q ((object) c, (object) NULL))))
+							     if (PJScheme.
+								 not ((object)
+								      PJScheme.
+								      char_is__q
+								      ((object) c, (object) NULL)))
 							       {
 								  return ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("string-state"))));
 							       }
@@ -14045,16 +13848,14 @@ public class PJScheme:Scheme
 						}
 					      else
 						{
-						   if (true_q
-						       (PJScheme.
-							Eq ((object) state,
-							    (object)
-							    symbol
-							    ("string-escape-state"))))
+						   if (PJScheme.
+						       Eq ((object) state,
+							   (object)
+							   symbol
+							   ("string-escape-state")))
 						     {
-							if (true_q
-							    (PJScheme.
-							     char_is__q ((object) c, (object) DOUBLEQUOTE)))
+							if (PJScheme.
+							    char_is__q ((object) c, (object) DOUBLEQUOTE))
 							  {
 							     return ((object)
 								     PJScheme.
@@ -14062,46 +13863,42 @@ public class PJScheme:Scheme
 							  }
 							else
 							  {
-							     if (true_q
-								 (PJScheme.
-								  char_is__q ((object) c, (object) BACKSLASH)))
+							     if (PJScheme.
+								 char_is__q ((object) c, (object) BACKSLASH))
 							       {
 								  return ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("string-state"))));
 							       }
 							     else
 							       {
-								  if (true_q
-								      (PJScheme.
-								       char_is__q
-								       ((object) c, (object) 'b')))
+								  if (PJScheme.char_is__q ((object) c, (object) 'b'))
 								    {
 								       return
 									  ((object) PJScheme.list ((object) symbol ("replace"), (object) BACKSPACE, (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("string-state"))));
 								    }
 								  else
 								    {
-								       if (true_q (PJScheme.char_is__q ((object) c, (object) 'f')))
+								       if (PJScheme.char_is__q ((object) c, (object) 'f'))
 									 {
 									    return
 									       ((object) PJScheme.list ((object) symbol ("replace"), (object) '\f', (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("string-state"))));
 									 }
 								       else
 									 {
-									    if (true_q (PJScheme.char_is__q ((object) c, (object) 'n')))
+									    if (PJScheme.char_is__q ((object) c, (object) 'n'))
 									      {
 										 return
 										    ((object) PJScheme.list ((object) symbol ("replace"), (object) NEWLINE, (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("string-state"))));
 									      }
 									    else
 									      {
-										 if (true_q (PJScheme.char_is__q ((object) c, (object) 't')))
+										 if (PJScheme.char_is__q ((object) c, (object) 't'))
 										   {
 										      return
 											 ((object) PJScheme.list ((object) symbol ("replace"), (object) '\t', (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("string-state"))));
 										   }
 										 else
 										   {
-										      if (true_q (PJScheme.char_is__q ((object) c, (object) 'r')))
+										      if (PJScheme.char_is__q ((object) c, (object) 'r'))
 											{
 											   return
 											      ((object) PJScheme.list ((object) symbol ("replace"), (object) '\r', (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("string-state"))));
@@ -14120,28 +13917,22 @@ public class PJScheme:Scheme
 						     }
 						   else
 						     {
-							if (true_q
-							    (PJScheme.
-							     Eq ((object)
-								 state,
-								 (object)
-								 symbol
-								 ("identifier-state"))))
+							if (PJScheme.
+							    Eq ((object)
+								state,
+								(object)
+								symbol
+								("identifier-state")))
 							  {
-							     if (true_q
-								 (PJScheme.
-								  char_subsequent_q
-								  ((object)
-								   c)))
+							     if (PJScheme.
+								 char_subsequent_q
+								 ((object) c))
 							       {
 								  return ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("identifier-state"))));
 							       }
 							     else
 							       {
-								  if (true_q
-								      (PJScheme.
-								       char_delimiter_q
-								       ((object) c)))
+								  if (PJScheme.char_delimiter_q ((object) c))
 								    {
 								       return
 									  ((object) PJScheme.list ((object) symbol ("emit"), (object) symbol ("identifier")));
@@ -14155,39 +13946,35 @@ public class PJScheme:Scheme
 							  }
 							else
 							  {
-							     if (true_q
-								 (PJScheme.
-								  Eq ((object)
-								      state,
-								      (object)
-								      symbol
-								      ("signed-state"))))
+							     if (PJScheme.
+								 Eq ((object)
+								     state,
+								     (object)
+								     symbol
+								     ("signed-state")))
 							       {
-								  if (true_q
-								      (PJScheme.
-								       char_numeric_q
-								       ((object) c)))
+								  if (PJScheme.char_numeric_q ((object) c))
 								    {
 								       return
 									  ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("whole-number-state"))));
 								    }
 								  else
 								    {
-								       if (true_q (PJScheme.char_is__q ((object) c, (object) '.')))
+								       if (PJScheme.char_is__q ((object) c, (object) '.'))
 									 {
 									    return
 									       ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("signed-decimal-point-state"))));
 									 }
 								       else
 									 {
-									    if (true_q (PJScheme.char_delimiter_q ((object) c)))
+									    if (PJScheme.char_delimiter_q ((object) c))
 									      {
 										 return
 										    ((object) PJScheme.list ((object) symbol ("emit"), (object) symbol ("identifier")));
 									      }
 									    else
 									      {
-										 if (true_q (PJScheme.char_subsequent_q ((object) c)))
+										 if (PJScheme.char_subsequent_q ((object) c))
 										   {
 										      return
 											 ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("identifier-state"))));
@@ -14203,25 +13990,23 @@ public class PJScheme:Scheme
 							       }
 							     else
 							       {
-								  if (true_q
-								      (PJScheme.
-								       Eq ((object) state, (object) symbol ("decimal-point-state"))))
+								  if (PJScheme.Eq ((object) state, (object) symbol ("decimal-point-state")))
 								    {
-								       if (true_q (PJScheme.char_numeric_q ((object) c)))
+								       if (PJScheme.char_numeric_q ((object) c))
 									 {
 									    return
 									       ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("fractional-number-state"))));
 									 }
 								       else
 									 {
-									    if (true_q (PJScheme.char_delimiter_q ((object) c)))
+									    if (PJScheme.char_delimiter_q ((object) c))
 									      {
 										 return
 										    ((object) PJScheme.list ((object) symbol ("emit"), (object) symbol ("dot")));
 									      }
 									    else
 									      {
-										 if (true_q (PJScheme.char_subsequent_q ((object) c)))
+										 if (PJScheme.char_subsequent_q ((object) c))
 										   {
 										      return
 											 ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("identifier-state"))));
@@ -14236,23 +14021,23 @@ public class PJScheme:Scheme
 								    }
 								  else
 								    {
-								       if (true_q (PJScheme.Eq ((object) state, (object) symbol ("signed-decimal-point-state"))))
+								       if (PJScheme.Eq ((object) state, (object) symbol ("signed-decimal-point-state")))
 									 {
-									    if (true_q (PJScheme.char_numeric_q ((object) c)))
+									    if (PJScheme.char_numeric_q ((object) c))
 									      {
 										 return
 										    ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("fractional-number-state"))));
 									      }
 									    else
 									      {
-										 if (true_q (PJScheme.char_delimiter_q ((object) c)))
+										 if (PJScheme.char_delimiter_q ((object) c))
 										   {
 										      return
 											 ((object) PJScheme.list ((object) symbol ("emit"), (object) symbol ("identifier")));
 										   }
 										 else
 										   {
-										      if (true_q (PJScheme.char_subsequent_q ((object) c)))
+										      if (PJScheme.char_subsequent_q ((object) c))
 											{
 											   return
 											      ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("identifier-state"))));
@@ -14267,44 +14052,44 @@ public class PJScheme:Scheme
 									 }
 								       else
 									 {
-									    if (true_q (PJScheme.Eq ((object) state, (object) symbol ("whole-number-state"))))
+									    if (PJScheme.Eq ((object) state, (object) symbol ("whole-number-state")))
 									      {
-										 if (true_q (PJScheme.char_numeric_q ((object) c)))
+										 if (PJScheme.char_numeric_q ((object) c))
 										   {
 										      return
 											 ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("whole-number-state"))));
 										   }
 										 else
 										   {
-										      if (true_q (PJScheme.char_is__q ((object) c, (object) '.')))
+										      if (PJScheme.char_is__q ((object) c, (object) '.'))
 											{
 											   return
 											      ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("fractional-number-state"))));
 											}
 										      else
 											{
-											   if (true_q (PJScheme.char_is__q ((object) c, (object) '/')))
+											   if (PJScheme.char_is__q ((object) c, (object) '/'))
 											     {
 												return
 												   ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("rational-number-state"))));
 											     }
 											   else
 											     {
-												if (true_q ((((bool) PJScheme.char_is__q ((object) c, (object) 'e')) || ((bool) PJScheme.char_is__q ((object) c, (object) 'E')))))
+												if ((((bool) PJScheme.char_is__q ((object) c, (object) 'e')) || ((bool) PJScheme.char_is__q ((object) c, (object) 'E'))))
 												  {
 												     return
 													((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("suffix-state"))));
 												  }
 												else
 												  {
-												     if (true_q (PJScheme.char_delimiter_q ((object) c)))
+												     if (PJScheme.char_delimiter_q ((object) c))
 												       {
 													  return
 													     ((object) PJScheme.list ((object) symbol ("emit"), (object) symbol ("integer")));
 												       }
 												     else
 												       {
-													  if (true_q (PJScheme.char_subsequent_q ((object) c)))
+													  if (PJScheme.char_subsequent_q ((object) c))
 													    {
 													       return
 														  ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("identifier-state"))));
@@ -14322,30 +14107,30 @@ public class PJScheme:Scheme
 									      }
 									    else
 									      {
-										 if (true_q (PJScheme.Eq ((object) state, (object) symbol ("fractional-number-state"))))
+										 if (PJScheme.Eq ((object) state, (object) symbol ("fractional-number-state")))
 										   {
-										      if (true_q (PJScheme.char_numeric_q ((object) c)))
+										      if (PJScheme.char_numeric_q ((object) c))
 											{
 											   return
 											      ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("fractional-number-state"))));
 											}
 										      else
 											{
-											   if (true_q ((((bool) PJScheme.char_is__q ((object) c, (object) 'e')) || ((bool) PJScheme.char_is__q ((object) c, (object) 'E')))))
+											   if ((((bool) PJScheme.char_is__q ((object) c, (object) 'e')) || ((bool) PJScheme.char_is__q ((object) c, (object) 'E'))))
 											     {
 												return
 												   ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("suffix-state"))));
 											     }
 											   else
 											     {
-												if (true_q (PJScheme.char_delimiter_q ((object) c)))
+												if (PJScheme.char_delimiter_q ((object) c))
 												  {
 												     return
 													((object) PJScheme.list ((object) symbol ("emit"), (object) symbol ("decimal")));
 												  }
 												else
 												  {
-												     if (true_q (PJScheme.char_subsequent_q ((object) c)))
+												     if (PJScheme.char_subsequent_q ((object) c))
 												       {
 													  return
 													     ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("identifier-state"))));
@@ -14361,23 +14146,23 @@ public class PJScheme:Scheme
 										   }
 										 else
 										   {
-										      if (true_q (PJScheme.Eq ((object) state, (object) symbol ("rational-number-state"))))
+										      if (PJScheme.Eq ((object) state, (object) symbol ("rational-number-state")))
 											{
-											   if (true_q (PJScheme.char_numeric_q ((object) c)))
+											   if (PJScheme.char_numeric_q ((object) c))
 											     {
 												return
 												   ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("rational-number-state*"))));
 											     }
 											   else
 											     {
-												if (true_q (PJScheme.char_delimiter_q ((object) c)))
+												if (PJScheme.char_delimiter_q ((object) c))
 												  {
 												     return
 													((object) PJScheme.list ((object) symbol ("emit"), (object) symbol ("identifier")));
 												  }
 												else
 												  {
-												     if (true_q (PJScheme.char_subsequent_q ((object) c)))
+												     if (PJScheme.char_subsequent_q ((object) c))
 												       {
 													  return
 													     ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("identifier-state"))));
@@ -14392,23 +14177,23 @@ public class PJScheme:Scheme
 											}
 										      else
 											{
-											   if (true_q (PJScheme.Eq ((object) state, (object) symbol ("rational-number-state*"))))
+											   if (PJScheme.Eq ((object) state, (object) symbol ("rational-number-state*")))
 											     {
-												if (true_q (PJScheme.char_numeric_q ((object) c)))
+												if (PJScheme.char_numeric_q ((object) c))
 												  {
 												     return
 													((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("rational-number-state*"))));
 												  }
 												else
 												  {
-												     if (true_q (PJScheme.char_delimiter_q ((object) c)))
+												     if (PJScheme.char_delimiter_q ((object) c))
 												       {
 													  return
 													     ((object) PJScheme.list ((object) symbol ("emit"), (object) symbol ("rational")));
 												       }
 												     else
 												       {
-													  if (true_q (PJScheme.char_subsequent_q ((object) c)))
+													  if (PJScheme.char_subsequent_q ((object) c))
 													    {
 													       return
 														  ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("identifier-state"))));
@@ -14423,30 +14208,30 @@ public class PJScheme:Scheme
 											     }
 											   else
 											     {
-												if (true_q (PJScheme.Eq ((object) state, (object) symbol ("suffix-state"))))
+												if (PJScheme.Eq ((object) state, (object) symbol ("suffix-state")))
 												  {
-												     if (true_q (PJScheme.char_sign_q ((object) c)))
+												     if (PJScheme.char_sign_q ((object) c))
 												       {
 													  return
 													     ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("signed-exponent-state"))));
 												       }
 												     else
 												       {
-													  if (true_q (PJScheme.char_numeric_q ((object) c)))
+													  if (PJScheme.char_numeric_q ((object) c))
 													    {
 													       return
 														  ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("exponent-state"))));
 													    }
 													  else
 													    {
-													       if (true_q (PJScheme.char_delimiter_q ((object) c)))
+													       if (PJScheme.char_delimiter_q ((object) c))
 														 {
 														    return
 														       ((object) PJScheme.list ((object) symbol ("emit"), (object) symbol ("identifier")));
 														 }
 													       else
 														 {
-														    if (true_q (PJScheme.char_subsequent_q ((object) c)))
+														    if (PJScheme.char_subsequent_q ((object) c))
 														      {
 															 return
 															    ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("identifier-state"))));
@@ -14462,23 +14247,23 @@ public class PJScheme:Scheme
 												  }
 												else
 												  {
-												     if (true_q (PJScheme.Eq ((object) state, (object) symbol ("signed-exponent-state"))))
+												     if (PJScheme.Eq ((object) state, (object) symbol ("signed-exponent-state")))
 												       {
-													  if (true_q (PJScheme.char_numeric_q ((object) c)))
+													  if (PJScheme.char_numeric_q ((object) c))
 													    {
 													       return
 														  ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("exponent-state"))));
 													    }
 													  else
 													    {
-													       if (true_q (PJScheme.char_delimiter_q ((object) c)))
+													       if (PJScheme.char_delimiter_q ((object) c))
 														 {
 														    return
 														       ((object) PJScheme.list ((object) symbol ("emit"), (object) symbol ("identifier")));
 														 }
 													       else
 														 {
-														    if (true_q (PJScheme.char_subsequent_q ((object) c)))
+														    if (PJScheme.char_subsequent_q ((object) c))
 														      {
 															 return
 															    ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("identifier-state"))));
@@ -14493,23 +14278,23 @@ public class PJScheme:Scheme
 												       }
 												     else
 												       {
-													  if (true_q (PJScheme.Eq ((object) state, (object) symbol ("exponent-state"))))
+													  if (PJScheme.Eq ((object) state, (object) symbol ("exponent-state")))
 													    {
-													       if (true_q (PJScheme.char_numeric_q ((object) c)))
+													       if (PJScheme.char_numeric_q ((object) c))
 														 {
 														    return
 														       ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("exponent-state"))));
 														 }
 													       else
 														 {
-														    if (true_q (PJScheme.char_delimiter_q ((object) c)))
+														    if (PJScheme.char_delimiter_q ((object) c))
 														      {
 															 return
 															    ((object) PJScheme.list ((object) symbol ("emit"), (object) symbol ("decimal")));
 														      }
 														    else
 														      {
-															 if (true_q (PJScheme.char_subsequent_q ((object) c)))
+															 if (PJScheme.char_subsequent_q ((object) c))
 															   {
 															      return
 																 ((object) PJScheme.list ((object) symbol ("shift"), (object) PJScheme.list ((object) symbol ("goto"), (object) symbol ("identifier-state"))));
@@ -14577,43 +14362,43 @@ public class PJScheme:Scheme
    {
       return ((object) PJScheme.cadr ((object) aatom));
    }
-   new public static object atom_q_hat (object asexp)
+   new public static bool atom_q_hat (object asexp)
    {
-      return ((object) PJScheme.
+      return ((bool) PJScheme.
 	      Eq ((object) PJScheme.car ((object) asexp), (object) atom_tag));
    }
-   new public static object pair_q_hat (object asexp)
+   new public static bool pair_q_hat (object asexp)
    {
-      return ((object) PJScheme.
+      return ((bool) PJScheme.
 	      Eq ((object) PJScheme.car ((object) asexp), (object) pair_tag));
    }
-   new public static object null_q_hat (object asexp)
+   new public static bool null_q_hat (object asexp)
    {
-      return ((object)
+      return ((bool)
 	      (((bool) PJScheme.atom_q_hat ((object) asexp))
 	       && ((bool) PJScheme.
 		   null_q ((object) PJScheme.
 			   untag_atom_hat ((object) asexp)))));
    }
-   new public static object symbol_q_hat (object asexp)
+   new public static bool symbol_q_hat (object asexp)
    {
-      return ((object)
+      return ((bool)
 	      (((bool) PJScheme.atom_q_hat ((object) asexp))
 	       && ((bool) PJScheme.
 		   symbol_q ((object) PJScheme.
 			     untag_atom_hat ((object) asexp)))));
    }
-   new public static object string_q_hat (object asexp)
+   new public static bool string_q_hat (object asexp)
    {
-      return ((object)
+      return ((bool)
 	      (((bool) PJScheme.atom_q_hat ((object) asexp))
 	       && ((bool) PJScheme.
 		   string_q ((object) PJScheme.
 			     untag_atom_hat ((object) asexp)))));
    }
-   new public static object vector_q_hat (object asexp)
+   new public static bool vector_q_hat (object asexp)
    {
-      return ((object)
+      return ((bool)
 	      (((bool) PJScheme.atom_q_hat ((object) asexp))
 	       && ((bool) PJScheme.
 		   vector_q ((object) PJScheme.
@@ -14685,9 +14470,9 @@ public class PJScheme:Scheme
 				cdr_hat ((object) PJScheme.
 					 cdr_hat ((object) asexp)))));
    }
-   new public static object eq_q_hat (object asexp, object sym)
+   new public static bool eq_q_hat (object asexp, object sym)
    {
-      return ((object) PJScheme.
+      return ((bool) PJScheme.
 	      Eq ((object) PJScheme.cadr ((object) asexp), (object) sym));
    }
    new public static object vector_to_list_hat (object asexp)
@@ -14700,9 +14485,9 @@ public class PJScheme:Scheme
       return ((object) PJScheme.
 	      symbol_to_string ((object) PJScheme.cadr ((object) asexp)));
    }
-   new public static object list_q_hat (object asexp)
+   new public static bool list_q_hat (object asexp)
    {
-      return ((object)
+      return ((bool)
 	      (((bool) PJScheme.null_q_hat ((object) asexp))
 	       ||
 	       ((bool)
@@ -14713,7 +14498,7 @@ public class PJScheme:Scheme
    }
    new public static object at_hat (object alist)
    {
-      if (true_q (PJScheme.null_q_hat ((object) alist)))
+      if (PJScheme.null_q_hat ((object) alist))
 	{
 	   return ((object) EmptyList);
 	}
@@ -14728,7 +14513,7 @@ public class PJScheme:Scheme
    }
    new public static object length_hat (object asexp)
    {
-      if (true_q (PJScheme.null_q_hat ((object) asexp)))
+      if (PJScheme.null_q_hat ((object) asexp))
 	{
 	   return ((object) 0);
 	}
@@ -14749,9 +14534,8 @@ public class PJScheme:Scheme
    }
    new public static void annotate_cps ()
    {
-      if (true_q
-	  (PJScheme.
-	   not ((object) _starreader_generates_annotated_sexps_q_star)))
+      if (PJScheme.
+	  not ((object) _starreader_generates_annotated_sexps_q_star))
 	{
 	   {
 	      value_reg = x_reg;
@@ -14760,7 +14544,7 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q (PJScheme.annotated_q ((object) x_reg)))
+	   if (PJScheme.annotated_q ((object) x_reg))
 	     {
 		{
 		   value_reg = x_reg;
@@ -14769,7 +14553,7 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q (PJScheme.pair_q ((object) x_reg)))
+		if (PJScheme.pair_q ((object) x_reg))
 		  {
 		     {
 			k_reg =
@@ -14796,7 +14580,7 @@ public class PJScheme:Scheme
    }
    new public static void unannotate_cps ()
    {
-      if (true_q (PJScheme.aatom_q ((object) x_reg)))
+      if (PJScheme.aatom_q ((object) x_reg))
 	{
 	   {
 	      x_reg = PJScheme.cadr ((object) x_reg);
@@ -14805,7 +14589,7 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q (PJScheme.apair_q ((object) x_reg)))
+	   if (PJScheme.apair_q ((object) x_reg))
 	     {
 		{
 		   k_reg =
@@ -14817,7 +14601,7 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q (PJScheme.pair_q ((object) x_reg)))
+		if (PJScheme.pair_q ((object) x_reg))
 		  {
 		     {
 			k_reg =
@@ -14830,7 +14614,7 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q (PJScheme.vector_q ((object) x_reg)))
+		     if (PJScheme.vector_q ((object) x_reg))
 		       {
 			  {
 			     k_reg =
@@ -14860,7 +14644,7 @@ public class PJScheme:Scheme
    }
    new public static object replace_info (object asexp, object new_info)
    {
-      if (true_q (PJScheme.atom_q_hat ((object) asexp)))
+      if (PJScheme.atom_q_hat ((object) asexp))
 	{
 	   return ((object) PJScheme.
 		   list ((object) atom_tag,
@@ -14956,9 +14740,8 @@ public class PJScheme:Scheme
    {
       object token = null;
       token = PJScheme.first ((object) tokens_reg);
-      if (true_q
-	  (PJScheme.
-	   token_type_q ((object) token, (object) symbol ("end-marker"))))
+      if (PJScheme.
+	  token_type_q ((object) token, (object) symbol ("end-marker")))
 	{
 	   {
 	      msg_reg = "unexpected end of input";
@@ -15001,10 +14784,9 @@ public class PJScheme:Scheme
 				   first ((object) tokens_reg));
       object temp_1 = null;
       temp_1 = PJScheme.first ((object) tokens_reg);
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) temp_1),
-	       (object) symbol ("integer"))))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) temp_1),
+	      (object) symbol ("integer")))
 	{
 	   object str = null;
 	   str = PJScheme.list_ref ((object) temp_1, (object) 1);
@@ -15021,10 +14803,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) temp_1),
-		    (object) symbol ("decimal"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) temp_1),
+		   (object) symbol ("decimal")))
 	     {
 		object str = null;
 		str = PJScheme.list_ref ((object) temp_1, (object) 1);
@@ -15041,16 +14822,15 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) PJScheme.car ((object) temp_1),
-			 (object) symbol ("rational"))))
+		if (PJScheme.
+		    Eq ((object) PJScheme.car ((object) temp_1),
+			(object) symbol ("rational")))
 		  {
 		     object str = null;
 		     str = PJScheme.list_ref ((object) temp_1, (object) 1);
 		     object num = null;
 		     num = PJScheme.string_to_rational ((object) str);
-		     if (true_q (PJScheme.true_q ((object) num)))
+		     if (PJScheme.true_q ((object) num))
 		       {
 			  {
 			     k_reg =
@@ -15080,10 +14860,9 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  Eq ((object) PJScheme.car ((object) temp_1),
-			      (object) symbol ("boolean"))))
+		     if (PJScheme.
+			 Eq ((object) PJScheme.car ((object) temp_1),
+			     (object) symbol ("boolean")))
 		       {
 			  object boolean = null;
 			  boolean =
@@ -15104,10 +14883,9 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       Eq ((object) PJScheme.car ((object) temp_1),
-				   (object) symbol ("character"))))
+			  if (PJScheme.
+			      Eq ((object) PJScheme.car ((object) temp_1),
+				  (object) symbol ("character")))
 			    {
 			       object chr = null;
 			       chr =
@@ -15130,11 +14908,10 @@ public class PJScheme:Scheme
 			    }
 			  else
 			    {
-			       if (true_q
-				   (PJScheme.
-				    Eq ((object) PJScheme.
-					car ((object) temp_1),
-					(object) symbol ("string"))))
+			       if (PJScheme.
+				   Eq ((object) PJScheme.
+				       car ((object) temp_1),
+				       (object) symbol ("string")))
 				 {
 				    object str = null;
 				    str =
@@ -15158,11 +14935,10 @@ public class PJScheme:Scheme
 				 }
 			       else
 				 {
-				    if (true_q
-					(PJScheme.
-					 Eq ((object) PJScheme.
-					     car ((object) temp_1),
-					     (object) symbol ("identifier"))))
+				    if (PJScheme.
+					Eq ((object) PJScheme.
+					    car ((object) temp_1),
+					    (object) symbol ("identifier")))
 				      {
 					 object id = null;
 					 id =
@@ -15188,12 +14964,11 @@ public class PJScheme:Scheme
 				      }
 				    else
 				      {
-					 if (true_q
-					     (PJScheme.
-					      Eq ((object) PJScheme.
-						  car ((object) temp_1),
-						  (object)
-						  symbol ("apostrophe"))))
+					 if (PJScheme.
+					     Eq ((object) PJScheme.
+						 car ((object) temp_1),
+						 (object)
+						 symbol ("apostrophe")))
 					   {
 					      {
 						 keyword_reg =
@@ -15205,12 +14980,11 @@ public class PJScheme:Scheme
 					   }
 					 else
 					   {
-					      if (true_q
-						  (PJScheme.
-						   Eq ((object) PJScheme.
-						       car ((object) temp_1),
-						       (object)
-						       symbol ("backquote"))))
+					      if (PJScheme.
+						  Eq ((object) PJScheme.
+						      car ((object) temp_1),
+						      (object)
+						      symbol ("backquote")))
 						{
 						   {
 						      keyword_reg =
@@ -15223,14 +14997,12 @@ public class PJScheme:Scheme
 						}
 					      else
 						{
-						   if (true_q
-						       (PJScheme.
-							Eq ((object) PJScheme.
-							    car ((object)
-								 temp_1),
-							    (object)
-							    symbol
-							    ("comma"))))
+						   if (PJScheme.
+						       Eq ((object) PJScheme.
+							   car ((object)
+								temp_1),
+							   (object)
+							   symbol ("comma")))
 						     {
 							{
 							   keyword_reg =
@@ -15243,15 +15015,14 @@ public class PJScheme:Scheme
 						     }
 						   else
 						     {
-							if (true_q
-							    (PJScheme.
-							     Eq ((object)
-								 PJScheme.
-								 car ((object)
-								      temp_1),
-								 (object)
-								 symbol
-								 ("comma-at"))))
+							if (PJScheme.
+							    Eq ((object)
+								PJScheme.
+								car ((object)
+								     temp_1),
+								(object)
+								symbol
+								("comma-at")))
 							  {
 							     {
 								keyword_reg =
@@ -15264,11 +15035,10 @@ public class PJScheme:Scheme
 							  }
 							else
 							  {
-							     if (true_q
-								 (PJScheme.
-								  Eq ((object)
-								      PJScheme.
-								      car ((object) temp_1), (object) symbol ("lparen"))))
+							     if (PJScheme.
+								 Eq ((object)
+								     PJScheme.
+								     car ((object) temp_1), (object) symbol ("lparen")))
 							       {
 								  object
 								     tokens =
@@ -15301,9 +15071,7 @@ public class PJScheme:Scheme
 							       }
 							     else
 							       {
-								  if (true_q
-								      (PJScheme.
-								       Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("lbracket"))))
+								  if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("lbracket")))
 								    {
 								       object
 									  tokens
@@ -15332,7 +15100,7 @@ public class PJScheme:Scheme
 								    }
 								  else
 								    {
-								       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("lvector"))))
+								       if (PJScheme.Eq ((object) PJScheme.car ((object) temp_1), (object) symbol ("lvector")))
 									 {
 									    {
 									       k_reg
@@ -15393,10 +15161,9 @@ public class PJScheme:Scheme
    {
       object temp_1 = null;
       temp_1 = PJScheme.first ((object) tokens_reg);
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) temp_1),
-	       (object) symbol ("rparen"))))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) temp_1),
+	      (object) symbol ("rparen")))
 	{
 	   {
 	      expected_terminator_reg = symbol ("rparen");
@@ -15406,10 +15173,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) temp_1),
-		    (object) symbol ("dot"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) temp_1),
+		   (object) symbol ("dot")))
 	     {
 		{
 		   msg_reg = "unexpected dot (.)";
@@ -15446,10 +15212,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) temp_1),
-		    (object) symbol ("dot"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) temp_1),
+		   (object) symbol ("dot")))
 	     {
 		{
 		   msg_reg = "unexpected dot (.)";
@@ -15484,10 +15249,9 @@ public class PJScheme:Scheme
 		 (object) PJScheme.list ((object) symbol ("rparen"),
 					 (object) symbol ("rbracket")))))
 	{
-	   if (true_q
-	       (PJScheme.
-		token_type_q ((object) PJScheme.first ((object) tokens_reg),
-			      (object) expected_terminator_reg)))
+	   if (PJScheme.
+	       token_type_q ((object) PJScheme.first ((object) tokens_reg),
+			     (object) expected_terminator_reg))
 	     {
 		{
 		   value4_reg = fail_reg;
@@ -15499,10 +15263,9 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) expected_terminator_reg,
-			 (object) symbol ("rparen"))))
+		if (PJScheme.
+		    Eq ((object) expected_terminator_reg,
+			(object) symbol ("rparen")))
 		  {
 		     {
 			msg_reg = "parenthesized list terminated by bracket";
@@ -15511,10 +15274,9 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  Eq ((object) expected_terminator_reg,
-			      (object) symbol ("rbracket"))))
+		     if (PJScheme.
+			 Eq ((object) expected_terminator_reg,
+			     (object) symbol ("rbracket")))
 		       {
 			  {
 			     msg_reg =
@@ -15652,7 +15414,7 @@ public class PJScheme:Scheme
    }
    new public static object search_frames (object frames, object variable)
    {
-      if (true_q (PJScheme.null_q ((object) frames)))
+      if (PJScheme.null_q ((object) frames))
 	{
 	   return ((object) false);
 	}
@@ -15746,12 +15508,11 @@ public class PJScheme:Scheme
 	{
 	   object components = null;
 	   components = PJScheme.split_variable ((object) var_reg);
-	   if (true_q
-	       ((((bool) PJScheme.
-		  null_q ((object) PJScheme.cdr ((object) components)))
-		 && ((bool) PJScheme.
-		     dlr_env_contains ((object) PJScheme.
-				       car ((object) components))))))
+	   if ((((bool) PJScheme.
+		 null_q ((object) PJScheme.cdr ((object) components)))
+		&& ((bool) PJScheme.
+		    dlr_env_contains ((object) PJScheme.
+				      car ((object) components)))))
 	     {
 		{
 		   value2_reg = fail_reg;
@@ -15762,21 +15523,20 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    ((((bool) PJScheme.
-		       not ((object) PJScheme.
-			    null_q ((object) PJScheme.
-				    cdr ((object) components))))
-		      && ((bool) PJScheme.
-			  dlr_env_contains ((object) PJScheme.
-					    car ((object) components)))
-		      && ((bool) PJScheme.
-			  dlr_object_contains ((object) PJScheme.
-					       dlr_env_lookup ((object)
-							       PJScheme.
-							       car ((object)
-								    components)),
-					       (object) components)))))
+		if ((((bool) PJScheme.
+		      not ((object) PJScheme.
+			   null_q ((object) PJScheme.
+				   cdr ((object) components))))
+		     && ((bool) PJScheme.
+			 dlr_env_contains ((object) PJScheme.
+					   car ((object) components)))
+		     && ((bool) PJScheme.
+			 dlr_object_contains ((object) PJScheme.
+					      dlr_env_lookup ((object)
+							      PJScheme.
+							      car ((object)
+								   components)),
+					      (object) components))))
 		  {
 		     {
 			value3_reg = fail_reg;
@@ -15791,10 +15551,8 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  null_q ((object) PJScheme.
-				  cdr ((object) components))))
+		     if (PJScheme.
+			 null_q ((object) PJScheme.cdr ((object) components)))
 		       {
 			  {
 			     info_reg = var_info_reg;
@@ -15826,9 +15584,8 @@ public class PJScheme:Scheme
       binding = PJScheme.search_env ((object) module_reg, (object) var);
       if (true_q (binding))
 	{
-	   if (true_q
-	       (PJScheme.
-		null_q ((object) PJScheme.cdr ((object) components_reg))))
+	   if (PJScheme.
+	       null_q ((object) PJScheme.cdr ((object) components_reg)))
 	     {
 		{
 		   value2_reg = fail_reg;
@@ -15851,7 +15608,7 @@ public class PJScheme:Scheme
 		       format ((object) "~a.~a", (object) path_reg,
 			       (object) var)));
 		value = PJScheme.binding_value ((object) binding);
-		if (true_q (PJScheme.environment_q ((object) value)))
+		if (PJScheme.environment_q ((object) value))
 		  {
 		     {
 			module_reg = value;
@@ -15863,10 +15620,9 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  dlr_object_contains ((object) value,
-					       (object) components_reg)))
+		     if (PJScheme.
+			 dlr_object_contains ((object) value,
+					      (object) components_reg))
 		       {
 			  {
 			     value3_reg = fail_reg;
@@ -15892,8 +15648,7 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.string_is__q ((object) path_reg, (object) "")))
+	   if (PJScheme.string_is__q ((object) path_reg, (object) ""))
 	     {
 		{
 		   info_reg = var_info_reg;
@@ -15966,14 +15721,13 @@ public class PJScheme:Scheme
    }
    new public static object head (object formals)
    {
-      if (true_q (PJScheme.symbol_q ((object) formals)))
+      if (PJScheme.symbol_q ((object) formals))
 	{
 	   return ((object) EmptyList);
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.pair_q ((object) PJScheme.cdr ((object) formals))))
+	   if (PJScheme.pair_q ((object) PJScheme.cdr ((object) formals)))
 	     {
 		return ((object) PJScheme.
 			cons ((object) PJScheme.car ((object) formals),
@@ -15990,14 +15744,13 @@ public class PJScheme:Scheme
    }
    new public static object last (object formals)
    {
-      if (true_q (PJScheme.symbol_q ((object) formals)))
+      if (PJScheme.symbol_q ((object) formals))
 	{
 	   return ((object) formals);
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.pair_q ((object) PJScheme.cdr ((object) formals))))
+	   if (PJScheme.pair_q ((object) PJScheme.cdr ((object) formals)))
 	     {
 		return ((object) PJScheme.
 			last ((object) PJScheme.cdr ((object) formals)));
@@ -16012,9 +15765,9 @@ public class PJScheme:Scheme
    {
       return ((bool) true);
    }
-   new public static object application_q_hat (object asexp)
+   new public static bool application_q_hat (object asexp)
    {
-      return ((object)
+      return ((bool)
 	      (((bool) PJScheme.list_q_hat ((object) asexp))
 	       && ((bool) PJScheme.
 		   not ((object) PJScheme.null_q_hat ((object) asexp)))
@@ -16057,9 +15810,9 @@ public class PJScheme:Scheme
 		    (object) symbol ("cases"),
 		    (object) symbol ("trace-lambda")));
    }
-   new public static object mit_style_define_q_hat (object asexp)
+   new public static bool mit_style_define_q_hat (object asexp)
    {
-      return ((object) PJScheme.
+      return ((bool) PJScheme.
 	      not ((object) PJScheme.
 		   symbol_q_hat ((object) PJScheme.
 				 cadr_hat ((object) asexp))));
@@ -16073,9 +15826,9 @@ public class PJScheme:Scheme
 	       || ((bool) PJScheme.char_q ((object) datum))
 	       || ((bool) PJScheme.string_q ((object) datum))));
    }
-   new public static object literal_q_hat (object asexp)
+   new public static bool literal_q_hat (object asexp)
    {
-      return ((object)
+      return ((bool)
 	      (((bool) PJScheme.
 		Eq ((object) PJScheme.car ((object) asexp),
 		    (object) atom_tag))
@@ -16097,9 +15850,9 @@ public class PJScheme:Scheme
 		     string_q ((object) PJScheme.
 			       untag_atom_hat ((object) asexp)))))));
    }
-   new public static object syntactic_sugar_q_hat (object asexp)
+   new public static bool syntactic_sugar_q_hat (object asexp)
    {
-      return ((object)
+      return ((bool)
 	      (((bool) PJScheme.pair_q_hat ((object) asexp))
 	       && ((bool) PJScheme.
 		   symbol_q_hat ((object) PJScheme.car_hat ((object) asexp)))
@@ -16150,7 +15903,7 @@ public class PJScheme:Scheme
    {
       object info = null;
       info = PJScheme.get_source_info ((object) adatum_reg);
-      if (true_q (PJScheme.literal_q_hat ((object) adatum_reg)))
+      if (PJScheme.literal_q_hat ((object) adatum_reg))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -16163,9 +15916,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q (PJScheme.symbol_q_hat ((object) adatum_reg)))
+	   if (PJScheme.symbol_q_hat ((object) adatum_reg))
 	     {
-		if (true_q (_staruse_lexical_address_star))
+		if (_staruse_lexical_address_star)
 		  {
 		     {
 			info_reg = info;
@@ -16190,7 +15943,7 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q (PJScheme.vector_q_hat ((object) adatum_reg)))
+		if (PJScheme.vector_q_hat ((object) adatum_reg))
 		  {
 		     {
 			k_reg =
@@ -16204,7 +15957,7 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q (PJScheme.quote_q_hat ((object) adatum_reg)))
+		     if (PJScheme.quote_q_hat ((object) adatum_reg))
 		       {
 			  {
 			     k_reg =
@@ -16218,9 +15971,7 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       quasiquote_q_hat ((object) adatum_reg)))
+			  if (PJScheme.quasiquote_q_hat ((object) adatum_reg))
 			    {
 			       {
 				  k_reg =
@@ -16240,9 +15991,8 @@ public class PJScheme:Scheme
 			    }
 			  else
 			    {
-			       if (true_q
-				   (PJScheme.
-				    unquote_q_hat ((object) adatum_reg)))
+			       if (PJScheme.
+				   unquote_q_hat ((object) adatum_reg))
 				 {
 				    {
 				       msg_reg = "misplaced";
@@ -16251,10 +16001,9 @@ public class PJScheme:Scheme
 				 }
 			       else
 				 {
-				    if (true_q
-					(PJScheme.
-					 unquote_splicing_q_hat ((object)
-								 adatum_reg)))
+				    if (PJScheme.
+					unquote_splicing_q_hat ((object)
+								adatum_reg))
 				      {
 					 {
 					    msg_reg = "misplaced";
@@ -16263,10 +16012,9 @@ public class PJScheme:Scheme
 				      }
 				    else
 				      {
-					 if (true_q
-					     (PJScheme.
-					      syntactic_sugar_q_hat ((object)
-								     adatum_reg)))
+					 if (PJScheme.
+					     syntactic_sugar_q_hat ((object)
+								    adatum_reg))
 					   {
 					      {
 						 k_reg =
@@ -16287,10 +16035,9 @@ public class PJScheme:Scheme
 					   }
 					 else
 					   {
-					      if (true_q
-						  (PJScheme.
-						   if_then_q_hat ((object)
-								  adatum_reg)))
+					      if (PJScheme.
+						  if_then_q_hat ((object)
+								 adatum_reg))
 						{
 						   {
 						      k_reg =
@@ -16317,9 +16064,9 @@ public class PJScheme:Scheme
 						}
 					      else
 						{
-						   if (true_q
-						       (PJScheme.
-							if_else_q_hat ((object) adatum_reg)))
+						   if (PJScheme.
+						       if_else_q_hat ((object)
+								      adatum_reg))
 						     {
 							{
 							   k_reg =
@@ -16335,11 +16082,8 @@ public class PJScheme:Scheme
 						     }
 						   else
 						     {
-							if (true_q
-							    (PJScheme.
-							     assignment_q_hat
-							     ((object)
-							      adatum_reg)))
+							if (PJScheme.
+							    assignment_q_hat ((object) adatum_reg))
 							  {
 							     {
 								k_reg =
@@ -16364,9 +16108,8 @@ public class PJScheme:Scheme
 							  }
 							else
 							  {
-							     if (true_q
-								 (PJScheme.
-								  func_q_hat ((object) adatum_reg)))
+							     if (PJScheme.
+								 func_q_hat ((object) adatum_reg))
 							       {
 								  {
 								     k_reg =
@@ -16385,12 +16128,9 @@ public class PJScheme:Scheme
 							       }
 							     else
 							       {
-								  if (true_q
-								      (PJScheme.
-								       define_q_hat
-								       ((object) adatum_reg)))
+								  if (PJScheme.define_q_hat ((object) adatum_reg))
 								    {
-								       if (true_q (PJScheme.mit_style_define_q_hat ((object) adatum_reg)))
+								       if (PJScheme.mit_style_define_q_hat ((object) adatum_reg))
 									 {
 									    {
 									       k_reg
@@ -16409,7 +16149,7 @@ public class PJScheme:Scheme
 									 }
 								       else
 									 {
-									    if (true_q (PJScheme.EqualSign ((object) PJScheme.length_hat ((object) adatum_reg), (object) 3)))
+									    if (PJScheme.EqualSign ((object) PJScheme.length_hat ((object) adatum_reg), (object) 3))
 									      {
 										 {
 										    k_reg
@@ -16427,7 +16167,7 @@ public class PJScheme:Scheme
 									      }
 									    else
 									      {
-										 if (true_q ((((bool) PJScheme.EqualSign ((object) PJScheme.length_hat ((object) adatum_reg), (object) 4)) && ((bool) PJScheme.string_q_hat ((object) PJScheme.caddr_hat ((object) adatum_reg))))))
+										 if ((((bool) PJScheme.EqualSign ((object) PJScheme.length_hat ((object) adatum_reg), (object) 4)) && ((bool) PJScheme.string_q_hat ((object) PJScheme.caddr_hat ((object) adatum_reg)))))
 										   {
 										      {
 											 k_reg
@@ -16457,9 +16197,9 @@ public class PJScheme:Scheme
 								    }
 								  else
 								    {
-								       if (true_q (PJScheme.define_b_q_hat ((object) adatum_reg)))
+								       if (PJScheme.define_b_q_hat ((object) adatum_reg))
 									 {
-									    if (true_q (PJScheme.mit_style_define_q_hat ((object) adatum_reg)))
+									    if (PJScheme.mit_style_define_q_hat ((object) adatum_reg))
 									      {
 										 {
 										    k_reg
@@ -16478,7 +16218,7 @@ public class PJScheme:Scheme
 									      }
 									    else
 									      {
-										 if (true_q (PJScheme.EqualSign ((object) PJScheme.length_hat ((object) adatum_reg), (object) 3)))
+										 if (PJScheme.EqualSign ((object) PJScheme.length_hat ((object) adatum_reg), (object) 3))
 										   {
 										      {
 											 k_reg
@@ -16496,7 +16236,7 @@ public class PJScheme:Scheme
 										   }
 										 else
 										   {
-										      if (true_q ((((bool) PJScheme.EqualSign ((object) PJScheme.length_hat ((object) adatum_reg), (object) 4)) && ((bool) PJScheme.string_q_hat ((object) PJScheme.caddr_hat ((object) adatum_reg))))))
+										      if ((((bool) PJScheme.EqualSign ((object) PJScheme.length_hat ((object) adatum_reg), (object) 4)) && ((bool) PJScheme.string_q_hat ((object) PJScheme.caddr_hat ((object) adatum_reg)))))
 											{
 											   {
 											      k_reg
@@ -16526,7 +16266,7 @@ public class PJScheme:Scheme
 									 }
 								       else
 									 {
-									    if (true_q (PJScheme.define_syntax_q_hat ((object) adatum_reg)))
+									    if (PJScheme.define_syntax_q_hat ((object) adatum_reg))
 									      {
 										 object
 										    name
@@ -16559,9 +16299,9 @@ public class PJScheme:Scheme
 									      }
 									    else
 									      {
-										 if (true_q (PJScheme.begin_q_hat ((object) adatum_reg)))
+										 if (PJScheme.begin_q_hat ((object) adatum_reg))
 										   {
-										      if (true_q (PJScheme.null_q_hat ((object) PJScheme.cdr_hat ((object) adatum_reg))))
+										      if (PJScheme.null_q_hat ((object) PJScheme.cdr_hat ((object) adatum_reg)))
 											{
 											   {
 											      msg_reg
@@ -16572,7 +16312,7 @@ public class PJScheme:Scheme
 											}
 										      else
 											{
-											   if (true_q (PJScheme.null_q_hat ((object) PJScheme.cddr_hat ((object) adatum_reg))))
+											   if (PJScheme.null_q_hat ((object) PJScheme.cddr_hat ((object) adatum_reg)))
 											     {
 												{
 												   adatum_reg
@@ -16603,7 +16343,7 @@ public class PJScheme:Scheme
 										   }
 										 else
 										   {
-										      if (true_q (PJScheme.lambda_q_hat ((object) adatum_reg)))
+										      if (PJScheme.lambda_q_hat ((object) adatum_reg))
 											{
 											   {
 											      k_reg
@@ -16621,7 +16361,7 @@ public class PJScheme:Scheme
 											}
 										      else
 											{
-											   if (true_q (PJScheme.trace_lambda_q_hat ((object) adatum_reg)))
+											   if (PJScheme.trace_lambda_q_hat ((object) adatum_reg))
 											     {
 												{
 												   k_reg
@@ -16639,9 +16379,9 @@ public class PJScheme:Scheme
 											     }
 											   else
 											     {
-												if (true_q (PJScheme.try_q_hat ((object) adatum_reg)))
+												if (PJScheme.try_q_hat ((object) adatum_reg))
 												  {
-												     if (true_q (PJScheme.EqualSign ((object) PJScheme.length_hat ((object) adatum_reg), (object) 2)))
+												     if (PJScheme.EqualSign ((object) PJScheme.length_hat ((object) adatum_reg), (object) 2))
 												       {
 													  {
 													     adatum_reg
@@ -16654,7 +16394,7 @@ public class PJScheme:Scheme
 												       }
 												     else
 												       {
-													  if (true_q ((((bool) PJScheme.EqualSign ((object) PJScheme.length_hat ((object) adatum_reg), (object) 3)) && ((bool) PJScheme.catch_q_hat ((object) PJScheme.caddr_hat ((object) adatum_reg))))))
+													  if ((((bool) PJScheme.EqualSign ((object) PJScheme.length_hat ((object) adatum_reg), (object) 3)) && ((bool) PJScheme.catch_q_hat ((object) PJScheme.caddr_hat ((object) adatum_reg)))))
 													    {
 													       {
 														  k_reg
@@ -16672,7 +16412,7 @@ public class PJScheme:Scheme
 													    }
 													  else
 													    {
-													       if (true_q ((((bool) PJScheme.EqualSign ((object) PJScheme.length_hat ((object) adatum_reg), (object) 3)) && ((bool) PJScheme.finally_q_hat ((object) PJScheme.caddr_hat ((object) adatum_reg))))))
+													       if ((((bool) PJScheme.EqualSign ((object) PJScheme.length_hat ((object) adatum_reg), (object) 3)) && ((bool) PJScheme.finally_q_hat ((object) PJScheme.caddr_hat ((object) adatum_reg)))))
 														 {
 														    {
 														       k_reg
@@ -16690,7 +16430,7 @@ public class PJScheme:Scheme
 														 }
 													       else
 														 {
-														    if (true_q ((((bool) PJScheme.EqualSign ((object) PJScheme.length_hat ((object) adatum_reg), (object) 4)) && ((bool) PJScheme.catch_q_hat ((object) PJScheme.caddr_hat ((object) adatum_reg))) && ((bool) PJScheme.finally_q_hat ((object) PJScheme.cadddr_hat ((object) adatum_reg))))))
+														    if ((((bool) PJScheme.EqualSign ((object) PJScheme.length_hat ((object) adatum_reg), (object) 4)) && ((bool) PJScheme.catch_q_hat ((object) PJScheme.caddr_hat ((object) adatum_reg))) && ((bool) PJScheme.finally_q_hat ((object) PJScheme.cadddr_hat ((object) adatum_reg)))))
 														      {
 															 {
 															    k_reg
@@ -16721,7 +16461,7 @@ public class PJScheme:Scheme
 												  }
 												else
 												  {
-												     if (true_q (PJScheme.raise_q_hat ((object) adatum_reg)))
+												     if (PJScheme.raise_q_hat ((object) adatum_reg))
 												       {
 													  {
 													     k_reg
@@ -16739,7 +16479,7 @@ public class PJScheme:Scheme
 												       }
 												     else
 												       {
-													  if (true_q (PJScheme.choose_q_hat ((object) adatum_reg)))
+													  if (PJScheme.choose_q_hat ((object) adatum_reg))
 													    {
 													       {
 														  k_reg
@@ -16757,7 +16497,7 @@ public class PJScheme:Scheme
 													    }
 													  else
 													    {
-													       if (true_q (PJScheme.application_q_hat ((object) adatum_reg)))
+													       if (PJScheme.application_q_hat ((object) adatum_reg))
 														 {
 														    {
 														       k_reg
@@ -16806,7 +16546,7 @@ public class PJScheme:Scheme
    }
    new public static void aparse_all ()
    {
-      if (true_q (PJScheme.null_q_hat ((object) adatum_list_reg)))
+      if (PJScheme.null_q_hat ((object) adatum_list_reg))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -16841,10 +16581,9 @@ public class PJScheme:Scheme
    }
    new public static void aparse_sexps ()
    {
-      if (true_q
-	  (PJScheme.
-	   token_type_q ((object) PJScheme.first ((object) tokens_reg),
-			 (object) symbol ("end-marker"))))
+      if (PJScheme.
+	  token_type_q ((object) PJScheme.first ((object) tokens_reg),
+			(object) symbol ("end-marker")))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -16865,7 +16604,7 @@ public class PJScheme:Scheme
    }
    new public static void get_lexical_address ()
    {
-      if (true_q (PJScheme.null_q ((object) senv_reg)))
+      if (PJScheme.null_q ((object) senv_reg))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -16899,10 +16638,8 @@ public class PJScheme:Scheme
    }
    new public static void get_lexical_address_offset ()
    {
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) contours_reg),
-	       (object) id_reg)))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) contours_reg), (object) id_reg))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -16925,7 +16662,7 @@ public class PJScheme:Scheme
    }
    new public static void create_letrec_assignments_hat ()
    {
-      if (true_q (PJScheme.null_q_hat ((object) vars_reg)))
+      if (PJScheme.null_q_hat ((object) vars_reg))
 	{
 	   {
 	      value2_reg = EmptyList;
@@ -16964,11 +16701,10 @@ public class PJScheme:Scheme
    }
    new public static void nest_let_star_bindings_hat ()
    {
-      if (true_q
-	  ((((bool) PJScheme.null_q_hat ((object) bindings_reg))
-	    || ((bool) PJScheme.
-		null_q_hat ((object) PJScheme.
-			    cdr_hat ((object) bindings_reg))))))
+      if ((((bool) PJScheme.null_q_hat ((object) bindings_reg))
+	   || ((bool) PJScheme.
+	       null_q_hat ((object) PJScheme.
+			   cdr_hat ((object) bindings_reg)))))
 	{
 	   {
 	      value_reg =
@@ -16996,7 +16732,7 @@ public class PJScheme:Scheme
    }
    new public static void case_clauses_to_simple_cond_clauses_hat ()
    {
-      if (true_q (PJScheme.null_q_hat ((object) clauses_reg)))
+      if (PJScheme.null_q_hat ((object) clauses_reg))
 	{
 	   {
 	      value_reg = EmptyList;
@@ -17017,7 +16753,7 @@ public class PJScheme:Scheme
    }
    new public static void case_clauses_to_cond_clauses_hat ()
    {
-      if (true_q (PJScheme.null_q_hat ((object) clauses_reg)))
+      if (PJScheme.null_q_hat ((object) clauses_reg))
 	{
 	   {
 	      value2_reg = EmptyList;
@@ -17040,7 +16776,7 @@ public class PJScheme:Scheme
    }
    new public static void record_case_clauses_to_cond_clauses_hat ()
    {
-      if (true_q (PJScheme.null_q_hat ((object) clauses_reg)))
+      if (PJScheme.null_q_hat ((object) clauses_reg))
 	{
 	   {
 	      value2_reg = EmptyList;
@@ -17063,7 +16799,7 @@ public class PJScheme:Scheme
    }
    new public static void make_dd_variant_constructors_hat ()
    {
-      if (true_q (PJScheme.null_q_hat ((object) variants_reg)))
+      if (PJScheme.null_q_hat ((object) variants_reg))
 	{
 	   {
 	      value2_reg = EmptyList;
@@ -17100,7 +16836,7 @@ public class PJScheme:Scheme
    }
    new public static void verify_dd_constructor_fields_hat ()
    {
-      if (true_q (PJScheme.null_q_hat ((object) fields_reg)))
+      if (PJScheme.null_q_hat ((object) fields_reg))
 	{
 	   {
 	      value_reg =
@@ -17195,9 +16931,9 @@ public class PJScheme:Scheme
 	       && ((bool) PJScheme.
 		   pattern_q ((object) PJScheme.cadr ((object) x)))));
    }
-   new public static object define_syntax_clause_q_hat (object x)
+   new public static bool define_syntax_clause_q_hat (object x)
    {
-      return ((object)
+      return ((bool)
 	      (((bool) PJScheme.list_q_hat ((object) x))
 	       && ((bool) PJScheme.
 		   EqualSign ((object) PJScheme.length_hat ((object) x),
@@ -17219,9 +16955,9 @@ public class PJScheme:Scheme
 		 && ((bool) PJScheme.
 		     apattern_q ((object) PJScheme.caddr ((object) x)))))));
    }
-   new public static object list_of_define_syntax_clauses_q_hat (object alist)
+   new public static bool list_of_define_syntax_clauses_q_hat (object alist)
    {
-      return ((object)
+      return ((bool)
 	      (((bool) PJScheme.null_q_hat ((object) alist))
 	       ||
 	       ((bool)
@@ -17243,7 +16979,7 @@ public class PJScheme:Scheme
       macro =
 	 PJScheme.get_first_frame_value ((object) macro_keyword,
 					 (object) macro_env);
-      if (true_q (PJScheme.pattern_macro_q ((object) macro)))
+      if (PJScheme.pattern_macro_q ((object) macro))
 	{
 	   {
 	      k_reg =
@@ -17271,7 +17007,7 @@ public class PJScheme:Scheme
    }
    new public static void process_macro_clauses_hat ()
    {
-      if (true_q (PJScheme.null_q ((object) clauses_reg)))
+      if (PJScheme.null_q ((object) clauses_reg))
 	{
 	   {
 	      msg_reg = "no matching clause found for";
@@ -17305,7 +17041,7 @@ public class PJScheme:Scheme
    }
    new public static void qq_expand_cps ()
    {
-      if (true_q (PJScheme.quasiquote_q_hat ((object) ax_reg)))
+      if (PJScheme.quasiquote_q_hat ((object) ax_reg))
 	{
 	   {
 	      k_reg =
@@ -17318,13 +17054,11 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       ((((bool) PJScheme.unquote_q_hat ((object) ax_reg))
-		 || ((bool) PJScheme.
-		     unquote_splicing_q_hat ((object) ax_reg)))))
+	   if ((((bool) PJScheme.unquote_q_hat ((object) ax_reg))
+		|| ((bool) PJScheme.
+		    unquote_splicing_q_hat ((object) ax_reg))))
 	     {
-		if (true_q
-		    (PJScheme.GreaterThan ((object) depth_reg, (object) 0)))
+		if (PJScheme.GreaterThan ((object) depth_reg, (object) 0))
 		  {
 		     {
 			k_reg =
@@ -17339,15 +17073,14 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 ((((bool) PJScheme.unquote_q_hat ((object) ax_reg))
-			   && ((bool) PJScheme.
-			       not ((object) PJScheme.
-				    null_q_hat ((object) PJScheme.
-						cdr_hat ((object) ax_reg))))
-			   && ((bool) PJScheme.
-			       null_q_hat ((object) PJScheme.
-					   cddr_hat ((object) ax_reg))))))
+		     if ((((bool) PJScheme.unquote_q_hat ((object) ax_reg))
+			  && ((bool) PJScheme.
+			      not ((object) PJScheme.
+				   null_q_hat ((object) PJScheme.
+					       cdr_hat ((object) ax_reg))))
+			  && ((bool) PJScheme.
+			      null_q_hat ((object) PJScheme.
+					  cddr_hat ((object) ax_reg)))))
 		       {
 			  {
 			     value_reg = PJScheme.cadr_hat ((object) ax_reg);
@@ -17370,7 +17103,7 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q (PJScheme.vector_q_hat ((object) ax_reg)))
+		if (PJScheme.vector_q_hat ((object) ax_reg))
 		  {
 		     {
 			k_reg =
@@ -17384,10 +17117,8 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  not ((object) PJScheme.
-			       pair_q_hat ((object) ax_reg))))
+		     if (PJScheme.
+			 not ((object) PJScheme.pair_q_hat ((object) ax_reg)))
 		       {
 			  {
 			     value_reg =
@@ -17401,10 +17132,9 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       null_q_hat ((object) PJScheme.
-					   cdr_hat ((object) ax_reg))))
+			  if (PJScheme.
+			      null_q_hat ((object) PJScheme.
+					  cdr_hat ((object) ax_reg)))
 			    {
 			       {
 				  ax_reg = PJScheme.car_hat ((object) ax_reg);
@@ -17431,7 +17161,7 @@ public class PJScheme:Scheme
    }
    new public static void qq_expand_list_cps ()
    {
-      if (true_q (PJScheme.quasiquote_q_hat ((object) ax_reg)))
+      if (PJScheme.quasiquote_q_hat ((object) ax_reg))
 	{
 	   {
 	      k_reg =
@@ -17444,13 +17174,11 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       ((((bool) PJScheme.unquote_q_hat ((object) ax_reg))
-		 || ((bool) PJScheme.
-		     unquote_splicing_q_hat ((object) ax_reg)))))
+	   if ((((bool) PJScheme.unquote_q_hat ((object) ax_reg))
+		|| ((bool) PJScheme.
+		    unquote_splicing_q_hat ((object) ax_reg))))
 	     {
-		if (true_q
-		    (PJScheme.GreaterThan ((object) depth_reg, (object) 0)))
+		if (PJScheme.GreaterThan ((object) depth_reg, (object) 0))
 		  {
 		     {
 			k_reg =
@@ -17465,7 +17193,7 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q (PJScheme.unquote_q_hat ((object) ax_reg)))
+		     if (PJScheme.unquote_q_hat ((object) ax_reg))
 		       {
 			  {
 			     value_reg =
@@ -17479,10 +17207,9 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       null_q_hat ((object) PJScheme.
-					   cddr_hat ((object) ax_reg))))
+			  if (PJScheme.
+			      null_q_hat ((object) PJScheme.
+					  cddr_hat ((object) ax_reg)))
 			    {
 			       {
 				  value_reg =
@@ -17509,7 +17236,7 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q (PJScheme.vector_q_hat ((object) ax_reg)))
+		if (PJScheme.vector_q_hat ((object) ax_reg))
 		  {
 		     {
 			k_reg =
@@ -17520,10 +17247,8 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  not ((object) PJScheme.
-			       pair_q_hat ((object) ax_reg))))
+		     if (PJScheme.
+			 not ((object) PJScheme.pair_q_hat ((object) ax_reg)))
 		       {
 			  {
 			     value_reg =
@@ -17539,10 +17264,9 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       null_q_hat ((object) PJScheme.
-					   cdr_hat ((object) ax_reg))))
+			  if (PJScheme.
+			      null_q_hat ((object) PJScheme.
+					  cdr_hat ((object) ax_reg)))
 			    {
 			       {
 				  k_reg =
@@ -17573,20 +17297,19 @@ public class PJScheme:Scheme
    }
    new public static object aunparse (object aexp)
    {
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) aexp),
-	       (object) symbol ("lit-aexp"))))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) aexp),
+	      (object) symbol ("lit-aexp")))
 	{
 	   object datum = null;
 	   datum = PJScheme.list_ref ((object) aexp, (object) 1);
-	   if (true_q (PJScheme.literal_q ((object) datum)))
+	   if (PJScheme.literal_q ((object) datum))
 	     {
 		return ((object) datum);
 	     }
 	   else
 	     {
-		if (true_q (PJScheme.vector_q ((object) datum)))
+		if (PJScheme.vector_q ((object) datum))
 		  {
 		     return ((object) datum);
 		  }
@@ -17602,10 +17325,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) aexp),
-		    (object) symbol ("var-aexp"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) aexp),
+		   (object) symbol ("var-aexp")))
 	     {
 		object id = null;
 		id = PJScheme.list_ref ((object) aexp, (object) 1);
@@ -17613,10 +17335,9 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) PJScheme.car ((object) aexp),
-			 (object) symbol ("lexical-address-aexp"))))
+		if (PJScheme.
+		    Eq ((object) PJScheme.car ((object) aexp),
+			(object) symbol ("lexical-address-aexp")))
 		  {
 		     object id = null;
 		     id = PJScheme.list_ref ((object) aexp, (object) 3);
@@ -17624,10 +17345,9 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  Eq ((object) PJScheme.car ((object) aexp),
-			      (object) symbol ("if-aexp"))))
+		     if (PJScheme.
+			 Eq ((object) PJScheme.car ((object) aexp),
+			     (object) symbol ("if-aexp")))
 		       {
 			  object test_aexp = null;
 			  object then_aexp = null;
@@ -17654,10 +17374,9 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       Eq ((object) PJScheme.car ((object) aexp),
-				   (object) symbol ("assign-aexp"))))
+			  if (PJScheme.
+			      Eq ((object) PJScheme.car ((object) aexp),
+				  (object) symbol ("assign-aexp")))
 			    {
 			       object var = null;
 			       object rhs_exp = null;
@@ -17681,10 +17400,9 @@ public class PJScheme:Scheme
 			    }
 			  else
 			    {
-			       if (true_q
-				   (PJScheme.
-				    Eq ((object) PJScheme.car ((object) aexp),
-					(object) symbol ("func-aexp"))))
+			       if (PJScheme.
+				   Eq ((object) PJScheme.car ((object) aexp),
+				       (object) symbol ("func-aexp")))
 				 {
 				    object exp = null;
 				    exp =
@@ -17701,12 +17419,10 @@ public class PJScheme:Scheme
 				 }
 			       else
 				 {
-				    if (true_q
-					(PJScheme.
-					 Eq ((object) PJScheme.
-					     car ((object) aexp),
-					     (object)
-					     symbol ("define-aexp"))))
+				    if (PJScheme.
+					Eq ((object) PJScheme.
+					    car ((object) aexp),
+					    (object) symbol ("define-aexp")))
 				      {
 					 object id = null;
 					 object docstring = null;
@@ -17720,11 +17436,9 @@ public class PJScheme:Scheme
 					 id =
 					    PJScheme.list_ref ((object) aexp,
 							       (object) 1);
-					 if (true_q
-					     (PJScheme.
-					      string_is__q ((object)
-							    docstring,
-							    (object) "")))
+					 if (PJScheme.
+					     string_is__q ((object) docstring,
+							   (object) ""))
 					   {
 					      return ((object) PJScheme.
 						      append ((object)
@@ -17755,12 +17469,11 @@ public class PJScheme:Scheme
 				      }
 				    else
 				      {
-					 if (true_q
-					     (PJScheme.
-					      Eq ((object) PJScheme.
-						  car ((object) aexp),
-						  (object)
-						  symbol ("define!-aexp"))))
+					 if (PJScheme.
+					     Eq ((object) PJScheme.
+						 car ((object) aexp),
+						 (object)
+						 symbol ("define!-aexp")))
 					   {
 					      object id = null;
 					      object docstring = null;
@@ -17777,12 +17490,10 @@ public class PJScheme:Scheme
 						 PJScheme.
 						 list_ref ((object) aexp,
 							   (object) 1);
-					      if (true_q
-						  (PJScheme.
-						   string_is__q ((object)
-								 docstring,
-								 (object)
-								 "")))
+					      if (PJScheme.
+						  string_is__q ((object)
+								docstring,
+								(object) ""))
 						{
 						   return ((object) PJScheme.
 							   append ((object)
@@ -17799,13 +17510,12 @@ public class PJScheme:Scheme
 					   }
 					 else
 					   {
-					      if (true_q
-						  (PJScheme.
-						   Eq ((object) PJScheme.
-						       car ((object) aexp),
-						       (object)
-						       symbol
-						       ("define-syntax-aexp"))))
+					      if (PJScheme.
+						  Eq ((object) PJScheme.
+						      car ((object) aexp),
+						      (object)
+						      symbol
+						      ("define-syntax-aexp")))
 						{
 						   object name = null;
 						   object clauses = null;
@@ -17824,14 +17534,13 @@ public class PJScheme:Scheme
 						}
 					      else
 						{
-						   if (true_q
-						       (PJScheme.
-							Eq ((object) PJScheme.
-							    car ((object)
-								 aexp),
-							    (object)
-							    symbol
-							    ("begin-aexp"))))
+						   if (PJScheme.
+						       Eq ((object) PJScheme.
+							   car ((object)
+								aexp),
+							   (object)
+							   symbol
+							   ("begin-aexp")))
 						     {
 							object exps = null;
 							exps =
@@ -17846,15 +17555,14 @@ public class PJScheme:Scheme
 						     }
 						   else
 						     {
-							if (true_q
-							    (PJScheme.
-							     Eq ((object)
-								 PJScheme.
-								 car ((object)
-								      aexp),
-								 (object)
-								 symbol
-								 ("lambda-aexp"))))
+							if (PJScheme.
+							    Eq ((object)
+								PJScheme.
+								car ((object)
+								     aexp),
+								(object)
+								symbol
+								("lambda-aexp")))
 							  {
 							     object formals =
 								null;
@@ -17872,11 +17580,10 @@ public class PJScheme:Scheme
 							  }
 							else
 							  {
-							     if (true_q
-								 (PJScheme.
-								  Eq ((object)
-								      PJScheme.
-								      car ((object) aexp), (object) symbol ("mu-lambda-aexp"))))
+							     if (PJScheme.
+								 Eq ((object)
+								     PJScheme.
+								     car ((object) aexp), (object) symbol ("mu-lambda-aexp")))
 							       {
 								  object
 								     formals =
@@ -17911,9 +17618,7 @@ public class PJScheme:Scheme
 							       }
 							     else
 							       {
-								  if (true_q
-								      (PJScheme.
-								       Eq ((object) PJScheme.car ((object) aexp), (object) symbol ("app-aexp"))))
+								  if (PJScheme.Eq ((object) PJScheme.car ((object) aexp), (object) symbol ("app-aexp")))
 								    {
 								       object
 									  rator
@@ -17937,7 +17642,7 @@ public class PJScheme:Scheme
 								    }
 								  else
 								    {
-								       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) aexp), (object) symbol ("try-catch-aexp"))))
+								       if (PJScheme.Eq ((object) PJScheme.car ((object) aexp), (object) symbol ("try-catch-aexp")))
 									 {
 									    object
 									       body
@@ -17971,7 +17676,7 @@ public class PJScheme:Scheme
 									 }
 								       else
 									 {
-									    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) aexp), (object) symbol ("try-finally-aexp"))))
+									    if (PJScheme.Eq ((object) PJScheme.car ((object) aexp), (object) symbol ("try-finally-aexp")))
 									      {
 										 object
 										    body
@@ -17996,7 +17701,7 @@ public class PJScheme:Scheme
 									      }
 									    else
 									      {
-										 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) aexp), (object) symbol ("try-catch-finally-aexp"))))
+										 if (PJScheme.Eq ((object) PJScheme.car ((object) aexp), (object) symbol ("try-catch-finally-aexp")))
 										   {
 										      object
 											 body
@@ -18039,7 +17744,7 @@ public class PJScheme:Scheme
 										   }
 										 else
 										   {
-										      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) aexp), (object) symbol ("raise-aexp"))))
+										      if (PJScheme.Eq ((object) PJScheme.car ((object) aexp), (object) symbol ("raise-aexp")))
 											{
 											   object
 											      exp
@@ -18051,7 +17756,7 @@ public class PJScheme:Scheme
 											}
 										      else
 											{
-											   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) aexp), (object) symbol ("choose-aexp"))))
+											   if (PJScheme.Eq ((object) PJScheme.car ((object) aexp), (object) symbol ("choose-aexp")))
 											     {
 												object
 												   exps
@@ -18128,7 +17833,7 @@ public class PJScheme:Scheme
       pc = (Function) scan_input;
       object result = null;
       result = PJScheme.trampoline ();
-      if (true_q (PJScheme.exception_q ((object) result)))
+      if (PJScheme.exception_q ((object) result))
 	{
 	   return ((object) result);
 	}
@@ -18136,11 +17841,10 @@ public class PJScheme:Scheme
 	{
 	   {
 	      _startokens_left_star = result;
-	      if (true_q
-		  (PJScheme.
-		   token_type_q ((object) PJScheme.
-				 first ((object) _startokens_left_star),
-				 (object) symbol ("end-marker"))))
+	      if (PJScheme.
+		  token_type_q ((object) PJScheme.
+				first ((object) _startokens_left_star),
+				(object) symbol ("end-marker")))
 		{
 		   return ((object) void_value);
 		}
@@ -18156,13 +17860,12 @@ public class PJScheme:Scheme
       PJScheme.execute_next_expression_rm ((object) src);
       object result = null;
       result = PJScheme.trampoline ();
-      if (true_q
-	  ((((bool) PJScheme.exception_q ((object) result))
-	    || ((bool) PJScheme.end_of_session_q ((object) result))
-	    || ((bool) PJScheme.
-		token_type_q ((object) PJScheme.
-			      first ((object) _startokens_left_star),
-			      (object) symbol ("end-marker"))))))
+      if ((((bool) PJScheme.exception_q ((object) result))
+	   || ((bool) PJScheme.end_of_session_q ((object) result))
+	   || ((bool) PJScheme.
+	       token_type_q ((object) PJScheme.
+			     first ((object) _startokens_left_star),
+			     (object) symbol ("end-marker")))))
 	{
 	   return ((object) result);
 	}
@@ -18205,11 +17908,11 @@ public class PJScheme:Scheme
 	      make_cont2 ((object) symbol ("<cont2-50>"), (object) exp,
 			  (object) k));
    }
-   new public static object get_use_stack_trace ()
+   new public static bool get_use_stack_trace ()
    {
-      return ((object) _staruse_stack_trace_star);
+      return ((bool) _staruse_stack_trace_star);
    }
-   new public static void set_use_stack_trace (object value)
+   new public static void set_use_stack_trace (bool value)
    {
       _staruse_stack_trace_star = value;
    }
@@ -18233,11 +17936,10 @@ public class PJScheme:Scheme
    }
    new public static void pop_stack_trace (object exp)
    {
-      if (true_q
-	  (PJScheme.
-	   not ((object) PJScheme.
-		null_q ((object) PJScheme.
-			car ((object) _starstack_trace_star)))))
+      if (PJScheme.
+	  not ((object) PJScheme.
+	       null_q ((object) PJScheme.
+		       car ((object) _starstack_trace_star))))
 	{
 	   PJScheme.set_car_b ((object) _starstack_trace_star,
 			       (object) PJScheme.cdr ((object) PJScheme.
@@ -18247,7 +17949,7 @@ public class PJScheme:Scheme
    }
    new public static void m ()
    {
-      if (true_q (_startracing_on_q_star))
+      if (_startracing_on_q_star)
 	{
 	   PJScheme.highlight_expression ((object) exp_reg);
 	}
@@ -18255,10 +17957,9 @@ public class PJScheme:Scheme
       k = ((_startracing_on_q_star)
 	   ? (PJScheme.
 	      make_debugging_k ((object) exp_reg, (object) k_reg)) : (k_reg));
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) exp_reg),
-	       (object) symbol ("lit-aexp"))))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) exp_reg),
+	      (object) symbol ("lit-aexp")))
 	{
 	   object datum = null;
 	   datum = PJScheme.list_ref ((object) exp_reg, (object) 1);
@@ -18270,10 +17971,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) exp_reg),
-		    (object) symbol ("var-aexp"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) exp_reg),
+		   (object) symbol ("var-aexp")))
 	     {
 		object id = null;
 		object info = null;
@@ -18287,10 +17987,9 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) PJScheme.car ((object) exp_reg),
-			 (object) symbol ("lexical-address-aexp"))))
+		if (PJScheme.
+		    Eq ((object) PJScheme.car ((object) exp_reg),
+			(object) symbol ("lexical-address-aexp")))
 		  {
 		     object depth = null;
 		     object offset = null;
@@ -18306,10 +18005,9 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  Eq ((object) PJScheme.car ((object) exp_reg),
-			      (object) symbol ("func-aexp"))))
+		     if (PJScheme.
+			 Eq ((object) PJScheme.car ((object) exp_reg),
+			     (object) symbol ("func-aexp")))
 		       {
 			  object exp = null;
 			  exp =
@@ -18324,10 +18022,9 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       Eq ((object) PJScheme.car ((object) exp_reg),
-				   (object) symbol ("if-aexp"))))
+			  if (PJScheme.
+			      Eq ((object) PJScheme.car ((object) exp_reg),
+				  (object) symbol ("if-aexp")))
 			    {
 			       object test_exp = null;
 			       object then_exp = null;
@@ -18355,11 +18052,10 @@ public class PJScheme:Scheme
 			    }
 			  else
 			    {
-			       if (true_q
-				   (PJScheme.
-				    Eq ((object) PJScheme.
-					car ((object) exp_reg),
-					(object) symbol ("assign-aexp"))))
+			       if (PJScheme.
+				   Eq ((object) PJScheme.
+				       car ((object) exp_reg),
+				       (object) symbol ("assign-aexp")))
 				 {
 				    object var = null;
 				    object rhs_exp = null;
@@ -18388,12 +18084,10 @@ public class PJScheme:Scheme
 				 }
 			       else
 				 {
-				    if (true_q
-					(PJScheme.
-					 Eq ((object) PJScheme.
-					     car ((object) exp_reg),
-					     (object)
-					     symbol ("define-aexp"))))
+				    if (PJScheme.
+					Eq ((object) PJScheme.
+					    car ((object) exp_reg),
+					    (object) symbol ("define-aexp")))
 				      {
 					 object var = null;
 					 object docstring = null;
@@ -18425,12 +18119,11 @@ public class PJScheme:Scheme
 				      }
 				    else
 				      {
-					 if (true_q
-					     (PJScheme.
-					      Eq ((object) PJScheme.
-						  car ((object) exp_reg),
-						  (object)
-						  symbol ("define!-aexp"))))
+					 if (PJScheme.
+					     Eq ((object) PJScheme.
+						 car ((object) exp_reg),
+						 (object)
+						 symbol ("define!-aexp")))
 					   {
 					      object var = null;
 					      object docstring = null;
@@ -18462,13 +18155,12 @@ public class PJScheme:Scheme
 					   }
 					 else
 					   {
-					      if (true_q
-						  (PJScheme.
-						   Eq ((object) PJScheme.
-						       car ((object) exp_reg),
-						       (object)
-						       symbol
-						       ("define-syntax-aexp"))))
+					      if (PJScheme.
+						  Eq ((object) PJScheme.
+						      car ((object) exp_reg),
+						      (object)
+						      symbol
+						      ("define-syntax-aexp")))
 						{
 						   object name = null;
 						   object clauses = null;
@@ -18507,14 +18199,13 @@ public class PJScheme:Scheme
 						}
 					      else
 						{
-						   if (true_q
-						       (PJScheme.
-							Eq ((object) PJScheme.
-							    car ((object)
-								 exp_reg),
-							    (object)
-							    symbol
-							    ("begin-aexp"))))
+						   if (PJScheme.
+						       Eq ((object) PJScheme.
+							   car ((object)
+								exp_reg),
+							   (object)
+							   symbol
+							   ("begin-aexp")))
 						     {
 							object exps = null;
 							exps =
@@ -18532,15 +18223,14 @@ public class PJScheme:Scheme
 						     }
 						   else
 						     {
-							if (true_q
-							    (PJScheme.
-							     Eq ((object)
-								 PJScheme.
-								 car ((object)
-								      exp_reg),
-								 (object)
-								 symbol
-								 ("lambda-aexp"))))
+							if (PJScheme.
+							    Eq ((object)
+								PJScheme.
+								car ((object)
+								     exp_reg),
+								(object)
+								symbol
+								("lambda-aexp")))
 							  {
 							     object formals =
 								null;
@@ -18565,11 +18255,10 @@ public class PJScheme:Scheme
 							  }
 							else
 							  {
-							     if (true_q
-								 (PJScheme.
-								  Eq ((object)
-								      PJScheme.
-								      car ((object) exp_reg), (object) symbol ("mu-lambda-aexp"))))
+							     if (PJScheme.
+								 Eq ((object)
+								     PJScheme.
+								     car ((object) exp_reg), (object) symbol ("mu-lambda-aexp")))
 							       {
 								  object
 								     formals =
@@ -18621,9 +18310,7 @@ public class PJScheme:Scheme
 							       }
 							     else
 							       {
-								  if (true_q
-								      (PJScheme.
-								       Eq ((object) PJScheme.car ((object) exp_reg), (object) symbol ("trace-lambda-aexp"))))
+								  if (PJScheme.Eq ((object) PJScheme.car ((object) exp_reg), (object) symbol ("trace-lambda-aexp")))
 								    {
 								       object
 									  name
@@ -18668,7 +18355,7 @@ public class PJScheme:Scheme
 								    }
 								  else
 								    {
-								       if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) exp_reg), (object) symbol ("mu-trace-lambda-aexp"))))
+								       if (PJScheme.Eq ((object) PJScheme.car ((object) exp_reg), (object) symbol ("mu-trace-lambda-aexp")))
 									 {
 									    object
 									       name
@@ -18722,7 +18409,7 @@ public class PJScheme:Scheme
 									 }
 								       else
 									 {
-									    if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) exp_reg), (object) symbol ("try-catch-aexp"))))
+									    if (PJScheme.Eq ((object) PJScheme.car ((object) exp_reg), (object) symbol ("try-catch-aexp")))
 									      {
 										 object
 										    body
@@ -18775,7 +18462,7 @@ public class PJScheme:Scheme
 									      }
 									    else
 									      {
-										 if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) exp_reg), (object) symbol ("try-finally-aexp"))))
+										 if (PJScheme.Eq ((object) PJScheme.car ((object) exp_reg), (object) symbol ("try-finally-aexp")))
 										   {
 										      object
 											 body
@@ -18821,7 +18508,7 @@ public class PJScheme:Scheme
 										   }
 										 else
 										   {
-										      if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) exp_reg), (object) symbol ("try-catch-finally-aexp"))))
+										      if (PJScheme.Eq ((object) PJScheme.car ((object) exp_reg), (object) symbol ("try-catch-finally-aexp")))
 											{
 											   object
 											      body
@@ -18885,7 +18572,7 @@ public class PJScheme:Scheme
 											}
 										      else
 											{
-											   if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) exp_reg), (object) symbol ("raise-aexp"))))
+											   if (PJScheme.Eq ((object) PJScheme.car ((object) exp_reg), (object) symbol ("raise-aexp")))
 											     {
 												object
 												   exp
@@ -18905,7 +18592,7 @@ public class PJScheme:Scheme
 											     }
 											   else
 											     {
-												if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) exp_reg), (object) symbol ("choose-aexp"))))
+												if (PJScheme.Eq ((object) PJScheme.car ((object) exp_reg), (object) symbol ("choose-aexp")))
 												  {
 												     object
 													exps
@@ -18927,7 +18614,7 @@ public class PJScheme:Scheme
 												  }
 												else
 												  {
-												     if (true_q (PJScheme.Eq ((object) PJScheme.car ((object) exp_reg), (object) symbol ("app-aexp"))))
+												     if (PJScheme.Eq ((object) PJScheme.car ((object) exp_reg), (object) symbol ("app-aexp")))
 												       {
 													  object
 													     rator
@@ -19020,24 +18707,22 @@ public class PJScheme:Scheme
    }
    new public static object get_procedure_name (object aexp)
    {
-      if (true_q (PJScheme.macro_derived_source_info_q ((object) aexp)))
+      if (PJScheme.macro_derived_source_info_q ((object) aexp))
 	{
 	   return ((object) PJScheme.
 		   rac ((object) PJScheme.get_source_info ((object) aexp)));
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) aexp),
-		    (object) symbol ("app-aexp"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) aexp),
+		   (object) symbol ("app-aexp")))
 	     {
 		object rator = null;
 		rator = PJScheme.list_ref ((object) aexp, (object) 1);
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) PJScheme.car ((object) rator),
-			 (object) symbol ("lexical-address-aexp"))))
+		if (PJScheme.
+		    Eq ((object) PJScheme.car ((object) rator),
+			(object) symbol ("lexical-address-aexp")))
 		  {
 		     object id = null;
 		     id = PJScheme.list_ref ((object) rator, (object) 3);
@@ -19045,10 +18730,9 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  Eq ((object) PJScheme.car ((object) rator),
-			      (object) symbol ("var-aexp"))))
+		     if (PJScheme.
+			 Eq ((object) PJScheme.car ((object) rator),
+			     (object) symbol ("var-aexp")))
 		       {
 			  object id = null;
 			  id = PJScheme.list_ref ((object) rator, (object) 1);
@@ -19056,10 +18740,9 @@ public class PJScheme:Scheme
 		       }
 		     else
 		       {
-			  if (true_q
-			      (PJScheme.
-			       Eq ((object) PJScheme.car ((object) rator),
-				   (object) symbol ("lambda-aexp"))))
+			  if (PJScheme.
+			      Eq ((object) PJScheme.car ((object) rator),
+				  (object) symbol ("lambda-aexp")))
 			    {
 			       object formals = null;
 			       formals =
@@ -19080,11 +18763,9 @@ public class PJScheme:Scheme
 			    }
 			  else
 			    {
-			       if (true_q
-				   (PJScheme.
-				    Eq ((object) PJScheme.
-					car ((object) rator),
-					(object) symbol ("mu-lambda-aexp"))))
+			       if (PJScheme.
+				   Eq ((object) PJScheme.car ((object) rator),
+				       (object) symbol ("mu-lambda-aexp")))
 				 {
 				    object formals = null;
 				    object runt = null;
@@ -19106,12 +18787,11 @@ public class PJScheme:Scheme
 				 }
 			       else
 				 {
-				    if (true_q
-					(PJScheme.
-					 Eq ((object) PJScheme.
-					     car ((object) rator),
-					     (object)
-					     symbol ("trace-lambda-aexp"))))
+				    if (PJScheme.
+					Eq ((object) PJScheme.
+					    car ((object) rator),
+					    (object)
+					    symbol ("trace-lambda-aexp")))
 				      {
 					 object name = null;
 					 name =
@@ -19121,13 +18801,12 @@ public class PJScheme:Scheme
 				      }
 				    else
 				      {
-					 if (true_q
-					     (PJScheme.
-					      Eq ((object) PJScheme.
-						  car ((object) rator),
-						  (object)
-						  symbol
-						  ("mu-trace-lambda-aexp"))))
+					 if (PJScheme.
+					     Eq ((object) PJScheme.
+						 car ((object) rator),
+						 (object)
+						 symbol
+						 ("mu-trace-lambda-aexp")))
 					   {
 					      object name = null;
 					      name =
@@ -19155,10 +18834,9 @@ public class PJScheme:Scheme
    }
    new public static object old_get_procedure_name (object exp)
    {
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) exp),
-	       (object) symbol ("lexical-address-aexp"))))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) exp),
+	      (object) symbol ("lexical-address-aexp")))
 	{
 	   object id = null;
 	   id = PJScheme.list_ref ((object) exp, (object) 3);
@@ -19166,10 +18844,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) exp),
-		    (object) symbol ("var-aexp"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) exp),
+		   (object) symbol ("var-aexp")))
 	     {
 		object id = null;
 		id = PJScheme.list_ref ((object) exp, (object) 1);
@@ -19177,10 +18854,9 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) PJScheme.car ((object) exp),
-			 (object) symbol ("app-aexp"))))
+		if (PJScheme.
+		    Eq ((object) PJScheme.car ((object) exp),
+			(object) symbol ("app-aexp")))
 		  {
 		     object rator = null;
 		     rator = PJScheme.list_ref ((object) exp, (object) 1);
@@ -19198,7 +18874,7 @@ public class PJScheme:Scheme
    {
       object info = null;
       info = PJScheme.rac ((object) exp);
-      if (true_q (PJScheme.Eq ((object) info, (object) symbol ("none"))))
+      if (PJScheme.Eq ((object) info, (object) symbol ("none")))
 	{
 	   return ((object) symbol ("macro-generated-exp"));
 	}
@@ -19214,7 +18890,7 @@ public class PJScheme:Scheme
    }
    new public static void runtime_error ()
    {
-      if (true_q (PJScheme.Eq ((object) info_reg, (object) symbol ("none"))))
+      if (PJScheme.Eq ((object) info_reg, (object) symbol ("none")))
 	{
 	   {
 	      exception_reg =
@@ -19244,7 +18920,7 @@ public class PJScheme:Scheme
    }
    new public static void m_star ()
    {
-      if (true_q (PJScheme.null_q ((object) exps_reg)))
+      if (PJScheme.null_q ((object) exps_reg))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -19266,8 +18942,7 @@ public class PJScheme:Scheme
    }
    new public static void eval_sequence ()
    {
-      if (true_q
-	  (PJScheme.null_q ((object) PJScheme.cdr ((object) exps_reg))))
+      if (PJScheme.null_q ((object) PJScheme.cdr ((object) exps_reg)))
 	{
 	   {
 	      exp_reg = PJScheme.car ((object) exps_reg);
@@ -19316,7 +18991,7 @@ public class PJScheme:Scheme
    }
    new public static void eval_choices ()
    {
-      if (true_q (PJScheme.null_q ((object) exps_reg)))
+      if (PJScheme.null_q ((object) exps_reg))
 	{
 	   pc = (Function) apply_fail;
 	}
@@ -19350,7 +19025,7 @@ public class PJScheme:Scheme
    }
    new public static object make_trace_depth_string (object level)
    {
-      if (true_q (PJScheme.EqualSign ((object) level, (object) 0)))
+      if (PJScheme.EqualSign ((object) level, (object) 0))
 	{
 	   return ((object) "");
 	}
@@ -19418,16 +19093,15 @@ public class PJScheme:Scheme
    }
    new public static bool length_at_least_q (object n, object ls)
    {
-      if (true_q (PJScheme.LessThan ((object) n, (object) 1)))
+      if (PJScheme.LessThan ((object) n, (object) 1))
 	{
 	   return ((bool) true);
 	}
       else
 	{
-	   if (true_q
-	       ((((bool) PJScheme.null_q ((object) ls))
-		 || ((bool) PJScheme.
-		     not ((object) PJScheme.pair_q ((object) ls))))))
+	   if ((((bool) PJScheme.null_q ((object) ls))
+		|| ((bool) PJScheme.
+		    not ((object) PJScheme.pair_q ((object) ls)))))
 	     {
 		return ((bool) false);
 	     }
@@ -19516,9 +19190,8 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		not ((object) PJScheme.string_q ((object) filename_reg))))
+	   if (PJScheme.
+	       not ((object) PJScheme.string_q ((object) filename_reg)))
 	     {
 		{
 		   msg_reg =
@@ -19530,10 +19203,9 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     not ((object) PJScheme.
-			  file_exists_q ((object) filename_reg))))
+		if (PJScheme.
+		    not ((object) PJScheme.
+			 file_exists_q ((object) filename_reg)))
 		  {
 		     {
 			msg_reg =
@@ -19567,10 +19239,9 @@ public class PJScheme:Scheme
    }
    new public static void read_and_eval_asexps ()
    {
-      if (true_q
-	  (PJScheme.
-	   token_type_q ((object) PJScheme.first ((object) tokens_reg),
-			 (object) symbol ("end-marker"))))
+      if (PJScheme.
+	  token_type_q ((object) PJScheme.first ((object) tokens_reg),
+			(object) symbol ("end-marker")))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -19591,7 +19262,7 @@ public class PJScheme:Scheme
    }
    new public static void load_files ()
    {
-      if (true_q (PJScheme.null_q ((object) filenames_reg)))
+      if (PJScheme.null_q ((object) filenames_reg))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -19614,7 +19285,7 @@ public class PJScheme:Scheme
    }
    new public static void length_loop ()
    {
-      if (true_q (PJScheme.null_q ((object) x_reg)))
+      if (PJScheme.null_q ((object) x_reg))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -19625,8 +19296,7 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.not ((object) PJScheme.pair_q ((object) x_reg))))
+	   if (PJScheme.not ((object) PJScheme.pair_q ((object) x_reg)))
 	     {
 		{
 		   msg_reg =
@@ -19648,7 +19318,7 @@ public class PJScheme:Scheme
    }
    new public static void make_set ()
    {
-      if (true_q (PJScheme.null_q ((object) lst_reg)))
+      if (PJScheme.null_q ((object) lst_reg))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -19670,48 +19340,46 @@ public class PJScheme:Scheme
    }
    new public static void equal_objects_q ()
    {
-      if (true_q
-	  ((((bool)
-	     (((bool) PJScheme.null_q ((object) x_reg))
-	      && ((bool) PJScheme.null_q ((object) y_reg))))
-	    ||
-	    ((bool)
-	     (((bool) PJScheme.boolean_q ((object) x_reg))
-	      && ((bool) PJScheme.boolean_q ((object) y_reg))
-	      &&
-	      ((bool)
-	       (((bool) (((bool) x_reg) && ((bool) y_reg)))
-		||
-		((bool)
-		 (((bool) PJScheme.not ((object) x_reg))
-		  && ((bool) PJScheme.not ((object) y_reg))))))))
-	    ||
-	    ((bool)
-	     (((bool) PJScheme.symbol_q ((object) x_reg))
-	      && ((bool) PJScheme.symbol_q ((object) y_reg))
-	      && ((bool) PJScheme.Eq ((object) x_reg, (object) y_reg))))
-	    ||
-	    ((bool)
-	     (((bool) PJScheme.number_q ((object) x_reg))
-	      && ((bool) PJScheme.number_q ((object) y_reg))
-	      && ((bool) PJScheme.
-		  EqualSign ((object) x_reg, (object) y_reg))))
-	    ||
-	    ((bool)
-	     (((bool) PJScheme.char_q ((object) x_reg))
-	      && ((bool) PJScheme.char_q ((object) y_reg))
-	      && ((bool) PJScheme.
-		  char_is__q ((object) x_reg, (object) y_reg))))
-	    ||
-	    ((bool)
-	     (((bool) PJScheme.Eq ((object) x_reg, (object) void_value))
-	      && ((bool) PJScheme.Eq ((object) y_reg, (object) void_value))))
-	    ||
-	    ((bool)
-	     (((bool) PJScheme.string_q ((object) x_reg))
-	      && ((bool) PJScheme.string_q ((object) y_reg))
-	      && ((bool) PJScheme.
-		  string_is__q ((object) x_reg, (object) y_reg)))))))
+      if ((((bool)
+	    (((bool) PJScheme.null_q ((object) x_reg))
+	     && ((bool) PJScheme.null_q ((object) y_reg))))
+	   ||
+	   ((bool)
+	    (((bool) PJScheme.boolean_q ((object) x_reg))
+	     && ((bool) PJScheme.boolean_q ((object) y_reg))
+	     &&
+	     ((bool)
+	      (((bool) (((bool) x_reg) && ((bool) y_reg)))
+	       ||
+	       ((bool)
+		(((bool) PJScheme.not ((object) x_reg))
+		 && ((bool) PJScheme.not ((object) y_reg))))))))
+	   ||
+	   ((bool)
+	    (((bool) PJScheme.symbol_q ((object) x_reg))
+	     && ((bool) PJScheme.symbol_q ((object) y_reg))
+	     && ((bool) PJScheme.Eq ((object) x_reg, (object) y_reg))))
+	   ||
+	   ((bool)
+	    (((bool) PJScheme.number_q ((object) x_reg))
+	     && ((bool) PJScheme.number_q ((object) y_reg))
+	     && ((bool) PJScheme.EqualSign ((object) x_reg, (object) y_reg))))
+	   ||
+	   ((bool)
+	    (((bool) PJScheme.char_q ((object) x_reg))
+	     && ((bool) PJScheme.char_q ((object) y_reg))
+	     && ((bool) PJScheme.
+		 char_is__q ((object) x_reg, (object) y_reg))))
+	   ||
+	   ((bool)
+	    (((bool) PJScheme.Eq ((object) x_reg, (object) void_value))
+	     && ((bool) PJScheme.Eq ((object) y_reg, (object) void_value))))
+	   ||
+	   ((bool)
+	    (((bool) PJScheme.string_q ((object) x_reg))
+	     && ((bool) PJScheme.string_q ((object) y_reg))
+	     && ((bool) PJScheme.
+		 string_is__q ((object) x_reg, (object) y_reg))))))
 	{
 	   {
 	      value_reg = true;
@@ -19720,9 +19388,8 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       ((((bool) PJScheme.pair_q ((object) x_reg))
-		 && ((bool) PJScheme.pair_q ((object) y_reg)))))
+	   if ((((bool) PJScheme.pair_q ((object) x_reg))
+		&& ((bool) PJScheme.pair_q ((object) y_reg))))
 	     {
 		{
 		   k_reg =
@@ -19736,14 +19403,13 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    ((((bool) PJScheme.vector_q ((object) x_reg))
-		      && ((bool) PJScheme.vector_q ((object) y_reg))
-		      && ((bool) PJScheme.
-			  EqualSign ((object) PJScheme.
-				     vector_length ((object) x_reg),
-				     (object) PJScheme.
-				     vector_length ((object) y_reg))))))
+		if ((((bool) PJScheme.vector_q ((object) x_reg))
+		     && ((bool) PJScheme.vector_q ((object) y_reg))
+		     && ((bool) PJScheme.
+			 EqualSign ((object) PJScheme.
+				    vector_length ((object) x_reg),
+				    (object) PJScheme.
+				    vector_length ((object) y_reg)))))
 		  {
 		     {
 			i_reg =
@@ -19767,7 +19433,7 @@ public class PJScheme:Scheme
    }
    new public static void equal_vectors_q ()
    {
-      if (true_q (PJScheme.LessThan ((object) i_reg, (object) 0)))
+      if (PJScheme.LessThan ((object) i_reg, (object) 0))
 	{
 	   {
 	      value_reg = true;
@@ -19789,7 +19455,7 @@ public class PJScheme:Scheme
    }
    new public static void member_loop ()
    {
-      if (true_q (PJScheme.null_q ((object) y_reg)))
+      if (PJScheme.null_q ((object) y_reg))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -19799,8 +19465,7 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.not ((object) PJScheme.pair_q ((object) y_reg))))
+	   if (PJScheme.not ((object) PJScheme.pair_q ((object) y_reg)))
 	     {
 		{
 		   msg_reg =
@@ -19841,7 +19506,7 @@ public class PJScheme:Scheme
    }
    new public static void append2 ()
    {
-      if (true_q (PJScheme.null_q ((object) ls1_reg)))
+      if (PJScheme.null_q ((object) ls1_reg))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -19863,7 +19528,7 @@ public class PJScheme:Scheme
    }
    new public static void append_all ()
    {
-      if (true_q (PJScheme.null_q ((object) lists_reg)))
+      if (PJScheme.null_q ((object) lists_reg))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -19874,8 +19539,7 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.null_q ((object) PJScheme.cdr ((object) lists_reg))))
+	   if (PJScheme.null_q ((object) PJScheme.cdr ((object) lists_reg)))
 	     {
 		{
 		   value2_reg = fail_reg;
@@ -19886,11 +19550,9 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     not ((object) PJScheme.
-			  list_q ((object) PJScheme.
-				  car ((object) lists_reg)))))
+		if (PJScheme.
+		    not ((object) PJScheme.
+			 list_q ((object) PJScheme.car ((object) lists_reg))))
 		  {
 		     {
 			msg_reg =
@@ -19918,10 +19580,9 @@ public class PJScheme:Scheme
    }
    new public static object dir (object args, object env)
    {
-      if (true_q
-	  ((((bool) PJScheme.null_q ((object) args))
-	    || ((bool) PJScheme.
-		environment_q ((object) PJScheme.car ((object) args))))))
+      if ((((bool) PJScheme.null_q ((object) args))
+	   || ((bool) PJScheme.
+	       environment_q ((object) PJScheme.car ((object) args)))))
 	{
 	   return ((object) PJScheme.
 		   sort ((Predicate2) symbolLessThan_q,
@@ -19957,14 +19618,13 @@ public class PJScheme:Scheme
    }
    new public static object flatten (object lists)
    {
-      if (true_q (PJScheme.null_q ((object) lists)))
+      if (PJScheme.null_q ((object) lists))
 	{
 	   return ((object) EmptyList);
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.list_q ((object) PJScheme.car ((object) lists))))
+	   if (PJScheme.list_q ((object) PJScheme.car ((object) lists)))
 	     {
 		return ((object) PJScheme.
 			append ((object) PJScheme.
@@ -19986,8 +19646,7 @@ public class PJScheme:Scheme
    }
    new public static void map_primitive ()
    {
-      if (true_q
-	  (PJScheme.iterator_q ((object) PJScheme.car ((object) args_reg))))
+      if (PJScheme.iterator_q ((object) PJScheme.car ((object) args_reg)))
 	{
 	   {
 	      generator_reg = PJScheme.car ((object) args_reg);
@@ -20000,7 +19659,7 @@ public class PJScheme:Scheme
 	   object list_args = null;
 	   list_args = PJScheme.listify ((object) args_reg);
 	   len = PJScheme.length ((object) args_reg);
-	   if (true_q (PJScheme.EqualSign ((object) len, (object) 1)))
+	   if (PJScheme.EqualSign ((object) len, (object) 1))
 	     {
 		{
 		   list1_reg = PJScheme.car ((object) list_args);
@@ -20009,7 +19668,7 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q (PJScheme.EqualSign ((object) len, (object) 2)))
+		if (PJScheme.EqualSign ((object) len, (object) 2))
 		  {
 		     {
 			list2_reg = PJScheme.cadr ((object) list_args);
@@ -20029,14 +19688,13 @@ public class PJScheme:Scheme
    }
    new public static object listify (object arg_list)
    {
-      if (true_q (PJScheme.null_q ((object) arg_list)))
+      if (PJScheme.null_q ((object) arg_list))
 	{
 	   return ((object) EmptyList);
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.list_q ((object) PJScheme.car ((object) arg_list))))
+	   if (PJScheme.list_q ((object) PJScheme.car ((object) arg_list)))
 	     {
 		return ((object) PJScheme.
 			cons ((object) PJScheme.car ((object) arg_list),
@@ -20046,9 +19704,8 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     vector_q ((object) PJScheme.car ((object) arg_list))))
+		if (PJScheme.
+		    vector_q ((object) PJScheme.car ((object) arg_list)))
 		  {
 		     return ((object) PJScheme.
 			     cons ((object) PJScheme.
@@ -20060,10 +19717,8 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 (PJScheme.
-			  string_q ((object) PJScheme.
-				    car ((object) arg_list))))
+		     if (PJScheme.
+			 string_q ((object) PJScheme.car ((object) arg_list)))
 		       {
 			  return ((object) PJScheme.
 				  cons ((object) PJScheme.
@@ -20100,7 +19755,7 @@ public class PJScheme:Scheme
    {
       object item = null;
       item = PJScheme.next_item ((object) iterator_reg);
-      if (true_q (PJScheme.null_q ((object) item)))
+      if (PJScheme.null_q ((object) item))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -20135,7 +19790,7 @@ public class PJScheme:Scheme
    {
       object item = null;
       item = PJScheme.next_item ((object) iterator_reg);
-      if (true_q (PJScheme.null_q ((object) item)))
+      if (PJScheme.null_q ((object) item))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -20160,7 +19815,7 @@ public class PJScheme:Scheme
    }
    new public static void map1 ()
    {
-      if (true_q (PJScheme.null_q ((object) list1_reg)))
+      if (PJScheme.null_q ((object) list1_reg))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -20170,7 +19825,7 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q (PJScheme.dlr_proc_q ((object) proc_reg)))
+	   if (PJScheme.dlr_proc_q ((object) proc_reg))
 	     {
 		{
 		   k_reg =
@@ -20203,7 +19858,7 @@ public class PJScheme:Scheme
    }
    new public static void map2 ()
    {
-      if (true_q (PJScheme.null_q ((object) list1_reg)))
+      if (PJScheme.null_q ((object) list1_reg))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -20213,7 +19868,7 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q (PJScheme.dlr_proc_q ((object) proc_reg)))
+	   if (PJScheme.dlr_proc_q ((object) proc_reg))
 	     {
 		{
 		   k_reg =
@@ -20251,8 +19906,7 @@ public class PJScheme:Scheme
    }
    new public static void mapN ()
    {
-      if (true_q
-	  (PJScheme.null_q ((object) PJScheme.car ((object) lists_reg))))
+      if (PJScheme.null_q ((object) PJScheme.car ((object) lists_reg)))
 	{
 	   {
 	      value2_reg = fail_reg;
@@ -20262,7 +19916,7 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q (PJScheme.dlr_proc_q ((object) proc_reg)))
+	   if (PJScheme.dlr_proc_q ((object) proc_reg))
 	     {
 		{
 		   k_reg =
@@ -20293,8 +19947,7 @@ public class PJScheme:Scheme
    }
    new public static void for_each_primitive ()
    {
-      if (true_q
-	  (PJScheme.iterator_q ((object) PJScheme.car ((object) lists_reg))))
+      if (PJScheme.iterator_q ((object) PJScheme.car ((object) lists_reg)))
 	{
 	   {
 	      generator_reg = PJScheme.car ((object) lists_reg);
@@ -20305,8 +19958,7 @@ public class PJScheme:Scheme
 	{
 	   object arg_list = null;
 	   arg_list = PJScheme.listify ((object) lists_reg);
-	   if (true_q
-	       (PJScheme.null_q ((object) PJScheme.car ((object) arg_list))))
+	   if (PJScheme.null_q ((object) PJScheme.car ((object) arg_list)))
 	     {
 		{
 		   value2_reg = fail_reg;
@@ -20316,7 +19968,7 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q (PJScheme.dlr_proc_q ((object) proc_reg)))
+		if (PJScheme.dlr_proc_q ((object) proc_reg))
 		  {
 		     {
 			PJScheme.dlr_apply ((object) proc_reg,
@@ -20613,7 +20265,7 @@ public class PJScheme:Scheme
    }
    new public static void occurs_q ()
    {
-      if (true_q (PJScheme.constant_q ((object) pattern_reg)))
+      if (PJScheme.constant_q ((object) pattern_reg))
 	{
 	   {
 	      value_reg = false;
@@ -20622,7 +20274,7 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q (PJScheme.pattern_variable_q ((object) pattern_reg)))
+	   if (PJScheme.pattern_variable_q ((object) pattern_reg))
 	     {
 		{
 		   value_reg =
@@ -20645,9 +20297,9 @@ public class PJScheme:Scheme
    }
    new public static void unify_patterns_hat ()
    {
-      if (true_q (PJScheme.pattern_variable_q ((object) p1_reg)))
+      if (PJScheme.pattern_variable_q ((object) p1_reg))
 	{
-	   if (true_q (PJScheme.pattern_variable_q ((object) p2_reg)))
+	   if (PJScheme.pattern_variable_q ((object) p2_reg))
 	     {
 		{
 		   value_reg =
@@ -20672,7 +20324,7 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q (PJScheme.pattern_variable_q ((object) p2_reg)))
+	   if (PJScheme.pattern_variable_q ((object) p2_reg))
 	     {
 		{
 		   temp_1 = p2_reg;
@@ -20688,11 +20340,10 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    ((((bool) PJScheme.constant_q ((object) p1_reg))
-		      && ((bool) PJScheme.constant_q ((object) p2_reg))
-		      && ((bool) PJScheme.
-			  Equal ((object) p1_reg, (object) p2_reg)))))
+		if ((((bool) PJScheme.constant_q ((object) p1_reg))
+		     && ((bool) PJScheme.constant_q ((object) p2_reg))
+		     && ((bool) PJScheme.
+			 Equal ((object) p1_reg, (object) p2_reg))))
 		  {
 		     {
 			value_reg =
@@ -20702,9 +20353,8 @@ public class PJScheme:Scheme
 		  }
 		else
 		  {
-		     if (true_q
-			 ((((bool) PJScheme.pair_q ((object) p1_reg))
-			   && ((bool) PJScheme.pair_q ((object) p2_reg)))))
+		     if ((((bool) PJScheme.pair_q ((object) p1_reg))
+			  && ((bool) PJScheme.pair_q ((object) p2_reg))))
 		       {
 			  {
 			     apair2_reg = ap2_reg;
@@ -20740,7 +20390,7 @@ public class PJScheme:Scheme
    }
    new public static void instantiate_hat ()
    {
-      if (true_q (PJScheme.constant_q ((object) pattern_reg)))
+      if (PJScheme.constant_q ((object) pattern_reg))
 	{
 	   {
 	      value2_reg = ap_reg;
@@ -20751,7 +20401,7 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q (PJScheme.pattern_variable_q ((object) pattern_reg)))
+	   if (PJScheme.pattern_variable_q ((object) pattern_reg))
 	     {
 		{
 		   avar_reg = ap_reg;
@@ -20761,7 +20411,7 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q (PJScheme.pair_q ((object) pattern_reg)))
+		if (PJScheme.pair_q ((object) pattern_reg))
 		  {
 		     {
 			k2_reg =
@@ -20793,10 +20443,9 @@ public class PJScheme:Scheme
    {
       object temp_1 = null;
       temp_1 = PJScheme.cdr ((object) s_reg);
-      if (true_q
-	  (PJScheme.
-	   Eq ((object) PJScheme.car ((object) temp_1),
-	       (object) symbol ("empty"))))
+      if (PJScheme.
+	  Eq ((object) PJScheme.car ((object) temp_1),
+	      (object) symbol ("empty")))
 	{
 	   {
 	      value2_reg = avar_reg;
@@ -20807,10 +20456,9 @@ public class PJScheme:Scheme
 	}
       else
 	{
-	   if (true_q
-	       (PJScheme.
-		Eq ((object) PJScheme.car ((object) temp_1),
-		    (object) symbol ("unit"))))
+	   if (PJScheme.
+	       Eq ((object) PJScheme.car ((object) temp_1),
+		   (object) symbol ("unit")))
 	     {
 		object new_var = null;
 		object new_pattern = null;
@@ -20819,8 +20467,7 @@ public class PJScheme:Scheme
 		   PJScheme.list_ref ((object) temp_1, (object) 3);
 		new_pattern = PJScheme.list_ref ((object) temp_1, (object) 2);
 		new_var = PJScheme.list_ref ((object) temp_1, (object) 1);
-		if (true_q
-		    (PJScheme.Equal ((object) var_reg, (object) new_var)))
+		if (PJScheme.Equal ((object) var_reg, (object) new_var))
 		  {
 		     {
 			value2_reg = new_apattern;
@@ -20841,10 +20488,9 @@ public class PJScheme:Scheme
 	     }
 	   else
 	     {
-		if (true_q
-		    (PJScheme.
-		     Eq ((object) PJScheme.car ((object) temp_1),
-			 (object) symbol ("composite"))))
+		if (PJScheme.
+		    Eq ((object) PJScheme.car ((object) temp_1),
+			(object) symbol ("composite")))
 		  {
 		     object s1 = null;
 		     object s2 = null;
@@ -20972,7 +20618,7 @@ public class PJScheme:Scheme
    public static bool _startracing_on_q_star = false;
    public static object _starstack_trace_star =
       PJScheme.list ((object) EmptyList);
-   public static object _staruse_stack_trace_star = true;
+   public static bool _staruse_stack_trace_star = true;
    public static object void_prim =
       PJScheme.make_proc ((object) symbol ("<proc-5>"));
    public static object zero_q_prim =
@@ -21263,18 +20909,14 @@ public class PJScheme:Scheme
       return retval;
    }
 
-   public static object use_lexical_address (object value)
+   public static bool use_lexical_address (object value)
    {
-      if (null_q (value))
-	{
-	   return _staruse_lexical_address_star;
-	}
-      else
+      if (!null_q (value))
 	{
 	   value = car (value);
-	   _staruse_lexical_address_star = (bool) value;
-	   return null;
+	   _staruse_lexical_address_star = true_q (value);
 	}
+      return _staruse_lexical_address_star;
    }
 
    // *tracing-on?*

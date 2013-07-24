@@ -506,7 +506,7 @@ public class Scheme {
 	       list(symbol("typeof"), new Proc("typeof", (Procedure1)get_type, 1, 1)),
 	       list(symbol("vector->list"), new Proc("vector->list", (Procedure1)vector_to_list, 1, 1)),
 	       list(symbol("vector?"), new Proc("vector?", (Procedure1Bool)vector_q, 1, 2)),
-	       list(symbol("use-lexical-address"), new Proc("use-lexical-address", (Procedure1)PJScheme.use_lexical_address, -1, 1)),
+	       list(symbol("use-lexical-address"), new Proc("use-lexical-address", (Procedure1Bool)PJScheme.use_lexical_address, -1, 1)),
 	       list(symbol("reset-toplevel-env"), new Proc("reset-toplevel-env", (Procedure0Void)reset_toplevel_env, 0, 0)),
 	       list(symbol("dict"), new Proc("dict", (Procedure1) make_dict, -1, 1)),
 	       list(symbol("apply-with-keywords"), new Proc("apply-with-keywords", (Procedure1) apply_with_keywords, -1, 1))
@@ -1377,7 +1377,7 @@ public class Scheme {
       return retval;
   }
 
-  public static object dlr_proc_q(object rator) {
+  public static bool dlr_proc_q(object rator) {
       // Works with Python Types
       //Console.WriteLine("dlr-proc? {0}");
       //return (! pair_q(rator));
@@ -1445,7 +1445,7 @@ public class Scheme {
     return retval;
   }
 
-  public static object dlr_object_contains(object result, object components) {
+  public static bool dlr_object_contains(object result, object components) {
       // checks to see if a dlr_object contains the parts_list
       //printf("dlr_object_contains: {0}, {1}\n", result, components);
       object parts_list = cdr(components); // skip the first component, the object
@@ -2061,7 +2061,7 @@ public class Scheme {
 			obj1.GetType().ToString(), obj2.GetType().ToString()));
   }
 
-  public static object not(object obj) {
+  public static bool not(object obj) {
 	return (! true_q(obj));
   }
 
