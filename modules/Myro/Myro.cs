@@ -1727,6 +1727,15 @@ public static class Myro
 	}
   
 	[method: JigsawTab("M/Advanced 3")]
+	public static void togglecam ()
+	{
+	    if (robot != null) 
+	        robot.togglecam();
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Advanced 3")]
 	public static void takeoff ()
 	{
 	    if (robot != null) 
@@ -3623,6 +3632,9 @@ public static class Myro
 		{
 		}
 
+	        public virtual void togglecam ()
+	        {
+		}
 
  	        // 3d robots
 	        public virtual void takeoff ()
