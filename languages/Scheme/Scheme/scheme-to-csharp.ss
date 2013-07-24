@@ -357,7 +357,7 @@
 		(format "return((~a) ~a) " 
 			proc-return-type 
 			(convert-exp (car args) proc-name)))
-	    (format "return((~a) ~a) " 
+	    (format "return((~a) ~a)" 
 		    return-cast 
 		    sargs)))
        ((or (eq? name 'apply) (eq? name 'map) (eq? name 'map^) (eq? name 'for-each) (eq? name 'apply*))
@@ -490,7 +490,7 @@
 	     (let* ((vars (map car bindings))
 		    (temps (map (lambda (v) (format "object ~a = null;\n"
 						    (proper-name v))) vars)))
-	       (format "{\n ~a ~a }\n"
+	       (format " ~a ~a \n"
 		       (apply string-append temps)
 		       (apply string-append 
 			      (map 
@@ -507,7 +507,7 @@
 (define convert-block
   (lambda (statements proc-name)
     (db "convert-block: '~s'~%" statements)
-    (format "{\n ~a\n }\n" (apply string-append 
+    (format "{ ~a }" (apply string-append 
 				  (map (lambda (s)
 					 (convert-statement s proc-name))
 				       statements)))))
