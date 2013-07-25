@@ -1360,10 +1360,7 @@ public static class Graphics
 			    onKeyPressCallbacks = new List ();
 			    onKeyReleaseCallbacks = new List ();
 			    // clear listeners:
-			    MotionNotifyEvent -= HandleMouseMovementOnShape;
-			    ButtonPressEvent -= HandleClickOnShape;
-			    ButtonReleaseEvent -= HandleMouseUpOnShape;
-
+			    clearListeners();
 			    _lastKey = "";
 			    _mouseState = "up";
 			    _keyState = "up";
@@ -1523,53 +1520,62 @@ public static class Graphics
 			}
 		}
     
+		public void clearListeners() {
+		    MotionNotifyEvent -= HandleMouseMovementOnShape;
+		    ButtonPressEvent -= HandleClickOnShape;
+		    ButtonReleaseEvent -= HandleMouseUpOnShape;
+		}
+
 		public void listen(string evt) {
 		    if (evt == "mouse-motion") {
+			// remove if already there:
+			MotionNotifyEvent -= HandleMouseMovementOnShape;
 			MotionNotifyEvent += HandleMouseMovementOnShape;
 		    } else if (evt == "mouse-press") {
+			// remove if already there:
+			ButtonPressEvent -= HandleClickOnShape;
 			ButtonPressEvent += HandleClickOnShape;
 		    } else if (evt == "mouse-release") {
+			// remove if already there:
+			ButtonReleaseEvent -= HandleMouseUpOnShape;
 			ButtonReleaseEvent += HandleMouseUpOnShape;
 		    } else {
 			throw new Exception(String.Format("invalid event '{0}': use 'mouse-motion', 'mouse-press', or 'mouse-release'", evt));
 		    }
 		}
 
-		private void HandleMouseMovementOnShape (object obj,
+		public void HandleMouseMovementOnShape (object obj,
                       Gtk.MotionNotifyEventArgs args)
 		{
 		    Event evt = new Event (args);
 		    lock (canvas.shapes) {
 			foreach (Shape shape in canvas.shapes) {
 			    if (shape.hit(evt.x, evt.y)) {
-				evt.obj = shape;
-				EventsManager.publish(evt);
+				EventsManager.publish("mouse-motion", shape);
 			    }
 			}
 		    }
 		}
 
-		private void HandleClickOnShape (object obj, Gtk.ButtonPressEventArgs args)
+		public void HandleClickOnShape (object obj, Gtk.ButtonPressEventArgs args)
 		{
 		    Event evt = new Event (args);
 		    lock (canvas.shapes) {
 			foreach (Shape shape in canvas.shapes) {
 			    if (shape.hit(evt.x, evt.y)) {
-				evt.obj = shape;
-				EventsManager.publish(evt);
+				EventsManager.publish("mouse-press", shape);
 			    }
 			}
 		    }
 		}
 
-		private void HandleMouseUpOnShape (object obj,
+		public void HandleMouseUpOnShape (object obj,
 						   Gtk.ButtonReleaseEventArgs args) {
 		    Event evt = new Event (args);
 		    lock (canvas.shapes) {
 			foreach (Shape shape in canvas.shapes) {
 			    if (shape.hit(evt.x, evt.y)) {
-				evt.obj = shape;
-				EventsManager.publish(evt);
+				EventsManager.publish("mouse-release", shape);
 			    }
 			}
 		    }
