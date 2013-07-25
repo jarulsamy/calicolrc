@@ -15,7 +15,7 @@ namespace Calico {
         public string password;
         public string status;
         bool alert;
-        bool debug;
+        public bool debug;
 
         public Chat(Calico.MainWindow calico, string user, string password) :
             this(calico, user, password, false) {
@@ -121,7 +121,9 @@ namespace Calico {
 
         public void OnMessage(object sender, agsXMPP.protocol.client.Message msg) {
             // Handle system messages here
-            //calico.ChatPrint(Tag.Info, String.Format("Chat from {0}: {1}\n", msg.From, msg.Body));
+            if (debug) {
+		calico.ChatPrint(Tag.Info, String.Format("Debug: from {0}: {1}\n", msg.From, msg.Body));
+	    }
             if (msg.Body.ToString().StartsWith("[blast]")) {
                 string [] lines = msg.Body.ToString().Split('\n');             // [blast]
                 if (lines.Length >= 5) {
@@ -213,10 +215,11 @@ namespace Calico {
         }
 
         public void OnError(object sender, Exception e) {
-            calico.Print(Tag.Error, String.Format("ERROR in Chat for user '{0}': {1}\n", user, e.Message));
+            calico.Print(Tag.Error, String.Format("Error in Chat for user '{0}': {1}\n", user, e.Message));
         }
 
         public void OnAuthError(object sender, agsXMPP.Xml.Dom.Element element) {
+            calico.Print(Tag.Error, String.Format("Authentication error in Chat for user '{0}': {1}\n", user, element));
         }
     
         public void Close() {

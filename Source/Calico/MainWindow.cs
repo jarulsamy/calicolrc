@@ -3666,6 +3666,35 @@ del _invoke, _
             chat.Close();
         }
 
+        public void Login() {
+	    Invoke( delegate {
+		    OnLoginActionActivated(null, null);
+		});
+	}
+	
+        public void Login(string username, string password) {
+            connection = new Chat(this, username, password);
+	}
+
+	public void OpenFromCloud (string filename) {
+	    if (connection != null) {
+		connection.GetFileFromCloud(filename);
+	    } else {
+		ErrorLine(_("You need to login before using chat."));
+	    }
+	}
+
+        public void SaveToCloud(string filename) {
+	    if (connection != null) {
+		string basename = System.IO.Path.GetFileName(filename);
+		if (!connection.SaveFileToCloud(filename, basename)) {
+		    ErrorLine(String.Format(_("Failed to save the file named '{0}' to the Calico Cloud."), basename));
+		}
+	    } else {
+		ErrorLine(_("You need to login before using the Calico Cloud."));
+	    }
+	}
+
         protected void OnLoginActionActivated(object sender, System.EventArgs e) {
             Dictionary<string,string > response = (Dictionary<string,string>)ask(new List<string>() {_("Username"), _("Password")}, _("Login"));
             if (response == null) {
@@ -4044,7 +4073,7 @@ del _invoke, _
 			ErrorLine(_("You need to login before using the Calico Cloud."));
 		  }
         }
-		
+
 	public void OnOpenFromCloudCallback (string [] list) {
 	    string response = pickOne(_("Open"), _("Open Cloud Filename"), list);
 	    if (response == null) {
@@ -4091,17 +4120,6 @@ del _invoke, _
 		ErrorLine(_("You need to login before using the Calico Cloud."));
 	    }
         }
-
-        public void SaveToCloud(string filename) {
-	    if (connection != null) {
-		string basename = System.IO.Path.GetFileName(filename);
-		if (!connection.SaveFileToCloud(filename, basename)) {
-		    ErrorLine(String.Format(_("Failed to save the file named '{0}' to the Calico Cloud."), basename));
-		}
-	    } else {
-		ErrorLine(_("You need to login before using the Calico Cloud."));
-	    }
-	}
 
         protected void OnRemoveModuleActionActivated (object sender, System.EventArgs e) {
 		  if (CurrentDocument != null)
