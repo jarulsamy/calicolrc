@@ -1580,7 +1580,7 @@ public class Scheme {
 	      ids[((Cons)current).id] = true;
 	      while (pair_q(current)) {
 		  //System.Console.WriteLine("Here 5");
-		  if (!retval.Equals("")) {
+		  if (retval.Length != 0) {
 		      retval.Append(" ");
 		  } 
 		  object car_current = car(current);
@@ -1656,35 +1656,35 @@ public class Scheme {
 		return "#<environment>"; //, car(obj));
 	  } else {
 	      //System.Console.WriteLine("Here 4");
-	      string retval = "";
+	      System.Text.StringBuilder retval = new System.Text.StringBuilder();
 	      object current = (Cons)obj;
 	      ids[((Cons)current).id] = true;
 	      while (pair_q(current)) {
 		  //System.Console.WriteLine("Here 5");
-		  if (retval != "") {
-		      retval += " ";
+		  if (retval.Length != 0) {
+		      retval.Append(" ");
 		  } 
 		  object car_current = car(current);
 		  if (pair_q(car_current) && ids.ContainsKey(((Cons)car_current).id)) {
-		      retval += " ...";
+		      retval.Append(" ...");
 		      current = null;
 		  } else {
-		      retval += repr(car_current, ids);
+		      retval.Append(repr(car_current, ids));
 		      current = cdr(current);
 		      if (pair_q(current) && ids.ContainsKey(((Cons)current).id)) {
-			  retval += " ...";
+			  retval.Append(" ...");
 			  current = null;
 		      } else if (pair_q(current) && car(current) == symbol("procedure")) { //FIXME: hack!
-			  retval += " . #<procedure>";
+			  retval.Append(" . #<procedure>");
 			  current = null;
 		      } else {
 			  if (!pair_q(current) && !Eq(current, EmptyList)) {
-			      retval += " . " + repr(current, ids); // ...
+			      retval.Append(" . ").Append(repr(current, ids)); // ...
 			  }
 		      }
 		  }
 	      }
-	      return "(" + retval + ")";
+	      return retval.Insert(0, "(").Append(")").ToString();
 	  }
 	} else {
 	    return obj.ToString();
@@ -2413,7 +2413,7 @@ public class Scheme {
 
     public static object current_directory(object path) {
         System.IO.Directory.SetCurrentDirectory(path.ToString());
-        return null;
+        return System.IO.Directory.GetCurrentDirectory();
     }
 
     public static object number_to_string(object number) {
@@ -2627,7 +2627,7 @@ public class Scheme {
 	      if (args[i] is object[]) {
 		  retval.Append(array_to_string((object[])args[i]));
 	      } else {
-		  if (!retval.Equals(""))
+		  if (retval.Length != 0)
 		      retval.Append(" ");
 		  retval.Append(args[i]);
 	      }
@@ -2874,6 +2874,11 @@ public class Scheme {
       return text.ToString();
   }
 
+  public static object string_append(object obj1, object obj2) {
+      System.Text.StringBuilder text = new System.Text.StringBuilder(obj1.ToString());
+      return text.Append(obj2.ToString()).ToString();
+  }
+
 // FIXME: Rewrite without recursion
   public static object assq(object x, object ls) {
       if (null_q(ls)) 
@@ -2927,7 +2932,7 @@ public class Scheme {
   public static string arrayToString(object[] array) {
       System.Text.StringBuilder retval = new System.Text.StringBuilder();
       foreach (object item in array) {
-	  if (!retval.Equals(""))
+	  if (retval.Length != 0)
 	      retval.Append(" ");
 	  retval.Append(item.ToString());
       }
@@ -2975,10 +2980,6 @@ public class Scheme {
 	string text = fp.ReadToEnd();
     fp.Close();
     return text;
-  }
-
-  public static object string_append(object obj1, object obj2) {
-	return (obj1.ToString() + obj2.ToString());
   }
 
   //--------------------------------------------------------------------------------------------
