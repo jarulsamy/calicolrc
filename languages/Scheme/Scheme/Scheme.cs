@@ -45,18 +45,20 @@ public class Config {
   public int DEBUG = 0;
   public bool NEED_NEWLINE = false;
   public List<Assembly> assemblies = new List<Assembly>();
-  //Hashtable symbol_table = new Hashtable(); //Default one
+    //Hashtable symbol_table = new Hashtable(); //Default one
 
   public Config() {
   }
 
   public Symbol symbol(string ssymbol) {	         
-      //if (!symbol_table.ContainsKey(ssymbol)) {	                 
-      //	  var newsym = new Symbol(ssymbol);	 
-      //	  symbol_table.Add(ssymbol, newsym);	 
-      //	  return newsym;	 
-      //      }	         
-      //return (Symbol) symbol_table[ssymbol];	 
+      /*
+      if (!symbol_table.ContainsKey(ssymbol)) {	                 
+      	  var newsym = new Symbol(ssymbol);	 
+      	  symbol_table.Add(ssymbol, newsym);	 
+      	  return newsym;	 
+      }	         
+      return (Symbol) symbol_table[ssymbol];	 
+      */
       // much faster to just return a new object:
       return new Symbol(ssymbol);	 
   }	
@@ -68,16 +70,20 @@ public class Config {
 
 public class Symbol {
     public string symbol;
+    int hashcode = -1;
+
     public Symbol(String ssymbol) {
 	symbol = ssymbol;
     }
     
     public override bool Equals(object other) {
-	return ((other is Symbol) && (this.symbol == ((Symbol)other).symbol));
+	return ((other is Symbol) && (this.GetHashCode() == ((Symbol)other).GetHashCode()));
     }
     
     public override int GetHashCode() {
-	return symbol.GetHashCode();
+	if (hashcode == -1)
+	    hashcode = symbol.GetHashCode();
+	return hashcode;
     }
     
     public override string ToString() {
@@ -421,25 +427,6 @@ public class Scheme {
 
   public static object string_split(object str, object delimiter) {
         return list(((String)str).Split((char) delimiter));
-
-       /*
-	// given list of chars and a delim char, return a list of strings
-	object retval = EmptyList;
-	object buffer = EmptyList;
-	object current1 = chars;
-	while (!Eq(current1, EmptyList)) {
-	  if (Eq(car(current1), delimiter)) {
-		retval = cons(list_to_string(reverse(buffer)), retval);
-		buffer = EmptyList;
-	  } else {
-		buffer = cons(car(current1), buffer);
-	  }
-	  current1 = cdr(current1);
-	}
-	if (!Eq(buffer, EmptyList))
-	  retval = cons(list_to_string(reverse(buffer)), retval);
-	return reverse(retval);
-      */
   }
 
   public static object make_proc(params object[] args) {
@@ -1562,7 +1549,7 @@ public class Scheme {
 	  else
 		return String.Format("{0}.0", s);
 	} else if (obj is String) {
-	  return String.Format("{0}", obj);
+	    return (string)obj;
 	} else if (obj is Symbol) {
 	    //System.Console.WriteLine("Here 2");
 	  return obj.ToString();
@@ -1872,42 +1859,45 @@ public class Scheme {
   }
 
   public static bool Equal(object obj1, object obj2) {
-      if (obj1 == null) {
-          return (obj2 == null);
-      } else if (obj2 == null) {
-          return false;
-      } else if ((obj1 is Symbol) || (obj2 is Symbol)) { 
-	  if ((obj1 is Symbol) && (obj2 is Symbol))
-              return ((Symbol)obj1).Equals(obj2);
-	  else return false;
-      } else if (pair_q(obj1) && pair_q(obj2)) {
-	  if (null_q(obj1) && null_q(obj2))
-              return true;
-	  else if (null_q(obj1))
-              return false;
-	  else if (null_q(obj2))
-              return false;
-	  else if (Equal(car(obj1),  car(obj2)))
-              return Equal(cdr(obj1), cdr(obj2));
-	  else
-              return false;
-      }
-      if (pair_q(obj1) || pair_q(obj2)) {
-          return false;
-      } else {
-	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
-              try {
-                  return (ObjectType.ObjTst(obj1, obj2, false) == 0);
-              } catch {
-                  return false;
-              }
-          } else {
-              if (obj1 is BigInteger) {
-                  return ((BigInteger)obj1).Equals(obj2);
-              } else {
-                  return ((BigInteger)obj2).Equals(obj1);
-              }
-          }
+      while (true) {
+	  if (obj1 == null) {
+	      return (obj2 == null);
+	  } else if (obj2 == null) {
+	      return false;
+	  } else if ((obj1 is Symbol) || (obj2 is Symbol)) { 
+	      if ((obj1 is Symbol) && (obj2 is Symbol))
+		  return ((Symbol)obj1).Equals(obj2);
+	      else 
+		  return false;
+	  } else if (pair_q(obj1) && pair_q(obj2)) {
+	      if (null_q(obj1) && null_q(obj2)) {
+		  return true;
+	      } else if (null_q(obj1) || null_q(obj2)) {
+		  return false;
+	      } else if (Equal(car(obj1),  car(obj2))) {
+		  // recursive:
+		  obj1 = cdr(obj1);
+		  obj2 = cdr(obj2);
+	      } else {
+		  return false;
+	      }
+	  } else if (pair_q(obj1) || pair_q(obj2)) {
+	      return false;
+	  } else {
+	      if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+		  try {
+		      return (ObjectType.ObjTst(obj1, obj2, false) == 0);
+		  } catch {
+		      return false;
+		  }
+	      } else {
+		  if (obj1 is BigInteger) {
+		      return ((BigInteger)obj1).Equals(obj2);
+		  } else {
+		      return ((BigInteger)obj2).Equals(obj1);
+		  }
+	      }
+	  }
       }
   }
 
@@ -3751,15 +3741,14 @@ public class Scheme {
           Vector bindings = (Vector) car(frame);
           object variables = cadr(frame);
           int i = 0;
-          while (!null_q(variables) && !Eq(car(variables), variable)) {
+          while (!null_q(variables)) {
+	      if (Eq(car(variables), variable)) {
+		  return bindings.get(i);
+	      }
               variables = cdr(variables);
               i++;
           }
-          if (null_q(variables)) {
-              return false;
-          } else {
-              return bindings.get(i);
-          }
+          return false;
       } else {
           throw new Exception("invalid frame");
       }
