@@ -64,7 +64,10 @@ namespace Calico {
 
             foreach (string arg in args) {
                 if (arg.StartsWith("--")) {
-                    // skip
+		    if (arg.StartsWith("--lang=")) {
+			string [] parts = arg.Split('=');
+			CurrentLanguage = parts[1];
+		    }
                 } else {
                     CurrentLanguage = manager.GetLanguageFromExtension(arg);
 		    string dirname = System.IO.Path.GetDirectoryName(arg);
@@ -246,7 +249,12 @@ namespace Calico {
 	    }
 
             foreach (string arg in args) {
-                if (!arg.StartsWith("--")) {
+                if (arg.StartsWith("--")) {
+		    if (arg.StartsWith("--lang=")) {
+			string [] parts = arg.Split('=');
+			CurrentLanguage = parts[1];
+		    }
+		} else {
                     CurrentLanguage = manager.GetLanguageFromExtension(arg);
 		    string dirname = System.IO.Path.GetDirectoryName(arg);
 		    if (dirname != "" && dirname != null) {
