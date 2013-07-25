@@ -1722,11 +1722,11 @@ public class Scheme {
 	for (int i = 0; i < smsg.Length; i++) {
 	    if (smsg[i] == TILDE) {
 		if (smsg[i+1] == 's') {
-		    new_msg.Append(string.Format("{0}", ToString(rest[count])));
+		    new_msg.Append(ToString(rest[count]));
 		    count += 1;
 		    i++;
 		} else if (smsg[i+1] == 'a') {
-		    new_msg.Append(string.Format("{0}", ToString(rest[count])));
+		    new_msg.Append(ToString(rest[count]));
 		    count += 1;
 		    i++;
 		} else if (smsg[i+1] == '%') {
@@ -2870,6 +2870,7 @@ public class Scheme {
       System.Text.StringBuilder text = new System.Text.StringBuilder();
       while (! null_q(x)) {
 	  text.Append(car(x).ToString());
+	  x = cdr(x);
       }
       return text.ToString();
   }
