@@ -8,7 +8,7 @@ tests will fail, that'sok
 
 cd rosjava_tutorial_pubsub
 
-./gradelw installApp
+../gradlew installApp
 
 cd rosjava_tutorial_pubsub/build/install/rosjava_tutorial_pubsub/lib
 mkdir tmp
