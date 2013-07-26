@@ -77,6 +77,7 @@ namespace Calico {
             SetValue("shell", "history-size", "int", 50);
             string cloud_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
             cloud_path = System.IO.Path.Combine(cloud_path, "calico", "Cloud", "");
+	    SetValue("config", "cloud-path", "string", cloud_path);
             SetValue("config", "toolSwapped", "bool", false);
             SetValue("config", "verticalSwapped", "bool", false);
             SetValue("config", "horizontalSwapped", "bool", false);

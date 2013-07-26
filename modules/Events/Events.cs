@@ -314,6 +314,7 @@ public static class Events {
 	  handler.Clear();
 	}
 	if (thread == null) {
+	  System.Console.WriteLine("Starting event loop...");
 	  thread = new Thread (new ThreadStart (loop));
 	  thread.IsBackground = true;
 	  thread.Start();

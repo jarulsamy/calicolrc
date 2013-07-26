@@ -1360,10 +1360,7 @@ public static class Graphics
 			    onKeyPressCallbacks = new List ();
 			    onKeyReleaseCallbacks = new List ();
 			    // clear listeners:
-			    MotionNotifyEvent -= HandleMouseMovementOnShape;
-			    ButtonPressEvent -= HandleClickOnShape;
-			    ButtonReleaseEvent -= HandleMouseUpOnShape;
-
+			    clearListeners();
 			    _lastKey = "";
 			    _mouseState = "up";
 			    _keyState = "up";
@@ -1523,53 +1520,62 @@ public static class Graphics
 			}
 		}
     
+		public void clearListeners() {
+		    MotionNotifyEvent -= HandleMouseMovementOnShape;
+		    ButtonPressEvent -= HandleClickOnShape;
+		    ButtonReleaseEvent -= HandleMouseUpOnShape;
+		}
+
 		public void listen(string evt) {
 		    if (evt == "mouse-motion") {
+			// remove if already there:
+			MotionNotifyEvent -= HandleMouseMovementOnShape;
 			MotionNotifyEvent += HandleMouseMovementOnShape;
 		    } else if (evt == "mouse-press") {
+			// remove if already there:
+			ButtonPressEvent -= HandleClickOnShape;
 			ButtonPressEvent += HandleClickOnShape;
 		    } else if (evt == "mouse-release") {
+			// remove if already there:
+			ButtonReleaseEvent -= HandleMouseUpOnShape;
 			ButtonReleaseEvent += HandleMouseUpOnShape;
 		    } else {
 			throw new Exception(String.Format("invalid event '{0}': use 'mouse-motion', 'mouse-press', or 'mouse-release'", evt));
 		    }
 		}
 
-		private void HandleMouseMovementOnShape (object obj,
+		public void HandleMouseMovementOnShape (object obj,
                       Gtk.MotionNotifyEventArgs args)
 		{
 		    Event evt = new Event (args);
 		    lock (canvas.shapes) {
 			foreach (Shape shape in canvas.shapes) {
 			    if (shape.hit(evt.x, evt.y)) {
-				evt.obj = shape;
-				EventsManager.publish(evt);
+				EventsManager.publish("mouse-motion", shape);
 			    }
 			}
 		    }
 		}
 
-		private void HandleClickOnShape (object obj, Gtk.ButtonPressEventArgs args)
+		public void HandleClickOnShape (object obj, Gtk.ButtonPressEventArgs args)
 		{
 		    Event evt = new Event (args);
 		    lock (canvas.shapes) {
 			foreach (Shape shape in canvas.shapes) {
 			    if (shape.hit(evt.x, evt.y)) {
-				evt.obj = shape;
-				EventsManager.publish(evt);
+				EventsManager.publish("mouse-press", shape);
 			    }
 			}
 		    }
 		}
 
-		private void HandleMouseUpOnShape (object obj,
+		public void HandleMouseUpOnShape (object obj,
 						   Gtk.ButtonReleaseEventArgs args) {
 		    Event evt = new Event (args);
 		    lock (canvas.shapes) {
 			foreach (Shape shape in canvas.shapes) {
 			    if (shape.hit(evt.x, evt.y)) {
-				evt.obj = shape;
-				EventsManager.publish(evt);
+				EventsManager.publish("mouse-release", shape);
 			    }
 			}
 		    }
@@ -2075,6 +2081,9 @@ public static class Graphics
 		public double x;
 		public double y;
 
+		public double gx;
+		public double gy;
+
 		public Point (IList iterable): this(iterable[0], iterable[1])
 		{
 		}
@@ -2362,6 +2371,11 @@ public static class Graphics
 		List<string> messages = new List<string>() {"mouse-press", "mouse-release", "mouse-motion"};
 		if (messages.Contains(message)) {
 		    Events.subscribe(message, procedure, this);
+		    // FIXME: maybe turn on the window listener:
+		    /*
+		    if (window != null) {
+		    }
+		    */
 		} else {
 		    throw new Exception(String.Format("Shape cannot subscribe to message: '{0}'", message));
 		}
@@ -2935,9 +2949,16 @@ public static class Graphics
 
 		public void  updateGlobalPosition (Cairo.Context g)
 		{
-			gx = center.x;
-			gy = center.y;
+		        gx = center.x; // shape's global x
+			gy = center.y; // shape's global y
 			g.UserToDevice (ref gx, ref gy);
+			if (points != null) { // bounding box
+			    foreach (Point p in points) {
+				p.gx = p.x;
+				p.gy = p.y;
+				g.UserToDevice (ref p.gx, ref p.gy);
+			    }
+			}
 		}
 
 		public Line penUp ()
@@ -3150,6 +3171,43 @@ public static class Graphics
 			double dx = x - center.x;
 			double dy = y - center.y;
 			move (dx, dy);
+		}
+
+	        public virtual void moveTo(double x, double y, double seconds) {
+		    if (seconds > 0) {
+			double updateTime = 0.025;
+			double intervals = seconds/updateTime;
+			double dx = (x - this.x)/intervals;
+			double dy = (y - this.y)/intervals;
+			for(int i = 0; i < intervals; i++){
+			    move(dx, dy);
+			    if (window != null) {
+				window.update();
+			    }
+			    wait(updateTime);
+			}
+		    }
+		    //in case we are not at an integer coordinate
+		    moveTo(x, y);
+		}
+
+	        public virtual void move(double x, double y, double seconds) {
+		    double ox = this.x, oy = this.y;
+		    if (seconds > 0) {
+			double updateTime = 0.025;
+			double intervals = seconds/updateTime;
+			double dx = x/intervals;
+			double dy = y/intervals;
+			for(int i = 0; i < intervals; i++){
+			    move(dx, dy);
+			    if (window != null) {
+				window.update();
+			    }
+			    wait(updateTime);
+			}
+		    }
+		    //in case we are not at an integer coordinate
+		    moveTo(ox + x, oy + y);
 		}
 
 		public void _moveTo (double x, double y)
@@ -4064,6 +4122,7 @@ public static class Graphics
 	public class Picture : Shape
 	{
 		Gdk.Pixbuf _pixbuf; // in memory rep of picture
+		public string filename;
 		public int _cacheWidth;
 		public int _cacheHeight;
     
@@ -4075,6 +4134,7 @@ public static class Graphics
 
 		public Picture (string filename) : this(true)
 		{
+		    this.filename = filename;
 		    InvokeBlocking (delegate {
 			    if (filename.StartsWith ("http://")) {
 				HttpWebRequest req = (HttpWebRequest)WebRequest.Create (filename);
@@ -4158,6 +4218,7 @@ public static class Graphics
 
 		public Picture (Picture original) : this(true)
 		{
+		    this.filename = original.filename;
 		    InvokeBlocking (delegate {
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (original._pixbuf.Colorspace, true, 8, original.getWidth (), original.getHeight ());

@@ -324,7 +324,6 @@ namespace Calico {
 	        };
 
             PrintLine(Tag.Info, String.Format(_("The Calico Project, Version {0}"), MainClass.Version));
-            SetLanguage(CurrentLanguage);
             // Handle all flags, in case something crashes:
             bool debug_handler = true;
             foreach (string arg1 in args) {
@@ -339,14 +338,18 @@ namespace Calico {
             bool openedFile = false;
             foreach (string arg2 in args) {
 		if (arg2.StartsWith("--")) {
-		    // ignore flags; handled above
+		    if (arg2.StartsWith("--lang=")) {
+			string [] parts = arg2.Split('=');
+			CurrentLanguage = parts[1];
+		    }
 		} else {
 		    Open(System.IO.Path.GetFullPath(arg2));
 		    openedFile = true;
 		}
             }
+            SetLanguage(CurrentLanguage);
             if (!openedFile) {
-                Open(null, "python"); // FIXME: open a file of DEFAULT type
+                Open(null, CurrentLanguage); // FIXME: open a file of DEFAULT type
             }
             // Hide things that shouldn't be seen yet:
             searchboxHide();
@@ -3666,6 +3669,35 @@ del _invoke, _
             chat.Close();
         }
 
+        public void Login() {
+	    Invoke( delegate {
+		    OnLoginActionActivated(null, null);
+		});
+	}
+	
+        public void Login(string username, string password) {
+            connection = new Chat(this, username, password);
+	}
+
+	public void OpenFromCloud (string filename) {
+	    if (connection != null) {
+		connection.GetFileFromCloud(filename);
+	    } else {
+		ErrorLine(_("You need to login before using chat."));
+	    }
+	}
+
+        public void SaveToCloud(string filename) {
+	    if (connection != null) {
+		string basename = System.IO.Path.GetFileName(filename);
+		if (!connection.SaveFileToCloud(filename, basename)) {
+		    ErrorLine(String.Format(_("Failed to save the file named '{0}' to the Calico Cloud."), basename));
+		}
+	    } else {
+		ErrorLine(_("You need to login before using the Calico Cloud."));
+	    }
+	}
+
         protected void OnLoginActionActivated(object sender, System.EventArgs e) {
             Dictionary<string,string > response = (Dictionary<string,string>)ask(new List<string>() {_("Username"), _("Password")}, _("Login"));
             if (response == null) {
@@ -4044,7 +4076,7 @@ del _invoke, _
 			ErrorLine(_("You need to login before using the Calico Cloud."));
 		  }
         }
-		
+
 	public void OnOpenFromCloudCallback (string [] list) {
 	    string response = pickOne(_("Open"), _("Open Cloud Filename"), list);
 	    if (response == null) {
@@ -4091,17 +4123,6 @@ del _invoke, _
 		ErrorLine(_("You need to login before using the Calico Cloud."));
 	    }
         }
-
-        public void SaveToCloud(string filename) {
-	    if (connection != null) {
-		string basename = System.IO.Path.GetFileName(filename);
-		if (!connection.SaveFileToCloud(filename, basename)) {
-		    ErrorLine(String.Format(_("Failed to save the file named '{0}' to the Calico Cloud."), basename));
-		}
-	    } else {
-		ErrorLine(_("You need to login before using the Calico Cloud."));
-	    }
-	}
 
         protected void OnRemoveModuleActionActivated (object sender, System.EventArgs e) {
 		  if (CurrentDocument != null)

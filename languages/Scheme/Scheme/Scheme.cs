@@ -45,18 +45,20 @@ public class Config {
   public int DEBUG = 0;
   public bool NEED_NEWLINE = false;
   public List<Assembly> assemblies = new List<Assembly>();
-  //Hashtable symbol_table = new Hashtable(); //Default one
+    //Hashtable symbol_table = new Hashtable(); //Default one
 
   public Config() {
   }
 
   public Symbol symbol(string ssymbol) {	         
-      //if (!symbol_table.ContainsKey(ssymbol)) {	                 
-      //	  var newsym = new Symbol(ssymbol);	 
-      //	  symbol_table.Add(ssymbol, newsym);	 
-      //	  return newsym;	 
-      //      }	         
-      //return (Symbol) symbol_table[ssymbol];	 
+      /*
+      if (!symbol_table.ContainsKey(ssymbol)) {	                 
+      	  var newsym = new Symbol(ssymbol);	 
+      	  symbol_table.Add(ssymbol, newsym);	 
+      	  return newsym;	 
+      }	         
+      return (Symbol) symbol_table[ssymbol];	 
+      */
       // much faster to just return a new object:
       return new Symbol(ssymbol);	 
   }	
@@ -68,16 +70,20 @@ public class Config {
 
 public class Symbol {
     public string symbol;
+    int hashcode = -1;
+
     public Symbol(String ssymbol) {
 	symbol = ssymbol;
     }
     
     public override bool Equals(object other) {
-	return ((other is Symbol) && (this.symbol == ((Symbol)other).symbol));
+	return ((other is Symbol) && (this.GetHashCode() == ((Symbol)other).GetHashCode()));
     }
     
     public override int GetHashCode() {
-	return symbol.GetHashCode();
+	if (hashcode == -1)
+	    hashcode = symbol.GetHashCode();
+	return hashcode;
     }
     
     public override string ToString() {
@@ -421,29 +427,10 @@ public class Scheme {
 
   public static object string_split(object str, object delimiter) {
         return list(((String)str).Split((char) delimiter));
-
-       /*
-	// given list of chars and a delim char, return a list of strings
-	object retval = EmptyList;
-	object buffer = EmptyList;
-	object current1 = chars;
-	while (!Eq(current1, EmptyList)) {
-	  if (Eq(car(current1), delimiter)) {
-		retval = cons(list_to_string(reverse(buffer)), retval);
-		buffer = EmptyList;
-	  } else {
-		buffer = cons(car(current1), buffer);
-	  }
-	  current1 = cdr(current1);
-	}
-	if (!Eq(buffer, EmptyList))
-	  retval = cons(list_to_string(reverse(buffer)), retval);
-	return reverse(retval);
-      */
   }
 
   public static object make_proc(params object[] args) {
-	return cons(symbol("procedure"), list(args));
+	return new Cons(symbol("procedure"), list(args));
   }
 
   // given a name, return a function that given an array, returns object
@@ -672,7 +659,7 @@ public class Scheme {
 	      retval = list(i); // start of list
 	      tail = retval;
 	    } else { // a pair
-	      set_cdr_b(tail, cons(i, EmptyList));
+	      set_cdr_b(tail, new Cons(i, EmptyList));
 	      tail = cdr(tail);
 	    }
 	  }
@@ -682,7 +669,7 @@ public class Scheme {
 	      retval = list(i); // start of list
 	      tail = retval;
 	    } else { // a pair
-	      set_cdr_b(tail, cons(i, EmptyList));
+	      set_cdr_b(tail, new Cons(i, EmptyList));
 	      tail = cdr(tail);
 	    }
 	  }
@@ -721,10 +708,10 @@ public class Scheme {
 	  int current_pos = 0;
 	  while (!EqualSign(current_pos, pos)) {
 		if (Eq(retval, EmptyList)) {
-		  retval = cons(car(current), EmptyList);
+		  retval = new Cons(car(current), EmptyList);
 		  tail = retval;
 		} else {
-		  set_cdr_b(tail, cons(car(current), EmptyList));
+		  set_cdr_b(tail, new Cons(car(current), EmptyList));
 		  tail = cdr(tail);
 		}
 		current = cdr(current);
@@ -806,7 +793,7 @@ public class Scheme {
 		retval = list(result); // start of list
 		tail = retval;
 	  } else { // pair
-		set_cdr_b(tail, cons(result, EmptyList));
+		set_cdr_b(tail, new Cons(result, EmptyList));
 		tail = cdr(tail);
 	  }
 	  current1 = cdr(current1);
@@ -866,7 +853,7 @@ public class Scheme {
 		  retval = list(result); // start of list
 		  tail = retval;
 	      } else { // pair
-		  set_cdr_b(tail, cons(result, EmptyList));
+		  set_cdr_b(tail, new Cons(result, EmptyList));
 		  tail = cdr(tail);
 	      }
 	  }
@@ -883,10 +870,10 @@ public class Scheme {
 	while (!Eq(current1, EmptyList)) {
 	  object result = apply(proc, car(current1), car(current2));
 	  if (Eq(retval, EmptyList)) {
-		retval = cons( result, EmptyList);
+		retval = new Cons( result, EmptyList);
 		tail = retval;
 	  } else {
-		set_cdr_b( tail, cons(result, EmptyList));
+		set_cdr_b( tail, new Cons(result, EmptyList));
 		tail = cdr(tail);
 	  }
 	  current1 = cdr(current1);
@@ -1149,10 +1136,10 @@ public class Scheme {
 	  string sstr = str.ToString();
 	  for (int i = 0; i < sstr.Length; i++) {
 		if (Eq(retval, EmptyList)) {
-		  retval = cons(sstr[i], EmptyList);
+		  retval = new Cons(sstr[i], EmptyList);
 		  tail = retval;
 		} else {
-		  set_cdr_b(tail, cons(sstr[i], EmptyList));
+		  set_cdr_b(tail, new Cons(sstr[i], EmptyList));
 		  tail = cdr(tail);
 		}
 	  }
@@ -1562,7 +1549,7 @@ public class Scheme {
 	  else
 		return String.Format("{0}.0", s);
 	} else if (obj is String) {
-	  return String.Format("{0}", obj);
+	    return (string)obj;
 	} else if (obj is Symbol) {
 	    //System.Console.WriteLine("Here 2");
 	  return obj.ToString();
@@ -1580,7 +1567,7 @@ public class Scheme {
 	      ids[((Cons)current).id] = true;
 	      while (pair_q(current)) {
 		  //System.Console.WriteLine("Here 5");
-		  if (!retval.Equals("")) {
+		  if (retval.Length != 0) {
 		      retval.Append(" ");
 		  } 
 		  object car_current = car(current);
@@ -1656,35 +1643,35 @@ public class Scheme {
 		return "#<environment>"; //, car(obj));
 	  } else {
 	      //System.Console.WriteLine("Here 4");
-	      string retval = "";
+	      System.Text.StringBuilder retval = new System.Text.StringBuilder();
 	      object current = (Cons)obj;
 	      ids[((Cons)current).id] = true;
 	      while (pair_q(current)) {
 		  //System.Console.WriteLine("Here 5");
-		  if (retval != "") {
-		      retval += " ";
+		  if (retval.Length != 0) {
+		      retval.Append(" ");
 		  } 
 		  object car_current = car(current);
 		  if (pair_q(car_current) && ids.ContainsKey(((Cons)car_current).id)) {
-		      retval += " ...";
+		      retval.Append(" ...");
 		      current = null;
 		  } else {
-		      retval += repr(car_current, ids);
+		      retval.Append(repr(car_current, ids));
 		      current = cdr(current);
 		      if (pair_q(current) && ids.ContainsKey(((Cons)current).id)) {
-			  retval += " ...";
+			  retval.Append(" ...");
 			  current = null;
 		      } else if (pair_q(current) && car(current) == symbol("procedure")) { //FIXME: hack!
-			  retval += " . #<procedure>";
+			  retval.Append(" . #<procedure>");
 			  current = null;
 		      } else {
 			  if (!pair_q(current) && !Eq(current, EmptyList)) {
-			      retval += " . " + repr(current, ids); // ...
+			      retval.Append(" . ").Append(repr(current, ids)); // ...
 			  }
 		      }
 		  }
 	      }
-	      return "(" + retval + ")";
+	      return retval.Insert(0, "(").Append(")").ToString();
 	  }
 	} else {
 	    return obj.ToString();
@@ -1722,11 +1709,11 @@ public class Scheme {
 	for (int i = 0; i < smsg.Length; i++) {
 	    if (smsg[i] == TILDE) {
 		if (smsg[i+1] == 's') {
-		    new_msg.Append(string.Format("{0}", ToString(rest[count])));
+		    new_msg.Append(ToString(rest[count]));
 		    count += 1;
 		    i++;
 		} else if (smsg[i+1] == 'a') {
-		    new_msg.Append(string.Format("{0}", ToString(rest[count])));
+		    new_msg.Append(ToString(rest[count]));
 		    count += 1;
 		    i++;
 		} else if (smsg[i+1] == '%') {
@@ -1872,42 +1859,45 @@ public class Scheme {
   }
 
   public static bool Equal(object obj1, object obj2) {
-      if (obj1 == null) {
-          return (obj2 == null);
-      } else if (obj2 == null) {
-          return false;
-      } else if ((obj1 is Symbol) || (obj2 is Symbol)) { 
-	  if ((obj1 is Symbol) && (obj2 is Symbol))
-              return ((Symbol)obj1).Equals(obj2);
-	  else return false;
-      } else if (pair_q(obj1) && pair_q(obj2)) {
-	  if (null_q(obj1) && null_q(obj2))
-              return true;
-	  else if (null_q(obj1))
-              return false;
-	  else if (null_q(obj2))
-              return false;
-	  else if (Equal(car(obj1),  car(obj2)))
-              return Equal(cdr(obj1), cdr(obj2));
-	  else
-              return false;
-      }
-      if (pair_q(obj1) || pair_q(obj2)) {
-          return false;
-      } else {
-	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
-              try {
-                  return (ObjectType.ObjTst(obj1, obj2, false) == 0);
-              } catch {
-                  return false;
-              }
-          } else {
-              if (obj1 is BigInteger) {
-                  return ((BigInteger)obj1).Equals(obj2);
-              } else {
-                  return ((BigInteger)obj2).Equals(obj1);
-              }
-          }
+      while (true) {
+	  if (obj1 == null) {
+	      return (obj2 == null);
+	  } else if (obj2 == null) {
+	      return false;
+	  } else if ((obj1 is Symbol) || (obj2 is Symbol)) { 
+	      if ((obj1 is Symbol) && (obj2 is Symbol))
+		  return ((Symbol)obj1).Equals(obj2);
+	      else 
+		  return false;
+	  } else if (pair_q(obj1) && pair_q(obj2)) {
+	      if (null_q(obj1) && null_q(obj2)) {
+		  return true;
+	      } else if (null_q(obj1) || null_q(obj2)) {
+		  return false;
+	      } else if (Equal(car(obj1),  car(obj2))) {
+		  // recursive:
+		  obj1 = cdr(obj1);
+		  obj2 = cdr(obj2);
+	      } else {
+		  return false;
+	      }
+	  } else if (pair_q(obj1) || pair_q(obj2)) {
+	      return false;
+	  } else {
+	      if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+		  try {
+		      return (ObjectType.ObjTst(obj1, obj2, false) == 0);
+		  } catch {
+		      return false;
+		  }
+	      } else {
+		  if (obj1 is BigInteger) {
+		      return ((BigInteger)obj1).Equals(obj2);
+		  } else {
+		      return ((BigInteger)obj2).Equals(obj1);
+		  }
+	      }
+	  }
       }
   }
 
@@ -2413,7 +2403,7 @@ public class Scheme {
 
     public static object current_directory(object path) {
         System.IO.Directory.SetCurrentDirectory(path.ToString());
-        return null;
+        return System.IO.Directory.GetCurrentDirectory();
     }
 
     public static object number_to_string(object number) {
@@ -2592,9 +2582,9 @@ public class Scheme {
 	  return list(p1, p2);
       bool result = apply_comparison(p, car(l), piv);
       if (result)
-	  return partition(p, piv, cdr(l), cons(car(l), p1), p2);
+	  return partition(p, piv, cdr(l), new Cons(car(l), p1), p2);
       else
-	  return partition(p, piv, cdr(l), p1, cons(car(l), p2));
+	  return partition(p, piv, cdr(l), p1, new Cons(car(l), p2));
   }
 
   public static object sort(object p, object l) {
@@ -2627,7 +2617,7 @@ public class Scheme {
 	      if (args[i] is object[]) {
 		  retval.Append(array_to_string((object[])args[i]));
 	      } else {
-		  if (!retval.Equals(""))
+		  if (retval.Length != 0)
 		      retval.Append(" ");
 		  retval.Append(args[i]);
 	      }
@@ -2663,7 +2653,7 @@ public class Scheme {
 	if (null_q(cdr(lyst)))
 	  return EmptyList;
 	else
-	  return cons(car(lyst), rdc(cdr(lyst)));
+	  return new Cons(car(lyst), rdc(cdr(lyst)));
   }
 	
   public static void set_cdr_b(object obj) {
@@ -2859,7 +2849,7 @@ public class Scheme {
     else if (environment_object_q(x))
       return (symbol("<environment>"));
     else if (pair_q(x))
-      return (cons(make_safe(car(x)), make_safe(cdr(x))));
+      return (new Cons(make_safe(car(x)), make_safe(cdr(x))));
     else if (vector_q(x))
       return (list_to_vector(make_safe(vector_to_list(x))));
     else
@@ -2870,8 +2860,14 @@ public class Scheme {
       System.Text.StringBuilder text = new System.Text.StringBuilder();
       while (! null_q(x)) {
 	  text.Append(car(x).ToString());
+	  x = cdr(x);
       }
       return text.ToString();
+  }
+
+  public static object string_append(object obj1, object obj2) {
+      System.Text.StringBuilder text = new System.Text.StringBuilder(obj1.ToString());
+      return text.Append(obj2.ToString()).ToString();
   }
 
 // FIXME: Rewrite without recursion
@@ -2927,7 +2923,7 @@ public class Scheme {
   public static string arrayToString(object[] array) {
       System.Text.StringBuilder retval = new System.Text.StringBuilder();
       foreach (object item in array) {
-	  if (!retval.Equals(""))
+	  if (retval.Length != 0)
 	      retval.Append(" ");
 	  retval.Append(item.ToString());
       }
@@ -2975,10 +2971,6 @@ public class Scheme {
 	string text = fp.ReadToEnd();
     fp.Close();
     return text;
-  }
-
-  public static object string_append(object obj1, object obj2) {
-	return (obj1.ToString() + obj2.ToString());
   }
 
   //--------------------------------------------------------------------------------------------
@@ -3749,15 +3741,14 @@ public class Scheme {
           Vector bindings = (Vector) car(frame);
           object variables = cadr(frame);
           int i = 0;
-          while (!null_q(variables) && !Eq(car(variables), variable)) {
+          while (!null_q(variables)) {
+	      if (Eq(car(variables), variable)) {
+		  return bindings.get(i);
+	      }
               variables = cdr(variables);
               i++;
           }
-          if (null_q(variables)) {
-              return false;
-          } else {
-              return bindings.get(i);
-          }
+          return false;
       } else {
           throw new Exception("invalid frame");
       }
