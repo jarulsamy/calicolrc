@@ -127,20 +127,32 @@ namespace Jigsaw
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Do the assignment
-			try {
-				CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
-				CExpressionProperty RHS = (CExpressionProperty)_properties["Expression"];
 
-				SetVariable(scope, VarName.Text, RHS.Evaluate(scope));
-				//Compiler.ExecAssignment(scope, VarName.Text, RHS.Text);
-
-			} catch (Exception ex) {
-				Console.WriteLine(ex.Message);
-				this["Message"] = ex.Message;
-				
-				this.State = RunningState.Error;
-				rr.Action = EngineAction.Error;
-				rr.Frame = null;
+			System.Threading.ManualResetEvent ev = new System.Threading.ManualResetEvent(false);
+			System.Threading.Thread t = new System.Threading.Thread(() => {
+				  try {
+					CVarNameProperty VarName = (CVarNameProperty)_properties["Variable"];
+					CExpressionProperty RHS = (CExpressionProperty)_properties["Expression"];
+					
+					SetVariable(scope, VarName.Text, RHS.Evaluate(scope));
+					//Compiler.ExecAssignment(scope, VarName.Text, RHS.Text);
+					
+				  } catch (Exception ex) {
+					Console.Error.WriteLine(ex.Message);
+					this["Message"] = ex.Message;
+					
+					this.State = RunningState.Error;
+					rr.Action = EngineAction.Error;
+					rr.Frame = null;
+				  } finally {
+					ev.Set();
+				  }
+				});
+			t.IsBackground = true;
+			t.Start();
+			while (!ev.WaitOne(0)) { // Are we done?
+			  while (Gtk.Application.EventsPending ())
+				Gtk.Application.RunIteration ();
 			}
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -420,16 +432,28 @@ namespace Jigsaw
 			
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 			// Execute the statement
-			try {
-				CStatementProperty Stat = (CStatementProperty)_properties["Statement"];
-				Stat.Evaluate(scope);
-			} catch (Exception ex) {
-				Console.WriteLine(ex.Message);
-				this["Message"] = ex.Message;
-				
-				this.State = RunningState.Error;
-				rr.Action = EngineAction.Error;
-				rr.Frame = null;
+			System.Threading.ManualResetEvent ev = new System.Threading.ManualResetEvent(false);
+			System.Threading.Thread t = new System.Threading.Thread(() => {
+				  try {
+					CStatementProperty Stat = (CStatementProperty)_properties["Statement"];
+					Stat.Evaluate(scope);
+				  } catch (Exception ex) {
+					Console.Error.WriteLine(ex.Message);
+					this["Message"] = ex.Message;
+					
+					this.State = RunningState.Error;
+					rr.Action = EngineAction.Error;
+					rr.Frame = null;
+				  } finally {
+					ev.Set();
+				  }
+				});
+
+			t.IsBackground = true;
+			t.Start();
+			while (!ev.WaitOne(0)) { // Are we done?
+			  while (Gtk.Application.EventsPending ())
+				Gtk.Application.RunIteration ();
 			}
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
