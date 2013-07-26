@@ -240,6 +240,26 @@ public class SimScribbler : Myro.Robot
 		    return getTurnDirection(current, target) != direction;
 		}
 		
+		public override int getAngle() {
+		    // get angle in degrees
+		    return (int)frame.rotation;
+		}
+
+		public double getRotation() {
+		    // get angle in radians
+		    return frame.body.Rotation;
+		}
+
+		public void setAngle(double target) {
+		    // set angle in degrees
+		    frame.rotation = target;
+		}
+
+		public void setRotation(double target) {
+		    // set angle in radians
+		    frame.body.Rotation = (float)target;
+		}
+
 		public override void turnBy (int angle, string units = "deg")
 		{
 		    double target;
@@ -248,7 +268,7 @@ public class SimScribbler : Myro.Robot
 		    } else {
 			target = angle; // radians
 		    }
-		    double current_rotation = (Math.PI / 180.0) * frame.rotation; // convert from degrees
+		    double current_rotation = getRotation(); // convert from degrees
 		    turnTo((int)(standard_range(current_rotation + target) * 180/Math.PI - 360));
 		}
 		
@@ -263,7 +283,7 @@ public class SimScribbler : Myro.Robot
 		    } else {
 			target = angle; // radians
 		    }
-		    double current_rotation = (Math.PI / 180.0) * frame.rotation; // convert from degrees
+		    double current_rotation = getRotation(); // convert from degrees
 		    string direction = getTurnDirection(current_rotation, target);
 		    if (direction == "same") {
 			return;
@@ -280,9 +300,9 @@ public class SimScribbler : Myro.Robot
 		    lock (queue) {
 			queue.Add(delegate {
 				if (frame.body.AngularVelocity != 0.0) { // still moving
-				    if (isDone(direction, frame.rotation * (Math.PI / 180.0), target)) {
+				    if (isDone(direction, getRotation(), target)) {
 					frame.body.AngularVelocity = 0.0f;
-					frame.rotation = target * (180.0 / Math.PI);
+					setRotation(target); // target is in radians
 					ev.Set();
 				    } else {
 					lock (queue) {
@@ -318,7 +338,7 @@ public class SimScribbler : Myro.Robot
 		  lock(frame.world) {
 			frame.body.Position = new Vector2 (((float)x) / MeterInPixels, 
 				((float)y) / MeterInPixels);
-			frame.body.Rotation = (float)(theta * Math.PI/180.0);
+			setAngle(theta); // theta is in degrees
 		  }
 		  simulation.window.refresh();
 		}
