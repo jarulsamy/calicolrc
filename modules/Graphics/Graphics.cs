@@ -2081,6 +2081,9 @@ public static class Graphics
 		public double x;
 		public double y;
 
+		public double gx;
+		public double gy;
+
 		public Point (IList iterable): this(iterable[0], iterable[1])
 		{
 		}
@@ -2368,6 +2371,11 @@ public static class Graphics
 		List<string> messages = new List<string>() {"mouse-press", "mouse-release", "mouse-motion"};
 		if (messages.Contains(message)) {
 		    Events.subscribe(message, procedure, this);
+		    // FIXME: maybe turn on the window listener:
+		    /*
+		    if (window != null) {
+		    }
+		    */
 		} else {
 		    throw new Exception(String.Format("Shape cannot subscribe to message: '{0}'", message));
 		}
@@ -2941,9 +2949,16 @@ public static class Graphics
 
 		public void  updateGlobalPosition (Cairo.Context g)
 		{
-			gx = center.x;
-			gy = center.y;
+		        gx = center.x; // shape's global x
+			gy = center.y; // shape's global y
 			g.UserToDevice (ref gx, ref gy);
+			if (points != null) { // bounding box
+			    foreach (Point p in points) {
+				p.gx = p.x;
+				p.gy = p.y;
+				g.UserToDevice (ref p.gx, ref p.gy);
+			    }
+			}
 		}
 
 		public Line penUp ()
@@ -4070,6 +4085,7 @@ public static class Graphics
 	public class Picture : Shape
 	{
 		Gdk.Pixbuf _pixbuf; // in memory rep of picture
+		public string filename;
 		public int _cacheWidth;
 		public int _cacheHeight;
     
@@ -4081,6 +4097,7 @@ public static class Graphics
 
 		public Picture (string filename) : this(true)
 		{
+		    this.filename = filename;
 		    InvokeBlocking (delegate {
 			    if (filename.StartsWith ("http://")) {
 				HttpWebRequest req = (HttpWebRequest)WebRequest.Create (filename);
@@ -4164,6 +4181,7 @@ public static class Graphics
 
 		public Picture (Picture original) : this(true)
 		{
+		    this.filename = original.filename;
 		    InvokeBlocking (delegate {
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (original._pixbuf.Colorspace, true, 8, original.getWidth (), original.getHeight ());
