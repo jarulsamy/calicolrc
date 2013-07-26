@@ -1,12 +1,14 @@
 
 
-all: ../Myro.dll
+all: ../Myro.dll Robots
 
 ../Myro.dll: Myro.cs ../Graphics/Graphics.cs
 	MONO_PATH=../../bin dmcs -sdk:4 -target:library \
 		Myro.cs \
 		-lib:.. \
+		-lib:../../bin \
 		-unsafe \
+		-r:Calico.exe \
 		-r:Graphics.dll \
 		-r:Events.dll \
 		-r:Tao.Sdl.dll \
@@ -21,6 +23,8 @@ all: ../Myro.dll
 		-pkg:gtk-sharp-2.0 \
 		-r:Mono.Cairo.dll \
 		-pkg:glib-sharp-2.0 
+
+Robots: 
 	cd Robots; make
 
 clean::

@@ -5,6 +5,7 @@ all: Scribbler.dll SimScribbler.dll SimPioneer.dll NxtRobot.dll \
 Arduino.dll: Arduino.cs 
 	MONO_PATH=../../bin:../../../languages/Java/lib dmcs -sdk:4 \
 		-r:../../Myro.dll \
+		-r:../../../bin/Calico.exe \
 		-r:../../../bin/IronPython.dll \
 		-r:../../../bin/Microsoft.Scripting.dll \
 		-r:../../../bin/Microsoft.Dynamic.dll \
@@ -15,6 +16,7 @@ Arduino.dll: Arduino.cs
 ROSARDrone.dll: ROSARDrone.cs ROSRobot.dll
 	MONO_PATH=../../bin:../../../languages/Java/lib dmcs -sdk:4 \
 		-r:../../Myro.dll \
+		-r:../../../bin/Calico.exe \
 		-r:../../Graphics.dll \
 		-r:../../../bin/IronPython.dll \
 		-r:../../../bin/Microsoft.Scripting.dll \
@@ -56,6 +58,7 @@ ROSARDrone.dll: ROSARDrone.cs ROSRobot.dll
 ROSRobot.dll: ROSRobot.cs
 	MONO_PATH=../../bin:../../../languages/Java/lib dmcs -sdk:4 \
 		-r:../../Myro.dll \
+		-r:../../../bin/Calico.exe \
 		-r:../../Graphics.dll \
 		-r:../../../bin/IronPython.dll \
 		-r:../../../bin/Microsoft.Scripting.dll \
@@ -97,6 +100,7 @@ Finch.dll: Finch.cs
 	dmcs -sdk:4 -lib:../../../bin \
 		-lib:../../../bin/linux \
 		-r:../../Myro.dll \
+		-r:../../../bin/Calico.exe \
 		-r:../../Graphics.dll \
 		-r:../../../bin/IronPython.dll \
 		-r:../../../bin/Microsoft.Scripting.dll \
@@ -112,6 +116,7 @@ Hummingbird.dll: Hummingbird.cs Finch.cs
 	dmcs -sdk:4 -lib:../../../bin \
 		-lib:../../../bin/linux \
 		-r:../../Myro.dll \
+		-r:../../../bin/Calico.exe \
 		-r:Finch.dll \
 		-r:../../Graphics.dll \
 		-r:../../../bin/IronPython.dll \
@@ -135,6 +140,7 @@ NxtRobot.dll: NxtRobot/NxtRobot.cs NxtRobot/NxtNet.cs NxtRobot/MotorPort.cs \
 	dmcs -sdk:4 -lib:../../bin -lib:../../modules \
 		-r:../../../bin/IronPython.dll \
 		-r:../../Myro.dll \
+		-r:../../../bin/Calico.exe \
 		-r:../../Graphics.dll \
 		-r:../../../bin/IronPython.dll \
 		-r:../../../bin/Microsoft.Scripting.dll \
@@ -148,6 +154,7 @@ NxtRobot.dll: NxtRobot/NxtRobot.cs NxtRobot/NxtNet.cs NxtRobot/MotorPort.cs \
 Scribbler.dll: Scribbler.cs ../Myro.cs
 	dmcs -sdk:4 -r:../../../bin/IronPython.dll \
 		-r:../../Myro.dll \
+		-r:../../../bin/Calico.exe \
 		-r:../../Graphics.dll \
 		-r:../../../bin/IronPython.dll \
 		-r:../../../bin/Microsoft.Scripting.dll \
@@ -160,6 +167,7 @@ Scribbler.dll: Scribbler.cs ../Myro.cs
 SimScribbler.dll: SimScribbler.cs ../Myro.cs
 	dmcs -sdk:4 -r:../../../bin/IronPython.dll \
 		-r:../../Myro.dll \
+		-r:../../../bin/Calico.exe \
 		-r:../../Graphics.dll \
 		-r:../../../bin/IronPython.dll \
 		-r:../../../bin/Microsoft.Scripting.dll \
@@ -174,6 +182,7 @@ SimPioneer.dll: SimPioneer.cs ../Myro.cs
 	dmcs -sdk:4 -r:../../../bin/IronPython.dll \
 		-r:../../Myro.dll \
 		-r:../../Graphics.dll \
+		-r:../../../bin/Calico.exe \
 		-r:../../../bin/IronPython.dll \
 		-r:../../../bin/Microsoft.Scripting.dll \
 		-r:../../../bin/Microsoft.Dynamic.dll \

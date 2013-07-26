@@ -1250,6 +1250,25 @@ public static class Myro
 		return retval;
 	}
 
+        [method: JigsawTab("M/Robot")]
+	public static object makeSimulation (Calico.MainWindow calico, string filename) 
+        {
+	    // where might the simulation be?
+	    // check if it is absolute  or relative path from current directory:
+	    if (!System.IO.File.Exists(filename)) {
+		// if not there, then check system directory:
+		if (System.IO.File.Exists(System.IO.Path.Combine(calico.relativePath("../modules/Myro/Robots/Worlds"), filename))) {
+		    filename = System.IO.Path.Combine(calico.relativePath("../modules/Myro/Robots/Worlds"), filename);
+		} else {
+		    throw new Exception(String.Format("Cannot find world file: '{0}'", filename));
+		}
+	    }
+	    calico.ExecuteFile(filename);
+	    // now there should be a Simulation, and a robot
+	    Simulation simulation = getSimulation();
+	    return simulation;
+	}
+
 	[method: JigsawTab("M/Robot")]
 	public static object makeRobot (string robot_type, params object [] args)
   {
@@ -1340,6 +1359,7 @@ public static class Myro
 			window.setBackground (groundColor);
 			window.mode = "physics";
 			window.gravity = Graphics.Vector (0, 0); // turn off gravity
+			Myro.simulation = this;
 		}
 
 	        public Simulation () : this(640, 480, true, true)
@@ -1348,7 +1368,7 @@ public static class Myro
 
 	        public Simulation (int width, int height) : this(width, height, true, true)
 	        {
-	        }
+		}
 
 	        public Simulation (int width, int height, bool load_default, bool run)
 	        {
@@ -1383,6 +1403,7 @@ public static class Myro
 			    ball.color = makeColor ("blue");
 			    addShape (ball);      
 			}
+			Myro.simulation = this;
 			if (run)
 			    setup();
 		}
