@@ -430,7 +430,7 @@ public class Scheme {
   }
 
   public static object make_proc(params object[] args) {
-	return cons(symbol("procedure"), list(args));
+	return new Cons(symbol("procedure"), list(args));
   }
 
   // given a name, return a function that given an array, returns object
@@ -659,7 +659,7 @@ public class Scheme {
 	      retval = list(i); // start of list
 	      tail = retval;
 	    } else { // a pair
-	      set_cdr_b(tail, cons(i, EmptyList));
+	      set_cdr_b(tail, new Cons(i, EmptyList));
 	      tail = cdr(tail);
 	    }
 	  }
@@ -669,7 +669,7 @@ public class Scheme {
 	      retval = list(i); // start of list
 	      tail = retval;
 	    } else { // a pair
-	      set_cdr_b(tail, cons(i, EmptyList));
+	      set_cdr_b(tail, new Cons(i, EmptyList));
 	      tail = cdr(tail);
 	    }
 	  }
@@ -708,10 +708,10 @@ public class Scheme {
 	  int current_pos = 0;
 	  while (!EqualSign(current_pos, pos)) {
 		if (Eq(retval, EmptyList)) {
-		  retval = cons(car(current), EmptyList);
+		  retval = new Cons(car(current), EmptyList);
 		  tail = retval;
 		} else {
-		  set_cdr_b(tail, cons(car(current), EmptyList));
+		  set_cdr_b(tail, new Cons(car(current), EmptyList));
 		  tail = cdr(tail);
 		}
 		current = cdr(current);
@@ -793,7 +793,7 @@ public class Scheme {
 		retval = list(result); // start of list
 		tail = retval;
 	  } else { // pair
-		set_cdr_b(tail, cons(result, EmptyList));
+		set_cdr_b(tail, new Cons(result, EmptyList));
 		tail = cdr(tail);
 	  }
 	  current1 = cdr(current1);
@@ -853,7 +853,7 @@ public class Scheme {
 		  retval = list(result); // start of list
 		  tail = retval;
 	      } else { // pair
-		  set_cdr_b(tail, cons(result, EmptyList));
+		  set_cdr_b(tail, new Cons(result, EmptyList));
 		  tail = cdr(tail);
 	      }
 	  }
@@ -870,10 +870,10 @@ public class Scheme {
 	while (!Eq(current1, EmptyList)) {
 	  object result = apply(proc, car(current1), car(current2));
 	  if (Eq(retval, EmptyList)) {
-		retval = cons( result, EmptyList);
+		retval = new Cons( result, EmptyList);
 		tail = retval;
 	  } else {
-		set_cdr_b( tail, cons(result, EmptyList));
+		set_cdr_b( tail, new Cons(result, EmptyList));
 		tail = cdr(tail);
 	  }
 	  current1 = cdr(current1);
@@ -1136,10 +1136,10 @@ public class Scheme {
 	  string sstr = str.ToString();
 	  for (int i = 0; i < sstr.Length; i++) {
 		if (Eq(retval, EmptyList)) {
-		  retval = cons(sstr[i], EmptyList);
+		  retval = new Cons(sstr[i], EmptyList);
 		  tail = retval;
 		} else {
-		  set_cdr_b(tail, cons(sstr[i], EmptyList));
+		  set_cdr_b(tail, new Cons(sstr[i], EmptyList));
 		  tail = cdr(tail);
 		}
 	  }
@@ -2582,9 +2582,9 @@ public class Scheme {
 	  return list(p1, p2);
       bool result = apply_comparison(p, car(l), piv);
       if (result)
-	  return partition(p, piv, cdr(l), cons(car(l), p1), p2);
+	  return partition(p, piv, cdr(l), new Cons(car(l), p1), p2);
       else
-	  return partition(p, piv, cdr(l), p1, cons(car(l), p2));
+	  return partition(p, piv, cdr(l), p1, new Cons(car(l), p2));
   }
 
   public static object sort(object p, object l) {
@@ -2653,7 +2653,7 @@ public class Scheme {
 	if (null_q(cdr(lyst)))
 	  return EmptyList;
 	else
-	  return cons(car(lyst), rdc(cdr(lyst)));
+	  return new Cons(car(lyst), rdc(cdr(lyst)));
   }
 	
   public static void set_cdr_b(object obj) {
@@ -2849,7 +2849,7 @@ public class Scheme {
     else if (environment_object_q(x))
       return (symbol("<environment>"));
     else if (pair_q(x))
-      return (cons(make_safe(car(x)), make_safe(cdr(x))));
+      return (new Cons(make_safe(car(x)), make_safe(cdr(x))));
     else if (vector_q(x))
       return (list_to_vector(make_safe(vector_to_list(x))));
     else
