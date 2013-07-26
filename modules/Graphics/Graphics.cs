@@ -3173,6 +3173,43 @@ public static class Graphics
 			move (dx, dy);
 		}
 
+	        public virtual void moveTo(double x, double y, double seconds) {
+		    if (seconds > 0) {
+			double updateTime = 0.025;
+			double intervals = seconds/updateTime;
+			double dx = (x - this.x)/intervals;
+			double dy = (y - this.y)/intervals;
+			for(int i = 0; i < intervals; i++){
+			    move(dx, dy);
+			    if (window != null) {
+				window.update();
+			    }
+			    wait(updateTime);
+			}
+		    }
+		    //in case we are not at an integer coordinate
+		    moveTo(x, y);
+		}
+
+	        public virtual void move(double x, double y, double seconds) {
+		    double ox = this.x, oy = this.y;
+		    if (seconds > 0) {
+			double updateTime = 0.025;
+			double intervals = seconds/updateTime;
+			double dx = x/intervals;
+			double dy = y/intervals;
+			for(int i = 0; i < intervals; i++){
+			    move(dx, dy);
+			    if (window != null) {
+				window.update();
+			    }
+			    wait(updateTime);
+			}
+		    }
+		    //in case we are not at an integer coordinate
+		    moveTo(ox + x, oy + y);
+		}
+
 		public void _moveTo (double x, double y)
 		{
 			double dx = x - center.x;
