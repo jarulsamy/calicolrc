@@ -11,12 +11,15 @@ background(0)
 noStroke()
 
 x = 0
-def draw(o, e):
+def draw():
     global x
     v = analogRead(0)       #photoresistor on analog 0
     y3 = Processing.map(v, 1024, 0, 0, height())
-    servo = Processing.map(v, 0, 1024, 255, 0)
-    analogWrite(3, servo)
+    led = Processing.map(v, 400, 800, 255, 0)
+    led = Processing.constrain(led, 0, 255)
+    servo = Processing.map(v, 0, 1024, 0, 255)
+    servo = Processing.constrain(servo, 0, 255)
+    analogWrite(3, led)
     analogWrite(6, servo)
     fill(255, 0, 196)
     ellipse(x, y3, 3, 3)

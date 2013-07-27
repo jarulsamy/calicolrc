@@ -9,19 +9,17 @@ background(0)
 noStroke()
 
 x = 0
-def draw():
-    global x
+for t in timer(30):
     v = analogRead(0)
-    y3 = Processing.map(v, 1024, 0, 0, height())
+    y = Processing.map(v, 1024, 0, 0, height())
 
     fill(255, 0, 196)
-    ellipse(x, y3, 3, 3)
+    ellipse(x, y, 3, 3)
 
     x = x + 1
     if x > width():
         x = 0
         background(0)
 
-frameRate(120)
-onLoop += draw
-loop()
+    delay(1)
+    redraw()

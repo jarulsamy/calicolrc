@@ -6,7 +6,7 @@ def pulse():
     for i in range(256):
         analogWrite(3, i)
         wait(.01)
-    for i in range(255, 0, -1):
+    for i in range(255, -1, -1):
         analogWrite(3, i)
         wait(.01)
 
