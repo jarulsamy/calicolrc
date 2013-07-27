@@ -863,6 +863,15 @@ internal class PWindow : Gtk.Window
 				break; 
 			}
 
+			switch (_textAlignY) {
+			case TextYAlign.CENTER:
+			        y = y - 0.5*th;
+				break;
+			case TextYAlign.BOTTOM:
+ 			        y = y - th;
+				break; 
+			}
+
 			g.Translate (x, y);
 			_fill (g);
 			_stroke (g);
