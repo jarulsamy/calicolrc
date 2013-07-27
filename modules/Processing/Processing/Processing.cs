@@ -526,10 +526,11 @@ public static class Processing
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void _onKeyReleaseEvent(object o, KeyReleaseEventArgs args)
 	{
+		if (_key == Gdk.Key.Escape) noLoop();
 		_keyPressed = false;
+		raiseKeyReleased(args);
 		_key = (Gdk.Key)0;
 		_keyCode = 0;
-		raiseKeyReleased(args);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
