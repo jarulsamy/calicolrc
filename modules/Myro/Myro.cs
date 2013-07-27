@@ -1220,11 +1220,7 @@ public static class Myro
 		  port = retval.ToString();
 	  }
 	  if (port.StartsWith ("sim")) {
-	      if (simulation != null && simulation.window.isRealized()) {
-		  simulation.clear();
-	      } else {
-		  simulation = new Simulation ();
-	      }
+	      new Simulation ();
 	      // defaults to SimScribbler in this interface
 	      robot = (Robot)makeRobot ("SimScribbler", simulation); 
 	      wait(1.0); // give it time to get started before trying to read sensors, etc
@@ -1253,19 +1249,36 @@ public static class Myro
         [method: JigsawTab("M/Robot")]
 	public static object makeSimulation (Calico.MainWindow calico, string filename) 
         {
-	    // where might the simulation be?
-	    // check if it is absolute  or relative path from current directory:
+	    // need to start simulation
+	    // where might the simulation script be?
+	    // check if it is absolute or relative path from current directory:
+	    // first, check to see if a simulation is already running; don't run more than one
 	    if (!System.IO.File.Exists(filename)) {
 		// if not there, then check system directory:
 		if (System.IO.File.Exists(System.IO.Path.Combine(calico.relativePath("../modules/Myro/Robots/Worlds"), filename))) {
 		    filename = System.IO.Path.Combine(calico.relativePath("../modules/Myro/Robots/Worlds"), filename);
 		} else {
-		    throw new Exception(String.Format("Cannot find world file: '{0}'", filename));
+		    throw new Exception(String.Format("Cannot find simulation file: '{0}'", filename));
 		}
 	    }
-	    calico.ExecuteFile(filename);
-	    // now there should be a Simulation, and a robot
-	    Simulation simulation = getSimulation();
+	    // Force destruction here, so we can wait till it gets started:
+	    if (Myro.simulation != null) {
+		if (Myro.simulation.window.isRealized()) {
+		    InvokeBlocking(delegate {
+			Myro.simulation.window.Destroy();
+			});
+		    Myro.simulation = null;
+		    Myro.robot = null;
+		}
+	    }
+	    calico.ExecuteFileInBackground(filename);
+	    // wait for simulation to start:
+	    int count = 0;
+	    while (getSimulation() == null && count < 10) {
+		Console.WriteLine("Waiting for simulation to start...");
+		wait(1);
+		count++;
+	    }
 	    return simulation;
 	}
 
@@ -1354,12 +1367,22 @@ public static class Myro
 	    
 		public Simulation (string title, int width, int height, Graphics.Color color)
 		{
-			window = makeWindow (title, width, height);
-			groundColor = color;
-			window.setBackground (groundColor);
-			window.mode = "physics";
-			window.gravity = Graphics.Vector (0, 0); // turn off gravity
-			Myro.simulation = this;
+		    // Force destruction here, so we can wait till it gets started:
+		    if (Myro.simulation != null) {
+			if (Myro.simulation.window.isRealized()) {
+			    InvokeBlocking(delegate {
+				    Myro.simulation.window.Destroy();
+				});
+			    Myro.simulation = null;
+			    Myro.robot = null;
+			}
+		    }
+		    window = makeWindow (title, width, height);
+		    groundColor = color;
+		    window.setBackground (groundColor);
+		    window.mode = "physics";
+		    window.gravity = Graphics.Vector (0, 0); // turn off gravity
+		    Myro.simulation = this;
 		}
 
 	        public Simulation () : this(640, 480, true, true)
@@ -1372,6 +1395,16 @@ public static class Myro
 
 	        public Simulation (int width, int height, bool load_default, bool run)
 	        {
+		        // Force destruction here, so we can wait till it gets started:
+		        if (Myro.simulation != null) {
+			    if (Myro.simulation.window.isRealized()) {
+				InvokeBlocking(delegate {
+					Myro.simulation.window.Destroy();
+				    });
+				Myro.simulation = null;
+				Myro.robot = null;
+			    }
+			}
 		        window = makeWindow ("Myro Simulation", width, height);
 			window.setBackground (groundColor);
 			window.mode = "physics";
