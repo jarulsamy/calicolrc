@@ -71,11 +71,11 @@ namespace Calico {
 		    }
                 } else {
                     CurrentLanguage = manager.GetLanguageFromExtension(arg);
-		    string dirname = System.IO.Path.GetDirectoryName(arg);
+		    string filename = System.IO.Path.GetFullPath(arg);
+		    string dirname = System.IO.Path.GetDirectoryName(filename);
 		    if (dirname != "" && dirname != null) {
 			if (System.IO.File.Exists(arg)) {
 			    System.IO.Directory.SetCurrentDirectory(dirname);
-			    string filename = System.IO.Path.GetFileName(arg);
 			    ExecuteFileInBackground(filename, CurrentLanguage);
 			} else {
 			    Console.Error.WriteLine("Error: no such file '{0}'; skipping...", arg);
@@ -259,12 +259,12 @@ namespace Calico {
 		    }
 		} else {
                     CurrentLanguage = manager.GetLanguageFromExtension(arg);
-		    string dirname = System.IO.Path.GetDirectoryName(arg);
+		    string filename = System.IO.Path.GetFullPath(arg);
+		    string dirname = System.IO.Path.GetDirectoryName(filename);
 		    if (dirname != "" && dirname != null) {
 			if (System.IO.File.Exists(arg)) {
 			    System.IO.Directory.SetCurrentDirectory(dirname);
 			    //System.Console.WriteLine("cd: " + dirname);
-			    string filename = System.IO.Path.GetFileName(arg);
 			    manager [CurrentLanguage].engine.ExecuteFile(filename);
 			} else {
 			    Console.Error.WriteLine("Error: no such file '{0}'; skipping...", arg);
