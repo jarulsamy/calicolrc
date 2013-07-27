@@ -1612,6 +1612,20 @@ public static class Processing
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab("P/Text")]
+	public static void textFont(string s = "Arial") 
+	{
+		if (_p == null) return;
+		_invoke ( delegate { 
+			try {
+				_p.textFont (s);
+			} catch (System.NullReferenceException e){
+				debug ( String.Format("textFont() ignored extra tick: {0}", e.ToString()), 1);
+			}
+		} );
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab("P/Text")]
 	public static double textWidth( string txt = "CALICO" ) 
 	{
 		if (_p == null) return -1.0;
@@ -1623,6 +1637,28 @@ public static class Processing
 				w = _p.textWidth (txt);
 			} catch (System.NullReferenceException e){
 				debug ( String.Format("textWidth() ignored extra tick: {0}", e.ToString()), 1);
+			}
+			ev.Set ();
+			return w;
+		} );
+		ev.WaitOne();
+		return w;
+	}
+
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab("P/Text")]
+	public static double textHeight( string txt = "CALICO" ) 
+	{
+		if (_p == null) return -1.0;
+		ManualResetEvent ev = new ManualResetEvent(false);
+
+		double w = -1.0;
+		_invokeDouble ( delegate { 
+			try {
+				w = _p.textHeight (txt);
+			} catch (System.NullReferenceException e){
+				debug ( String.Format("textHeight() ignored extra tick: {0}", e.ToString()), 1);
 			}
 			ev.Set ();
 			return w;
