@@ -333,7 +333,7 @@ namespace Calico {
             Print(_("  StartCalico --exec FILENAMEs   Run FILENAMEs"));
             Print(_("  StartCalico --repl FILENAMEs   Run FILENAMEs and starts read-eval-print loop"));
             Print(_("  StartCalico   --graphics       Run with graphics (with --exec or --repl)"));
-	    Print(_("  StartCalico   --noquit         Does not quit after executing file with --exec"));
+	    Print(_("  StartCalico   --noquit         Don't quit after executing file with --exec"));
 	    Print(_("  StartCalico --nomodules        Does not load the modules from modules/*.dll"));
             Print(_("  StartCalico --version          Displays the version number ({0})"), Version);
             Print(_("  StartCalico --verbose          Displays detailed information (for debugging)"));

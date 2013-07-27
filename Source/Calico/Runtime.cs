@@ -32,6 +32,7 @@ using Mono.Terminal;
 
 namespace Calico {
     public partial class CalicoConsole: MainWindow {
+	// ran with --graphics or without
        
         public CalicoConsole(): base(){}
 
@@ -92,8 +93,9 @@ namespace Calico {
                 }));
                 executeThread.IsBackground = true;
                 executeThread.Start();
-            } else if (!((IList<string>)this.args).Contains("--noquit")) {
-		Environment.Exit(0);
+            } else { //if (!((IList<string>)this.args).Contains("--noquit")) {
+		//Environment.Exit(0);
+		// do not exit, graphics must take care of exit
 	    }
         }
 
@@ -231,6 +233,7 @@ namespace Calico {
     }
 
     public partial class CalicoConsoleNoGUI: CalicoConsole{
+	// ran without --graphics
         public CalicoConsoleNoGUI(string[] args, LanguageManager manager, bool Debug, Config config, bool startREPL){
 	    this.args = args;
             this.config = config;
