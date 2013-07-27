@@ -693,6 +693,7 @@ public static class Graphics
 				_windows [title] = new Graphics.WindowClass (title, width, height);
 			  } else {
 				_windows [title].clear(false);
+				_windows [title].Resize(width, height);
 			  }
 			  _lastWindow = _windows [title];
 			  _lastWindow.KeepAbove = true;
@@ -719,6 +720,7 @@ public static class Graphics
 			    });
 		    } else {
 			_windows [title].canvas.shapes.Clear();
+			_windows [title].Resize(width, height);
 		    }
 		    _lastWindow = _windows [title];
 		    _lastWindow.KeepAbove = true;
