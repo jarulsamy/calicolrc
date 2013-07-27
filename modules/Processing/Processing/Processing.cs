@@ -25,6 +25,7 @@ using System.Threading;
 using System.Collections.Generic;
 using Cairo;
 using Gtk;
+using Gdk;
 
 // ------------------ Shared Constants -----------------------------------
 internal enum EllipseMode
@@ -88,6 +89,9 @@ public static class Processing
 	private static uint _keyCode = 0;
 	private static long _millis;								// The number of milliseconds when the window was created
 	private static bool _immediateMode = true;					// True if all drawing commands trigger a queue draw
+
+        public static Pixels pixels = new Pixels();
+
 
 	[method: JigsawTab(null)]
 	public static event ButtonReleaseEventHandler onMouseClicked;	// Mouse events
@@ -1650,6 +1654,24 @@ public static class Processing
 		} );
 	}
 
+  	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public static IList<string> listFonts()
+        { 
+	  var l = new List<string>();
+	  //Console.WriteLine(PangoHelper.ContextGet().FontMap);
+	  var lst = PangoHelper.ContextGet().Families;
+	  //for (int i = 0; i < lst.Length; i ++)
+	  foreach (Pango.FontFamily family in lst)
+	    {
+	      foreach (Pango.FontFace face in family.Faces)
+		{
+		  string fullname = family.Name + " " + face.FaceName;
+		  l.Add(fullname);
+		}
+	    }
+	  return l;
+        }
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab("P/Text")]
 	public static void textFont(string s = "Arial") 
@@ -1752,6 +1774,42 @@ public static class Processing
 	public static void randomSeed(int seed) {
 		_rand = new Random(seed);
 	}
+
+        // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public class Pixels
+	{
+      
+	  public uint this[int i]
+	  {
+            get
+	      {		
+                int x = i % _width;
+                int y = i / _width;
+                return getPixel (x, y);
+	      }
+            set
+	      {
+		
+                int x = i % _width;
+                int y = i / _width;
+                setPixel (x, y, value);
+	      }
+	  }
+	  
+	  public uint this[int x, int y]
+	  {	    
+            get
+	      {	
+                return getPixel (x, y);
+	      }
+            set
+	      {	
+                setPixel (x, y, value);
+	      }
+	  }
+	}
+  
+
 
     //////////////////////////////////////////////////////////////
     
