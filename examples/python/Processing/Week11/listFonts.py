@@ -1,16 +1,19 @@
 from Processing import *
 from random import choice
 
-window(400, 800)
+window(1500, 800)
 smooth()
-textSize(12)
+textSize(8)
 fonts = listFonts()
 
+x = 0
 y = 0
-while y < height():
-    f = choice(fonts)
+for f in sorted(fonts):
     textFont(f)
-    text(f, 0, y)
+    if y + textHeight(f) > height():
+        y = 0
+        x += 150
+    if x > width():
+        break
+    text(f, x, y)
     y = y + textHeight(f)
-
-
