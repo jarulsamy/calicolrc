@@ -1445,7 +1445,11 @@ namespace Calico {
 		config.SetValue("config", "window-width", w);
 		config.SetValue("config", "window-height", h);
 		config.SetValue("config", "shell-width", hpaned2.Position);
-		config.SetValue("config", "shell-height", VPaned2.Position);
+		if (verticalSwapped) {
+		    config.SetValue("config", "shell-height", VPaned2.Position);
+		} else {
+		    config.SetValue("config", "shell-height", VPaned2.Position - 12);
+		}
                 config.Save();
             } catch {
                 // Something is no longer valid. Let's just make a new one then
