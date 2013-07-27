@@ -803,6 +803,7 @@ internal class PWindow : Gtk.Window
 
 			var layout = new Pango.Layout (PangoContext);
 			layout.FontDescription = Pango.FontDescription.FromString (_textFace + " " + _textSize);
+			layout.Wrap = Pango.WrapMode.Char;
 			layout.Width = Pango.Units.FromPixels((int)w);
 			layout.SetText (txt);
 			int tw, th;
@@ -849,6 +850,7 @@ internal class PWindow : Gtk.Window
 
 			var layout = new Pango.Layout (PangoContext);
 			layout.FontDescription = Pango.FontDescription.FromString (_textFace + " " + _textSize);
+			layout.Wrap = Pango.WrapMode.WordChar;
 			layout.SetText (txt);
 			layout.Width = -1;
 			int tw, th;
