@@ -2,13 +2,14 @@ from Processing import *
 import string
 import random
 
-window(1680, 1050)
+window(500, 500)
+window(displayWidth(), displayHeight())
 fullscreen()
 smooth()
 noFill()
 textFont("Courier")
-textSize(28)
-frameRate(30)
+textSize(64)
+frameRate(40)
 stroke(0, 255, 24)
 
 def draw(o, e):
