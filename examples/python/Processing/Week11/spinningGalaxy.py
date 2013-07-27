@@ -18,7 +18,7 @@ angleChange = 137.5
 ## The radius of the circle
 maxRadius = 200
 
-def draw(o, e):
+def draw():
     global angleChange
     background(26, 26, 26)
     
@@ -31,7 +31,6 @@ def draw(o, e):
         ellipse(x, y, 5, 5)
     
     angleChange += 0.0001
-    doEvents()
 
 # Set up looping
 onLoop += draw

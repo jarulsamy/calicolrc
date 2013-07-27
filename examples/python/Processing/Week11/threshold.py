@@ -16,7 +16,7 @@ window( w, h )
 image( img, 0, 0)
 
 # Perform the threshold function
-def threshold(o, e):
+def threshold():
 
     # Redraw the original image
     image( img, 0, 0)
