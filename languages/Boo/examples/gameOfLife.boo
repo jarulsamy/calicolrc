@@ -50,7 +50,7 @@ def handleKeys():
 
 onKeyPressed += handleKeys
 
-def step(o, e):
+def step():
     background(0)
 
     # draw the board

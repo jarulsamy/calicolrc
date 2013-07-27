@@ -50,7 +50,7 @@ def handleKeys() as void:
 
 onKeyPressed += handleKeys
 
-def step(o as object, e as PElapsedEventArgs) as void:
+def step() as void:
     background(0)
 
     # draw the board
