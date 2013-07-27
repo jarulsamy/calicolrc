@@ -304,6 +304,8 @@ public static class Processing
 		_keyCode = 0;
 		_immediateMode = true;
 		_millis = DateTime.Now.Ticks * 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
+
+		frameRate(60);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -524,10 +526,15 @@ public static class Processing
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void _onKeyReleaseEvent(object o, KeyReleaseEventArgs args)
 	{
+		if (_key == Gdk.Key.Escape)
+		  {
+		    noLoop();
+		    exit();
+		  }
 		_keyPressed = false;
+		raiseKeyReleased(args);
 		_key = (Gdk.Key)0;
 		_keyCode = 0;
-		raiseKeyReleased(args);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -931,6 +938,35 @@ public static class Processing
 		return _height;
 	}
 
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab("P/Environ")]
+	public static double displayWidth() 
+	{	// Get the width of the screen
+	  return _p.Screen.Width;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab("P/Environ")]
+	public static void fullscreen()
+        {
+	  _invoke ( delegate { if (_p != null) _p.Fullscreen();});
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab("P/Environ")]
+	public static void unfullscreen()
+        {
+	  _invoke ( delegate { if (_p != null) _p.Unfullscreen();});
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab("P/Environ")]
+	public static double displayHeight() 
+	{	// Get the width of the screen
+	  return _p.Screen.Height;
+	}
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab("P/Environ")]
 	public static void immediateMode( bool value = true )
@@ -1053,7 +1089,11 @@ public static class Processing
 	[JigsawTab(null)]
 	public static void noLoop()
 	{
-		if (_tmr != null) _tmr.Stop ();
+		if (_tmr != null)
+		  {
+		    _tmr.Stop ();
+		    unfullscreen();
+		  }
 	}
 	[JigsawTab("P/Environ")]
 	public static void stopLoop() { noLoop (); }
@@ -1612,6 +1652,20 @@ public static class Processing
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab("P/Text")]
+	public static void textFont(string s = "Arial") 
+	{
+		if (_p == null) return;
+		_invoke ( delegate { 
+			try {
+				_p.textFont (s);
+			} catch (System.NullReferenceException e){
+				debug ( String.Format("textFont() ignored extra tick: {0}", e.ToString()), 1);
+			}
+		} );
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab("P/Text")]
 	public static double textWidth( string txt = "CALICO" ) 
 	{
 		if (_p == null) return -1.0;
@@ -1623,6 +1677,28 @@ public static class Processing
 				w = _p.textWidth (txt);
 			} catch (System.NullReferenceException e){
 				debug ( String.Format("textWidth() ignored extra tick: {0}", e.ToString()), 1);
+			}
+			ev.Set ();
+			return w;
+		} );
+		ev.WaitOne();
+		return w;
+	}
+
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab("P/Text")]
+	public static double textHeight( string txt = "CALICO" ) 
+	{
+		if (_p == null) return -1.0;
+		ManualResetEvent ev = new ManualResetEvent(false);
+
+		double w = -1.0;
+		_invokeDouble ( delegate { 
+			try {
+				w = _p.textHeight (txt);
+			} catch (System.NullReferenceException e){
+				debug ( String.Format("textHeight() ignored extra tick: {0}", e.ToString()), 1);
 			}
 			ev.Set ();
 			return w;

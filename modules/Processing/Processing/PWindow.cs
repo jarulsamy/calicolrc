@@ -45,7 +45,8 @@ internal class PWindow : Gtk.Window
 	private LineCap _strokeCap = LineCap.Round;					// Default line cap
 	private LineJoin _strokeJoin = LineJoin.Miter;				// Default line join 
 	private double _tightness = 0.2;							// Spline smooth factor {0.0, 1.0]
-	private double _textSize = 12.0;							// Default text size
+	private double _textSize = 26;							// Default text size
+    private string _textFace = "sans serif";
 	private TextAlign _textAlignX = TextAlign.LEFT;				// Text alignment mode in x-direction
 	private TextYAlign _textAlignY = TextYAlign.TOP;			// Text alignment mode in y-direction
 	private double _textScaleFactor = 120.0/72.0;				// (screen resolution / dots per inch)
@@ -200,6 +201,16 @@ internal class PWindow : Gtk.Window
 
 		_width = w;
 		_height = h;
+	}
+
+        public double displayWidth()
+        {
+   	  return Screen.Width;
+	}
+
+        public double displayHeight()
+        {
+   	  return Screen.Height;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -368,6 +379,12 @@ internal class PWindow : Gtk.Window
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void textFont(string s)
+	{
+		_textFace = s;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public void textAlign(TextAlign align)
 	{
 		_textAlignX = align;
@@ -386,10 +403,29 @@ internal class PWindow : Gtk.Window
 	{	// Return width of string
 		double w = 0.0;
 		using (Context g = new Context(_img)) {
-			TextExtents te = g.TextExtents(txt);
-			w = te.Width * _textScaleFactor;
+	                var layout = new Pango.Layout (PangoContext);
+			layout.FontDescription = Pango.FontDescription.FromString (_textFace + " " + _textSize);
+			layout.SetText (txt);
+			int tw, th;
+			layout.GetPixelSize (out tw, out th);
+			w = (double)tw;
 		};
 		return w;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public double textHeight(string txt)
+	{	// Return width of string
+		double h = 0.0;
+		using (Context g = new Context(_img)) {
+	                var layout = new Pango.Layout (PangoContext);
+			layout.FontDescription = Pango.FontDescription.FromString (_textFace + " " + _textSize);
+			layout.SetText (txt);
+			int tw, th;
+			layout.GetPixelSize (out tw, out th);
+			h = (double)th;
+		};
+		return h;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -774,61 +810,87 @@ internal class PWindow : Gtk.Window
 		using (Context g = new Context(_img)) {
 			g.Matrix = _mat;
 			g.Save ();
-			TextExtents te = g.TextExtents(txt);
-			double s = (_textSize/g.FontExtents.Height) * _textScaleFactor;
 
-			// If a box is specified, compute the new location of the text within the box using the _textAlign parameter
+			var layout = new Pango.Layout (PangoContext);
+			layout.FontDescription = Pango.FontDescription.FromString (_textFace + " " + _textSize);
+			layout.Wrap = Pango.WrapMode.Char;
+			layout.Width = Pango.Units.FromPixels((int)w);
+			layout.SetText (txt);
+			int tw, th;
+			layout.GetPixelSize (out tw, out th);
+
 			switch (_textAlignX) {
 			case TextAlign.LEFT:
-				//x = x - te.XBearing;
+			        layout.Alignment = Pango.Alignment.Left;
 				break;
 			case TextAlign.CENTER:
-				x = x + 0.5*w - 0.5*te.Width * s + 1.5*s;			// Last factor is fudge factor
+ 			        layout.Alignment = Pango.Alignment.Center;
+			        x = x - 0.5*tw;
 				break;
 			case TextAlign.RIGHT:
-				x = x + w - te.Width * s + te.XBearing * s + 3.0*s;	// Last factor is fudge factor
+ 			        layout.Alignment = Pango.Alignment.Right;
+ 			        x = x - tw;
 				break;
 			}
 
 			switch (_textAlignY) {
-			case TextYAlign.TOP:
-				y = y + te.Height * s;
-				break;
 			case TextYAlign.CENTER:
-				y = y + 0.5*h + 0.5*te.Height * s;
+			        y = y - 0.5*th;
 				break;
 			case TextYAlign.BOTTOM:
-				y = y + h + te.YBearing;
+ 			        y = y - th;
 				break; 
-			case TextYAlign.BASELINE:
-				y = y + h;
-				break;
 			}
 
 			g.Translate (x, y);
-			g.Scale (s, s);
-			g.TextPath (txt);
-			g.Restore ();
 			_fill (g);
 			_stroke (g);
+			Pango.CairoHelper.ShowLayout (g, layout);
+			g.Restore ();
 		}
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public void text(string txt, double x, double y) 
 	{	// Draw text to the context
+
 		using (Context g = new Context(_img)) {
 			g.Matrix = _mat;
 			g.Save ();
+
+			var layout = new Pango.Layout (PangoContext);
+			layout.FontDescription = Pango.FontDescription.FromString (_textFace + " " + _textSize);
+			layout.Wrap = Pango.WrapMode.WordChar;
+			layout.SetText (txt);
+			layout.Width = -1;
+			int tw, th;
+			layout.GetPixelSize (out tw, out th);
+
+			switch (_textAlignX) {
+			case TextAlign.CENTER:
+			        x = x - 0.5*tw;
+				break;
+			case TextAlign.RIGHT:
+ 			        x = x - tw;
+				break; 
+			}
+
+			switch (_textAlignY) {
+			case TextYAlign.CENTER:
+			        y = y - 0.5*th;
+				break;
+			case TextYAlign.BOTTOM:
+ 			        y = y - th;
+				break; 
+			}
+
 			g.Translate (x, y);
-			double s = (_textSize/g.FontExtents.Height) * _textScaleFactor;
-			g.Scale (s, s);
-			g.TextPath (txt);
-			g.Restore ();
 			_fill (g);
 			_stroke (g);
-		}
+			Pango.CairoHelper.ShowLayout (g, layout);
+			g.Restore ();
+		}	  	       
 	}
-
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
+

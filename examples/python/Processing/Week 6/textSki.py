@@ -5,6 +5,7 @@ import math
 
 window(700, 400)
 textSize(24)
+textAlign(LEFT, BOTTOM)
 
 # Redraw the sine function
 def drawSlope():
