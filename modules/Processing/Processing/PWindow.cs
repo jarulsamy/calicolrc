@@ -803,8 +803,10 @@ internal class PWindow : Gtk.Window
 		this.QueueDraw ();
 	}
 
+       
+  
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public void text(string txt, double x, double y, double w, double h) 
+        public void text(string txt, double x, double y, double w, double h, bool markup = false) 
 	{	// Draw text to the context
 
 		using (Context g = new Context(_img)) {
@@ -814,8 +816,13 @@ internal class PWindow : Gtk.Window
 			var layout = new Pango.Layout (PangoContext);
 			layout.FontDescription = Pango.FontDescription.FromString (_textFace + " " + _textSize);
 			layout.Wrap = Pango.WrapMode.Char;
-			layout.Width = Pango.Units.FromPixels((int)w);
-			layout.SetText (txt);
+
+			if (w != -1)  layout.Width = Pango.Units.FromPixels((int)w);
+			else          layout.Width = (int)w;
+
+			if (markup)   layout.SetMarkup (txt);
+			else          layout.SetText(txt);
+
 			int tw, th;
 			layout.GetPixelSize (out tw, out th);
 
@@ -852,44 +859,22 @@ internal class PWindow : Gtk.Window
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public void text(string txt, double x, double y) 
+	{	
+	        text(txt, x, y, -1, -1, false);
+	}
+
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void markup(string txt, double x, double y, double w, double h) 
 	{	// Draw text to the context
+	  
+	        text(txt, x, y, w, h, true);
+	}
 
-		using (Context g = new Context(_img)) {
-			g.Matrix = _mat;
-			g.Save ();
-
-			var layout = new Pango.Layout (PangoContext);
-			layout.FontDescription = Pango.FontDescription.FromString (_textFace + " " + _textSize);
-			layout.Wrap = Pango.WrapMode.WordChar;
-			layout.SetText (txt);
-			layout.Width = -1;
-			int tw, th;
-			layout.GetPixelSize (out tw, out th);
-
-			switch (_textAlignX) {
-			case TextAlign.CENTER:
-			        x = x - 0.5*tw;
-				break;
-			case TextAlign.RIGHT:
- 			        x = x - tw;
-				break; 
-			}
-
-			switch (_textAlignY) {
-			case TextYAlign.CENTER:
-			        y = y - 0.5*th;
-				break;
-			case TextYAlign.BOTTOM:
- 			        y = y - th;
-				break; 
-			}
-
-			g.Translate (x, y);
-			_fill (g);
-			_stroke (g);
-			Pango.CairoHelper.ShowLayout (g, layout);
-			g.Restore ();
-		}	  	       
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public void markup(string txt, double x, double y) 
+	{	// Draw text to the context
+ 	        text(txt, x, y, -1, -1, true);
 	}
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }

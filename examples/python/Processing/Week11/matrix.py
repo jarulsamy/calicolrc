@@ -2,13 +2,13 @@ from Processing import *
 import string
 from random import choice, uniform
 window(1680, 1050)
-window(displayWidth(), displayHeight())
+#window(displayWidth(), displayHeight())
 fullscreen()
 smooth()
 noFill()
 textFont("Courier")
 textSize(28)
-frameRate(30)
+frameRate(60)
 stroke(0, 255, 22)
 
 def keyPressed(o, e):
@@ -28,6 +28,10 @@ def draw(o, e):
         idx = int(uniform(0, len(msg)))
         msg[idx] = choice(choices)
     text("".join(msg), 0, 0, width(), height())
+
+    if (isMousePressed()):
+        v = int(random(len(pixels)))
+        pixels[v] = red(255)
 
 onLoop += draw
 loop()

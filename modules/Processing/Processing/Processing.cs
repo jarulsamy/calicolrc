@@ -1658,10 +1658,7 @@ public static class Processing
         public static IList<string> listFonts()
         { 
 	  var l = new List<string>();
-	  //Console.WriteLine(PangoHelper.ContextGet().FontMap);
-	  var lst = PangoHelper.ContextGet().Families;
-	  //for (int i = 0; i < lst.Length; i ++)
-	  foreach (Pango.FontFamily family in lst)
+	  foreach (Pango.FontFamily family in PangoHelper.ContextGet().Families)
 	    {
 	      foreach (Pango.FontFace face in family.Faces)
 		{
@@ -1756,6 +1753,37 @@ public static class Processing
 				if (_immediateMode) _p.redraw ();
 			} catch (System.NullReferenceException e){
 				debug(String.Format ("text() ignored extra tick: {0}", e.ToString()), 1);
+			}
+		} );
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab("P/Text")]
+	public static void markup(object obj, double x = 0.0, double y = 100.0, double w= 100.0, double h = 20.0) 
+	{	// Draw text
+		if (_p == null) return;
+		string txt = obj.ToString ();
+		_invoke ( delegate { 
+			try {
+				_p.markup(txt, x, y, w, h);
+				if (_immediateMode) _p.redraw ();
+			} catch (System.NullReferenceException e){
+				debug(String.Format ("markup() ignored extra tick: {0}", e.ToString()), 1);
+			}
+		} );
+	}
+
+	[JigsawTab("P/Text")]
+	public static void markup(object obj, double x = 0.0, double y = 100.0) 
+	{	// Draw text
+		if (_p == null) return;
+		string txt = obj.ToString ();
+		_invoke ( delegate { 
+			try {
+				_p.markup(txt, x, y);
+				if (_immediateMode) _p.redraw ();
+			} catch (System.NullReferenceException e){
+				debug(String.Format ("markup() ignored extra tick: {0}", e.ToString()), 1);
 			}
 		} );
 	}
