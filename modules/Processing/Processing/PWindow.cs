@@ -203,6 +203,16 @@ internal class PWindow : Gtk.Window
 		_height = h;
 	}
 
+        public double displayWidth()
+        {
+   	  return Screen.Width;
+	}
+
+        public double displayHeight()
+        {
+   	  return Screen.Height;
+	}
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public double map(double n = 0.0, double min1 = 0.0, double max1 = 1.0, double min2 = 0.0, double max2 = 1.0) 
 	{	// Map a number from one range to another

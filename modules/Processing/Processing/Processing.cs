@@ -304,6 +304,8 @@ public static class Processing
 		_keyCode = 0;
 		_immediateMode = true;
 		_millis = DateTime.Now.Ticks * 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
+
+		frameRate(60);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -931,6 +933,35 @@ public static class Processing
 		return _height;
 	}
 
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab("P/Environ")]
+	public static double displayWidth() 
+	{	// Get the width of the screen
+	  return _p.Screen.Width;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab("P/Environ")]
+	public static void fullscreen()
+        {
+	  _invoke ( delegate { if (_p != null) _p.Fullscreen();});
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab("P/Environ")]
+	public static void unfullscreen()
+        {
+	  _invoke ( delegate { if (_p != null) _p.Unfullscreen();});
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab("P/Environ")]
+	public static double displayHeight() 
+	{	// Get the width of the screen
+	  return _p.Screen.Height;
+	}
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab("P/Environ")]
 	public static void immediateMode( bool value = true )
@@ -1053,7 +1084,11 @@ public static class Processing
 	[JigsawTab(null)]
 	public static void noLoop()
 	{
-		if (_tmr != null) _tmr.Stop ();
+		if (_tmr != null)
+		  {
+		    _tmr.Stop ();
+		    unfullscreen();
+		  }
 	}
 	[JigsawTab("P/Environ")]
 	public static void stopLoop() { noLoop (); }
