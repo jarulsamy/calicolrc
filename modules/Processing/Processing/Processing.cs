@@ -90,7 +90,7 @@ public static class Processing
 	private static long _millis;								// The number of milliseconds when the window was created
 	private static bool _immediateMode = true;					// True if all drawing commands trigger a queue draw
 
-        public static Pixels pixels = new Pixels();
+        public readonly static Pixels pixels = new Pixels();
 
 
 	[method: JigsawTab(null)]
@@ -1807,6 +1807,13 @@ public static class Processing
         public class Pixels
 	{
       
+	  public int length
+	  {
+	    get
+	      {
+		return _width * _height;
+	      }	    
+	  }
 	  public uint this[int i]
 	  {
             get

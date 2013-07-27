@@ -29,9 +29,6 @@ def draw(o, e):
         msg[idx] = choice(choices)
     text("".join(msg), 0, 0, width(), height())
 
-    if (isMousePressed()):
-        v = int(random(len(pixels)))
-        pixels[v] = red(255)
 
 onLoop += draw
 loop()
