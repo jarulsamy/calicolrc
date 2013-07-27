@@ -38,12 +38,12 @@ def neighbors(x, y):
     world[(x + 1) % sx][(y + sy - 1) % sy][0]
 
 
-def addCells(o, e):
+def addCells():
     world[int(mouseX() / sz)][int(mouseY() / sz)][0] = 1
 
 onMouseDragged += addCells
 
-def handleKeys(o, e):
+def handleKeys():
     global paused, world
     if (key == 'c'):
         world = [[[0 for z in range(2)] for y in range(sy)] for x in range(sx)]
@@ -52,7 +52,7 @@ def handleKeys(o, e):
 
 onKeyPressed += handleKeys
 
-def step(o, e):
+def step():
     global paused
     background(0)
 

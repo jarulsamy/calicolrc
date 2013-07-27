@@ -4,7 +4,7 @@ size(640, 360)
 
 yoff = 0.0        ## 2nd dimension of perlin noise
 
-def draw(o, e):
+def draw():
   global yoff
   background(51)
 

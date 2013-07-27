@@ -2,13 +2,13 @@
 from Processing import *
 import math
 
-size(500, 300)
+window(500, 300)
 background(255)
 
 # Orbit angle state variable
 angle = 0
 
-def draw(o, e):
+def draw():
     global angle
     background(255)
     fill(0, 0, 255)
@@ -19,6 +19,6 @@ def draw(o, e):
     ellipse(mouseX() - dX, mouseY() - dY, 5, 5)
     redraw()
 
-frameRate(1)
+frameRate(10)
 onLoop += draw
 loop()

@@ -12,7 +12,7 @@ img = loadImage("natura-morta.jpg")
 image(img, 50, 40)
 
 # Handle mouse pressed events
-def doMousePressed(o, e):
+def doMousePressed():
     global img
 
     # Define the fade factor

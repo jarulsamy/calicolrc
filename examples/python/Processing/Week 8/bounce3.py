@@ -30,7 +30,7 @@ for i in range(nBalls):
     vy.append( random(0.0, 5.0) )
 
 # Redraw all balls
-def draw(o, e):
+def draw():
     global w, h, ay, sx, sy, vx, vy
     background(255)
 

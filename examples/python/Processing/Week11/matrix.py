@@ -11,7 +11,7 @@ textSize(28)
 frameRate(60)
 stroke(0, 255, 22)
 
-def keyPressed(o, e):
+def keyPressed():
     if (key() == key().space):
         stroke(random(255), random(255), random(255))
 

@@ -23,7 +23,7 @@ sy2 = random(0.0, 10.0)     # y position
 vx2 = random(-3.0, 3.0)     # x velocity
 vy2 = random(0.0, 5.0)      # y velocity
 
-def draw(o, e):
+def draw():
     global w, h, ay, sx, sy, vx, vy, sx2, sy2, vx2, vy2
     background(255)
 

@@ -113,14 +113,14 @@ def addParticleStart(o, e):
 
 onMousePressed += addParticleStart
 
-def addParticleEnd(o, e):
+def addParticleEnd():
     global ps, vs, sx, sy
     ps.append(Vector(mouseX(), mouseY()))
     vs.append(Vector(mouseX()- sx, mouseY()- sy))
 
 onMouseReleased += addParticleEnd
 
-def setGoal(o, e):
+def setGoal():
     global vs, ps
     for i in range(len(ps)):
         vs[i].x = .01*(mouseX() - ps[i].x)
@@ -128,7 +128,7 @@ def setGoal(o, e):
 
 onMouseMoved += setGoal
 
-def draw(o, e):
+def draw():
     global ps, vs
     #fill(128, 128)
     #rect(0, 0, width()+1, height()+1)

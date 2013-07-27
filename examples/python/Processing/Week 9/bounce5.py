@@ -57,7 +57,7 @@ for i in range(nBalls):
     balls.append( ball )
 
 # Function that updates and draws balls
-def draw(o, e):
+def draw():
     background(255)
 
     # Update and redraw all Ball instances

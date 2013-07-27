@@ -18,7 +18,7 @@ window(500, 500)
 smooth()
 frameRate(50)
 
-def doLoop(o, e) :
+def doLoop() :
     global walkPose, speed, cX, cY
     background(255)
     fill(200)
@@ -39,18 +39,18 @@ def doLoop(o, e) :
         line(cX, cY+20, cX-5, cY+30)        # legs at pose 2
         line(cX, cY+20, cX+5, cY+30)
 
-def doKeyPressed(o, e):
+def doKeyPressed():
     global walkPose, speed, cX, cY
-    if keyCode() == 65362:
+    if key() == "Up":
         walkPose = not walkPose
         cY -= speed
-    elif keyCode() == 65364:
+    elif key() == "Down":
         walkPose = not walkPose
         cY += speed
-    elif keyCode() == 65361:
+    elif key() == "Left":
         walkPose = not walkPose
         cX -= speed
-    elif keyCode() == 65363:
+    elif key() == "Right":
         walkPose = not walkPose
         cX += speed
 

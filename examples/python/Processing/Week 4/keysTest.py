@@ -10,11 +10,9 @@ window(500, 500)
 ##         delay(100)
 
 # Test keys detection using internal timer
-def testKey(o, e):
+def testKey():
     if isKeyPressed():
-        print( o )
         print( "key() is ", key() )
-        print( "keyCode() is ", keyCode() )
 frameRate(100)
 onLoop += testKey
 loop()

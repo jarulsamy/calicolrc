@@ -5,7 +5,7 @@ import math
 
 window(700, 400)
 textSize(24)
-textAlign(LEFT, BOTTOM)
+textAlign(LEFT)
 
 # Redraw the sine function
 def drawSlope():
@@ -38,7 +38,7 @@ def drawSlope():
 x = 0.0
 
 # Define the function that will get called repeatedly
-def draw(o, e):
+def draw():
     global x
 
     # First clear the screen and draw the empty ski slope

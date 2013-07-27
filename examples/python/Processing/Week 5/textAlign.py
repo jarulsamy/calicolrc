@@ -5,13 +5,13 @@ textSize(12)
 noFill()
 rect(50, 50, 400, 400)
 
-textAlign(LEFT)
+textAlign(LEFT, TOP)
 text("Upper left", 50, 50, 400, 400)
 
-textAlign(CENTER)
+textAlign(CENTER, TOP)
 text("In the middle", 50, 50, 400, 400)
 
-textAlign(RIGHT)
+textAlign(RIGHT, TOP)
 text("Upper right", 50, 50, 400, 400)
 
 textAlign(LEFT, CENTER)

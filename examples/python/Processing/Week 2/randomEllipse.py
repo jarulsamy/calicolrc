@@ -4,7 +4,7 @@ window(300, 300)
 smooth()
 frameRate(1)
 
-def draw(o, e):
+def draw():
     fill(random(255), random(255), random(255))
     ellipse(mouseX(), mouseY(), 30, 30)
 

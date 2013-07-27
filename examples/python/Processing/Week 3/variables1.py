@@ -6,7 +6,7 @@ window(500, 300)
 lastX = 0
 lastY = 0
 
-def mousePressed(o, e):
+def mousePressed():
     global lastX, lastY
     line(lastX, lastY, mouseX(), mouseY())
     lastX = mouseX()

@@ -18,7 +18,7 @@ fill(255, 0, 0)
 smooth()
 ellipseMode(CENTER)
 
-def draw(o, e):
+def draw():
     global sx, sy, vx, vy, ay
 
     # Equations of Motion
