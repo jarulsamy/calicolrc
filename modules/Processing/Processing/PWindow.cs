@@ -828,25 +828,33 @@ internal class PWindow : Gtk.Window
 
 			switch (_textAlignX) {
 			case TextAlign.LEFT:
+			       if (_rectMode == RectMode.CENTER) x = x - tw ;
 			        layout.Alignment = Pango.Alignment.Left;
 				break;
 			case TextAlign.CENTER:
  			        layout.Alignment = Pango.Alignment.Center;
-			        x = x - 0.5*tw;
+				if (w == -1 || _rectMode == RectMode.CENTER) x = x - 0.5*tw ;
 				break;
 			case TextAlign.RIGHT:
  			        layout.Alignment = Pango.Alignment.Right;
- 			        x = x - tw;
+				if (w == -1 || _rectMode == RectMode.CENTER) x = x - 0.5*tw + 0.5*h;
 				break;
 			}
 
+			
 			switch (_textAlignY) {
+			case TextYAlign.TOP:
+			  if (_rectMode == RectMode.CENTER) y = y - th ;
+			  break;
 			case TextYAlign.CENTER:
-			        y = y - 0.5*th;
-				break;
-			case TextYAlign.BOTTOM:
- 			        y = y - th;
-				break; 
+			  if (_rectMode == RectMode.CENTER) y = y - 0.5*th ;
+			  else y = y - 0.5*th + 0.5*h;
+			  break;
+			case TextYAlign.BASELINE:
+			case TextYAlign.BOTTOM:			        
+			  if (_rectMode == RectMode.CENTER) y = y - 0.5*th + 0.5*h ;
+			  else y = y - th + h;
+			  break; 
 			}
 
 			g.Translate (x, y);

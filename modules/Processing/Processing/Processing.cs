@@ -85,14 +85,13 @@ public static class Processing
 	private static bool _mousePressed = false;					// True if the mouse was just pressed
 	private static uint _mouseButton = 0;						// 1 for left, 2 for center, 3 for right
 	private static bool _keyPressed = false;
-	private static Gdk.Key _key;
-	private static uint _keyCode = 0;
+	private static string _key;
 	private static long _millis;								// The number of milliseconds when the window was created
 	private static bool _immediateMode = true;					// True if all drawing commands trigger a queue draw
 
         public readonly static Pixels pixels = new Pixels();
 
-
+  /*
 	[method: JigsawTab(null)]
 	public static event ButtonReleaseEventHandler onMouseClicked;	// Mouse events
 	[method: JigsawTab(null)]
@@ -109,8 +108,29 @@ public static class Processing
 	public static event KeyReleaseEventHandler onKeyReleased;
 	[method: JigsawTab(null)]
 	public static event EventHandler<PElapsedEventArgs> onLoop;
+	*/
 
-	private delegate void VoidDelegate ();						// A delegate that takes no args and returns nothing
+
+  
+	[method: JigsawTab(null)]
+	public static event VoidDelegate onMouseClicked;	// Mouse events
+	[method: JigsawTab(null)]
+	public static event VoidDelegate onMousePressed;
+	[method: JigsawTab(null)]
+	public static event VoidDelegate onMouseReleased;
+	[method: JigsawTab(null)]
+	public static event VoidDelegate onMouseMoved;
+	[method: JigsawTab(null)]
+	public static event VoidDelegate onMouseDragged;
+	[method: JigsawTab(null)]
+	public static event VoidDelegate onKeyPressed;		// Key events
+	[method: JigsawTab(null)]
+	public static event VoidDelegate onKeyReleased;
+	[method: JigsawTab(null)]
+	public static event VoidDelegate onLoop;
+
+
+	public delegate void VoidDelegate ();						// A delegate that takes no args and returns nothing
 	private delegate double DoubleDelegate ();					// A delegate that takes no args and returns a double
 	private delegate PImage PImageDelegate ();
 	public static int _debugLevel = 2;							// 0: verbose, 1: informational, 2: unhandled exceptions
@@ -304,8 +324,7 @@ public static class Processing
 		_mousePressed = false;
 		_mouseButton = 0;
 		_keyPressed = false;
-		_key = (Gdk.Key)0;
-		_keyCode = 0;
+		_key = ""; //(Gdk.Key)0;
 		_immediateMode = true;
 		_millis = DateTime.Now.Ticks * 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
 
@@ -368,8 +387,7 @@ public static class Processing
 		_mousePressed = false;
 		_mouseButton = 0;
 		_keyPressed = false;
-		_key = (Gdk.Key)0;
-		_keyCode = 0;
+		_key = ""; //(Gdk.Key)0;
 		_immediateMode = true;
 		_millis = DateTime.Now.Ticks * 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
 	}
@@ -522,34 +540,31 @@ public static class Processing
 	private static void _onKeyPressEvent(object o, KeyPressEventArgs args)
 	{
 		_keyPressed = true;
-		_key = args.Event.Key;
-		_keyCode = args.Event.KeyValue;
+		_key = args.Event.Key.ToString();
 		raiseKeyPressed(args);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void _onKeyReleaseEvent(object o, KeyReleaseEventArgs args)
 	{
-		if (_key == Gdk.Key.Escape)
+	  if (_key == "Escape") //Gdk.Key.Escape)
 		  {
 		    noLoop();
 		    exit();
 		  }
 		_keyPressed = false;
 		raiseKeyReleased(args);
-		_key = (Gdk.Key)0;
-		_keyCode = 0;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void raiseTimerElapsed(object o, PElapsedEventArgs a)
 	{
-        EventHandler<PElapsedEventArgs> handler = onLoop;
+        VoidDelegate handler = onLoop;
 
         if (handler != null)
         {
 	    try {
-		handler(o, a);
+		handler();
 	    } catch (Exception e) {
 		Console.Error.WriteLine("Error in onLoop: " + e.Message);
 		Console.Error.WriteLine("loop is now stopping.");
@@ -561,13 +576,13 @@ public static class Processing
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void raiseMouseMoved(MotionNotifyEventArgs e)
     {
-        MotionNotifyEventHandler handler = onMouseMoved;
+        VoidDelegate handler = onMouseMoved;
 
         // Event will be null if there are no subscribers
         if (handler != null)
         {	// Use the () operator to raise the event.
 	    try {
-		handler(null, e);
+		handler();
 	    } catch (Exception exc) {
 		Console.Error.WriteLine("Error in onMouseMoved: " + exc.Message);
 	    }
@@ -577,13 +592,13 @@ public static class Processing
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void raiseMouseDragged(MotionNotifyEventArgs e)
     {
-		MotionNotifyEventHandler handler = onMouseDragged;
+        VoidDelegate handler = onMouseDragged;
 
         // Event will be null if there are no subscribers
         if (handler != null)
         {	// Use the () operator to raise the event.
 	    try {
-		handler(null, e);
+		handler();
 	    } catch (Exception exc) {
 		Console.Error.WriteLine("Error in onMouseDragged: " + exc.Message);
 	    }
@@ -593,13 +608,13 @@ public static class Processing
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void raiseMousePressed(ButtonPressEventArgs e)
     {
-        ButtonPressEventHandler handler = onMousePressed;
+        VoidDelegate handler = onMousePressed;
 
         // Event will be null if there are no subscribers
         if (handler != null)
         {	// Use the () operator to raise the event.
 	    try {
-		handler(null, e);
+		handler();
 	    } catch (Exception exc) {
 		Console.Error.WriteLine("Error in onMousePressed: " + exc.Message);
 	    }
@@ -609,13 +624,13 @@ public static class Processing
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void raiseMouseClicked(ButtonReleaseEventArgs e)
 	{
-		ButtonReleaseEventHandler handler = onMouseClicked;
+		VoidDelegate handler = onMouseClicked;
 		
 		// Event will be null if there are no subscribers
 		if (handler != null)
 		{
 		    try {
-			handler(null, e);
+			handler();
 		    } catch (Exception exc) {
 			Console.Error.WriteLine("Error in onMouseClicked: " + exc.Message);
 		    }
@@ -625,13 +640,13 @@ public static class Processing
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void raiseMouseReleased(ButtonReleaseEventArgs e)
     {
-        ButtonReleaseEventHandler handler = onMouseReleased;
+        VoidDelegate handler = onMouseReleased;
 
         // Event will be null if there are no subscribers
         if (handler != null)
         {	// Use the () operator to raise the event.
 	    try {
-		handler(null, e);
+		handler();
 	    } catch (Exception exc) {
 		Console.Error.WriteLine("Error in onMouseReleased: " + exc.Message);
 	    }
@@ -641,11 +656,11 @@ public static class Processing
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void raiseKeyPressed(KeyPressEventArgs e)
     {
-        KeyPressEventHandler handler = onKeyPressed;
+       VoidDelegate handler = onKeyPressed;
         if (handler != null)
         {
 	    try {
-		handler(null, e);
+		handler();
 	    } catch (Exception exc) {
 		Console.Error.WriteLine("Error in onKeyPressed: " + exc.Message);
 	    }
@@ -654,12 +669,12 @@ public static class Processing
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	private static void raiseKeyReleased(KeyReleaseEventArgs e)
-    {
-        KeyReleaseEventHandler handler = onKeyReleased;
+    { 
+        VoidDelegate handler = onKeyReleased;
         if (handler != null)
         {
 	    try {
-		handler(null, e);
+		handler();
 	    } catch (Exception exc) {
 		Console.Error.WriteLine("Error in onKeyReleased: " + exc.Message);
 	    }
@@ -896,16 +911,16 @@ public static class Processing
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab("P/Input")]
-	public static Gdk.Key key()
+	public static string key()
 	{	// Return key pressed
 		return _key;
 	}
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab("P/Input")]
-	public static uint keyCode()
-	{	// Return integer code of key pressed
-		return _keyCode;
+	public static string keyCode()
+	{	// Return code of key pressed
+		return _key;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1051,7 +1066,7 @@ public static class Processing
 		_invoke ( delegate { _p.textAlign (_textAlignInt[align]); } );
 	}
 	[JigsawTab("P/Text")]
-	public static void textAlign( string align = "LEFT", string yalign = "TOP" )
+	public static void textAlign( string align = "LEFT", string yalign = "BASELINE" )
 	{
 		_invoke ( delegate { _p.textAlign (_textAlignStr[align], _textYAlignStr[yalign]); } );
 	}
@@ -1728,7 +1743,7 @@ public static class Processing
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab("P/Text")]
-	public static void text(object obj, double x = 0.0, double y = 100.0, double w= 100.0, double h = 20.0) 
+	public static void text(object obj, double x = 0.0, double y = 100.0, double w= -1, double h = -1) 
 	{	// Draw text
 		if (_p == null) return;
 		string txt = obj.ToString ();
