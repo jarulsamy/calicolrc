@@ -328,7 +328,7 @@ public static class Processing
 		_immediateMode = true;
 		_millis = DateTime.Now.Ticks * 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
 
-		frameRate(60);
+		frameRate(30);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
