@@ -54,6 +54,28 @@ def save(path, list):
         walk_right = splitRow("bear_child.png", 0, 0, 60, 80, 14)
         count += 1
 
+def animate(list):
+    win = Window(800, list[0].height + 20)
+    win.setBackground(Color(0,128,248))
+    x, y = 0, 10
+    count = 0
+    previous = None
+    while True:
+        pic = list[count] ##walk_right[count]
+        ##pic = Picture("bear/walk-right/%d.gif" % count)
+        pic.moveTo(x - pic.width/2, y + pic.height/2)
+        pic.draw(win)
+        if previous:
+            previous.undraw()
+        previous = pic
+        wait(.05)
+        x += pic.width/16
+        count += 1
+        if count % len(list) == 0:
+            count = 0
+        if x > 800:
+            x = 0
+
 ## Now, let's use the above in a specific way:
 
 def main():
@@ -61,10 +83,19 @@ def main():
     walk_left = list(reversed(splitRow("bear_child.png", 0, 80, 60, 80, 14)))
     walk_right_with_spear = splitRow("bear_child.png", 0, 160, 104, 80, 14)
     walk_left_with_spear = list(reversed(splitRow("bear_child.png", 0, 240, 104, 80, 14)))
-    
+
+    woman_right = splitRow("walking-woman.gif", 0, 0, 200, 400, 10)
+    woman_right.extend(splitRow("walking-woman.gif", 0, 400, 200, 400, 10))
+    walking = Myro.loadPictures("walkside.gif")
+    new_walking = []
+    for p in walking:
+        new_walking.append(p.getRegion((20, 9), 128 - 20, 188 - 9))
+
     save("bear/walk-right", walk_right)
     save("bear/walk-left", walk_left)
     save("bear-with-spear/walk-right", walk_right_with_spear)
     save("bear-with-spear/walk-left", walk_left_with_spear)
+    save("stickman/walk-right", new_walking)
+    save("woman/walk-right", woman_right)
 
 main()
