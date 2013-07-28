@@ -6,4 +6,4 @@ for i in range(10000):
     x = random(500)
     y = random(500)
     point(x, y)
-    delay(1)        # Magic
+    #delay(1)        # Magic
