@@ -182,11 +182,13 @@ namespace Calico {
             // Build the GUI:
             Build();
             this.KeepAbove = true;
-
-            Gtk.Application.Invoke(delegate {
+            
+            /*Gtk.Application.Invoke(delegate {
                 gui_thread_id = Thread.CurrentThread.ManagedThreadId;
             }
-            );
+            );*/
+
+            gui_thread_id = Thread.CurrentThread.ManagedThreadId;
             PostBuild();
             foreach (Gtk.TextTag tag in tags.Values) {
                 Output.Buffer.TagTable.Add(tag);

@@ -1,0 +1,8 @@
+/Users/keithohara/calico/Source/Calico/obj/x86/Debug/Calico.gtk-gui.gui.stetic
+/Users/keithohara/calico/Source/Calico/obj/x86/Debug/Calico.abstract-butterfly-icon.gif
+/Users/keithohara/calico/Source/Calico/obj/x86/Debug/Calico.icon-1.png
+/Users/keithohara/calico/Source/Calico/obj/x86/Debug/Calico.icon-2.png
+/Users/keithohara/calico/bin/Calico.exe.mdb
+/Users/keithohara/calico/bin/Calico.exe
+/Users/keithohara/calico/Source/Calico/obj/x86/Debug/Calico.exe
+/Users/keithohara/calico/Source/Calico/obj/x86/Debug/Calico.exe.mdb
