@@ -117,4 +117,5 @@ def main():
     save("stickman/walk-right", new_walking)
     save("woman/walk-right", woman_right)
 
-main()
+if __name__ == "__main__":
+    main()
