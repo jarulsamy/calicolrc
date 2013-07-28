@@ -851,8 +851,15 @@ internal class PWindow : Gtk.Window
 			  else y = y - 0.5*th + 0.5*h;
 			  break;
 			case TextYAlign.BASELINE:
-			  if (_rectMode == RectMode.CENTER) y = y - 0.5*th;
-			  else y = y - th;
+			  if (h == -1)
+			    {
+			      if (_rectMode == RectMode.CENTER) y = y - 0.5*th;
+			      else y = y - th;
+			    }	
+			  else
+			    { // with width & height act like TOP			      
+			      if (_rectMode == RectMode.CENTER) y = y - th ;
+			    }
 			  break;
 			case TextYAlign.BOTTOM:			        
 			  if (_rectMode == RectMode.CENTER) y = y - 0.5*th + 0.5*h ;
