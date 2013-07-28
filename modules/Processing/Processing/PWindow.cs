@@ -380,9 +380,11 @@ internal class PWindow : Gtk.Window
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public IList<string> listFonts()
+        public System.Collections.IList listFonts()
         { 
-	  var l = new List<string>();
+	  System.Collections.IList l = new IronPython.Runtime.List();
+	  //System.Collections.IList l = new System.Collections.ArrayList();
+
 	  foreach (Pango.FontFamily family in Gdk.PangoHelper.ContextGet().Families)
 	    {
 	      foreach (Pango.FontFace face in family.Faces)

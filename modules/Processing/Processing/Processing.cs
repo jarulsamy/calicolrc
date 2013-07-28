@@ -132,7 +132,7 @@ public static class Processing
 	public delegate void VoidDelegate ();						// A delegate that takes no args and returns nothing
 	private delegate double DoubleDelegate ();					// A delegate that takes no args and returns a double
 	private delegate PImage PImageDelegate ();
-        private delegate IList<string> IListDelegate();
+        private delegate System.Collections.IList IListDelegate();
 	public static int _debugLevel = 2;							// 0: verbose, 1: informational, 2: unhandled exceptions
 
 	// Constants
@@ -479,7 +479,7 @@ public static class Processing
 	private static void _invokeIList( IListDelegate fxn ) 
 	{	// Invoke a delegate that returns a list of strings on thread if necessary
 
-	        IList<string> val;
+	        System.Collections.IList val =null;
 		if (Thread.CurrentThread.ManagedThreadId != _guiThreadId)
 		{
 			Application.Invoke ( delegate{ val = fxn(); } );
@@ -1683,9 +1683,10 @@ public static class Processing
 	}
 
   	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public static IList<string> listFonts()
+        public static object listFonts()
         { 
-		IList<string> l = new List<string>();
+	  System.Collections.IList l = new IronPython.Runtime.List();
+	  //System.Collections.IList l = new System.Collections.ArrayList();
 		if (_p == null) return l;
 		ManualResetEvent ev = new ManualResetEvent(false);
 
