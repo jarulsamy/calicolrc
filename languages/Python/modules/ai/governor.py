@@ -434,7 +434,7 @@ class GovernorSRN(Governor, SRN):
         self.ravq.setAddModels(value)
         self.learning = value
 
-if __name__ == '<module>':
+if __name__ == '__name__':
     import os, gzip, sys
     if len(sys.argv) != 4:
         print("call with: python govenor.py governing resetEpoch decay")

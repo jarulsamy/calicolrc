@@ -208,10 +208,10 @@ class GrowingNeuralGas:
         best = dists[0][1]
         second = dists[1][1]
         if self.verbose > 1:
-            print "Processing:", point
-            print "Closest:", self.units[best].vectorStr()
-            print "Second:", self.units[second].vectorStr()
-            print
+            print("Processing:", point)
+            print("Closest:", self.units[best].vectorStr())
+            print("Second:", self.units[second].vectorStr())
+            print()
         return self.units[best], self.units[second]
 
     def incrementEdgeAges(self, unit):
@@ -229,7 +229,7 @@ class GrowingNeuralGas:
         Adds the appropriate edges to connect units a and b.
         """
         if self.verbose >= 1:
-            print "Add edge:", a.vectorStr(), b.vectorStr()
+            print("Add edge:", a.vectorStr(), b.vectorStr())
         a.edges.append(Edge(b))
         b.edges.append(Edge(a))
 
@@ -238,7 +238,7 @@ class GrowingNeuralGas:
         Removes the appropriate edges to disconnect units a and b.
         """
         if self.verbose >= 1:
-            print "Remove edge:", a.vectorStr(), b.vectorStr()
+            print("Remove edge:", a.vectorStr(), b.vectorStr())
         a.edges.remove(a.getEdgeTo(b))
         b.edges.remove(b.getEdgeTo(a))
 
@@ -254,8 +254,8 @@ class GrowingNeuralGas:
                 if unit.edges[i].age > self.maxAge:
                     if self.verbose >= 1:
                         adjacent = unit.edges[i].toUnit
-                        print "Removing stale edge: %s %s" % \
-                              (unit.vectorStr(), adjacent.vectorStr())
+                        print("Removing stale edge: %s %s" % \
+                              (unit.vectorStr(), adjacent.vectorStr()))
                     unit.edges.pop(i)
                 i -= 1
                     
@@ -263,7 +263,7 @@ class GrowingNeuralGas:
         while i>=0:
             if len(self.units[i].edges) == 0:
                 if self.verbose >= 1:
-                    print "Removing disconnected unit:", unit.vectorStr()
+                    print("Removing disconnected unit:", unit.vectorStr())
                 self.units.pop(i)
             i -= 1
 
@@ -294,14 +294,14 @@ class GrowingNeuralGas:
         """
         worst = self.maxErrorUnit(self.units)
         if self.verbose > 1:
-            print "Max error", worst.__str__()
+            print("Max error", worst.__str__())
         worstNeighbor = self.maxErrorUnit(worst.getNeighbors())
         newVector = []
         for i in range(len(worst.vector)):
             newVector.append(0.5 * (worst.vector[i] + worstNeighbor.vector[i]))
         newUnit = Unit(newVector)
         if self.verbose > 0:
-            print "Insert unit:", newUnit.vectorStr()
+            print("Insert unit:", newUnit.vectorStr())
         self.units.append(newUnit)
         self.connectUnits(newUnit, worst)
         self.connectUnits(newUnit, worstNeighbor)
@@ -356,7 +356,7 @@ def main():
     for i in range(15000):
         gng.step()
         if gng.stepCount % 1000==0:
-            print gng
+            print(gng)
     
 if __name__ == '__main__':
     main()

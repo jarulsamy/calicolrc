@@ -4865,8 +4865,8 @@ def main():
     # http://emergent.brynmawr.edu/
 
     def ask(question):
-        print(question, '[y/n/q] ', end=" ")
-        ans = sys.stdin.readline()[0].lower()
+        ans = input(question + ' [y/n/q]')
+        #ans = sys.stdin.readline()[0].lower()
         if ans == 'q':
             sys.exit()
         return ans == 'y'
@@ -5798,5 +5798,5 @@ def main():
         except Exception, err:
             print("Good!", err)
 
-#if __name__ == '<module>':
-#    main()
+if __name__ == '__main__':
+    main()

@@ -6,8 +6,8 @@ Extension of GA (pyrobot/brain/ga.py)
 __author__ = "Douglas Blank <dblank@brynmawr.edu>"
 __version__ = "$Revision$"
 
-from pyrobot.brain.ga import *
-import pyrobot.system.share as share
+from ga import *
+##import pyrobot.system.share as share
 from math import pi
 import operator, sys, types
 
@@ -185,28 +185,28 @@ class GPTree:
         else:
             return (reduce(operator.add, self.internals, 1),
                     reduce(operator.add, self.externals, 0))
-    def eval(self, env = None):
-        if env == None:
-            env = share.env
-        if self.op not in env.operators().keys():
-            if self.op in env.env:
-                retval = env.env[self.op]
+    def eval(self, myenv = None):
+        if myenv is None:
+            myenv = env
+        if self.op not in myenv.operators().keys():
+            if self.op in myenv.env:
+                retval = myenv.env[self.op]
             elif ALLOW_SELF_EVAL:
                 retval = self.op
             else:
                 raise AttributeError, ("'%s' is not in env, and ALLOW_SELF_EVAL = 0" % self.op)
 
         else:
-            if self.op in env.lazyOps().keys():
-                op = env.lazyOps()[self.op].func
-                retval = apply(op, (self.children, env))
-            elif self.op in env.regularOps().keys():
-                op = env.env[self.op].func
-                results = map(lambda x: x.eval(env), self.children)
+            if self.op in myenv.lazyOps().keys():
+                op = myenv.lazyOps()[self.op].func
+                retval = apply(op, (self.children, myenv))
+            elif self.op in myenv.regularOps().keys():
+                op = myenv.env[self.op].func
+                results = map(lambda x: x.eval(myenv), self.children)
                 retval = apply(op, results)
             else:
                 # just a terminal? Error?
-                retval = env.env[self.op]
+                retval = myenv.env[self.op]
         return retval
 
 class GPGene(Gene):
@@ -219,28 +219,29 @@ class GPGene(Gene):
             self.bias = args['bias']
         # higher the bias, more likely to be shallow
         if (random.random() < self.bias):
-            terminals = share.env.terminals().keys()
+            terminals = env.terminals().keys()
             if len(terminals) == 0:
                 raise AttributeError, "no terminals given in environment or eval()"
             term = terminals[ int(random.random() * len(terminals))]
             self.genotype = GPTree(term)
         else:
-            operators = share.env.operators().keys()
+            operators = env.operators().keys()
             if len(operators) == 0:
                 raise AttributeError, "no operators in environment"
-            pos = int(random.random() * len(operators)) 
+            pos = int(random.random() * len(operators))
             treeArgs = [operators[ pos ], ]
-            for i in range( share.env.env[operators[pos]].operands ):
+            for i in range( env.env[operators[pos]].operands ):
                 treeArgs.append( GPGene(**args).genotype )
             self.genotype = GPTree( *treeArgs )
     def __str__(self):
         return str(self.genotype)
     def display(self):
-        print self.genotype
+        print(self.genotype)
     def eval(self, additionalEnv = {}):
         """ Takes a dictionary """
-        share.env.update(additionalEnv)
-        return self.genotype.eval(share.env) # takes an Environment
+        env.update(additionalEnv)
+        return self.genotype.eval(env) # takes an Environment
+        pass
     def mutate(self, mutationRate):
         """
         Changes points based on mutationRate.
@@ -294,7 +295,7 @@ def wrapObj(current_symbol, objType = GPTree):
     """ A wrapper for parse. Should have been recursive... """
     retval = current_symbol
     if not isinstance(current_symbol, objType):
-        if current_symbol in share.env.env:
+        if current_symbol in env.env:
             retval = objType(current_symbol)
         elif type(current_symbol) == type(""): # self-evaluating number?
             if not ALLOW_SELF_EVAL:
@@ -332,7 +333,7 @@ def parse(exp, objType = GPTree):
     return wrapObj(current_symbol)
 
 # A standard environment dictionary:
-env = {'+'  : Operator(operator.add), # defaults to operands=2
+e = {'+'  : Operator(operator.add), # defaults to operands=2
        '-'  : Operator(operator.sub),
        '*'  : Operator(operator.mul),
        '/'  : Operator(div_func),
@@ -345,10 +346,10 @@ env = {'+'  : Operator(operator.add), # defaults to operands=2
        }
 
 # The standard environment:
-share.env = Environment(env)
+env = Environment(e)
 
 if __name__ == '__main__':
-    share.env.update( {'i1':0, 'i2':0} )
+    env.update( {'i1':0, 'i2':0} )
     outputs = [ 0, 1, 1, 0 ] # outputs for XOR
     inputs = [ {'i1' : 0, 'i2' : 0},
                {'i1' : 0, 'i2' : 1},
@@ -373,14 +374,14 @@ if __name__ == '__main__':
         def isDone(self):
             fit = self.pop.bestMember.fitness
             self.pop.bestMember.display()
-            print 
+            print()
             return fit == 4
     
     gp = GP(50)
     gp.evolve()
-    print " -----------------------------------------------------------------"
+    print(" -----------------------------------------------------------------")
     for ins in inputs:
-        print ins, gp.pop.bestMember.eval(ins)
+        print(ins, gp.pop.bestMember.eval(ins))
     raw_input("Press enter to continue...")
     class PI_GP(GA):
         def __init__(self, cnt, **args):
@@ -392,14 +393,14 @@ if __name__ == '__main__':
             diff = abs(self.pop.individuals[pos].eval() - pi)
             if pr:
                 self.pop.individuals[pos].display()
-                print
+                print()
             return max(pi - diff, 0) 
                 
         def isDone(self):
             return abs(self.fitnessFunction(0, 1) - pi) < .001
-    share.env.update( {'+1': Operator(lambda obj: obj + 1, 1, "regular"),
+    env.update( {'+1': Operator(lambda obj: obj + 1, 1, "regular"),
                        '1/2': .5,
                        'e': math.e } )
     gp = PI_GP(100)
     gp.evolve()
-    print " -----------------------------------------------------------------"
+    print(" -----------------------------------------------------------------")

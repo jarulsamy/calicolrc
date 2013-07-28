@@ -1,3 +1,4 @@
+from __future__ import print_function
 """
 A simple Genetic Algorithm in Python
 """
@@ -510,7 +511,7 @@ class GA:
                 if mutate:
                     self.pop.individuals[i].mutate(self.mutationRate)
 
-if __name__ in ['__main__', '<module>']:
+if __name__ == '__main__':
     # Here is a test to evolve a list of integers to maximize their sum:
 
     class MaxSumGA(GA):
