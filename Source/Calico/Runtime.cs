@@ -45,9 +45,7 @@ namespace Calico {
             manager.SetCalico(this);
             CurrentLanguage = "python";
 
-            Gtk.Application.Invoke(delegate {
-                gui_thread_id = Thread.CurrentThread.ManagedThreadId;
-            });
+            gui_thread_id = Thread.CurrentThread.ManagedThreadId;
 
             path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
             if (path.StartsWith("\\")) {
