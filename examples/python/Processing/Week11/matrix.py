@@ -8,11 +8,11 @@ smooth()
 noFill()
 textFont("Courier")
 textSize(28)
-frameRate(60)
+frameRate(20)
 stroke(0, 255, 22)
 
 def keyPressed():
-    if (key() == key().space):
+    if (key() == " "):
         stroke(random(255), random(255), random(255))
 
 onKeyPressed += keyPressed
@@ -22,12 +22,12 @@ msg = []
 for i in range(2**11):
     msg = msg + [choice(choices)]
 
-def draw(o, e):
+def draw():
     background(0)
     for i in range(150):
         idx = int(uniform(0, len(msg)))
         msg[idx] = choice(choices)
-    text("".join(msg), 0, 0, width(), height())
+    text("".join(msg), 0, 50, width(), height())
 
 
 onLoop += draw
