@@ -61,7 +61,7 @@ def drawSaturn(x, y, s, r):
     popMatrix()
 
 # Draw the entire scene, after rotating by the global angle
-def draw(o, e):
+def draw():
     global angle
     background(0)
     translate( 0.5*width(), 0.5*height() )

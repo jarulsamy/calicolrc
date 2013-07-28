@@ -4,11 +4,11 @@ window(600, 400)    # Create a window
 background(200)     # Color background
 ellipseMode(CENTER)
 
-def draw(o,e):
+def draw():
     background(200)
     ellipse(mouseX(), mouseY(), 50, 50)
 
-def doExit(o, e):
+def doExit():
     exit()
 
 # Handle a events

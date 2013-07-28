@@ -11,7 +11,7 @@ noStroke()
 x = 0
 size = 3
 
-def draw(o, e):
+def draw():
     global x
     y1 = Processing.map(get("2","distance"), 80, 0, 0, height())
     y2 = Processing.map(get("4","light"), 255, 0, 0, height())

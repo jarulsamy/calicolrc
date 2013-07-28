@@ -10,7 +10,7 @@ fill(255,255,255,32)
 noStroke()
 smooth()
 
-def draw(o, e):
+def draw():
     # A uniform distribution
     #x = random(0,width())
     #y = random(0,height())

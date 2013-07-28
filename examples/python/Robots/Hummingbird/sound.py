@@ -11,7 +11,7 @@ noStroke()
 x = 0
 size = 3
 
-def draw(o, e):
+def draw():
     global x
     y3 = Processing.map(get("1","sound"), 80, 0, 0, height())
 

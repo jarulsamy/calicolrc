@@ -22,7 +22,7 @@ def keyPress(o, e):
 
 onKeyPressed += keyPress
 
-def draw(o, e):
+def draw():
     global ball_x, ball_y, ball_dx, ball_dy, paddle_x, paddle_y
     background(0)
     pos = get("1","knob")

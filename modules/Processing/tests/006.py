@@ -10,16 +10,16 @@ background(255, 200, 200)
 frameRate(1)
 
 # Function that will handle internal timer elapsed event
-def draw(o, e):
+def draw():
     line( random(600), random(400), random(600), random(400))
     #println(frameCount())
     #println(focused())
 
-def doMousePressed(o, e):
+def doMousePressed():
     global onLoop
     onLoop -= draw  # Unhook internal timer elapsed event handler
 
-def doMouseReleased(o, e):
+def doMouseReleased():
     global onLoop
     onLoop += draw  # Hook internal timer elapsed event handler
 
