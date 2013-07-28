@@ -421,16 +421,20 @@ namespace Calico {
 	    if (toolSwapped) {
 		SwapTool();
 	    }
+	    int sw = (int)config.GetValue("config", "shell-width");
+	    int sh = (int)config.GetValue("config", "shell-height");
 	    if (verticalSwapped) {
 		SwapVertical();
+		if (sh != -1) { // hpaned divider between Shell and Output
+		    VPaned2.Position = sh;
+		}
+	    } else {
+		if (sh != -1) { // hpaned divider between Shell and Output
+		    VPaned2.Position = sh - 17;
+		}
 	    }
 	    if (horizontalSwapped) {
 		SwapHorizontal();
-	    }
-	    int sw = (int)config.GetValue("config", "shell-width");
-	    int sh = (int)config.GetValue("config", "shell-height");
-	    if (sh != -1) { // hpaned divider between Shell and Output
-		VPaned2.Position = sh;
 	    }
 	    if (sw != -1) { // vpaned divider between Shell and Tools
 		hpaned2.Position = sw;
@@ -1445,11 +1449,7 @@ namespace Calico {
 		config.SetValue("config", "window-width", w);
 		config.SetValue("config", "window-height", h);
 		config.SetValue("config", "shell-width", hpaned2.Position);
-		if (verticalSwapped) {
-		    config.SetValue("config", "shell-height", VPaned2.Position);
-		} else {
-		    config.SetValue("config", "shell-height", VPaned2.Position - 12);
-		}
+		config.SetValue("config", "shell-height", VPaned2.Position);
                 config.Save();
             } catch {
                 // Something is no longer valid. Let's just make a new one then
