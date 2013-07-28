@@ -48,7 +48,7 @@ internal class PWindow : Gtk.Window
 	private double _textSize = 26;							// Default text size
     private string _textFace = "sans serif";
 	private TextAlign _textAlignX = TextAlign.LEFT;				// Text alignment mode in x-direction
-	private TextYAlign _textAlignY = TextYAlign.TOP;			// Text alignment mode in y-direction
+	private TextYAlign _textAlignY = TextYAlign.BASELINE;			// Text alignment mode in y-direction
 	private double _textScaleFactor = 120.0/72.0;				// (screen resolution / dots per inch)
 	private static EllipseMode _ellipseMode = EllipseMode.CENTER;
 	private static RectMode _rectMode = RectMode.CORNER;
@@ -388,7 +388,7 @@ internal class PWindow : Gtk.Window
 	public void textAlign(TextAlign align)
 	{
 		_textAlignX = align;
-		_textAlignY = TextYAlign.TOP;
+		_textAlignY = TextYAlign.BASELINE;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -851,6 +851,9 @@ internal class PWindow : Gtk.Window
 			  else y = y - 0.5*th + 0.5*h;
 			  break;
 			case TextYAlign.BASELINE:
+			  if (_rectMode == RectMode.CENTER) y = y - 0.5*th;
+			  else y = y - th;
+			  break;
 			case TextYAlign.BOTTOM:			        
 			  if (_rectMode == RectMode.CENTER) y = y - 0.5*th + 0.5*h ;
 			  else y = y - th + h;
