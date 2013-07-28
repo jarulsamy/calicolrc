@@ -59,6 +59,9 @@ namespace CalicoPython
 			options.PrintFunction = true;
 			options.AllowWithStatement = true;
 			options.TrueDivision = true;
+			options.ModuleName = "__main__";
+			options.Module |= IronPython.Runtime.ModuleOptions.Initialize;
+
 			// FIXME: before a executefile, __name__ is "__builtin__";
 			//        after it is "<module>"
 			// FIXME: this doesn't work:
