@@ -25,7 +25,6 @@ using System.Threading;
 using System.Collections.Generic;
 using Cairo;
 using Gtk;
-using Gdk;
 
 // ------------------ Shared Constants -----------------------------------
 internal enum EllipseMode
@@ -133,6 +132,7 @@ public static class Processing
 	public delegate void VoidDelegate ();						// A delegate that takes no args and returns nothing
 	private delegate double DoubleDelegate ();					// A delegate that takes no args and returns a double
 	private delegate PImage PImageDelegate ();
+        private delegate IList<string> IListDelegate();
 	public static int _debugLevel = 2;							// 0: verbose, 1: informational, 2: unhandled exceptions
 
 	// Constants
@@ -467,6 +467,19 @@ public static class Processing
 	{	// Invoke a delegate that returns a double on thread if necessary
 
 		double val = 0.0;
+		if (Thread.CurrentThread.ManagedThreadId != _guiThreadId)
+		{
+			Application.Invoke ( delegate{ val = fxn(); } );
+		} else {
+			fxn();
+		}
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	private static void _invokeIList( IListDelegate fxn ) 
+	{	// Invoke a delegate that returns a list of strings on thread if necessary
+
+	        IList<string> val;
 		if (Thread.CurrentThread.ManagedThreadId != _guiThreadId)
 		{
 			Application.Invoke ( delegate{ val = fxn(); } );
@@ -1672,16 +1685,21 @@ public static class Processing
   	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public static IList<string> listFonts()
         { 
-	  var l = new List<string>();
-	  foreach (Pango.FontFamily family in PangoHelper.ContextGet().Families)
-	    {
-	      foreach (Pango.FontFace face in family.Faces)
-		{
-		  string fullname = family.Name + " " + face.FaceName;
-		  l.Add(fullname);
-		}
-	    }
-	  return l;
+		IList<string> l = new List<string>();
+		if (_p == null) return l;
+		ManualResetEvent ev = new ManualResetEvent(false);
+
+		_invokeIList ( delegate { 
+			try {
+			        l = _p.listFonts();
+			} catch (System.NullReferenceException e){
+				debug ( String.Format("listFonts() ignored extra tick: {0}", e.ToString()), 1);
+			}
+			ev.Set ();
+			return l;
+		} );
+		ev.WaitOne();
+		return l;
         }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

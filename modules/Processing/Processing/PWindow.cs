@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using Cairo;
 using Gtk;
 
+
 // ------------------ PWindow ----------------------------------------------
 internal class PWindow : Gtk.Window
 {
@@ -377,6 +378,22 @@ internal class PWindow : Gtk.Window
 	{
 		_textSize = s;
 	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public IList<string> listFonts()
+        { 
+	  var l = new List<string>();
+	  foreach (Pango.FontFamily family in Gdk.PangoHelper.ContextGet().Families)
+	    {
+	      foreach (Pango.FontFace face in family.Faces)
+		{
+		  string fullname = family.Name + " " + face.FaceName;
+		  l.Add(fullname);
+		}
+	    }
+	  return l;
+        }
+
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public void textFont(string s)
