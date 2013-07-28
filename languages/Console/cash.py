@@ -17,6 +17,7 @@ from __future__ import print_function, division
 
 import glob
 import os
+import sys
 import re
 import shutil
 import inspect
@@ -55,6 +56,13 @@ def setPause(value):
     global trace_pause
     trace_pause = value
 
+def ErrorLine(text):
+    ## IronPython bug?: rather than calling calico.ErrorLine
+    ## use this; calico.Print is a "new" overload in Runtime
+    ## but IronPython appears to call the underlying method
+    sys.stderr.write(text)
+    sys.stderr.write("\n")
+
 def executeLines(calico, text, stack):
     # put calico in the environment:
     globals()["calico"] = calico
@@ -74,17 +82,17 @@ def executeLines(calico, text, stack):
         try:
             execute(line, stack=stack[:])
         except ConsoleException, e:
-            calico.ErrorLine("Console stack trace:")
-            calico.ErrorLine("Traceback (most recent call last):")
+            ErrorLine("Console stack trace:")
+            ErrorLine("Traceback (most recent call last):")
             for s in e.stack:
-                calico.ErrorLine("  File \"%s\", line %s, from %s" % (s[0], s[1], s[4]))
-            calico.ErrorLine(e.message)
+                ErrorLine("  File \"%s\", line %s, from %s" % (s[0], s[1], s[4]))
+            ErrorLine(e.message)
             retval = False
             break
         except Exception, e:
             if debug:
-                calico.ErrorLine("".join(traceback.format_exc()))
-            calico.ErrorLine(str(e))
+                ErrorLine("".join(traceback.format_exc()))
+            ErrorLine(str(e))
             retval = False
             break
         except SystemExit, e:
@@ -633,7 +641,7 @@ def ls(name, incoming, tty, args, stack):
         data = ["."]
     for f in data:
         if not os.path.exists(f):
-            calico.ErrorLine("%s: cannot access '%s': no such file or directory" % (name, f))
+            ErrorLine("%s: cannot access '%s': no such file or directory" % (name, f))
             continue
         if os.path.isfile(f):
             yield list_file(f, pargs, tty)
@@ -674,9 +682,9 @@ def grep(name, incoming, tty, args, stack):
                     elif match(pargs.pattern, line):
                         yield "%s: %s" % (f, line)
             elif os.path.isdir(f):
-                calico.ErrorLine("%s: '%s' is a directory" % (name, f))
+                ErrorLine("%s: '%s' is a directory" % (name, f))
             else:
-                calico.ErrorLine("%s: no such file '%s'" % (name, f))
+                ErrorLine("%s: no such file '%s'" % (name, f))
     return # ends yields
 
 def wc(name, incoming, tty, args, stack):
@@ -704,9 +712,9 @@ def wc(name, incoming, tty, args, stack):
                     words += w
                     chars += c + 1
             elif os.path.isdir(f):
-                calico.ErrorLine("%s: '%s' is a directory" % (name, f))
+                ErrorLine("%s: '%s' is a directory" % (name, f))
             else:
-                calico.ErrorLine("%s: no such file '%s'" % (name, f))
+                ErrorLine("%s: no such file '%s'" % (name, f))
         yield "%6d %6d %6d total" % (lines, words, chars)
     return # ends yields
 
@@ -741,7 +749,7 @@ def more(name, incoming, tty, args, stack):
                         if not yn:
                             return
             elif os.path.isdir(f):
-                calico.ErrorLine("%s: '%s' is a directory" % (name, f))
+                ErrorLine("%s: '%s' is a directory" % (name, f))
             else:
                 raise ConsoleException("%s: no such file '%s'" % (name, f), stack)
 
@@ -837,14 +845,14 @@ def show(name, incoming, tty, args, stack):
                 pic = Myro.makePicture(filename)
                 Myro.show(pic, filename)
             else:
-                calico.ErrorLine("%s: ignoring '%s'; no such file" % (name, filename))
+                ErrorLine("%s: ignoring '%s'; no such file" % (name, filename))
     else:
         for filename in args:
             if os.path.isfile(filename):
                 pic = Myro.makePicture(filename)
                 Myro.show(pic, filename)
             else:
-                calico.ErrorLine("%s: ignoring '%s'; no such file" % (name, filename))
+                ErrorLine("%s: ignoring '%s'; no such file" % (name, filename))
     return []
 
 def open_cmd(name, incoming, tty, args, stack):
@@ -857,13 +865,13 @@ def open_cmd(name, incoming, tty, args, stack):
             if os.path.isfile(filename):
                 calico.Open(filename)
             else:
-                calico.ErrorLine("%s: ignoring '%s'; no such file" % (name, filename))
+                ErrorLine("%s: ignoring '%s'; no such file" % (name, filename))
     else:
         for filename in args:
             if os.path.isfile(filename):
                 calico.Open(filename)
             else:
-                calico.ErrorLine("%s: ignoring '%s'; no such file" % (name, filename))
+                ErrorLine("%s: ignoring '%s'; no such file" % (name, filename))
     return []
 
 def exec_cmd(name, incoming, tty, args, stack):
@@ -996,7 +1004,7 @@ def switch(name, incoming, tty, args, stack):
             commands = dos_commands
             command_set = "dos"
         else:
-            calico.ErrorLine("%s: cannot switch to '%s': use 'unix' or 'dos'" % (name, args[0]))
+            ErrorLine("%s: cannot switch to '%s': use 'unix' or 'dos'" % (name, args[0]))
     else:
         return [command_set]
     return []

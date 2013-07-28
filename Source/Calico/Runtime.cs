@@ -103,7 +103,23 @@ namespace Calico {
             Console.WriteLine(String.Format("Exception: {0}\n", args.ExceptionObject.ToString()));
         }
 
+	public void ActivateLanguage(string language, string backup) {
+	    if (manager.languages.ContainsKey(language) && manager[language].engine == null) {
+		manager.Register(manager[language], true);
+		manager[language].engine.Setup(path);
+		manager[language].engine.Start(path);
+		manager[language].engine.PostSetup(this);
+	    }
+	    if (manager[CurrentLanguage].engine == null) {
+		CurrentLanguage = backup;
+	    } else {
+		CurrentLanguage = language;
+	    }
+	}
+
         public void REPL() {
+	    ActivateLanguage(CurrentLanguage, "python");
+
             LineEditor le = new LineEditor("Calico", 1000);
             le.TabAtStartCompletes = false;
             string line, expr = "";
@@ -125,7 +141,6 @@ namespace Calico {
                 dumb = false;
             }
 
-            string oldCurrentLanguage = CurrentLanguage;
             while ((line = getline(le, prompt, indent, dumb, isatty)) != null) {
                 if (line.StartsWith(":")) {
                     string[] t = line.Split();
@@ -133,16 +148,7 @@ namespace Calico {
                         if (Array.Find(manager.getLanguages(), delegate(string lang) {
                             return lang == t [1];
                         }) != null) {
-			    CurrentLanguage = t [1];
-			    if (manager[CurrentLanguage].engine == null) {
-				manager.Register(manager[CurrentLanguage], true);
-				manager[CurrentLanguage].engine.Setup(path);
-				manager[CurrentLanguage].engine.Start(path);
-				manager[CurrentLanguage].engine.PostSetup(this);
-			    }
-			    if (manager[CurrentLanguage].engine == null) {
-				CurrentLanguage = oldCurrentLanguage;
-			    }
+			    ActivateLanguage(t[1], CurrentLanguage);
                         } 
                         expr = "";
                         prompt = CurrentLanguage + "> ";
