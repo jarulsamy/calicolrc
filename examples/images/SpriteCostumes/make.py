@@ -54,6 +54,25 @@ def save(path, list):
         walk_right = splitRow("bear_child.png", 0, 0, 60, 80, 14)
         count += 1
 
+def load(path):
+    """
+    Load a list of pictures in the given folder.
+    """
+    count = 0
+    retval = []
+    while True:
+        filename = path + ("/%d.gif" % count)
+        if os.path.exists(filename):
+            print("loading", filename)
+            p = Picture(filename)
+            p.border = 0
+            retval.append(p)
+            count += 1
+        else:
+            break
+    return retval
+
+
 def animate(list):
     win = Window(800, list[0].height + 20)
     win.setBackground(Color(0,128,248))
