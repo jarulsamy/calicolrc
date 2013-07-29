@@ -2964,6 +2964,7 @@ public class PImage
 		      if (!_pixbuf.HasAlpha) _pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0);
 		    }
 		  }
+
 		ev.Set();
 	     });
 	   ev.WaitOne();
@@ -2992,15 +2993,16 @@ public class PImage
 	public void setPixel(int x, int y, byte r, byte g, byte b, byte a) 
 	{	// Set an individual pixel in the pixbuf
 
-	  if (_pixbuf == null) return;
 	  ManualResetEvent ev = new ManualResetEvent(false);
 
 	   _invoke ( delegate {
-	  
-	       System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 0, r);
-	       System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 1, g);
-	       System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 2, b);
-	       System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 3, a);
+	       if (_pixbuf != null)
+		 {	  
+		   System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 0, r);
+		   System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 1, g);
+		   System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 2, b);
+		   System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 3, a);
+		 }
 	       ev.Set();
 	     });
 	  

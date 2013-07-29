@@ -4,7 +4,9 @@ window(500, 500)
 
 # Create a new image
 im = createImage(100, 100, ARGB)
-#background(255, 0, 0)
+#delay(1000)
+print("hello")
+background(255, 0, 0)
 # Modify its pixels
 im.loadPixels()
 #background(0,  255, 0)
