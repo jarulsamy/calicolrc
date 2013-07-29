@@ -2798,9 +2798,9 @@ public class PImage
 			string msg = String.Format ("Don't know how to load an image file with extension {0}", ext);
 			throw new Exception(msg);
 		}
-		ev.Set();
+		//ev.Set();
 	     });
-	   ev.WaitOne();
+	   //ev.WaitOne();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2812,9 +2812,9 @@ public class PImage
 		_img = new ImageSurface(format, width, height);
 		_width = width;
 		_height = height;
-		ev.Set();
+		//ev.Set);
 	     });
-	   ev.WaitOne();
+	   //ev.WaitOne();
 	}
 
 	public PImage(int width, int height) : this(width, height, Cairo.Format.ARGB32) { }
@@ -2964,9 +2964,9 @@ public class PImage
 		      if (!_pixbuf.HasAlpha) _pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0);
 		    }
 		  }
-		ev.Set();
+		//ev.Set();
 	     });
-	   ev.WaitOne();
+	   //ev.WaitOne();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2983,9 +2983,9 @@ public class PImage
 		      g.Paint ();
 		    }
 		  }
-		ev.Set();
+		//ev.Set();
 	     });
-	   ev.WaitOne();
+	   //ev.WaitOne();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
