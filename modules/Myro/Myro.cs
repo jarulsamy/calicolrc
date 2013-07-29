@@ -5282,22 +5282,15 @@ public static class Myro
 	[method: JigsawTab("M/Audio")]
 	public static void speak (string text)
 	{
-		speak (text, 0); // not async, wait for exit
+		speak (text, 0); // wait for exit
 	}
 
 	[method: JigsawTab("M/Audio")]
-	public static void speak (string text, bool async)
+	public static void speakNoWait (string text)
 	{
-		speak (text, bool_to_int (async)); // not async, wait for exit
+		speak (text, 1); // no wait, non-blocking
 	}
 
-	[method: JigsawTab("M/Audio")]
-	public static void speak (string text, double async)
-	{
-		speak (text, (int)async); // not async, wait for exit
-	}
-
-        [method: JigsawTab("M/Audio")]
 	public static void speak (string text, int async)
 	{
 		Console.WriteLine (text);
