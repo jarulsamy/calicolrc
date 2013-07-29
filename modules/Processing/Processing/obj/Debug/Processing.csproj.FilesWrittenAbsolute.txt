@@ -2,11 +2,3 @@
 /home/keithohara/gitCalico/modules/Processing.dll
 /home/keithohara/gitCalico/modules/Processing/Processing/obj/Debug/Processing.dll
 /home/keithohara/gitCalico/modules/Processing/Processing/obj/Debug/Processing.dll.mdb
-/home/dblank/Calico/modules/Processing.dll.mdb
-/home/dblank/Calico/modules/Processing.dll
-/home/dblank/Calico/modules/Processing/Processing/obj/Debug/Processing.dll
-/home/dblank/Calico/modules/Processing/Processing/obj/Debug/Processing.dll.mdb
-/Users/keithohara/calico/modules/Processing.dll.mdb
-/Users/keithohara/calico/modules/Processing.dll
-/Users/keithohara/calico/modules/Processing/Processing/obj/Debug/Processing.dll
-/Users/keithohara/calico/modules/Processing/Processing/obj/Debug/Processing.dll.mdb
