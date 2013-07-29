@@ -2932,29 +2932,34 @@ public class PImage
 	public void loadPixels()
 	{	// Copy pixels from current image to pixbuf
 
+	  ManualResetEvent ev = new ManualResetEvent(false);
+
 	   _invoke ( delegate {
 
-		if (_img  == null) return;
-
-		Gdk.Pixbuf pixbuf = null;
-
-		// Create a new pixmap and context
-		Gdk.Pixmap pm = new Gdk.Pixmap(null, _width, _height, 24);
-		using (Context g = Gdk.CairoHelper.Create(pm)) {
-			// Paint internal Cairo image onto pixmap
-			g.SetSourceSurface (_img, 0, 0);
-			g.Paint ();
-		}
-
-		// Convert pixmap to pixbuf
-		Gdk.Colormap colormap = pm.Colormap;
-		pixbuf = Gdk.Pixbuf.FromDrawable (pm, colormap, 0, 0, 0, 0, _width, _height);
-
-		if (pixbuf != null) {
-			_pixbuf = pixbuf;
-			if (!_pixbuf.HasAlpha) _pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0);
-		}
+		if (_img  != null)
+		  {
+		    Gdk.Pixbuf pixbuf = null;
+		    
+		    // Create a new pixmap and context
+		    Gdk.Pixmap pm = new Gdk.Pixmap(null, _width, _height, 24);
+		    using (Context g = Gdk.CairoHelper.Create(pm)) {
+		      // Paint internal Cairo image onto pixmap
+		      g.SetSourceSurface (_img, 0, 0);
+		      g.Paint ();
+		    }
+		    
+		    // Convert pixmap to pixbuf
+		    Gdk.Colormap colormap = pm.Colormap;
+		    pixbuf = Gdk.Pixbuf.FromDrawable (pm, colormap, 0, 0, 0, 0, _width, _height);
+		    
+		    if (pixbuf != null) {
+		      _pixbuf = pixbuf;
+		      if (!_pixbuf.HasAlpha) _pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0);
+		    }
+		  }
+		ev.Set();
 	     });
+	   ev.WaitOne();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
