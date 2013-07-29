@@ -2993,14 +2993,20 @@ public class PImage
 	{	// Set an individual pixel in the pixbuf
 
 	  if (_pixbuf == null) return;
+	  ManualResetEvent ev = new ManualResetEvent(false);
+
 	   _invoke ( delegate {
 	  
 	       System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 0, r);
 	       System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 1, g);
 	       System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 2, b);
 	       System.Runtime.InteropServices.Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 3, a);
+	       ev.Set();
 	     });
+	  
+	   ev.WaitOne();
 	}
+
 	public void setPixel(int x, int y, byte r, byte g, byte b) { setPixel(x, y, r, g, b, 255); }
 	public void setPixel(int x, int y, byte g, byte a) { setPixel(x, y, g, g, g, a); }
 	public void setPixel(int x, int y, byte g) { setPixel(x, y, g, g, g, 255); }
