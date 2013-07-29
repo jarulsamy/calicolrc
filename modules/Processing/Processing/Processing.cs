@@ -2951,6 +2951,8 @@ public class PImage
 		    Gdk.Pixmap pm = new Gdk.Pixmap(null, _width, _height, 24);
 		    using (Context g = Gdk.CairoHelper.Create(pm)) {
 		      // Paint internal Cairo image onto pixmap
+		      g.Color = new Cairo.Color(0, 0, 0);
+		      g.Paint();			
 		      g.SetSourceSurface (_img, 0, 0);
 		      g.Paint ();
 		    }

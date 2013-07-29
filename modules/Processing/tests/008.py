@@ -1,6 +1,7 @@
 from Processing import *
 
 window(500, 500)
+background(0)
 
 # Create a new image
 im = createImage(100, 100, ARGB)
