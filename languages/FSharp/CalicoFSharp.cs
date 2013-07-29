@@ -145,7 +145,11 @@ public class CalicoFSharpEngine : Engine
      public override void Close() {
 	   if (process != null) {
 		 //process.StandardInput.Close();
-		 process.Kill();
+		 try {
+		   process.Kill();
+		 } catch {
+		   // not running, can't kill
+		 }
 	   }
      }
 	 
