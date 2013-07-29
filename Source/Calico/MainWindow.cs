@@ -432,7 +432,7 @@ namespace Calico {
 		}
 	    } else {
 		if (sh != -1) { // hpaned divider between Shell and Output
-		    VPaned2.Position = sh - 17;
+		    VPaned2.Position = sh - 16;
 		}
 	    }
 	    if (horizontalSwapped) {

@@ -149,7 +149,7 @@ class BarChart:
             text.tag = "rescale"
 
 
-if __name__ == "<module>":
+if __name__ == "__main__":
     #BarChart("test 2", 800, 600, ["1", "2"])
     #BarChart("test 3", 640, 480, range(10))
     bc = BarChart("Barchart Test #1", 800, 600, [Myro.pickOne(*range(4)) for x in range(100)], x_label="Choice")
