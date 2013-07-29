@@ -575,29 +575,35 @@ public static class Graphics
 		pixel.setAlpha (value);
 	}
   
-        [method: JigsawTab("G/Pictures")]
-        public static void savePicture (IList pictures, string filename) {
-	    AnimatedGifEncoder gif = new AnimatedGifEncoder();
-	    gif.Start();
-	    gif.SetRepeat(0);
-	    foreach (Picture picture in pictures) {
+    [method: JigsawTab("G/Pictures")]
+	public static void savePicture (IList pictures, string filename, Graphics.Color color=null) {
+	  AnimatedGifEncoder gif = new AnimatedGifEncoder();
+	  if (color != null) {
+		gif.SetTransparent(System.Drawing.Color.FromArgb(color.alpha, color.red, color.green, color.blue));
+	  }
+	  gif.Start();
+	  gif.SetRepeat(0);
+	  foreach (Picture picture in pictures) {
 		gif.AddFrame(picture);
-	    }
-	    gif.Finish();
-	    gif.Output(filename);
+	  }
+	  gif.Finish();
+	  gif.Output(filename);
 	}
 
-        [method: JigsawTab("G/Pictures")]
-        public static void savePicture (List pictures, string filename, short delay, bool repeat) {
-	    AnimatedGifEncoder gif = new AnimatedGifEncoder();
-	    gif.Start();
-	    gif.SetRepeat(repeat ? 0 : -1);
-	    gif.SetDelay(delay);
-	    foreach (Picture picture in pictures) {
+    [method: JigsawTab("G/Pictures")]
+	public static void savePicture (List pictures, string filename, short delay, bool repeat, Graphics.Color color=null) {
+	  AnimatedGifEncoder gif = new AnimatedGifEncoder();
+	  if (color != null) {
+		gif.SetTransparent(System.Drawing.Color.FromArgb(color.alpha, color.red, color.green, color.blue));
+	  }
+	  gif.Start();
+	  gif.SetRepeat(repeat ? 0 : -1);
+	  gif.SetDelay(delay);
+	  foreach (Picture picture in pictures) {
 		gif.AddFrame(picture);
-	    }
-	    gif.Finish();
-	    gif.Output(filename);
+	  }
+	  gif.Finish();
+	  gif.Output(filename);
 	}
 
         [method: JigsawTab("G/Pictures")]
@@ -613,9 +619,9 @@ public static class Graphics
 	}
 
         [method: JigsawTab("G/Pictures")]
-        public static void savePicture (List list, string filename, short delay)
+        public static void savePicture (List list, string filename, short delay, Graphics.Color color=null)
 	{
-	    savePicture (list, filename, delay, false);
+	  savePicture (list, filename, delay, false, color);
 	}
 
         [method: JigsawTab("G/Pictures")]
@@ -4687,7 +4693,7 @@ public static class Graphics
 		    return _pixbuf.Height;
 		}
 
-		public void savePicture (string filename)
+		public void savePicture (string filename, Graphics.Color color=null)
 		{
 			// png, and jpg
 			String format;
@@ -4697,6 +4703,9 @@ public static class Graphics
 			    format = "jpeg";
 			} else if (filename.Substring (filename.Length - 3, 3) == "gif") {
 			    AnimatedGifEncoder gif = new AnimatedGifEncoder();
+				if (color != null) {
+				  gif.SetTransparent(System.Drawing.Color.FromArgb(color.alpha, color.red, color.green, color.blue));
+				}
 			    gif.Start();
 			    gif.AddFrame(this);
 			    gif.Finish();
