@@ -669,12 +669,20 @@ namespace Calico {
             switch_menu.Submenu.ShowAll();
         }
 
+		public string getExtension(string filename) {
+		  string ext = System.IO.Path.GetExtension(filename);
+		  if (ext.Length > 0) {
+			ext = ext.Substring(1); // after the dot
+		  }
+		  return ext;
+		}
+		
         public void process_example_dir(Gtk.MenuItem root_menu, string menu_name, DirectoryInfo dir, Language language) {
             Gtk.MenuItem menu = new Gtk.MenuItem(menu_name);
             ((Gtk.Menu)root_menu.Submenu).Add(menu);
             menu.Submenu = new Gtk.Menu();
             foreach (FileInfo f in dir.GetFiles("*.*")) {
-                if (!f.Name.EndsWith("~") && Contains(System.IO.Path.GetExtension(f.Name).Substring(1), language.extensions) && !f.Name.StartsWith("_")) {
+			  if (!f.Name.EndsWith("~") && Contains(getExtension(f.Name), language.extensions) && !f.Name.StartsWith("_")) {
                     Gtk.MenuItem fmenu = new Gtk.MenuItem(f.Name.Replace("_", "__"));
                     ((Gtk.Menu)menu.Submenu).Add(fmenu);
                     var fullname = f.FullName;
