@@ -2965,16 +2965,20 @@ public class PImage
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public void updatePixels() 
 	{	// Copy pixels from pixbuf to image
+	  ManualResetEvent ev = new ManualResetEvent(false);
+
 	   _invoke ( delegate {
 
-		if (_img  == null) return;
-		if (_pixbuf == null) return;
-
-		using (Context g = new Cairo.Context(_img)) {
-			Gdk.CairoHelper.SetSourcePixbuf(g, _pixbuf, 0.0, 0.0);
-			g.Paint ();
-		}
+		if (_img  != null && _pixbuf == null)
+		  {
+		    using (Context g = new Cairo.Context(_img)) {
+		      Gdk.CairoHelper.SetSourcePixbuf(g, _pixbuf, 0.0, 0.0);
+		      g.Paint ();
+		    }
+		  }
+		ev.Set();
 	     });
+	   ev.WaitOne();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
