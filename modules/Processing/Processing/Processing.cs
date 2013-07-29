@@ -2803,27 +2803,25 @@ public class PImage
 	public PImage get(int x, int y, int width, int height)
 	{	// Create a new image from a portion of the existing image.
 	  PImage img = new PImage(width, height);
-	   _invokePImage ( delegate {
-		ManualResetEvent ev = new ManualResetEvent(false);
-		_invokePImage ( delegate { 
-
-			try {
-			  using (Context g = new Context(img._img))
-			    {			
-			      _img.Show (g, -x, -y);
-			    }
-			} catch (System.NullReferenceException e){
-			  string msg = String.Format ("get() ignored extra tick: {0}", e);
-			  throw new Exception(msg);
-			}
-			ev.Set ();
-			return img;
-		} );
-		ev.WaitOne();
-		return img;
-	     });
-	   return img;
+	  ManualResetEvent ev = new ManualResetEvent(false);
+	  _invokePImage ( delegate { 
+	      
+	      try {
+		using (Context g = new Context(img._img))
+		  {			
+		    _img.Show (g, -x, -y);
+		  }
+	      } catch (System.NullReferenceException e){
+		string msg = String.Format ("get() ignored extra tick: {0}", e);
+		throw new Exception(msg);
+	      }
+	      ev.Set ();
+	      return img;
+	    } );
+	  ev.WaitOne();
+	  return img;
 	}
+
 	public PImage get() { return get(0, 0, _width, _height); } 
 	
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
