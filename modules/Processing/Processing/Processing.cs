@@ -1,242 +1,242 @@
-/*
-Calico - Scripting Environment
+ /*
+ Calico - Scripting Environment
 
-Copyright (c) 2012, 2013, Mark F. Russo <russomf@gmail.com>
+ Copyright (c) 2012, 2013, Mark F. Russo <russomf@gmail.com>
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-$Id: $
-*/
+ $Id: $
+ */
 
-using System;
-using System.IO;
-using System.Threading;
-using System.Collections.Generic;
-using Cairo;
-using Gtk;
+ using System;
+ using System.IO;
+ using System.Threading;
+ using System.Collections.Generic;
+ using Cairo;
+ using Gtk;
 
-// ------------------ Shared Constants -----------------------------------
-internal enum EllipseMode
-{
-	CENTER = 0,
-	CORNER = 1,
- 	RADIUS = 2,
-	CORNERS = 3
-}
+ // ------------------ Shared Constants -----------------------------------
+ internal enum EllipseMode
+ {
+	 CENTER = 0,
+	 CORNER = 1,
+	 RADIUS = 2,
+	 CORNERS = 3
+ }
 
-internal enum RectMode
-{
-	CENTER = 0,
-	CORNER = 1,
-	RADIUS = 2,
-	CORNERS = 3
-}
+ internal enum RectMode
+ {
+	 CENTER = 0,
+	 CORNER = 1,
+	 RADIUS = 2,
+	 CORNERS = 3
+ }
 
-internal enum ImageMode
-{
-	CENTER = 0,
-	CORNER = 1,
-	CORNERS = 2
-}
+ internal enum ImageMode
+ {
+	 CENTER = 0,
+	 CORNER = 1,
+	 CORNERS = 2
+ }
 
-internal enum TextAlign
-{
-	LEFT = 0,
-	CENTER = 1,
-	RIGHT = 2
-}
+ internal enum TextAlign
+ {
+	 LEFT = 0,
+	 CENTER = 1,
+	 RIGHT = 2
+ }
 
-internal enum TextYAlign
-{
-	TOP = 0,
-	BOTTOM = 1,
-	CENTER = 2,
-	BASELINE = 3
-}
+ internal enum TextYAlign
+ {
+	 TOP = 0,
+	 BOTTOM = 1,
+	 CENTER = 2,
+	 BASELINE = 3
+ }
 
-// -------------------------------------------------------------------------
-public static class Processing
-{
-	private static PWindow _p = null;							// Reference to internal window
-	private static Random _rand = new Random();					// Random number generation help
-	private static PTimer _tmr = null;
-	private static int _guiThreadId = -1;						// Thread id of window. -1 means not assigned
-	private static Gdk.Pixbuf _pixbuf = null;					// Internal pixbuf used by loadPixels and updatePixels
-	private static List<PKnot> _shape = null;					// Cache of points for a shape under construction
+ // -------------------------------------------------------------------------
+ public static class Processing
+ {
+	 private static PWindow _p = null;							// Reference to internal window
+	 private static Random _rand = new Random();					// Random number generation help
+	 private static PTimer _tmr = null;
+	 private static int _guiThreadId = -1;						// Thread id of window. -1 means not assigned
+	 private static Gdk.Pixbuf _pixbuf = null;					// Internal pixbuf used by loadPixels and updatePixels
+	 private static List<PKnot> _shape = null;					// Cache of points for a shape under construction
 
-	private static int _width;									// Cache of window size
-	private static int _height;
-	private static double _mouseX = 0.0;						// Mouse coordinates
-	private static double _mouseY = 0.0;
-	private static double _pmouseX = 0.0;						// Previously saved mouse coordinates
-	private static double _pmouseY = 0.0;
-	private static bool _mousePressed = false;					// True if the mouse was just pressed
-	private static uint _mouseButton = 0;						// 1 for left, 2 for center, 3 for right
-	private static bool _keyPressed = false;
-	private static string _key;
-	private static long _millis;								// The number of milliseconds when the window was created
-	private static bool _immediateMode = true;					// True if all drawing commands trigger a queue draw
+	 private static int _width;									// Cache of window size
+	 private static int _height;
+	 private static double _mouseX = 0.0;						// Mouse coordinates
+	 private static double _mouseY = 0.0;
+	 private static double _pmouseX = 0.0;						// Previously saved mouse coordinates
+	 private static double _pmouseY = 0.0;
+	 private static bool _mousePressed = false;					// True if the mouse was just pressed
+	 private static uint _mouseButton = 0;						// 1 for left, 2 for center, 3 for right
+	 private static bool _keyPressed = false;
+	 private static string _key;
+	 private static long _millis;								// The number of milliseconds when the window was created
+	 private static bool _immediateMode = true;					// True if all drawing commands trigger a queue draw
 
-        public readonly static Pixels pixels = new Pixels();
+	 public readonly static Pixels pixels = new Pixels();
 
-  /*
-	[method: JigsawTab(null)]
-	public static event ButtonReleaseEventHandler onMouseClicked;	// Mouse events
-	[method: JigsawTab(null)]
-	public static event ButtonPressEventHandler onMousePressed;
-	[method: JigsawTab(null)]
-	public static event ButtonReleaseEventHandler onMouseReleased;
-	[method: JigsawTab(null)]
-	public static event MotionNotifyEventHandler onMouseMoved;
-	[method: JigsawTab(null)]
-	public static event MotionNotifyEventHandler onMouseDragged;
-	[method: JigsawTab(null)]
-	public static event KeyPressEventHandler onKeyPressed;		// Key events
-	[method: JigsawTab(null)]
-	public static event KeyReleaseEventHandler onKeyReleased;
-	[method: JigsawTab(null)]
-	public static event EventHandler<PElapsedEventArgs> onLoop;
-	*/
-
-
-  
-	[method: JigsawTab(null)]
-	public static event VoidDelegate onMouseClicked;	// Mouse events
-	[method: JigsawTab(null)]
-	public static event VoidDelegate onMousePressed;
-	[method: JigsawTab(null)]
-	public static event VoidDelegate onMouseReleased;
-	[method: JigsawTab(null)]
-	public static event VoidDelegate onMouseMoved;
-	[method: JigsawTab(null)]
-	public static event VoidDelegate onMouseDragged;
-	[method: JigsawTab(null)]
-	public static event VoidDelegate onKeyPressed;		// Key events
-	[method: JigsawTab(null)]
-	public static event VoidDelegate onKeyReleased;
-	[method: JigsawTab(null)]
-	public static event VoidDelegate onLoop;
+   /*
+	 [method: JigsawTab(null)]
+	 public static event ButtonReleaseEventHandler onMouseClicked;	// Mouse events
+	 [method: JigsawTab(null)]
+	 public static event ButtonPressEventHandler onMousePressed;
+	 [method: JigsawTab(null)]
+	 public static event ButtonReleaseEventHandler onMouseReleased;
+	 [method: JigsawTab(null)]
+	 public static event MotionNotifyEventHandler onMouseMoved;
+	 [method: JigsawTab(null)]
+	 public static event MotionNotifyEventHandler onMouseDragged;
+	 [method: JigsawTab(null)]
+	 public static event KeyPressEventHandler onKeyPressed;		// Key events
+	 [method: JigsawTab(null)]
+	 public static event KeyReleaseEventHandler onKeyReleased;
+	 [method: JigsawTab(null)]
+	 public static event EventHandler<PElapsedEventArgs> onLoop;
+	 */
 
 
-	public delegate void VoidDelegate ();				// A delegate that takes no args and returns nothing
-	private delegate double DoubleDelegate ();			// A delegate that takes no args and returns a double
 
-	private delegate uint UintDelegate ();				// A delegate that takes no args and 
-	private delegate PImage PImageDelegate ();
-        private delegate System.Collections.IList IListDelegate();
-	public static int _debugLevel = 2;							// 0: verbose, 1: informational, 2: unhandled exceptions
+	 [method: JigsawTab(null)]
+	 public static event VoidDelegate onMouseClicked;	// Mouse events
+	 [method: JigsawTab(null)]
+	 public static event VoidDelegate onMousePressed;
+	 [method: JigsawTab(null)]
+	 public static event VoidDelegate onMouseReleased;
+	 [method: JigsawTab(null)]
+	 public static event VoidDelegate onMouseMoved;
+	 [method: JigsawTab(null)]
+	 public static event VoidDelegate onMouseDragged;
+	 [method: JigsawTab(null)]
+	 public static event VoidDelegate onKeyPressed;		// Key events
+	 [method: JigsawTab(null)]
+	 public static event VoidDelegate onKeyReleased;
+	 [method: JigsawTab(null)]
+	 public static event VoidDelegate onLoop;
 
-	// Constants
-	public static readonly int CENTER = 0;
-	public static readonly int CORNER = 1;
-	public static readonly int RADIUS = 2;
-	public static readonly int CORNERS = 3;
-	public static readonly int SQUARE = 4;
-	public static readonly int ROUND = 5;
-	public static readonly int PROJECT = 6;
-	public static readonly int BEVEL = 7;
-	public static readonly int MITER = 8;
-	public static readonly int RGB = 9;
-	public static readonly int ARGB = 10;
-	public static readonly int ALPHA = 11;
-	public static readonly int RIGHT = 12;
-	public static readonly int LEFT = 13;
-	public static readonly int TOP = 14;
-	public static readonly int BOTTOM = 15;
-	public static readonly int BASELINE = 16;
-	public static readonly bool CLOSE = true;
-	public static readonly double PI = 3.141592653589793238;
-	public static readonly double HALF_PI = 0.5*Processing.PI;
-	public static readonly double QUARTER_PI = 0.25*Processing.PI;
-	public static readonly double TWO_PI = 2.0*Processing.PI;
 
-	// String-constant maps
-	private static Dictionary<string, RectMode> _rectModeStr = new Dictionary<string,RectMode> () {
-		{"CORNER", RectMode.CORNER}, {"CENTER", RectMode.CENTER}, {"RADIUS", RectMode.RADIUS}, {"CORNERS", RectMode.CORNERS}
-	};
+	 public delegate void VoidDelegate ();				// A delegate that takes no args and returns nothing
+	 private delegate double DoubleDelegate ();			// A delegate that takes no args and returns a double
 
-	private static Dictionary<string, EllipseMode> _ellipseModeStr = new Dictionary<string,EllipseMode> () {
-		{"CORNER", EllipseMode.CORNER}, {"CENTER", EllipseMode.CENTER}, {"RADIUS", EllipseMode.RADIUS}, {"CORNERS", EllipseMode.CORNERS}
-	};
+	 private delegate uint UintDelegate ();				// A delegate that takes no args and 
+	 private delegate PImage PImageDelegate ();
+	 private delegate System.Collections.IList IListDelegate();
+	 public static int _debugLevel = 2;							// 0: verbose, 1: informational, 2: unhandled exceptions
 
-	private static Dictionary<string, ImageMode> _imageModeStr = new Dictionary<string,ImageMode> () {
-		{"CORNER", ImageMode.CORNER}, {"CENTER", ImageMode.CENTER}, {"CORNERS", ImageMode.CORNERS}
-	};
+	 // Constants
+	 public static readonly int CENTER = 0;
+	 public static readonly int CORNER = 1;
+	 public static readonly int RADIUS = 2;
+	 public static readonly int CORNERS = 3;
+	 public static readonly int SQUARE = 4;
+	 public static readonly int ROUND = 5;
+	 public static readonly int PROJECT = 6;
+	 public static readonly int BEVEL = 7;
+	 public static readonly int MITER = 8;
+	 public static readonly int RGB = 9;
+	 public static readonly int ARGB = 10;
+	 public static readonly int ALPHA = 11;
+	 public static readonly int RIGHT = 12;
+	 public static readonly int LEFT = 13;
+	 public static readonly int TOP = 14;
+	 public static readonly int BOTTOM = 15;
+	 public static readonly int BASELINE = 16;
+	 public static readonly bool CLOSE = true;
+	 public static readonly double PI = 3.141592653589793238;
+	 public static readonly double HALF_PI = 0.5*Processing.PI;
+	 public static readonly double QUARTER_PI = 0.25*Processing.PI;
+	 public static readonly double TWO_PI = 2.0*Processing.PI;
 
-	private static Dictionary<string, Cairo.LineCap> _strokeCapStr = new Dictionary<string,Cairo.LineCap> () {
-		{"SQUARE", LineCap.Butt}, {"ROUND", LineCap.Round}, {"PROJECT", LineCap.Square}
-	};
+	 // String-constant maps
+	 private static Dictionary<string, RectMode> _rectModeStr = new Dictionary<string,RectMode> () {
+		 {"CORNER", RectMode.CORNER}, {"CENTER", RectMode.CENTER}, {"RADIUS", RectMode.RADIUS}, {"CORNERS", RectMode.CORNERS}
+	 };
 
-	private static Dictionary<string, Cairo.LineJoin> _strokeJoinStr = new Dictionary<string,Cairo.LineJoin> () {
-		{"BEVEL", LineJoin.Bevel}, {"ROUND", LineJoin.Round}, {"MITER", LineJoin.Miter}
-	};
+	 private static Dictionary<string, EllipseMode> _ellipseModeStr = new Dictionary<string,EllipseMode> () {
+		 {"CORNER", EllipseMode.CORNER}, {"CENTER", EllipseMode.CENTER}, {"RADIUS", EllipseMode.RADIUS}, {"CORNERS", EllipseMode.CORNERS}
+	 };
 
-	private static Dictionary<string, Cairo.Format> _imageFormatStr = new Dictionary<string, Format>() {
-		{"RGB", Format.RGB24}, {"ARGB", Format.ARGB32}, {"ALPHA", Format.A8}	//grayscale alpha channel
-	};
+	 private static Dictionary<string, ImageMode> _imageModeStr = new Dictionary<string,ImageMode> () {
+		 {"CORNER", ImageMode.CORNER}, {"CENTER", ImageMode.CENTER}, {"CORNERS", ImageMode.CORNERS}
+	 };
 
-	// Integer-constant maps
-	private static Dictionary<int, RectMode> _rectModeInt = new Dictionary<int,RectMode> () {
-		{CORNER, RectMode.CORNER}, {CENTER, RectMode.CENTER}, {RADIUS, RectMode.RADIUS}, {CORNERS, RectMode.CORNERS}
-	};
+	 private static Dictionary<string, Cairo.LineCap> _strokeCapStr = new Dictionary<string,Cairo.LineCap> () {
+		 {"SQUARE", LineCap.Butt}, {"ROUND", LineCap.Round}, {"PROJECT", LineCap.Square}
+	 };
 
-	private static Dictionary<int, EllipseMode> _ellipseModeInt = new Dictionary<int,EllipseMode> () {
-		{CORNER, EllipseMode.CORNER}, {CENTER, EllipseMode.CENTER}, {RADIUS, EllipseMode.RADIUS}, {CORNERS, EllipseMode.CORNERS}
-	};
+	 private static Dictionary<string, Cairo.LineJoin> _strokeJoinStr = new Dictionary<string,Cairo.LineJoin> () {
+		 {"BEVEL", LineJoin.Bevel}, {"ROUND", LineJoin.Round}, {"MITER", LineJoin.Miter}
+	 };
 
-	private static Dictionary<int, ImageMode> _imageModeInt = new Dictionary<int,ImageMode> () {
-		{CORNER, ImageMode.CORNER}, {CENTER, ImageMode.CENTER}, {CORNERS, ImageMode.CORNERS}
-	};
+	 private static Dictionary<string, Cairo.Format> _imageFormatStr = new Dictionary<string, Format>() {
+		 {"RGB", Format.RGB24}, {"ARGB", Format.ARGB32}, {"ALPHA", Format.A8}	//grayscale alpha channel
+	 };
 
-	private static Dictionary<int, Cairo.LineCap> _strokeCapInt = new Dictionary<int,Cairo.LineCap> () {
-		{SQUARE, LineCap.Butt}, {ROUND, LineCap.Round}, {PROJECT, LineCap.Square}
-	};
+	 // Integer-constant maps
+	 private static Dictionary<int, RectMode> _rectModeInt = new Dictionary<int,RectMode> () {
+		 {CORNER, RectMode.CORNER}, {CENTER, RectMode.CENTER}, {RADIUS, RectMode.RADIUS}, {CORNERS, RectMode.CORNERS}
+	 };
 
-	private static Dictionary<int, Cairo.LineJoin> _strokeJoinInt = new Dictionary<int,Cairo.LineJoin> () {
-		{BEVEL, LineJoin.Bevel}, {ROUND, LineJoin.Round}, {MITER, LineJoin.Miter}
-	};
+	 private static Dictionary<int, EllipseMode> _ellipseModeInt = new Dictionary<int,EllipseMode> () {
+		 {CORNER, EllipseMode.CORNER}, {CENTER, EllipseMode.CENTER}, {RADIUS, EllipseMode.RADIUS}, {CORNERS, EllipseMode.CORNERS}
+	 };
 
-	private static Dictionary<int, Cairo.Format> _imageFormatInt = new Dictionary<int, Format>() {
-		{RGB, Format.RGB24}, {ARGB, Format.ARGB32}, {ALPHA, Format.A8}
-	};
+	 private static Dictionary<int, ImageMode> _imageModeInt = new Dictionary<int,ImageMode> () {
+		 {CORNER, ImageMode.CORNER}, {CENTER, ImageMode.CENTER}, {CORNERS, ImageMode.CORNERS}
+	 };
 
-	private static Dictionary<string, TextAlign> _textAlignStr = new Dictionary<string, TextAlign>() {
-		{"LEFT", TextAlign.LEFT}, {"CENTER", TextAlign.CENTER}, {"RIGHT", TextAlign.RIGHT}
-	};
+	 private static Dictionary<int, Cairo.LineCap> _strokeCapInt = new Dictionary<int,Cairo.LineCap> () {
+		 {SQUARE, LineCap.Butt}, {ROUND, LineCap.Round}, {PROJECT, LineCap.Square}
+	 };
 
-	private static Dictionary<int, TextAlign> _textAlignInt = new Dictionary<int, TextAlign>() {
-		{LEFT, TextAlign.LEFT}, {CENTER, TextAlign.CENTER}, {RIGHT, TextAlign.RIGHT}
-	};
+	 private static Dictionary<int, Cairo.LineJoin> _strokeJoinInt = new Dictionary<int,Cairo.LineJoin> () {
+		 {BEVEL, LineJoin.Bevel}, {ROUND, LineJoin.Round}, {MITER, LineJoin.Miter}
+	 };
 
-	private static Dictionary<string, TextYAlign> _textYAlignStr = new Dictionary<string, TextYAlign>() {
-		{"TOP", TextYAlign.TOP}, {"CENTER", TextYAlign.CENTER}, {"BOTTOM", TextYAlign.BOTTOM}, {"BASELINE", TextYAlign.BASELINE}
-	};
+	 private static Dictionary<int, Cairo.Format> _imageFormatInt = new Dictionary<int, Format>() {
+		 {RGB, Format.RGB24}, {ARGB, Format.ARGB32}, {ALPHA, Format.A8}
+	 };
 
-	private static Dictionary<int, TextYAlign> _textYAlignInt = new Dictionary<int, TextYAlign>() {
-		{TOP, TextYAlign.TOP}, {CENTER, TextYAlign.CENTER}, {BOTTOM, TextYAlign.BOTTOM}, {BASELINE, TextYAlign.BASELINE}
-	};
+	 private static Dictionary<string, TextAlign> _textAlignStr = new Dictionary<string, TextAlign>() {
+		 {"LEFT", TextAlign.LEFT}, {"CENTER", TextAlign.CENTER}, {"RIGHT", TextAlign.RIGHT}
+	 };
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	[JigsawTab(null)]
-	public static void log(object msg, string path) {
-		using (StreamWriter w = File.AppendText(path))
-		{
-			w.WriteLine("{0}: {1}", DateTime.Now.ToString(), msg.ToString());
-		}
-	}
+	 private static Dictionary<int, TextAlign> _textAlignInt = new Dictionary<int, TextAlign>() {
+		 {LEFT, TextAlign.LEFT}, {CENTER, TextAlign.CENTER}, {RIGHT, TextAlign.RIGHT}
+	 };
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	 private static Dictionary<string, TextYAlign> _textYAlignStr = new Dictionary<string, TextYAlign>() {
+		 {"TOP", TextYAlign.TOP}, {"CENTER", TextYAlign.CENTER}, {"BOTTOM", TextYAlign.BOTTOM}, {"BASELINE", TextYAlign.BASELINE}
+	 };
+
+	 private static Dictionary<int, TextYAlign> _textYAlignInt = new Dictionary<int, TextYAlign>() {
+		 {TOP, TextYAlign.TOP}, {CENTER, TextYAlign.CENTER}, {BOTTOM, TextYAlign.BOTTOM}, {BASELINE, TextYAlign.BASELINE}
+	 };
+
+	 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	 [JigsawTab(null)]
+	 public static void log(object msg, string path) {
+		 using (StreamWriter w = File.AppendText(path))
+		 {
+			 w.WriteLine("{0}: {1}", DateTime.Now.ToString(), msg.ToString());
+		 }
+	 }
+
+		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab(null)]
 	public static void MsgBox(object msg) {
 		Gtk.MessageDialog md = new Gtk.MessageDialog(
@@ -2798,9 +2798,9 @@ public class PImage
 			string msg = String.Format ("Don't know how to load an image file with extension {0}", ext);
 			throw new Exception(msg);
 		}
-		//ev.Set();
+		ev.Set();
 	     });
-	   //ev.WaitOne();
+	   ev.WaitOne();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2812,9 +2812,9 @@ public class PImage
 		_img = new ImageSurface(format, width, height);
 		_width = width;
 		_height = height;
-		//ev.Set);
+		ev.Set();
 	     });
-	   //ev.WaitOne();
+           ev.WaitOne();
 	}
 
 	public PImage(int width, int height) : this(width, height, Cairo.Format.ARGB32) { }
@@ -2964,9 +2964,9 @@ public class PImage
 		      if (!_pixbuf.HasAlpha) _pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0);
 		    }
 		  }
-		//ev.Set();
+		ev.Set();
 	     });
-	   //ev.WaitOne();
+	   ev.WaitOne();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -2976,16 +2976,16 @@ public class PImage
 
 	   _invoke ( delegate {
 
-		if (_img  != null && _pixbuf == null)
+		if (_img  != null && _pixbuf != null)
 		  {
 		    using (Context g = new Cairo.Context(_img)) {
 		      Gdk.CairoHelper.SetSourcePixbuf(g, _pixbuf, 0.0, 0.0);
 		      g.Paint ();
 		    }
 		  }
-		//ev.Set();
+		ev.Set();
 	     });
-	   //ev.WaitOne();
+	   ev.WaitOne();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
