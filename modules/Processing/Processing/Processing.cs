@@ -2765,6 +2765,7 @@ public class PImage
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public PImage(string path)
 	{
+	  ManualResetEvent ev = new ManualResetEvent(false);
 	   _invoke ( delegate {
 		// Check file type
 		string ext = System.IO.Path.GetExtension(path).ToLower ();
@@ -2797,17 +2798,23 @@ public class PImage
 			string msg = String.Format ("Don't know how to load an image file with extension {0}", ext);
 			throw new Exception(msg);
 		}
+		ev.Set();
 	     });
+	   ev.WaitOne();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public PImage(int width, int height, Cairo.Format format)
 	{	// Create a new PImage from a Cairo ImageSurface
+	  ManualResetEvent ev = new ManualResetEvent(false);
+
 	   _invoke ( delegate {
 		_img = new ImageSurface(format, width, height);
 		_width = width;
 		_height = height;
+		ev.Set();
 	     });
+	   ev.WaitOne();
 	}
 
 	public PImage(int width, int height) : this(width, height, Cairo.Format.ARGB32) { }
