@@ -8053,6 +8053,7 @@ public static class Graphics
 		sprites[name][costume][frameCount].y = 0;
 		sprites[name][costume][frameCount].draw(this);
 		picture.undraw();
+		picture.window.step();
 		picture = sprites[name][costume][frameCount];
 		wait(delay);
 	    }
