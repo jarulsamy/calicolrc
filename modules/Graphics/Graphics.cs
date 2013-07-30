@@ -575,6 +575,11 @@ public static class Graphics
 		pixel.setAlpha (value);
 	}
   
+        [method: JigsawTab("G/Pictures")]
+	public static void setTransparent (Picture picture, Graphics.Color color) {
+	    picture.setTransparent(color);
+	}
+
     [method: JigsawTab("G/Pictures")]
 	public static void savePicture (IList pictures, string filename, Graphics.Color color=null) {
 	  AnimatedGifEncoder gif = new AnimatedGifEncoder();
@@ -1177,7 +1182,14 @@ public static class Graphics
 		{
 		    return ToString();
 		}    
-	}
+
+	        public bool Equals(Graphics.Color other) 
+	        {
+		    return (red == other.red &&
+			    green == other.green &&
+			    blue == other.blue);
+		}
+	} // end of Color
 
 	public class Gradient
 	{
@@ -4691,6 +4703,28 @@ public static class Graphics
 		public int _getHeight ()
 		{
 		    return _pixbuf.Height;
+		}
+
+		public void setTransparent(Graphics.Color color)
+		{
+		    InvokeBlocking( delegate {
+			    for (int x = 0; x < _cacheWidth; x++) {
+				for (int y = 0; y < _cacheHeight; y++) {
+				    Color c1 = getColor (x, y);
+				    if (c1.Equals(color)) {
+					setAlpha(x, y, 0);
+				    }
+				}
+			    }
+			});
+		}
+
+		public void savePicture () {
+		    if (filename != null) {
+			savePicture(filename, null);
+		    } else {
+			throw new Exception("Picture does not have an associated filename");
+		    }
 		}
 
 		public void savePicture (string filename, Graphics.Color color=null)

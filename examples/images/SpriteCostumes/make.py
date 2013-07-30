@@ -103,12 +103,18 @@ def main():
     walk_right_with_spear = splitRow("bear_child.png", 0, 160, 104, 80, 14)
     walk_left_with_spear = list(reversed(splitRow("bear_child.png", 0, 240, 104, 80, 14)))
 
+    p = Picture("walking-woman.gif")
+
     woman_right = splitRow("walking-woman.gif", 0, 0, 200, 400, 10)
     woman_right.extend(splitRow("walking-woman.gif", 0, 400, 200, 400, 10))
+    for p in woman_right:
+        p.setTransparent(Color(0, 128, 248))
+    #
     walking = Myro.loadPictures("walkside.gif")
     new_walking = []
     for p in walking:
         new_walking.append(p.getRegion((20, 9), 128 - 20, 188 - 9))
+        new_walking[-1].setTransparent(Color(0,0,0))
 
     save("bear/walk-right", walk_right)
     save("bear/walk-left", walk_left)
