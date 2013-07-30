@@ -48,7 +48,7 @@ def save(path, list):
         pass
     count = 0
     for p in list:
-        filename = path + ("/%d.png" % count)
+        filename = path + ("/%02d.png" % count)
         print("saving", filename)
         p.savePicture(filename)
         walk_right = splitRow("bear_child.png", 0, 0, 60, 80, 14)
@@ -61,7 +61,7 @@ def load(path):
     count = 0
     retval = []
     while True:
-        filename = path + ("/%d.png" % count)
+        filename = path + ("/%02d.png" % count)
         if os.path.exists(filename):
             print("loading", filename)
             p = Picture(filename)
@@ -81,7 +81,7 @@ def animate(list):
     previous = None
     while True:
         pic = list[count] ##walk_right[count]
-        ##pic = Picture("bear/walk-right/%d.png" % count)
+        ##pic = Picture("bear/walk-right/%02d.png" % count)
         pic.moveTo(x - pic.width/2, y + pic.height/2)
         pic.draw(win)
         if previous:

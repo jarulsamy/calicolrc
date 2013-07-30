@@ -7906,6 +7906,10 @@ public static class Graphics
 
     //---------------------------------------------------SPRITE-------------------------------------------------
 
+    public static List<string> getSpriteNames() {
+	return new List<string>(new Sprite(new int [] {0, 0}).sprites.Keys);
+    }
+    
     public class Sprite : Shape {
 	public Graphics.Picture picture; 
 	public string costume;
@@ -7913,8 +7917,11 @@ public static class Graphics
 	public string name;
 	
 	// sprites["sally"]["walk"] = [Picture(), ...]
-	private Dictionary<string, Dictionary<string, List<Graphics.Picture>>> sprites;	
+	public Dictionary<string, Dictionary<string, List<Graphics.Picture>>> sprites;	
 	
+	public Sprite (IList iterable) : this(iterable, "bear"){
+	}
+
 	public Sprite (IList iterable, string name) : base(true){
 	    this.name = name;
 	    string codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
@@ -7929,7 +7936,7 @@ public static class Graphics
 		Picture temp = null;
 		try {
 		    temp = new Graphics.Picture(file);
-		} catch {
+		} catch { // skip non-image files
 		    continue;
 		}
 		string sname = System.IO.Path.GetFileNameWithoutExtension(file);
@@ -7946,13 +7953,18 @@ public static class Graphics
 		    string subname = new DirectoryInfo(subdirectory).Name;
 		    sprites[sname][subname] = new List<Picture>();
 		    foreach(string file in Directory.EnumerateFiles(subdirectory, "*.*")){
-			string costume_name = System.IO.Path.GetFileNameWithoutExtension(file);
-			sprites[sname][subname].Add(new Picture(file));
+			try {
+			    sprites[sname][subname].Add(new Picture(file));
+			} catch {
+			    // skip non-image files
+			}
 		    }
+		    sprites[sname][subname].Sort((x,y) => x.filename.CompareTo(y.filename));
 		}
 	    }
 	    
-	    costume = getCostume(name); // finds a good one for default
+	    
+	    costume = getDefaultCostumeName(name); // finds a good one for default
 	    picture = sprites[name][costume][0];
 
 	    center = new Point(iterable);
@@ -7965,7 +7977,11 @@ public static class Graphics
 	    picture.draw(this);
 	}
 
-	public string getCostume(string name) {
+	public string getDefaultCostumeName() {
+	    return getDefaultCostumeName(name);
+	}
+
+	public string getDefaultCostumeName(string name) {
 	    if (sprites[name].ContainsKey("default")) {
 		return "default";
 	    } else {
@@ -7974,6 +7990,38 @@ public static class Graphics
 		}
 	    }
 	    return null;
+	}
+
+	public List<string> getCostumes() {
+	    return new List<string>(sprites[name].Keys);
+	}
+	
+	public List<string> getCostumes(string name) {
+	    return new List<string>(sprites[name].Keys);
+	}
+	
+	public List<Picture> getFrames(string name, string costume) {
+	    return new List<Picture>(sprites[name][costume]);
+	}
+	
+	public List<Picture> getFrames(string costume) {
+	    return new List<Picture>(sprites[name][costume]);
+	}
+	
+	public List<Picture> getFrames() {
+	    return new List<Picture>(sprites[name][costume]);
+	}
+
+	public void animate(double delay) {
+	    for (frameCount = 1; frameCount < sprites[name][costume].Count; frameCount++) {
+		sprites[name][costume][frameCount].border = 0;
+		sprites[name][costume][frameCount].x = 0;
+		sprites[name][costume][frameCount].y = 0;
+		sprites[name][costume][frameCount].draw(this);
+		picture.undraw();
+		picture = sprites[name][costume][frameCount];
+		wait(delay);
+	    }
 	}
 	
 	public override bool hit (double x, double y)
