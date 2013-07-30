@@ -7903,4 +7903,108 @@ public static class Graphics
 	ag.Finish();
 	ag.Output("test.gif");
     }
+
+    //---------------------------------------------------SPRITE-------------------------------------------------
+
+    public class Sprite : Shape {
+	public Graphics.Picture picture; 
+	public string costume;
+	public int frameCount = 0;
+	public string name;
+	
+	// sprites["sally"]["walk"] = [Picture(), ...]
+	private Dictionary<string, Dictionary<string, List<Graphics.Picture>>> sprites;	
+	
+	public Sprite (IList iterable, string name) : base(true){
+	    this.name = name;
+	    string codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
+	    System.UriBuilder uri = new System.UriBuilder(codeBase);
+	    string path = System.Uri.UnescapeDataString(uri.Path);
+	    string AssemblyDirectory = System.IO.Path.GetDirectoryName(path);
+	    string folderPath = System.IO.Path.Combine(AssemblyDirectory, "../examples/images/SpriteCostumes");
+	    
+	    sprites = new Dictionary<string, Dictionary<string, List<Graphics.Picture>>>();
+	    // First, get raw files in this directory:
+	    foreach(string file in Directory.EnumerateFiles(folderPath, "*.*")){
+		Picture temp = null;
+		try {
+		    temp = new Graphics.Picture(file);
+		} catch {
+		    continue;
+		}
+		string sname = System.IO.Path.GetFileNameWithoutExtension(file);
+		sprites[sname] = new Dictionary<string, List<Picture>>();
+		sprites[sname]["default"] = new List<Picture>();
+		sprites[sname]["default"].Add(temp);
+	    }	
+	    // Next, for each directory:
+	    foreach(string directory in Directory.EnumerateDirectories(folderPath, "*")){
+		// for each costume
+		string sname = new DirectoryInfo(directory).Name;
+		sprites[sname] = new Dictionary<string, List<Picture>>();
+		foreach(string subdirectory in Directory.EnumerateDirectories(directory, "*")){
+		    string subname = new DirectoryInfo(subdirectory).Name;
+		    sprites[sname][subname] = new List<Picture>();
+		    foreach(string file in Directory.EnumerateFiles(subdirectory, "*.*")){
+			string costume_name = System.IO.Path.GetFileNameWithoutExtension(file);
+			sprites[sname][subname].Add(new Picture(file));
+		    }
+		}
+	    }
+	    
+	    costume = getCostume(name); // finds a good one for default
+	    picture = sprites[name][costume][0];
+
+	    center = new Point(iterable);
+	    set_points(center);
+
+	    // Draw picture on sprite:
+	    picture.x = 0;
+	    picture.y = 0;
+	    picture.border = 0;
+	    picture.draw(this);
+	}
+
+	public string getCostume(string name) {
+	    if (sprites[name].ContainsKey("default")) {
+		return "default";
+	    } else {
+		foreach (KeyValuePair<string,List<Picture>> kvp in sprites[name]) {
+		    return kvp.Key;
+		}
+	    }
+	    return null;
+	}
+	
+	public override bool hit (double x, double y)
+	{
+	    // ask the currenCostume what if it got hit:
+	    Point p = new Point (x, y);
+	    int counter = 0;
+	    double xinters;
+	    Point p1, p2;
+	    if (picture.points != null) {
+		p1 = picture.points [0];
+		for (int i=1; i<=picture.points.Length; i++) {
+		    p2 = picture.points [i % picture.points.Length];
+		    if (p.y > (Math.Min (p1.gy, p2.gy))) {
+			if (p.y <= (Math.Max (p1.gy, p2.gy))) {
+			    if (p.x <= (Math.Max (p1.gx, p2.gx))) {
+				if (p1.gy != p2.gy) {
+				    xinters = (p.y - p1.gy) * (p2.gx - p1.gx) / (p2.gy - p1.gy) + p1.gx;
+				    if (p1.gx == p2.gx || p.x <= xinters)
+					counter++;
+				}
+			    }
+			}
+		    }
+		    p1 = p2;
+		}
+		return (counter % 2 != 0); // hit?
+	    } else {
+		return false;
+	    }
+	}
+    }
+    //----------------------------------------------END OF SPRITE CLASS-----------------------------------------
 }
