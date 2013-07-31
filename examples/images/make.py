@@ -51,7 +51,6 @@ def save(path, list):
         filename = path + ("/%02d.png" % count)
         print("saving", filename)
         p.savePicture(filename)
-        walk_right = splitRow("bear_child.png", 0, 0, 60, 80, 14)
         count += 1
 
 def load(path):
@@ -98,30 +97,30 @@ def animate(list):
 ## Now, let's use the above in a specific way:
 
 def main():
-    walk_right = splitRow("bear_child.png", 0, 0, 60, 80, 14)
-    walk_left = list(reversed(splitRow("bear_child.png", 0, 80, 60, 80, 14)))
-    walk_right_with_spear = splitRow("bear_child.png", 0, 160, 104, 80, 14)
-    walk_left_with_spear = list(reversed(splitRow("bear_child.png", 0, 240, 104, 80, 14)))
+    walk_right = splitRow("source/bear_child.png", 0, 0, 60, 80, 14)
+    walk_left = list(reversed(splitRow("source/bear_child.png", 0, 80, 60, 80, 14)))
+    walk_right_with_spear = splitRow("source/bear_child.png", 0, 160, 104, 80, 14)
+    walk_left_with_spear = list(reversed(splitRow("source/bear_child.png", 0, 240, 104, 80, 14)))
 
-    p = Picture("walking-woman.gif")
+    p = Picture("source/walking-woman.gif")
 
-    woman_right = splitRow("walking-woman.gif", 0, 0, 200, 400, 10)
-    woman_right.extend(splitRow("walking-woman.gif", 0, 400, 200, 400, 10))
+    woman_right = splitRow("source/walking-woman.gif", 0, 0, 200, 400, 10)
+    woman_right.extend(splitRow("source/walking-woman.gif", 0, 400, 200, 400, 10))
     for p in woman_right:
         p.setTransparent(Color(0, 128, 248))
     #
-    walking = Myro.loadPictures("walkside.gif")
+    walking = Myro.loadPictures("source/walkside.gif")
     new_walking = []
     for p in walking:
         new_walking.append(p.getRegion((20, 9), 128 - 20, 188 - 9))
         new_walking[-1].setTransparent(Color(0,0,0))
 
-    save("bear/walk-right", walk_right)
-    save("bear/walk-left", walk_left)
-    save("bear-with-spear/walk-right", walk_right_with_spear)
-    save("bear-with-spear/walk-left", walk_left_with_spear)
-    save("stickman/walk-right", new_walking)
-    save("woman/walk-right", woman_right)
+    save("sprites/bear/walk-right", walk_right)
+    save("sprites/bear/walk-left", walk_left)
+    save("sprites/bear-with-spear/walk-right", walk_right_with_spear)
+    save("sprites/bear-with-spear/walk-left", walk_left_with_spear)
+    save("sprites/stickman/walk-right", new_walking)
+    save("sprites/woman/walk-right", woman_right)
 
 if __name__ == "__main__":
     main()
