@@ -46,7 +46,7 @@ public class Event {
 	}
   }
 
-  public Event (string message) : this(message, true) {
+  public Event (string message) : this(message, false) {
   }
 
   public Event (Gtk.ButtonReleaseEventArgs args) {
