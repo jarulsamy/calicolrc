@@ -7941,65 +7941,114 @@ public static class Graphics
     //---------------------------------------------------SPRITE-------------------------------------------------
 
     public static List<string> getSpriteNames() {
-	return new List<string>(new Sprite(new int [] {0, 0}).sprites.Keys);
+	List<string> sprites = new List<string>();
+	string codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
+	System.UriBuilder uri = new System.UriBuilder(codeBase);
+	string path = System.Uri.UnescapeDataString(uri.Path);
+	string AssemblyDirectory = System.IO.Path.GetDirectoryName(path);
+	string folderPath = System.IO.Path.Combine(AssemblyDirectory, "../examples/images/sprites");
+	    
+	// First, search raw files in this directory:
+	foreach(string file in Directory.EnumerateFiles(folderPath, "*.*")){
+	    string sname = System.IO.Path.GetFileNameWithoutExtension(file);
+	    Picture temp = null;
+	    try {
+		temp = new Graphics.Picture(file);
+	    } catch { // skip non-image files
+		// not a valid image, keep looking!
+	    }
+	    if (temp != null) {
+		sprites.Add(sname);
+	    }
+	}	
+	// Next, search each directory:
+	foreach(string directory in Directory.EnumerateDirectories(folderPath, "*")){
+	    // for each costume folder:
+	    string sname = new DirectoryInfo(directory).Name;
+	    sprites.Add(sname);
+	}
+	return sprites;
+    }
+
+    public static Dictionary<string, List<Graphics.Picture>> getCostumes(string name) {
+	string codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
+	System.UriBuilder uri = new System.UriBuilder(codeBase);
+	string path = System.Uri.UnescapeDataString(uri.Path);
+	string AssemblyDirectory = System.IO.Path.GetDirectoryName(path);
+	string folderPath = System.IO.Path.Combine(AssemblyDirectory, "../examples/images/sprites");
+	    
+	Dictionary<string, List<Graphics.Picture>> costumes = new Dictionary<string, List<Graphics.Picture>>();
+	// First, search raw files in this directory:
+	foreach(string file in Directory.EnumerateFiles(folderPath, "*.*")){
+	    string sname = System.IO.Path.GetFileNameWithoutExtension(file);
+	    if (sname == name) { // match!
+		Picture temp = null;
+		try {
+		    temp = new Graphics.Picture(file);
+		} catch { // skip non-image files
+		    // not a valid image, keep looking!
+		}
+		if (temp != null) {
+		    costumes["default"] = new List<Picture>();
+		    costumes["default"].Add(temp);
+		    return costumes;
+		}
+	    }
+	}	
+	// Next, search each directory:
+	foreach(string directory in Directory.EnumerateDirectories(folderPath, "*")){
+	    // for each costume folder:
+	    string sname = new DirectoryInfo(directory).Name;
+	    if (sname == name) { // match!
+		// first we find single-picture costumes:
+		foreach(string filename in Directory.EnumerateFiles(directory, "*.*")){
+		    Picture temp = null;
+		    try {
+			temp = new Graphics.Picture(filename);
+		    } catch { // skip non-image files
+			// not valid, skip it
+		    }
+		    if (temp != null) {
+			string fname = System.IO.Path.GetFileNameWithoutExtension(filename);
+			costumes[fname] = new List<Picture>();
+			costumes[fname].Add(temp);
+		    } // else skip
+		}
+		// next we find folder costumes:
+		foreach(string subdirectory in Directory.EnumerateDirectories(directory, "*")){
+		    string subname = new DirectoryInfo(subdirectory).Name;
+		    costumes[subname] = new List<Picture>();
+		    foreach(string file in Directory.EnumerateFiles(subdirectory, "*.*")){
+			try {
+			    costumes[subname].Add(new Picture(file));
+			} catch {
+			    // skip non-image files
+			}
+		    }
+		    costumes[subname].Sort((x,y) => x.filename.CompareTo(y.filename));
+		}
+		return costumes;
+	    }
+	}
+	return null; // nothing found
     }
     
     public class Sprite : Shape {
 	public Graphics.Picture picture; 
 	public string costume;
+	public Dictionary<string, List<Graphics.Picture>> costumes;
 	public int frameCount = 0;
 	public string name;
 	
-	// sprites["sally"]["walk"] = [Picture(), ...]
-	public Dictionary<string, Dictionary<string, List<Graphics.Picture>>> sprites;	
-	
-	public Sprite (IList iterable) : this(iterable, "bear"){
+	public Sprite (string name) : this(new int [] {0,0}, name){
 	}
 
 	public Sprite (IList iterable, string name) : base(true){
 	    this.name = name;
-	    string codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
-	    System.UriBuilder uri = new System.UriBuilder(codeBase);
-	    string path = System.Uri.UnescapeDataString(uri.Path);
-	    string AssemblyDirectory = System.IO.Path.GetDirectoryName(path);
-	    string folderPath = System.IO.Path.Combine(AssemblyDirectory, "../examples/images/SpriteCostumes");
+	    costumes = Graphics.getCostumes(name);
 	    
-	    sprites = new Dictionary<string, Dictionary<string, List<Graphics.Picture>>>();
-	    // First, get raw files in this directory:
-	    foreach(string file in Directory.EnumerateFiles(folderPath, "*.*")){
-		Picture temp = null;
-		try {
-		    temp = new Graphics.Picture(file);
-		} catch { // skip non-image files
-		    continue;
-		}
-		string sname = System.IO.Path.GetFileNameWithoutExtension(file);
-		sprites[sname] = new Dictionary<string, List<Picture>>();
-		sprites[sname]["default"] = new List<Picture>();
-		sprites[sname]["default"].Add(temp);
-	    }	
-	    // Next, for each directory:
-	    foreach(string directory in Directory.EnumerateDirectories(folderPath, "*")){
-		// for each costume
-		string sname = new DirectoryInfo(directory).Name;
-		sprites[sname] = new Dictionary<string, List<Picture>>();
-		foreach(string subdirectory in Directory.EnumerateDirectories(directory, "*")){
-		    string subname = new DirectoryInfo(subdirectory).Name;
-		    sprites[sname][subname] = new List<Picture>();
-		    foreach(string file in Directory.EnumerateFiles(subdirectory, "*.*")){
-			try {
-			    sprites[sname][subname].Add(new Picture(file));
-			} catch {
-			    // skip non-image files
-			}
-		    }
-		    sprites[sname][subname].Sort((x,y) => x.filename.CompareTo(y.filename));
-		}
-	    }
-	    
-	    
-	    costume = getDefaultCostumeName(name); // finds a good one for default
-	    picture = sprites[name][costume][0];
+	    costume = getDefaultCostumeName(); // finds a good name for default
+	    picture = costumes[costume][0]; // get the first picture as default
 
 	    center = new Point(iterable);
 	    set_points(center);
@@ -8016,45 +8065,57 @@ public static class Graphics
 	}
 
 	public string getDefaultCostumeName(string name) {
-	    if (sprites[name].ContainsKey("default")) {
+	    if (costumes.ContainsKey("default")) {
 		return "default";
 	    } else {
-		foreach (KeyValuePair<string,List<Picture>> kvp in sprites[name]) {
-		    return kvp.Key;
+		foreach (KeyValuePair<string,List<Picture>> kvp in costumes) {
+		    return kvp.Key; // get first one
 		}
 	    }
 	    return null;
 	}
 
-	public List<string> getCostumes() {
-	    return new List<string>(sprites[name].Keys);
+	public List<string> getCostumeNames() {
+	    return new List<string>(costumes.Keys);
 	}
 	
-	public List<string> getCostumes(string name) {
-	    return new List<string>(sprites[name].Keys);
-	}
-	
-	public List<Picture> getFrames(string name, string costume) {
-	    return new List<Picture>(sprites[name][costume]);
+	public void updateCostumes() {
+	    costumes = Graphics.getCostumes(name);
+	    costume = getDefaultCostumeName(); // finds a good one for default
 	}
 	
 	public List<Picture> getFrames(string costume) {
-	    return new List<Picture>(sprites[name][costume]);
+	    return costumes[costume];
 	}
 	
 	public List<Picture> getFrames() {
-	    return new List<Picture>(sprites[name][costume]);
+	    return costumes[costume];
+	}
+
+	public void changeCostume(string name) {
+	    costume = name;
+	    frameCount = 0;
+	    picture.undraw();
+	    picture = costumes[name][frameCount];
+	    costumes[costume][frameCount].x = 0;
+	    costumes[costume][frameCount].y = 0;
+	    picture.draw(window);
 	}
 
 	public void animate(double delay) {
-	    for (frameCount = 1; frameCount < sprites[name][costume].Count; frameCount++) {
-		sprites[name][costume][frameCount].border = 0;
-		sprites[name][costume][frameCount].x = 0;
-		sprites[name][costume][frameCount].y = 0;
-		sprites[name][costume][frameCount].draw(this);
-		picture.undraw();
+	    Picture previous = null;
+	    picture.undraw();
+	    for (frameCount = 0; frameCount < costumes[costume].Count; frameCount++) {
+		costumes[costume][frameCount].border = 0;
+		costumes[costume][frameCount].x = 0;
+		costumes[costume][frameCount].y = 0;
+		costumes[costume][frameCount].draw(this);
+		if (previous != null) {
+		    previous.undraw();
+		}
 		picture.window.step();
-		picture = sprites[name][costume][frameCount];
+		picture = costumes[costume][frameCount];
+		previous = picture;
 		wait(delay);
 	    }
 	}
