@@ -259,24 +259,24 @@ public static class Events {
 		    }
 	        }
 		foreach(Event evt in queue) {
-		  string id = getID(evt.obj, evt.type);
-		  if (handler.ContainsKey(id)) {
+		    string id = getID(evt.obj, evt.type);
+		    if (handler.ContainsKey(id)) {
 			Event lastEvent = null;
 			List<Thread> threads = new List<Thread>();
 			foreach (Tuple<Func<object,Event,object>,object> tuple in handler[id]) {
-			  Func<object,Event,object> code = tuple.Item1;
-			  object obj = tuple.Item2;
-			  Thread codethread = new Thread (new ThreadStart ( delegate {
-				      try {
-					  evt.value = code(obj, evt);
-				      } catch (Exception e) {
-					  System.Console.Error.WriteLine("Error in receiving message: '{0}': {1}", evt.type, e.Message);
-				      }
-				  }));
-			  threads.Add(codethread);
-			  codethread.IsBackground = true;
-			  codethread.Start();
-			  lastEvent = evt;
+			    Func<object,Event,object> code = tuple.Item1;
+			    object obj = tuple.Item2;
+			    Thread codethread = new Thread (new ThreadStart ( delegate {
+					try {
+					    evt.value = code(obj, evt);
+					} catch (Exception e) {
+					    System.Console.Error.WriteLine("Error in receiving message: '{0}': {1}", evt.type, e.Message);
+					}
+				    }));
+			    threads.Add(codethread);
+			    codethread.IsBackground = true;
+			    codethread.Start();
+			    lastEvent = evt;
 			}
 			if (lastEvent != null && lastEvent.wait) {
 			    // Wait for them all to finish

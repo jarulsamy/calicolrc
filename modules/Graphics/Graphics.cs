@@ -1248,6 +1248,8 @@ public static class Graphics
 		Gtk.ScrolledWindow _scrolledWindow = null;
 		public int _cacheHeight;
 		public int _cacheWidth;
+		public bool HandleKeyPressOnShape = false;
+		public bool HandleKeyReleaseOnShape = false;
 
 		public WindowClass (string title, Gtk.Widget widget) : base(title)
 		{
@@ -1551,6 +1553,8 @@ public static class Graphics
 		    MotionNotifyEvent -= HandleMouseMovementOnShape;
 		    ButtonPressEvent -= HandleClickOnShape;
 		    ButtonReleaseEvent -= HandleMouseUpOnShape;
+		    HandleKeyPressOnShape = false;
+		    HandleKeyReleaseOnShape = false;
 		}
 
 		public void listen(string evt) {
@@ -1566,8 +1570,12 @@ public static class Graphics
 			// remove if already there:
 			ButtonReleaseEvent -= HandleMouseUpOnShape;
 			ButtonReleaseEvent += HandleMouseUpOnShape;
+		    } else if (evt == "key-press") {
+			HandleKeyPressOnShape = true;
+		    } else if (evt == "key-release") {
+			HandleKeyReleaseOnShape = true;
 		    } else {
-			throw new Exception(String.Format("invalid event '{0}': use 'mouse-motion', 'mouse-press', or 'mouse-release'", evt));
+			throw new Exception(String.Format("invalid event '{0}': use 'mouse-motion', 'mouse-press', 'mouse-release', 'key-press', or 'key-release'.", evt));
 		    }
 		}
 
@@ -1649,6 +1657,15 @@ public static class Graphics
 			_lastKey = args.Event.Key.ToString ();
 			_keyState = "down";
 			Event evt = new Event (args);
+			evt.type = "key-press";
+			if (HandleKeyPressOnShape){
+			    lock (canvas.shapes) {
+				foreach (Shape shape in canvas.shapes) {
+				    evt.obj = shape;
+				    EventsManager.publish(evt);
+				}
+			    }
+			}
 			foreach (Func<object,Event,object> function in onKeyPressCallbacks) {
 				try {
 					Invoke (delegate {
@@ -1667,6 +1684,15 @@ public static class Graphics
 		{
 			_keyState = "up";
 			Event evt = new Event (args);
+			evt.type = "key-release";
+			if (HandleKeyPressOnShape){
+			    lock (canvas.shapes) {
+				foreach (Shape shape in canvas.shapes) {
+				    evt.obj = shape;
+				    EventsManager.publish(evt);
+				}
+			    }
+			}
 			foreach (Func<object,Event,object> function in onKeyReleaseCallbacks) {
 				try {
 					Invoke (delegate {
@@ -2400,7 +2426,7 @@ public static class Graphics
 		// FIXME: should call QueueDraw on set
 	    
 	    public void subscribe(string message, Func<object,Event,object> procedure) {
-		List<string> messages = new List<string>() {"mouse-press", "mouse-release", "mouse-motion"};
+		List<string> messages = new List<string>() {"mouse-press", "mouse-release", "mouse-motion", "key-press", "key-release"};
 		if (messages.Contains(message)) {
 		    Events.subscribe(message, procedure, this);
 		    // FIXME: maybe turn on the window listener:
