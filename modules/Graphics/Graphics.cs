@@ -1478,7 +1478,8 @@ public static class Graphics
 
 		public void drawAt (Shape shape, IList iterable)
 		{
-		    shape.moveTo((double)iterable[0], (double)iterable[1]);
+		    shape.moveTo(System.Convert.ToDouble(iterable[0]), 
+				 System.Convert.ToDouble(iterable[1]));
 		    shape.draw (this);
 		}
 
@@ -3302,7 +3303,8 @@ public static class Graphics
 		}
 	        
 	        public void drawAt (WindowClass win, IList iterable) {
-		    moveTo((double)iterable[0], (double)iterable[1]);
+		    moveTo(System.Convert.ToDouble(iterable[0]), 
+			   System.Convert.ToDouble(iterable[1]));
 		    draw(win);
 		}
     
@@ -3342,7 +3344,8 @@ public static class Graphics
 
 	        public void drawAt (Canvas canvas, IList iterable)
 	        {
-		    moveTo((double)iterable[0], (double)iterable[1]);
+		    moveTo(System.Convert.ToDouble(iterable[0]), 
+			   System.Convert.ToDouble(iterable[1]));
 		    draw(canvas);
 		}
 
