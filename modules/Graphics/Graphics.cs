@@ -1476,6 +1476,12 @@ public static class Graphics
 			shape.draw (this);
 		}
 
+		public void drawAt (Shape shape, IList iterable)
+		{
+		    shape.moveTo((double)iterable[0], (double)iterable[1]);
+		    shape.draw (this);
+		}
+
 		public void undraw (Shape shape)
 		{
 			shape.undraw ();
@@ -2145,6 +2151,11 @@ public static class Graphics
 		public string __repr__ ()
 		{
 			return String.Format ("<Point (x={0},y={1})>", x, y);
+		}
+
+		public void drawAt (WindowClass window, IList iterable)
+		{
+			throw new Exception ("Can't draw a point; use Dot instead");
 		}
 
 		public void draw (WindowClass window)
@@ -3289,6 +3300,11 @@ public static class Graphics
 			// Alias to QueueDraw
 			QueueDraw (); 
 		}
+	        
+	        public void drawAt (WindowClass win, IList iterable) {
+		    moveTo((double)iterable[0], (double)iterable[1]);
+		    draw(win);
+		}
     
 		public void draw (WindowClass win)
 		{ // Shape
@@ -3324,6 +3340,12 @@ public static class Graphics
 			});
 		}
 
+	        public void drawAt (Canvas canvas, IList iterable)
+	        {
+		    moveTo((double)iterable[0], (double)iterable[1]);
+		    draw(canvas);
+		}
+
 		public void draw (Canvas canvas)
 		{ // Shape
 		    InvokeBlocking( delegate {
@@ -3346,6 +3368,12 @@ public static class Graphics
 			});
 		}
     
+	        public void draw (Shape shape, IList iterable)
+	        {
+		    moveTo((double)iterable[0], (double)iterable[1]);
+		    draw(shape);
+		}
+
 		public void draw (Shape shape)
 		{ // Shape
 		    InvokeBlocking( delegate {
