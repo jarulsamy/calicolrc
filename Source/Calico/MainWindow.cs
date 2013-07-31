@@ -3613,6 +3613,15 @@ del _invoke, _
             }
         }
 
+        protected void OnChangeDirectoryActionActivated(object sender, System.EventArgs e) {
+            if (CurrentDocument != null) {
+			  if (System.IO.File.Exists(CurrentDocument.filename)) {
+				string dir = System.IO.Path.GetDirectoryName(CurrentDocument.filename);
+				System.IO.Directory.SetCurrentDirectory(dir);
+			  }
+            }
+        }
+
         protected void OnAboutActionActivated(object sender, System.EventArgs e) {
             if (CurrentDocument != null) {
                 CurrentDocument.OnAbout();

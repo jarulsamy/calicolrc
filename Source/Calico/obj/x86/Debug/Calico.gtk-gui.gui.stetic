@@ -374,6 +374,12 @@
         <property name="ShortLabel" translatable="yes">Toggle Breakpoint</property>
         <signal name="Activated" handler="OnSetBreakpointActionActivated" />
       </action>
+      <action id="ChangeDirectoryAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Change to Directory</property>
+        <property name="ShortLabel" translatable="yes">Change to Directory</property>
+        <signal name="Activated" handler="OnChangeDirectoryActionActivated" />
+      </action>
       <action id="ScriptOptionsAction">
         <property name="Type">Action</property>
         <property name="Label" translatable="yes">Script Options</property>
@@ -585,6 +591,7 @@
                 <node type="Menuitem" action="AboutAction" />
                 <node type="Separator" />
                 <node type="Menuitem" action="ToggleBreakpointAction" />
+                <node type="Menuitem" action="ChangeDirectoryAction" />
                 <node type="Menuitem" action="BlastScriptAction" />
                 <node type="Menu" action="ScriptOptionsAction" />
               </node>
