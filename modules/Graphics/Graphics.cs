@@ -8030,26 +8030,26 @@ public static class Graphics
 	return sprites;
     }
 
-    public static Dictionary<string, List<Graphics.Picture>> getCostumes(string name) {
+    public static Dictionary<string, List<Graphics.Shape>> getCostumes(string name) {
 	string codeBase = System.Reflection.Assembly.GetExecutingAssembly().CodeBase;
 	System.UriBuilder uri = new System.UriBuilder(codeBase);
 	string path = System.Uri.UnescapeDataString(uri.Path);
 	string AssemblyDirectory = System.IO.Path.GetDirectoryName(path);
 	string folderPath = System.IO.Path.Combine(AssemblyDirectory, "../examples/images/sprites");
 	    
-	Dictionary<string, List<Graphics.Picture>> costumes = new Dictionary<string, List<Graphics.Picture>>();
+	Dictionary<string, List<Graphics.Shape>> costumes = new Dictionary<string, List<Graphics.Shape>>();
 	// First, search raw files in this directory:
 	foreach(string file in Directory.EnumerateFiles(folderPath, "*.*")){
 	    string sname = System.IO.Path.GetFileNameWithoutExtension(file);
 	    if (sname == name) { // match!
-		Picture temp = null;
+		Shape temp = null;
 		try {
 		    temp = new Graphics.Picture(file);
 		} catch { // skip non-image files
 		    // not a valid image, keep looking!
 		}
 		if (temp != null) {
-		    costumes["default"] = new List<Picture>();
+		    costumes["default"] = new List<Shape>();
 		    costumes["default"].Add(temp);
 		    return costumes;
 		}
@@ -8062,7 +8062,7 @@ public static class Graphics
 	    if (sname == name) { // match!
 		// first we find single-picture costumes:
 		foreach(string filename in Directory.EnumerateFiles(directory, "*.*")){
-		    Picture temp = null;
+		    Shape temp = null;
 		    try {
 			temp = new Graphics.Picture(filename);
 		    } catch { // skip non-image files
@@ -8070,14 +8070,14 @@ public static class Graphics
 		    }
 		    if (temp != null) {
 			string fname = System.IO.Path.GetFileNameWithoutExtension(filename);
-			costumes[fname] = new List<Picture>();
+			costumes[fname] = new List<Shape>();
 			costumes[fname].Add(temp);
 		    } // else skip
 		}
 		// next we find folder costumes:
 		foreach(string subdirectory in Directory.EnumerateDirectories(directory, "*")){
 		    string subname = new DirectoryInfo(subdirectory).Name;
-		    costumes[subname] = new List<Picture>();
+		    costumes[subname] = new List<Shape>();
 		    foreach(string file in Directory.EnumerateFiles(subdirectory, "*.*")){
 			try {
 			    costumes[subname].Add(new Picture(file));
@@ -8085,7 +8085,7 @@ public static class Graphics
 			    // skip non-image files
 			}
 		    }
-		    costumes[subname].Sort((x,y) => x.filename.CompareTo(y.filename));
+		    //costumes[subname].Sort((x,y) => x.filename.CompareTo(y.filename));
 		}
 		return costumes;
 	    }
@@ -8094,12 +8094,21 @@ public static class Graphics
     }
     
     public class Sprite : Shape {
-	public Graphics.Picture picture; 
+	public Graphics.Shape shape; 
 	public string costume;
-	public Dictionary<string, List<Graphics.Picture>> costumes;
+	public Dictionary<string, List<Graphics.Shape>> costumes;
 	public int frame = 0;
 	public string name;
 	
+	public Sprite () {
+	    name = "undefined";
+	    costume = "default";
+	    costumes = new Dictionary<string, List<Graphics.Shape>>();
+	    costumes["default"] = new List<Graphics.Shape>();
+	    center = new Point(0,0);
+	    set_points(center);
+	}
+
 	public Sprite (string name) : this(new int [] {0,0}, name){
 	}
 
@@ -8111,16 +8120,45 @@ public static class Graphics
 	    }
 	    
 	    costume = getDefaultCostumeName(); // finds a good name for default
-	    picture = costumes[costume][0]; // get the first picture as default
+	    shape = costumes[costume][0]; // get the first picture as default
 
 	    center = new Point(iterable);
 	    set_points(center);
 
 	    // Draw picture on sprite:
-	    picture.x = 0;
-	    picture.y = 0;
-	    picture.border = 0;
-	    picture.draw(this);
+	    shape.x = 0;
+	    shape.y = 0;
+	    shape.border = 0;
+	    shape.draw(this);
+	}
+
+	public void addCostume(string cname, Shape shape) {
+	    // if not pre-existing, adds a new costume name and costume, or
+	    // if costume name already exists, adds a new frame
+	    if (this.shape != null) {
+		this.shape.undraw();
+	    }
+	    this.shape = shape;
+	    this.shape.x = 0;
+	    this.shape.y = 0;
+	    shape.draw(this);
+	    costume = cname;
+	    if (!costumes.ContainsKey(cname)) {
+		costumes[cname] = new List<Graphics.Shape>();
+	    }
+	    costumes[costume].Add(shape);
+	}
+
+	public void addFrame(Shape shape) {
+	    // adds a new frame to the current costume
+	    if (this.shape != null) {
+		this.shape.undraw();
+	    }
+	    this.shape = shape;
+	    this.shape.x = 0;
+	    this.shape.y = 0;
+	    shape.draw(this);
+	    costumes[costume].Add(shape);
 	}
 
 	public string getDefaultCostumeName() {
@@ -8131,7 +8169,7 @@ public static class Graphics
 	    if (costumes.ContainsKey("default")) {
 		return "default";
 	    } else {
-		foreach (KeyValuePair<string,List<Picture>> kvp in costumes) {
+		foreach (KeyValuePair<string,List<Shape>> kvp in costumes) {
 		    return kvp.Key; // get first one
 		}
 	    }
@@ -8147,29 +8185,29 @@ public static class Graphics
 	    costume = getDefaultCostumeName(); // finds a good one for default
 	}
 	
-	public List<Picture> getFrames(string costume) {
+	public List<Shape> getFrames(string costume) {
 	    return costumes[costume];
 	}
 	
-	public List<Picture> getFrames() {
+	public List<Shape> getFrames() {
 	    return costumes[costume];
 	}
 
 	public void changeCostume(string name) {
 	    costume = name;
 	    frame = 0;
-	    picture.undraw();
-	    picture = costumes[name][frame];
+	    shape.undraw();
+	    shape = costumes[name][frame];
 	    costumes[costume][frame].x = 0;
 	    costumes[costume][frame].y = 0;
 	    if (window != null) {
-		picture.draw(window);
+		shape.draw(window);
 	    }
 	}
 
 	public void animate(double delay) {
-	    Picture previous = null;
-	    picture.undraw();
+	    Shape previous = null;
+	    shape.undraw();
 	    for (frame = 0; frame < costumes[costume].Count; frame++) {
 		costumes[costume][frame].border = 0;
 		costumes[costume][frame].x = 0;
@@ -8179,10 +8217,10 @@ public static class Graphics
 		    previous.undraw();
 		}
 		if (window != null) {
-		    picture.window.step();
+		    shape.window.step();
 		}
-		picture = costumes[costume][frame];
-		previous = picture;
+		shape = costumes[costume][frame];
+		previous = shape;
 		wait(delay);
 	    }
 	}
@@ -8194,10 +8232,10 @@ public static class Graphics
 	    int counter = 0;
 	    double xinters;
 	    Point p1, p2;
-	    if (picture.points != null) {
-		p1 = picture.points [0];
-		for (int i=1; i<=picture.points.Length; i++) {
-		    p2 = picture.points [i % picture.points.Length];
+	    if (shape.points != null) {
+		p1 = shape.points [0];
+		for (int i=1; i<=shape.points.Length; i++) {
+		    p2 = shape.points [i % shape.points.Length];
 		    if (p.y > (Math.Min (p1.gy, p2.gy))) {
 			if (p.y <= (Math.Max (p1.gy, p2.gy))) {
 			    if (p.x <= (Math.Max (p1.gx, p2.gx))) {
