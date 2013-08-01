@@ -3543,6 +3543,20 @@ public static class Graphics
 					return null;
 			}
 		}
+
+	  public void speak(string text) {
+		Point top_left = new Point(-100, -100);
+		Point bottom_right = new Point(0, -50);
+		Point anchor = points[0];
+		SpeechBubble sb = new SpeechBubble(top_left, bottom_right, text, anchor);
+		sb.draw(this);
+	  }
+
+	  public void clear() {
+		lock (shapes) {
+		  shapes.Clear ();
+		}
+	  }
 	}
   
 	public class Text : Shape
@@ -8194,6 +8208,9 @@ public static class Graphics
 	}
 
 	public void changeCostume(string name) {
+	  if (name == costume) { // nothing needed to do
+		return;
+	  } else {
 	    costume = name;
 	    frame = 0;
 	    shape.undraw();
@@ -8201,28 +8218,69 @@ public static class Graphics
 	    costumes[costume][frame].x = 0;
 	    costumes[costume][frame].y = 0;
 	    if (window != null) {
-		shape.draw(window);
+		  shape.draw(window);
 	    }
+	  }
 	}
 
-	public void animate(double delay) {
-	    Shape previous = null;
-	    shape.undraw();
-	    for (frame = 0; frame < costumes[costume].Count; frame++) {
+	public void flipToFirstFrame() {
+	  flipToFrame(0);
+	}
+
+	public void flipToLastFrame() {
+	  flipToFrame(costumes[costume].Count - 1);
+	}
+
+	public void flipToNextFrame() {
+	  flipToFrame((frame + 1) % costumes[costume].Count);
+	}
+
+	public void flipToPreviousFrame() {
+	  flipToFrame((frame - 1) % costumes[costume].Count);
+	}
+
+	public void flipToFrame(int frame) {
+	  if (this.frame == frame) {
+		return;
+	  } else {
+		Shape previous = this.shape;
+		this.frame = frame;
 		costumes[costume][frame].border = 0;
 		costumes[costume][frame].x = 0;
 		costumes[costume][frame].y = 0;
 		costumes[costume][frame].draw(this);
 		if (previous != null) {
-		    previous.undraw();
-		}
-		if (window != null) {
-		    shape.window.step();
+		  previous.undraw();
 		}
 		shape = costumes[costume][frame];
+		if (window != null) {
+		  window.step();
+		}
+	  }
+	}
+
+	public void animate() {
+	  animate(.1);
+	}
+
+	public void animate(double delay) {
+	  Shape previous = null;
+	  shape.undraw();
+	  for (frame = 0; frame < costumes[costume].Count; frame++) {
+		costumes[costume][frame].border = 0;
+		costumes[costume][frame].x = 0;
+		costumes[costume][frame].y = 0;
+		costumes[costume][frame].draw(this);
+		if (previous != null) {
+		  previous.undraw();
+		}
+		shape = costumes[costume][frame];
+		if (window != null) {
+		  window.step();
+		}
 		previous = shape;
 		wait(delay);
-	    }
+	  }
 	}
 	
 	public override bool hit (double x, double y)
