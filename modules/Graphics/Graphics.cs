@@ -8097,7 +8097,7 @@ public static class Graphics
 	public Graphics.Picture picture; 
 	public string costume;
 	public Dictionary<string, List<Graphics.Picture>> costumes;
-	public int frameCount = 0;
+	public int frame = 0;
 	public string name;
 	
 	public Sprite (string name) : this(new int [] {0,0}, name){
@@ -8106,6 +8106,9 @@ public static class Graphics
 	public Sprite (IList iterable, string name) : base(true){
 	    this.name = name;
 	    costumes = Graphics.getCostumes(name);
+	    if (costumes == null) {
+		throw new Exception(String.Format("Sprite: no such sprite '{0}'", name));
+	    }
 	    
 	    costume = getDefaultCostumeName(); // finds a good name for default
 	    picture = costumes[costume][0]; // get the first picture as default
@@ -8154,27 +8157,31 @@ public static class Graphics
 
 	public void changeCostume(string name) {
 	    costume = name;
-	    frameCount = 0;
+	    frame = 0;
 	    picture.undraw();
-	    picture = costumes[name][frameCount];
-	    costumes[costume][frameCount].x = 0;
-	    costumes[costume][frameCount].y = 0;
-	    picture.draw(window);
+	    picture = costumes[name][frame];
+	    costumes[costume][frame].x = 0;
+	    costumes[costume][frame].y = 0;
+	    if (window != null) {
+		picture.draw(window);
+	    }
 	}
 
 	public void animate(double delay) {
 	    Picture previous = null;
 	    picture.undraw();
-	    for (frameCount = 0; frameCount < costumes[costume].Count; frameCount++) {
-		costumes[costume][frameCount].border = 0;
-		costumes[costume][frameCount].x = 0;
-		costumes[costume][frameCount].y = 0;
-		costumes[costume][frameCount].draw(this);
+	    for (frame = 0; frame < costumes[costume].Count; frame++) {
+		costumes[costume][frame].border = 0;
+		costumes[costume][frame].x = 0;
+		costumes[costume][frame].y = 0;
+		costumes[costume][frame].draw(this);
 		if (previous != null) {
 		    previous.undraw();
 		}
-		picture.window.step();
-		picture = costumes[costume][frameCount];
+		if (window != null) {
+		    picture.window.step();
+		}
+		picture = costumes[costume][frame];
 		previous = picture;
 		wait(delay);
 	    }
