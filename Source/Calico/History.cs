@@ -40,13 +40,41 @@ namespace Calico {
             }
         }
 
+        public string CurrentLanguage {
+            get {
+		string line = null;
+                if (position < 0)
+                    line = history[history.Count - position];
+                else
+                    line = history[position];
+		if (line.Contains("|;|")) {
+		    string [] parts = line.Split(new string [] {"|;|"}, StringSplitOptions.None);
+		    if (parts[0] == String.Empty)
+			return "";
+		    else
+			return parts[0];
+		} else {
+		    return "";
+		}
+            }
+        }
+
+	public string GetCode(string line) {
+	    if (line.Contains("|;|")) {
+		string [] parts = line.Split(new string [] {"|;|"}, StringSplitOptions.None);
+		return String.Join("|;|", parts, 1, parts.Length - 1);
+	    } else {
+		return line;
+	    }
+	}
+
         public History() : this(new List<string>()) {
         }
 
         public History(List<string> history) {
             // reference
             this.history = history;
-            if (history.Count == 0 || history[Last] != "") {
+            if (history.Count == 0 || GetCode(history[Last]) != "") {
                 history.Add("");
             }
             position = history.Count - 1;
@@ -56,43 +84,56 @@ namespace Calico {
             if (position > 0) {
                 position -= 1;
             }
-            return history[Position];
+            return GetCode(history[Position]);
         }
 
         public string down() {
             if (position < history.Count - 1) {
                 position += 1;
             }
-            return history[Position];
+            return GetCode(history[Position]);
         }
 
         public void update(string text) {
             if (text != "")
                 text = text.TrimEnd() + "\n";
-            history[Position] = text;
+	    string language = CurrentLanguage;
+            history[Position] = language + "|;|" + text;
+        }
+
+        public void update(string text, string language) {
+            if (text != "")
+                text = text.TrimEnd() + "\n";
+	    if (language == null)
+		language = "";
+            history[Position] = language + "|;|" + text;
         }
 
         public string update() {
-            return history[Position];
+            return GetCode(history[Position]);
         }
 
-        public void add(string text) {
+        public void add(string text, string language) {
             if (text != "")
                 text = text.TrimEnd() + "\n";
-            if (history[Last] != text) { // different
-                history.Add(text);
+	    if (language == null)
+		language = "";
+            if (history[Last] != language + "|;|" + text) { // different
+                history.Add(language + "|;|" + text);
             }
             position = history.Count - 1;
         }
 
-        public void last(string text) {
+        public void last(string text, string language) {
             if (text != "")
                 text = text.TrimEnd() + "\n";
+	    if (language == null)
+		language = "";
             // turns space into last command
-            if (history.Count > 1 && history[Last - 1] == text) {
+            if (history.Count > 1 && history[Last - 1] == language + "|;|" + text) {
                 // pass // same, skip it!
             } else {
-                history[Last] = text;
+                history[Last] = language + "|;|" + text;
             }
             position = history.Count - 1;
         }
@@ -101,7 +142,7 @@ namespace Calico {
             if (text == "") return true;
             text = text.ToLower();
             for (int i = position; i > 0; i--) {
-                if (history[i].ToLower().Contains(text)) {
+                if (GetCode(history[i]).ToLower().Contains(text)) {
                     position = i;
                     return true;
                 }
@@ -113,7 +154,7 @@ namespace Calico {
             if (text == "") return true;
             text = text.ToLower();
             for (int i = position - 1; i > 0; i--) {
-                if (i > 0 && history[i].ToLower().Contains(text)) {
+                if (i > 0 && GetCode(history[i]).ToLower().Contains(text)) {
                     position = i;
                     return true;
                 }
@@ -125,7 +166,7 @@ namespace Calico {
             if (text == "") return true;
             text = text.ToLower();
             for (int i = position + 1; i < history.Count; i++) {
-                if (i < history.Count && history[i].ToLower().Contains(text)) {
+                if (i < history.Count && GetCode(history[i]).ToLower().Contains(text)) {
                     position = i;
                     return true;
                 }

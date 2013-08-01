@@ -1186,6 +1186,13 @@ namespace Calico {
             return global::Mono.Unix.Catalog.GetString(message);
         }
 
+	public void SetCurrentLanguage(string possible) {
+	    // called after changing shell through history
+	    if (possible != "") {
+		SetLanguage(possible);
+	    }
+	}
+
         public void SetLanguage(string language) {
 	    if (language == null)
 		return;
@@ -2033,6 +2040,7 @@ namespace Calico {
                         //} else if (MainNotebook.Page == findTabByLabel(MainNotebook, "Shell")) {
                         if (history.SearchMore(searchEntry.ActiveText)) {
                             ShellEditor.Text = history.update();
+			    SetCurrentLanguage(history.CurrentLanguage);
                             UpdateUpDownArrows();
                         }
                     }
@@ -2044,6 +2052,7 @@ namespace Calico {
                         //} else if (MainNotebook.Page == findTabByLabel(MainNotebook, "Shell")) {
                         if (history.SearchPrevious(searchEntry.ActiveText)) {
                             ShellEditor.Text = history.update();
+			    SetCurrentLanguage(history.CurrentLanguage);
                             UpdateUpDownArrows();
                         }
                     } 
@@ -2187,9 +2196,9 @@ namespace Calico {
                     args.RetVal = true;
                     // nothing to do, but handled
                 } else if (manager [CurrentLanguage].engine != null && manager [CurrentLanguage].engine.ReadyToExecute(text)) {
-                    history.last(text.TrimEnd());
+                    history.last(text.TrimEnd(), CurrentLanguage);
                     ((Gtk.TextView)historyview).Buffer.InsertAtCursor(text.TrimEnd() + "\n");
-                    history.add("");
+                    history.add("", CurrentLanguage);
                     ExecuteShell();
                     completion = null;
                     args.RetVal = true;
@@ -2209,6 +2218,7 @@ namespace Calico {
                     ShellEditor.Caret.Column = col + 1;
                     args.RetVal = true;
                     UpdateUpDownArrows();
+		    SetCurrentLanguage(history.CurrentLanguage);
                 } else {
                     KeyUp(false); 
                 }
@@ -2226,6 +2236,7 @@ namespace Calico {
                     ShellEditor.Caret.Column = col + 1;
                     args.RetVal = true;
                     UpdateUpDownArrows();
+		    SetCurrentLanguage(history.CurrentLanguage);
                 } else {
                     KeyDown(false); 
                 }
@@ -2269,6 +2280,7 @@ namespace Calico {
                 ShellEditor.GrabFocus();
                 ShellEditor.Caret.Line = ShellEditor.Document.LineCount;
                 ShellEditor.Caret.Column = 1; //Shell.Document.GetLine(1).Length;
+		SetCurrentLanguage(history.CurrentLanguage);
             }
             UpdateUpDownArrows();
         }
@@ -2285,6 +2297,7 @@ namespace Calico {
                 ShellEditor.Caret.Line = 1;
                 int col = ShellEditor.Document.GetLine(1).Length;
                 ShellEditor.Caret.Column = col + 1;
+		SetCurrentLanguage(history.CurrentLanguage);
             }
             UpdateUpDownArrows();
         }
@@ -2838,9 +2851,9 @@ del _invoke, _
                 //} else if (tabShowing("Shell")) {
                 //else if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
                 string text = ShellEditor.Document.Text;
-                history.last(text.TrimEnd());
+                history.last(text.TrimEnd(), CurrentLanguage);
                 ((Gtk.TextView)historyview).Buffer.InsertAtCursor(text.TrimEnd() + "\n");
-                history.add("");
+                history.add("", CurrentLanguage);
                 ExecuteShell();
                 ShellEditor.GrabFocus();
             } else if (CurrentDocument != null) {
@@ -3554,6 +3567,7 @@ del _invoke, _
             } else if (lastSelectedPage == searchForPage(ShellEditor)) {
                 if (history.SearchMore(searchEntry.ActiveText)) {
                     ShellEditor.Text = history.update();
+		    SetCurrentLanguage(history.CurrentLanguage);
                     UpdateUpDownArrows();
                 }
             }
@@ -3565,6 +3579,7 @@ del _invoke, _
             } else if (lastSelectedPage == searchForPage(ShellEditor)) {
                 if (history.SearchNext(searchEntry.ActiveText)) {
                     ShellEditor.Text = history.update();
+		    SetCurrentLanguage(history.CurrentLanguage);
                     UpdateUpDownArrows();
                 }
             }
@@ -3577,6 +3592,7 @@ del _invoke, _
             } else if (lastSelectedPage == searchForPage(ShellEditor)) {
                 if (history.SearchPrevious(searchEntry.ActiveText)) {
                     ShellEditor.Text = history.update();
+		    SetCurrentLanguage(history.CurrentLanguage);
                     UpdateUpDownArrows();
                 }
             }
@@ -4011,6 +4027,7 @@ del _invoke, _
             } else if (lastSelectedPage == searchForPage(ShellEditor)) {
                 if (history.SearchPrevious(searchEntry.ActiveText)) {
                     ShellEditor.Text = history.update();
+		    SetCurrentLanguage(history.CurrentLanguage);
                     UpdateUpDownArrows();
                 }
             }
@@ -4022,6 +4039,7 @@ del _invoke, _
             } else if (lastSelectedPage == searchForPage(ShellEditor)) {
                 if (history.SearchNext(searchEntry.ActiveText)) {
                     ShellEditor.Text = history.update();
+		    SetCurrentLanguage(history.CurrentLanguage);
                     UpdateUpDownArrows();
                 }
             }
