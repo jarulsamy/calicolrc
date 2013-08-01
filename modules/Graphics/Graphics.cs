@@ -1582,11 +1582,12 @@ public static class Graphics
 		public void HandleMouseMovementOnShape (object obj,
                       Gtk.MotionNotifyEventArgs args)
 		{
-		    Event evt = new Event (args);
 		    lock (canvas.shapes) {
 			foreach (Shape shape in canvas.shapes) {
-			    if (shape.hit(evt.x, evt.y)) {
-				EventsManager.publish("mouse-motion", shape);
+			    if (shape.hit(args.Event.X, args.Event.Y)) {
+				Event evt = new Event (args);
+				evt.obj = shape;
+				EventsManager.publish(evt);
 			    }
 			}
 		    }
@@ -1594,11 +1595,12 @@ public static class Graphics
 
 		public void HandleClickOnShape (object obj, Gtk.ButtonPressEventArgs args)
 		{
-		    Event evt = new Event (args);
 		    lock (canvas.shapes) {
 			foreach (Shape shape in canvas.shapes) {
-			    if (shape.hit(evt.x, evt.y)) {
-				EventsManager.publish("mouse-press", shape);
+			    if (shape.hit(args.Event.X, args.Event.Y)) {
+				Event evt = new Event (args);
+				evt.obj = shape;
+				EventsManager.publish(evt);
 			    }
 			}
 		    }
@@ -1606,11 +1608,12 @@ public static class Graphics
 
 		public void HandleMouseUpOnShape (object obj,
 						   Gtk.ButtonReleaseEventArgs args) {
-		    Event evt = new Event (args);
 		    lock (canvas.shapes) {
 			foreach (Shape shape in canvas.shapes) {
-			    if (shape.hit(evt.x, evt.y)) {
-				EventsManager.publish("mouse-release", shape);
+			    if (shape.hit(args.Event.X, args.Event.Y)) {
+				Event evt = new Event (args);
+				evt.obj = shape;
+				EventsManager.publish(evt);
 			    }
 			}
 		    }
@@ -1656,21 +1659,21 @@ public static class Graphics
 		{
 			_lastKey = args.Event.Key.ToString ();
 			_keyState = "down";
-			Event evt = new Event (args);
-			evt.type = "key-press";
 			if (HandleKeyPressOnShape){
 			    lock (canvas.shapes) {
 				foreach (Shape shape in canvas.shapes) {
+				    Event evt = new Event (args);
 				    evt.obj = shape;
 				    EventsManager.publish(evt);
 				}
 			    }
 			}
+			Event evt2 = new Event (args);
 			foreach (Func<object,Event,object> function in onKeyPressCallbacks) {
 				try {
 					Invoke (delegate {
 						Func<object,Event,object > f = (Func<object,Event,object>)function;
-						f (obj, evt);
+						f (obj, evt2);
 					});
 				} catch (Exception e) {
 					Console.Error.WriteLine ("Error in onKeypress function");
@@ -1683,21 +1686,21 @@ public static class Graphics
                                       Gtk.KeyReleaseEventArgs args)
 		{
 			_keyState = "up";
-			Event evt = new Event (args);
-			evt.type = "key-release";
 			if (HandleKeyPressOnShape){
 			    lock (canvas.shapes) {
 				foreach (Shape shape in canvas.shapes) {
+				    Event evt = new Event (args);
 				    evt.obj = shape;
 				    EventsManager.publish(evt);
 				}
 			    }
 			}
+			Event evt2 = new Event (args);
 			foreach (Func<object,Event,object> function in onKeyReleaseCallbacks) {
 				try {
 					Invoke (delegate {
 						Func<object,Event,object > f = (Func<object,Event,object>)function;
-						f (obj, evt);
+						f (obj, evt2);
 					});
 				} catch (Exception e) {
 					Console.Error.WriteLine ("Error in onKeyRelease function");

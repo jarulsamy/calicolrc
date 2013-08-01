@@ -258,7 +258,9 @@ public static class Events {
 			}
 		    }
 	        }
+		//System.Console.WriteLine("evt count: {0}", queue.Count);
 		foreach(Event evt in queue) {
+		    //System.Console.WriteLine("loop: {0} {1} {2}", evt.type, evt.time, evt.obj);
 		    string id = getID(evt.obj, evt.type);
 		    if (handler.ContainsKey(id)) {
 			Event lastEvent = null;
@@ -266,6 +268,7 @@ public static class Events {
 			foreach (Tuple<Func<object,Event,object>,object> tuple in handler[id]) {
 			    Func<object,Event,object> code = tuple.Item1;
 			    object obj = tuple.Item2;
+			    //System.Console.WriteLine("    handler: {0}, {1}", id, obj);
 			    Thread codethread = new Thread (new ThreadStart ( delegate {
 					try {
 					    evt.value = code(obj, evt);
@@ -312,6 +315,7 @@ public static class Events {
 	}
 	lock (handler) {
 	  handler.Clear();
+	  assoc.Clear();
 	}
 	if (thread == null) {
 	  System.Console.WriteLine("Starting event loop...");
