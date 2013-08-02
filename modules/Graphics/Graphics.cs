@@ -2429,7 +2429,7 @@ public static class Graphics
 		// FIXME: set x,y of points should go from screen_coords to relative
 		// FIXME: should call QueueDraw on set
 	    
-	    public void subscribe(string message, Func<object,Event,object> procedure) {
+	    public int subscribe(string message, Func<object,Event,object> procedure) {
 		List<string> messages = new List<string>() {"mouse-press", "mouse-release", "mouse-motion", "key-press", "key-release"};
 		if (messages.Contains(message)) {
 		    if (window != null) {
@@ -2437,9 +2437,9 @@ public static class Graphics
 		    } else {
 			throw new Exception(String.Format("subscribe('{0}', ...) should be called after draw()", message));
 		    }
-		    Events.subscribe(message, procedure, this);
+		    return Events.subscribe(message, procedure, this);
 		} else {
-		    Events.subscribe(message, procedure, this);
+		    return Events.subscribe(message, procedure, this);
 		}
 	    }
 

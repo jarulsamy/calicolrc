@@ -243,10 +243,14 @@ public static class Events {
     public static void unsubscribe(int id) {
 	foreach(string key in handler.Keys) {
 	    List<Tuple<Func<object,Event,object>,object>> list = handler[key];
+	    List<Tuple<Func<object,Event,object>,object>> remove = new List<Tuple<Func<object,Event,object>,object>>();
 	    foreach (Tuple<Func<object,Event,object>,object> tuple in list) {
 		if (tuple == assoc[id]) {
-		    list.Remove(tuple);
+		    remove.Add(tuple);
 		}
+	    }
+	    foreach (Tuple<Func<object,Event,object>,object> tuple in remove) {
+		list.Remove(tuple);
 	    }
 	}
     }
