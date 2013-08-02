@@ -2406,6 +2406,7 @@ public static class Graphics
 		private Pen _pen;
 		private bool _has_pen;
 		internal bool close_path = true;
+	        SpeechBubble speechBubble = null;
         
 		public Shape (bool has_pen=true)
 		{
@@ -3545,11 +3546,65 @@ public static class Graphics
 		}
 
 	  public void speak(string text) {
-		Point top_left = new Point(-100, -100);
-		Point bottom_right = new Point(0, -50);
-		Point anchor = points[0];
-		SpeechBubble sb = new SpeechBubble(top_left, bottom_right, text, anchor);
-		sb.draw(this);
+		if (speechBubble != null) {
+		    speechBubble.undraw();
+		}
+		if (text != "" && this.window != null) {
+		    speechBubble = new SpeechBubble(text);
+		    speechBubble.window = this.window;
+		    // these are expensive:
+		    double [] text_widths = speechBubble.getExtents(speechBubble.words);
+		    double [] space_width = speechBubble.getExtents(new string [1] {"k"});
+		    //double text_height = speechBubble.height;
+		    
+		    // figure out bounding box for text
+		    // find the best ratio of width/height (9/6 maybe)
+		    double diff_ratio = 1000, best_x = 0, best_y = 0;
+		    for (int width = 100; width < 500; width += 100) {
+			for (int height = 100; height < 500; height += 100) {
+			    double xx = space_width[0];
+			    double yy = 3.0+speechBubble.fontSize;
+			    double ws = space_width[0];				// Word spacing
+			    double ls = speechBubble.fontSize + 2.0;		// Line spacing
+			    int i = 0;					// Word counter
+			    double max_row = 0, max_col = 0, col = 0;
+			    for (;;) {
+				// save the max row and max col:
+				col = xx + text_widths[i] + ws;
+				max_col = Math.Max(col, max_col);
+				max_row = yy + ls/2;
+				
+				// Move to next x position and next word
+				xx = xx + text_widths[i] + ws;
+				i++;
+				if (i < speechBubble.words.Length) {
+				    // If the next word would be rendered outside the clip region, 
+				    // move to next line. Otherwise, continue.
+				    if ( xx + text_widths[i] > width ) {
+					xx = space_width[0];
+					yy = yy + ls;
+				    }
+				} else {
+				    break;
+				}
+			    }
+			    if (Math.Abs(max_col/max_row - 9.0/6.0) < diff_ratio) {
+				diff_ratio = Math.Abs(max_col/max_row - 9.0/6.0);
+				best_x = max_col;
+				best_y = max_row;
+			    }
+			    //Console.WriteLine("x: {0}, y: {1} ({2}x{3})", best_x, best_y, width, height);
+			}
+		    }
+
+		    Point anchor = points[0];
+		    Point top_left = new Point(anchor.x - best_x, 
+					       anchor.y - best_y - 50);
+		    Point bottom_right = new Point(anchor.x, anchor.y - 50);
+		    speechBubble.setPositions(top_left, bottom_right, anchor);
+		    speechBubble.draw(this);
+		    QueueDraw();
+		}
 	  }
 
 	  public void clear() {
@@ -3679,10 +3734,12 @@ public static class Graphics
 			get {
 			    double retval = 0.0;
 			    InvokeBlocking( delegate {
-				    if (window.IsRealized) {
+				    if (window != null && window.IsRealized) {
 					using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
+					    g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
+					    g.SetFontSize(this.fontSize);
 					    Cairo.TextExtents te = g.TextExtents (text);
-					    retval = te.Width * 2;
+					    retval = te.Width;
 					}
 				    }
 				});
@@ -3694,16 +3751,37 @@ public static class Graphics
 			get {
 			    double retval = 0.0;
 			    InvokeBlocking( delegate {
-				    if (window.IsRealized) {
+				    if (window != null && window.IsRealized) {
 					using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
+					    g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
+					    g.SetFontSize(this.fontSize);
 					    Cairo.TextExtents te = g.TextExtents (text);
-					    retval = te.Height * 2;
+					    retval = te.Height;
 					}
 				    }
 				});
 			    return retval;
 			}
 		}
+
+		public double [] getExtents(string [] text) {
+		    double [] retval = new double [text.Length];
+		    InvokeBlocking( delegate {
+			    if (window != null && window.IsRealized) {
+				using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
+				    g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
+				    g.SetFontSize(this.fontSize);
+				    int pos = 0;
+				    foreach (string word in text) {
+					Cairo.TextExtents te = g.TextExtents (word);
+					retval [pos++]= te.Width;
+				    }
+				}
+			    }
+			});
+		    return retval;
+		}
+
 
 		public override void addToPhysics ()
 		{ // Text
@@ -3714,11 +3792,13 @@ public static class Graphics
 				double height = 0;
 				if (window.IsRealized) {
 				    using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
+					g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
+					g.SetFontSize(this.fontSize);
 					Cairo.TextExtents te = g.TextExtents (text);
 					// FIXME: need to adjust based on justification
 					// This works with x centered, y centered
-					width = te.Width * 2;
-					height = te.Height * 2;
+					width = te.Width;
+					height = te.Height;
 				    }
 				}
 				float MeterInPixels = 64.0f;
@@ -3746,10 +3826,13 @@ public static class Graphics
 	}
 
         public class SpeechBubble : Text {
-	    Point anchor;
-	    Point point2;
-	    string [] words;
-	    int _textYOffset = 12;  // Y offset for when a block's text
+	    public Point anchor;
+	    public Point point2;
+	    public string [] words;
+
+	    public SpeechBubble (string text) : base(new int [] {0,0}, text) {
+		this.words = text.Split(' ');
+	    }
 
 	    public SpeechBubble (IList iterable, IList point2, string text, IList anchor) : base(iterable, text) {
 		this.words = text.Split(' ');
@@ -3758,7 +3841,15 @@ public static class Graphics
 		this.border = 2;
 	    }
 
+	    public void setPositions(IList iterable, IList point2, IList anchor) {
+		set_points (new Point (iterable));
+		this.point2 = new Point(point2);
+		this.anchor = new Point(anchor);
+		this.border = 2;
+	    }
+
 	    public override void render (Cairo.Context g) {
+		int _textYOffset = (int)this.fontSize;  
 		double x = center.x;
 		double y = center.y;
 		double w = point2.x - center.x;
@@ -3809,9 +3900,11 @@ public static class Graphics
 		    // @@@ Note that in the following there are several hard-coded 
 		    // size tweaks that probably ought to be a function of the font size, 
 		    // not fixed values. Some day this should be fixed.
-		    double xx = x+10.0;
+		    TextExtents space = g.TextExtents("k");	// space extents
+
+		    double xx = x+ (space.Width);
 		    double yy = y+3.0+_textYOffset;
-		    double ws = 5.0;						// Word spacing
+		    double ws = space.Width;						// Word spacing
 		    double ls = this.fontSize + 2.0;		// Line spacing
 		    int i = 0;								// Word counter
 		    string word = words[i];					// First word
@@ -3834,7 +3927,7 @@ public static class Graphics
 			    // If the next word would be rendered outside the clip region, 
 			    // move to next line. Otherwise, continue.
 			    if ( xx + te.Width > x + w ) {
-				xx = x + 10.0;
+				xx = x + (space.Width);
 				yy = yy + ls;
 			    }
 			} else {
@@ -8219,6 +8312,7 @@ public static class Graphics
 	    costumes[costume][frame].y = 0;
 	    if (window != null) {
 		  shape.draw(window);
+		  window.step();
 	    }
 	  }
 	}
@@ -8283,6 +8377,10 @@ public static class Graphics
 	  }
 	}
 	
+	public new void speak(string text) {
+	    shape.speak(text);
+	}
+
 	public override bool hit (double x, double y)
 	{
 	    // ask the currenCostume what if it got hit:
