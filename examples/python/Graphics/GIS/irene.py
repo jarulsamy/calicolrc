@@ -46,5 +46,5 @@ def main():
         gis.displayControls(win)
         drawIrene(win)
 
-if __name__ == "<module>":
+if __name__ == "__main__":
     main()
