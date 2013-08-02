@@ -2432,14 +2432,14 @@ public static class Graphics
 	    public void subscribe(string message, Func<object,Event,object> procedure) {
 		List<string> messages = new List<string>() {"mouse-press", "mouse-release", "mouse-motion", "key-press", "key-release"};
 		if (messages.Contains(message)) {
-		    Events.subscribe(message, procedure, this);
 		    if (window != null) {
 			window.listen(message);
 		    } else {
 			throw new Exception(String.Format("subscribe('{0}', ...) should be called after draw()", message));
 		    }
+		    Events.subscribe(message, procedure, this);
 		} else {
-		    throw new Exception(String.Format("Shape cannot subscribe to message: '{0}'", message));
+		    Events.subscribe(message, procedure, this);
 		}
 	    }
 

@@ -230,6 +230,12 @@ public static class Events {
 	  handler[id].Add(tuple);
 	  counter++;
 	  assoc[counter] = tuple;
+	  // also associate with null object as well:
+	  string null_id = getID(null, message);
+	  if (!handler.ContainsKey(null_id)) {
+	      handler[null_id] = new List<Tuple<Func<object,Event,object>,object>>();
+	  }
+	  handler[null_id].Add(tuple);
       }
       return counter;
   }
@@ -240,7 +246,6 @@ public static class Events {
 	    foreach (Tuple<Func<object,Event,object>,object> tuple in list) {
 		if (tuple == assoc[id]) {
 		    list.Remove(tuple);
-		    return;
 		}
 	    }
 	}
