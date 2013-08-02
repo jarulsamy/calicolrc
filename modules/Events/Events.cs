@@ -231,11 +231,13 @@ public static class Events {
 	  counter++;
 	  assoc[counter] = tuple;
 	  // also associate with null object as well:
-	  string null_id = getID(null, message);
-	  if (!handler.ContainsKey(null_id)) {
-	      handler[null_id] = new List<Tuple<Func<object,Event,object>,object>>();
+	  if (obj != null) {
+	      string null_id = getID(null, message);
+	      if (!handler.ContainsKey(null_id)) {
+		  handler[null_id] = new List<Tuple<Func<object,Event,object>,object>>();
+	      }
+	      handler[null_id].Add(tuple);
 	  }
-	  handler[null_id].Add(tuple);
       }
       return counter;
   }
