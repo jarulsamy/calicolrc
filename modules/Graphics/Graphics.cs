@@ -3403,7 +3403,9 @@ public static class Graphics
     
 	        public void draw (Shape shape, IList iterable)
 	        {
-		    moveTo((double)iterable[0], (double)iterable[1]);
+		    double x = System.Convert.ToDouble(iterable[0]);
+		    double y = System.Convert.ToDouble(iterable[1]);
+		    moveTo(x, y);
 		    draw(shape);
 		}
 
@@ -8156,6 +8158,10 @@ public static class Graphics
 		    // not a valid image, keep looking!
 		}
 		if (temp != null) {
+		    temp.tag = sname;
+		    temp.border = 0;
+		    temp.x = 0;
+		    temp.y = 0;
 		    costumes["default"] = new List<Shape>();
 		    costumes["default"].Add(temp);
 		    return costumes;
@@ -8177,6 +8183,10 @@ public static class Graphics
 		    }
 		    if (temp != null) {
 			string fname = System.IO.Path.GetFileNameWithoutExtension(filename);
+			temp.tag = fname;
+			temp.border = 0;
+			temp.x = 0;
+			temp.y = 0;
 			costumes[fname] = new List<Shape>();
 			costumes[fname].Add(temp);
 		    } // else skip
@@ -8187,7 +8197,13 @@ public static class Graphics
 		    costumes[subname] = new List<Shape>();
 		    foreach(string file in Directory.EnumerateFiles(subdirectory, "*.*")){
 			try {
-			    costumes[subname].Add(new Picture(file));
+			    Picture temp = new Picture(file);
+			    string fname = System.IO.Path.GetFileNameWithoutExtension(file);
+			    temp.tag = fname;
+			    temp.border = 0;
+			    temp.x = 0;
+			    temp.y = 0;
+			    costumes[subname].Add(temp);
 			} catch {
 			    // skip non-image files
 			}
@@ -8233,9 +8249,6 @@ public static class Graphics
 	    set_points(center);
 
 	    // Draw picture on sprite:
-	    shape.x = 0;
-	    shape.y = 0;
-	    shape.border = 0;
 	    shape.draw(this);
 	}
 
@@ -8246,8 +8259,6 @@ public static class Graphics
 		this.shape.undraw();
 	    }
 	    this.shape = shape;
-	    this.shape.x = 0;
-	    this.shape.y = 0;
 	    shape.draw(this);
 	    costume = cname;
 	    if (!costumes.ContainsKey(cname)) {
@@ -8308,13 +8319,32 @@ public static class Graphics
 	    frame = 0;
 	    shape.undraw();
 	    shape = costumes[name][frame];
-	    costumes[costume][frame].x = 0;
-	    costumes[costume][frame].y = 0;
 	    if (window != null) {
-		  shape.draw(window);
+		  shape.draw(this);
 		  window.step();
 	    }
 	  }
+	}
+
+	public void selectFrameByTag(string tag) {
+	    int count = 0;
+	    foreach (Shape shape in costumes[costume]) {
+		if (shape.tag == tag) {
+		    flipToFrame(count);
+		    return;
+		} else {
+		    count++;
+		}
+	    }
+	    throw new Exception(String.Format("no such frame tagged with '{0}' in costume '{1}'", tag, costume));
+	}
+
+	public List<string> getFrameTags() {
+	    List<string> retval = new List<string>();
+	    foreach (Shape shape in costumes[costume]) {
+		retval.Add(shape.tag);
+	    }
+	    return retval;
 	}
 
 	public void flipToFirstFrame() {
@@ -8339,9 +8369,6 @@ public static class Graphics
 	  } else {
 		Shape previous = this.shape;
 		this.frame = frame;
-		costumes[costume][frame].border = 0;
-		costumes[costume][frame].x = 0;
-		costumes[costume][frame].y = 0;
 		costumes[costume][frame].draw(this);
 		if (previous != null) {
 		  previous.undraw();
@@ -8353,34 +8380,76 @@ public static class Graphics
 	  }
 	}
 
-	public void animate() {
-	  animate(.1);
-	}
-
-	public void animate(double delay) {
-	  Shape previous = null;
-	  shape.undraw();
-	  for (frame = 0; frame < costumes[costume].Count; frame++) {
-		costumes[costume][frame].border = 0;
-		costumes[costume][frame].x = 0;
-		costumes[costume][frame].y = 0;
+	public void animate(double seconds, double delay=.1) {
+	    // Animate the shape for N seconds
+	    Shape previous = shape;
+	    double timeSteps = seconds/delay;
+	    int iterations = (int)timeSteps;
+	    for (int i = 0; i < iterations; i++) {
+		frame = i % costumes[costume].Count;
 		costumes[costume][frame].draw(this);
 		if (previous != null) {
-		  previous.undraw();
+		    previous.undraw();
 		}
 		shape = costumes[costume][frame];
 		if (window != null) {
-		  window.step();
+		    window.step();
 		}
 		previous = shape;
 		wait(delay);
-	  }
-	}
-	
-	public new void speak(string text) {
-	    shape.speak(text);
+	    }
 	}
 
+	public void animateLoop(int iterations=1, double delay=.1) {
+	    // Animate shape for a number of loops through frames
+	    Shape previous = shape;
+	    for (int i = 0; i < iterations; i++) {
+		frame = i % costumes[costume].Count;
+		costumes[costume][frame].draw(this);
+		if (previous != null) {
+		    previous.undraw();
+		}
+		shape = costumes[costume][frame];
+		if (window != null) {
+		    window.step();
+		}
+		previous = shape;
+		wait(delay);
+	    }
+	}
+
+	public void animateTo(IList iterable, double seconds, double delay=.1) {
+	    // Animate to a place
+	    // FIXME: if no time given, compute how much time it would
+	    // take to get to x,y
+	    double x = System.Convert.ToDouble(iterable[0]);
+	    double y = System.Convert.ToDouble(iterable[1]);
+	    if (costumes[costume].Count == 0) {
+		throw new Exception("\'" + costume + "\' does not contain any frames.");
+	    }
+	    double timeSteps = seconds/delay;
+	    int iterations = (int)timeSteps;
+	    Shape previous = shape;
+	    double dx = (x - this.x)/iterations;
+	    double dy = (y - this.y)/iterations;
+	    for (int i = 0; i < iterations; i++) {
+		frame = i % costumes[costume].Count;
+		costumes[costume][frame].draw(this);
+		if (previous != null) {  
+		    previous.undraw();
+		}
+		shape = costumes[costume][frame];
+		previous = shape;
+		this.move(dx, dy);
+		if (window != null) {
+		    shape.window.step();
+		}
+		wait(delay);
+	    }
+	    //in case we are not at an integer coordinate
+	    this.moveTo(x, y);
+	}
+	
 	public override bool hit (double x, double y)
 	{
 	    // ask the currenCostume what if it got hit:
