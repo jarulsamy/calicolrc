@@ -646,11 +646,11 @@ public class Scribbler: Myro.Robot
                 if (sensor == "light") {
                     List values = GetWord (Scribbler.GET_LIGHT_ALL, 6);
                     if (Myro.Contains (pos, 0, "left")) {
-                        retvals.append ((int)values [0]);
+                        retvals.append (System.Convert.ToInt32(values [0]));
                     } else if (Myro.Contains (pos, 1, "middle", "center")) {
-                        retvals.append ((int)values [1]);
+                        retvals.append (System.Convert.ToInt32(values [1]));
                     } else if (Myro.Contains (pos, 2, "right")) {
-                        retvals.append ((int)values [2]);
+                        retvals.append (System.Convert.ToInt32(values [2]));
                     } else if (pos == null | pos.ToString() == "all") {
                         retvals.append (values);
                     } 
@@ -658,18 +658,18 @@ public class Scribbler: Myro.Robot
                     byte [] values = GetBytes (Scribbler.GET_IR_ALL, 2);
 
                     if (Myro.Contains (pos, 0, "left")) {
-                        retvals.append ((int)values [0]);
+                        retvals.append (System.Convert.ToInt32(values [0]));
                     } else if (Myro.Contains (pos, 1, "right")) {
-                        retvals.append ((int)values [1]);
+                        retvals.append (System.Convert.ToInt32(values [1]));
                     } else if (pos == null | pos.ToString() == "all") {
                         retvals.append (values);
                     }
                 } else if (sensor == "line") {
                     byte [] values = GetBytes (Scribbler.GET_LINE_ALL, 2);
                     if (Myro.Contains (pos, 0, "left")) {
-                        retvals.append ((int)values [0]);
+                        retvals.append (System.Convert.ToInt32(values [0]));
                     } else if (Myro.Contains (pos, 1, "right")) {
-                        retvals.append ((int)values [1]);
+                        retvals.append (System.Convert.ToInt32(values [1]));
                     }
                 } else if (sensor == "data") {
                     retvals.append (getData ((int)pos));
@@ -705,7 +705,7 @@ public class Scribbler: Myro.Robot
     {
         int [] ints = new int[position.Length];
         for (int i=0; i < position.Length; i++) {
-            ints [i] = (int)position [i];
+            ints [i] = System.Convert.ToInt32(position [i]);
         }
         return getData (ints);
     }
@@ -740,7 +740,7 @@ public class Scribbler: Myro.Robot
 
     public override void setLEDBack (object value)
     {
-	double dvalue = (double)value;
+	double dvalue = System.Convert.ToDouble(value);
         if (dvalue > 1) {
             dvalue = 1;
         } else if (dvalue <= 0) {
@@ -850,7 +850,7 @@ public class Scribbler: Myro.Robot
             return (value.ToString() == "on" ||
                     value.ToString() == "1");
         } else if (value as int? != null) {
-            return ((int)value == 1);
+            return (System.Convert.ToInt32(value) == 1);
         } else 
               return false;
     }
@@ -920,7 +920,7 @@ public class Scribbler: Myro.Robot
         } else if (item == "whitebalance") {
             setWhiteBalance (sposition);
         } else if (item == "irpower") {
-            setIRPower ((int)position);
+	    setIRPower (System.Convert.ToInt32(position));
         } else if (item == "volume") {
             if (isTrue (position)) {
                 volume = 1;
@@ -932,9 +932,9 @@ public class Scribbler: Myro.Robot
         } else if (item == "startsong") {
             startsong = sposition;
         } else if (item == "echomode") {
-            setEchoMode ((int)position);
+            setEchoMode (System.Convert.ToInt32(position));
         } else if (item == "data") {
-            setData ((int)position, (byte)value);
+            setData (System.Convert.ToInt32(position), (byte)value);
         } else if (item == "password") {
             setPassword (sposition);
         } else if (item == "forwardness") {
@@ -967,7 +967,7 @@ public class Scribbler: Myro.Robot
                 throw new Exception ();
             }
         } else {
-            int value = (int)position;
+            int value = System.Convert.ToInt32(position);
             if (value == 0) {
                 write (Scribbler.GET_DONGLE_L_IR);
             } else if (value == 1) {
@@ -1007,7 +1007,7 @@ public class Scribbler: Myro.Robot
                 throw new Exception ();
             }
         } else {
-            int value = (int)position;
+            int value = System.Convert.ToInt32(position);
             if (value == 0) {
                 buffer[1] = 0;
             } else if (value == 2) {
@@ -1223,7 +1223,7 @@ public class Scribbler: Myro.Robot
     public override void beep (double duration, double frequency)
     {
         lock (this) { // lock robot
-            set_speaker ((int)frequency, (int)(duration * 1000));
+            set_speaker (System.Convert.ToInt32(frequency), System.Convert.ToInt32(duration * 1000));
             // 100% of the intended delay
             Myro.wait (duration);
             read (Scribbler.PACKET_LENGTH + 11);
@@ -1232,7 +1232,7 @@ public class Scribbler: Myro.Robot
 
     public override void beep (double duration, double frequency, double frequency2)
     {
-        set_speaker_2 ((int)frequency, (int)frequency2, (int)(duration * 1000));
+        set_speaker_2 (System.Convert.ToInt32(frequency), System.Convert.ToInt32(frequency2), System.Convert.ToInt32(duration * 1000));
         // 100% of the intended delay
         Myro.wait (duration);
         read (Scribbler.PACKET_LENGTH + 11);

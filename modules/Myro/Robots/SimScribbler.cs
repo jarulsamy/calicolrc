@@ -586,21 +586,21 @@ public class SimScribbler : Myro.Robot
 				positions = new object[3] {0, 1, 2};
 			foreach (object position in positions) {
 			    if (position is int) {
-				if (((int)position) == 0) {
+				if (System.Convert.ToInt32(position) == 0) {
 				    key = "obstacle-left";
-				} else if (((int)position) == 1) {
+				} else if (System.Convert.ToInt32(position) == 1) {
 				    key = "obstacle-center";
-				} else if (((int)position) == 2) {
+				} else if (System.Convert.ToInt32(position) == 2) {
 				    key = "obstacle-right";
 				} else {
 				    throw new Exception ("invalid position in getObstacle()");
 				}
 			    } else if (position is double) {
-				if (((double)position) == 0) {
+				if (System.Convert.ToDouble(position) == 0) {
 				    key = "obstacle-left";
-				} else if (((double)position) == 1) {
+				} else if ((System.Convert.ToDouble(position)) == 1) {
 				    key = "obstacle-center";
-				} else if (((double)position) == 2) {
+				} else if ((System.Convert.ToDouble(position)) == 2) {
 				    key = "obstacle-right";
 				} else {
 				    throw new Exception ("invalid position in getObstacle()");
@@ -664,17 +664,17 @@ public class SimScribbler : Myro.Robot
 				positions = new object[2] {0, 1};
 			foreach (object position in positions) {
 			    if (position is int) {
-				if (((int)position) == 0) {
+				if (System.Convert.ToInt32(position) == 0) {
 				    key = "distance-left";
-				} else if (((int)position) == 1) {
+				} else if (System.Convert.ToInt32(position) == 1) {
 				    key = "distance-right";
 				} else {
 				    throw new Exception ("invalid position in getDistance()");
 				}
 			    } else if (position is double) {
-				if (((double)position) == 0) {
+				if (System.Convert.ToDouble(position) == 0) {
 				    key = "distance-left";
-				} else if (((double)position) == 1) {
+				} else if (System.Convert.ToDouble(position) == 1) {
 				    key = "distance-right";
 				} else {
 				    throw new Exception ("invalid position in getDistance()");
@@ -736,21 +736,21 @@ public class SimScribbler : Myro.Robot
 				positions = new object[3] {0, 1, 2};
 				foreach (object position in positions) {
 					if (position is int) {
-						if (((int)position) == 0) {
+						if (System.Convert.ToInt32(position) == 0) {
 							key = "light-left";
-						} else if (((int)position) == 1) {
+						} else if (System.Convert.ToInt32(position) == 1) {
 							key = "light-center";
-						} else if (((int)position) == 2) {
+						} else if (System.Convert.ToInt32(position) == 2) {
 							key = "light-right";
 						} else {
 							throw new Exception ("invalid position in getLight()");
 						}
 					} else if (position is double) {
-						if (((double)position) == 0) {
+						if (System.Convert.ToDouble(position) == 0) {
 							key = "light-left";
-						} else if (((double)position) == 1) {
+						} else if (System.Convert.ToDouble(position) == 1) {
 							key = "light-center";
-						} else if (((double)position) == 2) {
+						} else if (System.Convert.ToDouble(position) == 2) {
 							key = "light-right";
 						} else {
 							throw new Exception ("invalid position in getLight()");
@@ -814,17 +814,17 @@ public class SimScribbler : Myro.Robot
 				positions = new object[2] {0, 1};
 				foreach (object position in positions) {
 					if (position is int) {
-						if (((int)position) == 0) {
+						if (System.Convert.ToInt32(position) == 0) {
 							key = "ir-left";
-						} else if (((int)position) == 1) {
+						} else if (System.Convert.ToInt32(position) == 1) {
 							key = "ir-right";
 						} else {
 							throw new Exception ("invalid position in getIR()");
 						}
 					} else if (position is double) {
-						if (((double)position) == 0) {
+						if (System.Convert.ToDouble(position) == 0) {
 							key = "ir-left";
-						} else if (((double)position) == 1) {
+						} else if (System.Convert.ToDouble(position) == 1) {
 							key = "ir-right";
 						} else {
 							throw new Exception ("invalid position in getIR()");
