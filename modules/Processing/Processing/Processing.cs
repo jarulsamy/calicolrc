@@ -23,6 +23,7 @@
  using System.IO;
  using System.Threading;
  using System.Collections.Generic;
+using System.Collections;
  using Cairo;
  using Gtk;
 
@@ -1376,6 +1377,13 @@
 		Console.WriteLine ( String.Join(" ", sitems) );
 	}
 
+	public static void println(IList items) 
+	{	// Print a message to the console
+		string[] sitems = new string[items.Count];
+		for (int i=0; i<items.Count; i++) sitems[i] = items[i].ToString ();
+		Console.WriteLine ( String.Join(" ", sitems) );
+	}
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	internal static void debug(string msg, int level) 
 	{	// 0: verbose, 1: information, 2: serious exceptions
@@ -2194,12 +2202,26 @@
 		return tmax;
 	}
 
+	public static double max(IList vals)
+	{	// Compute the maximum value of several numbers
+		double tmax = System.Convert.ToDouble(vals[0]);
+		for (int i=1; i<vals.Count; i++) tmax = Math.Max (tmax, System.Convert.ToDouble(vals[i]));
+		return tmax;
+	}
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab("P/Math")]
 	public static double min(params double[] vals)
 	{	// Compute the minimum value of several numbers
 		double tmin = vals[0];
 		for (int i=1; i<vals.Length; i++) tmin = Math.Min (tmin, vals[i]);
+		return tmin;
+	}
+
+	public static double min(IList vals)
+	{	// Compute the minimum value of several numbers
+	        double tmin = System.Convert.ToDouble(vals[0]);
+		for (int i=1; i<vals.Count; i++) tmin = Math.Min (tmin, System.Convert.ToDouble(vals[i]));
 		return tmin;
 	}
 
