@@ -334,10 +334,9 @@ public class SimScribbler : Myro.Robot
 		}
 
 	    public override void setPose(int x, int y, double theta) {
-		  float MeterInPixels = 64.0f;
 		  lock(frame.world) {
-			frame.body.Position = new Vector2 (((float)x) / MeterInPixels, 
-				((float)y) / MeterInPixels);
+		        frame.center.x = x;
+		        frame.center.y = y;
 			setAngle(theta); // theta is in degrees
 		  }
 		  simulation.window.refresh();
