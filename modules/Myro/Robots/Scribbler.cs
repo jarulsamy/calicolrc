@@ -1951,7 +1951,7 @@ public class Scribbler: Myro.Robot
 
      public override void servo(int id, int value)
     {
-        if (!flukeIsAtLeast("3.0.9"))
+        if (!flukeIsAtLeast("3.0.9")) return;
         write(Scribbler.SET_SERVO);
         write((byte)id);
         write((byte)value);
@@ -1959,7 +1959,7 @@ public class Scribbler: Myro.Robot
     
     public override void enablePanNetworking()
     {
-        if (!flukeIsAtLeast("3.0.9"))
+        if (!flukeIsAtLeast("3.0.9")) return;
         write(Scribbler.ENABLE_PAN);
         write_2byte(0x123);
     }
