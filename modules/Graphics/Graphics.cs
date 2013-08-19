@@ -1686,7 +1686,7 @@ public static class Graphics
                                       Gtk.KeyReleaseEventArgs args)
 		{
 			_keyState = "up";
-			if (HandleKeyPressOnShape){
+			if (HandleKeyReleaseOnShape){
 			    lock (canvas.shapes) {
 				foreach (Shape shape in canvas.shapes) {
 				    Event evt = new Event (args);
