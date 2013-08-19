@@ -187,6 +187,7 @@ namespace Jigsaw
 		protected int paletteWidth = 110;
 
 		public Dictionary<string,Dictionary<string,object>> addedModule = new Dictionary<string,Dictionary<string,object>>();
+		public bool ask_delete_block = true;
 
 		// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 		public Canvas(string modulePath, int width, int height, double worldWidth, double worldHeight) : base(width, height, worldWidth, worldHeight) 
@@ -3669,18 +3670,19 @@ namespace Jigsaw
 			if (_cvs.Toplevel.IsTopLevel) toplevel = (Gtk.Window)_cvs.Toplevel;
 			
 			// Ask to delete the block
-			string blockName = this.Text.Replace ("`", "");
-			Gtk.MessageDialog dlg = new Gtk.MessageDialog(
+			if ((_cvs as Canvas).ask_delete_block) {
+			    string blockName = this.Text.Replace ("`", "");
+			    Gtk.MessageDialog dlg = new Gtk.MessageDialog(
 				toplevel,
 				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
 				Gtk.MessageType.Question,
 				Gtk.ButtonsType.YesNo,
 				String.Format ("Delete '{0}'?", blockName));
-			dlg.Title = "Delete Block?";
-			Gtk.ResponseType rsp = (Gtk.ResponseType)dlg.Run ();
-			dlg.Destroy();
-			if (rsp == Gtk.ResponseType.No) return;
-			
+			    dlg.Title = "Delete Block?";
+			    Gtk.ResponseType rsp = (Gtk.ResponseType)dlg.Run ();
+			    dlg.Destroy();
+			    if (rsp == Gtk.ResponseType.No) return;
+			} 
 			// Delete and reposition what's left
 			(_cvs as Canvas).DeleteBlock(this);
 			if (top != this) top.RepositionBlocks(null);
@@ -3709,16 +3711,18 @@ namespace Jigsaw
 			if (_cvs.Toplevel.IsTopLevel) toplevel = (Gtk.Window)_cvs.Toplevel;
 
 			// Ask to delete the selected blocks
-			Gtk.MessageDialog dlg = new Gtk.MessageDialog(
+			if ((_cvs as Canvas).ask_delete_block) {
+			    Gtk.MessageDialog dlg = new Gtk.MessageDialog(
 				toplevel,
 				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
 				Gtk.MessageType.Question,
 				Gtk.ButtonsType.YesNo,
 				String.Format ("Delete {0} block(s)?", allSelected.Count));
-			dlg.Title = "Delete Selected Blocks?";
-			Gtk.ResponseType rsp = (Gtk.ResponseType)dlg.Run ();
-			dlg.Destroy();
-			if (rsp == Gtk.ResponseType.No) return;
+			    dlg.Title = "Delete Selected Blocks?";
+			    Gtk.ResponseType rsp = (Gtk.ResponseType)dlg.Run ();
+			    dlg.Destroy();
+			    if (rsp == Gtk.ResponseType.No) return;
+			}
 
 			// Delete and reposition what's left
 			foreach (CBlock b in allSelected) (_cvs as Canvas).DeleteBlock(b);
@@ -3737,16 +3741,18 @@ namespace Jigsaw
 			if (_cvs.Toplevel.IsTopLevel) toplevel = (Gtk.Window)_cvs.Toplevel;
 			
 			// Ask to delete the block
-			Gtk.MessageDialog dlg = new Gtk.MessageDialog(
+			if ((_cvs as Canvas).ask_delete_block) {
+			    Gtk.MessageDialog dlg = new Gtk.MessageDialog(
 				toplevel,
 				Gtk.DialogFlags.Modal | Gtk.DialogFlags.DestroyWithParent, 
 				Gtk.MessageType.Question,
 				Gtk.ButtonsType.YesNo,
 				"Delete the selected block and all blocks below it in its stack?");
-			dlg.Title = "Delete Stack?";
-			Gtk.ResponseType rsp = (Gtk.ResponseType)dlg.Run ();
-			dlg.Destroy();
-			if (rsp == Gtk.ResponseType.No) return;
+			    dlg.Title = "Delete Stack?";
+			    Gtk.ResponseType rsp = (Gtk.ResponseType)dlg.Run ();
+			    dlg.Destroy();
+			    if (rsp == Gtk.ResponseType.No) return;
+			}
 			
 			(_cvs as Canvas).DeleteStack(this);
 			_cvs.Invalidate();

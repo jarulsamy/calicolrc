@@ -354,7 +354,10 @@ del _invoke, _
 	    Gtk.MenuItem menu = new Gtk.MenuItem("Toggle Inset");
 	    menu.Activated += new EventHandler(cvs.OnViewToggleInset);
 	    ((Gtk.Menu)options_menu.Submenu).Add(menu);
-	    menu.Show();
+            SetAdditionalOptionsMenu((Gtk.Menu)options_menu.Submenu);
+	    options_menu.ShowAll();
+	    cvs.ask_delete_block = (bool)calico.config.GetValue("jigsaw-language", "ask-delete-block");
+
 	    // // Show properties:
 	    // menu = new Gtk.MenuItem("View Properties");
 	    // menu.Activated += delegate { cvs.ShowPropertiesWindow(); };
@@ -367,11 +370,24 @@ del _invoke, _
 	    // ((Gtk.Menu)options_menu.Submenu).Add(miViewAutoProps);
 	    // miViewAutoProps.Show();
     }
+
+	public void SetAdditionalOptionsMenu(Gtk.Menu submenu) {
+	    // Put language specific stuff in overloaded version
+	    bool ask_delete_block = (bool)calico.config.GetValue("jigsaw-language", "ask-delete-block");
+	    Gtk.CheckMenuItem menu_item = new Gtk.CheckMenuItem("Ask to Delete Block");
+	    menu_item.Active = ask_delete_block;
+	    menu_item.Activated += delegate(object sender, EventArgs e) {
+		bool value = ((Gtk.CheckMenuItem)sender).Active;
+		calico.config.SetValue("jigsaw-language", "ask-delete-block", value);
+		cvs.ask_delete_block = (bool)calico.config.GetValue("jigsaw-language", "ask-delete-block");
+	    };
+	    ((Gtk.Menu)submenu).Add(menu_item);
+	}
 }
 
 public class CalicoJigsawLanguage : Language
 {
-	public CalicoJigsawLanguage () : 
+    public CalicoJigsawLanguage () : 
         base("jigsaw",  "Jigsaw", new string[] { "jig"}, null)
 	{
 		IsTextLanguage = false;
@@ -384,7 +400,7 @@ public class CalicoJigsawLanguage : Language
 
 	public override Document MakeDocument (Calico.MainWindow calico, string filename)
 	{
-		return new CalicoJigsawDocument (calico, filename);
+	    return new CalicoJigsawDocument (calico, filename);
 	}
 
 	public static new Language MakeLanguage ()
@@ -392,5 +408,12 @@ public class CalicoJigsawLanguage : Language
 		return new CalicoJigsawLanguage ();
 	}
 
+	public override void InitializeConfig() {
+	    base.InitializeConfig();
+	    if (local_config != null && !local_config.HasValue("jigsaw-language", "ask-delete-block")) {
+		// add it! 
+		local_config.SetValue("jigsaw-language", "ask-delete-block", "bool", true);
+	    }
+	}
 }
 
