@@ -1358,12 +1358,12 @@ def upgrade(what, url=None, port=None):
         if url != None:
             printStatus("   with url %s" % url)
         upgrade_scribbler(url=url, port=port)
-    if what == "fluke":
+    elif what == "fluke":
         printStatus("Upgrading fluke...")
         if port != None:
-            printStatus("   with port", port)
+            printStatus("   with port '%s'" % port)
         if url != None:
-            printStatus("   with url", url)
+            printStatus("   with url '%s'" % url)
         upgrade_fluke(url=url, port=port)
 
 def main():
