@@ -148,7 +148,7 @@ namespace Calico {
 		int y = (int)config.GetValue("config", "window-y");
 		int w = (int)config.GetValue("config", "window-width");
 		int h = (int)config.GetValue("config", "window-height");
-		if (x != -1 || y != -1) {
+		if (x > 0 && y > 0) {
 		    Move(x, y);
 		}
 		if (w != -1 || h != -1) {
