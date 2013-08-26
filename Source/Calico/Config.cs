@@ -87,6 +87,7 @@ namespace Calico {
             SetValue("config", "window-height", "int", -1);
             SetValue("config", "shell-height", "int", -1);
             SetValue("config", "shell-width", "int", -1);
+	    SetValue("config", "remember-window-position", "bool", false);
         }
         public object GetValue(string section, string setting) {
             return values[section][setting];

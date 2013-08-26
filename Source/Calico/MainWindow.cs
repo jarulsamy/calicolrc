@@ -143,15 +143,17 @@ namespace Calico {
             if (path.StartsWith("\\")) {
                 path = path.Substring(1);
             }
-	    int x = (int)config.GetValue("config", "window-x");
-	    int y = (int)config.GetValue("config", "window-y");
-	    int w = (int)config.GetValue("config", "window-width");
-	    int h = (int)config.GetValue("config", "window-height");
-	    if (x != -1 || y != -1) {
-		Move(x, y);
-	    }
-	    if (w != -1 || h != -1) {
-		Resize(w, h);
+	    if ((bool)config.GetValue("config", "remember-window-position")) {
+		int x = (int)config.GetValue("config", "window-x");
+		int y = (int)config.GetValue("config", "window-y");
+		int w = (int)config.GetValue("config", "window-width");
+		int h = (int)config.GetValue("config", "window-height");
+		if (x != -1 || y != -1) {
+		    Move(x, y);
+		}
+		if (w != -1 || h != -1) {
+		    Resize(w, h);
+		}
 	    }
             // FIXME: URI to path
             // string path = Uri.UnescapeDataString(uri.Path);
@@ -312,6 +314,21 @@ namespace Calico {
             }
             languages_menu.Submenu.ShowAll();
 
+	    // Setup config Calico options:
+            Gtk.MenuItem options_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/CalicoAction/OptionsAction");
+            if (options_menu == null) {
+                throw new Exception("/menubar2/CalicoAction/OptionsAction");
+            }
+            options_menu.Submenu = new Gtk.Menu();
+	    bool value = (bool)config.GetValue("config", "remember-window-position");
+	    Gtk.CheckMenuItem options_menu_item = new Gtk.CheckMenuItem(_("Remember Window Position"));
+	    options_menu_item.Active = value;
+	    options_menu_item.Activated += delegate {
+		config.SetValue("config", "remember-window-position", options_menu_item.Active);
+            };
+	    ((Gtk.Menu)options_menu.Submenu).Add(options_menu_item);
+            options_menu.ShowAll();
+
             // Set optional items of TextArea
             ShellEditor.Options.ShowFoldMargin = false;
             ShellEditor.Options.ShowIconMargin = false;
@@ -420,26 +437,28 @@ namespace Calico {
             butterfly.Image = animationImages [0];
             this.KeepAbove = false;
 
-	    if (toolSwapped) {
-		SwapTool();
-	    }
-	    int sw = (int)config.GetValue("config", "shell-width");
-	    int sh = (int)config.GetValue("config", "shell-height");
-	    if (verticalSwapped) {
-		SwapVertical();
-		if (sh != -1) { // hpaned divider between Shell and Output
-		    VPaned2.Position = sh;
+	    if ((bool)config.GetValue("config", "remember-window-position")) {
+		if (toolSwapped) {
+		    SwapTool();
+		}	 
+		int sw = (int)config.GetValue("config", "shell-width");
+		int sh = (int)config.GetValue("config", "shell-height");
+		if (verticalSwapped) {
+		    SwapVertical();
+		    if (sh != -1) { // hpaned divider between Shell and Output
+			VPaned2.Position = sh;
+		    }
+		} else {
+		    if (sh != -1) { // hpaned divider between Shell and Output
+			VPaned2.Position = sh - 16;
+		    }
 		}
-	    } else {
-		if (sh != -1) { // hpaned divider between Shell and Output
-		    VPaned2.Position = sh - 16;
+		if (horizontalSwapped) {
+		    SwapHorizontal();
 		}
-	    }
-	    if (horizontalSwapped) {
-		SwapHorizontal();
-	    }
-	    if (sw != -1) { // vpaned divider between Shell and Tools
-		hpaned2.Position = sw;
+		if (sw != -1) { // vpaned divider between Shell and Tools
+		    hpaned2.Position = sw;
+		}
 	    }
             // Start up background updater
             GLib.Timeout.Add(500, UpdateGUI);
@@ -4211,5 +4230,17 @@ del _invoke, _
 		ErrorLine(_("You need to login before using the Calico Cloud."));
 	    }
         }
+
+	protected void OnResetOptionsActionActivated (object sender, System.EventArgs e) {
+	    // reset config
+	    // put all things back
+	    // restart
+	    if (yesno(_("Are you sure you want to reset the configuration and exit?"))) {
+		string config_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
+		config_path = System.IO.Path.Combine(config_path, "calico", "config.xml");
+                config = new Config(config_path, true);
+		RequestQuit();
+	    }
+	}
     }
 }

@@ -202,7 +202,7 @@
       <action id="ViewAction">
         <property name="Type">Action</property>
         <property name="Label" translatable="yes">View</property>
-        <property name="ShortLabel" translatable="yes">Options</property>
+        <property name="ShortLabel" translatable="yes">View</property>
       </action>
       <action id="zoomInAction">
         <property name="Type">Action</property>
@@ -362,11 +362,6 @@
         <property name="ShortLabel" translatable="yes">About...</property>
         <signal name="Activated" handler="OnAboutActionActivated" />
       </action>
-      <action id="OptionsAction">
-        <property name="Type">Action</property>
-        <property name="Label" translatable="yes">Options...</property>
-        <property name="ShortLabel" translatable="yes">Options...</property>
-      </action>
       <action id="ToggleBreakpointAction">
         <property name="Type">Action</property>
         <property name="Accelerator">&lt;Control&gt;period</property>
@@ -383,7 +378,7 @@
       <action id="ScriptOptionsAction">
         <property name="Type">Action</property>
         <property name="Label" translatable="yes">Script Options</property>
-        <property name="ShortLabel" translatable="yes">Options</property>
+        <property name="ShortLabel" translatable="yes">Script Options</property>
       </action>
       <action id="FindPreviousAction">
         <property name="Type">Action</property>
@@ -459,6 +454,17 @@
         <property name="Type">Action</property>
         <property name="Label" translatable="yes">Languages</property>
         <property name="ShortLabel" translatable="yes">Languages</property>
+      </action>
+      <action id="OptionsAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Options</property>
+        <property name="ShortLabel" translatable="yes">Options</property>
+      </action>
+      <action id="ResetOptionsAction">
+        <property name="Type">Action</property>
+        <property name="Label" translatable="yes">Reset Options...</property>
+        <property name="ShortLabel" translatable="yes">Reset Options...</property>
+        <signal name="Activated" handler="ResetOptionsActionActivated" />
       </action>
       <action id="FindNextAction">
         <property name="Type">Action</property>
@@ -600,6 +606,9 @@
                   <node type="Menuitem" action="InstallNewAddonAction" />
                 </node>
                 <node type="Menu" action="LanguagesAction" />
+                <node type="Separator" />
+                <node type="Menuitem" action="OptionsAction" />
+                <node type="Menuitem" action="ResetOptionsAction" />
               </node>
               <node type="Menu" action="HelpAction">
                 <node type="Menuitem" action="aboutAction" />
