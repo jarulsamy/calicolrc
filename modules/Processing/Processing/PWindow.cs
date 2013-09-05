@@ -569,6 +569,18 @@ internal class PWindow : Gtk.Window
 				break;
 			case EllipseMode.CORNERS:
 				// TODO
+                double ow = w;
+                double oh = h;
+                w = ow - x;
+                h = oh - y;
+                hw = w/2;
+                hh = h/2;
+				cx = x + hw;
+				cy = y + hh;
+                w = Math.Abs(w);
+                hw = Math.Abs(hw);
+                h = Math.Abs(h);
+                hh = Math.Abs(hh);
 				break;
 			default: //EllipseMode.CORNER:
 				cx = x + hw;
