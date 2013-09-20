@@ -111,12 +111,12 @@ public class Arduino:Myro.Robot
     _serialPort.DataBits = 8;
     _serialPort.Parity = Parity.None;
     _serialPort.StopBits = StopBits.One;
-    _last = this;
     if (autoStart)
       {
 		this.delay = delay;
 		this.Open();
       }
+    _last = this;
   }
 
   /// <summary>

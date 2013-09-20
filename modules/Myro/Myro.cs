@@ -1291,8 +1291,8 @@ public static class Myro
 	}
 	DirectoryInfo d = new DirectoryInfo (System.IO.Path.Combine (path, "Myro", "Robots"));		
 	foreach (FileInfo f in d.GetFiles("*.dll")) {
-	  //System.Console.WriteLine ("Loading {0}...", f.FullName);
-	  Assembly assembly = Assembly.LoadFrom (f.FullName);
+        //System.Console.WriteLine ("Loading {0}...", f.FullName);
+        Assembly assembly = Assembly.LoadFrom (f.FullName);
 	  if (assembly != null) {
 		foreach (Type type in assembly.GetTypes()) {
 		  Type [] types = getTypesOfArgs (args);
@@ -1301,12 +1301,12 @@ public static class Myro
 			object robot;
 			try {
 			  robot = constructor.Invoke (args);
-			} catch (Exception) {
-			  //System.Console.WriteLine ("Failure; skipping robot '{0}': {1}", f.Name, e.Message);
+			} catch (Exception e) {
+                //System.Console.WriteLine ("Failure; skipping robot '{0}': {1}", f.Name, e.Message);
 			  continue;
 			}
-			Myro.robot = (Robot)robot;
-			return robot;
+            Myro.robot = (Robot)robot;
+            return robot;
 		  }
 		}
 	  }
