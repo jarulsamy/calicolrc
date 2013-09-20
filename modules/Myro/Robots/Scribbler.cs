@@ -740,16 +740,17 @@ public class Scribbler: Myro.Robot
 
     public override void setLEDBack (object value)
     {
-	double dvalue = System.Convert.ToDouble(value);
+        double dvalue = System.Convert.ToDouble(value);
+	    int ivalue;
         if (dvalue > 1) {
-            dvalue = 1;
+            ivalue = 1;
         } else if (dvalue <= 0) {
-            dvalue = 0;
+            ivalue = 0;
         } else {
-            dvalue = (int)(dvalue * (255 - 170) + 170); // scale
+            ivalue = (int)(dvalue * (255 - 170) + 170); // scale
         }
         write (Scribbler.SET_DIMMER_LED);
-        write ((byte)value);
+        write ((byte)ivalue);
     }
 
     public override void setVolume (object volume)
@@ -886,7 +887,7 @@ public class Scribbler: Myro.Robot
 
     public void set (string item, object position, object value)
     {
-	string sposition = position.ToString();
+        string sposition = position.ToString();
         if (item == "led") {
             if (sposition == "center" || sposition == "middle") {
                 if (isTrue (value))
