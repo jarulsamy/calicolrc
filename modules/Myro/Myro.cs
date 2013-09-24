@@ -1655,6 +1655,15 @@ public static class Myro
 	}
 
 	[method: JigsawTab("M/Advanced 4")]
+        public static void makeAnalogOutput (int port)
+	{
+	    if (robot != null) 
+	        robot.makeAnalogOutput (port);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Advanced 4")]
         public static void makePWMOutput (int port)
 	{
 	    if (robot != null) 
@@ -3773,6 +3782,10 @@ public static class Myro
 	       }
 
 	       public virtual void makeDigitalOutput (int port)
+   	       {
+	       }
+
+	       public virtual void makeAnalogOutput (int port)
    	       {
 	       }
 

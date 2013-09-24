@@ -271,6 +271,11 @@ public class Arduino:Myro.Robot
         pinMode(pin, OUTPUT);
     }
 
+    public override void makeAnalogOutput(int pin)
+    {
+        pinMode(pin, OUTPUT);
+    }
+
     /// <summary>
     /// Write to a digital pin that has been toggled to output mode with pinMode() method.
     /// </summary>
