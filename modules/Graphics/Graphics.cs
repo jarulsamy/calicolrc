@@ -4742,6 +4742,30 @@ public static class Graphics
 			});
 		}
 
+		public void fillRegion (IList iterable, Graphics.Color color)
+		{
+		    InvokeBlocking( delegate {
+			    Point p = new Point (iterable);
+			    Graphics.Color target = getColor((int)p.x, (int)p.y);
+			    Stack<Point> q = new Stack<Point>();
+			    q.Push(p);
+			    while (q.Count > 0) {
+				Point n = q.Pop();
+				if (getColor((int)n.x, (int)n.y).Equals(target)) {
+				    setColor((int)n.x, (int)n.y, color);
+				    if (n.x > 0)
+					q.Push(new Point(n.x - 1, n.y));
+				    if (n.x < width)
+					q.Push(new Point(n.x + 1, n.y));
+				    if (n.y > 0)
+					q.Push(new Point(n.x, n.y - 1));
+				    if (n.x < height)
+					q.Push(new Point(n.x, n.y + 1));
+				}
+			    }
+			});
+		}
+
 		public void flipHorizontal ()
 		{
 		    InvokeBlocking( delegate {
