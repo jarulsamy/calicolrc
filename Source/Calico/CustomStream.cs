@@ -37,8 +37,12 @@ namespace Calico {
             // FIXME: Ruby generates \r\n 13 10
             //if (bytes[0] == 13)
             //    return;
-            string text = System.Text.Encoding.UTF8.GetString(bytes, offset, count);
-	    window.Print(tag, text);
+            if (count == 3 && offset == 0 && bytes [0] == 239 && bytes [1] == 187 && bytes [2] == 191) {
+                // clear screen?
+            } else {
+                string text = System.Text.Encoding.UTF8.GetString(bytes, offset, count);
+                window.Print(tag, text);              
+            }
         }
 
         public override void WriteByte(Byte b){
