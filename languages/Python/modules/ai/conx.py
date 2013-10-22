@@ -4285,7 +4285,13 @@ class BackpropNetwork(Network):
         output = Network.propagate(self, *arg, **kw)
         if self.interactive:
             self.updateGraphics()
-        return output
+        # IMPORTANT: convert results from numpy.floats to conventional floats 
+        if type(output) == dict:
+            for layerName in output:
+                output[layerName] = [float(x) for x in output[layerName]]
+            return output
+        else:
+            return [float(x) for x in output]
 
     def sweep(self):
         result = Network.sweep(self)
