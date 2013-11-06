@@ -708,6 +708,7 @@ public static class Graphics
 			  }
 			  _lastWindow = _windows [title];
 			  _lastWindow.KeepAbove = true;
+			  _lastWindow.Show();
 			});
 	    return _windows [title];
 	}
@@ -755,6 +756,7 @@ public static class Graphics
 		    }
 		    _lastWindow = _windows [title];
 		    _lastWindow.KeepAbove = true;
+			_lastWindow.Show();
 		});
 	    return _windows [title];
 	}
