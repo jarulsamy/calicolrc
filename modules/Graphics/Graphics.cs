@@ -4455,6 +4455,10 @@ public static class Graphics
 			});
 		}
 
+
+		public Picture (System.Drawing.Bitmap bitmap, bool fluke1=false) : this(bitmap, bitmap.Width, bitmap.Height, fluke1) {
+		}
+
 		public Picture (System.Drawing.Bitmap bitmap, int width, int height, bool fluke1=false) : this(true) {
 		    InvokeBlocking (delegate {
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
