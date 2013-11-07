@@ -23,7 +23,7 @@
  using System.IO;
  using System.Threading;
  using System.Collections.Generic;
-using System.Collections;
+ using System.Collections;
  using Cairo;
  using Gtk;
 
@@ -3144,6 +3144,22 @@ public class PImage
 
 	}
 	public void save(string path) { save(path, false); }
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public System.Drawing.Bitmap toBitmap() {
+	    System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(_width, _height);
+	    for (int x=0; x < _width; x++) {
+		for (int y=0; y < _height; y++) {
+		    byte r = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 0);
+		    byte g = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 1);
+		    byte b = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 2);
+		    byte a = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 3);
+		    System.Drawing.Color color = System.Drawing.Color.FromArgb(a, r, g, b);
+		    bitmap.SetPixel(x, y, color);
+		}
+	    }
+	    return bitmap;
+	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 }
