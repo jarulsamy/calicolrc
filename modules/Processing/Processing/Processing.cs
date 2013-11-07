@@ -799,6 +799,25 @@
 		return new PImage(width, height, frmt);
 	}
 
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab("P/Images")]
+	public static PImage createImage(System.Drawing.Bitmap bitmap) {
+	    PImage image = new PImage(bitmap.Width, bitmap.Height, _imageFormatStr["ARGB"]);
+	    for (int x=0; x < bitmap.Width; x++) {
+		for (int y=0; y < bitmap.Height; y++) {
+		    System.Drawing.Color pixel = bitmap.GetPixel (x, y);
+		    byte r = pixel.R;
+		    byte g = pixel.G;
+		    byte b = pixel.B;
+		    byte a = pixel.A;
+		    image.setPixel(x, y, r, g, b, a);
+		}
+	    }
+	    return image;
+	}
+
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab("P/Images")]
 	public static PImage createImage(int width = 100, int height = 100, int format = (int)Format.ARGB32)
