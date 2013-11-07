@@ -2740,6 +2740,7 @@ public static class Graphics
 							 ((float)y) / MeterInPixels);
 			    // FIXME: undo operation; call rotateTo()?
 			    body.Rotation = (float)_rotation;
+			    body.Awake = true;
 			}
 		    }
 		}

@@ -12,11 +12,9 @@
       <Pad Id="ProjectPad">
         <State expanded="True">
           <Node name="HidSharp" expanded="True">
-            <Node name="References" expanded="True" />
+            <Node name="References" expanded="True" selected="True" />
             <Node name="Platform" expanded="True">
-              <Node name="Linux" expanded="True">
-                <Node name="LinuxHidManager.cs" selected="True" />
-              </Node>
+              <Node name="Linux" expanded="True" />
             </Node>
             <Node name="ReportDescriptors" expanded="True">
               <Node name="Parser" expanded="True" />
