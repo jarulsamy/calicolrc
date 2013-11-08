@@ -1178,9 +1178,9 @@
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab("P/Environ")]
-	public static uint frameRate(uint fps = 15)
+	public static double frameRate(double fps = 15)
 	{	// Sets timer interval
-		uint fr = Convert.ToUInt32(1000.0/Convert.ToDouble(fps));
+		uint fr = Convert.ToUInt32(1000.0/fps);
 		bool enabled = _tmr.Enabled;
 		_tmr.Stop ();
 		_tmr.Interval = fr;
