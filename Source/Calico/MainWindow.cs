@@ -3084,6 +3084,17 @@ del _invoke, _
             //LocalTreeView.Model = LocalList;
         }
 
+        public void UpdateLocal(IList<IList<object>> locals) {
+            LocalList.Clear();
+            foreach (IList<object> list in locals) {
+                string vname = list[0].ToString();
+                if (! vname.StartsWith("_") && vname != "calico") {
+                    string repr = Repr(list[1]);
+                    LocalList.AppendValues(vname, repr);
+                }
+            }
+        }
+
         public bool UpdateEnvironment() {
             // update tree in Environment tab
             // update the ones that already exist:

@@ -12,14 +12,17 @@ import Mono.TextEditor
 import sys, os
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
-from lc3 import LC3
+from lc3 import LC3, lc_hex
 import time
+from collections import OrderedDict
+import traceback
 
 class CalicoLC3(LC3):
     def __init__(self, calico, trace, trace_pause, filename):
         LC3.__init__(self)
         self.calico = calico
         self.trace = trace
+        self.debug = trace
         self.trace_pause = trace_pause
         self.filename = filename
         #print("init:", self.trace)
@@ -47,6 +50,17 @@ class CalicoLC3(LC3):
             return
         # Ok, we have something to do:
         Calico.MainWindow.InvokeBlocking(lambda: self.setTraceButtons(lineno))
+        Calico.MainWindow.InvokeBlocking( lambda: self.calico.UpdateLocal([
+            ["PC", lc_hex(self.get_pc())],
+            ["NZP", self.get_nzp()],
+            ["R0", lc_hex(self.get_register(0))],
+            ["R1", lc_hex(self.get_register(1))],
+            ["R2", lc_hex(self.get_register(2))],
+            ["R3", lc_hex(self.get_register(3))],
+            ["R4", lc_hex(self.get_register(4))],
+            ["R5", lc_hex(self.get_register(5))],
+            ["R6", lc_hex(self.get_register(6))],
+            ["R7", lc_hex(self.get_register(7))]]))
         psv = self.calico.ProgramSpeedValue
         #print("psv", psv)
         if (psv == 0 or
@@ -75,6 +89,7 @@ class CalicoLC3(LC3):
     def setTrace(self, value):
         #print("setTrace:", value)
         self.trace = value
+        self.debug = value
 
 class MyEngine(Calico.Engine):
     def __init__(self, *args, **kwargs):
@@ -87,13 +102,45 @@ class MyEngine(Calico.Engine):
     def PostSetup(self, calico):
         #print("post setup", self.trace)
         self.lc3 = CalicoLC3(calico, self.trace, self.trace_pause, self.filename)
+        Calico.MainWindow.InvokeBlocking( lambda: calico.UpdateLocal([
+            ["PC", lc_hex(self.lc3.get_pc())],
+            ["NZP", self.lc3.get_nzp()],
+            ["R0", lc_hex(self.lc3.get_register(0))],
+            ["R1", lc_hex(self.lc3.get_register(1))],
+            ["R2", lc_hex(self.lc3.get_register(2))],
+            ["R3", lc_hex(self.lc3.get_register(3))],
+            ["R4", lc_hex(self.lc3.get_register(4))],
+            ["R5", lc_hex(self.lc3.get_register(5))],
+            ["R6", lc_hex(self.lc3.get_register(6))],
+            ["R7", lc_hex(self.lc3.get_register(7))]]))
 
     def Execute(self, text):
+        if text.strip() == ".list":
+            try:
+                self.lc3.dump()
+            except:
+                print("You should run code first")
+            return True
+        elif text.strip() == ".regs":
+            try:
+                self.lc3.dump_registers()
+            except:
+                print("You should run code first")
+            return True
+        elif text.strip().startswith(".dump"):
+            words = [word.strip() for word in text.split()]
+            try:
+                self.lc3.dump(*[int("0" + word, 16) for word in words[1:]])
+            except:
+                print("You should run code first")
+            return True
+
         ok = False
         try:
             self.lc3.assemble(text)
             ok = True
         except:
+            traceback.print_exc()
             print("Error in assembly!")
         if ok:
             ok = False
@@ -101,6 +148,7 @@ class MyEngine(Calico.Engine):
                 self.lc3.run()
                 ok = True
             except:
+                traceback.print_exc()
                 print("Runtime error!")
         self.lc3.filename = None
         return ok
@@ -130,7 +178,7 @@ class MyEngine(Calico.Engine):
 
     def SetTraceOff(self):
         #print("trace off")
-        self.trace = False
+        self.trace = False        
         self.lc3.setTrace(False)
 
 class MyDocument(Calico.TextDocument):

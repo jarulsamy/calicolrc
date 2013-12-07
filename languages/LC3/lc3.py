@@ -114,6 +114,7 @@ class LC3(object):
 
     def __init__(self):
         # Functions for interpreting instructions:
+        self.debug = False
         self.apply = {
             0b0000: self.BR,
             0b0001: self.ADD,
@@ -183,6 +184,9 @@ class LC3(object):
         self.nzp = (int(value & (1 << 15) > 0), 
                     int(value == 0), 
                     int(value & (1 << 15) == 0))
+        if self.debug:
+            print("    NZP <=", self.nzp)
+
 
     def get_nzp(self, register=None):
         if register is not None:
@@ -195,15 +199,21 @@ class LC3(object):
 
     def set_pc(self, value):
         self.pc = value
+        if self.debug:
+            print("    PC <= %s" % lc_hex(self.pc))
 
     def increment_pc(self, value=1):
         self.pc += value
+        if self.debug:
+            print("    PC <= %s" % lc_hex(self.pc))
 
     def get_register(self, position):
         return self.register[position]
 
     def set_register(self, position, value):
         self.register[position] = value
+        if self.debug:
+            print("    R%d <= %s" % (position, lc_hex(value)))
 
     def set_instruction(self, location, n, line):
         """
@@ -217,6 +227,8 @@ class LC3(object):
         return self.memory[location]
 
     def set_memory(self, location, value):
+        if self.debug:
+            print("    memory[%s] <= %s" % (lc_hex(location), lc_hex(value)))
         self.memory[location] = value
 
     def memory_tofile(self, start, stop, f):
@@ -473,7 +485,8 @@ class LC3(object):
             instruction = self.get_memory(self.get_pc())
             instr = instruction >> 12
             #print("executing: %s..." % lc_hex(self.get_pc()))
-            #print(self.format[instr](instruction, self.get_pc()))
+            if self.debug:
+                print(self.instruction_count, self.format[instr](instruction, self.get_pc()))
             self.increment_pc()
             self.instruction_count += 1
             self.apply[instr](instruction)
@@ -496,9 +509,9 @@ class LC3(object):
         print("-" * 20)
     
     def dump(self, start=None, stop=None):
-        self.dump_registers()
-        if start == stop == None:
+        if start is None:
             start = min(self.source.keys())
+        if stop is None:
             stop = max(self.source.keys()) + 1
         for memory in range(start, stop):
             instruction = self.get_memory(memory)
