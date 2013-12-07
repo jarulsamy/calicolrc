@@ -1201,6 +1201,31 @@ namespace Calico {
             }
         }
 
+        public static void InvokeBlocking (InvokeDelegate invoke)
+        {
+	    System.Exception exception = null;
+	    ManualResetEvent ev = new ManualResetEvent(false);
+	    if (needInvoke ()) {
+		Gtk.Application.Invoke (delegate {
+			try {
+			    invoke ();
+			} catch (Exception e) {
+			    exception = e;
+			}
+			ev.Set();
+		    });
+		ev.WaitOne();
+	    } else {
+		try {
+		    invoke ();
+		} catch (Exception e) {
+		    exception = e;
+		}
+	    }
+	    if (exception != null)
+		throw exception;
+	}
+
         public static string _(string message) {
             return global::Mono.Unix.Catalog.GetString(message);
         }

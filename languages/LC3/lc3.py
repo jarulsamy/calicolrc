@@ -113,15 +113,6 @@ class LC3(object):
     }
 
     def __init__(self):
-        self.cycle = 0
-        self.set_pc(0x3000)
-        self.immediate_mask = {}
-        for im in self.immediate:
-            self.immediate_mask[im] = (1 << self.immediate[im]) - 1
-        self.instructions = self.instruction_info.keys()
-        self.regs = dict(('R%1i' % r, r) for r in range(8))
-        self.labels = {}
-        self.label_location = {}
         # Functions for interpreting instructions:
         self.apply = {
             0b0000: self.BR,
@@ -167,12 +158,21 @@ class LC3(object):
     #### memory, register, nzp, and pc can be implemented in different
     #### means.
     def initialize(self):
+        self.cycle = 0
+        self.set_pc(0x3000)
+        self.immediate_mask = {}
+        for im in self.immediate:
+            self.immediate_mask[im] = (1 << self.immediate[im]) - 1
+        self.instructions = self.instruction_info.keys()
+        self.regs = dict(('R%1i' % r, r) for r in range(8))
+        self.labels = {}
+        self.label_location = {}
         self.memory = array('i', [0] * (1 << 16))
         self.reset_registers()
 
     def reset(self):
         ## FIXME: reload code
-        self.reset_registers()
+        self.initialize()
 
     def reset_registers(self):
         self.register = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0}

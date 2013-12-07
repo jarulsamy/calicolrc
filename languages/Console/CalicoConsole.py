@@ -10,7 +10,7 @@ import Calico
 clr.AddReference("Mono.TextEditor") 
 import Mono.TextEditor
 
-sys.path.append(os.path.dirname(__file__))
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 # Now, define the Document, Engine, and Language classes:
 class MyLanguageEngine(Calico.Engine):
@@ -107,7 +107,7 @@ class MyLanguage(Calico.Language):
         Given the root_path to calico, return the path to the examples
         folder.
         """
-        return os.path.join(os.path.dirname(__file__), "examples")
+        return os.path.join(os.path.abspath(os.path.dirname(__file__)), "examples")
 
 # And finally define a method of loading it:
 def MakeLanguage():
@@ -116,5 +116,5 @@ def MakeLanguage():
     just once, even for non-visible languages.
     """
     Mono.TextEditor.Highlighting.SyntaxModeService.LoadStylesAndModes(
-        os.path.join(os.path.dirname(__file__), "SyntaxModes"))
+        os.path.join(os.path.abspath(os.path.dirname(__file__)), "SyntaxModes"))
     return MyLanguage()

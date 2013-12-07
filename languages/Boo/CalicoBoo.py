@@ -25,8 +25,8 @@ from __future__ import division
 
 import sys
 import os
-sys.path.append(os.path.dirname(__file__))
-sys.path.append(os.path.dirname(__file__) + "/../../bin")
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
+sys.path.append(os.path.abspath(os.path.dirname(__file__) + "/../../bin"))
 import clr                 # Allows connection to CLR/DLR bits
 clr.AddReference("Calico") # Add reference to the main Calico.exe
 import System
@@ -147,7 +147,7 @@ class BooLanguage(Calico.Language):
         Given the root_path to calico, return the path to the examples
         folder.
         """
-        return os.path.join(os.path.dirname(__file__), "examples")
+        return os.path.join(os.path.abspath(os.path.dirname(__file__)), "examples")
 
 # And finally define a method of loading it:
 def MakeLanguage():

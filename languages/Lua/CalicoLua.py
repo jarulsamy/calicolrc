@@ -30,7 +30,7 @@ import System
 import Calico
 clr.AddReference("Mono.TextEditor") 
 import Mono.TextEditor
-sys.path.append(os.path.dirname(__file__))
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 clr.AddReference('LuaSharp.dll')
 clr.AddReference('LuaEnv.dll')
 import LuaSharp

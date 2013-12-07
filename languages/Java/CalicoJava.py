@@ -188,7 +188,7 @@ class MyLanguage(Calico.Language):
         Given the root_path to calico, return the path to the examples
         folder.
         """
-        return os.path.join(os.path.dirname(__file__), "examples")
+        return os.path.join(os.path.abspath(os.path.dirname(__file__)), "examples")
 
 # And finally define a method of loading it:
 def MakeLanguage():

@@ -8,7 +8,7 @@ clr.AddReference("gtk-sharp")
 import Gtk
 
 import sys, os
-sys.path.append(os.path.dirname(__file__))
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from bf import *
 
@@ -108,7 +108,7 @@ class MyLanguage(Calico.Language):
         return ""
         
     def getExamplesPath(self, root_path):
-    	return os.path.join(os.path.dirname(__file__), "examples")
+    	return os.path.join(os.path.abspath(os.path.dirname(__file__)), "examples")
 
 def MakeLanguage():
     return MyLanguage()

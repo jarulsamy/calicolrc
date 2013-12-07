@@ -1,3 +1,4 @@
+from __future__ import print_function
 # Sample Language File
 
 import clr
@@ -10,7 +11,7 @@ clr.AddReference("Mono.TextEditor")
 import Mono.TextEditor
 
 import sys, os
-sys.path.append(os.path.dirname(__file__))
+sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 import basic
 
@@ -60,9 +61,9 @@ class MyLanguage(Calico.Language):
         return "IMPORT \"%s\"" % fileName
         
     def getExamplesPath(self, root_path):
-    	return os.path.join(os.path.dirname(__file__), "examples")
+    	return os.path.join(os.path.abspath(os.path.dirname(__file__)), "examples")
 
 def MakeLanguage():
     Mono.TextEditor.Highlighting.SyntaxModeService.LoadStylesAndModes(
-        os.path.join(os.path.dirname(__file__), "SyntaxModes"))
+        os.path.join(os.path.abspath(os.path.dirname(__file__)), "SyntaxModes"))
     return MyLanguage()

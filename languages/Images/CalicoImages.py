@@ -20,14 +20,14 @@
 
 from __future__ import print_function
 import sys
-sys.path.append("../../modules")
+import os
+sys.path.append(os.path.abspath("../../modules"))
 import clr
 clr.AddReference("Calico")
 import Calico
 import System
 clr.AddReference("Graphics.dll")
 import Graphics
-import os
 import Gtk
 
 class MyEngine(Calico.Engine):
