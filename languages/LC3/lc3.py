@@ -280,7 +280,7 @@ class LC3(object):
             except ValueError:
                 return
 
-    def process_instruction(self, words, line_count):
+    def process_instruction(self, words, line_count, line):
         """
         Process ready split words from line and parse the line use
         put to show the instruction line without label values
@@ -448,7 +448,7 @@ class LC3(object):
             words = (line.split()) if ';' in line else line.split()
             if '.END' in words:
                 break
-            self.process_instruction(words, line_count)
+            self.process_instruction(words, line_count, line)
             line_count += 1
          # second pass:
         for label, value in self.label_location.items():
@@ -483,7 +483,7 @@ class LC3(object):
         while self.cont:
             self.handleDebug(self.source.get(self.get_pc(), -1))
             instruction = self.get_memory(self.get_pc())
-            instr = instruction >> 12
+            instr = (instruction >> 12) & 0xF
             #print("executing: %s..." % lc_hex(self.get_pc()))
             if self.debug:
                 print(self.instruction_count, self.format[instr](instruction, self.get_pc()))
@@ -515,7 +515,7 @@ class LC3(object):
             stop = max(self.source.keys()) + 1
         for memory in range(start, stop):
             instruction = self.get_memory(memory)
-            instr = (instruction >> 12) 
+            instr = (instruction >> 12) & 0xF
             label = self.lookup(memory, "")
             if label:
                 label = label + ":"
@@ -533,7 +533,7 @@ class LC3(object):
         print("           .ORIG %s " % lc_hex(start))
         for memory in range(start, stop):
             instruction = self.get_memory(memory)
-            instr = instruction >> 12
+            instr = (instruction >> 12) & 0xF
             label = self.lookup(memory, "")
             if label:
                 label = label + ":"
@@ -614,13 +614,13 @@ class LC3(object):
         raise ValueError("attempt to execute reserved instruction")
 
     def RESERVED_format(self, instruction, location):
-        return ";; RESERVED %s %s" % (lc_hex(instruction >> 12), 
+        return ";; RESERVED %s %s" % (lc_hex((instruction >> 12) & 0xF), 
                                       lc_hex(instruction & 0b0000111111111111))
 
     def LEA(self, instruction):
         dst = (instruction & 0b0000111000000000) >> 9
         pc_offset9 = instruction & 0b0000000111111111
-        self.set_register(dst, lc_bin(plus(self.get_pc(), sext(pc_offset9))))
+        self.set_register(dst, lc_bin(plus(self.get_pc(), sext(pc_offset9,9))))
         self.set_nzp(self.get_register(dst))
 
     def LEA_format(self, instruction, location):
@@ -631,8 +631,13 @@ class LC3(object):
     def TRAP(self, instruction):
         vector = instruction & 0b0000000011111111
         self.set_register(7, self.get_pc())
-        if vector == 0x21:
+        # FIXME: need to read/write and set return registers
+        if vector == 0x20:
+            pass
+        elif vector == 0x21:
             # out
+            pass
+        elif vector == 0x22:
             pass
         elif vector == 0x23:
             # in
@@ -693,7 +698,7 @@ class LC3(object):
         dst = (instruction & 0b0000111000000000) >> 9
         base = (instruction & 0b0000000111000000) >> 6
         pc_offset6 = instruction & 0b0000000000111111
-        self.set_register(dst, self.get_memory(plus(self.get_register(base), sext(pc_offset6))))
+        self.set_register(dst, self.get_memory(plus(self.get_register(base), sext(pc_offset6,6))))
         self.set_nzp(self.get_register(dst))
 
     def LDR_format(self, instruction, location):
