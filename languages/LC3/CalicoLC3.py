@@ -30,7 +30,7 @@ class CalicoLC3(LC3):
     def handleDebug(self, lineno):
         ## First, see if we need to do something:
         #print("check trace:", lineno, self.trace, self.calico.ProgramSpeedValue)
-        if lineno == -1 or self.filename is None or not self.trace: 
+        if not self.trace: 
             #print(1)
             return
         try:
@@ -38,6 +38,8 @@ class CalicoLC3(LC3):
             if (self.calico.CurrentDocument == None):
                 #print(3)
                 return
+            elif (lineno == -1):
+                pass
             elif (self.calico.CurrentDocument.HasBreakpointSetAtLine(lineno)):
                 # don't return! Fall through and wait
                 #print(4)
@@ -49,7 +51,8 @@ class CalicoLC3(LC3):
             #print(6)
             return
         # Ok, we have something to do:
-        Calico.MainWindow.InvokeBlocking(lambda: self.setTraceButtons(lineno))
+        if lineno != -1:
+            Calico.MainWindow.InvokeBlocking(lambda: self.setTraceButtons(lineno))
         Calico.MainWindow.InvokeBlocking( lambda: self.calico.UpdateLocal([
             ["PC", lc_hex(self.get_pc())],
             ["NZP", self.get_nzp()],
@@ -64,7 +67,8 @@ class CalicoLC3(LC3):
         psv = self.calico.ProgramSpeedValue
         #print("psv", psv)
         if (psv == 0 or
-            self.calico.CurrentDocument.HasBreakpointSetAtLine(lineno) or
+            ((lineno != -1) and 
+             self.calico.CurrentDocument.HasBreakpointSetAtLine(lineno)) or
             self.trace_pause):
             self.calico.playResetEvent.Reset()
             #print("wait!")
@@ -115,7 +119,11 @@ class MyEngine(Calico.Engine):
             ["R7", lc_hex(self.lc3.get_register(7))]]))
 
     def Execute(self, text):
-        if text.strip() == ".list":
+        if text.strip() == ".raw":
+            for x in range(0x3000, 0x30FF):
+                print(lc_hex(x), lc_hex(self.lc3.get_memory(x)))
+            return True
+        elif text.strip() == ".list":
             try:
                 self.lc3.dump()
             except:
@@ -145,7 +153,12 @@ class MyEngine(Calico.Engine):
         if ok:
             ok = False
             try:
+                self.lc3.cycle = 0
+                self.lc3.instruction_count = 0
                 self.lc3.run()
+                self.lc3.dump_registers()
+                print("Instructions:", self.lc3.instruction_count)
+                print("Cycles:", self.lc3.cycle)
                 ok = True
             except:
                 traceback.print_exc()
@@ -154,6 +167,18 @@ class MyEngine(Calico.Engine):
         return ok
 
     def ExecuteFile(self, filename):
+        # Display nice message
+        self.lc3.orig = 0x0200
+        self.lc3.pc = 0x0200
+        orig = self.lc3.debug
+        self.lc3.debug = False
+        self.lc3.trace = False
+        self.lc3.run()
+        self.lc3.reset_registers()
+        self.lc3.set_pc(0x3000)
+        self.lc3.debug = orig
+        self.lc3.trace = orig
+        # Ok, now let's go!
         self.lc3.filename = filename
         fp = file(filename)
         text = "".join(fp.readlines())

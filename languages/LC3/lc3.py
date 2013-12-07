@@ -53,7 +53,6 @@ class LC3(object):
     """
     reg_pos = [9, 6, 0]
     flags = {'n': 1 << 11, 'z': 1 << 10, 'p': 1 << 9}
-    source = {}
     # instructions:
     instruction_info = {
         'ADD': 0b1 << 12,
@@ -114,6 +113,7 @@ class LC3(object):
 
     def __init__(self):
         # Functions for interpreting instructions:
+        self.trace = False
         self.debug = False
         self.apply = {
             0b0000: self.BR,
@@ -159,6 +159,7 @@ class LC3(object):
     #### memory, register, nzp, and pc can be implemented in different
     #### means.
     def initialize(self):
+        self.source = {}
         self.cycle = 0
         self.set_pc(0x3000)
         self.immediate_mask = {}
@@ -170,6 +171,18 @@ class LC3(object):
         self.label_location = {}
         self.memory = array('i', [0] * (1 << 16))
         self.reset_registers()
+        self.load_os(os.path.join(os.path.dirname(__file__), "lc3os.asm"))
+        self.set_memory(0xFE04, 0xFFFF) ## OS_DSR Display Ready
+        self.set_memory(0xFE00, 0xFFFF) ## OS_KBSR Keyboard Ready
+        self.reset_registers()
+        self.set_pc(0x3000)
+
+    def load_os(self, filename):
+        text = "".join(open(filename).readlines())
+        self.assemble(text)
+        self.labels = {}
+        self.label_location = {}
+        self.source = {}
 
     def reset(self):
         ## FIXME: reload code
@@ -183,7 +196,7 @@ class LC3(object):
     def set_nzp(self, value):
         self.nzp = (int(value & (1 << 15) > 0), 
                     int(value == 0), 
-                    int(value & (1 << 15) == 0))
+                    int(value & (1 << 15) == 0) and value != 0)
         if self.debug:
             print("    NZP <=", self.nzp)
 
@@ -436,6 +449,8 @@ class LC3(object):
     
     def assemble(self, code):
         # processing the lines
+        orig_debug = self.debug
+        self.debug = False
         line_count = 1
         for line in code.splitlines():
             # remove comments
@@ -472,6 +487,7 @@ class LC3(object):
                     else:
                         self.set_memory(ref, plus(self.memory[ref], lc_bin(mask & current)))
         self.set_pc(self.orig)
+        self.debug = orig_debug
 
     def handleDebug(self, lineno):
         pass
@@ -491,9 +507,6 @@ class LC3(object):
             self.instruction_count += 1
             self.apply[instr](instruction)
             #self.dump_registers()
-        self.dump_registers()
-        print("Instructions:", self.instruction_count)
-        print("Cycles:", self.cycle)
 
     def dump_registers(self):
         print("PC:", lc_hex(self.get_pc()))
@@ -602,13 +615,16 @@ class LC3(object):
     def STI(self, instruction):
         src = (instruction & 0b0000111000000000) >> 9
         pc_offset9 = instruction & 0b0000000111111111
-        self.set_memory(self.get_memory(
-            plus(self.get_pc(), sext(pc_offset9,9))), self.get_register(src))
+        memory = self.get_memory(plus(self.get_pc(), sext(pc_offset9,9)))
+        self.set_memory(memory, self.get_register(src))
+        ## Hook up, side effect display:
+        if memory == 0xFE06: ## OS_DDR
+            print(chr(self.get_register(src)), end="")
         
     def STI_format(self, instruction, location):
         dst = (instruction & 0b0000111000000000) >> 9
         pc_offset9 = instruction & 0b0000000111111111
-        return "STI R%d, %s" % (src, self.lookup(plus(sext(pc_offset9,9), location) + 1))
+        return "STI R%d, %s" % (dst, self.lookup(plus(sext(pc_offset9,9), location) + 1))
 
     def RESERVED(self, instruction):
         raise ValueError("attempt to execute reserved instruction")
@@ -631,29 +647,38 @@ class LC3(object):
     def TRAP(self, instruction):
         vector = instruction & 0b0000000011111111
         self.set_register(7, self.get_pc())
-        # FIXME: need to read/write and set return registers
+        self.set_pc(self.get_memory(vector))
         if vector == 0x20:
-            pass
-        elif vector == 0x21:
-            # out
-            pass
-        elif vector == 0x22:
-            pass
-        elif vector == 0x23:
-            # in
-            pass
-        elif vector == 0x25:
-            # halt
+            from Myro import ask
+            data = ask(["Enter a character:"], "LC3 input>")
+            if data["Enter a character:"]:
+                self.set_memory(0xFE02, ord(data["Enter a character:"][0]))
+            else:
+                self.set_memory(0xFE02, 10) # CR
+        #    return "GETC"
+        #elif vector == 0x21:
+        #    return "OUT"
+        #elif vector == 0x22:
+        #    return "PUTS"
+        #elif vector == 0x23:
+        #   return "IN"
+        #elif vector == 0x24:
+        #    return "PUTSP"
+        if vector == 0x25:
             self.cont = False
-        else:
-            raise ValueError("invalid TRAP vector: %s" % lc_hex(vector))
 
     def TRAP_format(self, instruction, location):
         vector = instruction & 0b0000000011111111
-        if vector == 0x21:
+        if vector == 0x20:
+            return "GETC"
+        elif vector == 0x21:
             return "OUT"
+        elif vector == 0x22:
+            return "PUTS"
         elif vector == 0x23:
             return "IN"
+        elif vector == 0x24:
+            return "PUTSP"
         elif vector == 0x25:
             return "HALT"
         else:
@@ -668,6 +693,11 @@ class LC3(object):
             z and self.get_nzp(1) or 
             p and self.get_nzp(2)):
             self.set_pc(plus(self.pc, sext(pc_offset9,9)))
+            if self.debug:
+                print("    True - branching to", lc_hex(self.get_pc()))
+        else:
+            if self.debug:
+                print("    False - continuing...")
 
     def BR_format(self, instruction, location):
         n = instruction & 0b0000100000000000
