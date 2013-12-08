@@ -2557,6 +2557,14 @@ del _invoke, _
             Print(Tag.Error, format + "\n");
         }
 
+        public void Info(string format) {
+            Print(Tag.Info, format);
+        }
+
+        public void InfoLine(string format) {
+            Print(Tag.Info, format + "\n");
+        }
+
         public void PrintLine(Tag tag, string format) {
             Print(tag, format + "\n");
         }

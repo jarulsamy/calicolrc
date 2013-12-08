@@ -329,7 +329,8 @@ class LC3(object):
             if self.valid_label(words[0]):
                 self.labels[self.make_label(words[0])] = self.get_pc()
             else:
-                print('Warning: no label for .STRINGZ in line for PC = %s:\n%s, line #%s' % (lc_hex(self.get_pc()), line, line_count))
+                self.source[self.get_pc()] = line_count
+                raise ValueError('No label for .STRINGZ in line for PC = %s: %s, line #%s' % (lc_hex(self.get_pc()), line, line_count))
             s = line.split('"')
             string1 = string = s[1]
             # rejoin if "  inside quotes
@@ -364,8 +365,8 @@ class LC3(object):
             self.labels[self.make_label(words[0])] = self.get_pc()
             value = self.get_immediate(words[-1])
             if value is None or value <= 0:
-                raise ValueError('Bad .BLKW immediate: %s, %r' %
-                                 (words[-1], value))
+                self.source[self.get_pc()] = line_count
+                raise ValueError('Bad .BLKW immediate: %s, %r' % (words[-1], value))
             self.increment_pc(value)
             return
         # -------------------------------------------------------------
@@ -389,15 +390,16 @@ class LC3(object):
             if self.valid_label(words[0]):
                 self.labels[self.make_label(words[0])] = self.get_pc()
             else:
-                print('Warning: invalid label %s in line\n%s, line #: %s' % (words[0], line, line_count))
+                self.source[self.get_pc()] = line_count
+                raise ValueError('Invalid label %s in line %s, line #: %s' % (words[0], line, line_count))
             if len(words) < 2:
                 return
             found = words[1] if words[1] in self.instructions else ''
         if not found:
+            self.source[self.get_pc()] = line_count
             word = words[0]
             if len(words) > 1:
-                print('Not an instruction: %s' % line)
-                return
+                raise ValueError('Not an instruction: %s' % line)
             else:
                 if self.valid_label(word):
                     if self.make_label(word) in self.label_location:
@@ -405,14 +407,14 @@ class LC3(object):
                     else:
                         self.label_location[self.make_label(word)] = [[self.get_pc(), 0xFFFF, 16]]
                 else:
-                    raise ValueError('Invalid label: %r, line:\n%s\n' %
-                                        (word, line))
+                    raise ValueError('Invalid label: %r, line: %s' % (word, line))
             return
     
         try:
             instruction = self.instruction_info[found]
         except KeyError:
-            print('Unknown: %s' % found)
+            self.source[self.get_pc()] = line_count
+            raise ValueError('Unknown: instruction "%s"' % found)
         else:
             if found == 'BR':
                 instruction |= fl
@@ -438,8 +440,7 @@ class LC3(object):
                             else:
                                 self.label_location[self.make_label(word)] = [[self.get_pc(), self.immediate_mask[found], self.immediate[found]]]
                         else:
-                            raise ValueError('Invalid label: %r, line:\n%s\n' %
-                                             (word, line))
+                            raise ValueError('Invalid label: %r, line: %s' % (word, line))
     
                 instruction |= r
                 if found == 'JMPT':
@@ -468,8 +469,8 @@ class LC3(object):
          # second pass:
         for label, value in self.label_location.items():
             if label not in self.labels:
-                print('Bad label failure:')
-                print(label, ':', self.label_location[label])
+                self.source[self.get_pc()] = line_count
+                raise ValueError('Bad label failure: %s: %s"' % (label, self.label_location[label]))
             else:
                 for ref, mask, bits in value:
                     current = self.labels[label] - ref - 1
@@ -478,7 +479,8 @@ class LC3(object):
                     if self.get_memory(ref) == 0: # not instruction -> absolute
                         self.set_memory(ref, self.labels[label])
                     elif not self.in_range(current, bits) :
-                        raise ValueError(("%s, mask %s, offset %s,  %s, ref %s" %
+                        self.source[self.get_pc()] = line_count
+                        raise ValueError(("Not an instruction: %s, mask %s, offset %s,  %s, ref %s" %
                                 (label,
                                 bin(mask),
                                 self.labels[label] - ref,
@@ -491,6 +493,9 @@ class LC3(object):
 
     def handleDebug(self, lineno):
         pass
+
+    def Info(self, string):
+        print(string, end="")
 
     def run(self):
         self.cont = True
@@ -619,7 +624,10 @@ class LC3(object):
         self.set_memory(memory, self.get_register(src))
         ## Hook up, side effect display:
         if memory == 0xFE06: ## OS_DDR
-            print(chr(self.get_register(src)), end="")
+            try:
+                self.Info(chr(self.get_register(src)))
+            except:
+                raise ValueError("Value in R%d (%s) is not in range 0-255" % (src, self.get_register(src)))
         
     def STI_format(self, instruction, location):
         dst = (instruction & 0b0000111000000000) >> 9
@@ -650,9 +658,9 @@ class LC3(object):
         self.set_pc(self.get_memory(vector))
         if vector == 0x20:
             from Myro import ask
-            data = ask(["Enter a character:"], "LC3 input>")
-            if data["Enter a character:"]:
-                self.set_memory(0xFE02, ord(data["Enter a character:"][0]))
+            data = ask(["Enter a character"], "LC3 Character Input")
+            if data["Enter a character"]:
+                self.set_memory(0xFE02, ord(data["Enter a character"][0]))
             else:
                 self.set_memory(0xFE02, 10) # CR
         #    return "GETC"

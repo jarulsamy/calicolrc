@@ -27,6 +27,9 @@ class CalicoLC3(LC3):
         self.filename = filename
         #print("init:", self.trace)
 
+    def Info(self, string):
+        self.calico.Info(string)
+
     def handleDebug(self, lineno):
         ## First, see if we need to do something:
         #print("check trace:", lineno, self.trace, self.calico.ProgramSpeedValue)
@@ -105,6 +108,7 @@ class MyEngine(Calico.Engine):
 
     def PostSetup(self, calico):
         #print("post setup", self.trace)
+        self.calico = calico
         self.lc3 = CalicoLC3(calico, self.trace, self.trace_pause, self.filename)
         Calico.MainWindow.InvokeBlocking( lambda: calico.UpdateLocal([
             ["PC", lc_hex(self.lc3.get_pc())],
@@ -119,28 +123,83 @@ class MyEngine(Calico.Engine):
             ["R7", lc_hex(self.lc3.get_register(7))]]))
 
     def Execute(self, text):
-        if text.strip() == ".raw":
-            for x in range(0x3000, 0x30FF):
-                print(lc_hex(x), lc_hex(self.lc3.get_memory(x)))
+
+        words = [word.strip() for word in text.split()]
+        if words[0] == ".help":
+            print("Use: ")
+            print(" .raw [start [stop]]             - list meory in hex")
+            print(" .list                           - list program from memory")
+            print(" .dump [start [stop]]            - dump memory as program")
+            print(" .regs                           - show registers")
+            print(" .set pc HEXVALUE                - set PC")
+            print(" .set memory HEXLOCATION HEXVALUE- set memory")
+            print(" .set reg VALUE HEXVALUE         - set register")
+            print(" .get pc                         - get PC")
+            print(" .get memory HEXLOCATION         - get memory")
+            print(" .get reg VALUE                  - get register")
             return True
-        elif text.strip() == ".list":
+        elif words[0] == ".raw":
+            if len(words) > 0:
+                start = int("0" + words[1], 16)
+            else:
+                start = 0x3000
+            if len(words) > 1:
+                stop = int("0" + words[2], 16)
+            else:
+                stop = 0x300F
+            try:
+                for x in range(start, stop):
+                    print(lc_hex(x), lc_hex(self.lc3.get_memory(x)))
+            except:
+                print("Help: .raw [start [stop]]")
+            return True
+        elif words[0] == ".list":
             try:
                 self.lc3.dump()
             except:
-                print("You should run code first")
+                print("Error; did you should run code first?")
             return True
-        elif text.strip() == ".regs":
+        elif words[0] == ".regs":
             try:
                 self.lc3.dump_registers()
             except:
-                print("You should run code first")
+                print("Error; did you should run code first?")
             return True
-        elif text.strip().startswith(".dump"):
-            words = [word.strip() for word in text.split()]
+        elif words[0] == ".dump":
             try:
                 self.lc3.dump(*[int("0" + word, 16) for word in words[1:]])
             except:
-                print("You should run code first")
+                print("Error; did you should run code first?")
+            return True
+        elif words[0] == ".set":
+            try:
+                if words[1] == "pc":
+                    self.lc3.set_pc(int("0" + words[2], 16))
+                elif words[1] == "memory":
+                    self.lc3.set_memory(int("0" + words[2], 16), int("0" + words[3], 16))
+                elif words[1] == "reg":
+                    self.lc3.set_register(int(words[2]), int("0" + words[3], 16))
+                else:
+                    print("Use .set [pc|memory|reg] ...")                
+            except:
+                print("Hint: .set pc x3000")
+                print("      .set reg 1 xFFFF")
+                print("      .set memory x300A x1")
+            return True
+        elif words[0] == ".get":
+            try:
+                if words[1] == "pc":
+                    print(lc_hex(self.lc3.get_pc()))
+                elif words[1] == "memory":
+                    print(lc_hex(self.lc3.get_memory(int("0" + words[2], 16))))
+                elif words[1] == "reg":
+                    print(self.lc3.get_register(int(words[2])))
+                else:
+                    print("Use .get [pc|memory|reg] ...")                
+            except:
+                print("Hint: .get pc")
+                print("      .get reg 1")
+                print("      .get memory x300A")
             return True
 
         ok = False
@@ -149,7 +208,14 @@ class MyEngine(Calico.Engine):
             ok = True
         except:
             traceback.print_exc()
-            print("Error in assembly!")
+            if self.lc3.get_pc() in self.lc3.source:
+                self.calico.Error("\nAssemble error!\nFile \"%s\", line %s\n" % 
+                                  (self.filename, 
+                                   self.lc3.source[self.lc3.get_pc()]))
+            else:
+                self.calico.Error("\nRuntime error!\nFile \"%s\", memory %s\n" % 
+                                  (self.filename, 
+                                   lc_hex(self.lc3.get_pc())))
         if ok:
             ok = False
             try:
@@ -162,8 +228,16 @@ class MyEngine(Calico.Engine):
                 ok = True
             except:
                 traceback.print_exc()
-                print("Runtime error!")
-        self.lc3.filename = None
+                if self.lc3.get_pc() in self.lc3.source:
+                    self.calico.Error("\nRuntime error!\nFile \"%s\", line %s\n" % 
+                                      (self.filename, 
+                                       self.lc3.source[self.lc3.get_pc()]))
+                else:
+                    self.calico.Error("\nRuntime error!\nFile \"%s\", memory %s\n" % 
+                                      (self.filename, 
+                                       lc_hex(self.lc3.get_pc())))
+
+        self.filename = None
         return ok
 
     def ExecuteFile(self, filename):
@@ -179,7 +253,7 @@ class MyEngine(Calico.Engine):
         self.lc3.debug = orig
         self.lc3.trace = orig
         # Ok, now let's go!
-        self.lc3.filename = filename
+        self.filename = filename
         fp = file(filename)
         text = "".join(fp.readlines())
         fp.close()
