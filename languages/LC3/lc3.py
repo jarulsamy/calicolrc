@@ -196,7 +196,7 @@ class LC3(object):
     def set_nzp(self, value):
         self.nzp = (int(value & (1 << 15) > 0), 
                     int(value == 0), 
-                    int(value & (1 << 15) == 0) and value != 0)
+                    int((value & (1 << 15) == 0) and value != 0))
         if self.debug:
             print("    NZP <=", self.nzp)
 
