@@ -110,6 +110,25 @@ class LC3(object):
         'TRAP': 8,
         'UNDEFINED': 0,
     }
+    # Based on C.2 and C.7 states, and 1 cycle for each memory read
+    cycles = {
+            0b0000: 5  + 1, # BR
+            0b0001: 5  + 1, # ADD
+            0b0010: 7  + 3, # LD, + 2 memory reads
+            0b0011: 7  + 2, # ST, + 1 memory read, one store
+            0b0100: 6  + 1, # JSR
+            0b0101: 5  + 1, # AND
+            0b0110: 7  + 2, # LDR
+            0b0111: 7  + 3, # STR
+            0b1000: 12 + 3, # RTI
+            0b1001: 5  + 1, # NOT
+            0b1010: 9  + 3, # LDI
+            0b1011: 9  + 3, # STI
+            0b1100: 5  + 1, # JMP and RET
+            0b1101: 13 + 1, # RESERVED
+            0b1110: 5  + 1, # LEA
+            0b1111: 7  + 2, # TRAP
+        }
 
     def __init__(self):
         # Functions for interpreting instructions:
@@ -513,6 +532,7 @@ class LC3(object):
             print(self.instruction_count, self.format[instr](instruction, self.get_pc()))
         self.increment_pc()
         self.instruction_count += 1
+        self.cycle += self.cycles[instr]
         self.apply[instr](instruction)
         #self.dump_registers()
 

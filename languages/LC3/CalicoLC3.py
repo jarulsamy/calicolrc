@@ -264,7 +264,8 @@ class MyEngine(Calico.Engine):
                 self.lc3.run()
                 self.lc3.dump_registers()
                 print("Instructions:", self.lc3.instruction_count)
-                print("Cycles:", self.lc3.cycle)
+                print("Cycles: %s (%s milliseconds)" % 
+                      (self.lc3.cycle, self.lc3.cycle * 1./2000000))
                 ok = True
             except Exception as exc:
                 if self.lc3.debug:
