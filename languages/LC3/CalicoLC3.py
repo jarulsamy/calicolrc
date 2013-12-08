@@ -38,7 +38,7 @@ class CalicoLC3(LC3):
             return
         try:
             #print(2)
-            if (self.calico.CurrentDocument == None):
+            if (self.calico.CurrentDocument == None): # FIXME: so that it will work with other files
                 #print(3)
                 return
             elif (lineno == -1):
@@ -54,6 +54,7 @@ class CalicoLC3(LC3):
             #print(6)
             return
         # Ok, we have something to do:
+        #print("lineno", lineno)
         if lineno != -1:
             Calico.MainWindow.InvokeBlocking(lambda: self.setTraceButtons(lineno))
         Calico.MainWindow.InvokeBlocking( lambda: self.calico.UpdateLocal([
@@ -82,13 +83,16 @@ class CalicoLC3(LC3):
             time.sleep(pause)
 
     def setTraceButtons(self, lineno):
-        document = self.calico.GetDocument(self.filename)
-        if document:
-            self.calico.playResetEvent.Reset()
-            self.calico.PlayButton.Sensitive = True
-            self.calico.PauseButton.Sensitive = False
-            document.GotoLine(lineno)
-            document.SelectLine(lineno)
+        #print("filename", self.filename)
+        if self.filename:
+            document = self.calico.GetDocument(self.filename)
+            #print("document", document)
+            if document:
+                self.calico.playResetEvent.Reset()
+                self.calico.PlayButton.Sensitive = True
+                self.calico.PauseButton.Sensitive = False
+                document.GotoLine(lineno)
+                document.SelectLine(lineno)
 
     def setPause(self, value):
         self.trace_pause = value
@@ -126,7 +130,10 @@ class MyEngine(Calico.Engine):
 
         words = [word.strip() for word in text.split()]
         if words[0] == ".help":
-            print("Use: ")
+            print("Interactive Directives: ")
+            print(" .assemble                       - assemble the first .asm file in Calico")
+            print(" .step                           - execute the next instruction, increment PC")
+            print(" .reset                          - reset LC3 to start state")
             print(" .raw [start [stop]]             - list meory in hex")
             print(" .list                           - list program from memory")
             print(" .dump [start [stop]]            - dump memory as program")
@@ -201,13 +208,44 @@ class MyEngine(Calico.Engine):
                 print("      .get reg 1")
                 print("      .get memory x300A")
             return True
+        elif words[0] == ".reset":
+            self.lc3.reset()
+            return True
+        elif words[0] == ".assemble":
+            document = self.calico.GetDocument(".asm")
+            if document:
+                self.lc3.filename = document.filename
+                text = document.GetText()
+                self.lc3.assemble(text)
+                print("Assembled", document.filename)
+            else:
+                print("Open an LC3 script")
+            return True
+        elif words[0] == ".cont":
+            self.run(reset=False)
+            return True
+        elif words[0] == ".step":
+            orig_debug = self.lc3.debug
+            orig_trace = self.lc3.trace
+            self.lc3.debug = True
+            self.lc3.trace = True
+            if self.lc3.get_pc() in self.lc3.source:
+                lineno = self.lc3.source[self.lc3.get_pc()]
+                if lineno > 0:
+                    Calico.MainWindow.InvokeBlocking(lambda: self.lc3.setTraceButtons(lineno))
+                    Calico.MainWindow.InvokeBlocking(lambda: self.calico.switchToShell())
+            self.lc3.step()
+            self.lc3.debug = orig_debug
+            self.lc3.trace = orig_trace
+            return True
 
         ok = False
         try:
             self.lc3.assemble(text)
             ok = True
-        except:
-            traceback.print_exc()
+        except Exception as exc:
+            if self.lc3.debug:
+                traceback.print_exc()
             if self.lc3.get_pc() in self.lc3.source:
                 self.calico.Error("\nAssemble error!\nFile \"%s\", line %s\n" % 
                                   (self.filename, 
@@ -216,6 +254,8 @@ class MyEngine(Calico.Engine):
                 self.calico.Error("\nRuntime error!\nFile \"%s\", memory %s\n" % 
                                   (self.filename, 
                                    lc_hex(self.lc3.get_pc())))
+            self.calico.Error(exc.message)
+
         if ok:
             ok = False
             try:
@@ -226,8 +266,9 @@ class MyEngine(Calico.Engine):
                 print("Instructions:", self.lc3.instruction_count)
                 print("Cycles:", self.lc3.cycle)
                 ok = True
-            except:
-                traceback.print_exc()
+            except Exception as exc:
+                if self.lc3.debug:
+                    traceback.print_exc()
                 if self.lc3.get_pc() in self.lc3.source:
                     self.calico.Error("\nRuntime error!\nFile \"%s\", line %s\n" % 
                                       (self.filename, 
@@ -236,8 +277,8 @@ class MyEngine(Calico.Engine):
                     self.calico.Error("\nRuntime error!\nFile \"%s\", memory %s\n" % 
                                       (self.filename, 
                                        lc_hex(self.lc3.get_pc())))
+                self.calico.Error(exc.message)
 
-        self.filename = None
         return ok
 
     def ExecuteFile(self, filename):
@@ -254,6 +295,7 @@ class MyEngine(Calico.Engine):
         self.lc3.trace = orig
         # Ok, now let's go!
         self.filename = filename
+        self.lc3.filename = filename
         fp = file(filename)
         text = "".join(fp.readlines())
         fp.close()
@@ -261,7 +303,7 @@ class MyEngine(Calico.Engine):
         return True
 
     def ReadyToExecute(self, text):
-        return text.split("\n")[-1].strip() == ""
+        return text.split("\n")[-1].strip() == "" or text.startswith(".")
 
     def RequestPause(self):
         self.trace_pause = True
@@ -281,6 +323,9 @@ class MyEngine(Calico.Engine):
         self.lc3.setTrace(False)
 
 class MyDocument(Calico.TextDocument):
+    def Stop(self):
+        self.calico.manager["lc3"].engine.lc3.cont = False;
+
     def GetAuthors(self):
         return System.Array[str]([
             "Douglas S. Blank <dblank@cs.brynmawr.edu>",

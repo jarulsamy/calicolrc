@@ -161,6 +161,8 @@ class LC3(object):
     def initialize(self):
         self.source = {}
         self.cycle = 0
+        self.cont = False
+        self.instruction_count = 0
         self.set_pc(0x3000)
         self.immediate_mask = {}
         for im in self.immediate:
@@ -450,8 +452,6 @@ class LC3(object):
     
     def assemble(self, code):
         # processing the lines
-        orig_debug = self.debug
-        self.debug = False
         line_count = 1
         for line in code.splitlines():
             # remove comments
@@ -470,7 +470,7 @@ class LC3(object):
         for label, value in self.label_location.items():
             if label not in self.labels:
                 self.source[self.get_pc()] = line_count
-                raise ValueError('Bad label failure: %s: %s"' % (label, self.label_location[label]))
+                raise ValueError('Bad label: "%s"' % label)
             else:
                 for ref, mask, bits in value:
                     current = self.labels[label] - ref - 1
@@ -489,7 +489,6 @@ class LC3(object):
                     else:
                         self.set_memory(ref, plus(self.memory[ref], lc_bin(mask & current)))
         self.set_pc(self.orig)
-        self.debug = orig_debug
 
     def handleDebug(self, lineno):
         pass
@@ -497,21 +496,25 @@ class LC3(object):
     def Info(self, string):
         print(string, end="")
 
-    def run(self):
+    def run(self, reset=True):
+        if reset:
+            self.cycle = 0
+            self.instruction_count = 0
         self.cont = True
-        self.cycle = 0
-        self.instruction_count = 0
         while self.cont:
-            self.handleDebug(self.source.get(self.get_pc(), -1))
-            instruction = self.get_memory(self.get_pc())
-            instr = (instruction >> 12) & 0xF
-            #print("executing: %s..." % lc_hex(self.get_pc()))
-            if self.debug:
-                print(self.instruction_count, self.format[instr](instruction, self.get_pc()))
-            self.increment_pc()
-            self.instruction_count += 1
-            self.apply[instr](instruction)
-            #self.dump_registers()
+            self.step()
+
+    def step(self):
+        self.handleDebug(self.source.get(self.get_pc(), -1))
+        instruction = self.get_memory(self.get_pc())
+        instr = (instruction >> 12) & 0xF
+        #print("executing: %s..." % lc_hex(self.get_pc()))
+        if self.debug:
+            print(self.instruction_count, self.format[instr](instruction, self.get_pc()))
+        self.increment_pc()
+        self.instruction_count += 1
+        self.apply[instr](instruction)
+        #self.dump_registers()
 
     def dump_registers(self):
         print("PC:", lc_hex(self.get_pc()))
