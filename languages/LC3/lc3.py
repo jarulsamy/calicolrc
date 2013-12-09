@@ -306,7 +306,6 @@ class LC3(object):
             all(n in '-0123456789abcdefgABCDEF' for n in word[1:])):
             if word[1] == "-":
                 v = ((-int('0x' + word[2:], 0)) & mask)
-                print("get_immediate", word, v)
                 return v
             else:
                 return int('0' + word, 0) & mask
