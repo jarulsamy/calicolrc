@@ -14,7 +14,6 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from lc3 import LC3, lc_hex
 import time
-from collections import OrderedDict
 import traceback
 
 class CalicoLC3(LC3):
@@ -47,7 +46,7 @@ class CalicoLC3(LC3):
                 # don't return! Fall through and wait
                 #print(4)
                 pass
-            elif (self.calico.ProgramSpeedValue == 100):
+            elif (self.calico.ProgramSpeedValue == 100 and not self.trace_pause):
                 #print(5)
                 return
         except:
@@ -69,14 +68,16 @@ class CalicoLC3(LC3):
             ["R6", lc_hex(self.get_register(6))],
             ["R7", lc_hex(self.get_register(7))]]))
         psv = self.calico.ProgramSpeedValue
-        #print("psv", psv)
+        #print("psv", psv, self.trace_pause, lineno)
         if (psv == 0 or
             ((lineno != -1) and 
              self.calico.CurrentDocument.HasBreakpointSetAtLine(lineno)) or
             self.trace_pause):
-            self.calico.playResetEvent.Reset()
             #print("wait!")
+            self.calico.playResetEvent.Reset()
             self.calico.playResetEvent.WaitOne()
+            if self.calico.ProgramSpeedValue != 0:
+                self.trace_pause = False
         elif (psv < 100): ## then we are in a delay:
             pause = (2.0 / psv)
             ## Force at least a slight sleep, else no GUI controls
@@ -88,9 +89,15 @@ class CalicoLC3(LC3):
             document = self.calico.GetDocument(self.filename)
             #print("document", document)
             if document:
-                self.calico.playResetEvent.Reset()
-                self.calico.PlayButton.Sensitive = True
-                self.calico.PauseButton.Sensitive = False
+                if self.calico.ProgramSpeedValue == 0:
+                    self.calico.PlayButton.Sensitive = True 
+                    self.calico.PauseButton.Sensitive = False
+                elif self.trace_pause:
+                    self.calico.PlayButton.Sensitive = True
+                    self.calico.PauseButton.Sensitive = False
+                else:
+                    self.calico.PlayButton.Sensitive = False
+                    self.calico.PauseButton.Sensitive = True
                 document.GotoLine(lineno)
                 document.SelectLine(lineno)
 
@@ -309,23 +316,24 @@ class MyEngine(Calico.Engine):
     def RequestPause(self):
         self.trace_pause = True
         self.lc3.setPause(True)
-
-    def ConfigureTrace(self):
-        pass
+        Calico.Engine.RequestPause(self)
 
     def SetTraceOn(self, calico):
         #print("trace on")
         self.trace = True
         self.lc3.setTrace(True)
+        Calico.Engine.SetTraceOn(self, calico)
 
     def SetTraceOff(self):
         #print("trace off")
         self.trace = False        
         self.lc3.setTrace(False)
+        Calico.Engine.SetTraceOff(self)
 
 class MyDocument(Calico.TextDocument):
     def Stop(self):
         self.calico.manager["lc3"].engine.lc3.cont = False;
+        Calico.TextDocument.Stop(self)
 
     def GetAuthors(self):
         return System.Array[str]([
