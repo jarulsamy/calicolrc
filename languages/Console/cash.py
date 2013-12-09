@@ -1067,7 +1067,7 @@ def tail(name, incoming, tty, args, stack):
                 yield line
                 count += 1
 
-# FIXME add these: head tail find pushd popd wget wc cal date du df
+# FIXME add these: find pushd popd wget wc cal date du df
 # uname cut plot time hostname id < > cls TAB-completion
 
 ### Add new commands above this point
