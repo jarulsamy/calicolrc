@@ -191,16 +191,19 @@ class LC3(object):
         self.labels = {}
         self.label_location = {}
         self.memory = array('i', [0] * (1 << 16))
+        self.register = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0}
         self.reset_registers()
-        self.load_os(os.path.join(os.path.dirname(__file__), "lc3os.asm"))
-        self.set_memory(0xFE04, 0xFFFF) ## OS_DSR Display Ready
-        self.set_memory(0xFE00, 0xFFFF) ## OS_KBSR Keyboard Ready
+        self.load_os()
         self.reset_registers()
-        self.set_pc(0x3000)
 
-    def load_os(self, filename):
+    def load_os(self, filename=None):
+        if filename is None:
+            filename = os.path.join(os.path.dirname(__file__), "lc3os.asm")
         text = "".join(open(filename).readlines())
         self.assemble(text)
+        self.set_memory(0xFE04, 0xFFFF) ## OS_DSR Display Ready
+        self.set_memory(0xFE00, 0xFFFF) ## OS_KBSR Keyboard Ready
+        self.set_pc(0x3000)
         self.labels = {}
         self.label_location = {}
         self.source = {}
@@ -210,9 +213,10 @@ class LC3(object):
         self.initialize()
 
     def reset_registers(self):
-        self.register = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0}
-        self.nzp = (0,0,0)
-        self.pc = self.orig
+        for i in range(8):
+            self.set_register(i, 0)
+        self.set_nzp(0)
+        self.set_pc(self.orig)
         
     def set_nzp(self, value):
         self.nzp = (int(value & (1 << 15) > 0), 
@@ -237,9 +241,9 @@ class LC3(object):
             print("    PC <= %s" % lc_hex(self.pc))
 
     def increment_pc(self, value=1):
-        self.pc += value
+        self.set_pc(self.get_pc() + value)
         if self.debug:
-            print("    PC <= %s" % lc_hex(self.pc))
+            print("    PC <= %s" % lc_hex(self.get_pc()))
 
     def get_register(self, position):
         return self.register[position]
@@ -510,7 +514,7 @@ class LC3(object):
                                 bin(self.labels[label]),
                                 lc_hex(ref))))
                     else:
-                        self.set_memory(ref, plus(self.memory[ref], lc_bin(mask & current)))
+                        self.set_memory(ref, plus(self.get_memory(ref), lc_bin(mask & current)))
         self.set_pc(self.orig)
 
     def handleDebug(self, lineno):
@@ -546,7 +550,7 @@ class LC3(object):
             print("%s: %s" % (r,v), end=" ")
         print()
         count = 1
-        for key in sorted(self.register.keys()):
+        for key in range(8):
             print("R%s: %s" % (key, lc_hex(self.get_register(key))), end=" ")
             if count % 4 == 0:
                 print()
@@ -611,7 +615,7 @@ class LC3(object):
         if (self.psr & 0b1000000000000000):
             raise ValueError("priviledge mode exception")
         else:
-            self.set_pc(self.get_memory(self.register(6))) # R6 is the SSP
+            self.set_pc(self.get_memory(self.get_register(6))) # R6 is the SSP
             self.set_register(6, lc_bin(plus(self.get_register(6), 1)))
             temp = self.get_memory(self.get_register(6))
             self.set_register(6, lc_bin(plus(self.get_register(6), 1)))
@@ -725,10 +729,12 @@ class LC3(object):
         z = instruction & 0b0000010000000000
         p = instruction & 0b0000001000000000
         pc_offset9 = instruction & 0b0000000111111111
+        if (not any([n, z, p])):
+            raise AttributeError("Attempting to execute data!")
         if (n and self.get_nzp(0) or 
             z and self.get_nzp(1) or 
             p and self.get_nzp(2)):
-            self.set_pc(plus(self.pc, sext(pc_offset9,9)))
+            self.set_pc(plus(self.get_pc(), sext(pc_offset9,9)))
             if self.debug:
                 print("    True - branching to", lc_hex(self.get_pc()))
         else:
@@ -798,7 +804,7 @@ class LC3(object):
         temp = self.get_pc()
         if (instruction & 0b0000100000000000): # JSR
             pc_offset11 = instruction & 0b0000011111111111
-            self.set_pc(plus(self.pc, sext(pc_offset11,11)))
+            self.set_pc(plus(self.get_pc(), sext(pc_offset11,11)))
         else:                                  # JSRR
             base = (instruction & 0b0000000111000000) >> 6
             self.set_pc(self.get_register(base))
@@ -854,6 +860,22 @@ class LC3(object):
         else:
             sr2 = instruction & 0b0000000000000111
             return "AND R%s, R%s, R%s" % (dst, sr1, sr2)
+
+    def load(self, filename):
+        self.filename = filename
+        fp = file(filename)
+        text = "".join(fp.readlines())
+        fp.close()
+        return text
+
+    def execute(self, filename):
+        text = self.load(filename)
+        self.assemble(text)
+        self.run()
+        self.dump_registers()
+        print("Instructions:", self.instruction_count)
+        print("Cycles: %s (%s milliseconds)" % 
+              (self.cycle, self.cycle * 1./2000000))
 
     def save(self, base):
         # producing output

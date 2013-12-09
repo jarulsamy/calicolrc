@@ -200,6 +200,7 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
   public CalicoSpreadsheetDocument(Calico.MainWindow calico, string filename) : 
 	  base(calico, filename, "spreadsheet")
   {
+      Console.WriteLine("Loading Spreadsheet...");
 	DocumentType = "Sheet";
 	Rows = 100;
 	Cols = 26;
@@ -239,9 +240,9 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 		  foreach(List line in new Csv.reader(filename).readLines()) {
 			col = 1;
 			foreach(string item in line) {
-			  sheet.liststore.GetIterFromString(out iter, String.Format("{0}:{1}", row, col));
-			  sheet.liststore.SetValue(iter, col, item);
-			  col++;
+			    sheet.liststore.GetIterFromString(out iter, String.Format("{0}:{1}", row, col));
+			    sheet.liststore.SetValue(iter, col, item);
+			    col++;
 			}
 			row++;
 		  }
@@ -341,11 +342,39 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 		return sheet.liststore.GetValue(iter, offset);
 	}
 
-	public object GetData(int x, int y) {
-		// Matrix, 0-based
-		Gtk.TreeIter iter;
-		sheet.liststore.GetIterFromString(out iter, x.ToString());
-		return sheet.liststore.GetValue(iter, y + 1);
+	public void SetData(string column, int row, object item) {
+	    // SetData("A", 1, "Data1")
+	    Gtk.TreeIter iter;
+	    char c;
+	    Char.TryParse(column.ToUpper(), out c);
+	    int offset = c - 'A' + 1;
+	    sheet.liststore.GetIterFromString(out iter, (row - 1).ToString());
+	    sheet.liststore.SetValue(iter, offset, item.ToString());
+	}
+
+	public void SetData(int column, int row, object item) {
+	    // SetData(0, 0, "Data1")
+	    Gtk.TreeIter iter;
+	    int offset = column + 1;
+	    sheet.liststore.GetIterFromString(out iter, row.ToString());
+	    sheet.liststore.SetValue(iter, offset, item.ToString());
+	}
+
+	public object GetData(int column, int row) {
+	    Gtk.TreeIter iter;
+	    int offset = column + 1;
+	    sheet.liststore.GetIterFromString(out iter, row.ToString());
+	    return sheet.liststore.GetValue(iter, offset);
+	}
+
+	public void SetData(object item) {
+	    // SetData("")
+	    for (int column=0; column < MaxCols; column++) {
+		Column col = this[column];
+		for (int row = 0; row < MaxRows; row++) {
+		    col[row] = item.ToString();
+		}
+	    }
 	}
 
 	public void FindMaxRow() {

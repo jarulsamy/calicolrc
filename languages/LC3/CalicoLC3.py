@@ -18,6 +18,7 @@ import traceback
 
 class CalicoLC3(LC3):
     def __init__(self, calico, trace, trace_pause, filename):
+        self.doc = calico.GetDocument("Memory.csv")
         LC3.__init__(self)
         self.calico = calico
         self.trace = trace
@@ -25,6 +26,80 @@ class CalicoLC3(LC3):
         self.trace_pause = trace_pause
         self.filename = filename
         #print("init:", self.trace)
+
+    def get_memory(self, location):
+        if self.doc:
+            row = location // 256
+            col = location % 256
+            try:
+                return int("0" + self.doc.GetData(col + 1, row + 3), 16)
+            except:
+                return 0
+        else:
+            return LC3.get_memory(self, location)
+
+    def set_memory(self, location, value):
+        if self.doc:
+            row = location // 256
+            col = location % 256
+            self.doc.SetData(col + 1, row + 3, lc_hex(value))
+        else:
+            LC3.set_memory(self, location, value)
+
+    def set_register(self, reg, value):
+        if self.doc:
+            row = 1
+            col = (reg * 2) + 1
+            self.doc.SetData(col, row, lc_hex(value))
+        else:
+            LC3.set_register(self, reg, value)
+
+    def get_register(self, reg):
+        if self.doc:
+            row = 1
+            col = (reg * 2) + 1
+            return int("0" + self.doc.GetData(col, row), 16)
+        else:
+            return LC3.get_register(self, reg)
+
+    def set_pc(self, value):
+        if self.doc:
+            row = 0
+            col = 1
+            self.doc.SetData(col, row, lc_hex(value))
+        else:
+            LC3.set_pc(self, value)
+
+    def get_pc(self):
+        if self.doc:
+            row = 0
+            col = 1
+            return int("0" + self.doc.GetData(col, row), 16)
+        else:
+            return LC3.get_pc(self)
+
+    def set_nzp(self, value):
+        if self.doc:
+            row = 0
+            col = 3
+            nzp = (int(value & (1 << 15) > 0),
+                   int(value == 0),
+                   int((value & (1 << 15) == 0) and value != 0))
+            self.doc.SetData(col, row, nzp)
+        else:
+            LC3.set_nzp(self, value)
+
+    def get_nzp(self, register=None):
+        if self.doc:
+            row = 0
+            col = 3
+            nzp = eval(self.doc.GetData(col, row))
+            if register is not None:
+                return nzp[register]
+            else:
+                return nzp
+        else:
+            return LC3.get_nzp(self, register)
 
     def Info(self, string):
         self.calico.Info(string)
@@ -138,6 +213,7 @@ class MyEngine(Calico.Engine):
         words = [word.strip() for word in text.split()]
         if words[0] == ".help":
             print("Interactive Directives: ")
+            print(" .show memory                    - show memory as a spreadsheet")
             print(" .assemble                       - assemble the first .asm file in Calico")
             print(" .step                           - execute the next instruction, increment PC")
             print(" .reset                          - reset LC3 to start state")
@@ -229,7 +305,10 @@ class MyEngine(Calico.Engine):
                 print("Open an LC3 script")
             return True
         elif words[0] == ".cont":
-            self.run(reset=False)
+            try:
+                self.run(reset=False)
+            except:
+                print("Error")
             return True
         elif words[0] == ".step":
             orig_debug = self.lc3.debug
@@ -244,6 +323,25 @@ class MyEngine(Calico.Engine):
             self.lc3.step()
             self.lc3.debug = orig_debug
             self.lc3.trace = orig_trace
+            return True
+        elif words[0] == ".show":
+            if len(words) > 0:
+                if words[1] == "memory":
+                    memory = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                                          "Memory.csv")
+                    
+                    self.calico.Open(memory)
+                    self.lc3.doc = self.calico.GetDocument("Memory.csv")
+                    try:
+                        print("Loading LC3 operating system...")
+                        self.lc3.load_os()
+                        self.lc3.reset_registers()
+                    except:
+                        traceback.print_exc()
+                else:
+                    print("Invalid show item '%s'; use '.show memory'" % words[1])
+            else:
+                print("Use: .show memory")
             return True
 
         ok = False
@@ -266,8 +364,6 @@ class MyEngine(Calico.Engine):
         if ok:
             ok = False
             try:
-                self.lc3.cycle = 0
-                self.lc3.instruction_count = 0
                 self.lc3.run()
                 self.lc3.dump_registers()
                 print("Instructions:", self.lc3.instruction_count)
@@ -290,23 +386,9 @@ class MyEngine(Calico.Engine):
         return ok
 
     def ExecuteFile(self, filename):
-        # Display nice message
-        self.lc3.orig = 0x0200
-        self.lc3.pc = 0x0200
-        orig = self.lc3.debug
-        self.lc3.debug = False
-        self.lc3.trace = False
-        self.lc3.run()
         self.lc3.reset_registers()
-        self.lc3.set_pc(0x3000)
-        self.lc3.debug = orig
-        self.lc3.trace = orig
-        # Ok, now let's go!
         self.filename = filename
-        self.lc3.filename = filename
-        fp = file(filename)
-        text = "".join(fp.readlines())
-        fp.close()
+        text = self.lc3.load(filename)
         self.Execute(text) 
         return True
 
