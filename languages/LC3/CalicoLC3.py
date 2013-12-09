@@ -17,15 +17,18 @@ import time
 import traceback
 
 class CalicoLC3(LC3):
-    def __init__(self, calico, trace, trace_pause, filename):
+    def __init__(self, calico, debug, trace_pause, filename):
         self.doc = calico.GetDocument("Memory.csv")
         LC3.__init__(self)
         self.calico = calico
-        self.trace = trace
-        self.debug = trace
+        self.debug = debug
         self.trace_pause = trace_pause
         self.filename = filename
-        #print("init:", self.trace)
+
+    def reset_memory(self):
+        LC3.reset_memory(self)
+        for i in range(0, 0x0500):
+            self._set_memory(i, 0)
 
     def get_memory(self, location):
         if self.doc:
@@ -38,21 +41,21 @@ class CalicoLC3(LC3):
         else:
             return LC3.get_memory(self, location)
 
-    def set_memory(self, location, value):
+    def _set_memory(self, location, value):
         if self.doc:
             row = location // 256
             col = location % 256
             self.doc.SetData(col + 1, row + 3, lc_hex(value))
         else:
-            LC3.set_memory(self, location, value)
+            LC3._set_memory(self, location, value)
 
-    def set_register(self, reg, value):
+    def _set_register(self, reg, value):
         if self.doc:
             row = 1
             col = (reg * 2) + 1
             self.doc.SetData(col, row, lc_hex(value))
         else:
-            LC3.set_register(self, reg, value)
+            LC3._set_register(self, reg, value)
 
     def get_register(self, reg):
         if self.doc:
@@ -62,13 +65,13 @@ class CalicoLC3(LC3):
         else:
             return LC3.get_register(self, reg)
 
-    def set_pc(self, value):
+    def _set_pc(self, value):
         if self.doc:
             row = 0
             col = 1
             self.doc.SetData(col, row, lc_hex(value))
         else:
-            LC3.set_pc(self, value)
+            LC3._set_pc(self, value)
 
     def get_pc(self):
         if self.doc:
@@ -78,7 +81,7 @@ class CalicoLC3(LC3):
         else:
             return LC3.get_pc(self)
 
-    def set_nzp(self, value):
+    def _set_nzp(self, value):
         if self.doc:
             row = 0
             col = 3
@@ -87,7 +90,7 @@ class CalicoLC3(LC3):
                    int((value & (1 << 15) == 0) and value != 0))
             self.doc.SetData(col, row, nzp)
         else:
-            LC3.set_nzp(self, value)
+            LC3._set_nzp(self, value)
 
     def get_nzp(self, register=None):
         if self.doc:
@@ -107,7 +110,7 @@ class CalicoLC3(LC3):
     def handleDebug(self, lineno):
         ## First, see if we need to do something:
         #print("check trace:", lineno, self.trace, self.calico.ProgramSpeedValue)
-        if not self.trace: 
+        if not self.debug: 
             #print(1)
             return
         try:
@@ -181,13 +184,12 @@ class CalicoLC3(LC3):
 
     def setTrace(self, value):
         #print("setTrace:", value)
-        self.trace = value
         self.debug = value
 
 class MyEngine(Calico.Engine):
     def __init__(self, *args, **kwargs):
         Calico.Engine.__init__(*args, **kwargs)
-        self.trace = False
+        self.debug = False
         self.trace_pause = False
         self.filename = None
         #print("engine init", self.trace)
@@ -195,7 +197,7 @@ class MyEngine(Calico.Engine):
     def PostSetup(self, calico):
         #print("post setup", self.trace)
         self.calico = calico
-        self.lc3 = CalicoLC3(calico, self.trace, self.trace_pause, self.filename)
+        self.lc3 = CalicoLC3(calico, self.debug, self.trace_pause, self.filename)
         Calico.MainWindow.InvokeBlocking( lambda: calico.UpdateLocal([
             ["PC", lc_hex(self.lc3.get_pc())],
             ["NZP", self.lc3.get_nzp()],
@@ -312,9 +314,7 @@ class MyEngine(Calico.Engine):
             return True
         elif words[0] == ".step":
             orig_debug = self.lc3.debug
-            orig_trace = self.lc3.trace
             self.lc3.debug = True
-            self.lc3.trace = True
             if self.lc3.get_pc() in self.lc3.source:
                 lineno = self.lc3.source[self.lc3.get_pc()]
                 if lineno > 0:
@@ -322,7 +322,6 @@ class MyEngine(Calico.Engine):
                     Calico.MainWindow.InvokeBlocking(lambda: self.calico.switchToShell())
             self.lc3.step()
             self.lc3.debug = orig_debug
-            self.lc3.trace = orig_trace
             return True
         elif words[0] == ".show":
             if len(words) > 0:
@@ -402,13 +401,13 @@ class MyEngine(Calico.Engine):
 
     def SetTraceOn(self, calico):
         #print("trace on")
-        self.trace = True
+        self.debug = True
         self.lc3.setTrace(True)
         Calico.Engine.SetTraceOn(self, calico)
 
     def SetTraceOff(self):
         #print("trace off")
-        self.trace = False        
+        self.debug = False        
         self.lc3.setTrace(False)
         Calico.Engine.SetTraceOff(self)
 

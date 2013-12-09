@@ -132,7 +132,6 @@ class LC3(object):
 
     def __init__(self):
         # Functions for interpreting instructions:
-        self.trace = False
         self.debug = False
         self.apply = {
             0b0000: self.BR,
@@ -190,20 +189,26 @@ class LC3(object):
         self.regs = dict(('R%1i' % r, r) for r in range(8))
         self.labels = {}
         self.label_location = {}
-        self.memory = array('i', [0] * (1 << 16))
         self.register = {0:0, 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0}
+        self.reset_memory()
         self.reset_registers()
         self.load_os()
         self.reset_registers()
+
+    def reset_memory(self):
+        self.memory = array('i', [0] * (1 << 16))
 
     def load_os(self, filename=None):
         if filename is None:
             filename = os.path.join(os.path.dirname(__file__), "lc3os.asm")
         text = "".join(open(filename).readlines())
+        orig = self.debug 
+        self.debug = False
         self.assemble(text)
         self.set_memory(0xFE04, 0xFFFF) ## OS_DSR Display Ready
         self.set_memory(0xFE00, 0xFFFF) ## OS_KBSR Keyboard Ready
         self.set_pc(0x3000)
+        self.debug = orig
         self.labels = {}
         self.label_location = {}
         self.source = {}
@@ -213,18 +218,23 @@ class LC3(object):
         self.initialize()
 
     def reset_registers(self):
+        orig = self.debug
+        self.debug = False
         for i in range(8):
             self.set_register(i, 0)
         self.set_nzp(0)
         self.set_pc(self.orig)
+        self.debug = orig
         
-    def set_nzp(self, value):
+    def _set_nzp(self, value):
         self.nzp = (int(value & (1 << 15) > 0), 
                     int(value == 0), 
                     int((value & (1 << 15) == 0) and value != 0))
-        if self.debug:
-            print("    NZP <=", self.nzp)
 
+    def set_nzp(self, value):
+        self._set_nzp(value)
+        if self.debug:
+            print("    NZP <=", self.get_nzp())
 
     def get_nzp(self, register=None):
         if register is not None:
@@ -236,20 +246,24 @@ class LC3(object):
         return self.pc
 
     def set_pc(self, value):
-        self.pc = value
+        self._set_pc(value)
         if self.debug:
-            print("    PC <= %s" % lc_hex(self.pc))
+            print("    PC <= %s" % lc_hex(value))
+
+    def _set_pc(self, value):
+        self.pc = value
 
     def increment_pc(self, value=1):
         self.set_pc(self.get_pc() + value)
-        if self.debug:
-            print("    PC <= %s" % lc_hex(self.get_pc()))
 
     def get_register(self, position):
         return self.register[position]
 
-    def set_register(self, position, value):
+    def _set_register(self, position, value):
         self.register[position] = value
+
+    def set_register(self, position, value):
+        self._set_register(position, value)
         if self.debug:
             print("    R%d <= %s" % (position, lc_hex(value)))
 
@@ -264,10 +278,13 @@ class LC3(object):
     def get_memory(self, location):
         return self.memory[location]
 
+    def _set_memory(self, location, value):
+        self.memory[location] = value
+
     def set_memory(self, location, value):
+        self._set_memory(location, value)
         if self.debug:
             print("    memory[%s] <= %s" % (lc_hex(location), lc_hex(value)))
-        self.memory[location] = value
 
     def memory_tofile(self, start, stop, f):
         self.memory[start:stop].tofile(f)
@@ -479,6 +496,8 @@ class LC3(object):
     
     def assemble(self, code):
         # processing the lines
+        orig = self.debug
+        self.debug = False
         line_count = 1
         for line in code.splitlines():
             # remove comments
@@ -497,6 +516,7 @@ class LC3(object):
         for label, value in self.label_location.items():
             if label not in self.labels:
                 self.source[self.get_pc()] = line_count
+                self.debug = orig
                 raise ValueError('Bad label: "%s"' % label)
             else:
                 for ref, mask, bits in value:
@@ -507,6 +527,7 @@ class LC3(object):
                         self.set_memory(ref, self.labels[label])
                     elif not self.in_range(current, bits) :
                         self.source[self.get_pc()] = line_count
+                        self.debug = orig
                         raise ValueError(("Not an instruction: %s, mask %s, offset %s,  %s, ref %s" %
                                 (label,
                                 bin(mask),
@@ -514,8 +535,13 @@ class LC3(object):
                                 bin(self.labels[label]),
                                 lc_hex(ref))))
                     else:
-                        self.set_memory(ref, plus(self.get_memory(ref), lc_bin(mask & current)))
+                        # FIXME: not sure what this is, but if we init
+                        # memory first, it works ok
+                        self.set_memory(ref, 
+                                        plus(self.get_memory(ref), 
+                                             lc_bin(mask & current)))
         self.set_pc(self.orig)
+        self.debug = orig
 
     def handleDebug(self, lineno):
         pass
@@ -551,7 +577,7 @@ class LC3(object):
         print()
         count = 1
         for key in range(8):
-            print("R%s: %s" % (key, lc_hex(self.get_register(key))), end=" ")
+            print("R%d: %s" % (key, lc_hex(self.get_register(key))), end=" ")
             if count % 4 == 0:
                 print()
             count += 1
@@ -835,10 +861,10 @@ class LC3(object):
         sr1 = (instruction & 0b0000000111000000) >> 6
         if (instruction & 0b0000000000100000):
             imm5 = instruction & 0b0000000000011111
-            return "ADD R%s, R%s, #%s" % (dst, sr1, sext(imm5, 5))
+            return "ADD R%d, R%d, #%s" % (dst, sr1, sext(imm5, 5))
         else:
             sr2 = instruction & 0b0000000000000111
-            return "ADD R%s, R%s, R%s" % (dst, sr1, sr2)
+            return "ADD R%d, R%d, R%d" % (dst, sr1, sr2)
 
     def AND(self, instruction):
         dst = (instruction & 0b0000111000000000) >> 9
@@ -856,10 +882,10 @@ class LC3(object):
         sr1 = (instruction & 0b0000000111000000) >> 6
         if (instruction & 0b0000000000100000):
             imm5 = instruction & 0b0000000000011111
-            return "AND R%s, R%s, #%s" % (dst, sr1, sext(imm5, 5))
+            return "AND R%d, R%d, #%s" % (dst, sr1, sext(imm5, 5))
         else:
             sr2 = instruction & 0b0000000000000111
-            return "AND R%s, R%s, R%s" % (dst, sr1, sr2)
+            return "AND R%d, R%d, R%d" % (dst, sr1, sr2)
 
     def load(self, filename):
         self.filename = filename
