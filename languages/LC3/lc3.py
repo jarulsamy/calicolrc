@@ -303,15 +303,20 @@ class LC3(object):
 
     def get_immediate(self, word, mask=0xFFFF):
         if (word.startswith('x') and
-            all(n in '-0123456789abcdefgABCDEF' for n in word[1:]) and
-            not '-' in word[2:]):
-            return int('0' + word, 0) & mask
+            all(n in '-0123456789abcdefgABCDEF' for n in word[1:])):
+            if word[1] == "-":
+                v = ((-int('0x' + word[2:], 0)) & mask)
+                print("get_immediate", word, v)
+                return v
+            else:
+                return int('0' + word, 0) & mask
         elif word.startswith('#'):
             return int(word[1:]) & mask
         else:
             try:
                 return int(word) & mask
             except ValueError:
+                # could be a label
                 return
 
     def process_instruction(self, words, line_count, line):
@@ -650,7 +655,7 @@ class LC3(object):
             try:
                 self.Info(chr(self.get_register(src)))
             except:
-                raise ValueError("Value in R%d (%s) is not in range 0-255" % (src, self.get_register(src)))
+                raise ValueError("Value in R%d (%s) is not in range 0-255 (x00-xFF)" % (src, lc_hex(self.get_register(src))))
         
     def STI_format(self, instruction, location):
         dst = (instruction & 0b0000111000000000) >> 9
@@ -686,17 +691,18 @@ class LC3(object):
                 self.set_memory(0xFE02, ord(data["Enter a character"][0]))
             else:
                 self.set_memory(0xFE02, 10) # CR
-        #    return "GETC"
-        #elif vector == 0x21:
-        #    return "OUT"
-        #elif vector == 0x22:
-        #    return "PUTS"
-        #elif vector == 0x23:
-        #   return "IN"
-        #elif vector == 0x24:
-        #    return "PUTSP"
-        if vector == 0x25:
+        elif vector == 0x21:
+            pass
+        elif vector == 0x22:
+            pass
+        elif vector == 0x23:
+            pass
+        elif vector == 0x24:
+            pass
+        elif vector == 0x25:
             self.cont = False
+        else:
+            raise ValueError("invalid TRAP vector: %s" % lc_hex(vector))
 
     def TRAP_format(self, instruction, location):
         vector = instruction & 0b0000000011111111
