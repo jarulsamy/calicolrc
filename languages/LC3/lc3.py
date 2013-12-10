@@ -80,6 +80,7 @@ class LC3(object):
         'STI': 0b1011 << 12,
         'STR': 0b0111 << 12,
         'TRAP': 0b1111 << 12,
+        'SHIFT': 0b1101 << 12,
     }
     # bits of immediate mode field:
     immediate = {
@@ -108,9 +109,9 @@ class LC3(object):
         'STI': 9,
         'STR': 6,
         'TRAP': 8,
-        'UNDEFINED': 0,
+        'SHIFT': 6,
     }
-    # Based on C.2 and C.7 states, and 1 cycle for each memory read
+    # Based on appendix figure C.2 and C.7 states, and 1 cycle for each memory read
     cycles = {
             0b0000: 5  + 1, # BR
             0b0001: 5  + 1, # ADD
@@ -125,7 +126,7 @@ class LC3(object):
             0b1010: 9  + 3, # LDI
             0b1011: 9  + 3, # STI
             0b1100: 5  + 1, # JMP and RET
-            0b1101: 13 + 1, # RESERVED
+            0b1101: 5  + 1, # SHIFT
             0b1110: 5  + 1, # LEA
             0b1111: 7  + 2, # TRAP
         }
@@ -148,7 +149,7 @@ class LC3(object):
             0b1010: self.LDI,
             0b1011: self.STI,
             0b1100: self.JMP, # and RET
-            0b1101: self.RESERVED,
+            0b1101: self.SHIFT,
             0b1110: self.LEA,
             0b1111: self.TRAP,
         }
@@ -167,7 +168,7 @@ class LC3(object):
             0b1010: self.LDI_format,
             0b1011: self.STI_format,
             0b1100: self.JMP_format, # and RET_format
-            0b1101: self.RESERVED_format,
+            0b1101: self.SHIFT_format,
             0b1110: self.LEA_format,
             0b1111: self.TRAP_format,
         }
@@ -931,6 +932,25 @@ class LC3(object):
         else:
             sr2 = instruction & 0b0000000000000111
             return "AND R%d, R%d, R%d" % (dst, sr1, sr2)
+
+    def SHIFT(self, instruction):
+        ## SHIFT DST, SRC, immed6
+        dst = (instruction & 0b0000111000000000) >> 9
+        src = (instruction & 0b0000000111000000) >> 6
+        imm6 = lc_int(sext(instruction & 0b0000000000111111,6))
+        if imm6 < 0: # arithmetic shift right preserves sign
+            value = sext(self.get_register(src) >> -imm6, 16 + imm6)
+            self.set_register(dst, value)
+        else:
+            self.set_register(dst, self.get_register(src) << imm6)
+        self.set_nzp(self.get_register(dst))
+
+    def SHIFT_format(self, instruction, location):
+        ## SHIFT DST, SRC, DIR, immed4
+        dst = (instruction & 0b0000111000000000) >> 9
+        src = (instruction & 0b0000000111000000) >> 6
+        imm6 = instruction & 0b0000000000111111
+        return "SHIFT R%d, R%d, #%s" % (dst, src, lc_int(sext(imm6, 6)))
 
     def load(self, filename):
         self.filename = filename

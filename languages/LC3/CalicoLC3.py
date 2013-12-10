@@ -374,7 +374,7 @@ class MyEngine(Calico.Engine):
                 self.calico.Error("\nRuntime error!\nFile \"%s\", memory %s\n" % 
                                   (self.filename, 
                                    lc_hex(self.lc3.get_pc())))
-            self.calico.Error(exc.message)
+            self.calico.Error(exc.message + "\n")
 
         if ok:
             ok = False
@@ -396,7 +396,7 @@ class MyEngine(Calico.Engine):
                     self.calico.Error("\nRuntime error!\nFile \"%s\", memory %s\n" % 
                                       (self.filename, 
                                        lc_hex(self.lc3.get_pc())))
-                self.calico.Error(exc.message)
+                self.calico.Error(exc.message + "\n")
 
         return ok
 
