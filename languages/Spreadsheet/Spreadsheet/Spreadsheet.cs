@@ -240,8 +240,10 @@ public class CalicoSpreadsheetDocument : Document, IEnumerable<object>
 		  foreach(List line in new Csv.reader(filename).readLines()) {
 			col = 1;
 			foreach(string item in line) {
-			    sheet.liststore.GetIterFromString(out iter, String.Format("{0}:{1}", row, col));
-			    sheet.liststore.SetValue(iter, col, item);
+			    if (item.Length > 0) {
+				sheet.liststore.GetIterFromString(out iter, String.Format("{0}:{1}", row, col));
+				sheet.liststore.SetValue(iter, col, item);
+			    }
 			    col++;
 			}
 			row++;

@@ -136,19 +136,20 @@ class CalicoLC3(LC3):
             return
         # Ok, we have something to do:
         #print("lineno", lineno)
-        if lineno != -1:
+        if lineno != -1 and self.calico.GetEnvironment() == "gtk":
             Calico.MainWindow.InvokeBlocking(lambda: self.setTraceButtons(lineno))
-        Calico.MainWindow.InvokeBlocking( lambda: self.calico.UpdateLocal([
-            ["PC", lc_hex(self.get_pc())],
-            ["NZP", self.get_nzp()],
-            ["R0", lc_hex(self.get_register(0))],
-            ["R1", lc_hex(self.get_register(1))],
-            ["R2", lc_hex(self.get_register(2))],
-            ["R3", lc_hex(self.get_register(3))],
-            ["R4", lc_hex(self.get_register(4))],
-            ["R5", lc_hex(self.get_register(5))],
-            ["R6", lc_hex(self.get_register(6))],
-            ["R7", lc_hex(self.get_register(7))]]))
+        if self.calico.GetEnvironment() == "gtk":
+            Calico.MainWindow.InvokeBlocking( lambda: self.calico.UpdateLocal([
+                ["PC", lc_hex(self.get_pc())],
+                ["NZP", self.get_nzp()],
+                ["R0", lc_hex(self.get_register(0))],
+                ["R1", lc_hex(self.get_register(1))],
+                ["R2", lc_hex(self.get_register(2))],
+                ["R3", lc_hex(self.get_register(3))],
+                ["R4", lc_hex(self.get_register(4))],
+                ["R5", lc_hex(self.get_register(5))],
+                ["R6", lc_hex(self.get_register(6))],
+                ["R7", lc_hex(self.get_register(7))]]))
         psv = self.calico.ProgramSpeedValue
         #print("psv", psv, self.trace_pause, lineno)
         if (psv == 0 or
@@ -203,20 +204,20 @@ class MyEngine(Calico.Engine):
         #print("post setup", self.trace)
         self.calico = calico
         self.lc3 = CalicoLC3(calico, self.debug, self.warn, self.trace_pause, self.filename)
-        Calico.MainWindow.InvokeBlocking( lambda: calico.UpdateLocal([
-            ["PC", lc_hex(self.lc3.get_pc())],
-            ["NZP", self.lc3.get_nzp()],
-            ["R0", lc_hex(self.lc3.get_register(0))],
-            ["R1", lc_hex(self.lc3.get_register(1))],
-            ["R2", lc_hex(self.lc3.get_register(2))],
-            ["R3", lc_hex(self.lc3.get_register(3))],
-            ["R4", lc_hex(self.lc3.get_register(4))],
-            ["R5", lc_hex(self.lc3.get_register(5))],
-            ["R6", lc_hex(self.lc3.get_register(6))],
-            ["R7", lc_hex(self.lc3.get_register(7))]]))
+        if self.calico.GetEnvironment() == "gtk":
+            Calico.MainWindow.InvokeBlocking( lambda: calico.UpdateLocal([
+                ["PC", lc_hex(self.lc3.get_pc())],
+                ["NZP", self.lc3.get_nzp()],
+                ["R0", lc_hex(self.lc3.get_register(0))],
+                ["R1", lc_hex(self.lc3.get_register(1))],
+                ["R2", lc_hex(self.lc3.get_register(2))],
+                ["R3", lc_hex(self.lc3.get_register(3))],
+                ["R4", lc_hex(self.lc3.get_register(4))],
+                ["R5", lc_hex(self.lc3.get_register(5))],
+                ["R6", lc_hex(self.lc3.get_register(6))],
+                ["R7", lc_hex(self.lc3.get_register(7))]]))
 
     def Execute(self, text):
-
         words = [word.strip() for word in text.split()]
         if words[0] == ".help":
             print("Interactive Directives: ")
@@ -332,7 +333,7 @@ class MyEngine(Calico.Engine):
             self.lc3.debug = True
             if self.lc3.get_pc() in self.lc3.source:
                 lineno = self.lc3.source[self.lc3.get_pc()]
-                if lineno > 0:
+                if lineno > 0 and self.calico.GetEnvironment() == "gtk":
                     Calico.MainWindow.InvokeBlocking(lambda: self.lc3.setTraceButtons(lineno))
                     Calico.MainWindow.InvokeBlocking(lambda: self.calico.switchToShell())
             self.lc3.step()

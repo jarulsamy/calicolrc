@@ -101,6 +101,27 @@ namespace Calico {
             Console.WriteLine(String.Format("Exception: {0}\n", args.ExceptionObject.ToString()));
         }
 
+        public new Document GetDocument(string name) {
+	    return null;
+	}
+
+        public new void Info(string message) {
+	    Console.Write(message);
+	}
+
+        public new void Warn(string message) {
+	    Console.Error.Write(message);
+	}
+
+	public new string GetEnvironment() {
+	    return "tty";
+	}
+
+	public new double ProgramSpeedValue {
+	    get { return 100;}
+	    set {}
+	}
+
 	public void ActivateLanguage(string language, string backup) {
 	    if (manager.languages.ContainsKey(language) && manager[language].engine == null) {
 		manager.Register(manager[language], true);

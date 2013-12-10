@@ -4286,5 +4286,9 @@ del _invoke, _
 		RequestQuit();
 	    }
 	}
+
+	public string GetEnvironment() {
+	    return "gtk";
+	}
     }
 }
