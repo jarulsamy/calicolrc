@@ -34,17 +34,17 @@ def sext(binary, bits):
     else:
         return binary
 
+def lc_int(v):
+    if v & (1 << 15): # negative
+        return -((~(v & 0xFFFF) + 1) & 0xFFFF)
+    else:
+        return v
+
 def plus(v1, v2):
     """
     Add two values together, return a positive or negative value.
     """
-    v1 = v1 & 0b1111111111111111
-    v2 = v2 & 0b1111111111111111
-    if v1 & (0b1 << 15): # neg
-        v1 = -(~(v1 - 1) & 0xFFFF)
-    if v2 & (0b1 << 15): # neg
-        v2 = -(~(v2 - 1) & 0xFFFF)
-    return v1 + v2
+    return lc_int(v1) + lc_int(v2)
 
 class LC3(object):
     """
@@ -331,10 +331,18 @@ class LC3(object):
             else:
                 return int('0' + word, 0) & mask
         elif word.startswith('#'):
-            return int(word[1:]) & mask
+            if word[1] == "-":
+                v = -int(word[2:]) & mask
+                return v 
+            else:
+                return int(word[1:]) & mask
         else:
             try:
-                return int(word) & mask
+                if word[0] == "-":
+                    v = -int(word[1:]) & mask
+                    return v
+                else:
+                    return int(word) & mask
             except ValueError:
                 # could be a label
                 return
@@ -477,7 +485,8 @@ class LC3(object):
                     value = self.get_immediate(word, self.immediate_mask[found])
                     if value is not None:
                         instruction |= value
-                        if found in ('ADD', 'AND'):
+                        # set the immediate bit in ADD and AND instruction:
+                        if found in ('ADD', 'AND'): 
                             instruction |= 1 << 5
                     elif word != found:
                         if self.valid_label(word):
@@ -554,21 +563,32 @@ class LC3(object):
             self.cycle = 0
             self.instruction_count = 0
         self.cont = True
+        if self.debug:
+            print("Tracing Script! PC* is incremented Program Counter")
+            print("(Instr/Cycles Count) INSTR [source line] (PC*: xHEX)")
+            print("----------------------------------------------------")
         while self.cont:
             self.step()
 
     def step(self):
-        self.handleDebug(self.source.get(self.get_pc(), -1))
-        instruction = self.get_memory(self.get_pc())
+        pc = self.get_pc()
+        self.handleDebug(self.source.get(pc, -1))
+        instruction = self.get_memory(pc)
         instr = (instruction >> 12) & 0xF
-        #print("executing: %s..." % lc_hex(self.get_pc()))
-        if self.debug:
-            print(self.instruction_count, self.format[instr](instruction, self.get_pc()))
-        self.increment_pc()
         self.instruction_count += 1
         self.cycle += self.cycles[instr]
+        self.increment_pc()
+        if self.debug:
+            line = self.source.get(pc, -1)
+            line_str = (" [%s]" % line) if (line != -1) else ""
+            print("(%s/%s) %s%s (%s*: %s)" % (
+                self.instruction_count, 
+                self.cycle, 
+                self.format[instr](instruction, pc), 
+                line_str,
+                lc_hex(self.get_pc()), 
+                lc_hex(instruction)))
         self.apply[instr](instruction)
-        #self.dump_registers()
 
     def dump_registers(self):
         print("PC:", lc_hex(self.get_pc()))
@@ -595,7 +615,7 @@ class LC3(object):
             if label:
                 label = label + ":"
             if (instr in self.format.keys()):
-                print("%-10s %s - %s  %-41s [line: %s]" % (
+                print("%-10s %s: %s  %-41s [line: %s]" % (
                     label, lc_hex(memory), lc_hex(instruction), 
                     self.format[instr](instruction, memory), self.source.get(memory, "")))
             else:
@@ -664,9 +684,13 @@ class LC3(object):
     def LDI(self, instruction):
         dst = (instruction & 0b0000111000000000) >> 9
         pc_offset9 = instruction & 0b0000000111111111
-        self.set_register(dst,self.get_memory(
-            self.get_memory(
-                plus(self.get_pc(), sext(pc_offset9, 9)))))
+        location = plus(self.get_pc(), sext(pc_offset9, 9))
+        memory1 = self.get_memory(location)
+        memory2 = self.get_memory(memory1)
+        if self.debug:
+            print("  Reading memory[x%04x] (x%04x) =>" % (location, memory1))
+            print("  Reading memory[x%04x] (x%04x) =>" % (memory1, memory2))
+        self.set_register(dst, memory2)
         self.set_nzp(self.get_register(dst))        
 
     def LDI_format(self, instruction, location):
@@ -784,7 +808,11 @@ class LC3(object):
     def LD(self, instruction):
         dst = (instruction & 0b0000111000000000) >> 9
         pc_offset9 = instruction & 0b0000000111111111
-        self.set_register(dst, self.get_memory(plus(self.get_pc(), sext(pc_offset9,9))))
+        location = plus(self.get_pc(), sext(pc_offset9,9))
+        memory = self.get_memory(location)
+        if self.debug:
+            print("  Reading memory[x%04x] (x%04x) =>" % (location, memory))
+        self.set_register(dst, memory)
         self.set_nzp(self.get_register(dst))
 
     def LD_format(self, instruction, location):
@@ -796,7 +824,11 @@ class LC3(object):
         dst = (instruction & 0b0000111000000000) >> 9
         base = (instruction & 0b0000000111000000) >> 6
         pc_offset6 = instruction & 0b0000000000111111
-        self.set_register(dst, self.get_memory(plus(self.get_register(base), sext(pc_offset6,6))))
+        location = plus(self.get_register(base), sext(pc_offset6,6))
+        memory = self.get_memory(location)
+        if self.debug:
+            print("  Reading memory[x%04x] (x%04x) =>" % (location, memory))
+        self.set_register(dst, memory)
         self.set_nzp(self.get_register(dst))
 
     def LDR_format(self, instruction, location):
@@ -861,7 +893,7 @@ class LC3(object):
         sr1 = (instruction & 0b0000000111000000) >> 6
         if (instruction & 0b0000000000100000):
             imm5 = instruction & 0b0000000000011111
-            return "ADD R%d, R%d, #%s" % (dst, sr1, sext(imm5, 5))
+            return "ADD R%d, R%d, #%s" % (dst, sr1, lc_int(sext(imm5, 5)))
         else:
             sr2 = instruction & 0b0000000000000111
             return "ADD R%d, R%d, R%d" % (dst, sr1, sr2)
@@ -882,7 +914,7 @@ class LC3(object):
         sr1 = (instruction & 0b0000000111000000) >> 6
         if (instruction & 0b0000000000100000):
             imm5 = instruction & 0b0000000000011111
-            return "AND R%d, R%d, #%s" % (dst, sr1, sext(imm5, 5))
+            return "AND R%d, R%d, #%s" % (dst, sr1, lc_int(sext(imm5, 5)))
         else:
             sr2 = instruction & 0b0000000000000111
             return "AND R%d, R%d, R%d" % (dst, sr1, sr2)

@@ -326,11 +326,12 @@ class MyEngine(Calico.Engine):
         elif words[0] == ".show":
             if len(words) > 0:
                 if words[1] == "memory":
-                    memory = os.path.join(os.path.abspath(os.path.dirname(__file__)),
-                                          "Memory.csv")
-                    
-                    self.calico.Open(memory)
                     self.lc3.doc = self.calico.GetDocument("Memory.csv")
+                    if self.lc3.doc is None:
+                        memory = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                                              "Memory.csv")
+                        self.calico.Open(memory)
+                        self.lc3.doc = self.calico.GetDocument("Memory.csv")
                     try:
                         print("Loading LC3 operating system...")
                         self.lc3.load_os()
