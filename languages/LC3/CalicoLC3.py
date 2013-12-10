@@ -17,11 +17,12 @@ import time
 import traceback
 
 class CalicoLC3(LC3):
-    def __init__(self, calico, debug, trace_pause, filename):
+    def __init__(self, calico, debug, warn, trace_pause, filename):
         self.doc = calico.GetDocument("Memory.csv")
         LC3.__init__(self)
         self.calico = calico
         self.debug = debug
+        self.warn = warn
         self.trace_pause = trace_pause
         self.filename = filename
 
@@ -107,6 +108,9 @@ class CalicoLC3(LC3):
     def Info(self, string):
         self.calico.Info(string)
 
+    def Error(self, string):
+        self.calico.Error(string)
+
     def handleDebug(self, lineno):
         ## First, see if we need to do something:
         #print("check trace:", lineno, self.trace, self.calico.ProgramSpeedValue)
@@ -190,6 +194,7 @@ class MyEngine(Calico.Engine):
     def __init__(self, *args, **kwargs):
         Calico.Engine.__init__(*args, **kwargs)
         self.debug = False
+        self.warn = True
         self.trace_pause = False
         self.filename = None
         #print("engine init", self.trace)
@@ -197,7 +202,7 @@ class MyEngine(Calico.Engine):
     def PostSetup(self, calico):
         #print("post setup", self.trace)
         self.calico = calico
-        self.lc3 = CalicoLC3(calico, self.debug, self.trace_pause, self.filename)
+        self.lc3 = CalicoLC3(calico, self.debug, self.warn, self.trace_pause, self.filename)
         Calico.MainWindow.InvokeBlocking( lambda: calico.UpdateLocal([
             ["PC", lc_hex(self.lc3.get_pc())],
             ["NZP", self.lc3.get_nzp()],
@@ -217,6 +222,7 @@ class MyEngine(Calico.Engine):
             print("Interactive Directives: ")
             print(" .show memory                    - show memory as a spreadsheet")
             print(" .assemble                       - assemble the first .asm file in Calico")
+            print(" .cont                           - continue running")
             print(" .step                           - execute the next instruction, increment PC")
             print(" .reset                          - reset LC3 to start state")
             print(" .raw [start [stop]]             - list meory in hex")
@@ -226,6 +232,7 @@ class MyEngine(Calico.Engine):
             print(" .set pc HEXVALUE                - set PC")
             print(" .set memory HEXLOCATION HEXVALUE- set memory")
             print(" .set reg VALUE HEXVALUE         - set register")
+            print(" .set warn BOOL                  - set warnings on/off")
             print(" .get pc                         - get PC")
             print(" .get memory HEXLOCATION         - get memory")
             print(" .get reg VALUE                  - get register")
@@ -233,12 +240,13 @@ class MyEngine(Calico.Engine):
         elif words[0] == ".raw":
             if len(words) > 0:
                 start = int("0" + words[1], 16)
+                if len(words) > 1:
+                    stop = int("0" + words[2], 16)
+                else:
+                    stop = start + 25
             else:
                 start = 0x3000
-            if len(words) > 1:
-                stop = int("0" + words[2], 16)
-            else:
-                stop = 0x300F
+                stop = 0x3000 + 25
             try:
                 for x in range(start, stop):
                     print(lc_hex(x), lc_hex(self.lc3.get_memory(x)))
@@ -271,12 +279,16 @@ class MyEngine(Calico.Engine):
                     self.lc3.set_memory(int("0" + words[2], 16), int("0" + words[3], 16))
                 elif words[1] == "reg":
                     self.lc3.set_register(int(words[2]), int("0" + words[3], 16))
+                elif words[1] == "warn":
+                    self.warn = bool(int(words[2]))
+                    self.lc3.warn = bool(int(words[2]))
                 else:
-                    print("Use .set [pc|memory|reg] ...")                
+                    print("Use .set [pc|memory|reg|warn] ...")                
             except:
                 print("Hint: .set pc x3000")
                 print("      .set reg 1 xFFFF")
                 print("      .set memory x300A x1")
+                print("      .set warn 0")
             return True
         elif words[0] == ".get":
             try:
@@ -286,12 +298,15 @@ class MyEngine(Calico.Engine):
                     print(lc_hex(self.lc3.get_memory(int("0" + words[2], 16))))
                 elif words[1] == "reg":
                     print(self.lc3.get_register(int(words[2])))
+                elif words[1] == "warn":
+                    print(int(self.lc3.warn))
                 else:
-                    print("Use .get [pc|memory|reg] ...")                
+                    print("Use .get [pc|memory|reg|warn] ...")                
             except:
                 print("Hint: .get pc")
                 print("      .get reg 1")
                 print("      .get memory x300A")
+                print("      .get warn")
             return True
         elif words[0] == ".reset":
             self.lc3.reset()

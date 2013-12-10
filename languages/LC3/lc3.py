@@ -133,6 +133,7 @@ class LC3(object):
     def __init__(self):
         # Functions for interpreting instructions:
         self.debug = False
+        self.warn = True
         self.apply = {
             0b0000: self.BR,
             0b0001: self.ADD,
@@ -558,6 +559,9 @@ class LC3(object):
     def Info(self, string):
         print(string, end="")
 
+    def Error(self, string):
+        print(string, end="")
+
     def run(self, reset=True):
         if reset:
             self.cycle = 0
@@ -740,6 +744,10 @@ class LC3(object):
         if vector == 0x20:
             from Myro import ask
             data = ask(["Enter a character"], "LC3 Character Input")
+            if data is None:
+                self.cont = False
+                self.Error("KeyboardInterrupt\n")
+                return
             if data["Enter a character"]:
                 self.set_memory(0xFE02, ord(data["Enter a character"][0]))
             else:
@@ -780,7 +788,8 @@ class LC3(object):
         p = instruction & 0b0000001000000000
         pc_offset9 = instruction & 0b0000000111111111
         if (not any([n, z, p])):
-            raise AttributeError("Attempting to execute data!")
+            if self.warn:
+                self.Error("Attempting to execute NOOP at %s\n" % lc_hex(self.get_pc() - 1))
         if (n and self.get_nzp(0) or 
             z and self.get_nzp(1) or 
             p and self.get_nzp(2)):
