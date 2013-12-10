@@ -19,8 +19,8 @@ import traceback
 class CalicoLC3(LC3):
     def __init__(self, calico, debug, warn, trace_pause, filename):
         self.doc = calico.GetDocument("Memory.csv")
-        LC3.__init__(self)
         self.calico = calico
+        LC3.__init__(self)
         self.debug = debug
         self.warn = warn
         self.trace_pause = trace_pause

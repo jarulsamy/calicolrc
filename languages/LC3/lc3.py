@@ -274,7 +274,6 @@ class LC3(object):
         correctly.
         """
         self.set_memory(location, lc_bin(n))
-        self.source[location] = line
 
     def get_memory(self, location):
         return self.memory[location]
@@ -323,27 +322,39 @@ class LC3(object):
         return (word[0].isalpha() and
                 all(c.isalpha() or c.isdigit() or c in ['_', ':'] for c in word))
 
+    def bitwise_and(self, value, mask):
+        if value >= 0:
+            if (value & ~mask) and self.warn:
+                self.Error("Overflow immediate: %s at line %s\n" % (value, self.source.get(self.get_pc(), "unknown")))
+        else:
+            if (-value & ~(mask >> 1)) and self.warn:
+                self.Error("Overflow immediate: %s at line %s\n" % (value, self.source.get(self.get_pc(), "unknown")))
+        return (value & mask)
+
     def get_immediate(self, word, mask=0xFFFF):
         if (word.startswith('x') and
             all(n in '-0123456789abcdefgABCDEF' for n in word[1:])):
             if word[1] == "-":
-                v = ((-int('0x' + word[2:], 0)) & mask)
-                return v
+                raw = (-int('0x' + word[2:], 0)) 
+                return self.bitwise_and(raw, mask)
             else:
-                return int('0' + word, 0) & mask
+                raw = int('0' + word, 0)
+                return  self.bitwise_and(raw, mask)
         elif word.startswith('#'):
             if word[1] == "-":
-                v = -int(word[2:]) & mask
-                return v 
+                raw = -int(word[2:])
+                return self.bitwise_and(raw, mask)
             else:
-                return int(word[1:]) & mask
+                raw = int(word[1:])
+                return self.bitwise_and(raw, mask)
         else:
             try:
                 if word[0] == "-":
-                    v = -int(word[1:]) & mask
-                    return v
+                    raw = -int(word[1:])
+                    return self.bitwise_and(raw, mask)
                 else:
-                    return int(word) & mask
+                    raw = int(word)
+                    return self.bitwise_and(raw, mask)
             except ValueError:
                 # could be a label
                 return
@@ -353,6 +364,7 @@ class LC3(object):
         Process ready split words from line and parse the line use
         put to show the instruction line without label values
         """
+        self.source[self.get_pc()] = line_count
         found = ''
         if not words or words[0].startswith(';'):
             return
@@ -369,7 +381,6 @@ class LC3(object):
                         self.label_location[self.make_label(word)] = [[self.get_pc(), 0xFFFF, 16]]
                 else:
                     self.set_memory(self.get_pc(), lc_bin(value))
-                    self.source[self.get_pc()] = line_count
             if words[0] != '.FILL':
                 self.labels[self.make_label(words[0])] = self.get_pc()
             self.increment_pc()
@@ -384,7 +395,6 @@ class LC3(object):
             if self.valid_label(words[0]):
                 self.labels[self.make_label(words[0])] = self.get_pc()
             else:
-                self.source[self.get_pc()] = line_count
                 raise ValueError('No label for .STRINGZ in line for PC = %s: %s, line #%s' % (lc_hex(self.get_pc()), line, line_count))
             s = line.split('"')
             string1 = string = s[1]
@@ -420,7 +430,6 @@ class LC3(object):
             self.labels[self.make_label(words[0])] = self.get_pc()
             value = self.get_immediate(words[-1])
             if value is None or value <= 0:
-                self.source[self.get_pc()] = line_count
                 raise ValueError('Bad .BLKW immediate: %s, %r' % (words[-1], value))
             self.increment_pc(value)
             return
@@ -445,13 +454,11 @@ class LC3(object):
             if self.valid_label(words[0]):
                 self.labels[self.make_label(words[0])] = self.get_pc()
             else:
-                self.source[self.get_pc()] = line_count
                 raise ValueError('Invalid label %s in line %s, line #: %s' % (words[0], line, line_count))
             if len(words) < 2:
                 return
             found = words[1] if words[1] in self.instructions else ''
         if not found:
-            self.source[self.get_pc()] = line_count
             word = words[0]
             if len(words) > 1:
                 raise ValueError('Not an instruction: %s' % line)
@@ -468,7 +475,6 @@ class LC3(object):
         try:
             instruction = self.instruction_info[found]
         except KeyError:
-            self.source[self.get_pc()] = line_count
             raise ValueError('Unknown: instruction "%s"' % found)
         else:
             if found == 'BR':
@@ -525,7 +531,6 @@ class LC3(object):
          # second pass:
         for label, value in self.label_location.items():
             if label not in self.labels:
-                self.source[self.get_pc()] = line_count
                 self.debug = orig
                 raise ValueError('Bad label: "%s"' % label)
             else:
@@ -536,7 +541,6 @@ class LC3(object):
                     if self.get_memory(ref) == 0: # not instruction -> absolute
                         self.set_memory(ref, self.labels[label])
                     elif not self.in_range(current, bits) :
-                        self.source[self.get_pc()] = line_count
                         self.debug = orig
                         raise ValueError(("Not an instruction: %s, mask %s, offset %s,  %s, ref %s" %
                                 (label,
