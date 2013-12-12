@@ -20,15 +20,16 @@ import traceback
 
 class Screen(object):
     def __init__(self):
-        self.window = Graphics.Window("Calico Screen", 100, 100)
-        self.window.setBackground(Graphics.Color(0,0,0))
-        self.window.mode = "bitmap"
+        self.cursor = (0,0)
         self.mx = 16
         self.my = 24
         self.cols = 2 ** 6
         self.rows = 2 ** 5
-        self.window.Resize(self.mx * self.cols,
-                           self.my * self.rows)
+        self.window = Graphics.Window("Calico Screen", 
+                                      self.cols * self.mx, 
+                                      self.rows * self.my)
+        self.window.setBackground(Graphics.Color(0,0,0))
+        self.window.mode = "bitmap"
         self.memory = [[0 for i in range(self.rows)] for j in range(self.cols)]
         # load font: http://home.online.no/~kr-lund/emul-fnt.htm "I am
         # giving this files and information away for free so there are
@@ -54,17 +55,44 @@ class Screen(object):
     def clear(self):
         self.memory = [[0 for i in range(self.rows)] for j in range(self.cols)]
         self.window.clear()
+        self.cursor = (0,0)
         self.window.setBackground(Graphics.Color(0,0,0))
 
     def peek(self, x, y):
         return self.memory[x][y]
 
-    def poke(self, x, y, string):
-        for i in range(len(string)):
-            self.memory[x][y] = ord(string[i])
-            self.makeBlock((i + x) * self.mx + self.mx//2,
-                           y * self.my + self.mx//2 + self.my/2 - 8,
-                           ord(string[i]))
+    def update_cursor(self, x, y):
+        if x == self.cols:
+            x, y = (0, y + 1)           # wrap back to left, next row
+        if y >= self.rows:
+            x, y = (0, self.rows - 1)   # scroll up, stay at bottom
+            self.window.updateNow()
+            dump = Graphics.Picture(self.window)
+            self.window.clear()
+            self.window.setBackground(Graphics.Color(0,0,0))
+            dump.move(0, -self.my)
+            dump.draw(self.window)
+            # self.memory = FIXME, move up one row
+        self.cursor = (x, y)
+
+    def poke(self, ox, oy, ch):
+        if (ox, oy) == (-1, -1):
+            x, y = self.cursor
+            if ch == "\n":
+                self.update_cursor(0, y + 1)
+                return
+        else:
+            x, y = ox, oy
+        self.memory[x][y] = ord(ch)
+        self.makeBlock(x * self.mx + self.mx//2,
+                       y * self.my + self.mx//2 + self.my/2 - 8,
+                       ord(ch))
+        if (ox, oy) == (-1, -1):
+            self.update_cursor(x + 1, y)
+
+    def display(self, string):
+        for c in string:
+            self.poke(-1, -1, c)
 
 class CalicoLC3(LC3):
     def __init__(self, calico, debug, warn, trace_pause, filename):
@@ -245,11 +273,12 @@ class CalicoLC3(LC3):
     def screen_set_cursor(self, x, y):
         if self.screen is None:
             self.screen = Screen()
+        self.screen.cursor = (x, y)
 
     def screen_get_cursor(self):
         if self.screen is None:
             self.screen = Screen()
-        return 0,0
+        return self.screen.cursor
 
     def screen_clear(self):
         if self.screen is None:
@@ -447,7 +476,7 @@ class MyEngine(Calico.Engine):
                                   (self.filename, 
                                    self.lc3.source[self.lc3.get_pc()]))
             else:
-                self.calico.Error("\nRuntime error!\nFile \"%s\", memory %s\n" % 
+                self.calico.Error("\nAssemble error!\nFile \"%s\", memory %s\n" % 
                                   (self.filename, 
                                    lc_hex(self.lc3.get_pc())))
             self.calico.Error(exc.message + "\n")
@@ -534,3 +563,4 @@ def MakeLanguage():
     Mono.TextEditor.Highlighting.SyntaxModeService.LoadStylesAndModes(
         os.path.join(os.path.abspath(os.path.dirname(__file__)), "SyntaxModes"))
     return MyLanguage()
+

@@ -403,6 +403,9 @@ class LC3(object):
         else:
             raise ValueError("Invalid .SET MODE, '%s'. Use 'GRAPHICS' or 'SHIFT'" % mode)
         self.instructions = self.instruction_info.keys()
+        self.immediate_mask = {}
+        for im in self.immediate:
+            self.immediate_mask[im] = (1 << self.immediate[im]) - 1
 
     def process_instruction(self, words, line_count, line):
         """
@@ -564,6 +567,7 @@ class LC3(object):
         orig = self.debug
         self.debug = False
         line_count = 1
+        # first pass:
         for line in code.splitlines():
             # remove comments
             ## FIXME: can't do like this! Need a real parser:
@@ -790,21 +794,24 @@ class LC3(object):
         pc_offset9 = instruction & 0b0000000111111111
         return "LEA R%d, %s" % (dst, self.lookup(plus(sext(pc_offset9,9), location) + 1))
 
+    def getc(self):
+        from Myro import ask
+        data = ask(["Enter a character"], "LC3 Character Input")
+        if data is None:
+            self.cont = False
+            self.Error("KeyboardInterrupt\n")
+            return
+        if data["Enter a character"]:
+            return ord(data["Enter a character"][0])
+        else:
+            return 10 # Carriage Return
+
     def TRAP(self, instruction):
         vector = instruction & 0b0000000011111111
         self.set_register(7, self.get_pc())
         self.set_pc(self.get_memory(vector))
         if vector == 0x20:
-            from Myro import ask
-            data = ask(["Enter a character"], "LC3 Character Input")
-            if data is None:
-                self.cont = False
-                self.Error("KeyboardInterrupt\n")
-                return
-            if data["Enter a character"]:
-                self.set_memory(0xFE02, ord(data["Enter a character"][0]))
-            else:
-                self.set_memory(0xFE02, 10) # CR
+            self.set_memory(0xFE02, self.getc())
         elif vector == 0x21:
             pass
         elif vector == 0x22:
@@ -1119,150 +1126,4 @@ class LC3(object):
             self.memory_tofile(self.orig,self.get_pc(), f)
             self.memory_byteswap()
 
-
-if __name__ == "__main__":
-    machine = LC3()
-    test_code = """
-;;; Algorithm for the iteration x <- a x mod m
-;;; using Schrage's method
-
-	.ORIG x3000
-	JSR Random
-	HALT
-
-;;; -----------------------------------------------------
-;;; Memory X has next random number
-Random: ST R7,BACK 		; save return location
-	LD R0, M
-	LD R1, A
-	JSR Divide 		; R0 / R1
-	;; q = m / a
-	LD R0, QUOTIENT 	; R0 / R1
-	ST R0, Q 	
-	;; r = m mod a
-	LD R0, REMAINDER 	; R0 mod R1
-	ST R0, R
-        ;; x / q
-	LD R0, X
-	LD R1, Q
-	JSR Divide 		; R0 / R1
-	LD R1, QUOTIENT
-	ST R1, TEMP2
-	LD R1, REMAINDER 	; x mod q
-	ST R1, TEMP1
-	;; x <-  a * (x mod q) - r * (x / q)
-	;;      a * TEMP1 - r * TEMP2
-	LD R0, A
-	JSR Multiply 		; R2 <- R0 * R1
-	ST R2, TEMP1
-	;;      a * TEMP1 - r * TEMP2
-	LD R0, R
-	LD R1, TEMP2
-	JSR Multiply 		; R2 <- r * TEMP2
-	NOT R2,R2 		; -R2
-	ADD R2,R2,#1
-	ST R2, TEMP2 
-	LD R1, TEMP1
-	ADD R2, R2, R1 		; TEMP1 - TEMP2
-TEST:	BRzp DONE 		; if x < 0 then
-	LD R1, M
-	ADD R2, R2, R1 		; x <- x + m
-DONE:	ST R2, X
-	LD R7, BACK 		; Restore return address
-	RET
-A:	.FILL #7       	;; a , the multiplicative constant is given
-M:	.FILL #32767    ;; m = 2 ** 15 - 1, the modulus is given
-X:	.FILL #10	;; x, the seed is given
-R:	.FILL #0
-Q:	.FILL #0
-TEMP1:	.FILL #0
-TEMP2:	.FILL #0
-BACK:	.FILL #0
-
-;;; -----------------------------------------------------
-;;; R2 <- R0 * R1
-;;; Also uses R3 to store SIGN
-Multiply: AND R2,R2,#0
-	  AND R3,R3,#0
-	  ADD R0,R0,#0 		; compare R0
-	  BRn MultNEG1
-	  BR  MultCont
-MultNEG1: NOT R3,R3 		; flip SIGN
-	  NOT R0,R0
-	  ADD R0,R0,#1
-MultCONT: ADD R1,R1,#0 		; compare R1
-	  BRn MultNEG2
-	  BR MultInit
-MultNEG2: NOT R3,R3 		; flip SIGN
-	  NOT R1,R1
-	  ADD R1,R1,#1
-MultInit: ADD R0,R0,#0  	; have R0 set the condition codes
-MultLoop: BRz MultDone
-	  ADD R2,R2,R1
-	  ADD R0,R0,#-1
-	  BR MultLoop
-MultDone: ADD R0,R3,#0
-	  BRzp MultRet
-	  NOT R2,R2
-	  ADD R2,R2,#1
-MultRet:  RET			; R2 has the sum
-
-;;; -----------------------------------------------------
-;;; R0 / R1
-;;; Also uses R3 to store SIGN
-;;;           R4 to store -R1
-;;;           R5 is QUOTIENT
-;;;           R6 is REMAINDER
-;;;           R2 temp
-Divide:   AND R3,R3,#0
-	  ST R3, QUOTIENT
-	  ST R3, REMAINDER
-	  ADD R0,R0,#0 		; compare R0
-	  BRn DivNEG1
-	  BR  DivCont
-DivNEG1:  NOT R3,R3 		; flip SIGN
-	  NOT R0,R0
-	  ADD R0,R0,#1
-DivCONT:  ADD R1,R1,#0 		; compare R1
-	  BRn DivNEG2
-	  BR DivInit
-DivNEG2:  NOT R3,R3 		; flip SIGN
-	  NOT R1,R1
-	  ADD R1,R1,#1
-DivInit:  ADD R4,R1,#0
-	  NOT R4,R4
-	  ADD R4,R4,#1
-DivLoop:  ADD R2,R0,R4  	; have R2 set the condition codes
-	  BRn DivDone
-	  ADD R0,R0,R4
-	  LD R2,QUOTIENT
-	  ADD R2,R2,#1
-	  ST R2,QUOTIENT
-	  BR DivLoop
-DivDone:  ADD R3,R3,#0 		; Negative?
-	  BRzp DivRet
-	  LD R2,QUOTIENT 	; Yes, then negate R2
-	  NOT R2,R2
-	  ADD R2,R2,#1
-	  ST R2,QUOTIENT
-DivRet:	  ST R0,REMAINDER
-	  RET			; R2 has the sum
-QUOTIENT:	.FILL #0
-REMAINDER:	.FILL #0
-	.END
-"""
-
-    add_code = """
-.ORIG 0x3000
-   ADD R0,R0,#1
-   HALT
-.END
-"""
-
-    machine.assemble(test_code)
-    #machine.disassemble()
-    #machine.dump()
-    machine.run()
-    #machine.dump_registers()
-    #machine.save("test_code")
 
