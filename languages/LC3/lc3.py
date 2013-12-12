@@ -51,9 +51,15 @@ class LC3(object):
     The LC3 Computer. This object can assemble, disassemble, and execute
     LC3 programs.
     """
+    # if RX is used in an instruction, these are the positions:
+    # 0000111222000333
     reg_pos = [9, 6, 0]
     flags = {'n': 1 << 11, 'z': 1 << 10, 'p': 1 << 9}
-    # instructions:
+    # All variations of instructions:
+    # Note that the following are handled in code:
+    #    * two modes of ADD and AND
+    #    * variations of BR (BRn, BRnp, etc)
+    # as they have the same mnemonic
     instruction_info = {
         'ADD': 0b1 << 12,
         'AND': 0b0101 << 12,
@@ -360,6 +366,44 @@ class LC3(object):
                 # could be a label
                 return
 
+    def set_assembly_mode(self, mode):
+        # clear out spare instructions
+        for key in self.instruction_info.keys():
+            if (self.instruction_info[key] >> 12) == 0b1101:
+                del self.instruction_info[key]
+        for key in self.immediate.keys():
+            if (self.immediate[key] >> 12) == 0b1101:
+                del self.immediate[key]
+        # Add new instructions
+        if mode == "SHIFT":
+            # assembler:
+            self.instruction_info["SHIFT"] = 0b1101 << 12
+            self.immediate["SHIFT"] = 6
+            # interpreter:
+            self.cycles[0b1101] = 5  + 1
+            self.apply[0b1101] = self.SHIFT
+            self.format[0b1101] = self.SHIFT_format
+        elif mode == "GRAPHICS":
+            # assembler:
+            self.instruction_info["CLEAR"]  = (0b1101 << 12) + (0b010 << 3)
+            self.instruction_info["GETCUR"] = (0b1101 << 12) + (0b100 << 3)
+            self.instruction_info["SETCUR"] = (0b1101 << 12) + (0b101 << 3)
+            self.instruction_info["POKE"]   = (0b1101 << 12) + (0b001 << 3)
+            self.instruction_info["PEEK"]   = (0b1101 << 12) + (0b000 << 3)
+            self.immediate["SCREEN"] = 0
+            self.immediate["CLEAR"] = 0
+            self.immediate["GETCUR"] = 0
+            self.immediate["SETCUR"] = 0
+            self.immediate["POKE"] = 0
+            self.immediate["PEEK"] = 0
+            # interpreter:
+            self.cycles[0b1101] = 5  + 1
+            self.apply[0b1101] = self.SCREEN
+            self.format[0b1101] = self.SCREEN_format
+        else:
+            raise ValueError("Invalid .SET MODE, '%s'. Use 'GRAPHICS' or 'SHIFT'" % mode)
+        self.instructions = self.instruction_info.keys()
+
     def process_instruction(self, words, line_count, line):
         """
         Process ready split words from line and parse the line use
@@ -434,6 +478,10 @@ class LC3(object):
                 raise ValueError('Bad .BLKW immediate: %s, %r' % (words[-1], value))
             self.increment_pc(value)
             return
+        elif '.SET' == words[0]:
+            if words[1] == "MODE":
+                self.set_assembly_mode(words[2])
+            return
         # -------------------------------------------------------------
         ind = -1
         if words[0].startswith('BR'):
@@ -443,7 +491,7 @@ class LC3(object):
         if ind >= 0 and len(words[ind]) <= 5:
             if all(c in self.flags for c in words[ind][2:].lower()):
                 fl = 0
-                # BR alone does not make sense so default to Branch always
+                # BR means BRnzp
                 if words[ind] == 'BR':
                     words[ind] = 'BRnzp'
                 for f in words[ind][2:].lower():
@@ -951,6 +999,83 @@ class LC3(object):
         src = (instruction & 0b0000000111000000) >> 6
         imm6 = instruction & 0b0000000000111111
         return "SHIFT R%d, R%d, #%s" % (dst, src, lc_int(sext(imm6, 6)))
+
+    def screen_set_cursor(self, x, y):
+        pass
+
+    def screen_get_cursor(self):
+        return 0,0
+
+    def screen_clear(self):
+        pass
+
+    def screen_poke(self, x, y, value):
+        pass
+
+    def screen_peek(self, x, y):
+        return 0
+
+    def SCREEN(self, instruction):
+        ## SCREEN 
+        if (instruction & 0b010 << 3): # CLEAR
+            #CLEAR:  SCREEN ...,...,010,...
+            self.screen_clear()
+        elif (instruction & 0b100 << 3): # cursor
+            #GETCUR: SCREEN Rx , Ry,100,...
+            #SETCUR: SCREEN Rx , Ry,101,...
+            if (instruction & 0b001 << 3): # setcur
+                rx = (instruction & 0b0000111000000000) >> 9
+                ry = (instruction & 0b0000000111000000) >> 6
+                self.screen_set_cursor(self.get_register(rx), self.get_register(ry))
+            else:
+                rx = (instruction & 0b0000111000000000) >> 9
+                ry = (instruction & 0b0000000111000000) >> 6
+                x, y = self.screen_get_cursor()
+                self.set_register(rx, x)
+                self.set_register(ry, y)
+        else: # peek/poke
+            #POKE:   SCREEN Rx , Ry,001, RSRC
+            #PEEK:   SCREEN Rx , Ry,000, RDST
+            if (instruction & 0b001 << 3): # poke
+                rx = (instruction & 0b0000111000000000) >> 9
+                ry = (instruction & 0b0000000111000000) >> 6
+                src = (instruction & 0b0000000000000111) 
+                self.screen_poke(self.get_register(rx), self.get_register(ry), self.get_register(src))
+            else:
+                rx = (instruction & 0b0000111000000000) >> 9
+                ry = (instruction & 0b0000000111000000) >> 6
+                dst = (instruction & 0b0000000000000111) 
+                self.set_register(dst, self.screen_peek(self.get_register(rx), self.get_register(ry)))
+
+    def SCREEN_format(self, instruction, location):
+        ## SCREEN 
+        if (instruction & 0b010 << 3): # CLEAR
+            #CLEAR:  SCREEN ...,...,010,...
+            return "CLEAR"
+        elif (instruction & 0b100 << 3): # cursor
+            #GETCUR: SCREEN Rx , Ry,100,...
+            #SETCUR: SCREEN Rx , Ry,101,...
+            if (instruction & 0b001 << 3): # setcur
+                rx = (instruction & 0b0000111000000000) >> 9
+                ry = (instruction & 0b0000000111000000) >> 6
+                return "SETCUR R%d, R%d" % (rx, ry)
+            else:
+                rx = (instruction & 0b0000111000000000) >> 9
+                ry = (instruction & 0b0000000111000000) >> 6
+                return "GETCUR R%d, R%d" % (rx, ry)
+        else: # peek/poke
+            #POKE:   SCREEN Rx , Ry,001, RSRC
+            #PEEK:   SCREEN Rx , Ry,000, RDST
+            if (instruction & 0b001 << 3): # poke
+                rx = (instruction & 0b0000111000000000) >> 9
+                ry = (instruction & 0b0000000111000000) >> 6
+                src = (instruction & 0b0000000000000111) 
+                return "POKE R%d, R%d, R%d" % (rx, ry, src)
+            else:
+                rx = (instruction & 0b0000111000000000) >> 9
+                ry = (instruction & 0b0000000111000000) >> 6
+                dst = (instruction & 0b0000000000000111) 
+                return "PEEK R%d, R%d, R%d" % (rx, ry, dst)
 
     def load(self, filename):
         self.filename = filename

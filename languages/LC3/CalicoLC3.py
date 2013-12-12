@@ -8,6 +8,8 @@ clr.AddReference("gtk-sharp")
 import Gtk
 clr.AddReference("Mono.TextEditor") 
 import Mono.TextEditor
+clr.AddReference("Graphics")
+import Graphics
 
 import sys, os
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
@@ -15,6 +17,54 @@ sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 from lc3 import LC3, lc_hex
 import time
 import traceback
+
+class Screen(object):
+    def __init__(self):
+        self.window = Graphics.Window("Calico Screen", 100, 100)
+        self.window.setBackground(Graphics.Color(0,0,0))
+        self.window.mode = "bitmap"
+        self.mx = 16
+        self.my = 24
+        self.cols = 2 ** 6
+        self.rows = 2 ** 5
+        self.window.Resize(self.mx * self.cols,
+                           self.my * self.rows)
+        self.memory = [[0 for i in range(self.rows)] for j in range(self.cols)]
+        # load font: http://home.online.no/~kr-lund/emul-fnt.htm "I am
+        # giving this files and information away for free so there are
+        # no warranties of any kind."
+        # Copyright (c) 2001 Knut Roll-Lund
+        filename = os.path.join(os.path.abspath(os.path.dirname(__file__)),
+                                'TRS81-3krl.png')
+        font = Graphics.Picture(filename)
+        self.image = [0] * 256
+        index = 0
+        for row in range(0, font.height, 24):
+            for col in range(0, font.width, 16):
+                self.image[index] = font.getRegion((col,row), 16, 24)
+                index += 1
+
+    def makeBlock(self, x, y, c):
+        block =  Graphics.Picture(self.image[c])
+        block.border = 0
+        block.center = Graphics.Point(x,y)
+        block.drawAt(self.window, (x, y))
+        return
+
+    def clear(self):
+        self.memory = [[0 for i in range(self.rows)] for j in range(self.cols)]
+        self.window.clear()
+        self.window.setBackground(Graphics.Color(0,0,0))
+
+    def peek(self, x, y):
+        return self.memory[x][y]
+
+    def poke(self, x, y, string):
+        for i in range(len(string)):
+            self.memory[x][y] = ord(string[i])
+            self.makeBlock((i + x) * self.mx + self.mx//2,
+                           y * self.my + self.mx//2 + self.my/2 - 8,
+                           ord(string[i]))
 
 class CalicoLC3(LC3):
     def __init__(self, calico, debug, warn, trace_pause, filename):
@@ -25,6 +75,7 @@ class CalicoLC3(LC3):
         self.warn = warn
         self.trace_pause = trace_pause
         self.filename = filename
+        self.screen = None
 
     def reset_memory(self):
         LC3.reset_memory(self)
@@ -190,6 +241,30 @@ class CalicoLC3(LC3):
     def setTrace(self, value):
         #print("setTrace:", value)
         self.debug = value
+
+    def screen_set_cursor(self, x, y):
+        if self.screen is None:
+            self.screen = Screen()
+
+    def screen_get_cursor(self):
+        if self.screen is None:
+            self.screen = Screen()
+        return 0,0
+
+    def screen_clear(self):
+        if self.screen is None:
+            self.screen = Screen()
+        self.screen.clear()
+
+    def screen_poke(self, x, y, value):
+        if self.screen is None:
+            self.screen = Screen()
+        self.screen.poke(x, y, chr(value))
+
+    def screen_peek(self, x, y):
+        if self.screen is None:
+            self.screen = Screen()
+        return self.screen.peek(x, y)
 
 class MyEngine(Calico.Engine):
     def __init__(self, *args, **kwargs):
