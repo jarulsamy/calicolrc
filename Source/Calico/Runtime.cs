@@ -136,6 +136,15 @@ namespace Calico {
 	    }
 	}
 
+	public void usage() {
+	    Console.WriteLine("Calico command-line usage:");
+	    Console.WriteLine("   :lang LANGUAGE  - where LANGUAGE python, ruby, scheme, etc.");
+	    Console.WriteLine("   :run FILENAME   - where FILENAME is a Calico Language program");
+	    Console.WriteLine("   :help           - this message");
+	    Console.WriteLine("   COMMAND         - a command in the current LANGAUGE");
+	    Console.WriteLine("   ^d              - <control>d will exit");
+	}
+
         public void REPL() {
 	    ActivateLanguage(CurrentLanguage, "python");
 
@@ -160,7 +169,17 @@ namespace Calico {
                 dumb = false;
             }
 
+            int counter = 0;
             while ((line = getline(le, prompt, indent, dumb, isatty)) != null) {
+		if (line == "") {
+		    if (counter > 1) {
+			usage();
+			counter = 0;
+		    } else {
+			counter++;
+		    }
+		    continue;
+		}
                 if (line.StartsWith(":")) {
                     string[] t = line.Split();
                     if (t [0] == ":lang") {
@@ -172,7 +191,27 @@ namespace Calico {
                         expr = "";
                         prompt = CurrentLanguage + "> ";
                         indent = "";
-                    }
+                    } else if (t [0] == ":help") {
+			usage();
+                    } else if (t [0] == ":run") {
+			string arg = t[1];
+			CurrentLanguage = manager.GetLanguageFromExtension(arg);
+			string filename = System.IO.Path.GetFullPath(arg);
+			string dirname = System.IO.Path.GetDirectoryName(filename);
+			if (dirname != "" && dirname != null) {
+			    if (System.IO.File.Exists(arg)) {
+				System.IO.Directory.SetCurrentDirectory(dirname);
+				ExecuteFileInBackground(filename, CurrentLanguage); 
+				prompt = CurrentLanguage + "> ";
+				indent = "";
+				expr = "";
+			    } else {
+				Console.Error.WriteLine("Error: no such file '{0}'; skipping...", arg);
+			    }
+			}
+		    } else {
+			usage();
+		    }
                 } else {
                     if (expr != "") {
                         expr = expr + "\n" + line;

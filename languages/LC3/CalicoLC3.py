@@ -428,8 +428,12 @@ class MyEngine(Calico.Engine):
             return True
         elif words[0] == ".cont":
             try:
-                self.run(reset=False)
+                self.lc3.cont = True
+                while self.lc3.cont:
+                    self.lc3.step()
+                self.lc3.dump_registers()
             except:
+                #traceback.print_exc()
                 print("Error")
             return True
         elif words[0] == ".step":

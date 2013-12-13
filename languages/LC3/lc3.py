@@ -1127,3 +1127,48 @@ class LC3(object):
             self.memory_byteswap()
 
 
+"""
+Macro ideas, from:
+http://www.cs.georgetown.edu/~squier/Teaching/HardwareFundamentals/LC3-trunk/src/lc3pre_Language_Extensions.txt
+
+example code         translation
+----------           -----------
+
+mov__(r3, r5)        add r3, r5, 0        ;;-- r3 <== r5
+
+zero__(r2)           and r2, r2, 0        ;;-- r2 <== 0
+
+inc__(r7)            add r7, r7, 1        ;;-- r7 <== r7 + 1
+
+dec__(r7)            add r7, r7, -1       ;;-- r7 <== r7 - 1
+
+push__(r5)           add sp__, sp__, -1
+                     str r5, sp__, 0
+
+pop__(r5)            ldr r5, sp__, 0
+                     add sp__, sp__, 1
+                     mov__(r1, r1)        ;;-- sets NZP CCs per r5
+
+sub__(r1, r2, r3)    not r3, r3           ;;-- r1 <== (r2 - r3)
+                     add r3, r3, 1
+                     add r1, r2, r3
+                     add r3, r3, -1
+                     not r3, r3           ;;-- r2 and r3 unchanged,
+                     mov__(r1, r1)        ;;-- sets NZP CCs per r1
+
+or__(r1, r2, r3)    not r2, r2            ;;-- r1 <== (r2 OR r3)
+                    not r3, r3
+                    and r1, r2, r3
+                    not r1, r1
+                    not r2, r2
+                    not r3, r3            ;;-- r2 and r3 unchanged,
+                    mov__(r1, r1)         ;;-- sets NZP CCs per r1
+
+jsr__(mySub_BEGIN)  push__( R7 )          ;;-- uses stack discpline,
+                    jsr mySub_BEGIN       ;;-- allows nested calls
+                    pop__( R7 )
+
+trap__(x13)         push__( R7 )          ;;-- uses stack discpline,
+                    trap x13              ;;-- allows nested calls
+                    pop__( R7 )
+"""
