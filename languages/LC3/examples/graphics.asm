@@ -19,6 +19,6 @@ NEXT    AND R0,R0,#0
         BRz DONE
         BR LOOP
 DONE    HALT
-ROWS .FILL #-64
-COLS .FILL #-4
+ROWS .FILL #-32
+COLS .FILL #-8
 .END

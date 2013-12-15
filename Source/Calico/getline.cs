@@ -225,11 +225,16 @@ namespace Mono.Terminal {
 
 		void UpdateHomeRow (int screenpos)
 		{
-			int lines = 1 + (screenpos / Console.WindowWidth);
+		    int lines;
+		    if (Console.WindowWidth > 0) {
+			lines = 1 + (screenpos / Console.WindowWidth);
+		    } else {
+			lines = 1 + (screenpos / 70);
+		    }
 
-			home_row = Console.CursorTop - (lines - 1);
-			if (home_row < 0)
-				home_row = 0;
+		    home_row = Console.CursorTop - (lines - 1);
+		    if (home_row < 0)
+			home_row = 0;
 		}
 		
 
@@ -301,7 +306,11 @@ namespace Mono.Terminal {
 
 		int LineCount {
 			get {
+			    if (Console.WindowWidth > 0) {
 				return (shown_prompt.Length + rendered_text.Length)/Console.WindowWidth;
+			    } else {
+				return (shown_prompt.Length + rendered_text.Length)/70;
+			    }
 			}
 		}
 		
@@ -310,8 +319,15 @@ namespace Mono.Terminal {
 			cursor = newpos;
 
 			int actual_pos = shown_prompt.Length + TextToRenderPos (cursor);
-			int row = home_row + (actual_pos/Console.WindowWidth);
-			int col = actual_pos % Console.WindowWidth;
+			int row;
+			int col;
+			if (Console.WindowWidth > 0) {
+			    row = home_row + (actual_pos/Console.WindowWidth);
+			    col = actual_pos % Console.WindowWidth;
+			} else {
+			    row = home_row + (actual_pos/70);
+			    col = actual_pos % 70;
+			}
 
 			if (row >= Console.BufferHeight)
 				row = Console.BufferHeight-1;
@@ -762,8 +778,9 @@ namespace Mono.Terminal {
 
 			while (!done){
 				ConsoleModifiers mod;
-				
+				//Console.WriteLine("ReadKey...");
 				cki = Console.ReadKey (true);
+				//Console.WriteLine("ReadKey!" + cki.Key.ToString());
 				if (cki.Key == ConsoleKey.Escape){
 					cki = Console.ReadKey (true);
 
@@ -947,7 +964,7 @@ namespace Mono.Terminal {
 			//
 			public void Append (string s)
 			{
-				//Console.WriteLine ("APPENDING {0} head={1} tail={2}", s, head, tail);
+			    //Console.WriteLine ("APPENDING {0} head={1} tail={2}", s, head, tail);
 				history [head] = s;
 				head = (head+1) % history.Length;
 				if (head == tail)
@@ -1044,7 +1061,7 @@ namespace Mono.Terminal {
 
 			public void Dump ()
 			{
-				Console.WriteLine ("Head={0} Tail={1} Cursor={2} count={3}", head, tail, cursor, count);
+			    //Console.WriteLine ("Head={0} Tail={1} Cursor={2} count={3}", head, tail, cursor, count);
 				for (int i = 0; i < history.Length;i++){
 					Console.WriteLine (" {0} {1}: {2}", i == cursor ? "==>" : "   ", i, history[i]);
 				}
