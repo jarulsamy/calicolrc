@@ -1,0 +1,2 @@
+/home/dblank/Desktop/IPython/clrzmq/perf/local_thr.exe
+/home/dblank/Desktop/IPython/clrzmq/src/ZeroMQ.Perf.ThrLocal/obj/x86/Debug/local_thr.exe
