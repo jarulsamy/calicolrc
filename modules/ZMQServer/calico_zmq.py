@@ -20,20 +20,20 @@ def server_loop():
         ## Send reply back to client
         server.Send("World", Encoding.Unicode)
 
-thread = threading.Thread(target=server_loop)
-thread.start()
+#thread = threading.Thread(target=server_loop)
+#thread.start()
 
-client = context.CreateSocket(ZeroMQ.SocketType.REQ)
-client.Connect("tcp://localhost:5555")
+#client = context.CreateSocket(ZeroMQ.SocketType.REQ)
+#client.Connect("tcp://localhost:5555")
 
-request = "Hello"
-for requestNum in range(10):
-    print("Sending request %s..." % requestNum)
-    request = System.Array[System.Byte]([ord(b) for b in "Hello"])
-    client.Send(request, 5, 0)
-    array = System.Array[System.Byte]([0] * 100)
-    reply = client.Receive(array)
-    print("Received reply %s: %s" % (requestNum, reply))
+#request = "Hello"
+#for requestNum in range(10):
+#    print("Sending request %s..." % requestNum)
+#    request = System.Array[System.Byte]([ord(b) for b in "Hello"])
+#    client.Send(request, 5, 0)
+#    array = System.Array[System.Byte]([0] * 100)
+#    reply = client.Receive(array)
+#    print("Received reply %s: %s" % (requestNum, reply))
 
-exiting = True
-thread.join()
+#exiting = True
+#thread.join()
