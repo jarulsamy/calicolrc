@@ -183,7 +183,7 @@ public static class ZMQServer {
 	public void send_multipart(List<string> list) {
 	    int count = 0;
 	    foreach (string msg in list) {
-		if (count < list.Count) {
+		if (count < list.Count - 1) {
 		    socket.SendMore(msg, Encoding.UTF8);
 		} else {
 		    socket.Send(msg, Encoding.UTF8);
@@ -214,7 +214,7 @@ public static class ZMQServer {
 	}
 
 	public static string now() {
-	    return DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffff");
+	    return DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.ffffff");
 	}
 
 	public static string msg_id() {
