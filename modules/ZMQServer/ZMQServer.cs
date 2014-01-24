@@ -71,19 +71,21 @@ public static class ZMQServer {
 	public ShellChannel shell_channel;
 	public IOPubChannel iopub_channel;
 	public Authorization auth;
+	public string engine_id;
 
 	public Session(string filename) {
 	    this.filename = filename;
 	    session_id = System.Guid.NewGuid().ToString();
+	    engine_id = System.Guid.NewGuid().ToString();
 	    string json = File.ReadAllText(filename);
 	    var config = decode(json);
 	    auth = new Authorization(config["key"].ToString(),
 				     config["signature_scheme"].ToString());
-	    shell_channel = new ShellChannel(auth,
+	    shell_channel = new ShellChannel(this, auth,
 		    config["transport"].ToString(), 
 		    config["ip"].ToString(),
 		    config["shell_port"].ToString());
-	    iopub_channel = new IOPubChannel(auth,
+	    iopub_channel = new IOPubChannel(this, auth,
 		    config["transport"].ToString(), 
 		    config["ip"].ToString(),
 		    config["iopub_port"].ToString());
@@ -91,6 +93,7 @@ public static class ZMQServer {
     }
 
     public class Channel {
+	public Session session;
 	public string transport;
 	public string address;
 	public ZmqContext context;
@@ -98,10 +101,13 @@ public static class ZMQServer {
 	public string port;
 	public Authorization auth;
 
-	public Channel(Authorization auth, string transport, 
+	public Channel(Session session, 
+		       Authorization auth, 
+		       string transport, 
 		       string address, 
 		       string port, 
 		       SocketType socket_type) {
+	    this.session = session;
 	    this.auth = auth;
 	    this.transport = transport;
 	    this.address = address;
@@ -149,16 +155,18 @@ public static class ZMQServer {
 				    IDictionary<string, object> m_content) {
 	}
 
-	public void send(IDictionary<string,object> header,
+	public void send(Channel channel,
+			 IDictionary<string,object> header,
 			 IDictionary<string,object> parent_header,
 			 IDictionary<string,object> metadata,
 			 IDictionary<string,object> content) {
-	    send(encode(header), encode(parent_header), encode(metadata),
+	    send(channel, encode(header), encode(parent_header), encode(metadata),
 		 encode(content));
 	}
 
 
-	public void send(string header,
+	public void send(Channel channel,
+			 string header,
 			 string parent_header,
 			 string metadata,
 			 string content) {
@@ -171,7 +179,8 @@ public static class ZMQServer {
 			      parent_header,
 			      metadata,
 			      content);
-	    send_multipart(new List<string>() 
+	    send_multipart(channel,
+			   new List<string>() 
 			   {"<IDS|MSG>",
 				   signature,
 				   header,
@@ -180,13 +189,13 @@ public static class ZMQServer {
 				   content});
 	}
 
-	public void send_multipart(List<string> list) {
+	public void send_multipart(Channel channel, List<string> list) {
 	    int count = 0;
 	    foreach (string msg in list) {
 		if (count < list.Count - 1) {
-		    socket.SendMore(msg, Encoding.UTF8);
+		    channel.socket.SendMore(msg, Encoding.UTF8);
 		} else {
-		    socket.Send(msg, Encoding.UTF8);
+		    channel.socket.Send(msg, Encoding.UTF8);
 		}
 		count++;
 	    }
@@ -194,9 +203,13 @@ public static class ZMQServer {
     }
 
     public class ShellChannel : Channel {
-	public ShellChannel(Authorization auth, string transport, string address, 
+	public int execution_count = 1;
+	public ShellChannel(Session session, 
+			    Authorization auth, 
+			    string transport, 
+			    string address, 
 			    string port) : 
-	    base(auth, transport, address, port, SocketType.DEALER) {
+	    base(session, auth, transport, address, port, SocketType.DEALER) {
 	}
 
 	public IDictionary<string, object> Header(string date, 
@@ -227,6 +240,7 @@ public static class ZMQServer {
 				IDictionary<string, object> m_metadata, 
 				IDictionary<string, object> m_content) {
 
+	    // Shell handler
 	    Console.WriteLine("on_recv" + m_header["msg_type"]);
 	    if (m_header["msg_type"].ToString() == "execute_request") {
 		var header = Header(now(),
@@ -240,73 +254,73 @@ public static class ZMQServer {
 		{
 		    {"execution_state", "busy"}
 		};
-		send(header, m_header, metadata, content);
-		/*
-        header = {
-            "date": datetime.datetime.now().isoformat(),
-            "msg_id": msg_id(),
-            "username": "kernel",
-            "session": m_header["session"],
-            "msg_type": "pyin",
-        }
-        metadata = {}
-        content = {
-            'execution_count': execution_count,
-            'code': m_content["code"],
-        }
-        send(iopub_stream, header, m_header, metadata, content)
-        #######################################################################
-        header = {
-            "date": datetime.datetime.now().isoformat(),
-            "msg_id": msg_id(),
-            "username": "kernel",
-            "session": m_header["session"],
-            "msg_type": "pyout",
-        }
-        metadata = {}
-        content = {
-            'execution_count': execution_count,
-            'data': {"text/plain": "result!"},
-            'metadata': {}
-        }
-        send(iopub_stream, header, m_header, metadata, content)
-        #######################################################################
-        header = {
-            "date": datetime.datetime.now().isoformat(),
-            "msg_id": msg_id(),
-            "username": "kernel",
-            "session": m_header["session"],
-            "msg_type": "status",
-        }
-        metadata = {}
-        content = {
-            'execution_state': "idle",
-        }
-        send(iopub_stream, header, m_header, metadata, content)
-        #######################################################################
-        header = {
-            "date": datetime.datetime.now().isoformat(),
-            "msg_id": msg_id(),
-            "username": "kernel",
-            "session": m_header["session"],
-            "msg_type": "execute_reply",
-        }
-        metadata = {
-            "dependencies_met": True,
-            "engine": engine_id,
-            "status": "ok",
-            "started": datetime.datetime.now().isoformat(),
-        }
-        content = {
-            "status": "ok",
-            "execution_count": execution_count,
-            "user_variables": {},
-            "payload": [],
-            "user_expressions": {},
-        }
-        send(shell_stream, header, m_header, metadata, content)
-        execution_count += 1
-		*/
+		send(session.iopub_channel, header, m_header, metadata, content);
+		// ---------------------------------------------------
+		header = Header(now(),
+				msg_id(),
+				"kernel",
+				m_header["session"].ToString(),
+				"pyin");
+		metadata = new Dictionary<string, object>();
+		content = new Dictionary<string, object>
+		{
+		    {"execution_count", execution_count},
+		    {"code", m_content["code"].ToString()},
+		};
+		send(session.iopub_channel, header, m_header, metadata, content);
+		// ---------------------------------------------------
+		header = Header(now(),
+				msg_id(),
+				"kernel",
+				m_header["session"].ToString(),
+				"pyout");
+		metadata = new Dictionary<string, object>();
+		content = new Dictionary<string, object>
+		{
+		    {"execution_count", execution_count},
+		    {"data", new Dictionary<string, object>
+		     {
+                         {"text/plain", "result!"}
+                     }
+		    },
+		    {"metadata", new Dictionary<string, object>()}
+		};
+		send(session.iopub_channel, header, m_header, metadata, content);
+		// ---------------------------------------------------
+		header = Header(now(),
+				msg_id(),
+				"kernel",
+				m_header["session"].ToString(),
+				"status");
+		metadata = new Dictionary<string, object>();
+		content = new Dictionary<string, object>
+		{
+		    {"execution_state", "idle"}
+		};
+		send(session.iopub_channel, header, m_header, metadata, content);
+		// ---------------------------------------------------
+		header = Header(now(),
+				msg_id(),
+				"kernel",
+				m_header["session"].ToString(),
+				"execute_reply");
+		metadata = new Dictionary<string, object>
+		{
+		    {"dependencies_met", true},
+		    {"engine", session.engine_id},
+		    {"status", "ok"},
+		    {"started", now()}
+		};
+		content = new Dictionary<string, object>
+		{
+		    {"status", "ok"},
+		    {"execution_count", execution_count},
+		    {"user_variables", new Dictionary<string, object>()},
+		    {"payload", new List<object>()},
+		    {"user_expressions", new Dictionary<string, object>()}
+		};
+		send(session.shell_channel, header, m_header, metadata, content);
+		execution_count += 1;
 	    } else if (m_header["msg_type"].ToString() == "kernel_info_request") {
 		var header = Header(now(),
 				    msg_id(),
@@ -321,23 +335,19 @@ public static class ZMQServer {
 			{"ipython_version", new List<object>() {1, 1, 0, ""}},
 			{"language_version", new List<int>() {0, 0, 1}},
 			{"language", "simple_kernel"},
-			{"execution_state", "busy"}
 		    };
-		send(header, m_header, metadata, content);
-	    /*
-    elif m_header["msg_type"] == "history_request":
-        header = {
-            "date": datetime.datetime.now().isoformat(),
-            "msg_id": msg_id(),
-            "username": m_header["username"],
-            "session": m_header["session"],
-            "msg_type": "kernel_info_reply",
-        } 
-        content = {
-            'output' : False,
-        }
-        send(shell_stream, header, m_header, m_metadata, content)
-		*/
+		send(session.shell_channel, header, m_header, metadata, content);
+	    } else if (m_header["msg_type"].ToString() == "history_request") {
+		var header = Header(now(),
+				msg_id(),
+				m_header["username"].ToString(),
+				m_header["session"].ToString(),
+				"kernel_info_reply");
+		var content = new Dictionary<string, object>
+		    {
+			{"output", false}
+		    };
+		send(session.shell_channel, header, m_header, m_metadata, content);
 	    } else {
 		throw new Exception("unknown msg_type: " + m_header["msg_type"]);
 	    }
@@ -345,9 +355,12 @@ public static class ZMQServer {
     }
 
     public class IOPubChannel : Channel {
-	public IOPubChannel(Authorization auth, string transport, string address, 
+	public IOPubChannel(Session session, 
+			    Authorization auth, 
+			    string transport, 
+			    string address, 
 			    string port) : 
-	    base(auth, transport, address, port, SocketType.PUB) {
+	    base(session, auth, transport, address, port, SocketType.PUB) {
 	}
     }
 
