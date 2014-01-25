@@ -270,8 +270,21 @@ namespace Calico {
 		    compiledCode = source.Compile();
 		}
 	    } catch {
-		Console.Error.WriteLine("Unable to compile!");
-		return null;
+		// let's try to Execute, before giving up:
+		try { 
+		    sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
+		    source = engine.CreateScriptSourceFromString(text, sctype);
+		    compiledCode = source.Compile();
+		} catch {
+		    try {
+			sctype = Microsoft.Scripting.SourceCodeKind.Statements;
+			source = engine.CreateScriptSourceFromString(text, sctype);
+			compiledCode = source.Compile();
+		    } catch {
+			Console.Error.WriteLine("Unable to compile!");
+			return null;
+		    }
+		}
 	    }
 	    object retval = null;
 	    bool aborted = false;
