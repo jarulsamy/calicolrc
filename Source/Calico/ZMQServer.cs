@@ -17,6 +17,28 @@ public static class ZMQServer {
 	return JsonConvert.SerializeObject(dict);
     }
 
+    public static string now() {
+	return DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.ffffff");
+    }
+
+    public static string msg_id() {
+	return System.Guid.NewGuid().ToString();
+    }
+
+    public static IDictionary<string, object> Header(string date, 
+						     string msg_id,
+						     string username,
+						     string session,
+						     string msg_type) {
+	Dictionary<string,object> dict = new Dictionary<string,object>();
+	dict["date"] = date;
+	dict["msg_id"] = msg_id;
+	dict["username"] = username;
+	dict["session"] = session;
+	dict["msg_type"] = msg_type;
+	return dict;
+    }
+
     public static IDictionary<string, object> decode(string json) {
 	return JsonConvert.DeserializeObject<IDictionary<string, object>>(
 			    json, new JsonConverter[] {new MyConverter()});
@@ -77,6 +99,8 @@ public static class ZMQServer {
 	public Authorization auth;
 	public string engine_id;
 	public Calico.MainWindow calico;
+	public int current_execution_count = 0;
+	public IDictionary<string, object> parent_header;
 
 	public Session(Calico.MainWindow calico, string filename) {
 	    this.calico = calico;
@@ -114,6 +138,47 @@ public static class ZMQServer {
 	    shell_channel.thread.Start();
 	    control_channel.thread.Start();
 	    stdin_channel.thread.Start();
+	}
+
+	public void SetOutputs(int execution_count, IDictionary<string, object> m_header) {
+	    current_execution_count = execution_count;
+	    parent_header = m_header;
+	}
+
+	public void StdErrWrite(string message) {
+	    if (current_execution_count > 0) {
+		var header = Header(now(),
+				      "kernel",
+				      session_id,
+				      msg_id(),
+				      "stream");
+		var metadata = new Dictionary<string, object>();
+		var content = new Dictionary<string, object> {
+		    {"data", message},
+		    {"name", "stderr"}
+		};
+		iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	    } else {
+		// skip
+	    }
+	}
+
+	public void StdOutWrite(string message) {
+	    if (current_execution_count > 0) {
+		var header = Header(now(),
+				      "kernel",
+				      session_id,
+				      msg_id(),
+				      "stream");
+		var metadata = new Dictionary<string, object>();
+		var content = new Dictionary<string, object> {
+		    {"data", message},
+		    {"name", "stdout"}
+		};
+		iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	    } else {
+		// skip
+	    }
 	}
     }
 
@@ -162,9 +227,7 @@ public static class ZMQServer {
 			s_header, s_parent_header, s_metadata, s_content});
 		
 		if (comp_sig != signature) {
-		    Console.WriteLine("on_recv: " + signature);
-		    Console.WriteLine("       : " + comp_sig);
-		    Console.WriteLine("Error: signatures don't match!");
+		    throw new Exception("Error: signatures don't match!");
 		}
 
 		IDictionary<string, object> header = decode(s_header);
@@ -199,13 +262,6 @@ public static class ZMQServer {
 			 string content) {
 	    string signature = auth.sign(new List<string>() {header, parent_header, 
 							     metadata, content});
-	    Console.WriteLine("send: [{0} {1} {2} {3} {4} {5}]",
-			      "<IDS|MSG>",
-			      signature,
-			      header,
-			      parent_header,
-			      metadata,
-			      content);
 	    send_multipart(channel,
 			   new List<string>() 
 			   {"<IDS|MSG>",
@@ -231,34 +287,13 @@ public static class ZMQServer {
 
     public class ShellChannel : Channel {
 	public int execution_count = 1;
+
 	public ShellChannel(Session session, 
 			    Authorization auth, 
 			    string transport, 
 			    string address, 
 			    string port) : 
 	    base(session, auth, transport, address, port, SocketType.DEALER) {
-	}
-
-	public IDictionary<string, object> Header(string date, 
-		      string msg_id,
-		      string username,
-		      string session,
-		      string msg_type) {
-	    Dictionary<string,object> dict = new Dictionary<string,object>();
-	    dict["date"] = date;
-	    dict["msg_id"] = msg_id;
-	    dict["username"] = username;
-	    dict["session"] = session;
-	    dict["msg_type"] = msg_type;
-	    return dict;
-	}
-
-	public static string now() {
-	    return DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.ffffff");
-	}
-
-	public static string msg_id() {
-	    return System.Guid.NewGuid().ToString();
 	}
 
 	public override void on_recv(string m_signature, 
@@ -268,7 +303,6 @@ public static class ZMQServer {
 				IDictionary<string, object> m_content) {
 
 	    // Shell handler
-	    Console.WriteLine("on_recv" + m_header["msg_type"]);
 	    if (m_header["msg_type"].ToString() == "execute_request") {
 		var header = Header(now(),
 				    msg_id(),
@@ -296,80 +330,14 @@ public static class ZMQServer {
 		};
 		send(session.iopub_channel, header, m_header, metadata, content);
 		// ---------------------------------------------------
-		header = Header(now(),
-				msg_id(),
-				"kernel",
-				m_header["session"].ToString(),
-				"pyout");
-		metadata = new Dictionary<string, object>();
 
 		string code = m_content["code"].ToString().Trim();
-		object retval = null;
-		if (code.StartsWith(":")) { // :lang 
+		if (code.StartsWith(":") && session.calico != null) { // :lang 
 		    session.calico.CurrentLanguage = code.Substring(6).Trim();
-		    retval = "Calico Language is now set to " + code.Substring(1);
 		} else {
-		    // FIXME: just use Execute, and get output in window
-		    try {
-			retval = session.calico.Evaluate(code);
-			if (retval != null) {
-			    retval = retval.ToString();
-			}
-		    } catch {
-			try {
-			    session.calico.Execute(code);
-			    retval = "Ok";
-			} catch {
-			    retval = "ERROR";
-			}
-		    }
+		    // Execute in background, and report results
+		    ExecuteInBackgound(code, m_header, execution_count);
 		}
-
-		content = new Dictionary<string, object>
-		{
-		    {"execution_count", execution_count},
-		    {"data", new Dictionary<string, object>
-		     {
-                         {"text/plain", retval}
-                     }
-		    },
-		    {"metadata", new Dictionary<string, object>()}
-		};
-		send(session.iopub_channel, header, m_header, metadata, content);
-		// ---------------------------------------------------
-		header = Header(now(),
-				msg_id(),
-				"kernel",
-				m_header["session"].ToString(),
-				"status");
-		metadata = new Dictionary<string, object>();
-		content = new Dictionary<string, object>
-		{
-		    {"execution_state", "idle"}
-		};
-		send(session.iopub_channel, header, m_header, metadata, content);
-		// ---------------------------------------------------
-		header = Header(now(),
-				msg_id(),
-				"kernel",
-				m_header["session"].ToString(),
-				"execute_reply");
-		metadata = new Dictionary<string, object>
-		{
-		    {"dependencies_met", true},
-		    {"engine", session.engine_id},
-		    {"status", "ok"},
-		    {"started", now()}
-		};
-		content = new Dictionary<string, object>
-		{
-		    {"status", "ok"},
-		    {"execution_count", execution_count},
-		    {"user_variables", new Dictionary<string, object>()},
-		    {"payload", new List<object>()},
-		    {"user_expressions", new Dictionary<string, object>()}
-		};
-		send(session.shell_channel, header, m_header, metadata, content);
 		execution_count += 1;
 	    } else if (m_header["msg_type"].ToString() == "kernel_info_request") {
 		var header = Header(now(),
@@ -401,6 +369,67 @@ public static class ZMQServer {
 	    } else {
 		throw new Exception("unknown msg_type: " + m_header["msg_type"]);
 	    }
+	}
+
+	public void ExecuteInBackgound(string code, IDictionary<string, object> m_header, int execution_count) {
+	    session.SetOutputs(execution_count, m_header);
+	    var header = Header(now(),
+				msg_id(),
+				"kernel",
+				m_header["session"].ToString(),
+				"pyout");
+	    var metadata = new Dictionary<string, object>();
+	    
+	    if (session.calico != null) {
+		session.calico.Execute(code);
+	    }
+	    
+	    var content = new Dictionary<string, object>
+		{
+		    {"execution_count", execution_count},
+		    {"data", new Dictionary<string, object>
+		     {
+                         {"text/plain", "Ok"}
+                     }
+		    },
+		    {"metadata", new Dictionary<string, object>()}
+		};
+	    send(session.iopub_channel, header, m_header, metadata, content);
+	    // ---------------------------------------------------
+	    header = Header(now(),
+			    msg_id(),
+			    "kernel",
+			    m_header["session"].ToString(),
+			    "status");
+	    metadata = new Dictionary<string, object>();
+	    content = new Dictionary<string, object>
+		{
+		    {"execution_state", "idle"}
+		};
+	    send(session.iopub_channel, header, m_header, metadata, content);
+	    // ---------------------------------------------------
+	    header = Header(now(),
+			    msg_id(),
+			    "kernel",
+			    m_header["session"].ToString(),
+			    "execute_reply");
+	    metadata = new Dictionary<string, object>
+		{
+		    {"dependencies_met", true},
+		    {"engine", session.engine_id},
+		    {"status", "ok"},
+		    {"started", now()}
+		};
+	    content = new Dictionary<string, object>
+		{
+		    {"status", "ok"},
+		    {"execution_count", execution_count},
+		    {"user_variables", new Dictionary<string, object>()},
+		    {"payload", new List<object>()},
+		    {"user_expressions", new Dictionary<string, object>()}
+		};
+	    send(session.shell_channel, header, m_header, metadata, content);
+	    session.SetOutputs(0, null);
 	}
     }
 
@@ -451,12 +480,38 @@ public static class ZMQServer {
 	}
     }
 
-    public static void Main(Calico.MainWindow calico, string config_file) {
-	Session session = new Session(calico, config_file);
+    public static Session session;
+
+    public static void StdErrWrite(string message) {
+	if (session != null) {
+	    session.StdErrWrite(message);
+	} else {
+	    System.Console.Error.Write(message);
+	}
+    }
+
+    public static void StdOutWrite(string message) {
+	if (session != null) {
+	    session.StdOutWrite(message);
+	} else {
+	    System.Console.Write(message);
+	}
+    }
+
+    /*
+    public static void Main(string [] args) {
+	session = new Session(null, args[0]);
 	session.start();
 	while (true) {
-	    Console.Write(".");
-	    Console.Out.Flush();
+	    Thread.Sleep ((int)(1 * 1000)); // seconds
+	}
+    }
+    */
+
+    public static void Start(Calico.MainWindow calico, string config_file) {
+	session = new Session(calico, config_file);
+	session.start();
+	while (true) {
 	    Thread.Sleep ((int)(1 * 1000)); // seconds
 	}
     }

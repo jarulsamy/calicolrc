@@ -543,10 +543,18 @@ namespace Calico {
             return path;
         }
 
+	public virtual CustomStream GetStdOut() {
+	    return new CustomStream(this, Tag.Normal);
+	}
+
+	public virtual CustomStream GetStdErr() {
+	    return new CustomStream(this, Tag.Error);
+	}
+
         void configureIO() {
             if (! Debug) {
-                CustomStream nout = new CustomStream(this, Tag.Normal);
-                CustomStream nerr = new CustomStream(this, Tag.Error);
+                CustomStream nout = GetStdOut();
+                CustomStream nerr = GetStdErr();
                 manager.SetRedirects(nout, nerr);
 
                 StreamWriter swout = new StreamWriter(nout);
@@ -2549,6 +2557,10 @@ del _invoke, _
 
         public static Gtk.TextTag TagColor(Tag tag) {
             return tags [tag];
+        }
+
+        public void Warn(string format) {
+            Print(Tag.Warning, format);
         }
 
         public void Print(string format) {

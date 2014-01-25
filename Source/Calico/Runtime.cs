@@ -389,7 +389,15 @@ namespace Calico {
 		    }
                 }
             }
-	    ZMQServer.Main(this, config_file);
+	    ZMQServer.Start(this, config_file);
+        }
+
+        public new void Print(Tag tag, string format) {
+	    if (tag == Tag.Error) {
+		ZMQServer.StdErrWrite(format);
+	    } else {
+		ZMQServer.StdOutWrite(format);
+	    }
         }
     }
 }
