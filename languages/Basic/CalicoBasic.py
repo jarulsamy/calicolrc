@@ -21,6 +21,10 @@ class MyEngine(Calico.Engine):
         self.interpreter.Execute(text)
         return True
 
+    def Evaluate(self, text):
+        self.interpreter.Execute(text)
+        return "Ok"
+
     def ExecuteFile(self, filename):
         fp = file(filename)
         text = "".join(fp.readlines())

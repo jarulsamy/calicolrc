@@ -43,6 +43,15 @@ class MyLanguageEngine(Calico.Engine):
         import cash
         return cash.executeLines(self.calico, text, [["<module>", 1, 0, len(text), "'Calico Shell'"]])
 
+    def Evaluate(self, text):
+        """
+        This is where you do something for the text (code). This is
+        the interpreter.
+        """
+        import cash
+        cash.executeLines(self.calico, text, [["<module>", 1, 0, len(text), "'Calico Shell'"]])
+        return "Ok"
+
     def ExecuteFile(self, filename):
         """
         This is the code that will interprete a file.
