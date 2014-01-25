@@ -551,7 +551,7 @@ namespace Calico {
 	    return new CustomStream(this, Tag.Error);
 	}
 
-        void configureIO() {
+        public void configureIO() {
             if (! Debug) {
                 CustomStream nout = GetStdOut();
                 CustomStream nerr = GetStdErr();
@@ -565,7 +565,6 @@ namespace Calico {
                 swerr.AutoFlush = true;
                 Console.SetError(swerr);
             }
-
         }
 
 	void AddGotoFileToMenu(String text, Gtk.PopulatePopupArgs args) {
@@ -2605,7 +2604,12 @@ del _invoke, _
             Print(tag, format + "\n");
         }
 
-        public void Print(Tag tag, string format) {
+	public static string now() {
+	    return DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.ffffff");
+	}
+
+        public virtual void Print(Tag tag, string format) {
+	    System.IO.File.WriteAllText(String.Format("/home/dblank/log.{0}", now()), "configureIO");
             if (Debug) {
                 Console.Write(format);
             } else {

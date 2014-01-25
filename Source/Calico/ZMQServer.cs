@@ -163,6 +163,7 @@ public static class ZMQServer {
 	    }
 	}
 
+	// Session:
 	public void StdOutWrite(string message) {
 	    if (current_execution_count > 0) {
 		var header = Header(now(),
@@ -372,35 +373,40 @@ public static class ZMQServer {
 	}
 
 	public void ExecuteInBackgound(string code, IDictionary<string, object> m_header, int execution_count) {
-	    session.SetOutputs(execution_count, m_header);
 	    var header = Header(now(),
 				msg_id(),
 				"kernel",
 				m_header["session"].ToString(),
 				"pyout");
 	    var metadata = new Dictionary<string, object>();
-	    string retval = "";
+	    string retval = null;
+	    session.SetOutputs(execution_count, m_header);
 	    if (session.calico != null) {
 		try {
 		    object obj = session.calico.Evaluate(code);
 		    if (obj != null)
 			retval = obj.ToString();
+		    else
+			retval = null;
 		} catch (Exception e) {
 		    retval = e.ToString();
 		}
 	    }
-	    
-	    var content = new Dictionary<string, object>
-		{
-		    {"execution_count", execution_count},
-		    {"data", new Dictionary<string, object>
-		     {
-                         {"text/plain", retval}
-                     }
-		    },
-		    {"metadata", new Dictionary<string, object>()}
-		};
-	    send(session.iopub_channel, header, m_header, metadata, content);
+	    session.SetOutputs(0, null);
+	    Dictionary<string, object> content = null;
+	    if (retval != null) {
+		content = new Dictionary<string, object>
+		    {
+			{"execution_count", execution_count},
+			{"data", new Dictionary<string, object>
+			 {
+			     {"text/plain", retval}
+			 }
+			},
+			{"metadata", new Dictionary<string, object>()}
+		    };
+		send(session.iopub_channel, header, m_header, metadata, content);
+	    }
 	    // ---------------------------------------------------
 	    header = Header(now(),
 			    msg_id(),
@@ -435,7 +441,6 @@ public static class ZMQServer {
 		    {"user_expressions", new Dictionary<string, object>()}
 		};
 	    send(session.shell_channel, header, m_header, metadata, content);
-	    session.SetOutputs(0, null);
 	}
     }
 
@@ -488,19 +493,21 @@ public static class ZMQServer {
 
     public static Session session;
 
+    // ZMQServer:
     public static void StdErrWrite(string message) {
 	if (session != null) {
 	    session.StdErrWrite(message);
 	} else {
-	    System.Console.Error.Write(message);
+	    //System.Console.Error.Write(message);
 	}
     }
 
+    // ZMQServer:
     public static void StdOutWrite(string message) {
 	if (session != null) {
 	    session.StdOutWrite(message);
 	} else {
-	    System.Console.Write(message);
+	    //System.Console.Write(message);
 	}
     }
 

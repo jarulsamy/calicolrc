@@ -43,6 +43,7 @@ namespace Calico {
             this.Debug = Debug;
             this.manager = manager;
             manager.SetCalico(this);
+            //configureIO();
             CurrentLanguage = "python";
 
             gui_thread_id = Thread.CurrentThread.ManagedThreadId;
@@ -120,20 +121,6 @@ namespace Calico {
 	public new double ProgramSpeedValue {
 	    get { return 100;}
 	    set {}
-	}
-
-	public void ActivateLanguage(string language, string backup) {
-	    if (manager.languages.ContainsKey(language) && manager[language].engine == null) {
-		manager.Register(manager[language], true);
-		manager[language].engine.Setup(path);
-		manager[language].engine.Start(path);
-		manager[language].engine.PostSetup(this);
-	    }
-	    if (manager[CurrentLanguage].engine == null) {
-		CurrentLanguage = backup;
-	    } else {
-		CurrentLanguage = language;
-	    }
 	}
 
 	public void usage() {
@@ -277,7 +264,7 @@ namespace Calico {
 	    return (answer.Substring(0,1).ToLower() == "y");
 	}
 
-        public new void Print(Tag tag, string format) {
+        public override void Print(Tag tag, string format) {
 	    if (tag == Tag.Error) {
 		System.Console.Error.Write(format);
 	    } else {
@@ -304,6 +291,7 @@ namespace Calico {
             this.Debug = Debug;
             this.manager = manager;
             manager.SetCalico(this);
+            //configureIO();
             CurrentLanguage = "python";
 
             path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
@@ -352,6 +340,7 @@ namespace Calico {
             this.Debug = Debug;
             this.manager = manager;
             manager.SetCalico(this);
+            configureIO();
             CurrentLanguage = "python";
 
             path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
@@ -392,7 +381,7 @@ namespace Calico {
 	    ZMQServer.Start(this, config_file);
         }
 
-        public new void Print(Tag tag, string format) {
+        public override void Print(Tag tag, string format) {
 	    if (tag == Tag.Error) {
 		ZMQServer.StdErrWrite(format);
 	    } else {
