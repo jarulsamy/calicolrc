@@ -245,7 +245,9 @@ namespace Calico {
                 withGraphics = true;
             }
             // Process executable commands here:
-            if (((IList<string>)args).Contains("--exec")) {
+            if (((IList<string>)args).Contains("--server")) {
+		win = new CalicoServer(args, manager, Debug, config); 
+            } else if (((IList<string>)args).Contains("--exec")) {
 		// implies running with noconsole, with or without repl
 		if (withGraphics) {
 		    Application.Init();

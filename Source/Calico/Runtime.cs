@@ -344,6 +344,53 @@ namespace Calico {
 	    }
         }
     }
+
+    public partial class CalicoServer: CalicoConsole {
+        public CalicoServer (string[] args, LanguageManager manager, bool Debug, Config config) {
+	    this.args = args;
+            this.config = config;
+            this.Debug = Debug;
+            this.manager = manager;
+            manager.SetCalico(this);
+            CurrentLanguage = "python";
+
+            path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
+            if (path.StartsWith("\\")) {
+                path = path.Substring(1);
+            }
+
+	    if (!((IList<string>)args).Contains("--nomodules")) {
+		manager.PostSetup(this); 
+	    }
+
+	    string config_file = "";
+            for(int i = 0; i < args.Length; i++) {
+		string arg = args[i];
+                if (arg.StartsWith("--")) {
+		    if (arg.StartsWith("--lang=")) {
+			string [] parts = arg.Split('=');
+			CurrentLanguage = parts[1];
+		    } else if (arg == "--server") {
+			config_file = args[i + 1];
+			i++;
+		    }
+		} else {
+                    CurrentLanguage = manager.GetLanguageFromExtension(arg);
+		    string filename = System.IO.Path.GetFullPath(arg);
+		    string dirname = System.IO.Path.GetDirectoryName(filename);
+		    if (dirname != "" && dirname != null) {
+			if (System.IO.File.Exists(arg)) {
+			    System.IO.Directory.SetCurrentDirectory(dirname);
+			    //System.Console.WriteLine("cd: " + dirname);
+			    manager [CurrentLanguage].engine.ExecuteFile(filename);
+			} else {
+			    Console.Error.WriteLine("Error: no such file '{0}'; skipping...", arg);
+			}
+		    }
+                }
+            }
+	    ZMQServer.Main(this, config_file);
+        }
+    }
 }
 
-// enter not on bottom row inserts, not executes

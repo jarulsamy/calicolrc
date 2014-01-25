@@ -32,6 +32,8 @@
     <ConsolePause>False</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="clrzmq" />
+    <Reference Include="Newtonsoft.Json" />
     <Reference Include="System" />
     <Reference Include="pango-sharp, Version=2.12.0.0, Culture=neutral, PublicKeyToken=35e10195dab3c99f">
       <Private>False</Private>
@@ -90,6 +92,7 @@
     <Compile Include="LanguageManager.cs" />
     <Compile Include="History.cs" />
     <Compile Include="TabCompletion.cs" />
+    <Compile Include="ZMQServer.cs" />
     <Compile Include="..\..\modules\Reflection\Reflection.cs">
       <Link>Reflection.cs</Link>
     </Compile>
