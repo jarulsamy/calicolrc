@@ -4,6 +4,7 @@
 using System;
 using System.Text;
 using System.IO;
+using System.Threading;
 using ZeroMQ;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters; // CustomCreationConverter
@@ -68,8 +69,11 @@ public static class ZMQServer {
     public class Session {
 	public string filename;
 	public string session_id;
+	public HeartBeatChannel hb_channel;
 	public ShellChannel shell_channel;
 	public IOPubChannel iopub_channel;
+	public ControlChannel control_channel;
+	public StdInChannel stdin_channel;
 	public Authorization auth;
 	public string engine_id;
 
@@ -81,6 +85,10 @@ public static class ZMQServer {
 	    var config = decode(json);
 	    auth = new Authorization(config["key"].ToString(),
 				     config["signature_scheme"].ToString());
+	    hb_channel = new HeartBeatChannel(this, auth,
+		    config["transport"].ToString(), 
+		    config["ip"].ToString(),
+		    config["hb_port"].ToString());
 	    shell_channel = new ShellChannel(this, auth,
 		    config["transport"].ToString(), 
 		    config["ip"].ToString(),
@@ -89,6 +97,21 @@ public static class ZMQServer {
 		    config["transport"].ToString(), 
 		    config["ip"].ToString(),
 		    config["iopub_port"].ToString());
+	    control_channel = new ControlChannel(this, auth,
+		    config["transport"].ToString(), 
+		    config["ip"].ToString(),
+		    config["control_port"].ToString());
+	    stdin_channel = new StdInChannel(this, auth,
+		    config["transport"].ToString(), 
+		    config["ip"].ToString(),
+		    config["stdin_port"].ToString());
+	}
+
+	public void start() {
+	    hb_channel.thread.Start();
+	    shell_channel.thread.Start();
+	    control_channel.thread.Start();
+	    stdin_channel.thread.Start();
 	}
     }
 
@@ -100,6 +123,7 @@ public static class ZMQServer {
 	public ZmqSocket socket;
 	public string port;
 	public Authorization auth;
+	public Thread thread;
 
 	public Channel(Session session, 
 		       Authorization auth, 
@@ -117,9 +141,10 @@ public static class ZMQServer {
 	    socket.Bind(
 		String.Format("{0}://{1}:{2}", 
 			      this.transport, this.address, this.port));
+	    thread = new Thread (new ThreadStart (loop));
 	}
 
-	public void loop() {
+	public virtual void loop() {
 	    while (true) {
 		string message = socket.Receive(Encoding.UTF8);
 		while (message != "<IDS|MSG>") {
@@ -364,8 +389,50 @@ public static class ZMQServer {
 	}
     }
 
+    public class ControlChannel : Channel {
+	public ControlChannel(Session session, 
+			    Authorization auth, 
+			    string transport, 
+			    string address, 
+			    string port) : 
+	    base(session, auth, transport, address, port, SocketType.DEALER) {
+	}
+    }
+
+    public class StdInChannel : Channel {
+	public StdInChannel(Session session, 
+			    Authorization auth, 
+			    string transport, 
+			    string address, 
+			    string port) : 
+	    base(session, auth, transport, address, port, SocketType.DEALER) {
+	}
+    }
+
+    public class HeartBeatChannel : Channel {
+	public HeartBeatChannel(Session session, 
+			    Authorization auth, 
+			    string transport, 
+			    string address, 
+			    string port) : 
+	    base(session, auth, transport, address, port, SocketType.REP) {
+	}
+
+	public override void loop() {
+	    while (true) {
+		string message = socket.Receive(Encoding.UTF8);
+		socket.Send(message, Encoding.UTF8);
+	    }
+	}
+    }
+
     static void Main(string[] args) {
 	Session session = new Session(args[0]);
-	session.shell_channel.loop();
+	session.start();
+	while (true) {
+	    Console.Write(".");
+	    Console.Out.Flush();
+	    Thread.Sleep ((int)(1 * 1000)); // seconds
+	}
     }
 }
