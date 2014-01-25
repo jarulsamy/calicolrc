@@ -309,7 +309,11 @@ public static class ZMQServer {
 		    session.calico.CurrentLanguage = code.Substring(1);
 		    retval = "Calico Language is now set to " + code.Substring(1);
 		} else {
-		    retval = session.calico.Evaluate(code, session.calico.CurrentLanguage);
+		    try {
+			retval = session.calico.Evaluate(code, session.calico.CurrentLanguage);
+		    } catch {
+			retval = "Error!";
+		    }
 		    if (retval != null) {
 			retval = retval.ToString();
 		    }
