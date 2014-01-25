@@ -303,19 +303,25 @@ public static class ZMQServer {
 				"pyout");
 		metadata = new Dictionary<string, object>();
 
-		string code = m_content["code"].ToString();
+		string code = m_content["code"].ToString().Trim();
 		object retval = null;
-		if (code.StartsWith(":")) {
-		    session.calico.CurrentLanguage = code.Substring(1);
+		if (code.StartsWith(":")) { // :lang 
+		    session.calico.CurrentLanguage = code.Substring(6).Trim();
 		    retval = "Calico Language is now set to " + code.Substring(1);
 		} else {
+		    // FIXME: just use Execute, and get output in window
 		    try {
-			retval = session.calico.Evaluate(code, session.calico.CurrentLanguage);
+			retval = session.calico.Evaluate(code);
+			if (retval != null) {
+			    retval = retval.ToString();
+			}
 		    } catch {
-			retval = "Error!";
-		    }
-		    if (retval != null) {
-			retval = retval.ToString();
+			try {
+			    session.calico.Execute(code);
+			    retval = "Ok";
+			} catch {
+			    retval = "ERROR";
+			}
 		    }
 		}
 

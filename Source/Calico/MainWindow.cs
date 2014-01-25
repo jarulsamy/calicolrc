@@ -2388,6 +2388,12 @@ namespace Calico {
             return manager [language].engine.Execute(text, false);
 	}
 
+        public void Execute(string text) {
+	    if (CurrentLanguage == null)
+		return;
+	    manager [CurrentLanguage].engine.Execute(text);
+        }
+
         public bool ExecuteInBackground(string text, string language) {
             if (ProgramRunning) {
                 return false;
@@ -2412,6 +2418,10 @@ namespace Calico {
 
         public object Evaluate(string text, string language) {
             return manager [language].engine.Evaluate(text);
+        }
+
+        public object Evaluate(string text) {
+            return manager [CurrentLanguage].engine.Evaluate(text);
         }
 
         public void ExecuteInBackground(string text) {
