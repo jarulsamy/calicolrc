@@ -1245,6 +1245,20 @@ namespace Calico {
 	    }
 	}
 
+	public void ActivateLanguage(string language, string backup) {
+	    if (manager.languages.ContainsKey(language) && manager[language].engine == null) {
+		manager.Register(manager[language], true);
+		manager[language].engine.Setup(path);
+		manager[language].engine.Start(path);
+		manager[language].engine.PostSetup(this);
+	    }
+	    if (manager[CurrentLanguage].engine == null) {
+		CurrentLanguage = backup;
+	    } else {
+		CurrentLanguage = language;
+	    }
+	}
+
         public void SetLanguage(string language) {
 	    if (language == null)
 		return;

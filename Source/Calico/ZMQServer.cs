@@ -333,7 +333,7 @@ public static class ZMQServer {
 
 		string code = m_content["code"].ToString().Trim();
 		if (code.StartsWith(":") && session.calico != null) { // :lang 
-		    session.calico.CurrentLanguage = code.Substring(6).Trim();
+		    session.calico.ActivateLanguage(code.Substring(6).Trim(), session.calico.CurrentLanguage);
 		} else {
 		    // Execute in background, and report results
 		    ExecuteInBackgound(code, m_header, execution_count);
@@ -379,9 +379,15 @@ public static class ZMQServer {
 				m_header["session"].ToString(),
 				"pyout");
 	    var metadata = new Dictionary<string, object>();
-	    
+	    string retval = "";
 	    if (session.calico != null) {
-		session.calico.Execute(code);
+		try {
+		    object obj = session.calico.Evaluate(code);
+		    if (obj != null)
+			retval = obj.ToString();
+		} catch (Exception e) {
+		    retval = e.ToString();
+		}
 	    }
 	    
 	    var content = new Dictionary<string, object>
@@ -389,7 +395,7 @@ public static class ZMQServer {
 		    {"execution_count", execution_count},
 		    {"data", new Dictionary<string, object>
 		     {
-                         {"text/plain", "Ok"}
+                         {"text/plain", retval}
                      }
 		    },
 		    {"metadata", new Dictionary<string, object>()}
