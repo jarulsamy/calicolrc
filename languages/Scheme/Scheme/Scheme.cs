@@ -3257,6 +3257,7 @@ public class Scheme {
 	  s.Append(this.car.ToString());
 	  object sexp = this.cdr;
 	  while (sexp is Cons) {
+	      s.Append(" ");
 	      s.Append((((Cons)sexp).car).ToString());
 	      sexp = ((Cons)sexp).cdr;
 	  }
