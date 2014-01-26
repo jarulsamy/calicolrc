@@ -47,6 +47,10 @@ class InteractiveInterpreter(Boo.Lang.Interpreter.InteractiveInterpreter):
 
 # Now, define the Document, Engine, and Language classes:
 class BooEngine(Calico.Engine):
+    #def SetRedirects(self, stdout, stderr):
+    #    System.Console.SetOut(stdout)
+    #    System.Console.SetError(stderr)
+
     def PostSetup(self, calico):
         """
         Do things here that you want to do once (initializations).
@@ -55,6 +59,15 @@ class BooEngine(Calico.Engine):
         self.interpreter = InteractiveInterpreter()
         self.interpreter.RememberLastValue = True
         self.interpreter.SetValue("calico", calico)
+
+    def Evaluate(self, text):
+        compiler_context = self.interpreter.Eval(text)
+        error = False
+        for e in compiler_context.Errors:
+            if e.Code != 'BCE0034': # side-effects, don't report
+                return error
+        result = self.interpreter._lastValue
+        return result
 
     def Execute(self, text, feedback=True):
         """
