@@ -32,7 +32,7 @@ using Mono.Terminal;
 
 namespace Calico {
     public partial class CalicoConsole: MainWindow {
-	// ran with --graphics or without
+	// ran without --nographics
        
         public CalicoConsole(): base(){}
 
@@ -224,7 +224,7 @@ namespace Calico {
 		}
             }
 	    // If running with graphics, we need to tell everything to stop:
-	    if (((IList<string>)this.args).Contains("--graphics")) {
+	    if (!((IList<string>)this.args).Contains("--nographics")) {
 		Environment.Exit(0);
 	    }
         }
@@ -284,7 +284,7 @@ namespace Calico {
     }
 
     public partial class CalicoConsoleNoGUI: CalicoConsole{
-	// ran without --graphics
+	// ran with --nographics
         public CalicoConsoleNoGUI(string[] args, LanguageManager manager, bool Debug, Config config, bool startREPL){
 	    this.args = args;
             this.config = config;

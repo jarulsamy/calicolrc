@@ -240,28 +240,34 @@ namespace Calico {
             if (((IList<string>)args).Contains("--debug")) {
                 Debug = true;
             }
-            bool withGraphics = false;
-            if (((IList<string>)args).Contains("--graphics")) {
-                withGraphics = true;
+            bool withGraphics = true;
+            if (((IList<string>)args).Contains("--nographics")) {
+                withGraphics = false;
             }
             // Process executable commands here:
-            if (((IList<string>)args).Contains("--server")) {
-		win = new CalicoServer(args, manager, Debug, config); 
-            } else if (((IList<string>)args).Contains("--exec")) {
+	    if (((IList<string>)args).Contains("--exec") || ((IList<string>)args).Contains("--server")) {
 		// implies running with noconsole, with or without repl
 		if (withGraphics) {
 		    Application.Init();
 		    // run in background if repl:
-		    if (((IList<string>)args).Contains("--repl")) {
+		    if (((IList<string>)args).Contains("--repl") || ((IList<string>)args).Contains("--server")) {
 			System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
 				Application.Run();
 			    });
 			//thread.IsBackground = true;
 			thread.Start();
 		    }
-		    win = new CalicoConsole(args, manager, Debug, config, ((IList<string>)args).Contains("--repl")); 
+		    if (((IList<string>)args).Contains("--server")) {
+			win = new CalicoServer(args, manager, Debug, config); 
+		    } else {
+			win = new CalicoConsole(args, manager, Debug, config, ((IList<string>)args).Contains("--repl")); 
+		    }
 		} else {
-		    win = new CalicoConsoleNoGUI(args, manager, Debug, config, ((IList<string>)args).Contains("--repl")); 
+		    if (((IList<string>)args).Contains("--server")) {
+			win = new CalicoServer(args, manager, Debug, config); 
+		    } else {
+			win = new CalicoConsoleNoGUI(args, manager, Debug, config, ((IList<string>)args).Contains("--repl")); 
+		    }
 		}
 		// run now, if not repl:
 		if (!((IList<string>)args).Contains("--repl")) {
@@ -334,7 +340,7 @@ namespace Calico {
             Print(_("  StartCalico --lang=LANGUAGE    Sets default language (python, etc.)"));
             Print(_("  StartCalico --exec FILENAMEs   Run FILENAMEs"));
             Print(_("  StartCalico --repl FILENAMEs   Run FILENAMEs and starts read-eval-print loop"));
-            Print(_("  StartCalico   --graphics       Run with graphics (with --exec or --repl)"));
+            Print(_("  StartCalico   --nographics     Don't run with graphics (with --exec, --repl)"));
 	    Print(_("  StartCalico   --noquit         Don't quit after executing file with --exec"));
 	    Print(_("  StartCalico --nomodules        Does not load the modules from modules/*.dll"));
             Print(_("  StartCalico --version          Displays the version number ({0})"), Version);
@@ -342,6 +348,7 @@ namespace Calico {
             Print(_("  StartCalico --debug            Calico output goes to console rather than GUI"));
             Print(_("  StartCalico --debug-handler    Calico will not catch system errors"));
             Print(_("  StartCalico --reset            Resets config settings to factory defaults"));
+            Print(_("  StartCalico --server FILENAME  Used as a backend language kernel for IPython"));
             Print(_("  StartCalico --help             Displays this message"));
             Print("");
         }
