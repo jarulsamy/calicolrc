@@ -11,6 +11,59 @@ using Newtonsoft.Json.Converters; // CustomCreationConverter
 using System.Collections.Generic; // IDictionary
 using System.Security.Cryptography;
 
+// IList
+using System.Collections;
+using System.Reflection;// IEnumerator
+
+public static class Extensions
+{
+	public static T[] Slice<T> (this T[] source, int start, int end)
+	{
+		if (start == 0 && end == source.Length)
+			return source;
+		// Handles negative ends.
+		if (end < 0) {
+			end = source.Length + end;
+		}
+		int len = end - start;
+		// Return new array.
+		T[] res = new T[len];
+		for (int i = 0; i < len; i++) {
+			res [i] = source [i + start];
+		}
+		return res;
+	}
+
+	public static T[] Slice<T> (this T[] source, int start)
+	{
+		int end = source.Length;
+		if (start == 0 && end == source.Length)
+			return source;
+		int len = end - start;
+		// Return new array.
+		T[] res = new T[len];
+		for (int i = 0; i < len; i++) {
+			res [i] = source [i + start];
+		}
+		return res;
+	}
+
+	public static object[] Slice (this IList source, int start, int end)
+	{
+		// Handles negative ends.
+		if (end < 0) {
+			end = source.Count + end;
+		}
+		int len = end - start;
+		// Return new array.
+		object[] res = new object[len];
+		for (int i = 0; i < len; i++) {
+			res [i] = source [i + start];
+		}
+		return res;
+	}
+}
+
 public static class ZMQServer {
 
     public static string encode(IDictionary<string, object> dict) {
@@ -331,14 +384,21 @@ public static class ZMQServer {
 		};
 		send(session.iopub_channel, header, m_header, metadata, content);
 		// ---------------------------------------------------
-
-		string code = m_content["code"].ToString().Trim();
-		if (code.StartsWith(":") && session.calico != null) { // :lang 
-		    string language = code.Substring(6).Trim().ToLower();
-		    string message = "Unknown language: " + language;
+		// First, handle any Calico metacommands:
+		string code = m_content["code"].ToString();
+		if (code.StartsWith(":lang") && session.calico != null) { // :lang 
+		    string [] lines = code.Split(new string[] { "\r\n", "\n" }, 
+						 System.StringSplitOptions.None);
+		    string language = lines[0].Substring(6).Trim().ToLower();
+		    if (lines.Length > 1) {
+			code = String.Join("\n", lines.Slice(1));
+		    } else {
+			code = "";
+		    }
+		    string message = String.Format("Unknown language: '{0}'", language);
 		    if (session.calico.manager.ContainsKey(language)) {
 			session.calico.ActivateLanguage(language, session.calico.CurrentLanguage);
-			message = "Calico Language is now " + session.calico.GetCurrentProperLanguage();
+			message = String.Format("Calico Language is now '{0}' {1}", session.calico.GetCurrentProperLanguage(), code);
 		    }
 		    header = Header(now(),
 				    msg_id(),
@@ -356,6 +416,8 @@ public static class ZMQServer {
 			    {"metadata", new Dictionary<string, object>()}
 			};
 		    send(session.iopub_channel, header, m_header, metadata, content);
+		}
+		if (code.Trim() == "") {
 		    header = Header(now(),
 				    msg_id(),
 				    "kernel",
@@ -389,10 +451,10 @@ public static class ZMQServer {
 			    {"user_expressions", new Dictionary<string, object>()}
 			};
 		    send(session.shell_channel, header, m_header, metadata, content);
-		} else {
-		    // Execute in background, and report results
-		    ExecuteInBackground(code, m_header, execution_count);
+		    return;
 		}
+		// Execute in background, and report results
+		ExecuteInBackground(code, m_header, execution_count);
 		execution_count += 1;
 	    } else if (m_header["msg_type"].ToString() == "kernel_info_request") {
 		var header = Header(now(),
