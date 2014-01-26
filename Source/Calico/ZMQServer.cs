@@ -398,7 +398,7 @@ public static class ZMQServer {
 		    string message = String.Format("Unknown language: '{0}'", language);
 		    if (session.calico.manager.ContainsKey(language)) {
 			session.calico.ActivateLanguage(language, session.calico.CurrentLanguage);
-			message = String.Format("Calico Language is now '{0}' {1}", session.calico.GetCurrentProperLanguage(), code);
+			message = String.Format("Calico Language is now '{0}'", session.calico.GetCurrentProperLanguage());
 		    }
 		    header = Header(now(),
 				    msg_id(),
