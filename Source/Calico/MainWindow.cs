@@ -880,6 +880,10 @@ namespace Calico {
 	    return false;
 	}
 	
+	public string GetCurrentProperLanguage() {
+	    return manager[CurrentLanguage].proper_name;
+	}
+
         void OnChangeActiveLanguages(object sender, EventArgs e) {
             Gtk.MenuItem languages_menu = (Gtk.MenuItem)UIManager.GetWidget("/menubar2/CalicoAction/LanguagesAction");
             if (languages_menu == null) {

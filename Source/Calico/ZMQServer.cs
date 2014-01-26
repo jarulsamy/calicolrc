@@ -334,10 +334,64 @@ public static class ZMQServer {
 
 		string code = m_content["code"].ToString().Trim();
 		if (code.StartsWith(":") && session.calico != null) { // :lang 
-		    session.calico.ActivateLanguage(code.Substring(6).Trim(), session.calico.CurrentLanguage);
+		    string language = code.Substring(6).Trim().ToLower();
+		    string message = "Unknown language: " + language;
+		    if (session.calico.manager.ContainsKey(language)) {
+			session.calico.ActivateLanguage(language, session.calico.CurrentLanguage);
+			message = "Calico Language is now " + session.calico.GetCurrentProperLanguage();
+		    }
+		    header = Header(now(),
+				    msg_id(),
+				    "kernel",
+				    m_header["session"].ToString(),
+				    "pyout");
+		    content = new Dictionary<string, object>
+			{
+			    {"execution_count", execution_count},
+			    {"data", new Dictionary<string, object>
+			     {
+				 {"text/plain", message}
+			     }
+			    },
+			    {"metadata", new Dictionary<string, object>()}
+			};
+		    send(session.iopub_channel, header, m_header, metadata, content);
+		    header = Header(now(),
+				    msg_id(),
+				    "kernel",
+				    m_header["session"].ToString(),
+				    "status");
+		    metadata = new Dictionary<string, object>();
+		    content = new Dictionary<string, object>
+			{
+			    {"execution_state", "idle"}
+			};
+		    send(session.iopub_channel, header, m_header, metadata, content);
+		    // ---------------------------------------------------
+		    header = Header(now(),
+				    msg_id(),
+				    "kernel",
+				    m_header["session"].ToString(),
+				    "execute_reply");
+		    metadata = new Dictionary<string, object>
+			{
+			    {"dependencies_met", true},
+			    {"engine", session.engine_id},
+			    {"status", "ok"},
+			    {"started", now()}
+			};
+		    content = new Dictionary<string, object>
+			{
+			    {"status", "ok"},
+			    {"execution_count", execution_count},
+			    {"user_variables", new Dictionary<string, object>()},
+			    {"payload", new List<object>()},
+			    {"user_expressions", new Dictionary<string, object>()}
+			};
+		    send(session.shell_channel, header, m_header, metadata, content);
 		} else {
 		    // Execute in background, and report results
-		    ExecuteInBackgound(code, m_header, execution_count);
+		    ExecuteInBackground(code, m_header, execution_count);
 		}
 		execution_count += 1;
 	    } else if (m_header["msg_type"].ToString() == "kernel_info_request") {
@@ -367,12 +421,14 @@ public static class ZMQServer {
 			{"output", false}
 		    };
 		send(session.shell_channel, header, m_header, m_metadata, content);
+	    } else if (m_header["msg_type"].ToString() == "object_info_request") {
+		// FIXME: add object_info_request
 	    } else {
 		throw new Exception("unknown msg_type: " + m_header["msg_type"]);
 	    }
 	}
 
-	public void ExecuteInBackgound(string code, IDictionary<string, object> m_header, int execution_count) {
+	public void ExecuteInBackground(string code, IDictionary<string, object> m_header, int execution_count) {
 	    var header = Header(now(),
 				msg_id(),
 				"kernel",

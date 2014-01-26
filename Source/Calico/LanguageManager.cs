@@ -124,6 +124,14 @@ namespace Calico {
             }
         }
 
+        public bool ContainsKey(string lang) {
+            foreach (string language in languages.Keys) {
+                if (language == lang)
+		    return true;
+            }
+	    return false;
+        }
+
         public void PostSetup(MainWindow calico) {
             foreach (string language in languages.Keys) {
                 if (languages[language].engine != null)
