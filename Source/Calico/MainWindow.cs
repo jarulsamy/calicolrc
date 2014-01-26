@@ -2614,7 +2614,6 @@ del _invoke, _
 	}
 
         public virtual void Print(Tag tag, string format) {
-	    System.IO.File.WriteAllText(String.Format("/home/dblank/log.{0}", now()), "configureIO");
             if (Debug) {
                 Console.Write(format);
             } else {
