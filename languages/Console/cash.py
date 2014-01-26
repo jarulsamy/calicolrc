@@ -173,6 +173,8 @@ def setTraceButtons(filename, lineno, start, end):
             document.texteditor.SetSelection(lineno, start + 1, lineno, end + 1)
 
 def handleDebug(filename, lineno, start, end):
+    if Calico.MainWindow.serverMode:
+        return
     ## First, see if we need to do something:
     try:
         if (calico.CurrentDocument == None):

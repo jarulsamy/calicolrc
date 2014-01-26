@@ -31,6 +31,7 @@ using Calico;
 
 namespace Calico {
     public partial class MainWindow : Gtk.Window {
+	public bool serverMode = false;
         public Config config;
         public Gtk.Clipboard clipboard;
         private Mono.TextEditor.TextEditor _shell;

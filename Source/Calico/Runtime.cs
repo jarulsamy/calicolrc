@@ -335,6 +335,7 @@ namespace Calico {
 
     public partial class CalicoServer: CalicoConsole {
         public CalicoServer (string[] args, LanguageManager manager, bool Debug, Config config) {
+	    this.serverMode = true;
 	    this.args = args;
             this.config = config;
             this.Debug = Debug;
