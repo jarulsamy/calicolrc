@@ -1521,78 +1521,7 @@ public class Scheme {
   }
 
   public static string ToString(object obj) {
-	if (obj == null) {
-	  return "<void>"; // FIXME: should give void when forced
-	} else if (obj is System.Boolean) {
-	  return ((bool)obj) ? "#t" : "#f";
-	} else if (obj is IronPython.Runtime.List) {
-	  return ((IronPython.Runtime.List)obj).__repr__(
-		  IronPython.Runtime.DefaultContext.Default);
-	} else if (obj is IronPython.Runtime.PythonDictionary) {
-	  return ((IronPython.Runtime.PythonDictionary)obj).__repr__(
-		  IronPython.Runtime.DefaultContext.Default);
-	} else if (obj is IronPython.Runtime.PythonTuple) {
-	  return obj.ToString();
-	} else if (obj is System.Collections.Hashtable) {
-	    string retval = "";
-	    foreach (DictionaryEntry pair in (System.Collections.Hashtable)obj) {
-                retval += String.Format(" '({0} {1})", ToString(pair.Key), ToString(pair.Value));
-            }
-	    return "(dict" + retval + ")";
-	} else if (obj is Array) {
-	    //System.Console.WriteLine("Here 1");
-	  return (string)array_to_string((object[]) obj);
-	} else if (obj is double) {
-	  string s = obj.ToString();
-	  if (s.Contains("."))
-		return s;
-	  else
-		return String.Format("{0}.0", s);
-	} else if (obj is String) {
-	    return (string)obj;
-	} else if (obj is Symbol) {
-	    //System.Console.WriteLine("Here 2");
-	  return obj.ToString();
-	} else if (pair_q(obj)) {
-	    //System.Console.WriteLine("Here 3");
-	  if (procedure_q(obj)) {
-		return "#<procedure>";
-	  } else if (Eq(car(obj), symbol("environment"))) {
-		return "#<environment>"; //, car(obj));
-	  } else {
-	      //System.Console.WriteLine("Here 4");
-	      System.Text.StringBuilder retval = new System.Text.StringBuilder();
-	      object current = (Cons)obj;
-	      Dictionary<int,bool> ids = new Dictionary<int,bool>();
-	      ids[((Cons)current).id] = true;
-	      while (pair_q(current)) {
-		  //System.Console.WriteLine("Here 5");
-		  if (retval.Length != 0) {
-		      retval.Append(" ");
-		  } 
-		  object car_current = car(current);
-		  if (pair_q(car_current) && ids.ContainsKey(((Cons)car_current).id)) {
-		      retval.Append(" ...");
-		      current = null;
-		  } else {
-		      retval.Append(repr(car_current));
-		      current = cdr(current);
-		      if (pair_q(current) && ids.ContainsKey(((Cons)current).id)) {
-			  retval.Append(" ...");
-			  current = null;
-		      } else {
-			  if (!pair_q(current) && !Eq(current, EmptyList)) {
-			      retval.Append(" . ");
-			      retval.Append(repr(current)); // ...
-			  }
-		      }
-		  }
-	      }
-	      return retval.Insert(0, "(").Append(")").ToString();
-	  }
-	} else {
-	    return obj.ToString();
-	}
+      return repr(obj);
   }
 
   public static string repr(object obj) {
