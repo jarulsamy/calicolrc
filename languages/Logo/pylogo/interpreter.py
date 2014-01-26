@@ -677,6 +677,7 @@ class Interpreter(object):
         tokenizer = reader.FileTokenizer(input, output=output,
                                          prompt=self.prompts)
         self.push_tokenizer(tokenizer)
+        retval = None
         try:
             while 1:
                 try:
@@ -691,6 +692,7 @@ class Interpreter(object):
                     if tokenizer.context:
                         tokenizer.context = []
                         print('Aborted')
+                        break
                     else:
                         print("Bye")
                         break
@@ -703,7 +705,7 @@ class Interpreter(object):
                 if v is EOF:
                     break
                 if v is not None:
-                    print("%s" % repr(v))
+                    retval = repr(v)
         finally:
             self.pop_tokenizer()
 

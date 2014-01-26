@@ -19,8 +19,13 @@ import Calico
 class LogoEngine(Calico.Engine):
     Logo = Logo
 
-    def PostSetup(self, calico):
-        pass
+    def Evaluate(self, text):
+        retval = None
+        try:
+            retval = Logo.REP(StringTokenizer(text))
+        except Exception, e:
+            System.Console.Error.WriteLine("Caught exception: '%s'" % e.message)
+        return retval
 
     def Execute(self, text):
         try:
