@@ -5250,9 +5250,18 @@ public class PJScheme:Scheme
 																																					   PJScheme.
 																																					   list_ref
 																																					   ((object) temp_1, (object) 1);
-																																					PJScheme.
-																																					   set_global_value_b
-																																					   ((object) var, (object) value1_reg);
+																																					if (PJScheme.procedure_object_q ((object) value1_reg))
+																																					  {
+																																					     PJScheme.
+																																						set_global_value_b
+																																						((object) var, (object) PJScheme.dlr_func ((object) value1_reg));
+																																					  }
+																																					else
+																																					  {
+																																					     PJScheme.
+																																						set_global_value_b
+																																						((object) var, (object) value1_reg);
+																																					  }
 																																					PJScheme.
 																																					   set_global_docstring_b
 																																					   ((object) var, (object) docstring);

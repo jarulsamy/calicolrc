@@ -412,7 +412,9 @@
       (define!-aexp (var docstring rhs-exp info)
 	(m rhs-exp env handler fail
 	  (lambda-cont2 (rhs-value fail)
-	    (set-global-value! var rhs-value)
+	    (if (procedure-object? rhs-value)
+		(set-global-value! var (dlr-func rhs-value))
+		(set-global-value! var rhs-value))
 	    (set-global-docstring! var docstring)
 	    (k void-value fail))))
       (define-syntax-aexp (name clauses aclauses info)
