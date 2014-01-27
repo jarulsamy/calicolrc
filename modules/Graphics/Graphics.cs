@@ -2099,6 +2099,12 @@ public static class Graphics
 		{
 		    return ToString();
 		}
+
+		public IDictionary<string, string> GetRepresentations() {
+		    IDictionary<string, string> retval = new Picture (this).GetRepresentations();
+		    retval["text/plain"] =  this.ToString();
+		    return retval;
+		}
 	}
   
         [method: JigsawTab("G/Windows")]
