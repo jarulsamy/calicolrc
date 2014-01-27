@@ -261,8 +261,16 @@ namespace Calico {
 
         public override object Evaluate(string text) {
 	    Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression;
-	    Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
-	    Microsoft.Scripting.Hosting.CompiledCode compiledCode = null;
+	    Microsoft.Scripting.Hosting.ScriptSource source;
+	    Microsoft.Scripting.Hosting.CompiledCode compiledCode;
+	    try {
+		source = engine.CreateScriptSourceFromString(text, sctype);
+		compiledCode = null;
+	    } catch (Exception e) {
+		Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+		PrintLine(eo.FormatException(e));
+		return null;
+	    }
 	    try {
 		if (compiler_options != null) {
 		    compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
@@ -280,8 +288,9 @@ namespace Calico {
 			sctype = Microsoft.Scripting.SourceCodeKind.Statements;
 			source = engine.CreateScriptSourceFromString(text, sctype);
 			compiledCode = source.Compile();
-		    } catch {
-			Console.Error.WriteLine("Unable to compile!");
+		    } catch (Exception e) {
+			Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+			PrintLine(eo.FormatException(e));
 			return null;
 		    }
 		}
@@ -296,6 +305,10 @@ namespace Calico {
 	    } catch (System.Threading.ThreadAbortException) {
 		System.Threading.Thread.Sleep(100);
 		System.Threading.Thread.ResetAbort();
+		aborted = true;
+	    } catch (Exception e) {
+		Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+		PrintLine(eo.FormatException(e));
 	    }
 	    if (aborted) {
 		System.Console.Error.WriteLine("Running script aborted!");

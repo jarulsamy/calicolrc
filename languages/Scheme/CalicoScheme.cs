@@ -53,7 +53,40 @@ public class CalicoSchemeEngine : Engine
   public override bool Execute(string text, bool ok) {
     initialize_execute();
     object result = PJScheme.execute_string_rm(text);
-    return HandleOutput(result, ok);
+    if (CheckGood(result))
+	return HandleOutput(result, ok);
+    else
+	return false;
+  }
+
+  public bool CheckGood(object result) {
+      string resultString = Scheme.repr(result);
+      if (resultString.StartsWith("(exception ")) {
+	  System.Console.Error.WriteLine("Traceback (most recent call last):");
+	  if (Scheme.list_q(result) && ((int)Scheme.length(result)) == 2) {
+	      object list = Scheme.cadr(result);
+	      if (Scheme.list_q(list) && ((int)Scheme.length(list)) == 6) {
+		  object error = ((Scheme.Cons)list)[0];
+		  object message = ((Scheme.Cons)list)[1];
+		  object src_file = ((Scheme.Cons)list)[2];
+		  object src_line = ((Scheme.Cons)list)[3];
+		  object src_col = ((Scheme.Cons)list)[4];
+		  object stack = ((Scheme.Cons)list)[5];
+		  format_trace_back(stack);
+		  if (src_file.ToString() != "none") {
+		      System.Console.Error.WriteLine(String.Format("  File \"{0}\", line {1}, col {2}", 
+								   src_file, src_line, src_col));
+		  }
+		  System.Console.Error.WriteLine(String.Format("{0}: {1}", error, message));
+	      } else {
+		  System.Console.Error.WriteLine(list);
+	      }
+	  } else {
+	      System.Console.Error.WriteLine(resultString);
+	  }
+	  return false;
+      }
+      return true;
   }
 
   public override void RequestPause () {
@@ -80,31 +113,6 @@ public class CalicoSchemeEngine : Engine
 
   public bool HandleOutput(object result, bool ok) {
     string resultString = Scheme.repr(result);
-    if (resultString.StartsWith("(exception ")) {
-	System.Console.Error.WriteLine("Traceback (most recent call last):");
-	if (Scheme.list_q(result) && ((int)Scheme.length(result)) == 2) {
-	    object list = Scheme.cadr(result);
-	    if (Scheme.list_q(list) && ((int)Scheme.length(list)) == 6) {
-		object error = ((Scheme.Cons)list)[0];
-		object message = ((Scheme.Cons)list)[1];
-		object src_file = ((Scheme.Cons)list)[2];
-		object src_line = ((Scheme.Cons)list)[3];
-		object src_col = ((Scheme.Cons)list)[4];
-		object stack = ((Scheme.Cons)list)[5];
-		format_trace_back(stack);
-		if (src_file.ToString() != "none") {
-		    System.Console.Error.WriteLine(String.Format("  File \"{0}\", line {1}, col {2}", 
-								 src_file, src_line, src_col));
-		}
-		System.Console.Error.WriteLine(String.Format("{0}: {1}", error, message));
-	    } else {
-		System.Console.Error.WriteLine(list);
-	    }
-	} else {
-	    System.Console.Error.WriteLine(resultString);
-	}
-	return false;
-    }
     if (result != null) {
 	System.Console.WriteLine(resultString);
     }
@@ -126,7 +134,11 @@ public class CalicoSchemeEngine : Engine
 
   public override object Evaluate(string text) {
     initialize_execute();
-    return PJScheme.execute_string_rm(text);
+    object result = PJScheme.execute_string_rm(text);
+    if (CheckGood(result))
+	return result;
+    else
+	return null;
   }
 
   public override bool ExecuteFile(string filename) {
