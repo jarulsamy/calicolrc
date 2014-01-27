@@ -5292,6 +5292,34 @@ public static class Graphics
 		{
 		    return ToString();
 		}
+
+		public IDictionary<string, string> GetRepresentations() {
+		    byte [] buffer;
+		    string png_string;
+		    string jpg_string;
+		    
+		    try {
+			buffer = _pixbuf.SaveToBuffer("png");
+			png_string = System.Convert.ToBase64String(buffer, 0, buffer.Length);
+		    } catch {
+			png_string = "";
+		    }
+		    try {
+			buffer = _pixbuf.SaveToBuffer("jpeg");
+			jpg_string = System.Convert.ToBase64String(buffer, 0, buffer.Length);
+		    } catch {
+			jpg_string = "";
+		    }
+
+		    var retval = new Dictionary<string, string>();
+		    retval["text/plain"] =  this.ToString();
+		    if (png_string != "")
+			retval["image/png"] = png_string;
+		    if (jpg_string != "")
+			retval["image/jpeg"] = jpg_string;
+		    return retval;
+		}
+
 	} // -- end of Picture class
 
 

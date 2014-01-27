@@ -3085,6 +3085,10 @@ del _invoke, _
             }
         }
 
+	public Representation  MakeRepresentations(IDictionary<string, string> dict) {
+	    return new Representation(dict);
+	}
+
         public string Repr(object obj) {
             string repr = null;
             if (HasField(obj, "Value")) {
@@ -4334,5 +4338,17 @@ del _invoke, _
 	public string GetEnvironment() {
 	    return "gtk";
 	}
+    }
+
+    public class Representation {
+	public IDictionary<string, string> dict;
+	
+	public Representation(IDictionary<string, string> dict) {
+	    this.dict = dict;
+	}
+	
+	public IDictionary<string, string> GetRepresentations() {
+	    return dict;
+	} 
     }
 }

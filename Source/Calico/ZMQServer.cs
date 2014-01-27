@@ -265,6 +265,26 @@ public static class ZMQServer {
 	    thread = new Thread (new ThreadStart (loop));
 	}
 
+	public Dictionary<string, string> GetRepresentations(object obj) {
+	    var data = new Dictionary<string, string>();
+	    // Everything has a text fallback:
+	    if (obj == null) {
+		data["text/plain"] = "";
+	    } else {
+		data["text/plain"] = session.calico.Repr(obj);
+		// Now, let's get additional ones, if they exist
+		Type type = obj.GetType();
+		System.Reflection.MethodInfo method = type.GetMethod("GetRepresentations");
+		if (method != null) {
+		    IDictionary<string, string> reprs = (IDictionary<string, string>) method.Invoke(obj, new object [] {});
+		    foreach (KeyValuePair<string, string> kvp in (IDictionary<string, string>)reprs) {
+			data[kvp.Key] = kvp.Value;
+		    }
+		}
+	    }
+	    return data;
+	}
+		   
 	public virtual void loop() {
 	    while (true) {
 		string message = socket.Receive(Encoding.UTF8);
@@ -385,20 +405,20 @@ public static class ZMQServer {
 		send(session.iopub_channel, header, m_header, metadata, content);
 		// ---------------------------------------------------
 		// First, handle any Calico metacommands:
-		string code = m_content["code"].ToString();
+		string code = m_content["code"].ToString().Trim();
 		if (code.StartsWith(":lang") && session.calico != null) { // :lang 
 		    string [] lines = code.Split(new string[] { "\r\n", "\n" }, 
 						 System.StringSplitOptions.None);
 		    string language = lines[0].Substring(6).Trim().ToLower();
 		    if (lines.Length > 1) {
-			code = String.Join("\n", lines.Slice(1));
+			code = String.Join("\n", lines.Slice(1)).Trim();
 		    } else {
 			code = "";
 		    }
-		    string message = String.Format("Unknown language: '{0}'", language);
+		    string message = String.Format("Unknown language: \"{0}\"", language);
 		    if (session.calico.manager.ContainsKey(language)) {
 			session.calico.ActivateLanguage(language, session.calico.CurrentLanguage);
-			message = String.Format("Calico Language is now '{0}'", session.calico.GetCurrentProperLanguage());
+			message = String.Format("Calico Language is now \"{0}\"", session.calico.GetCurrentProperLanguage());
 		    }
 		    header = Header(now(),
 				    msg_id(),
@@ -408,16 +428,12 @@ public static class ZMQServer {
 		    content = new Dictionary<string, object>
 			{
 			    {"execution_count", execution_count},
-			    {"data", new Dictionary<string, object>
-			     {
-				 {"text/plain", message}
-			     }
-			    },
+			    {"data", GetRepresentations(message)},
 			    {"metadata", new Dictionary<string, object>()}
 			};
 		    send(session.iopub_channel, header, m_header, metadata, content);
 		}
-		if (code.Trim() == "") {
+		if (code == "") {
 		    header = Header(now(),
 				    msg_id(),
 				    "kernel",
@@ -497,17 +513,13 @@ public static class ZMQServer {
 				m_header["session"].ToString(),
 				"pyout");
 	    var metadata = new Dictionary<string, object>();
-	    string retval = null;
+	    object retval = null;
 	    session.SetOutputs(execution_count, m_header);
 	    if (session.calico != null) {
 		try {
-		    object obj = session.calico.Evaluate(code);
-		    if (obj != null)
-			retval = obj.ToString();
-		    else
-			retval = null;
+		    retval = session.calico.Evaluate(code);
 		} catch (Exception e) {
-		    retval = e.ToString();
+		    retval = e;
 		}
 	    }
 	    session.SetOutputs(0, null);
@@ -516,11 +528,7 @@ public static class ZMQServer {
 		content = new Dictionary<string, object>
 		    {
 			{"execution_count", execution_count},
-			{"data", new Dictionary<string, object>
-			 {
-			     {"text/plain", retval}
-			 }
-			},
+			{"data", GetRepresentations(retval)},
 			{"metadata", new Dictionary<string, object>()}
 		    };
 		send(session.iopub_channel, header, m_header, metadata, content);

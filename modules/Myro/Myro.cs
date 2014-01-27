@@ -46,43 +46,6 @@ using System.Net;
 
 using Tao.Sdl;
 
-public static class Extensions
-{
-        [method: JigsawTab(null)]
-	public static T[] Slice<T> (this T[] source, int start, int end)
-	{
-		if (start == 0 && end == source.Length)
-			return source;
-		// Handles negative ends.
-		if (end < 0) {
-			end = source.Length + end;
-		}
-		int len = end - start;
-		// Return new array.
-		T[] res = new T[len];
-		for (int i = 0; i < len; i++) {
-			res [i] = source [i + start];
-		}
-		return res;
-	}
-
-        [method: JigsawTab(null)]
-	public static object[] Slice (this IList source, int start, int end)
-	{
-		// Handles negative ends.
-		if (end < 0) {
-			end = source.Count + end;
-		}
-		int len = end - start;
-		// Return new array.
-		object[] res = new object[len];
-		for (int i = 0; i < len; i++) {
-			res [i] = source [i + start];
-		}
-		return res;
-	}
-}
-
 public static class SerialPortCache
 {
 	public static Dictionary<string,SerialPort> ports = new Dictionary<string,SerialPort> ();
