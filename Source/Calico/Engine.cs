@@ -139,7 +139,7 @@ namespace Calico {
                 try {
                     manager.scriptRuntimeSetup.LanguageSetups.Add(languageSetup);
                 } catch {
-		            Console.Error.WriteLine("WARNING: Please restart Calico to use this language");
+		            Console.Error.WriteLine("Please activate and restart Calico to use this language");
                     engine = null;
                 }
             } else {
@@ -236,7 +236,7 @@ namespace Calico {
 
         public override bool ReadyToExecute(string text) {
             if (engine == null) {
-                PrintLine("Please restart Calico to use this language.");
+                PrintLine("Please activate and restart Calico to use this language.");
                 return false;
             }
             // If more than one line in DLR, wait for a blank line
@@ -260,6 +260,10 @@ namespace Calico {
         }
 
         public override object Evaluate(string text) {
+            if (engine == null) {
+                PrintLine("Please activate and restart Calico to use this language.");
+                return null;
+            }
 	    Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression;
 	    Microsoft.Scripting.Hosting.ScriptSource source;
 	    Microsoft.Scripting.Hosting.CompiledCode compiledCode;
@@ -324,7 +328,7 @@ namespace Calico {
 		  // This is called by RunInBackground() in the MainWindow
 		  //manager.calico.last_error = ""
 		  if (engine == null) {
-			PrintLine("Please restart Calico to use this language.");
+			PrintLine("Please activate and restart Calico to use this language.");
 			return false;
 		  }
 		  Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
