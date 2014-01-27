@@ -4350,5 +4350,13 @@ del _invoke, _
 	public IDictionary<string, string> GetRepresentations() {
 	    return dict;
 	} 
+
+	public override string ToString() {
+	    if (dict.ContainsKey("text/plain")) {
+		return dict["text/plain"];
+	    } else {
+		return "<indescribable object>";
+	    }
+	} 
     }
 }
