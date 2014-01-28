@@ -46,6 +46,8 @@ using System.Net;
 
 using Tao.Sdl;
 
+using Calico;
+
 public static class SerialPortCache
 {
 	public static Dictionary<string,SerialPort> ports = new Dictionary<string,SerialPort> ();

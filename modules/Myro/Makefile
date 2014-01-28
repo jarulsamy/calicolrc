@@ -2,7 +2,7 @@
 
 all: ../Myro.dll Robots
 
-../Myro.dll: Myro.cs ../Graphics/Graphics.cs
+../Myro.dll: Myro.cs ../Graphics/Graphics.cs 
 	MONO_PATH=../../bin dmcs -sdk:4 -target:library \
 		Myro.cs \
 		-lib:.. \

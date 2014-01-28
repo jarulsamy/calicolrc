@@ -29,7 +29,58 @@ using System.Text;
 using System.Collections.Generic;
 using Calico;
 
+using System.Collections;
+
 namespace Calico {
+    public static class Extensions
+    {
+	public static T[] Slice<T> (this T[] source, int start, int end)
+	{
+	    if (start == 0 && end == source.Length)
+		return source;
+	    // Handles negative ends.
+	    if (end < 0) {
+		end = source.Length + end;
+	    }
+	    int len = end - start;
+	    // Return new array.
+	    T[] res = new T[len];
+	    for (int i = 0; i < len; i++) {
+		res [i] = source [i + start];
+	    }
+	    return res;
+	}
+	
+	public static T[] Slice<T> (this T[] source, int start)
+	{
+		int end = source.Length;
+		if (start == 0 && end == source.Length)
+			return source;
+		int len = end - start;
+		// Return new array.
+		T[] res = new T[len];
+		for (int i = 0; i < len; i++) {
+			res [i] = source [i + start];
+		}
+		return res;
+	}
+
+	public static object[] Slice (this IList source, int start, int end)
+	{
+		// Handles negative ends.
+		if (end < 0) {
+			end = source.Count + end;
+		}
+		int len = end - start;
+		// Return new array.
+		object[] res = new object[len];
+		for (int i = 0; i < len; i++) {
+			res [i] = source [i + start];
+		}
+		return res;
+	}
+    }
+
     public partial class MainWindow : Gtk.Window {
 	public bool serverMode = false;
         public Config config;

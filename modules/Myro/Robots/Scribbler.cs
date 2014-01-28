@@ -5,6 +5,8 @@ using System.IO.Ports;
 using System.Threading;
 using System;
 
+using Calico;
+
 public class Scribbler: Myro.Robot
 {
     static string REVISION = "$Revision: $";
