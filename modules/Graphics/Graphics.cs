@@ -149,7 +149,7 @@ public static class Graphics
         [method: JigsawTab(null)]
 	public static bool needInvoke ()
 	{
-	  return (Thread.CurrentThread.ManagedThreadId != 1);
+	  return (Thread.CurrentThread.ManagedThreadId != gui_thread_id);
 	}
 
         [method: JigsawTab(null)]
