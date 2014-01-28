@@ -40,7 +40,7 @@ Processing.jar: ../../../modules/Processing.dll
 	 $(IKVMSTUB) -lib:../../../bin/ -lib:/usr/lib/cli/gtk-sharp-2.0/ -lib:/usr/lib/cli/glib-sharp-2.0/ -lib:/usr/lib/cli/atk-sharp-2.0/ -lib:/usr/lib/cli/gdk-sharp-2.0/ -lib:/usr/lib/cli/pango-sharp-2.0/ ../../../modules/Processing.dll
 
 Myro.jar: ../../../modules/Myro.dll
-	 $(IKVMSTUB) -lib:../../../bin/ -lib:/usr/lib/cli/gtk-sharp-2.0/ -lib:/usr/lib/cli/glib-sharp-2.0/ -lib:/usr/lib/cli/atk-sharp-2.0/ -lib:/usr/lib/cli/gdk-sharp-2.0/ -lib:/usr/lib/cli/pango-sharp-2.0/  ../../../modules/Myro.dll
+	 $(IKVMSTUB) -lib:../../../bin/ -lib:/usr/lib/cli/gtk-sharp-2.0/ -lib:/usr/lib/cli/glib-sharp-2.0/ -lib:/usr/lib/cli/atk-sharp-2.0/ -lib:/usr/lib/cli/gdk-sharp-2.0/ -lib:/usr/lib/cli/pango-sharp-2.0/  -r:../../../bin/Calico.exe ../../../modules/Myro.dll
 
 gtk-sharp.jar:
 	$(IKVMSTUB) -lib:../../../bin/ -lib:/usr/lib/cli/gtk-sharp-2.0/ -lib:/usr/lib/cli/glib-sharp-2.0/ -lib:/usr/lib/cli/atk-sharp-2.0/ -lib:/usr/lib/cli/gdk-sharp-2.0/ -lib:/usr/lib/cli/pango-sharp-2.0/ /usr/lib/mono/gac/gtk-sharp/2.12.0.0__35e10195dab3c99f/gtk-sharp.dll
