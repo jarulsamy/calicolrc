@@ -196,7 +196,7 @@ namespace Calico {
 				      } catch {
 				      }
 				      try {
-                          method = type.GetMethod("set_gui_thread_id");
+					  method = type.GetMethod("set_gui_thread_id");
 					  if (method != null)
 					      method.Invoke(type, new object [] {MainWindow.gui_thread_id});                      
 				      } catch {

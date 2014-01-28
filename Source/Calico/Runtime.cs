@@ -38,6 +38,10 @@ namespace Calico {
 
         public CalicoConsole(string[] args, LanguageManager manager, bool Debug, Config config, bool startREPL):
         base() {
+            Gtk.Application.Invoke(delegate {
+		    gui_thread_id = Thread.CurrentThread.ManagedThreadId;
+		});
+
 	    this.args = args;
             this.config = config;
             this.Debug = Debug;
@@ -45,8 +49,6 @@ namespace Calico {
             manager.SetCalico(this);
             //configureIO();
             CurrentLanguage = "python";
-
-            gui_thread_id = Thread.CurrentThread.ManagedThreadId;
 
             path = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
             if (path.StartsWith("\\")) {
@@ -335,6 +337,9 @@ namespace Calico {
 
     public partial class CalicoServer: CalicoConsole {
         public CalicoServer (string[] args, LanguageManager manager, bool Debug, Config config) {
+            Gtk.Application.Invoke(delegate {
+		    gui_thread_id = Thread.CurrentThread.ManagedThreadId;
+		});
 	    this.serverMode = true;
 	    this.args = args;
             this.config = config;

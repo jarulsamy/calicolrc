@@ -2551,9 +2551,10 @@
 		ManualResetEvent ev = new ManualResetEvent(false);
 
 		PImage img = null;
+
 		_invokePImage ( delegate { 
 			try {
-				img = _p.get (x, y, width, height);
+			    img = _p.get (x, y, width, height);
 			} catch (System.NullReferenceException e){
 				debug ( String.Format("get() ignored extra tick: {0}", e.ToString()), 1);
 			}
@@ -2866,7 +2867,7 @@ public class PImage
 	      try {
 		using (Context g = new Context(img._img))
 		  {			
-		    _img.Show (g, -x, -y);
+		      _img.Show (g, -x, -y);
 		  }
 	      } catch (System.NullReferenceException e){
 		string msg = String.Format ("get() ignored extra tick: {0}", e);
@@ -3178,6 +3179,33 @@ public class PImage
 		}
 	    }
 	    return bitmap;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        public IDictionary<string, string> GetRepresentations() {
+	    byte [] buffer;
+	    string png_string = "";
+	    string jpg_string = "";
+	    loadPixels();
+	    try {
+		buffer = _pixbuf.SaveToBuffer("png");
+		png_string = System.Convert.ToBase64String(buffer, 0, buffer.Length);
+	    } catch {
+		png_string = "";
+	    }
+	    try {
+		buffer = _pixbuf.SaveToBuffer("jpeg");
+		jpg_string = System.Convert.ToBase64String(buffer, 0, buffer.Length);
+	    } catch {
+		jpg_string = "";
+	    }
+	    var retval = new Dictionary<string, string>();
+	    retval["text/plain"] =  "<PImage>";
+	    if (png_string != "")
+		retval["image/png"] = png_string;
+	    if (jpg_string != "")
+		retval["image/jpeg"] = jpg_string;
+	    return retval;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
