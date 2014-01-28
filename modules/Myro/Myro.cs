@@ -1511,6 +1511,16 @@ public static class Myro
 		    window.step (.1);
 		}
 	    }
+
+	    public IDictionary<string, string> GetRepresentations() {
+		if (window != null) {
+		    return window.GetRepresentations();
+		} else {
+		    var retval = new Dictionary<string, string>();
+		    retval["text/plain"] = this.ToString();
+		    return retval;
+		}
+	    }
 	}
 
 	[method: JigsawTab("M/Robot")]

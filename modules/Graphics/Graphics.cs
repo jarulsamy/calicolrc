@@ -8566,9 +8566,14 @@ public static class Graphics
 	WindowClass window = null;
 	Canvas canvas = null;
 	Shape shape = null;
+	string text = null;
 
 	public Representation(WindowClass window) {
 	    this.window = window;
+	}
+
+	public Representation(string text) {
+	    this.text = text;
 	}
 
 	public Representation(Canvas canvas) {
@@ -8591,7 +8596,10 @@ public static class Graphics
 		wait(1); // hack
 	    }
 	    IDictionary<string, string> retval = null;
-	    if (window != null) {
+	    if (text != null) {
+		retval = new Dictionary<string, string>();
+		retval["text/plain"] = text;
+	    } else if (window != null) {
 		retval = window.GetRepresentations();
 	    } else if (canvas != null) {
 		//retval = canvas.GetRepresentations();
