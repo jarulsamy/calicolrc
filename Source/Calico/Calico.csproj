@@ -93,6 +93,7 @@
     <Compile Include="History.cs" />
     <Compile Include="TabCompletion.cs" />
     <Compile Include="ZMQServer.cs" />
+    <Compile Include="Representations.cs" />
     <Compile Include="..\..\modules\Reflection\Reflection.cs">
       <Link>Reflection.cs</Link>
     </Compile>

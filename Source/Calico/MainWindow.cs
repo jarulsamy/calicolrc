@@ -3136,10 +3136,6 @@ del _invoke, _
             }
         }
 
-	public Representation  MakeRepresentations(IDictionary<string, string> dict) {
-	    return new Representation(dict);
-	}
-
         public string Repr(object obj) {
             string repr = null;
             if (HasField(obj, "Value")) {
@@ -4389,25 +4385,28 @@ del _invoke, _
 	public string GetEnvironment() {
 	    return "gtk";
 	}
-    }
 
-    public class Representation {
-	public IDictionary<string, string> dict;
-	
-	public Representation(IDictionary<string, string> dict) {
-	    this.dict = dict;
+	public AudioRepresentation Audio(string filename) {
+	    return new AudioRepresentation(filename);
 	}
 	
-	public IDictionary<string, string> GetRepresentations() {
-	    return dict;
-	} 
+	public MimeRepresentation HTML(string text) {
+	    return new MimeRepresentation("text/html", text, "text/plain", "<HTML>");
+	}
+	
+	public ImageRepresentation Image(string filename) {
+	    return new ImageRepresentation(filename);
+	}
+    
+	// JSON, PNG, JPEG, SVG, Math, LaTeX, Audio, Video, IFrame
+	// display_pretty, display_html, display_jpeg, display_png, 
+	// display_json, display_latex, display_svg, display_audio, display_video
 
-	public override string ToString() {
-	    if (dict.ContainsKey("text/plain")) {
-		return dict["text/plain"];
-	    } else {
-		return "<indescribable object>";
-	    }
-	} 
+	public void display(object obj) {
+	    if (ZMQServer.session != null)
+		ZMQServer.session.display(obj);
+	    else
+		Print(Repr(obj));
+	}
     }
 }

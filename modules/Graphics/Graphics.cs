@@ -1475,18 +1475,18 @@ public static class Graphics
 		    return _height;
 		}
     
-		public Representation draw (Shape shape)
+		public GraphicsRepresentation draw (Shape shape)
 		{
 			shape.draw (this);
-			return new Representation(this);
+			return new GraphicsRepresentation(this);
 		}
 
-		public Representation drawAt (Shape shape, IList iterable)
+		public GraphicsRepresentation drawAt (Shape shape, IList iterable)
 		{
 		    shape.moveTo(System.Convert.ToDouble(iterable[0]), 
 				 System.Convert.ToDouble(iterable[1]));
 		    shape.draw (this);
-		    return new Representation(this);
+		    return new GraphicsRepresentation(this);
 		}
 
 		public void undraw (Shape shape)
@@ -3343,14 +3343,14 @@ public static class Graphics
 			QueueDraw (); 
 		}
 	        
-	        public Representation drawAt (WindowClass win, IList iterable) {
+	        public GraphicsRepresentation drawAt (WindowClass win, IList iterable) {
 		    moveTo(System.Convert.ToDouble(iterable[0]), 
 			   System.Convert.ToDouble(iterable[1]));
 		    draw(win);
-		    return new Representation(win);
+		    return new GraphicsRepresentation(win);
 		}
     
-		public Representation draw (WindowClass win)
+		public GraphicsRepresentation draw (WindowClass win)
 		{ // Shape
 		    InvokeBlocking( delegate {
 			    // Add this shape to the Canvas list.
@@ -3382,18 +3382,18 @@ public static class Graphics
 				QueueDraw ();
 			    }
 			});
-		    return new Representation(win);
+		    return new GraphicsRepresentation(win);
 		}
 
-	        public Representation drawAt (Canvas canvas, IList iterable)
+	        public GraphicsRepresentation drawAt (Canvas canvas, IList iterable)
 	        {
 		    moveTo(System.Convert.ToDouble(iterable[0]), 
 			   System.Convert.ToDouble(iterable[1]));
 		    draw(canvas);
-		    return new Representation(canvas);
+		    return new GraphicsRepresentation(canvas);
 		}
 
-		public Representation draw (Canvas canvas)
+		public GraphicsRepresentation draw (Canvas canvas)
 		{ // Shape
 		    InvokeBlocking( delegate {
 			// Add this shape to the Canvas list.
@@ -3413,19 +3413,19 @@ public static class Graphics
 			}
 			QueueDraw ();
 			});
-		    return new Representation(canvas);
+		    return new GraphicsRepresentation(canvas);
 		}
     
-	        public Representation draw (Shape shape, IList iterable)
+	        public GraphicsRepresentation draw (Shape shape, IList iterable)
 	        {
 		    double x = System.Convert.ToDouble(iterable[0]);
 		    double y = System.Convert.ToDouble(iterable[1]);
 		    moveTo(x, y);
 		    draw(shape);
-		    return new Representation(this);
+		    return new GraphicsRepresentation(this);
 		}
 
-		public Representation draw (Shape shape)
+		public GraphicsRepresentation draw (Shape shape)
 		{ // Shape
 		    InvokeBlocking( delegate {
 			// Add this shape to the shape's list.
@@ -3444,7 +3444,7 @@ public static class Graphics
 			drawn_on_shape = shape;
 			QueueDraw ();
 			});
-		    return new Representation(shape);
+		    return new GraphicsRepresentation(shape);
 		}
     
 	    public void undraw ()
@@ -5382,7 +5382,7 @@ public static class Graphics
 			// FIXME: actually move it
 		}
 
-		public Representation draw (WindowClass win)
+		public GraphicsRepresentation draw (WindowClass win)
 		{ // button
 		    InvokeBlocking (delegate {
 			    window = win;
@@ -5390,7 +5390,7 @@ public static class Graphics
 			    window.getCanvas ().Put (this, (int)_x, (int)_y);
 			    window.QueueDraw ();
 			});
-		    return new Representation(win);
+		    return new GraphicsRepresentation(win);
 		}
 
 		public void connect (string signal, Func<object,Event,object> function)
@@ -5455,7 +5455,7 @@ public static class Graphics
          // FIXME: actually move it
      }
 
-     public Representation draw (WindowClass win)
+     public GraphicsRepresentation draw (WindowClass win)
      { // button
          window = win;
          Invoke (delegate {
@@ -5463,7 +5463,7 @@ public static class Graphics
              window.getCanvas ().Put (this, (int)_x, (int)_y);
              window.QueueDraw ();
          });
-	 return new Representation(win);
+	 return new GraphicsRepresentation(win);
      }
 
 /*
@@ -5539,7 +5539,7 @@ public static class Graphics
 			// FIXME: actually move it
 		}
 
-		public Representation draw (WindowClass win)
+		public GraphicsRepresentation draw (WindowClass win)
 		{ // hslider
 			window = win;
 			Invoke (delegate {
@@ -5547,7 +5547,7 @@ public static class Graphics
 				window.getCanvas ().Put (this, (int)_x, (int)_y);
 				window.QueueDraw ();
 			});
-			return new Representation(win);
+			return new GraphicsRepresentation(win);
 		}
 
 		public void connect (string signal, Func<object,Event,object> function)
@@ -6534,27 +6534,27 @@ public static class Graphics
 		graph = parser.Parse (contents);
 	    }
 	    
-	    public Representation draw(WindowClass window) {
+	    public GraphicsRepresentation draw(WindowClass window) {
 		this.window = window;
 		draw();
-		return new Representation(window);
+		return new GraphicsRepresentation(window);
 	    }
 	    
-	    public Representation draw(WindowClass window, IDictionary options) {
+	    public GraphicsRepresentation draw(WindowClass window, IDictionary options) {
 		this.window = window;
 		draw(options);
-		return new Representation(window);
+		return new GraphicsRepresentation(window);
 	    }
 	    
-	    public Representation draw(IDictionary options) {
+	    public GraphicsRepresentation draw(IDictionary options) {
 		foreach(KeyValuePair<object,object> kvp in (IDictionary<object,object>)options) {
 		    this.options[kvp.Key.ToString()] = kvp.Value;
 		}
 		draw();
-		return new Representation(window);
+		return new GraphicsRepresentation(window);
 	    }
 	    
-	    public Representation draw() {
+	    public GraphicsRepresentation draw() {
 		int _width = 0, _height = 0;
 		if (window == null) {
 		    string label;
@@ -6760,7 +6760,7 @@ public static class Graphics
 		    }
 	            count++;
 		}
-		return new Representation(window);
+		return new GraphicsRepresentation(window);
 	    }
 	    
 	    [method: JigsawTab("G/Misc")]
@@ -8562,29 +8562,32 @@ public static class Graphics
     }
     //----------------------------------------------END OF SPRITE CLASS-----------------------------------------
 
-    public class Representation {
+    public class GraphicsRepresentation {
 	WindowClass window = null;
 	Canvas canvas = null;
 	Shape shape = null;
 	string text = null;
-
-	public Representation(WindowClass window) {
+	
+	public GraphicsRepresentation() {
+	}
+	
+	public GraphicsRepresentation(WindowClass window) {
 	    this.window = window;
 	}
 
-	public Representation(string text) {
+	public GraphicsRepresentation(string text) {
 	    this.text = text;
 	}
 
-	public Representation(Canvas canvas) {
+	public GraphicsRepresentation(Canvas canvas) {
 	    this.canvas = canvas;
 	}
 
-	public Representation(Shape shape) {
+	public GraphicsRepresentation(Shape shape) {
 	    this.shape = shape;
 	}
 
-	public IDictionary<string, string> GetRepresentations() {
+	public virtual IDictionary<string, string> GetRepresentations() {
 	    bool need_to_refresh = true;
 	    if (window != null) {
 	    } else if (canvas != null) {

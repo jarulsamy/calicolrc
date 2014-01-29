@@ -187,6 +187,40 @@ public static class ZMQServer {
 		// skip
 	    }
 	}
+
+	public Dictionary<string, string> GetRepresentations(object obj) {
+	    var data = new Dictionary<string, string>();
+	    // Everything has a text fallback:
+	    if (obj == null) {
+		data["text/plain"] = "";
+	    } else {
+		data["text/plain"] = calico.Repr(obj);
+		// Now, let's get additional ones, if they exist
+		Type type = obj.GetType();
+		System.Reflection.MethodInfo method = type.GetMethod("GetRepresentations");
+		if (method != null) {
+		    IDictionary<string, string> reprs = (IDictionary<string, string>) method.Invoke(obj, new object [] {});
+		    foreach (KeyValuePair<string, string> kvp in (IDictionary<string, string>)reprs) {
+			data[kvp.Key] = kvp.Value;
+		    }
+		}
+	    }
+	    return data;
+	}
+
+	public void display(object obj) {
+	    var header = Header(now(),
+				"kernel",
+				session_id, 
+				msg_id(),
+				"display_data");
+	    var metadata = new Dictionary<string, object>();
+	    var content = new Dictionary<string, object> {
+		{"source", "display"},
+		{"data", GetRepresentations(obj)}
+	    };
+	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	}
     }
 
     public class Channel {
@@ -216,26 +250,6 @@ public static class ZMQServer {
 		String.Format("{0}://{1}:{2}", 
 			      this.transport, this.address, this.port));
 	    thread = new Thread (new ThreadStart (loop));
-	}
-
-	public Dictionary<string, string> GetRepresentations(object obj) {
-	    var data = new Dictionary<string, string>();
-	    // Everything has a text fallback:
-	    if (obj == null) {
-		data["text/plain"] = "";
-	    } else {
-		data["text/plain"] = session.calico.Repr(obj);
-		// Now, let's get additional ones, if they exist
-		Type type = obj.GetType();
-		System.Reflection.MethodInfo method = type.GetMethod("GetRepresentations");
-		if (method != null) {
-		    IDictionary<string, string> reprs = (IDictionary<string, string>) method.Invoke(obj, new object [] {});
-		    foreach (KeyValuePair<string, string> kvp in (IDictionary<string, string>)reprs) {
-			data[kvp.Key] = kvp.Value;
-		    }
-		}
-	    }
-	    return data;
 	}
 		   
 	public virtual void loop() {
@@ -381,7 +395,7 @@ public static class ZMQServer {
 		    content = new Dictionary<string, object>
 			{
 			    {"execution_count", execution_count},
-			    {"data", GetRepresentations(message)},
+			    {"data", ZMQServer.session.GetRepresentations(message)},
 			    {"metadata", new Dictionary<string, object>()}
 			};
 		    send(session.iopub_channel, header, m_header, metadata, content);
@@ -481,7 +495,7 @@ public static class ZMQServer {
 		content = new Dictionary<string, object>
 		    {
 			{"execution_count", execution_count},
-			{"data", GetRepresentations(retval)},
+			{"data", ZMQServer.session.GetRepresentations(retval)},
 			{"metadata", new Dictionary<string, object>()}
 		    };
 		send(session.iopub_channel, header, m_header, metadata, content);
