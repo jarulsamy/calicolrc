@@ -467,7 +467,7 @@ public static class ZMQServer {
 		    };
 		send(session.shell_channel, header, m_header, m_metadata, content);
 	    } else if (m_header["msg_type"].ToString() == "object_info_request") {
-		// FIXME: add object_info_request
+		// FIXME: add object_info_request, shutdown_request, complete_request
 	    } else {
 		throw new Exception("unknown msg_type: " + m_header["msg_type"]);
 	    }
