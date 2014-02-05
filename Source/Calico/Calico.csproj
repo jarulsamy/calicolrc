@@ -69,12 +69,11 @@
       <HintPath>..\..\bin\Microsoft.Dynamic.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Microsoft.Scripting.Core, Version=1.1.0.30, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
-      <HintPath>..\..\bin\Microsoft.Scripting.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Mono.TextEditor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\bin\Mono.TextEditor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Microsoft.CSharp">
       <Private>False</Private>
     </Reference>
     <Reference Include="agsXMPP, Version=1.2.1.0, Culture=neutral, PublicKeyToken=null">

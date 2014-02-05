@@ -1,0 +1,954 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>obj/Debug/IronRuby.Tests</name>
+    </assembly>
+    <members>
+        <member name="M:IronRuby.Tests.Tests.AreEqual(System.Object,System.Object)">
+            <summary>
+            Asserts two values are equal
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.AreSetsEqual``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Asserts two sets are equal.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.AreBagsEqual``1(System.Collections.Generic.IEnumerable{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Asserts two bags (lists with insignificant order) are equal.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Assert(System.Boolean,System.String)">
+            <summary>
+            Asserts an condition it true
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_MethodAliases1">
+            <summary>
+            alias keyword binds lexically while alias_method binds to self.class.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.AliasMethodLookup1">
+            <summary>
+            Alias (unlike undef) looks up the method in Object.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.AliasMethodLookup3">
+            <summary>
+            Alias in define_method.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.AliasInModuleEval1">
+            <summary>
+            "alias" uses the same lookup algorithm as method definition (see RubyScope.GetMethodDefinitionOwner).
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_ParallelAssignment1">
+            <summary>
+            Order of evaluation.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_ParallelAssignment6">
+            <summary>
+            Non-simple LHS, simple RHS. Difference between |LHS| &gt; 0 (r0 and r3) and |LHS| == 0 (r1).
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_ParallelAssignment7">
+            <summary>
+            Simple LHS and splat only RHS.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_ParallelAssignment8">
+            <summary>
+            Simple RHS.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_ParallelAssignment9">
+            <summary>
+            Inner splat-only LHS.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_ParallelAssignment10">
+            <summary>
+            Recursion in L(1,-).
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SimpleInplaceAsignmentToIndirectLeftValues1">
+            <summary>
+            ArrayItemAccess and AttributeAccess read target ones in an in-place assignment.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Backtrace5">
+            <summary>
+            Checks if the interpreted frames are aligned with CLR frames.
+            TODO: Need some way how to decode Python names and hide PythonOps.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyIfExpression1">
+            <summary>
+            Else-if clauses.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyIfExpression2">
+            <summary>
+            Bodies.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrMethods2">
+            <summary>
+            Order of initialization of CLR methods.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrMethods3">
+            <summary>
+            Mixing instance and static methods - instance Object::Equals(Object), static Object::Equals(Object, Object).
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrMethods4">
+            <summary>
+            Builtin types only expose CLR methods under unmangled names (mangling is no applied).
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrMethodEnumeration1">
+            <summary>
+            No CLR names should be returned for builtin types and singletons.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrExtensionMethods2">
+            <summary>
+            Loads an assembly that defines more extension methods in the given namespace.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrExtensionMethods3">
+            <summary>
+            Extension methods not available by default onlty after their declaring namespace is "used".
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrExtensionMethods4">
+            <summary>
+            Extension methods defined using generic parameters and constraints.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrExtensionMethods5">
+            <summary>
+            Extension methods are available on CLR interfaces implemented by Ruby classes.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrOverloadInheritance2">
+            <summary>
+            Dynamic site and group caching.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrOverloadInheritance5">
+            <summary>
+            Removing an overload barrier.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrOverloadInheritance6">
+            <summary>
+            Removing an overload barrier.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrOverloadInheritance7">
+            <summary>
+            Removing an overload barrier.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrOverloadInheritance_ClrMembers1">
+            <summary>
+            Method group should include methods of both casings.
+            It might depend on the order of method calls what overloads are available otherwise.
+            D.new.foo finds Foo and
+            - includes [foo(double), foo(int)] into the group if C.new.foo was invoked previously
+            - includes [Foo(bool)] into the group otherwise.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrExplicitInterfaces1">
+            <summary>
+            Calling (explicit) interface methods on internal classes.
+            A method that is accessible via any interface should be called.
+            If there is more than one then regular overload resolution should kick in.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrTypes1">
+            <summary>
+            Type represents a class object - it is equivalent to RubyClass.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrOverride2">
+            <summary>
+            Virtual methods of built-in types cannot be overridden.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrOverride3">
+            <summary>
+            We need to fully initialize the derived type before calling base ctor.
+            The ebase ctor can call virtual methods that require _class to be set.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrOverride4">
+            <summary>
+            Super call in an override.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrDetachedVirtual1">
+            <summary>
+            See RubyMethodGroupBase.BuildCallNoFlow.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrNew1">
+            <summary>
+            Instantiation.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrPrimitiveNumericTypes1">
+            <summary>
+            TODO: Currently we don't narrow results of arithmetic operations to the self-type even if the value fits.
+            That might by just fine, but in some scenarios (overload resolution) it might be better to narrow the result type.
+            Shelveset "Numerics-MetaOpsWithNarrowing" contains prototype implementation of the narrowing.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrOperators3">
+            <summary>
+            Operator mapping is not performed for builtin classes.
+            CLR BigInteger defines op_LessThan but we want less-than operator to call comparison method &lt;=&gt;.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrInclude1">
+            <summary>
+            CLR class re-def and inclusions.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClrAlias1">
+            <summary>
+            Alias.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Constants3">
+            <summary>
+            Class/module def makes name of the constant by appending its simple name to the name of the lexically containing class/module.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Constants4">
+            <summary>
+            Top-level class/module definition does look-up in Object and all its mixins.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.UnqualifiedConstants1">
+            <summary>
+            Unqualified constant lookup should search in lexical scopes from inner most to the outer most
+            looking into modules for constant declared in those modules and their mixins.
+            It shouldn't look to base classes nor mixins.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.UnqualifiedConstants2">
+            <summary>
+            If a constant is not found in the current scope chain, the inner-most module scope's module/class and its ancestors are checked.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.LoadAndGlobalConstants">
+            <summary>
+            Global constants defined in loaded code are defined on the anonymous module created by the load.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.GlobalConstants1">
+            <summary>
+            The default interop constant_missing looks to scope only if called on Object.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ConstantCaching_Unqualified4">
+            <summary>
+            GlobalConstantAccess version needs to be invalidate on inclusion.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ConstantCaching_Unqualified5">
+            <summary>
+            module_eval {} in Ruby 1.9 changes constant lookup chain.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ConstantCaching_Unqualified6">
+            <summary>
+            Update of strong value needs to set the weak value as well (and vice versa).
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ConstantCaching_Unqualified7">
+            <summary>
+            Check to see whether we don't unwrap WeakReferences accidentally, preserve object identity and unwrap null correctly.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Dlr_DynamicObject3">
+            <summary>
+            Scope variable lookup uses InteropBinder.TryGetMemberExact which should use errorSuggestion correctly.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Interpreter1C">
+            <summary>
+            Faults.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Interpreter1D">
+            <summary>
+            Faults.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Interpreter_JumpFromFinally1">
+            <summary>
+            Jump out of finally.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Interpreter_JumpFromFinally2">
+            <summary>
+            Pending continuation override: jump from finally should cancel any pending jumps (gotos or throws) from try-block.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Interpreter3">
+            <summary>
+            ThreadAbortException handling.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Interpreter6">
+            <summary>
+            Variable shadowing.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.InterpreterLoops3">
+            <summary>
+            Gotos with values jumping from the loop.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SimpleCall4">
+            <summary>
+            LambdaExpression gets converted to a wrapper.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SimpleCall5">
+            <summary>
+            CallSite optimization for more arguments than there is Func generic overloads.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.MethodCallCaching3">
+            <summary>
+            A method defined in a module is overridden by another module's method.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.MethodCallCaching_MethodMissing1">
+            <summary>
+            method_missing
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.MethodCallCaching_MethodMissing2">
+            <summary>
+            method_missing
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.MethodCallCaching_MethodMissing3">
+            <summary>
+            method_missing
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.MethodCallCaching7">
+            <summary>
+            Checks that if the same site is used twice and the first use failes on parameter conversion the second use is not affected.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.MethodCallCaching8">
+            <summary>
+            Caching of lookup failures on CLR types must distinguish between static and instance methods.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Send2">
+            <summary>
+            Send propagates the current scope.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Visibility2A">
+            <summary>
+            public/private/protected define a super-forwarder - a method that calls super.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Visibility3">
+            <summary>
+            Protected visibility and singletons.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Visibility4">
+            <summary>
+            Protected visibility + caching.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ModuleFunctionVisibility2">
+            <summary>
+            module_function/private/protected/public doesn't copy a method that is already private/private/protected/public.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.DefineMethodVisibility1">
+            <summary>
+            define_method copies given method and sets its visibility according to the the current scope flags.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.AliasedMethodVisibility1">
+            <summary>
+            alias, alias_method ignore the current scope visibility flags and copy methods with their visibility unmodified.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyScopes1">
+            <summary>
+            Tests that class lexical scopes are applied to method definitions.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyScopes2A">
+            <summary>
+            Uninitialized local variables.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyScopes2B">
+            <summary>
+            Uninitialized local variables in closure.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyScopes3">
+            <summary>
+            Tests that variables defined in module/class locals scope are not visible outside.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyScopes6">
+            <summary>
+            Nested module scopes - they don't have DLR tuples and therefore need to be skipped when looking up a storage from closure.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.BasicObject2">
+            <summary>
+            TODO: Unqualified constant lookup doesn't fallback to Object on BasicObject and its subclasses.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClassDuplication4">
+            <summary>
+            BasicObject
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Autoload1">
+            <summary>
+            Autoload removes the constant from the declaring module before it loads the target file.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ModuleFreezing1">
+            <summary>
+            Freezing and module initializers.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ModuleFreezing2">
+            <summary>
+            Tests recursive singleton freezing.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.InstanceVariables3">
+            <summary>
+            Instance variable removal.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.InstanceVariables4">
+            <summary>
+            Object cloning.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.InstanceVariables5">
+            <summary>
+            Subclasses of builtin types and CLR types.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.InstanceVariables6">
+            <summary>
+            Anonymous classes with a basse class that has static instance variables.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ProtocolCaching1">
+            <summary>
+            Kernel#Array first tries to_ary and then to_a. We need to invalidate the cache when to_ary is added.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ProtocolCaching2">
+            <summary>
+            We need to invalidate the cache when respond_to? is added.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ProtocolCaching3">
+            <summary>
+            We need to invalidate the cache when to_xxx is removed.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ProtocolCaching4">
+            <summary>
+            Caching of to_s conversion.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RangeCondition1A">
+            <summary>
+            The state variable of a range condition is allocated in the inner-most non-block lexical scope.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RangeCondition1B">
+            <summary>
+            The state variable of a range condition allocated the inner-most non-block lexical scope.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RangeCondition1C">
+            <summary>
+            The state variable of a range condition is statically allocated.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RangeCondition2">
+            <summary>
+            Block expressions propagate 'in-condition' property to the last statement.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyArgSplatting4">
+            <summary>
+            Splat anything that's IList (including arrays and values passed via out parameters).
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ToSConversion1">
+            <summary>
+            Embedded string does call "to_s" w/o calling "respond_to?" first.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SuperParameterless2B">
+            <summary>
+            Super passes the most recent values of the parameter variables but keeps the original block value.
+            This is consistent with yield.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Super2">
+            <summary>
+            Calls to super with block and no arguments (was bug in parser/AST).
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SuperAndMethodMissing1">
+            <summary>
+            Super calls method_missing.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SuperInDefineMethod1_Test(System.Boolean)">
+            <summary>
+            Super in a proc invoked via a call to a method defined by define_method uses
+            the method's name and declaring module for super-method lookup.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SuperInBlocks1">
+            <summary>
+            Super in a proc invoked via "call" uses the self and parameters captured in closure by the block.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SuperInDefineMethod2">
+            <summary>
+            define_method returns a lambda that behaves like a method-block when called.
+            This behavior is not very well defined in CRuby (see http://redmine.ruby-lang.org/issues/show/2419).
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SuperInDefineMethod3">
+            <summary>
+            Caching - a single super call site can be used for invocation of two different methods,
+            if it is defined in a block that is used in define_method.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SuperInDefineMethod4">
+            <summary>
+            Caching - The same as SuperInDefineMethod4 but with implicit arguments at super call site.
+            This should throw an exception as in Ruby 1.9.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SuperInDefineMethod5">
+            <summary>
+            Caching - the same super call site can be used to invoke different method names.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SuperInAliasedDefinedMethod1">
+            <summary>
+            Alias doesn't change DeclaringModule of the method =&gt; super call uses the class in which the method is defined.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SuperInModuleEval1">
+            <summary>
+            super doesn't use self, declaring-module defined by module_eval/instance_eval.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SuperCallInEvalWithBinding19">
+            <summary>
+            MRI 1.9: The self object captured by Kernel#binding is the one captured by the scope, not the receiver of the binding call.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.UndefMethodLookup1">
+            <summary>
+            Undef (unlike alias) doesn't look up the method in Object.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.UndefMethodLookup2">
+            <summary>
+            Undef in class_eval.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.UndefMethodLookup3">
+            <summary>
+            Undef on singletons.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.UndefMethodLookup4">
+            <summary>
+            Undef in instance_eval.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.UndefMethodLookup6">
+            <summary>
+            Undef in define_method.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyInitializers0">
+            <summary>
+            Tests whether user initializer is properly called (w/o block argument).
+            If this fails all RSpec tests fails.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyInitializers2B">
+            <summary>
+            Block's proc-converter ("new") is not alive when the block breaks.
+            This tests whether "new" frame is cleaned up correctly.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyInitializers3">
+            <summary>
+            Retry returns from the 'new' frame (skipping initialize frame) as that frame is its proc-converter.
+            The block is not redefined however. Only the proc-converter frame is updated to the new instance of the 'new' frame.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyInitializers4A">
+            <summary>
+            The same case as Scenario_RubyInitializers3, but with initializer defined in library.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyInitializers4B">
+            <summary>
+            A block is yielded to from "initialize", not from the factory.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyInitializers5">
+            <summary>
+            Test initializers with procs (instead of blocks - the proc-converter is different now).
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.EqualityComparer1">
+            <summary>
+            Equality comparer doesn't call 'eql?' if the values are reference-equal.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Eval4">
+            <summary>
+            Assigning to a variable defined in an outer scope shouldn't define a new variable in the currenct scope.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ModuleEvalProc2">
+            <summary>
+            Break from module_eval'd proc works.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ModuleEvalProc3">
+            <summary>
+            module_eval uses yield semantics for invoking the proc.
+            (return in a yield to inactive lambda doesn't work).
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.InstanceEvalProc1">
+            <summary>
+            instance_eval creates an instance singleton and sets the scope of method definitions and aliases to it.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.InstanceEvalProc2">
+            <summary>
+            instance_eval sets public visibility flag on the evaluated block scope.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ModuleClassNew1">
+            <summary>
+            module_eval is used in Class.new
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ModuleClassNew2">
+            <summary>
+            Class.new uses yield (as module_eval does). If the block doesn't break the return value is the class.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.LoopBreak1">
+            <summary>
+            Break in a while loop.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.LoopBreak2">
+            <summary>
+            Break with a value in a while loop.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.LoopBreak3">
+            <summary>
+            Loop break from within class declaration.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.LoopRedo1">
+            <summary>
+            Redo in a while loop.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.LoopNext1">
+            <summary>
+            Next in a while loop.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.MethodBreakRetryRedoNext1">
+            <summary>
+            Break, retry, redo and next in a method, out of loop/rescue.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RubyHosting1E">
+            <summary>
+            missing_method on scope forwards to super class if the variable is not defined in scope;
+            unmangled name is used if available and the mangled is not found in the scope.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RubyHosting1F">
+            <summary>
+            method_missing on main singleton can be invoked directly.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.PythonInterop_InvokeMember_Fallback1">
+            <summary>
+            Python falls back if the member is not defined and Ruby then invokes the member with original casing.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.PythonInterop_InvokeMember_Fallback2">
+            <summary>
+            Python falls back if the member is not defined and Ruby then invokes the member with original casing.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.PythonInterop_NamedIndexers1">
+            <summary>
+            We convert a call to a setter with multiple parameters to a GetMember + SetIndex.
+            This makes indexed properties on foreign meta-objects work.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RubyBlocks6">
+            <summary>
+            Return, yield and retry in a method.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RubyBlocks7">
+            <summary>
+            Break in a block.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RubyBlocks8">
+            <summary>
+            Redo in a block.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RubyBlocks9">
+            <summary>
+            Next in a block.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RubyBlocks10A">
+            <summary>
+            Retry in a block.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RubyBlocks10B">
+            <summary>
+            Retry in a block called via Proc#call.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RubyBlocks11">
+            <summary>
+            Return with stack unwinding.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RubyBlocks14A">
+            <summary>
+            Nested yielding.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RubyBlocks14B">
+            <summary>
+            Covers RubyOps.YieldBlockBreak.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RubyBlocks14C">
+            <summary>
+            Covers RubyOps.YieldBlockBreak error path.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RubyBlocks15">
+            <summary>
+            Retry for-loop: for-loop should behave like x.each { } method call with a block, that is x is reevaluted on retry.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RubyBlocks16">
+            <summary>
+            Tests optimization of block break from another block.
+            Yield yields to a block that breaks to its proc-converter, which is foo.
+            So the example should retrun 1 from the foo call.
+            Break is propagated thru yields in two ways:
+            1) returning ReturnReason == Break via BlockParam (fast path)
+            2) throwing MethodUnwinder exception (slow path)
+            ReturnReason should be propagated by yields as long as the owner of the block that contains the yield
+            is the target frame for the break. That's the case for for-loop blocks in this test.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RubyBlocks17">
+            <summary>
+            Retry is propagated to the 'each' call.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.BlockReturnOptimization1">
+            <summary>
+            Block return propagates thru a single library method with a block without throwing unwinding exception.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.BlockReturnOptimization2">
+            <summary>
+            Block return propagates thru multiple library method calls with a block without throwing unwinding exception.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.BlockReturnOptimization3">
+            <summary>
+            Block return propagates thru user method calls with a block without throwing unwinding exception.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.BlockReturnOptimization4">
+            <summary>
+            An unwinding exception is thrown if any frame is called w/o a block.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.BlockReturnOptimization5">
+            <summary>
+            Return propagates thru proc/lambda calls.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.BlockReturnOptimization6">
+            <summary>
+            Return propagates thru proc/lambda calls.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.BlockReturnOptimization7">
+            <summary>
+            Return propagates thru yield in a block.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyProcCallArgs2D">
+            <summary>
+            Tests MRI inconsistency in Yield1 vs YieldNoSplat1 when invoked from Call1.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyBlockArgs3">
+            <summary>
+            RHS is list, LHS is not simple, but contains splatting.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyBlockArgs4A">
+            <summary>
+            !L(1,-) and R(0,*), empty array to splat.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyBlockArgs4B">
+            <summary>
+            Anonymous unsplat parameters.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.RubyProcs2">
+            <summary>
+            Assigning to a block parameter should not affect yield.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.MethodToProc1">
+            <summary>
+            TODO: 1.9 actually doesn't allow proc.binding
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.DefineMethod2">
+            <summary>
+            define_method and class_eval change owner of the method definition.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.EvalBreak2">
+            <summary>
+            Break from a block called via Proc#call.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.EvalRetry1">
+            <summary>
+            Block needs to set InLoop and InRescue flags on RFC to "false".
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Singletons1A">
+            <summary>
+            Ruby class.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Singletons1B">
+            <summary>
+            Object.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Singletons1C">
+            <summary>
+            A subclass of a CLR class.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Singletons1D">
+            <summary>
+            A CLR class.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SingletonCaching2A">
+            <summary>
+            IRubyObjects.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SingletonCaching2B">
+            <summary>
+            Object.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.SingletonCaching2C">
+            <summary>
+            CLR types.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ModuleSingletons1">
+            <summary>
+            Singleton(module)'s super-class is singleton(Module).
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.ClassSingletons1">
+            <summary>
+            Cannot instantiate singleton(class).
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyExceptions12A">
+            <summary>
+            Order of evaluation inside rescue clauses.
+            </summary>
+        </member>
+        <member name="M:IronRuby.Tests.Tests.Scenario_RubyExceptions13">
+            <summary>
+            Retry try-catch block.
+            </summary>
+        </member>
+        <member name="T:IronRuby.Tests.CoverageParserLogger">
+            <summary>
+            Create a shadow stack, similar to the one used to keep track of which LALR state you are in
+            Whenever you encounter a 'shift' action push 0 on the shadow stack. Since you shift terimal symbols, we can ignore them.
+            Whenever you encounter a 'reduction' action, pop the top n elements off the shadow stack and log them. So, for example
+            if you encounter a production which is a sequence of four terminals you get "[ 0 0 0 0 ]".
+            Whenever you encounter a 'goto' action (typically immediately after a reduction), push the production ID on the shadow stack.
+            This way, the next time you reduce a production where the non terminal token was you have a production ID instead of 0.
+            </summary>
+        </member>
+    </members>
+</doc>

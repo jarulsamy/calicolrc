@@ -66,6 +66,7 @@ ERRORTOKEN = 52
 N_TOKENS = 53
 NT_OFFSET = 256
 #--end constants--
+__all__ = ["N_TOKENS", "tok_name"]
 
 tok_name = {}
 for _name, _value in globals().items():

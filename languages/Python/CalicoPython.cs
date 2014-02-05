@@ -96,7 +96,7 @@ namespace CalicoPython
 		{
 		  // If in another file, don't stop:
 		  if (ttype == "call") { 
-		    if (frame.f_code.co_filename != trace_filename)
+		      if (frame.f_code.co_filename != trace_filename)
 		      return null;
 		  }
 		  // If in correct file, and speed is less than full speed, show line:

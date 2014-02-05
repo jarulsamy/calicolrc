@@ -1,22 +1,12 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>obj/v2Release/Microsoft.Scripting.Metadata</name>
+        <name>obj/Debug/Microsoft.Scripting.Metadata</name>
     </assembly>
     <members>
         <member name="T:Microsoft.Scripting.Metadata.MemoryBlock">
             <summary>
             Represents a block in memory.
-            </summary>
-        </member>
-        <member name="T:Microsoft.Scripting.Metadata.MemoryMapping">
-            <summary>
-            Represents a memory mapped file. Can only be used by trusted code.
-            </summary>
-        </member>
-        <member name="M:Microsoft.Scripting.Metadata.MemoryMapping.Create(System.String)">
-            <summary>
-            Creates an empty mapping for given file. Only first 2GB the file are mapped if the file is greater.
             </summary>
         </member>
         <member name="T:Microsoft.Scripting.Metadata.MemoryReader">

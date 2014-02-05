@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>obj/v2Release/Microsoft.Scripting</name>
+        <name>obj/Debug/Microsoft.Scripting</name>
     </assembly>
     <members>
         <member name="T:Microsoft.Scripting.Hosting.DocumentationOperations">
@@ -315,12 +315,12 @@
             Converts the object obj to the type T.  Returns true if the value can be converted, false if it cannot.
             </summary>
         </member>
-        <member name="M:Microsoft.Scripting.Runtime.DynamicOperations.DoOperation``2(Microsoft.Scripting.Ast.ExpressionType,``0)">
+        <member name="M:Microsoft.Scripting.Runtime.DynamicOperations.DoOperation``2(System.Linq.Expressions.ExpressionType,``0)">
             <summary>
             Performs a generic unary operation on the strongly typed target and returns the value as the specified type
             </summary>
         </member>
-        <member name="M:Microsoft.Scripting.Runtime.DynamicOperations.DoOperation``3(Microsoft.Scripting.Ast.ExpressionType,``0,``1)">
+        <member name="M:Microsoft.Scripting.Runtime.DynamicOperations.DoOperation``3(System.Linq.Expressions.ExpressionType,``0,``1)">
             <summary>
             Peforms the generic binary operation on the specified strongly typed targets and returns
             the strongly typed result.
@@ -752,22 +752,22 @@
             Returns true if the value can be converted, false if it cannot.
             </summary>
         </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.DoOperation(Microsoft.Scripting.Ast.ExpressionType,System.Object)">
+        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.DoOperation(System.Linq.Expressions.ExpressionType,System.Object)">
             <summary>
             Performs a generic unary operation on the specified target and returns the result.
             </summary>
         </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.DoOperation``2(Microsoft.Scripting.Ast.ExpressionType,``0)">
+        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.DoOperation``2(System.Linq.Expressions.ExpressionType,``0)">
             <summary>
             Performs a generic unary operation on the strongly typed target and returns the value as the specified type
             </summary>
         </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.DoOperation(Microsoft.Scripting.Ast.ExpressionType,System.Object,System.Object)">
+        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.DoOperation(System.Linq.Expressions.ExpressionType,System.Object,System.Object)">
             <summary>
             Performs the generic binary operation on the specified targets and returns the result.
             </summary>
         </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.DoOperation``3(Microsoft.Scripting.Ast.ExpressionType,``0,``1)">
+        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.DoOperation``3(System.Linq.Expressions.ExpressionType,``0,``1)">
             <summary>
             Peforms the generic binary operation on the specified strongly typed targets and returns
             the strongly typed result.
@@ -1046,12 +1046,12 @@
             returning it.
             </summary>
         </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.DoOperation(Microsoft.Scripting.Ast.ExpressionType,System.Runtime.Remoting.ObjectHandle)">
+        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.DoOperation(System.Linq.Expressions.ExpressionType,System.Runtime.Remoting.ObjectHandle)">
             <summary>
             Performs the specified unary operator on the remote object.
             </summary>
         </member>
-        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.DoOperation(Microsoft.Scripting.Ast.ExpressionType,System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
+        <member name="M:Microsoft.Scripting.Hosting.ObjectOperations.DoOperation(System.Linq.Expressions.ExpressionType,System.Runtime.Remoting.ObjectHandle,System.Runtime.Remoting.ObjectHandle)">
             <summary>
             Performs the specified binary operator on the remote object.
             </summary>
@@ -1417,6 +1417,17 @@
             Use this API in case the exception is not serializable (for example, due to security restrictions) or its serialization
             loses information that you need to access.
             </remarks>
+        </member>
+        <member name="M:Microsoft.Scripting.Hosting.ScriptEngine.CreateScope">
+            <summary>
+            Creates a new ScriptScope using the default storage container
+            </summary>
+        </member>
+        <member name="M:Microsoft.Scripting.Hosting.ScriptEngine.CreateScope(System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            Creates a new ScriptScope whose storage contains the provided dictionary of objects
+            Accesses to the ScriptScope will turn into get,set, and delete members against this dictionary
+            </summary>
         </member>
         <member name="M:Microsoft.Scripting.Hosting.ScriptEngine.CreateScope(System.Dynamic.IDynamicMetaObjectProvider)">
             <summary>
@@ -2181,6 +2192,28 @@
         <member name="P:Microsoft.Scripting.Runtime.LanguageContext.CanCreateSourceCode">
             <summary>
             Whether the language can parse code and create source units.
+            </summary>
+        </member>
+        <member name="M:Microsoft.Scripting.Runtime.LanguageContext.GetScope(System.String)">
+            <summary>
+            Gets the scope associated with a file, or null if none was available
+            </summary>
+        </member>
+        <member name="M:Microsoft.Scripting.Runtime.LanguageContext.CreateScope">
+            <summary>
+            Creates a new ScriptScope using the default storage container
+            </summary>
+        </member>
+        <member name="M:Microsoft.Scripting.Runtime.LanguageContext.CreateScope(System.Collections.Generic.IDictionary{System.String,System.Object})">
+            <summary>
+            Creates a new ScriptScope whose storage contains the provided dictionary of objects
+            Accesses to the ScriptScope will turn into get,set, and delete members against this dictionary
+            </summary>
+        </member>
+        <member name="M:Microsoft.Scripting.Runtime.LanguageContext.CreateScope(System.Dynamic.IDynamicMetaObjectProvider)">
+            <summary>
+            Creates a new ScriptScope whose storage is an arbitrary object.
+            Accesses to the ScriptScope will turn into get, set, and delete members against the object.
             </summary>
         </member>
         <member name="M:Microsoft.Scripting.Runtime.LanguageContext.ScopeSetVariable(Microsoft.Scripting.Runtime.Scope,System.String,System.Object)">
