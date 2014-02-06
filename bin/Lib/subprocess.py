@@ -397,6 +397,13 @@ import gc
 import signal
 import errno
 
+if sys.platform == "cli":
+    os.WEXITSTATUS = 0
+    os.WIFEXITED = 1
+    os.WTERMSIG = 2
+    os.WIFSIGNALED = 3
+    os.WNOHANG = 4
+
 # Exception classes used by this module.
 class CalledProcessError(Exception):
     """This exception is raised when a process run by check_call() or
@@ -427,7 +434,6 @@ if mswindows:
 else:
     import select
     _has_poll = hasattr(select, 'poll')
-    import fcntl
     import pickle
 
     # When select or poll has indicated that the file is writable,
@@ -1068,6 +1074,7 @@ class Popen(object):
 
 
         def _set_cloexec_flag(self, fd, cloexec=True):
+            import fcntl
             try:
                 cloexec_flag = fcntl.FD_CLOEXEC
             except AttributeError:

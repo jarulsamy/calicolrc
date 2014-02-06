@@ -59,7 +59,8 @@ Compile():
 import __future__
 
 _features = [getattr(__future__, fname)
-             for fname in __future__.all_feature_names]
+             for fname in __future__.all_feature_names
+             if hasattr(__future__, fname)]
 
 __all__ = ["compile_command", "Compile", "CommandCompiler"]
 
