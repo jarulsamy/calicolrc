@@ -52,7 +52,8 @@ namespace CalicoPython
 				engine = manager.scriptRuntime.GetEngine (dlr_name);  
 			} else {
 				engine = scriptRuntime.GetEngine (dlr_name);  
-			}		
+			}
+			scope = IronPython.Hosting.Python.CreateModule(engine, "__main__");
 			// Set the compiler options here:
 			compiler_options = engine.GetCompilerOptions ();
 			IronPython.Compiler.PythonCompilerOptions options = (IronPython.Compiler.PythonCompilerOptions)compiler_options;
