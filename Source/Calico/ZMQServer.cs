@@ -31,20 +31,6 @@ public static class ZMQServer {
 	return System.Guid.NewGuid().ToString();
     }
 
-    public static IDictionary<string, object> Header(string date, 
-						     string msg_id,
-						     string username,
-						     string session,
-						     string msg_type) {
-	Dictionary<string,object> dict = new Dictionary<string,object>();
-	dict["date"] = date;
-	dict["msg_id"] = msg_id;
-	dict["username"] = username;
-	dict["session"] = session;
-	dict["msg_type"] = msg_type;
-	return dict;
-    }
-
     public static IDictionary<string, object> decode(string json) {
 	return JsonConvert.DeserializeObject<IDictionary<string, object>>(
 			    json, new JsonConverter[] {new MyConverter()});
@@ -153,11 +139,7 @@ public static class ZMQServer {
 
 	public void StdErrWrite(string message) {
 	    if (current_execution_count > 0) {
-		var header = Header(now(),
-				      "kernel",
-				      session_id,
-				      msg_id(),
-				      "stream");
+		var header = Header("stream");
 		var metadata = new Dictionary<string, object>();
 		var content = new Dictionary<string, object> {
 		    {"data", message},
@@ -172,11 +154,7 @@ public static class ZMQServer {
 	// Session:
 	public void StdOutWrite(string message) {
 	    if (current_execution_count > 0) {
-		var header = Header(now(),
-				      "kernel",
-				      session_id,
-				      msg_id(),
-				      "stream");
+		var header = Header("stream");
 		var metadata = new Dictionary<string, object>();
 		var content = new Dictionary<string, object> {
 		    {"data", message},
@@ -208,12 +186,47 @@ public static class ZMQServer {
 	    return data;
 	}
 
+	public IDictionary<string, object> Header(string msg_type) {
+	    Dictionary<string,object> dict = new Dictionary<string,object>();
+	    dict["date"] = now();
+	    dict["msg_id"] = msg_id();
+	    dict["username"] = "kernel";
+	    dict["session"] = session_id;
+	    dict["msg_type"] = msg_type;
+	    return dict;
+	}
+
+	public IDictionary<string, object> Header(string msg_type, string session_id) {
+	    Dictionary<string,object> dict = new Dictionary<string,object>();
+	    dict["date"] = now();
+	    dict["msg_id"] = msg_id();
+	    dict["username"] = "kernel";
+	    dict["session"] = session_id;
+	    dict["msg_type"] = msg_type;
+	    return dict;
+	}
+
+	public void display_widget(Widgets.Widget widget) {
+	    var header = Header("comm_open");
+	    var metadata = new Dictionary<string, object>();
+	    var content = widget.GetInitialState();
+	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	    header = Header("comm_msg");
+	    metadata = new Dictionary<string, object>();
+	    content = widget.GetState();
+	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	    header = Header("comm_msg");
+	    metadata = new Dictionary<string, object>();
+	    content = widget.GetDisplay();
+	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	}
+
 	public void display(object obj) {
-	    var header = Header(now(),
-				"kernel",
-				session_id, 
-				msg_id(),
-				"display_data");
+	    if (obj is Widgets.Widget) {
+		display_widget((Widgets.Widget)obj);
+		return;
+	    }
+	    var header = Header("display_data");
 	    var metadata = new Dictionary<string, object>();
 	    var content = new Dictionary<string, object> {
 		{"source", "display"},
@@ -345,12 +358,7 @@ public static class ZMQServer {
 
 	    // Shell handler
 	    if (m_header["msg_type"].ToString() == "execute_request") {
-		var header = Header(now(),
-				    msg_id(),
-				    "kernel",
-				    m_header["session"].ToString(),
-				    "status"
-				    );
+		var header = session.Header("status", m_header["session"].ToString());
 		var metadata = new Dictionary<string, object>();
 		var content = new Dictionary<string, object>
 		{
@@ -358,11 +366,7 @@ public static class ZMQServer {
 		};
 		send(session.iopub_channel, header, m_header, metadata, content);
 		// ---------------------------------------------------
-		header = Header(now(),
-				msg_id(),
-				"kernel",
-				m_header["session"].ToString(),
-				"pyin");
+		header = session.Header("pyin", m_header["session"].ToString());
 		metadata = new Dictionary<string, object>();
 		content = new Dictionary<string, object>
 		{
@@ -387,11 +391,7 @@ public static class ZMQServer {
 			session.calico.ActivateLanguage(language, session.calico.CurrentLanguage);
 			message = String.Format("Calico Language is now \"{0}\"", session.calico.GetCurrentProperLanguage());
 		    }
-		    header = Header(now(),
-				    msg_id(),
-				    "kernel",
-				    m_header["session"].ToString(),
-				    "pyout");
+		    header = session.Header("pyout", m_header["session"].ToString());
 		    content = new Dictionary<string, object>
 			{
 			    {"execution_count", execution_count},
@@ -401,11 +401,7 @@ public static class ZMQServer {
 		    send(session.iopub_channel, header, m_header, metadata, content);
 		}
 		if (code == "") {
-		    header = Header(now(),
-				    msg_id(),
-				    "kernel",
-				    m_header["session"].ToString(),
-				    "status");
+		    header = session.Header("status", m_header["session"].ToString());
 		    metadata = new Dictionary<string, object>();
 		    content = new Dictionary<string, object>
 			{
@@ -413,11 +409,7 @@ public static class ZMQServer {
 			};
 		    send(session.iopub_channel, header, m_header, metadata, content);
 		    // ---------------------------------------------------
-		    header = Header(now(),
-				    msg_id(),
-				    "kernel",
-				    m_header["session"].ToString(),
-				    "execute_reply");
+		    header = session.Header("execute_reply", m_header["session"].ToString());
 		    metadata = new Dictionary<string, object>
 			{
 			    {"dependencies_met", true},
@@ -440,12 +432,7 @@ public static class ZMQServer {
 		ExecuteInBackground(code, m_header, execution_count);
 		execution_count += 1;
 	    } else if (m_header["msg_type"].ToString() == "kernel_info_request") {
-		var header = Header(now(),
-				    msg_id(),
-				    "kernel",
-				    m_header["session"].ToString(),
-				    "kernel_info_reply"
-				    );
+		var header = session.Header("kernel_info_reply", m_header["session"].ToString());
 		var metadata = new Dictionary<string, object>();
 		var content = new Dictionary<string, object>
 		    {
@@ -456,11 +443,7 @@ public static class ZMQServer {
 		    };
 		send(session.shell_channel, header, m_header, metadata, content);
 	    } else if (m_header["msg_type"].ToString() == "history_request") {
-		var header = Header(now(),
-				msg_id(),
-				m_header["username"].ToString(),
-				m_header["session"].ToString(),
-				"kernel_info_reply");
+		var header = session.Header("kernel_info_reply", m_header["session"].ToString());
 		var content = new Dictionary<string, object>
 		    {
 			{"output", false}
@@ -468,17 +451,17 @@ public static class ZMQServer {
 		send(session.shell_channel, header, m_header, m_metadata, content);
 	    } else if (m_header["msg_type"].ToString() == "object_info_request") {
 		// FIXME: add object_info_request, shutdown_request, complete_request
+	    } else if (m_header["msg_type"].ToString() == "comm_msg") {
+		System.Console.WriteLine("sending comm_msg to " + m_content["comm_id"].ToString());
+		Widgets.onReceive(m_content["comm_id"].ToString(),
+				  (IDictionary<string, object>)m_content["data"]);
 	    } else {
 		throw new Exception("unknown msg_type: " + m_header["msg_type"]);
 	    }
 	}
 
 	public void ExecuteInBackground(string code, IDictionary<string, object> m_header, int execution_count) {
-	    var header = Header(now(),
-				msg_id(),
-				"kernel",
-				m_header["session"].ToString(),
-				"pyout");
+	    var header = session.Header("pyout", m_header["session"].ToString());
 	    var metadata = new Dictionary<string, object>();
 	    object retval = null;
 	    session.SetOutputs(execution_count, m_header);
@@ -501,11 +484,7 @@ public static class ZMQServer {
 		send(session.iopub_channel, header, m_header, metadata, content);
 	    }
 	    // ---------------------------------------------------
-	    header = Header(now(),
-			    msg_id(),
-			    "kernel",
-			    m_header["session"].ToString(),
-			    "status");
+	    header = session.Header("status", m_header["session"].ToString());
 	    metadata = new Dictionary<string, object>();
 	    content = new Dictionary<string, object>
 		{
@@ -513,11 +492,7 @@ public static class ZMQServer {
 		};
 	    send(session.iopub_channel, header, m_header, metadata, content);
 	    // ---------------------------------------------------
-	    header = Header(now(),
-			    msg_id(),
-			    "kernel",
-			    m_header["session"].ToString(),
-			    "execute_reply");
+	    header = session.Header("execute_reply", m_header["session"].ToString());
 	    metadata = new Dictionary<string, object>
 		{
 		    {"dependencies_met", true},

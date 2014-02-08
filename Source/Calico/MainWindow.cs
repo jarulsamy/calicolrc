@@ -4397,6 +4397,10 @@ del _invoke, _
 	public ImageRepresentation Image(string filename) {
 	    return new ImageRepresentation(filename);
 	}
+
+	public Widgets.FloatSliderView FloatSliderView() {
+	    return new Widgets.FloatSliderView();
+	}
     
 	// JSON, PNG, JPEG, SVG, Math, LaTeX, Audio, Video, IFrame
 	// display_pretty, display_html, display_jpeg, display_png, 
@@ -4406,7 +4410,7 @@ del _invoke, _
 	    if (ZMQServer.session != null)
 		ZMQServer.session.display(obj);
 	    else
-		Print(Repr(obj));
+		PrintLine(Repr(obj));
 	}
     }
 }
