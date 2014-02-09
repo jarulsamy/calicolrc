@@ -207,6 +207,8 @@ public static class ZMQServer {
 	}
 
 	public void update_widget(Widgets.Widget widget, IDictionary<string, object> parent_header) {
+	    // FIXME: this works for initializing widgets, but not for generic updates
+	    // not sure what is missing...
 	    var header = Header("comm_msg");
 	    var metadata = new Dictionary<string, object>();
 	    var content = widget.GetState();
@@ -458,7 +460,8 @@ public static class ZMQServer {
 	    } else if (m_header["msg_type"].ToString() == "comm_msg") {
 		System.Console.WriteLine("sending comm_msg to " + m_content["comm_id"].ToString());
 		Widgets.Dispatch(m_content["comm_id"].ToString(),
-				  (IDictionary<string, object>)m_content["data"]);
+				 (IDictionary<string, object>)m_content["data"],
+				 m_header);
 	    } else {
 		throw new Exception("unknown msg_type: " + m_header["msg_type"]);
 	    }
