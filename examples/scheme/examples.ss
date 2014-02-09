@@ -127,7 +127,7 @@
 
 (define test-all
   (lambda ()
-    (display "Testing letrec, macros, and streams: ")
+    (printf "Testing letrec, macros, and streams: ")
     (verify #f (odd? 42))
     (verify #t (even? 42))
     (verify #t (odd? 43))
@@ -162,12 +162,12 @@
     ;;(display exp)
     ;;(display " ")
     (if (equal? exp answer)
-      (display ".")
+      (printf ".")
 	  (printf "failed; was ~a, should be ~a" exp answer))))
 
 (define test-mu-lambda
   (lambda ()
-    (display "\nTesting mu lambda: ")
+    (printf "\nTesting mu lambda: ")
     (verify '(1 2 3 4 5)
       ((lambda x x) 1 2 3 4 5))
     (verify '(1 (2 3 4 5))
@@ -185,7 +185,7 @@
 
 (define test-define
   (lambda ()
-    (display "\nTesting define: ")
+    (printf "\nTesting define: ")
     (define f1 (lambda (a b c) (list a b c)))
     (define (f2) (list 42))
     (define (f3 . x) (list x))
@@ -196,7 +196,7 @@
 
 (define test-call/cc
   (lambda ()
-    (display "\nTesting call/cc: ")
+    (printf "\nTesting call/cc: ")
     (verify 40
       (* 10 (call/cc (lambda (k) 4))))
     (verify 40
@@ -208,7 +208,7 @@
 
 (define test-try
   (lambda ()
-    (display "\nTesting try: ")
+    (printf "\nTesting try: ")
     (verify 3
       (try 3))
     (verify 3
@@ -284,7 +284,7 @@
 
 (define test-loop
   (lambda ()
-    (display "\nTesting loop: ")
+    (printf "\nTesting loop: ")
     (verify 'blastoff! (try (let loop ((n 5))
                             n
                             (if (= n 0)
@@ -293,7 +293,7 @@
                 (catch e e)))))
 
 (define (test-macros)
-  (display "\nTesting macros: ")
+  (printf "\nTesting macros: ")
   (verify #t
     (let ((bool 5))
       (or (= bool 4) (= bool 5))))
