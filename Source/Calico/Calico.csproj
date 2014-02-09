@@ -79,6 +79,9 @@
     <Reference Include="agsXMPP, Version=1.2.1.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>..\..\bin\agsXMPP.dll</HintPath>
     </Reference>
+    <Reference Include="Widgets">
+      <HintPath>..\..\modules\Widgets.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MainWindow.cs" />
@@ -92,7 +95,6 @@
     <Compile Include="History.cs" />
     <Compile Include="TabCompletion.cs" />
     <Compile Include="ZMQServer.cs" />
-    <Compile Include="Widgets.cs" />
     <Compile Include="Representations.cs" />
     <Compile Include="..\..\modules\Reflection\Reflection.cs">
       <Link>Reflection.cs</Link>

@@ -453,7 +453,7 @@ public static class ZMQServer {
 		// FIXME: add object_info_request, shutdown_request, complete_request
 	    } else if (m_header["msg_type"].ToString() == "comm_msg") {
 		System.Console.WriteLine("sending comm_msg to " + m_content["comm_id"].ToString());
-		Widgets.onReceive(m_content["comm_id"].ToString(),
+		Widgets.Dispatch(m_content["comm_id"].ToString(),
 				  (IDictionary<string, object>)m_content["data"]);
 	    } else {
 		throw new Exception("unknown msg_type: " + m_header["msg_type"]);

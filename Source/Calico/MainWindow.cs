@@ -4398,10 +4398,6 @@ del _invoke, _
 	    return new ImageRepresentation(filename);
 	}
 
-	public Widgets.FloatSliderView FloatSliderView() {
-	    return new Widgets.FloatSliderView();
-	}
-    
 	// JSON, PNG, JPEG, SVG, Math, LaTeX, Audio, Video, IFrame
 	// display_pretty, display_html, display_jpeg, display_png, 
 	// display_json, display_latex, display_svg, display_audio, display_video
