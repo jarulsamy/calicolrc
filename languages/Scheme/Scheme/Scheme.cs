@@ -13,7 +13,9 @@ using System;
 using System.IO; // File
 using System.Reflection; // Assembly
 using System.Threading;
-using Microsoft.Scripting.Math;
+//using Microsoft.Scripting.Math;
+using System.Numerics;
+using Mono.Math;
 using Microsoft.Scripting.Hosting;
 using System.Collections; // Hashtable
 using System.Collections.Generic; // List
@@ -143,12 +145,7 @@ public class Scheme {
   }
 
   public static BigInteger makeBigInteger(int value) {
-	int sign = +1;
-	if (value < 0) {
-	  sign = -1;
-	  value *= -1;
-	}
-	return new BigInteger(sign, (uint)value);
+	return new BigInteger(value);
   }
 
   public static BigInteger BigIntegerParse(string value) {
@@ -1903,8 +1900,8 @@ public class Scheme {
 		  // ignore and continue
 		}
 	  }
-	  BigInteger b1 = null;
-	  BigInteger b2 = null;
+	  BigInteger? b1 = null;
+	  BigInteger? b2 = null;
 	  if (obj1 is int) {
 		b1 = makeBigInteger((int) obj1);
 	  } else if (obj1 is BigInteger) {
@@ -1960,8 +1957,8 @@ public class Scheme {
           // continue
         }
       }
-      BigInteger b1 = null;
-      BigInteger b2 = null;
+      BigInteger? b1 = null;
+      BigInteger? b2 = null;
       if (obj1 is int) {
         b1 = makeBigInteger((int) obj1);
       } else if (obj1 is BigInteger) {
@@ -2071,8 +2068,8 @@ public class Scheme {
 		  // pass
 		}
 	  }
-	  BigInteger b1 = null;
-	  BigInteger b2 = null;
+	  BigInteger? b1 = null;
+	  BigInteger? b2 = null;
 	  if (obj1 is int) {
 		b1 = makeBigInteger((int) obj1);
 	  } else if (obj1 is BigInteger) {
@@ -2116,8 +2113,8 @@ public class Scheme {
 		  // pass
 		}
 	  }
-	  BigInteger b1 = null;
-	  BigInteger b2 = null;
+	  BigInteger? b1 = null;
+	  BigInteger? b2 = null;
 	  if (obj1 is int) {
 		b1 = makeBigInteger((int) obj1);
 	  } else if (obj1 is BigInteger) {
@@ -2161,8 +2158,8 @@ public class Scheme {
           // ignore and continue
         }
       }
-      BigInteger b1 = null;
-      BigInteger b2 = null;
+      BigInteger? b1 = null;
+      BigInteger? b2 = null;
       if (obj1 is int) {
         b1 = makeBigInteger((int) obj1);
       } else if (obj1 is BigInteger) {
@@ -2209,8 +2206,8 @@ public class Scheme {
           // continue
         }
       }
-      BigInteger b1 = null;
-      BigInteger b2 = null;
+      BigInteger? b1 = null;
+      BigInteger? b2 = null;
       if (obj1 is int) {
         b1 = makeBigInteger((int) obj1);
       } else if (obj1 is BigInteger) {
@@ -2278,8 +2275,8 @@ public class Scheme {
             // ignore and continue
           }
         }
-        BigInteger b1 = null;
-        BigInteger b2 = null;
+        BigInteger? b1 = null;
+        BigInteger? b2 = null;
         if (obj1 is int) {
           b1 = makeBigInteger((int) obj1);
         } else if (obj1 is BigInteger) {
@@ -2698,7 +2695,7 @@ public class Scheme {
 	  else if (obj is float || obj is double)
 	      return Math.Abs((double)obj);
 	  else if (obj is BigInteger)
-	      return ((BigInteger)obj).Abs();
+	      return BigInteger.Abs((BigInteger)obj);
 	  else if (obj is Rational)
 	      return Math.Abs((double)ToDouble(obj));
 	  else
