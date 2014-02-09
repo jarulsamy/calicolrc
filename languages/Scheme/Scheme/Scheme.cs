@@ -21,6 +21,32 @@ using System.Collections; // Hashtable
 using System.Collections.Generic; // List
 using IronPython;
 
+public static class ReflectionExtensions {
+
+    public static object InvokeWithNamedParameters(this MethodBase self, object obj, IDictionary<string, object> namedParameters) { 
+        return self.Invoke(obj, MapParameters(self, namedParameters));
+    }
+
+    public static object[] MapParameters(MethodBase method, IDictionary<string, object> namedParameters)
+    {
+	var parms = method.GetParameters();
+        string[] paramNames = new string[parms.Length];
+        object[] parameters = new object[parms.Length];
+	int i = 0;
+	foreach (var parm in parms) {
+            parameters[i] = parm.RawDefaultValue;
+	    paramNames[i] = parm.Name;
+	    i++;
+	}
+        foreach (var item in namedParameters) {
+            var paramName = item.Key;
+            var paramIndex = Array.IndexOf(paramNames, paramName);
+            parameters[paramIndex] = item.Value;
+        }
+        return parameters;
+    }
+}
+
 public class Method {
     public object classobj;
     public MethodInfo method;
@@ -38,8 +64,21 @@ public class Method {
 	}
 	// then invoke
 	this.method = type.GetMethod(this.name, Scheme.get_types(args));
-	object retval = this.method.Invoke(this.classobj, args);
-	return retval != null ? retval : Scheme.symbol("<void>");
+	if (this.method == null) {
+	    var parameters = new Dictionary<string, object>();
+	    // Add parameters to dict
+	    this.method = type.GetMethod(this.name);
+	    object retval = this.method.InvokeWithNamedParameters(this.classobj, parameters); // FIXME: pass in args
+	    if (this.method != null) {
+		return retval != null ? retval : Scheme.symbol("<void>");
+	    } else {
+		System.Console.Error.WriteLine("invoke failed!");
+		return Scheme.symbol("<void>");
+	    }
+	} else {
+	    object retval = this.method.Invoke(this.classobj, args);
+	    return retval != null ? retval : Scheme.symbol("<void>");
+	}
     }
 }
 
