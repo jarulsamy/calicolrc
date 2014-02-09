@@ -206,15 +206,19 @@ public static class ZMQServer {
 	    return dict;
 	}
 
+	public void update_widget(Widgets.Widget widget, IDictionary<string, object> parent_header) {
+	    var header = Header("comm_msg");
+	    var metadata = new Dictionary<string, object>();
+	    var content = widget.GetState();
+	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	}
+
 	public void display_widget(Widgets.Widget widget) {
 	    var header = Header("comm_open");
 	    var metadata = new Dictionary<string, object>();
 	    var content = widget.GetInitialState();
 	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
-	    header = Header("comm_msg");
-	    metadata = new Dictionary<string, object>();
-	    content = widget.GetState();
-	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	    update_widget(widget, parent_header);
 	    header = Header("comm_msg");
 	    metadata = new Dictionary<string, object>();
 	    content = widget.GetDisplay();

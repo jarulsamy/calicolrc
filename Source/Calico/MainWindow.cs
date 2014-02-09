@@ -4402,6 +4402,25 @@ del _invoke, _
 	// display_pretty, display_html, display_jpeg, display_png, 
 	// display_json, display_latex, display_svg, display_audio, display_video
 
+	public Widgets.Widget ButtonWidget(string description="", 
+					   bool disabled=false, 
+					   bool visible=true) {
+	    return new Widgets.ButtonWidget(ZMQServer.session, description, disabled, visible);
+	}
+
+	public Widgets.Widget FloatSliderWidget(double min=0.0, 
+						double max=100.0, 
+						double step=0.1, 
+						double value=0.0, 
+						string description="",
+						string orientation="horizontal", 
+						bool readout=true, 
+						bool disabled=false, 
+						bool visible=true) {
+	    return new Widgets.FloatSliderWidget(ZMQServer.session, min, max, step, value, description,
+						 orientation, readout, disabled, visible);
+	}
+
 	public void display(object obj) {
 	    if (ZMQServer.session != null)
 		ZMQServer.session.display(obj);

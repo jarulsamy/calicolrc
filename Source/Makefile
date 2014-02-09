@@ -1,7 +1,3 @@
 
-all: ../modules/Widgets.dll 
+all: 
 	xbuild
-
-../modules/Widgets.dll: Calico/Widgets.cs
-	mcs Calico/Widgets.cs -target:library -out:../modules/Widgets.dll
-

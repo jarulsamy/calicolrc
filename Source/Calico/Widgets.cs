@@ -28,8 +28,10 @@ public static class Widgets {
 	public string comm_id;
 	public System.Func<object,object> on_click_func;
 	public Dictionary<string,System.Func<string,string,object>> on_value_change_func = new Dictionary<string,System.Func<string,string,object>>();
+	ZMQServer.Session session = null;
 
-	public Widget() {
+	public Widget(ZMQServer.Session session) {
+	    this.session = session;
 	    target_name = "WidgetModel";
 	    data = new Dictionary<string, object>();
 	    comm_id = System.Guid.NewGuid().ToString();
@@ -37,11 +39,22 @@ public static class Widgets {
 	    Widgets.register(this);
 	}
 
+	// Attributes
+	public bool visible {
+	    get { return (bool)get("visible"); }
+	    set { set("visible", value); }
+	}
+	public bool disabled {
+	    get { return (bool)get("disabled"); }
+	    set { set("disabled", value); }
+	}
+
 	public void Dispatch(IDictionary<string, object> data) {
 	    // handle comm_msg for widget
 	    if (data.ContainsKey("sync_data")) {
 		// data: {"method":"backbone","sync_data":{"value":0.8}}
-		this.data["value"] = ((Dictionary<string,object>)data["sync_data"])["value"];
+		((Dictionary<string,object>)this.data["state"])["value"] = ((Dictionary<string,object>)data["sync_data"])["value"];
+		update();
 	    }
 	    if (data.ContainsKey("content")) {
 		// data: {"content":{"event":"click"},"method":"custom"}
@@ -90,21 +103,55 @@ public static class Widgets {
 	}
 
 	public void set(string value_name, object value) {
-	    data[value_name] = value;
-	    // Need to send comm_msg:
-	    // data: {"state":{"_view_name":"ButtonView","disabled":false,"_css":{},"description":"XXX","visible":true},"method":"update"}
+	    ((Dictionary<string,object>)data["state"])[value_name] = value;
+	    session.update_widget(this, new Dictionary<string, object>());
+	}
+
+	public void update() {
+	    session.update_widget(this, new Dictionary<string, object>());
 	}
 
 	public object get(string value_name) {
-	    return data[value_name];
+	    return ((Dictionary<string,object>)data["state"])[value_name];
 	}
     }
 
     public class FloatSliderWidget : Widget {
-	public FloatSliderWidget(double min=0.0, double max=100.0, double step=0.1, 
+	// Attributes
+	public double min {
+	    get { return (double)get("min"); }
+	    set { set("min", value); }
+	}
+	public double max {
+	    get { return (double)get("max"); }
+	    set { set("max", value); }
+	}
+	public double step {
+	    get { return (double)get("step"); }
+	    set { set("step", value); }
+	}
+	public double value {
+	    get { return (double)get("value"); }
+	    set { set("value", value); }
+	}
+	public string description {
+	    get { return (string)get("description"); }
+	    set { set("description", value); }
+	}
+	public string orientation {
+	    get { return (string)get("orientation"); }
+	    set { set("orientation", value); }
+	}
+	public bool readout {
+	    get { return (bool)get("readout"); }
+	    set { set("readout", value); }
+	}
+
+	public FloatSliderWidget(ZMQServer.Session session,
+				 double min=0.0, double max=100.0, double step=0.1, 
 				 double value=0.0, string description="",
 				 string orientation="horizontal", bool readout=true, 
-				 bool disabled=false, bool visible=true) : base() {
+				 bool disabled=false, bool visible=true) : base(session) {
 	    data["state"] = new Dictionary<string,object> {
 		{"_view_name",  "FloatSliderView"},
 		{"orientation", orientation},
@@ -123,8 +170,16 @@ public static class Widgets {
     }
 
     public class ButtonWidget : Widget {
-	public ButtonWidget(string description="", bool disabled=false, 
-			    bool visible=true, string css="") : base() {
+	// Attributes
+	public string description {
+	    get { return (string)get("description"); }
+	    set { set("description", value); }
+	}
+
+	public ButtonWidget(ZMQServer.Session session,
+			    string description="", 
+			    bool disabled=false, 
+			    bool visible=true) : base(session) {
 	    data["state"] = new Dictionary<string,object> {
 		{"_view_name",  "ButtonView"},
 		{"_css",        new Dictionary<string,object>()},
@@ -139,7 +194,7 @@ public static class Widgets {
     /*
       BoundedFloatTextWidget
       BoundedIntTextWidget
-      ButtonWidget
+      ButtonWidget - ok
       CheckboxWidget
       DropdownWidget
       FloatProgressWidget
