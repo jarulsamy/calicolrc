@@ -50,6 +50,10 @@ public static class Widgets {
 	    get { return (bool)get("disabled"); }
 	    set { set("disabled", value); }
 	}
+	public string _view_name {
+	    get { return (string)get("_view_name"); }
+	    set { set("_view_name", value); }
+	}
 
 	public void Dispatch(IDictionary<string, object> data,
 			     IDictionary<string, object> parent_header) {
@@ -113,14 +117,14 @@ public static class Widgets {
 	    };
 	}
 
+	public void update(IDictionary<string, object> parent_header) {
+	    session.update_widget(this, parent_header);
+	}
+
 	public void set(string value_name, object value) {
 	    ((Dictionary<string,object>)data["state"])[value_name] = value;
 	    // not in reaction to a message, no parent_header
 	    session.update_widget(this, new Dictionary<string, object>());
-	}
-
-	public void update(IDictionary<string, object> parent_header) {
-	    session.update_widget(this, parent_header);
 	}
 
 	public object get(string value_name) {
@@ -391,12 +395,27 @@ public static class Widgets {
 	    get { return (string)get("description"); }
 	    set { set("description", value); }
 	}
+	public double min {
+	    get { return (double)get("min"); }
+	    set { set("min", value); }
+	}
+	public double max {
+	    get { return (double)get("max"); }
+	    set { set("max", value); }
+	}
+	public double step {
+	    get { return (double)get("step"); }
+	    set { set("step", value); }
+	}
 	public double value {
 	    get { return (double)get("value"); }
 	    set { set("value", value); }
 	}
 
 	public FloatTextProgressWidget(ZMQServer.Session session,
+				       double min=0.0, 
+				       double max=100.0, 
+				       double step=0.1, 
 				       double value=0.0,
 				       string description="", 
 				       bool disabled=false, 
@@ -407,6 +426,9 @@ public static class Widgets {
 		{"disabled",    disabled},
 		{"visible",     visible},
 		{"description", description},
+		{"min",         min},
+		{"max",         max},
+		{"step",        step},
 		{"value",       value},
 	    };
 	    data["method"] = "update";
@@ -447,16 +469,22 @@ public static class Widgets {
 	    get { return (string)get("description"); }
 	    set { set("description", value); }
 	}
+	public string value {
+	    get { return (string)get("value"); }
+	    set { set("value", value); }
+	}
 
 	public HTMLWidget(ZMQServer.Session session,
-			    string description="", 
-			    bool disabled=false, 
-			    bool visible=true) : base(session) {
+			  string value,
+			  string description="", 
+			  bool disabled=false, 
+			  bool visible=true) : base(session) {
 	    data["state"] = new Dictionary<string,object> {
 		{"_view_name",  "HTMLView"},
 		{"_css",        get_css()},
 		{"disabled",    disabled},
 		{"visible",     visible},
+		{"value",       value},
 		{"description", description},
 	    };
 	    data["method"] = "update";
@@ -649,16 +677,22 @@ public static class Widgets {
 	    get { return (string)get("description"); }
 	    set { set("description", value); }
 	}
+	public string value {
+	    get { return (string)get("value"); }
+	    set { set("value", value); }
+	}
 
 	public LatexWidget(ZMQServer.Session session,
-			    string description="", 
-			    bool disabled=false, 
-			    bool visible=true) : base(session) {
+			   string value,
+			   string description="", 
+			   bool disabled=false, 
+			   bool visible=true) : base(session) {
 	    data["state"] = new Dictionary<string,object> {
 		{"_view_name",  "LatexView"},
 		{"_css",        get_css()},
 		{"disabled",    disabled},
 		{"visible",     visible},
+		{"value",       value},
 		{"description", description},
 	    };
 	    data["method"] = "update";
@@ -691,17 +725,23 @@ public static class Widgets {
 	    get { return (string)get("description"); }
 	    set { set("description", value); }
 	}
+	public string value {
+	    get { return (string)get("value"); }
+	    set { set("value", value); }
+	}
 
 	public TextWidget(ZMQServer.Session session,
-			    string description="", 
-			    bool disabled=false, 
-			    bool visible=true) : base(session) {
+			  string value="",
+			  string description="", 
+			  bool disabled=false, 
+			  bool visible=true) : base(session) {
 	    data["state"] = new Dictionary<string,object> {
 		{"_view_name",  "TextView"},
 		{"_css",        get_css()},
 		{"disabled",    disabled},
 		{"visible",     visible},
 		{"description", description},
+		{"value",       value},
 	    };
 	    data["method"] = "update";
 	}
@@ -713,16 +753,22 @@ public static class Widgets {
 	    get { return (string)get("description"); }
 	    set { set("description", value); }
 	}
+	public string value {
+	    get { return (string)get("value"); }
+	    set { set("value", value); }
+	}
 
 	public TextareaWidget(ZMQServer.Session session,
-			    string description="", 
-			    bool disabled=false, 
-			    bool visible=true) : base(session) {
+			      string value,
+			      string description="", 
+			      bool disabled=false, 
+			      bool visible=true) : base(session) {
 	    data["state"] = new Dictionary<string,object> {
 		{"_view_name",  "TextareaView"},
 		{"_css",        get_css()},
 		{"disabled",    disabled},
 		{"visible",     visible},
+		{"value",       value},
 		{"description", description},
 	    };
 	    data["method"] = "update";
@@ -741,9 +787,10 @@ public static class Widgets {
 	}
 
 	public ToggleButtonWidget(ZMQServer.Session session,
-			    string description="", 
-			    bool disabled=false, 
-			    bool visible=true) : base(session) {
+				  bool value,
+				  string description="", 
+				  bool disabled=false, 
+				  bool visible=true) : base(session) {
 	    data["state"] = new Dictionary<string,object> {
 		{"_view_name",  "ToggleButtonView"},
 		{"_css",        get_css()},
@@ -762,7 +809,6 @@ public static class Widgets {
 				   bool disabled=false, 
 				   bool visible=true) : 
    	         base(session, description, disabled, visible) {
-	    
 	    ((IDictionary<string,object>)data["state"])["_view_name"] = "ToggleButtonsView";
 	}
     }

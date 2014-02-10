@@ -4394,6 +4394,10 @@ del _invoke, _
 	    return new MimeRepresentation("text/html", text, "text/plain", "<HTML>");
 	}
 	
+	public MimeRepresentation Javascript(string text) {
+	    return new MimeRepresentation("application/javascript", text, "text/plain", "<JavaScript>");
+	}
+
 	public ImageRepresentation Image(string filename) {
 	    return new ImageRepresentation(filename);
 	}
