@@ -286,12 +286,20 @@ namespace Calico {
 		try { 
 		    sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
 		    source = engine.CreateScriptSourceFromString(text, sctype);
-		    compiledCode = source.Compile();
+		    if (compiler_options != null) {
+			compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
+		    } else {
+			compiledCode = source.Compile();
+		    }		 
 		} catch {
 		    try {
 			sctype = Microsoft.Scripting.SourceCodeKind.Statements;
 			source = engine.CreateScriptSourceFromString(text, sctype);
-			compiledCode = source.Compile();
+			if (compiler_options != null) {
+			    compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
+			} else {
+			    compiledCode = source.Compile();
+			}
 		    } catch (Exception e) {
 			Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
 			PrintLine(eo.FormatException(e));
