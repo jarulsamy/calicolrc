@@ -23,18 +23,22 @@ using IronPython;
 
 public static class ReflectionExtensions {
 
-    public static object InvokeWithNamedParameters(this MethodBase self, object obj, IDictionary<string, object> namedParameters) { 
-        return self.Invoke(obj, MapParameters(self, namedParameters));
+    public static object InvokeWithNamedParameters(this MethodBase self, object obj, object [] args, IDictionary<string, object> namedParameters) { 
+        return self.Invoke(obj, MapParameters(self, args, namedParameters));
     }
 
-    public static object[] MapParameters(MethodBase method, IDictionary<string, object> namedParameters)
+    public static object[] MapParameters(MethodBase method, object [] args, IDictionary<string, object> namedParameters)
     {
 	var parms = method.GetParameters();
         string[] paramNames = new string[parms.Length];
         object[] parameters = new object[parms.Length];
 	int i = 0;
 	foreach (var parm in parms) {
-            parameters[i] = parm.RawDefaultValue;
+	    if (i < args.Length) {
+		parameters[i] = args[i];
+	    } else {
+		parameters[i] = parm.RawDefaultValue;
+	    }
 	    paramNames[i] = parm.Name;
 	    i++;
 	}
@@ -62,13 +66,17 @@ public class Method {
 	if (this.type == null) {
 	    this.type = classobj.GetType();
 	}
-	// then invoke
+	// then invoke 
+	// FIXME: this two step method doesn't work with those
+	// functions that have some default args with parameter names
+	// does work with fully specified args (all), or with functions
+	// that have default args for all.
 	this.method = type.GetMethod(this.name, Scheme.get_types(args));
 	if (this.method == null) {
 	    var parameters = new Dictionary<string, object>();
 	    // Add parameters to dict
 	    this.method = type.GetMethod(this.name);
-	    object retval = this.method.InvokeWithNamedParameters(this.classobj, parameters); // FIXME: pass in args
+	    object retval = this.method.InvokeWithNamedParameters(this.classobj, args, parameters); 
 	    if (this.method != null) {
 		return retval != null ? retval : Scheme.symbol("<void>");
 	    } else {
