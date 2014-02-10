@@ -206,9 +206,17 @@ public static class ZMQServer {
 	    return dict;
 	}
 
-	public void update_widget(Widgets.Widget widget, IDictionary<string, object> parent_header) {
-	    // FIXME: this works for initializing widgets, but not for generic updates
-	    // not sure what is missing...
+	public void update_status(string status, IDictionary<string, object> parent_header) { 
+	    // "busy", "idle"
+	    var header = Header("status");
+	    var metadata = new Dictionary<string, object>();
+	    var content = new Dictionary<string, object>() {
+		{"execution_state", status}
+	    };
+	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	}
+
+	public void update_state(Widgets.Widget widget, IDictionary<string, object> parent_header) { 
 	    var header = Header("comm_msg");
 	    var metadata = new Dictionary<string, object>();
 	    var content = widget.GetState();
@@ -220,7 +228,7 @@ public static class ZMQServer {
 	    var metadata = new Dictionary<string, object>();
 	    var content = widget.GetInitialState();
 	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
-	    update_widget(widget, parent_header);
+	    update_state(widget, parent_header);
 	    header = Header("comm_msg");
 	    metadata = new Dictionary<string, object>();
 	    content = widget.GetDisplay();

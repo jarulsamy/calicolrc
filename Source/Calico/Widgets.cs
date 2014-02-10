@@ -1,6 +1,7 @@
 // IPython kernel backend in C#
 // Doug Blank
 
+using System; // Int64
 using System.Collections; // IDictionary
 using System.Collections.Generic; // Dictionary
 
@@ -60,14 +61,17 @@ public static class Widgets {
 	    // handle comm_msg for widget
 	    if (data.ContainsKey("sync_data")) {
 		// data: {"method":"backbone","sync_data":{"value":0.8}}
+		session.update_status("busy", parent_header);
 		((Dictionary<string,object>)this.data["state"])["value"] = ((Dictionary<string,object>)data["sync_data"])["value"];
-		update(parent_header);
+		session.update_status("idle", parent_header);
 	    }
 	    if (data.ContainsKey("content")) {
 		// data: {"content":{"event":"click"},"method":"custom"}
 		string evt = ((Dictionary<string,object>)data["content"])["event"].ToString();
 		if (evt == "click") {
+		    session.update_status("busy", parent_header);
 		    onClick();
+		    session.update_status("idle", parent_header);
 		}
 	    }
 	}
@@ -117,14 +121,10 @@ public static class Widgets {
 	    };
 	}
 
-	public void update(IDictionary<string, object> parent_header) {
-	    session.update_widget(this, parent_header);
-	}
-
 	public void set(string value_name, object value) {
 	    ((Dictionary<string,object>)data["state"])[value_name] = value;
 	    // not in reaction to a message, no parent_header
-	    session.update_widget(this, new Dictionary<string, object>());
+	    session.update_state(this, new Dictionary<string, object>());
 	}
 
 	public object get(string value_name) {
@@ -185,28 +185,28 @@ public static class Widgets {
 	    set { set("description", value); }
 	}
 	// FIXME: Should these be ints or strings?
-	public int min {
-	    get { return (int)get("min"); }
+	public Int64 min {
+	    get { return (Int64)get("min"); }
 	    set { set("min", value); }
 	}
-	public int max {
-	    get { return (int)get("max"); }
+	public Int64 max {
+	    get { return (Int64)get("max"); }
 	    set { set("max", value); }
 	}
-	public int step {
-	    get { return (int)get("step"); }
+	public Int64 step {
+	    get { return (Int64)get("step"); }
 	    set { set("step", value); }
 	}
-	public int value {
-	    get { return (int)get("value"); }
+	public Int64 value {
+	    get { return (Int64)get("value"); }
 	    set { set("value", value); }
 	}
 
 	public BoundedIntTextWidget(ZMQServer.Session session,
-				    int min=0, 
-				    int max=100, 
-				    int step=1, 
-				    int value=0, 
+				    Int64 min=0, 
+				    Int64 max=100, 
+				    Int64 step=1, 
+				    Int64 value=0, 
 				    string description="", 
 				    bool disabled=false, 
 				    bool visible=true) : base(session) {
@@ -545,28 +545,28 @@ public static class Widgets {
 	    get { return (string)get("description"); }
 	    set { set("description", value); }
 	}
-	public int min {
-	    get { return (int)get("min"); }
+	public Int64 min {
+	    get { return (Int64)get("min"); }
 	    set { set("min", value); }
 	}
 	public double max {
-	    get { return (int)get("max"); }
+	    get { return (Int64)get("max"); }
 	    set { set("max", value); }
 	}
 	public double step {
-	    get { return (int)get("step"); }
+	    get { return (Int64)get("step"); }
 	    set { set("step", value); }
 	}
 	public double value {
-	    get { return (int)get("value"); }
+	    get { return (Int64)get("value"); }
 	    set { set("value", value); }
 	}
 
 	public IntProgressWidget(ZMQServer.Session session,
-				 int min=0, 
-				 int max=100, 
-				 int step=1, 
-				 int value=0, 
+				 Int64 min=0, 
+				 Int64 max=100, 
+				 Int64 step=1, 
+				 Int64 value=0, 
 				 string description="", 
 				 bool disabled=false, 
 				 bool visible=true) : base(session) {
@@ -591,20 +591,20 @@ public static class Widgets {
 	    get { return (string)get("description"); }
 	    set { set("description", value); }
 	}
-	public int min {
-	    get { return (int)get("min"); }
+	public Int64 min {
+	    get { return (Int64)get("min"); }
 	    set { set("min", value); }
 	}
-	public int max {
-	    get { return (int)get("max"); }
+	public Int64 max {
+	    get { return (Int64)get("max"); }
 	    set { set("max", value); }
 	}
-	public int step {
-	    get { return (int)get("step"); }
+	public Int64 step {
+	    get { return (Int64)get("step"); }
 	    set { set("step", value); }
 	}
-	public int value {
-	    get { return (int)get("value"); }
+	public Int64 value {
+	    get { return (Int64)get("value"); }
 	    set { set("value", value); }
 	}
 	public string orientation {
@@ -617,10 +617,10 @@ public static class Widgets {
 	}
 
 	public IntSliderWidget(ZMQServer.Session session,
-			       int min=0, 
-			       int max=100, 
-			       int step=1, 
-			       int value=0, 
+			       Int64 min=0, 
+			       Int64 max=100, 
+			       Int64 step=1, 
+			       Int64 value=0, 
 			       string description="", 
 			       bool disabled=false, 
 			       string orientation="horizontal", 
@@ -645,8 +645,8 @@ public static class Widgets {
 
     public class IntTextWidget : Widget {
 	// Attributes
-	public int value {
-	    get { return (int)get("value"); }
+	public Int64 value {
+	    get { return (Int64)get("value"); }
 	    set { set("value", value); }
 	}
 	public string description {
@@ -655,7 +655,7 @@ public static class Widgets {
 	}
 
 	public IntTextWidget(ZMQServer.Session session,
-			     int value=0,
+			     Int64 value=0,
 			     string description="",
 			     bool disabled=false, 
 			     bool visible=true) : base(session) {
