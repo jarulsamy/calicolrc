@@ -479,17 +479,22 @@ public static class ZMQServer {
 		    retval = e;
 		}
 	    }
-	    session.SetOutputs(0, null);
 	    Dictionary<string, object> content = null;
 	    if (retval != null) {
-		content = new Dictionary<string, object>
-		    {
-			{"execution_count", execution_count},
-			{"data", ZMQServer.session.GetRepresentations(retval)},
-			{"metadata", new Dictionary<string, object>()}
-		    };
-		send(session.iopub_channel, header, m_header, metadata, content);
+		if (retval is Widgets.Widget) {
+		    // Widgets inject themselves to output, but have no return repr
+		    session.display_widget((Widgets.Widget)retval);
+		} else {
+		    content = new Dictionary<string, object>
+			{
+			    {"execution_count", execution_count},
+			    {"data", ZMQServer.session.GetRepresentations(retval)},
+			    {"metadata", new Dictionary<string, object>()}
+			};
+		    send(session.iopub_channel, header, m_header, metadata, content);
+		}
 	    }
+	    session.SetOutputs(0, null); // wait till after widget displays
 	    // ---------------------------------------------------
 	    header = session.Header("status", m_header["session"].ToString());
 	    metadata = new Dictionary<string, object>();
