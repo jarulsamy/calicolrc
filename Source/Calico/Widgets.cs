@@ -140,19 +140,19 @@ public static class Widgets {
 	}
 	public double min {
 	    get { return (double)get("min"); }
-	    set { set("min", value); }
+	    set { set("min", Convert.ToDouble(value)); }
 	}
 	public double max {
 	    get { return (double)get("max"); }
-	    set { set("max", value); }
+	    set { set("max", Convert.ToDouble(value)); }
 	}
 	public double step {
 	    get { return (double)get("step"); }
-	    set { set("step", value); }
+	    set { set("step", Convert.ToDouble(value)); }
 	}
 	public double value {
 	    get { return (double)get("value"); }
-	    set { set("value", value); }
+	    set { set("value", Convert.ToDouble(value)); }
 	}
 
 	public BoundedFloatTextWidget(ZMQServer.Session session,
@@ -293,19 +293,19 @@ public static class Widgets {
 	}
 	public double min {
 	    get { return (double)get("min"); }
-	    set { set("min", value); }
+	    set { set("min", Convert.ToDouble(value)); }
 	}
 	public double max {
 	    get { return (double)get("max"); }
-	    set { set("max", value); }
+	    set { set("max", Convert.ToDouble(value)); }
 	}
 	public double step {
 	    get { return (double)get("step"); }
-	    set { set("step", value); }
+	    set { set("step", Convert.ToDouble(value)); }
 	}
 	public double value {
 	    get { return (double)get("value"); }
-	    set { set("value", value); }
+	    set { set("value", Convert.ToDouble(value)); }
 	}
 
 	public FloatProgressWidget(ZMQServer.Session session,
@@ -335,19 +335,19 @@ public static class Widgets {
 	// Attributes
 	public double min {
 	    get { return (double)get("min"); }
-	    set { set("min", value); }
+	    set { set("min", Convert.ToDouble(value)); }
 	}
 	public double max {
 	    get { return (double)get("max"); }
-	    set { set("max", value); }
+	    set { set("max", Convert.ToDouble(value)); }
 	}
 	public double step {
 	    get { return (double)get("step"); }
-	    set { set("step", value); }
+	    set { set("step", Convert.ToDouble(value)); }
 	}
 	public double value {
 	    get { return (double)get("value"); }
-	    set { set("value", value); }
+	    set { set("value", Convert.ToDouble(value)); }
 	}
 	public string description {
 	    get { return (string)get("description"); }
@@ -397,19 +397,19 @@ public static class Widgets {
 	}
 	public double min {
 	    get { return (double)get("min"); }
-	    set { set("min", value); }
+	    set { set("min", Convert.ToDouble(value)); }
 	}
 	public double max {
 	    get { return (double)get("max"); }
-	    set { set("max", value); }
+	    set { set("max", Convert.ToDouble(value)); }
 	}
 	public double step {
 	    get { return (double)get("step"); }
-	    set { set("step", value); }
+	    set { set("step", Convert.ToDouble(value)); }
 	}
 	public double value {
 	    get { return (double)get("value"); }
-	    set { set("value", value); }
+	    set { set("value", Convert.ToDouble(value)); }
 	}
 
 	public FloatTextProgressWidget(ZMQServer.Session session,
@@ -443,7 +443,7 @@ public static class Widgets {
 	}
 	public double value {
 	    get { return (double)get("value"); }
-	    set { set("value", value); }
+	    set { set("value", Convert.ToDouble(value)); }
 	}
 
 	public FloatTextWidget(ZMQServer.Session session,
