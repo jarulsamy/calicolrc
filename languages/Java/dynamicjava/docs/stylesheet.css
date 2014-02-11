@@ -1,0 +1,102 @@
+/*
+ * Style for the DynamicJava documentation
+ * 
+ * Stephane Hillion - 1999/06/03
+ */
+body {
+  background-color : #FFFFFF;
+  font-family      : Helvetica, Arial, sans-serif;
+}
+
+a {
+  text-decoration : none;
+}
+
+a.mailto {
+  font-style : italic;
+}
+
+em {
+  font-style  : normal;
+  font-weight : bold;
+}
+
+code {
+  font-family: monospace;
+}
+
+.small {
+  font-size : smaller;
+}
+
+p {
+  font-family      : Helvetica, Arial, sans-serif;
+}
+
+h2 {
+  font-family      : Helvetica, Arial, sans-serif;
+}
+
+div {
+  font-family      : Helvetica, Arial, sans-serif;
+}
+
+blockquote {
+  font-family      : Helvetica, Arial, sans-serif;
+}
+
+PRE {
+  white-space: pre;
+  background-color: rgb(237,229,229);
+  color: black;
+  font-family: monospace;
+  border-style: solid;
+  border-width: 1px;
+  padding: 1%;
+  width: 100%;
+}
+
+PRE SPAN.doc-string {
+  background-color: rgb(237,229,229);
+  color: rgb(40,138,81);
+}
+
+PRE SPAN.reference {
+  background-color: rgb(237,229,229);
+  color: rgb(0,101,190);
+}
+
+PRE SPAN.type {
+  background-color: rgb(237,229,229);
+  color: rgb(142,0,142);
+}
+
+PRE SPAN.function-name {
+  background-color: rgb(237,229,229);
+  color: rgb(207,0,0);
+}
+
+PRE SPAN.string {
+  background-color: rgb(237,229,229);
+  color: rgb(0,138,142);
+}
+
+PRE SPAN.comment {
+  background-color: rgb(237,229,229);
+  color: rgb(121,105,239);
+}
+
+PRE SPAN.variable-name {
+  background-color: rgb(237,229,229);
+  color: rgb(190,101,0);
+}
+
+PRE SPAN.preprocessor {
+  background-color: rgb(237,229,229);
+  color: rgb(0,138,0);
+}
+
+PRE SPAN.keyword {
+  background-color: rgb(237,229,229);
+  color: rgb(0,0,142);
+}

@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+   "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+  <head>
+    <title>Scripting with DynamicJava</title>
+
+    <meta name="description" content="Scripting with DynamicJava">
+    <meta name="keywords" content="DynamicJava, scripting">
+    <meta name="author" content="Stephane Hillion">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+  </head>
+
+  <body bgcolor="white">
+    <img src="images/oil-koala.gif"
+         alt="Logo"
+         width="140"
+         height="87">
+    <img src="images/dj-logo.gif"
+         alt="DynamicJava"
+         width="426"
+         height="72"><br>
+
+    <hr noshade>
+
+    <!-- ############  'scripting' ########### -->
+
+    <p><img src="images/scripting.gif"
+	    alt="Scripting"
+	    width="271"
+            height="33"><br>
+
+      <blockquote>
+      DynamicJava is a Java<sup class="small">TM</sup> interpreter which try to
+      follow the Java Language Specification. Some extensions have been added to
+      ease the creation of small programs. All these extensions have been added
+      with the same goal in mind: reduce the amount of code to write and make it
+      easy to translate a script to a valid Java program. The following sections
+      describe these extensions.
+
+      <h2>Top-level</h2>
+      A Java program (called a compilation unit in the specification) can contain:
+      <ul>
+	<li>An optional <code>package</code> clause,</li>
+	<li>Optionals <code>import</code> clauses,</li>
+	<li>One or more <code>class</code> or <code>interface</code> declarations.</li>
+      </ul>
+      A DynamicJava script is a Java program. It can also contain statements,
+      expressions and function declarations. The meaning of a <code>package</code>
+      clause is different. Here is an example 
+      (<a href="sources/top_level.djava">top_level.djava</a>):
+
+    <pre>
+System.out.println("<span class="doc-string">Example script</span>");
+
+<span class="comment">// Place the script in the package p.
+</span><span class="keyword">package</span> <span class="reference">p</span>;
+
+<span class="reference">public</span> <span class="keyword">class</span> <span class="function-name">C</span> {
+    <span class="reference">public</span> <span class="function-name">C</span>() {
+	System.out.println("<span class="string">C created</span>");
+    }
+}
+
+<span class="comment">// Place the script in the anonymous package.
+</span><span class="keyword">package</span>;
+<span class="keyword">import</span> <span class="reference">p</span>.*;
+
+<span class="comment">// Create an instance of p.C
+</span><span class="keyword">new</span> <span class="type">C</span>();
+    </pre>
+
+      <p>The <code>package</code> and <code>import</code> clauses can be placed
+      anywhere at the top-level in a script. The <code>package</code> clause used
+      without package name places the script in the anonymous package (the package
+      where the application was launched).
+
+      <h2>Variables</h2>
+      <p>In scripts declaring variables is optional. The interpreter automatically
+      declares a variable when an unknown identifier is encountered on the left side
+      of an assignment. A variable declared by the interpreter has no difference
+      with an explicitly declared one: the interpreter assigns a type to the variable
+      (the type of the right hand side of the assignment) and this type will be
+      enforced later in the program. This means that it is not possible to dynamically
+      modify the type of a variable.<br>
+      Note: The variable declared in an expression like <code>var = null;</code> is a
+      <code>java.lang.Object</code>.
+
+      <h2>Functions</h2>
+      <p>The syntax used to declare a method can be used to declare a function in
+      the top level environment. The resulting function can be used everywhere in
+      the top-level environment and in the body of every functions. Functions
+      are not visible from classes, can be recursive and can be overloaded, exactly
+      like Java<sup class="small">TM</sup> methods.<br>
+      Here is an example that use functions
+      (<a href="sources/functions.djava">functions.djava</a>):
+
+    <pre>
+<span class="keyword">import</span> <span class="reference">java</span>.<span class="reference">math</span>.*;
+
+<span class="comment">// A first version of the factorial function that
+// takes an int as parameter
+</span><span class="type">BigInteger</span> <span class="function-name">fact</span>(<span class="type">int</span> <span class="variable-name">n</span>) {
+    <span class="comment">// A forward reference to fact(BigInteger n)
+</span>    <span class="keyword">return</span> fact(<span class="keyword">new</span> <span class="type">BigInteger</span>("" + n));
+}
+
+<span class="comment">// An overloaded recursive version of the factorial
+// function that takes a BigInteger as parameter
+</span><span class="type">BigInteger</span> <span class="function-name">fact</span>(<span class="type">BigInteger</span> <span class="variable-name">n</span>) {
+    <span class="keyword">return</span> (n.equals(BigInteger.ZERO)) ?
+        BigInteger.ONE : n.multiply(fact(n.subtract(BigInteger.ONE)));
+}
+
+System.out.println("<span class="doc-string">fact(30) = </span>" + fact(30));
+    </pre>
+
+      <p>The body of a function can contain forward references to classes and to other
+      functions. In fact the body of a function is lazily interpreted and the type
+      checking is made the first time the function is called. So every class and
+      function declared before the first invocation of a function can be used in
+      its body.
+
+      <p>As mentioned above, the function declaration syntax is exactly the same
+      as the method declaration syntax. This means that modifiers (<code>public</code>,
+      <code>final</code>, <code>synchronized</code>, ...) and <code>throws</code>
+      clause can be used. It is allowed to ease the transition from functions to
+      methods but it is ignored by the interpreter. 
+
+      <h2>Classes</h2>
+      <p>The class declaration has exactly the same semantic in
+      Java<sup class="small">TM</sup> and in DynamicJava programs with one exception:
+      the top-level anonymous classes. The choice has been made to export the
+      final variables declared in the top-level environment to these classes.
+
+      <h2>Casts</h2>
+      <p>Some runtime casts are optional. The following example is a script that
+      contains casts
+      (<a href="sources/casts1.djava">casts1.djava</a>):
+    <pre>
+i = 1;
+<span class="type">byte</span>   <span class="variable-name">b1</span> = (<span class="type">byte</span>)(i + 1);
+<span class="type">Object</span> <span class="variable-name">o</span>  = <span class="keyword">new</span> <span class="type">Byte</span>(b1);
+<span class="type">Byte</span>   <span class="variable-name">b2</span> = (<span class="type">Byte</span>)o;
+<span class="type">Number</span> <span class="variable-name">n</span>  = (<span class="type">Number</span>)o;
+b1 = ((<span class="type">Byte</span>)o).byteValue();
+    </pre>
+
+      <p>The next example is the same script without the optional runtime casts
+      (<a href="sources/casts2.djava">casts2.djava</a>):
+    <pre>
+i = 1;
+<span class="type">byte</span>   <span class="variable-name">b1</span> = (<span class="type">byte</span>)(i + 1);
+<span class="type">Object</span> <span class="variable-name">o</span>  = <span class="keyword">new</span> <span class="type">Byte</span>(b1);
+<span class="type">Byte</span>   <span class="variable-name">b2</span> = o;
+<span class="type">Number</span> <span class="variable-name">n</span>  = o;
+b1 = ((<span class="type">Byte</span>)o).byteValue();
+    </pre>
+
+      <p>The cast at the last line cannot be removed because the interpreter needs
+      the information it holds to find the <code>byteValue</code> method while
+      it makes the type checking of the expression.
+      </blockquote>
+
+    <hr noshade>
+
+    <div class="small">
+      Send comments, suggestions and bug reports to
+      <a class="mailto" href="mailto:shillion@ilog.fr">
+	shillion@ilog.fr</a><br>
+
+<!-- Created: Wed Aug  4 11:22:38 MET DST 1999 -->
+<!-- hhmts start -->
+Last modified: Mon Nov 22 10:58:37 MET 1999
+<!-- hhmts end -->
+    </div>
+    <hr noshade>
+  </body>
+</html>

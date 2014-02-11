@@ -1,0 +1,6 @@
+i = 1;
+byte   b1 = (byte)(i + 1);
+Object o  = new Byte(b1);
+Byte   b2 = o;
+Number n  = o;
+b1 = ((Byte)o).byteValue();

@@ -1,0 +1,17 @@
+System.out.println("Example script");
+
+// Place the script in the package p.
+package p;
+
+public class C {
+    public C() {
+	System.out.println("C created");
+    }
+}
+
+// Place the script in the anonymous package.
+package;
+import p.*;
+
+// Create an instance of p.C
+new C();

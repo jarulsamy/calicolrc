@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+   "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+  <head>
+    <title>The DynamicJava Command Line Interpreter</title>
+
+    <meta name="description" content="DynamicJava Command Line Interpreter Reference">
+    <meta name="keywords" content="DynamicJava, interpreter, manual, reference">
+    <meta name="author" content="Stephane Hillion">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+  </head>
+
+  <body bgcolor="white">
+    <img src="images/oil-koala.gif"
+         alt="Logo"
+         width="140"
+         height="87">
+    <img src="images/dj-logo.gif"
+         alt="DynamicJava"
+         width="426"
+         height="72"><br>
+
+    <hr noshade>
+
+    <!-- ############  'The DynamicJava interpreter' section  ########### -->
+
+    <p><img src="images/interpreter.gif"
+	    alt="The DynamicJava interpreter"
+	    width="288"
+            height="33"><br>
+      <blockquote>
+      The DynamicJava distribution includes a command line interpreter.
+      It can be invoked using the following command:<br><br>
+      <code>
+	djava [options] [file]
+      </code><br>
+      or<br>
+      <code>
+	djava [options] -c classname [args ...]
+      </code><br><br>
+
+      <blockquote>
+      <dl>
+	<dt><b>file</b></dt>
+	<dd>The script to execute. A script has not to be a valid Java<sup class="small">
+	TM</sup> compilation unit: it can contain statements and expressions outside
+        class definitions. Each of them are evalutated sequentially.<br>
+	If no file is given, the interpreter enters interactive mode. In this mode
+	you must press the enter key twice in order to interpret the last statement.
+	</dd>
+	<dt><b>-c &lt;classname&gt;</b></dt>
+	<dd>With this option <code>djava</code> works like the <code>java</code>
+	  command: it invokes the <code>main</code> method of the given class.<br>
+	  Note: When you use this option, be sure to have correctly set the library
+	  path with the <b>-lp</b> option (the current directory is not in the default
+	  library path).
+	  </dd>
+      </dl>
+      </blockquote>
+
+      Options:
+      <blockquote>
+      <dl>
+	<dt><b>-cp  &lt;directories or jar files separated by : or ;&gt;</b></dt>
+	<dd>Set the search path for the class files. It is the same as the -cp
+	  option of the java command. The classpath set with this option is added
+          to the default classpath given by the CLASSPATH environment variable.
+	  </dd>
+	<dt><b>-lp  &lt;directories separated by : or ;&gt;</b></dt>
+	<dd>Set the search path for the auxiliary source files. These files must have
+	  the structure of the Java<sup class="small">TM</sup> compilation
+	  unit (ie. package clause + importations + classes or interfaces).
+	  </dd>
+	<dt><b>-i &lt;file&gt;</b></dt>
+	<dd>Load an initialization script.</dd>
+	<dt><b>-l</b></dt>
+	<dd>Tells the interpreter that it must not exit on exception.</dd>
+      </dl>
+      </blockquote>
+      </blockquote>
+
+    <hr noshade>
+
+    <div class="small">
+      Send comments, suggestions and bug reports to
+      <a class="mailto" href="mailto:shillion@ilog.fr">
+	shillion@ilog.fr</a><br>
+
+<!-- Created: Wed Aug  4 11:22:38 MET DST 1999 -->
+<!-- hhmts start -->
+Last modified: Fri Jun  9 17:01:13 MEST 2000
+<!-- hhmts end -->
+    </div>
+    <hr noshade>
+  </body>
+</html>

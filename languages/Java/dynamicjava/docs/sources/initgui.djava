@@ -1,0 +1,10 @@
+import javax.swing.*;
+
+// Set the look and feel of the application
+UIManager.setLookAndFeel("com.sun.java.swing.plaf.motif.MotifLookAndFeel");
+SwingUtilities.updateComponentTreeUI(gui);
+SwingUtilities.updateComponentTreeUI(gui.getOptionsDialog());
+
+// Set the size of the main frame and set the divider location
+gui.setSize(600, 600);
+((JSplitPane)gui.getContentPane().getComponents()[1]).setDividerLocation(380);

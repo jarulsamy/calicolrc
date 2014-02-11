@@ -4406,6 +4406,79 @@ del _invoke, _
 	// display_pretty, display_html, display_jpeg, display_png, 
 	// display_json, display_latex, display_svg, display_audio, display_video
 
+	public Widgets.Widget makeBoundedFloatTextWidget() {
+	    return BoundedFloatTextWidget();
+	}
+	public Widgets.Widget makeBoundedIntTextWidget() {
+	    return BoundedIntTextWidget();
+	}
+	public Widgets.Widget makeButtonWidget() {
+	    return ButtonWidget();
+	}
+	public Widgets.Widget makeCheckboxWidget() {
+	    return CheckboxWidget();
+	}
+	public Widgets.Widget makeDropdownWidget() {
+	    return DropdownWidget();
+	}
+	public Widgets.Widget makeFloatProgressWidget() {
+	    return FloatProgressWidget();
+	}
+	public Widgets.Widget makeFloatSliderWidget() {
+	    return FloatSliderWidget();
+	}
+	public Widgets.Widget makeFloatTextProgressWidget() {
+	    return FloatTextProgressWidget();
+	}
+	public Widgets.Widget makeFloatTextWidget() {
+	    return FloatTextWidget();
+	}
+	public Widgets.Widget makeHTMLWidget() {
+	    return HTMLWidget();
+	}
+	public Widgets.Widget makeImageWidget() {
+	    return ImageWidget();
+	}
+	public Widgets.Widget makeIntProgressWidget() {
+	    return IntProgressWidget();
+	}
+	public Widgets.Widget makeIntSliderWidget() {
+	    return IntSliderWidget();
+	}
+	public Widgets.Widget makeIntTextWidget() {
+	    return IntTextWidget();
+	}
+	public Widgets.Widget makeLatexWidget() {
+	    return LatexWidget();
+	}
+	public Widgets.Widget makeRadioButtonsWidget() {
+	    return RadioButtonsWidget();
+	}
+	public Widgets.Widget makeSelectWidget() {
+	    return SelectWidget();
+	}
+	public Widgets.Widget makeTextWidget() {
+	    return TextWidget();
+	}
+	public Widgets.Widget makeTextareaWidget() {
+	    return TextareaWidget();
+	}
+	public Widgets.Widget makeToggleButtonWidget() {
+	    return ToggleButtonWidget();
+	}
+	public Widgets.Widget makeToogleButtonsWidget() {
+	    return ToogleButtonsWidget();
+	}
+	public Widgets.Widget makeContainerWidget() {
+	    return ContainerWidget();
+	}
+	public Widgets.Widget makePopupWidget() {
+	    return PopupWidget();
+	}
+	public Widgets.Widget makeSelectionWidget() {
+	    return SelectionWidget();
+	}
+
 	public Widgets.Widget BoundedFloatTextWidget(double min=0.0, 
 						     double max=100.0, 
 						     double step=0.1, 
@@ -4519,7 +4592,7 @@ del _invoke, _
 					       visible);
 	}
 
-	public Widgets.Widget HTMLWidget(string value,
+	public Widgets.Widget HTMLWidget(string value="",
 					 string description="", 
 					 bool disabled=false, 
 					 bool visible=true) {
@@ -4636,7 +4709,7 @@ del _invoke, _
 					  visible);
 	}
 
-	public Widgets.Widget TextareaWidget(string value,
+	public Widgets.Widget TextareaWidget(string value="",
 					     string description="", 
 					     bool disabled=false, 
 					     bool visible=true) {

@@ -1,0 +1,283 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+   "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+  <head>
+    <title>DynamicJava</title>
+
+    <meta name="description" content="DynamicJava Documentation -- An introduction to the DynamicJava scripting language">
+    <meta name="keywords" content="DynamicJava, documentation, programming language, API, script, scripting language">
+    <meta name="author" content="Stephane Hillion">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+  </head>
+
+  <body bgcolor="white">
+    <img src="images/oil-koala.gif"
+         alt="Logo"
+         width="140"
+         height="87">
+    <img src="images/dj-logo.gif"
+         alt="DynamicJava"
+         width="426"
+         height="72"><br>
+
+    <div class="small">The original version of this page is located here:
+      <a href="http://koala.ilog.fr/djava/index.html">
+	http://koala.ilog.fr/djava/index.html</a>.</div>
+
+    <!-- ############  'Contents'  ########### -->
+    <hr noshade>
+
+    <p><img src="images/contents.gif"
+	    alt="Contents"
+	    width="98"
+            height="28"><br>
+      <blockquote>
+      <ul>
+	<li>Local links
+	  <ul>
+	    <li><a href="#overview">Overview</a></li>
+	    <li><a href="#author">Author</a></li>
+	    <li><a href="#news">News</a></li>
+	    <li><a href="#use">The ways to use DynamicJava</a></li>
+	    <li><a href="#differences">Differences between DynamicJava and Java</a></li>
+	    <li><a href="#api-specification">DynamicJava API Specification</a></li>
+	    <li><a href="#opensource">DynamicJava open-source project</a></li>
+	    <li><a href="#download">Download DynamicJava</a></li>
+	  </ul>
+	</li>
+	<li><a href="interpreter.html">The DynamicJava interpreter</a></li>
+	<li><a href="gui.html">The DynamicJava GUI</a></li>
+	<li><a href="scripting.html">Scripting with DynamicJava</a></li>
+	<li><a href="embedding.html">Embedding DynamicJava</a></li>
+	<li><a href="incompatibilities.html">DynamicJava incompatibilities with Java
+	  </a></li>
+	<li><a href="licence.html">License</a></li>
+	<li><a href="thanks.html">Acknowledgments</a></li>
+	<li><a href="links.html">Links</a></li>
+      </ul>
+      </blockquote>
+
+    <hr noshade>
+    <!-- ############  'Overview' section  ########### -->
+
+    <a name="overview"></a>
+    <p><img src="images/overview.gif"
+	    alt="Overview"
+	    width="97"
+            height="28"><br>
+      <blockquote>
+      DynamicJava is a Java<sup class="small">TM</sup> source interpreter.
+      It executes programs written in Java<sup class="small">TM</sup>, like
+      described in the
+      <a href="http://java.sun.com/docs/books/jls/html/index.html">
+	Java Language Specification</a>, in addition with scripting features.
+      DynamicJava was written in pure Java<sup class="small">TM</sup>, is free
+      and distributed with the source code.
+      </blockquote>
+
+    <!-- ###########  'author' section  ########### -->
+
+    <a name="author"></a>
+    <p><img src="images/author.gif"
+	    alt="Author"
+	    width="76"
+            height="28"><br>
+
+      <blockquote>
+      DynamicJava was designed and implemented by
+      <a href="http://koala.ilog.fr/shillion/index.html">Stéphane Hillion</a>.
+      Send comments, suggestions and bug reports to
+      <a class="mailto" href="mailto:shillion@ilog.fr">
+	shillion@ilog.fr</a>
+
+      </blockquote>
+
+    <!-- ###########  'news' section  ########### -->
+
+    <a name="news"></a>
+    <p><img src="images/news.gif"
+	    alt="News"
+	    width="61"
+            height="28"><br>
+
+      <blockquote>
+      <dl>
+	<dt><em>2002/06/13</em></dt>
+	<dd>Version 1.1.5 released. Added security features.</dd>
+	<dt><em>2001/03/19</em></dt>
+	<dd>Version 1.1.4 released. Fixed the jdk1.3's introspection problem.</dd>
+	<dt><em>2001/01/23</em></dt>
+	<dd>Version 1.1.3 released. Few API additions.</dd>
+	<dt><em>2000/07/03</em></dt>
+	<dd>Version 1.1.2 released. Minor API additions and fixes.</dd>
+	<dt><em>2000/03/14</em></dt>
+	<dd>Version 1.1.1 released. Few bug fixes and script style comments
+	  beginning with '#'.</dd>
+	<dt><em>2000/01/13</em></dt>
+	<dd>Created a <a href="#opensource">DynamicJava project</a> at
+	  <a href="http://sourceforge.net">SourceForge</a>.
+	</dd>
+	<dt><em>1999/11/30</em></dt>
+	<dd>Version 1.1 released. Release focused on performances enhancement.
+        DynamicJava is around two times faster both in statement interpretation and
+        class creation.</dd>
+	<dt><em>1999/11/23</em></dt>
+	<dd>Version 1.0 released. Some new feature, enhanced documentation, and a lot
+        of bug fixes.</dd>
+	<dt><em>1999/11/16</em></dt>
+	<dd>Version 1.0beta7 released. New platform-independent installation
+	  procedure, more user-friendly GUI and simplified error handling at
+	  the API level.</dd>
+	<dt><em>1999/11/10</em></dt>
+	<dd>Version 1.0beta6 released. Lot of bug fixes and new features: a dynamically
+	    extensible classpath (with local paths or URLs), new options, GUI
+	  enhancements, etc ...</dd>
+	<dt><em>1999/10/26</em></dt>
+	<dd>Version 1.0beta5 released. Bug fixes, support for top-level anonymous
+	    classes.</dd>
+	<dt><em>1999/10/19</em></dt>
+	<dd>Version 1.0beta4 released. Bug fixes, support for top-level functions,
+	    and GUI enhancements.</dd>
+	<dt><em>1999/10/12</em></dt>
+	<dd>Version 1.0beta3 released. Bug fixes, and a simple GUI.</dd>
+	<dt><em>1999/10/08</em></dt>
+	<dd>Version 1.0beta2 released. Some new features and examples, and a fix
+	    for a problem with the return key under Windows in interactive mode.</dd>
+	<dt><em>1999/10/02</em></dt>
+	<dd>Initial release of DynamicJava.</dd>
+      </dl>
+      </blockquote>
+
+    <!-- ############  'The ways to use DynamicJava' section  ########### -->
+
+    <a name="use"></a>
+    <p><img src="images/use.gif"
+	    alt="The ways to use DynamicJava"
+	    width="292"
+            height="33"><br>
+      <blockquote>
+      <dl>
+        <dt><em>As an extension language</em></dt>
+        <dd>You can use DynamicJava to allow the user to configure and/or
+	    extend your application.</dd>
+
+        <dt><em>As a debugging tool</em></dt>
+        <dd>Run as a standalone application, DynamicJava can help you to
+	    test your application in an interactive way.</dd>
+
+        <dt><em>To experiment a Java API</em></dt>
+        <dd>Even if it is fully documented, it is always necessary to try out
+            a Java API. The ability of DynamicJava to instantiate and to extend
+	    Java<sup class="small">TM</sup> classes on-the-fly makes it a
+	    good experimentation tool.</dd>
+
+        <dt><em>As a rapid prototyping tool</em></dt>
+        <dd>DynamicJava permits faster development of applications by
+	    allowing an easy migration from scripts to Java<sup class="small">TM</sup>
+	    programs.</dd>
+      </dl>
+      </blockquote>
+
+    <!-- ######## 'Differences beetween DynamicJava and Java' section  ########### -->
+
+    <a name="differences"></a>
+    <p><img src="images/differences.gif"
+	    alt="Differences beetween DynamicJava and Java"
+	    width="423"
+            height="33"><br>
+      <blockquote>
+      DynamicJava supports all features provided by the Java language and
+      the Java 2 platform API including class and inner class definition,
+      multi-threading, GC ...<br>
+      DynamicJava extends the Java<sup class="small">TM</sup> grammar to
+      accept many scripting features:
+      <ul>
+	<li>Statements and expressions can be written outside classes, in the
+	  top-level environment.</li>
+	<li>The variable declaration is optional. When the left part of an
+	  assignment is an unknown identifier, a variable is defined. The
+	  type of this variable is the type of the right part of the assignment.
+	  </li>
+	<li>The dynamic casts are optional.</li>
+	<li>The <code>package</code> clause can be used anywhere in the top-level
+	  environment to set the current package. The syntax of this clause has
+	  been extended : writing <code>package;</code> set the current package to the
+	  anonymous package.
+	<li>C-like functions are supported in the top-level environment. The syntax
+	  used to declare a function is the same as the one used to declare a method.
+	  The method modifiers (public, static, ...) and the <code>throws</code>
+	  clause are ignored. Functions can only be used in the top-level environment
+	  and in the body of other functions, including itself.</li>
+	<li>Anonymous classes defined in the top-level environment can contain
+	  references to top-level environment's final variables.</li>
+	<li>Inline comments beginning with '#' are allowed.</li>
+      </ul>
+      See the <a href="incompatibilities.html">incompatiblities with Java</a> and
+      <a href="scripting.html">scripting with DynamicJava</a> to
+      learn more about the differences between DynamicJava and Java.
+      </blockquote>
+
+    <!-- ############  'DynamicJava API Specification' section  ########### -->
+
+    <a name="api-specification"></a>
+    <p><img src="images/api-specification.gif"
+	    alt="DynamicJava API Specification"
+	    width="302"
+            height="33"><br>
+      <blockquote>
+      The <a href="http://java.sun.com/products/jdk/1.2/docs/api">
+	Java<sup class="small">TM</sup> 2 Platform
+      API Specification</a> is the core API for the DynamicJava programmer.
+      Because DynamicJava is written in Java, the <a href="javadoc/index.html">
+      DynamicJava API Specification</a> (the classes that compose the interpreter)
+      and every other Java<sup class="small">TM</sup> libraries can also be used
+      in scripts.
+      </blockquote>
+
+    <!-- ############  'DynamicJava open-source project' section  ########### -->
+
+    <a name="opensource"></a>
+    <p><img src="images/open-source.gif"
+	    alt="DynamicJava open-source project"
+	    width="336"
+            height="33"><br>
+      <blockquote>
+      DynamicJava forums, bug-tracking system ... are hosted at the
+      <a href="http://sourceforge.net"> 
+	<img src="http://sourceforge.net/sflogo.php?group_id=1396&type=1"
+	  width="88" height="31" border="0" alt="SourceForge logo"></a>.
+      </blockquote>
+
+    <!-- ############  'Download DynamicJava' section  ########### -->
+
+    <a name="download"></a>
+    <p><img src="images/download.gif"
+	    alt="Download DynamicJava"
+	    width="235"
+            height="33"><br>
+      <blockquote>
+      The latest version of DynamicJava can be downloaded
+      <a href="http://koala.ilog.fr/djava/DynamicJava.zip">here</a>.<br>
+      The corresponding
+      <a href="http://koala.ilog.fr/djava/DynamicJava-src.zip">CVS snapshot</a>.<br>
+      Current version is 1.1.5 (2002/06/13).<br>
+      <em>Requirements:</em> You need the
+      <a href="http://java.sun.com/products/jdk/1.2/">Sun JDK 1.2</a> or newer
+        installed on your system.
+      </blockquote>
+
+    <hr noshade>
+
+
+    <div class="small">
+      Send comments, suggestions and bug reports to
+      <a class="mailto" href="mailto:shillion@ilog.fr">
+	shillion@ilog.fr</a><br>
+
+<!-- Created: Wed Aug  4 11:22:38 MET DST 1999 -->
+<!-- hhmts start -->
+Last modified: Thu Jan 29 10:56:27 CET 2004
+<!-- hhmts end -->
+    </div>
+  </body>
+</html>

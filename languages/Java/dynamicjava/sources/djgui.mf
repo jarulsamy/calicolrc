@@ -1,0 +1,3 @@
+Manifest-Version: $Id: djgui.mf,v 1.1 2001/03/18 17:57:38 shillion Exp $
+Main-Class: koala.dynamicjava.gui.Main
+Class-Path: lib/dynamicjava.jar

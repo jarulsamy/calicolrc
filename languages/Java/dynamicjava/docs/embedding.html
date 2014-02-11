@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+   "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html>
+  <head>
+    <title>Embedding DynamicJava</title>
+
+    <meta name="description" content="Embedding a DynamicJava interpreter">
+    <meta name="keywords" content="DynamicJava, embedding, interpreter">
+    <meta name="author" content="Stephane Hillion">
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+  </head>
+
+  <body bgcolor="white">
+    <img src="images/oil-koala.gif"
+         alt="Logo"
+         width="140"
+         height="87">
+    <img src="images/dj-logo.gif"
+         alt="DynamicJava"
+         width="426"
+         height="72"><br>
+
+    <hr noshade>
+
+    <!-- ######## 'Embedding DynamicJava' section  ########### -->
+
+     <p><img src="images/embedding.gif"
+	    alt="Embedding DynamicJava"
+	    width="248"
+            height="33"><br>
+      <blockquote>
+      This section shows you how to embed a DynamicJava interpreter into a
+      Java<sup class="small">TM</sup> application.
+
+      <p>The following program creates a JFrame and exports it to a DynamicJava interpreter.
+	Then an external script is interpreted in order to initialize the JFrame.
+	After the script has been executed, the application shows the JFrame.<br>
+	This example illustrates how to customize a Java<sup class="small">TM</sup>
+	object from a DynamicJava script.
+
+	<p>Here is the source code of the Java<sup class="small">TM</sup> application
+	(<a href="sources/Embedding.java">Embedding.java</a>):
+
+    <pre>
+<span class="keyword">import</span> <span class="reference">java</span>.<span class="reference">io</span>.*;
+<span class="keyword">import</span> <span class="reference">javax</span>.<span class="reference">swing</span>.<span class="type">JFrame</span>;
+
+<span class="keyword">import</span> <span class="reference">koala</span>.<span class="reference">dynamicjava</span>.<span class="reference">interpreter</span>.*;
+<span class="keyword">import</span> <span class="reference">koala</span>.<span class="reference">dynamicjava</span>.<span class="reference">parser</span>.<span class="reference">wrapper</span>.*;
+
+<span class="reference">public</span> <span class="keyword">class</span> <span class="function-name">Embedding</span> {
+    <span class="reference">public</span> <span class="type">static</span> <span class="type">void</span> <span class="function-name">main</span>(<span class="type">String</span>[] <span class="variable-name">args</span>) {
+	<span class="type">JFrame</span> <span class="variable-name">frame</span> = <span class="keyword">new</span> <span class="type">JFrame</span>();
+
+	<span class="comment">// Create the interpreter. It will use the default JavaCC parser.
+</span>	<span class="type">Interpreter</span> <span class="variable-name">interpreter</span> = <span class="keyword">new</span> <span class="type">TreeInterpreter</span>(<span class="keyword">new</span> <span class="type">JavaCCParserFactory</span>());
+
+	<span class="comment">// Export the JFrame to the interpreter.
+</span>	interpreter.defineVariable("<span class="string">frame</span>", frame);
+	
+	<span class="comment">// Interpret the script
+</span>	<span class="keyword">try</span> {
+	    interpreter.interpret("<span class="string">init.djava</span>");
+	} <span class="keyword">catch</span> (<span class="type">InterpreterException</span> <span class="variable-name">e</span>) {
+	    System.err.println(e);
+	} <span class="keyword">catch</span> (<span class="type">Throwable</span> <span class="variable-name">e</span>) {
+	    System.err.println(e);
+	}
+
+	<span class="comment">// Show the frame
+</span>	frame.show();
+    }
+}
+    </pre>
+	<p>Here is the source code of the DynamicJava script
+	(<a href="sources/init.djava">init.djava</a>):
+
+    <pre>
+<span class="comment">// Customize the size of the frame
+</span>frame.setSize(200, 200);
+
+<span class="keyword">import</span> <span class="reference">java</span>.<span class="reference">awt</span>.<span class="reference">event</span>.*;
+
+<span class="comment">// Add a window listener to the frame
+</span>frame.addWindowListener(<span class="keyword">new</span> <span class="type">WindowAdapter</span>() {
+    <span class="reference">public</span> <span class="type">void</span> <span class="function-name">windowClosing</span>(<span class="type">WindowEvent</span> <span class="variable-name">e</span>) {
+        System.exit(0);
+    }
+});
+    </pre>
+
+	<p>This script sets the size of the JFrame and adds a window listener to it. The
+	listener causes the application to exit when the JFrame is closed.
+      </blockquote>
+
+    <hr noshade>
+
+    <div class="small">
+      Send comments, suggestions and bug reports to
+      <a class="mailto" href="mailto:shillion@ilog.fr">
+	sillion@ilog.fr</a><br>
+
+<!-- Created: Wed Aug  4 11:22:38 MET DST 1999 -->
+<!-- hhmts start -->
+Last modified: Mon Nov 22 17:22:02 MET 1999
+<!-- hhmts end -->
+    </div>
+    <hr noshade>
+  </body>
+</html>
