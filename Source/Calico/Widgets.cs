@@ -475,7 +475,7 @@ public static class Widgets {
 	}
 
 	public HTMLWidget(ZMQServer.Session session,
-			  string value,
+			  string value="",
 			  string description="", 
 			  bool disabled=false, 
 			  bool visible=true) : base(session) {
@@ -683,7 +683,7 @@ public static class Widgets {
 	}
 
 	public LatexWidget(ZMQServer.Session session,
-			   string value,
+			   string value="",
 			   string description="", 
 			   bool disabled=false, 
 			   bool visible=true) : base(session) {
@@ -759,7 +759,7 @@ public static class Widgets {
 	}
 
 	public TextareaWidget(ZMQServer.Session session,
-			      string value,
+			      string value="",
 			      string description="", 
 			      bool disabled=false, 
 			      bool visible=true) : base(session) {
@@ -787,7 +787,7 @@ public static class Widgets {
 	}
 
 	public ToggleButtonWidget(ZMQServer.Session session,
-				  bool value,
+				  bool value=false,
 				  string description="", 
 				  bool disabled=false, 
 				  bool visible=true) : base(session) {
