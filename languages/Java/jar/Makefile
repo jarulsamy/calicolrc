@@ -1,7 +1,7 @@
 MONO_LIB_PATH=/usr/lib/mono/4.0
-IKVMSTUB=ikvmstub -r:$(MONO_LIB_PATH)/mscorlib.dll -nostdlib 
+#IKVMSTUB=ikvmstub -r:$(MONO_LIB_PATH)/mscorlib.dll -nostdlib 
 #IKVMSTUB=ikvmstub.exe
-IKVMSTUB=ikvmstub.exe -r:$(MONO_LIB_PATH)/mscorlib.dll -nostdlib  -r:$(MONO_LIB_PATH)/System.Web.Services.dll   -r:$(MONO_LIB_PATH)/System.Drawing.dll   -r:$(MONO_LIB_PATH)/System.dll   -r:$(MONO_LIB_PATH)/System.Core.dll
+IKVMSTUB=../lib/ikvmstub.exe -lib:$(MONO_LIB_PATH) -lib:../../../bin/
 
 all: Common.jar Csv.jar Math.jar mscorlib.jar Reflection.jar Rhyduino.jar Graphics.jar FarseerPhysics.jar Games.jar Kinect.jar Processing.jar Myro.jar gtk-sharp.jar gdk-sharp.jar 
 

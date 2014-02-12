@@ -50,9 +50,9 @@ namespace Csv {
       close();
     }
 
-    public List readLines() {
-      List retval = new List();
-      List line;
+    public IronPython.Runtime.List readLines() {
+      IronPython.Runtime.List retval = new IronPython.Runtime.List();
+      IronPython.Runtime.List line;
       while (! _reader.EndOfStream) {
 	line = readLine();
 	retval.Add(line);

@@ -20,21 +20,17 @@ import System
 import Calico
 import traceback
 
-# This is done here, because of problem loading if in PostSetup:
-classpath = "" # java.util.ArrayList()
+parser = koala.dynamicjava.parser.wrapper.JavaCCParserFactory()
+interpreter = koala.dynamicjava.interpreter.TreeInterpreter(parser)
 jarpath = os.path.abspath(os.path.join(os.path.dirname(__file__), "jar"))
+# This must be done here:
 for filename in glob.glob(os.path.join(jarpath, "*.jar")):
-    #f = java.io.File(os.path.abspath(filename))
     f = os.path.abspath(filename)
-    if classpath:
-        classpath += ";"
-    #classpath += f 
-    break
+    interpreter.addClassPath(f)
+interpreter.addLibrarySuffix(".java");
+classLoader = interpreter.getClassLoader()
 
-#classpath = System.Array[System.String](classpath)
-
-#options = koala.dynamicjava.Options.DEFAULT
-#interpreter.getVariableNames().toArray()
+# interpreter.getVariableNames().toArray()
 
 class OutputStream(java.io.ByteArrayOutputStream):
     def write(self, *args):
@@ -53,7 +49,6 @@ class OutputStream(java.io.ByteArrayOutputStream):
             print(retval, end="")
         elif self.out_type == "error":
             print(retval, end="", file=sys.stderr)
-            #self.calico.Error(retval)
 
 def isNone(v):
     return hasattr(v, "isNone") and v.isNone()
@@ -63,20 +58,21 @@ class MyLanguageEngine(Calico.Engine):
     def PostSetup(self, calico):
         """
         Do things here that you want to do once (initializations).
+        FIXME: this seems to be called twice!
         """
         self.calico = calico
         self.parser = koala.dynamicjava.parser.wrapper.JavaCCParserFactory()
-        self.interpreter = koala.dynamicjava.interpreter.TreeInterpreter(self.parser)
-	self.interpreter.addLibrarySuffix(".java");
-        ## need to set classLoader?
-
-        self.interpreter.defineVariable("calico", calico)
+        self.interpreter = koala.dynamicjava.interpreter.TreeInterpreter(self.parser, classLoader)
+        self.interpreter.addLibrarySuffix(".java");
         if hasattr(self, "out"):
             self.interpreter.setOut(self.out)
         if hasattr(self, "err"):
             self.interpreter.setErr(self.err)
-        #self.interpreter.addClassPath(classpath)
-        #self.interpreter.interpret("import cli.*;") # makes all DLLs available at top
+        self.interpreter.interpret("import cli.*;") # makes all DLLs available at top
+        try:
+            self.interpreter.getVariable("calico")
+        except:
+            self.interpreter.defineVariable("calico", self.calico)
 
     def SetRedirects(self, stdout, stderr):
         self.out = OutputStream()
@@ -104,6 +100,7 @@ class MyLanguageEngine(Calico.Engine):
                     else:
                         print(retval)
         except Exception, error:
+            # FIXME: java code now handles exceptions
             message = error.message
             message = message.replace("koala.dynamicjava.interpreter.", "")
             message = message.replace("koala.dynamicjava.parser.wrapper.", "")
@@ -138,7 +135,6 @@ class MyLanguageEngine(Calico.Engine):
         """
         This is the code that will interprete a file.
         """
-        print("Run filename '%s'!" % filename)
         try:
             text = "".join(open(filename).readlines())
         except:

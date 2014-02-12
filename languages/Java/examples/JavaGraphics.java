@@ -1,4 +1,3 @@
-import static Graphics.*;
 
 public class JavaGraphics {
     public static void main() {

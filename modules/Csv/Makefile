@@ -2,11 +2,11 @@
 MONO_PATH=../../bin
 
 ../Csv.dll: Csv.cs 
-	MONO_PATH=$(MONO_PATH) gmcs \
+	MONO_PATH=$(MONO_PATH) dmcs \
 		-target:library Csv.cs \
 		-out:../Csv.dll \
-		-lib:../ \
-		-r:IronPython \
+		-lib:../ -lib:../../bin \
+		-r:IronPython.dll 
 
 clean::
 	rm -rf ../Csv.dll *~

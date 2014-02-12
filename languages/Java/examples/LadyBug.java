@@ -1,9 +1,11 @@
 // Ladybug
-import static Processing.*;
+//import static Processing.*;
 
-window(400, 400);
-background(255);
-smooth();
+// FIXME: import static is gone!
+
+Processing.window(400, 400);
+Processing.background(255);
+Processing.smooth();
 
 // Head
 fill(0);
