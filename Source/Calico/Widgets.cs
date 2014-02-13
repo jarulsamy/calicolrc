@@ -30,7 +30,7 @@ public static class Widgets {
 	public Dictionary<string,object> data;
 	public string comm_id;
 	public System.Func<object,object> on_click_func;
-	public Dictionary<string,System.Func<string,string,object>> on_value_change_func = new Dictionary<string,System.Func<string,string,object>>();
+	public Dictionary<string,System.Func<string,object,object>> on_value_change_func = new Dictionary<string,System.Func<string,object,object>>();
 	ZMQServer.Session session = null;
 
 	public Widget(ZMQServer.Session session) {
@@ -44,16 +44,16 @@ public static class Widgets {
 
 	// Attributes
 	public bool visible {
-	    get { return (bool)get("visible"); }
-	    set { set("visible", value); }
+	    get { return Convert.ToBoolean(get("visible")); }
+	    set { set("visible", Convert.ToBoolean(value)); }
 	}
 	public bool disabled {
-	    get { return (bool)get("disabled"); }
-	    set { set("disabled", value); }
+	    get { return Convert.ToBoolean(get("disabled")); }
+	    set { set("disabled", Convert.ToBoolean(value)); }
 	}
 	public string _view_name {
-	    get { return (string)get("_view_name"); }
-	    set { set("_view_name", value); }
+	    get { return Convert.ToString(get("_view_name")); }
+	    set { set("_view_name", Convert.ToString(value)); }
 	}
 
 	public void Dispatch(IDictionary<string, object> data,
@@ -61,8 +61,17 @@ public static class Widgets {
 	    // handle comm_msg for widget
 	    if (data.ContainsKey("sync_data")) {
 		// data: {"method":"backbone","sync_data":{"value":0.8}}
+		// Let the frontend know that we are busy:
 		session.update_status("busy", parent_header);
-		((Dictionary<string,object>)this.data["state"])["value"] = ((Dictionary<string,object>)data["sync_data"])["value"];
+		// first, change the value in the dictionary
+		// make sure it is correct type:
+		object value = ((Dictionary<string,object>)data["sync_data"])["value"];
+		((Dictionary<string,object>)this.data["state"])["value"] = value;
+		// Next, call any associated callbacks:
+		if (on_value_change_func.ContainsKey("value")) {
+		    on_value_change_func["value"]("value", value);
+		}
+		// And back to idle:
 		session.update_status("idle", parent_header);
 	    }
 	    if (data.ContainsKey("content")) {
@@ -88,7 +97,7 @@ public static class Widgets {
 	    on_click_func = function;
 	}
 
-	public void on_value_change(System.Func<string,string,object> function, string value_name) {
+	public void on_value_change(System.Func<string,object,object> function, string value_name) {
 	    on_value_change_func[value_name] = function;
 	}
 
@@ -135,23 +144,23 @@ public static class Widgets {
     public class BoundedFloatTextWidget : Widget {
 	// Attributes
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 	public double min {
-	    get { return (double)get("min"); }
+	    get { return Convert.ToDouble(get("min")); }
 	    set { set("min", Convert.ToDouble(value)); }
 	}
 	public double max {
-	    get { return (double)get("max"); }
+	    get { return Convert.ToDouble(get("max")); }
 	    set { set("max", Convert.ToDouble(value)); }
 	}
 	public double step {
-	    get { return (double)get("step"); }
+	    get { return Convert.ToDouble(get("step")); }
 	    set { set("step", Convert.ToDouble(value)); }
 	}
 	public double value {
-	    get { return (double)get("value"); }
+	    get { return Convert.ToDouble(get("value")); }
 	    set { set("value", Convert.ToDouble(value)); }
 	}
 
@@ -181,25 +190,25 @@ public static class Widgets {
     public class BoundedIntTextWidget : Widget {
 	// Attributes
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 	// FIXME: Should these be ints or strings?
 	public Int64 min {
-	    get { return (Int64)get("min"); }
-	    set { set("min", value); }
+	    get { return Convert.ToInt64(get("min")); }
+	    set { set("min", Convert.ToInt64(value)); }
 	}
 	public Int64 max {
-	    get { return (Int64)get("max"); }
-	    set { set("max", value); }
+	    get { return Convert.ToInt64(get("max")); }
+	    set { set("max", Convert.ToInt64(value)); }
 	}
 	public Int64 step {
-	    get { return (Int64)get("step"); }
-	    set { set("step", value); }
+	    get { return Convert.ToInt64(get("step")); }
+	    set { set("step", Convert.ToInt64(value)); }
 	}
 	public Int64 value {
-	    get { return (Int64)get("value"); }
-	    set { set("value", value); }
+	    get { return Convert.ToInt64(get("value")); }
+	    set { set("value", Convert.ToInt64(value)); }
 	}
 
 	public BoundedIntTextWidget(ZMQServer.Session session,
@@ -228,8 +237,8 @@ public static class Widgets {
     public class ButtonWidget : Widget {
 	// Attributes
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 
 	public ButtonWidget(ZMQServer.Session session,
@@ -250,12 +259,12 @@ public static class Widgets {
     public class CheckboxWidget : Widget {
 	// Attributes
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 	public bool value {
-	    get { return (bool)get("value"); }
-	    set { set("value", value); }
+	    get { return Convert.ToBoolean(get("value")); }
+	    set { set("value", Convert.ToBoolean(value)); }
 	}
 
 	public CheckboxWidget(ZMQServer.Session session,
@@ -288,23 +297,23 @@ public static class Widgets {
     public class FloatProgressWidget : Widget {
 	// Attributes
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 	public double min {
-	    get { return (double)get("min"); }
+	    get { return Convert.ToDouble(get("min")); }
 	    set { set("min", Convert.ToDouble(value)); }
 	}
 	public double max {
-	    get { return (double)get("max"); }
+	    get { return Convert.ToDouble(get("max")); }
 	    set { set("max", Convert.ToDouble(value)); }
 	}
 	public double step {
-	    get { return (double)get("step"); }
+	    get { return Convert.ToDouble(get("step")); }
 	    set { set("step", Convert.ToDouble(value)); }
 	}
 	public double value {
-	    get { return (double)get("value"); }
+	    get { return Convert.ToDouble(get("value")); }
 	    set { set("value", Convert.ToDouble(value)); }
 	}
 
@@ -334,32 +343,32 @@ public static class Widgets {
     public class FloatSliderWidget : Widget {
 	// Attributes
 	public double min {
-	    get { return (double)get("min"); }
+	    get { return Convert.ToDouble(get("min")); }
 	    set { set("min", Convert.ToDouble(value)); }
 	}
 	public double max {
-	    get { return (double)get("max"); }
+	    get { return Convert.ToDouble(get("max")); }
 	    set { set("max", Convert.ToDouble(value)); }
 	}
 	public double step {
-	    get { return (double)get("step"); }
+	    get { return Convert.ToDouble(get("step")); }
 	    set { set("step", Convert.ToDouble(value)); }
 	}
 	public double value {
-	    get { return (double)get("value"); }
+	    get { return Convert.ToDouble(get("value")); }
 	    set { set("value", Convert.ToDouble(value)); }
 	}
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 	public string orientation {
-	    get { return (string)get("orientation"); }
-	    set { set("orientation", value); }
+	    get { return Convert.ToString(get("orientation")); }
+	    set { set("orientation", Convert.ToString(value)); }
 	}
 	public bool readout {
-	    get { return (bool)get("readout"); }
-	    set { set("readout", value); }
+	    get { return Convert.ToBoolean(get("readout")); }
+	    set { set("readout", Convert.ToBoolean(value)); }
 	}
 
 	public FloatSliderWidget(ZMQServer.Session session,
@@ -392,23 +401,23 @@ public static class Widgets {
     public class FloatTextProgressWidget : Widget {
 	// Attributes
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 	public double min {
-	    get { return (double)get("min"); }
+	    get { return Convert.ToDouble(get("min")); }
 	    set { set("min", Convert.ToDouble(value)); }
 	}
 	public double max {
-	    get { return (double)get("max"); }
+	    get { return Convert.ToDouble(get("max")); }
 	    set { set("max", Convert.ToDouble(value)); }
 	}
 	public double step {
-	    get { return (double)get("step"); }
+	    get { return Convert.ToDouble(get("step")); }
 	    set { set("step", Convert.ToDouble(value)); }
 	}
 	public double value {
-	    get { return (double)get("value"); }
+	    get { return Convert.ToDouble(get("value")); }
 	    set { set("value", Convert.ToDouble(value)); }
 	}
 
@@ -438,11 +447,11 @@ public static class Widgets {
     public class FloatTextWidget : Widget {
 	// Attributes
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 	public double value {
-	    get { return (double)get("value"); }
+	    get { return Convert.ToDouble(get("value")); }
 	    set { set("value", Convert.ToDouble(value)); }
 	}
 
@@ -466,12 +475,12 @@ public static class Widgets {
     public class HTMLWidget : Widget {
 	// Attributes
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 	public string value {
-	    get { return (string)get("value"); }
-	    set { set("value", value); }
+	    get { return Convert.ToString(get("value")); }
+	    set { set("value", Convert.ToString(value)); }
 	}
 
 	public HTMLWidget(ZMQServer.Session session,
@@ -494,22 +503,22 @@ public static class Widgets {
     public class ImageWidget : Widget {
 	// Attributes
 	public string format {
-	    get { return (string)get("format"); }
-	    set { set("format", value); }
+	    get { return Convert.ToString(get("format")); }
+	    set { set("format", Convert.ToString(value)); }
 	}
 	// FIXME: CastingUnicode: int
 	public string width {
-	    get { return (string)get("width"); }
-	    set { set("width", value); }
+	    get { return Convert.ToString(get("width")); }
+	    set { set("width", Convert.ToString(value)); }
 	}
 	// FIXME: CastingUnicode: int
 	public string height {
-	    get { return (string)get("height"); }
-	    set { set("height", value); }
+	    get { return Convert.ToString(get("height")); }
+	    set { set("height", Convert.ToString(value)); }
 	}
 	public string _b64value {
-	    get { return (string)get("_b64value"); }
-	    set { set("_b64value", value); }
+	    get { return Convert.ToString(get("_b64value")); }
+	    set { set("_b64value", Convert.ToString(value)); }
 	}
 	public byte[] value {
 	    get { return (byte [])get("value"); }
@@ -542,24 +551,24 @@ public static class Widgets {
     public class IntProgressWidget : Widget {
 	// Attributes
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 	public Int64 min {
-	    get { return (Int64)get("min"); }
-	    set { set("min", value); }
+	    get { return Convert.ToInt64(get("min")); }
+	    set { set("min", Convert.ToInt64(value)); }
 	}
 	public double max {
-	    get { return (Int64)get("max"); }
-	    set { set("max", value); }
+	    get { return Convert.ToInt64(get("max")); }
+	    set { set("max", Convert.ToInt64(value)); }
 	}
 	public double step {
-	    get { return (Int64)get("step"); }
-	    set { set("step", value); }
+	    get { return Convert.ToInt64(get("step")); }
+	    set { set("step", Convert.ToInt64(value)); }
 	}
 	public double value {
-	    get { return (Int64)get("value"); }
-	    set { set("value", value); }
+	    get { return Convert.ToInt64(get("value")); }
+	    set { set("value", Convert.ToInt64(value)); }
 	}
 
 	public IntProgressWidget(ZMQServer.Session session,
@@ -588,32 +597,32 @@ public static class Widgets {
     public class IntSliderWidget : Widget {
 	// Attributes
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 	public Int64 min {
-	    get { return (Int64)get("min"); }
-	    set { set("min", value); }
+	    get { return Convert.ToInt64(get("min")); }
+	    set { set("min", Convert.ToInt64(value)); }
 	}
 	public Int64 max {
-	    get { return (Int64)get("max"); }
-	    set { set("max", value); }
+	    get { return Convert.ToInt64(get("max")); }
+	    set { set("max", Convert.ToInt64(value)); }
 	}
 	public Int64 step {
-	    get { return (Int64)get("step"); }
-	    set { set("step", value); }
+	    get { return Convert.ToInt64(get("step")); }
+	    set { set("step", Convert.ToInt64(value)); }
 	}
 	public Int64 value {
-	    get { return (Int64)get("value"); }
-	    set { set("value", value); }
+	    get { return Convert.ToInt64(get("value")); }
+	    set { set("value", Convert.ToInt64(value)); }
 	}
 	public string orientation {
-	    get { return (string)get("orientation"); }
-	    set { set("orientation", value); }
+	    get { return Convert.ToString(get("orientation")); }
+	    set { set("orientation", Convert.ToString(value)); }
 	}
 	public bool readout {
-	    get { return (bool)get("readout"); }
-	    set { set("readout", value); }
+	    get { return Convert.ToBoolean(get("readout")); }
+	    set { set("readout", Convert.ToBoolean(value)); }
 	}
 
 	public IntSliderWidget(ZMQServer.Session session,
@@ -646,12 +655,12 @@ public static class Widgets {
     public class IntTextWidget : Widget {
 	// Attributes
 	public Int64 value {
-	    get { return (Int64)get("value"); }
-	    set { set("value", value); }
+	    get { return Convert.ToInt64(get("value")); }
+	    set { set("value", Convert.ToInt64(value)); }
 	}
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 
 	public IntTextWidget(ZMQServer.Session session,
@@ -674,12 +683,12 @@ public static class Widgets {
     public class LatexWidget : Widget {
 	// Attributes
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 	public string value {
-	    get { return (string)get("value"); }
-	    set { set("value", value); }
+	    get { return Convert.ToString(get("value")); }
+	    set { set("value", Convert.ToString(value)); }
 	}
 
 	public LatexWidget(ZMQServer.Session session,
@@ -722,12 +731,12 @@ public static class Widgets {
     public class TextWidget : Widget {
 	// Attributes
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 	public string value {
-	    get { return (string)get("value"); }
-	    set { set("value", value); }
+	    get { return Convert.ToString(get("value")); }
+	    set { set("value", Convert.ToString(value)); }
 	}
 
 	public TextWidget(ZMQServer.Session session,
@@ -750,12 +759,12 @@ public static class Widgets {
     public class TextareaWidget : Widget {
 	// Attributes
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 	public string value {
-	    get { return (string)get("value"); }
-	    set { set("value", value); }
+	    get { return Convert.ToString(get("value")); }
+	    set { set("value", Convert.ToString(value)); }
 	}
 
 	public TextareaWidget(ZMQServer.Session session,
@@ -778,12 +787,12 @@ public static class Widgets {
     public class ToggleButtonWidget : Widget {
 	// Attributes
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 	public bool value {
-	    get { return (bool)get("value"); }
-	    set { set("value", value); }
+	    get { return Convert.ToBoolean(get("value")); }
+	    set { set("value", Convert.ToBoolean(value)); }
 	}
 
 	public ToggleButtonWidget(ZMQServer.Session session,
@@ -841,12 +850,12 @@ public static class Widgets {
     public class PopupWidget : Widget {
 	// Attributes
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 	public string button_text {
-	    get { return (string)get("button_text"); }
-	    set { set("button_text", value); }
+	    get { return Convert.ToString(get("button_text")); }
+	    set { set("button_text", Convert.ToString(value)); }
 	}
 
 	public PopupWidget(ZMQServer.Session session,
@@ -872,8 +881,8 @@ public static class Widgets {
 	// value
 	// values
 	public string description {
-	    get { return (string)get("description"); }
-	    set { set("description", value); }
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
 	}
 
 	public SelectionWidget(ZMQServer.Session session,
