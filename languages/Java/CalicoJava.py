@@ -23,7 +23,7 @@ import traceback
 parser = koala.dynamicjava.parser.wrapper.JavaCCParserFactory()
 interpreter = koala.dynamicjava.interpreter.TreeInterpreter(parser)
 jarpath = os.path.abspath(os.path.join(os.path.dirname(__file__), "jar"))
-# This must be done here:
+# This must be done here, for security I think:
 for filename in glob.glob(os.path.join(jarpath, "*.jar")):
     f = os.path.abspath(filename)
     interpreter.addClassPath(f)
