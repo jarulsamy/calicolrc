@@ -12,7 +12,6 @@ public static class Widgets {
     public static void Dispatch(string id, 
 				IDictionary<string, object> data, 
 				IDictionary<string, object> parent_header) {
-	System.Console.WriteLine(id);
 	if (Widgets.comm_id.ContainsKey(id)) {
 	    Widgets.comm_id[id].Dispatch(data, parent_header);
 	} else {
@@ -25,13 +24,22 @@ public static class Widgets {
 	return widget;
     }
 
+    public class Callback {
+	public System.Func<string,object,object> on_value_change_callback;
+
+	public Callback(System.Func<string,object,object> on_value_change_callback) {
+	    this.on_value_change_callback = on_value_change_callback;
+	}
+    }
+
     public class Widget {
 	public string target_name;
 	public Dictionary<string,object> data;
 	public string comm_id;
 	public System.Func<object,object> on_click_func;
-	public Dictionary<string,System.Func<string,object,object>> on_value_change_func = new Dictionary<string,System.Func<string,object,object>>();
+	public Dictionary<string,Callback> on_value_change_callback = new Dictionary<string,Callback>();
 	ZMQServer.Session session = null;
+	public int execution_count;
 
 	public Widget(ZMQServer.Session session) {
 	    this.session = session;
@@ -63,13 +71,20 @@ public static class Widgets {
 		// data: {"method":"backbone","sync_data":{"value":0.8}}
 		// Let the frontend know that we are busy:
 		session.update_status("busy", parent_header);
-		// first, change the value in the dictionary
-		// make sure it is correct type:
 		object value = ((Dictionary<string,object>)data["sync_data"])["value"];
+		// first, change the value in the dictionary
 		((Dictionary<string,object>)this.data["state"])["value"] = value;
 		// Next, call any associated callbacks:
-		if (on_value_change_func.ContainsKey("value")) {
-		    on_value_change_func["value"]("value", value);
+		if (on_value_change_callback.ContainsKey("value")) {
+		    Callback fcb = on_value_change_callback["value"];
+		    // session ID ignored, just make it non-zero:
+		    session.SetOutputs(9999, parent_header);
+		    try {
+			fcb.on_value_change_callback("value", value);
+		    } catch {
+			// FIXME:
+		    }
+		    session.SetOutputs(0, null); // wait till after widget displays
 		}
 		// And back to idle:
 		session.update_status("idle", parent_header);
@@ -98,7 +113,7 @@ public static class Widgets {
 	}
 
 	public void on_value_change(System.Func<string,object,object> function, string value_name) {
-	    on_value_change_func[value_name] = function;
+	    on_value_change_callback[value_name] = new Callback(function);
 	}
 
 	public void onClick() {

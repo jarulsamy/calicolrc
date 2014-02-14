@@ -93,10 +93,12 @@ public static class ZMQServer {
 	public Calico.MainWindow calico;
 	public int current_execution_count = 0;
 	public IDictionary<string, object> parent_header;
+	public System.IO.StreamWriter log;
 
 	public Session(Calico.MainWindow calico, string filename) {
 	    this.calico = calico;
 	    this.filename = filename;
+	    //this.log = new System.IO.StreamWriter("zmqserver.log");
 	    session_id = System.Guid.NewGuid().ToString();
 	    engine_id = System.Guid.NewGuid().ToString();
 	    string json = File.ReadAllText(filename);
@@ -147,7 +149,10 @@ public static class ZMQServer {
 		};
 		iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
 	    } else {
-		// skip
+		if (log != null) {
+		    log.Write(message);
+		    log.Flush();
+		}
 	    }
 	}
 
@@ -162,7 +167,10 @@ public static class ZMQServer {
 		};
 		iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
 	    } else {
-		// skip
+		if (log != null) {
+		    log.Write(message);
+		    log.Flush();
+		}
 	    }
 	}
 
@@ -224,6 +232,7 @@ public static class ZMQServer {
 	}
 
 	public void display_widget(Widgets.Widget widget) {
+	    widget.execution_count = session.current_execution_count;
 	    var header = Header("comm_open");
 	    var metadata = new Dictionary<string, object>();
 	    var content = widget.GetInitialState();
@@ -466,7 +475,6 @@ public static class ZMQServer {
 	    } else if (m_header["msg_type"].ToString() == "object_info_request") {
 		// FIXME: add object_info_request, shutdown_request, complete_request
 	    } else if (m_header["msg_type"].ToString() == "comm_msg") {
-		System.Console.WriteLine("sending comm_msg to " + m_content["comm_id"].ToString());
 		Widgets.Dispatch(m_content["comm_id"].ToString(),
 				 (IDictionary<string, object>)m_content["data"],
 				 m_header);
