@@ -1,7 +1,5 @@
 // Ladybug
-//import static Processing.*;
-
-// FIXME: import static is gone!
+import static Processing.*;
 
 Processing.window(400, 400);
 Processing.background(255);

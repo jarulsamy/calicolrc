@@ -67,37 +67,41 @@ public static class Widgets {
 	public void Dispatch(IDictionary<string, object> data,
 			     IDictionary<string, object> parent_header) {
 	    // handle comm_msg for widget
+	    session.SetOutputs(9999, parent_header);
+	    // Let the frontend know that we are busy:
+	    session.update_status("busy", parent_header);
 	    if (data.ContainsKey("sync_data")) {
 		// data: {"method":"backbone","sync_data":{"value":0.8}}
-		// Let the frontend know that we are busy:
-		session.update_status("busy", parent_header);
-		object value = ((Dictionary<string,object>)data["sync_data"])["value"];
-		// first, change the value in the dictionary
-		((Dictionary<string,object>)this.data["state"])["value"] = value;
-		// Next, call any associated callbacks:
-		if (on_value_change_callback.ContainsKey("value")) {
-		    Callback fcb = on_value_change_callback["value"];
-		    // session ID ignored, just make it non-zero:
-		    session.SetOutputs(9999, parent_header);
-		    try {
-			fcb.on_value_change_callback("value", value);
-		    } catch {
-			// FIXME:
+		// Get names of attributes to sync:
+		Dictionary<string,object> value_names = (Dictionary<string,object>)data["sync_data"];
+		// session ID ignored, just make it non-zero:
+		foreach (String value_name in value_names.Keys) {
+		    object value = value_names[value_name];
+		    // first, change the value in the widget dictionary:
+		    ((Dictionary<string,object>)this.data["state"])[value_name] = value;
+		    // Next, call any associated callbacks:
+		    if (on_value_change_callback.ContainsKey(value_name)) {
+			Callback fcb = on_value_change_callback[value_name];
+			try {
+			    fcb.on_value_change_callback(value_name, value);
+			} catch (Exception e) {
+			    System.Console.Error.WriteLine(e.ToString());
+			}
 		    }
-		    session.SetOutputs(0, null); // wait till after widget displays
 		}
-		// And back to idle:
-		session.update_status("idle", parent_header);
 	    }
 	    if (data.ContainsKey("content")) {
 		// data: {"content":{"event":"click"},"method":"custom"}
 		string evt = ((Dictionary<string,object>)data["content"])["event"].ToString();
 		if (evt == "click") {
-		    session.update_status("busy", parent_header);
 		    onClick();
-		    session.update_status("idle", parent_header);
+		} else {
+		    System.Console.Error.WriteLine("Need to handle event: " + evt);
 		}
 	    }
+	    // And back to idle:
+	    session.update_status("idle", parent_header);
+	    session.SetOutputs(0, null); // wait till after widget displays
 	}
 
 	public Dictionary<string,object> get_css() {
@@ -117,8 +121,13 @@ public static class Widgets {
 	}
 
 	public void onClick() {
-	    if (on_click_func != null) 
-		on_click_func(this);
+	    if (on_click_func != null) {
+		try {
+		    on_click_func(this);
+		} catch (Exception e) {
+		    System.Console.Error.WriteLine(e.ToString());
+		}
+	    }
 	}
 
 	public IDictionary<string, object> GetInitialState() {

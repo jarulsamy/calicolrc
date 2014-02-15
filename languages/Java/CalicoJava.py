@@ -10,27 +10,37 @@ clr.AddReference("Calico") # Add reference to the main Calico.exe
 import glob
 libpath = os.path.abspath(os.path.join(os.path.dirname(__file__), "lib"))
 sys.path.append(libpath)
+#print(sys.path)
 for filename in glob.glob(os.path.join(libpath, "*.dll")):
     filename = os.path.abspath(filename)
+    #print(filename)
     clr.AddReference(filename)
 
-import koala
+import edu
 import java
 import System
 import Calico
 import traceback
 
-parser = koala.dynamicjava.parser.wrapper.JavaCCParserFactory()
-interpreter = koala.dynamicjava.interpreter.TreeInterpreter(parser)
+# This is done here, because of problem loading if in PostSetup:
+classpath = java.util.ArrayList()
 jarpath = os.path.abspath(os.path.join(os.path.dirname(__file__), "jar"))
-# This must be done here, for security I think:
 for filename in glob.glob(os.path.join(jarpath, "*.jar")):
-    f = os.path.abspath(filename)
-    interpreter.addClassPath(f)
-interpreter.addLibrarySuffix(".java");
-classLoader = interpreter.getClassLoader()
+    fileobj = java.io.File(os.path.abspath(filename))
+    #print(filename)
+    classpath.Add(fileobj)
 
-# interpreter.getVariableNames().toArray()
+options = edu.rice.cs.dynamicjava.Options.DEFAULT
+loader = edu.rice.cs.plt.reflect.PathClassLoader(classpath)
+
+# FIXME: get line of error
+# HINT: drjava only does that on compile, not interpreter
+#inputStream = java.io.ByteArrayInputStream(System.Array[System.Byte](map(ord,list("class Person {"))))
+#p = koala.dynamicjava.parser.impl.Parser(inputStream)
+#try:
+#    print(p.parseStream())
+#except Exception, e:
+#    pass
 
 class OutputStream(java.io.ByteArrayOutputStream):
     def write(self, *args):
@@ -48,7 +58,7 @@ class OutputStream(java.io.ByteArrayOutputStream):
         if self.out_type == "output":
             print(retval, end="")
         elif self.out_type == "error":
-            print(retval, end="", file=sys.stderr)
+            self.calico.Error(retval)
 
 def isNone(v):
     return hasattr(v, "isNone") and v.isNone()
@@ -58,29 +68,21 @@ class MyLanguageEngine(Calico.Engine):
     def PostSetup(self, calico):
         """
         Do things here that you want to do once (initializations).
-        FIXME: this seems to be called twice!
         """
         self.calico = calico
-        self.parser = koala.dynamicjava.parser.wrapper.JavaCCParserFactory()
-        self.interpreter = koala.dynamicjava.interpreter.TreeInterpreter(self.parser, classLoader)
-        self.interpreter.addLibrarySuffix(".java");
-        if hasattr(self, "out"):
-            self.interpreter.setOut(self.out)
-        if hasattr(self, "err"):
-            self.interpreter.setErr(self.err)
+        self.interpreter = edu.rice.cs.dynamicjava.interpreter.Interpreter(
+            options, loader)
         self.interpreter.interpret("import cli.*;") # makes all DLLs available at top
-        try:
-            self.interpreter.getVariable("calico")
-        except:
-            self.interpreter.defineVariable("calico", self.calico)
 
     def SetRedirects(self, stdout, stderr):
-        self.out = OutputStream()
-        self.out.out_type = "output"
-        self.out.calico = self.calico
-        self.err = OutputStream()
-        self.err.out_type = "error"
-        self.err.calico = self.calico
+        out = OutputStream()
+        out.out_type = "output"
+        out.calico = self.calico
+        err = OutputStream()
+        err.out_type = "error"
+        err.calico = self.calico
+        edu.rice.cs.plt.io.IOUtil.replaceSystemOut(out)
+        edu.rice.cs.plt.io.IOUtil.replaceSystemErr(err)
             
     def Execute(self, text, feedback=True):
         """
@@ -100,9 +102,8 @@ class MyLanguageEngine(Calico.Engine):
                     else:
                         print(retval)
         except Exception, error:
-            # FIXME: java code now handles exceptions
             message = error.message
-            message = message.replace("koala.dynamicjava.interpreter.", "")
+            message = message.replace("koala.dynamicjava.interpreter.error.", "")
             message = message.replace("koala.dynamicjava.parser.wrapper.", "")
             message = message.replace("Derived classes must implement it", "java.lang.NullPointerException");
             self.calico.Error(message + "\n")
@@ -135,6 +136,7 @@ class MyLanguageEngine(Calico.Engine):
         """
         This is the code that will interprete a file.
         """
+        print("Run filename '%s'!" % filename)
         try:
             text = "".join(open(filename).readlines())
         except:
