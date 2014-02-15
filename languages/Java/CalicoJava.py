@@ -60,6 +60,22 @@ class OutputStream(java.io.ByteArrayOutputStream):
         elif self.out_type == "error":
             self.calico.Error(retval)
 
+def toType(v):
+    if hasattr(v, "__class__") and hasattr(v.__class__, "__name__"):
+        if v.__class__.__name__ == "Integer":
+            return v.intValue()
+        elif v.__class__.__name__ == "Double":
+            return v.doubleValue()
+        elif v.__class__.__name__ == "Byte":
+            return v.byteValue()
+        elif v.__class__.__name__ == "Float":
+            return v.floatValue()
+        elif v.__class__.__name__ == "Long":
+            return v.longValue()
+        elif v.__class__.__name__ == "Short":
+            return v.shortValue()
+    return v
+
 def isNone(v):
     return hasattr(v, "isNone") and v.isNone()
 
@@ -74,7 +90,6 @@ class MyLanguageEngine(Calico.Engine):
             options, loader)
         self.interpreter.interpret("import cli.*;") # makes all DLLs available at top
         self.interpreter.interpret("cli.Calico.MainWindow calico;")
-        print("calico is:", calico)
         self.interpreter.setVariable("calico", calico)
 
     def SetRedirects(self, stdout, stderr):
@@ -124,7 +139,7 @@ class MyLanguageEngine(Calico.Engine):
             except:
                 pass
             if not isNone(retval):
-                return retval
+                return toType(retval)
             else:
                 return None
         except Exception, error:
