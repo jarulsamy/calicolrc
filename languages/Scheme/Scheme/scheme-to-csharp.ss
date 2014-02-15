@@ -82,6 +82,9 @@
     (if-else?^ "Func<object,bool>" ())
     (assignment?^ "Func<object,bool>" ())
     (func?^ "Func<object,bool>" ())
+    (callback0?^ "Func<object,bool>" ())
+    (callback1?^ "Func<object,bool>" ())
+    (callback2?^ "Func<object,bool>" ())
     (define?^ "Func<object,bool>" ())
     (define!?^ "Func<object,bool>" ())
     (define-syntax?^ "Func<object,bool>" ())
@@ -170,6 +173,9 @@
     (not "bool" ())
     (get-use-stack-trace "bool" ())
     (set-use-stack-trace "void" ("bool"))
+    (callback0 "Func<object>" ())
+    (callback1 "Func<object,object>" ())
+    (callback2 "Func<object,object,object>" ())
     ))
 
 (define *system-ignore-definitions*
@@ -281,6 +287,45 @@
     return delegate (object[] args) { 
       proc_reg = schemeProc;
       args_reg = PJScheme.list ((object) args);
+      handler_reg = REP_handler;
+      k2_reg = REP_k;
+      pc = (Function) apply_proc;
+      return PJScheme.trampoline();
+    };
+  }
+
+  public static Func<object> callback0(object schemeProc) {
+    // Return a Csharp function that when invoked acts
+    // like schemeProc by calling apply_proc on its args.
+    return () => { 
+      proc_reg = schemeProc;
+      args_reg = PJScheme.list ();
+      handler_reg = REP_handler;
+      k2_reg = REP_k;
+      pc = (Function) apply_proc;
+      return PJScheme.trampoline();
+    };
+  }
+
+  public static Func<object,object> callback1(object schemeProc) {
+    // Return a Csharp function that when invoked acts
+    // like schemeProc by calling apply_proc on its args.
+    return (object arg) => { 
+      proc_reg = schemeProc;
+      args_reg = PJScheme.list (arg);
+      handler_reg = REP_handler;
+      k2_reg = REP_k;
+      pc = (Function) apply_proc;
+      return PJScheme.trampoline();
+    };
+  }
+
+  public static Func<object,object,object> callback2(object schemeProc) {
+    // Return a Csharp function that when invoked acts
+    // like schemeProc by calling apply_proc on its args.
+    return (object arg1, object arg2) => { 
+      proc_reg = schemeProc;
+      args_reg = PJScheme.list (arg1, arg2);
       handler_reg = REP_handler;
       k2_reg = REP_k;
       pc = (Function) apply_proc;
