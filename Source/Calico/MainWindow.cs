@@ -4775,5 +4775,21 @@ del _invoke, _
 	    else
 		PrintLine(Repr(obj));
 	}
+
+	public void clear_output() {
+	    if (ZMQServer.session != null)
+		ZMQServer.session.clear_output();
+	    else {
+		// pass
+	    }
+	}
+
+	public void clear_output(bool wait) {
+	    if (ZMQServer.session != null)
+		ZMQServer.session.clear_output(wait);
+	    else {
+		// pass
+	    }
+	}
     }
 }

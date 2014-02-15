@@ -64,6 +64,10 @@ public static class Widgets {
 	    set { set("_view_name", Convert.ToString(value)); }
 	}
 
+	public void clear_output(bool wait) {
+	    session.clear_output(this, wait);
+	}
+
 	public void Dispatch(IDictionary<string, object> data,
 			     IDictionary<string, object> parent_header) {
 	    // handle comm_msg for widget

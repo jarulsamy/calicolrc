@@ -231,6 +231,16 @@ public static class ZMQServer {
 	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
 	}
 
+	/* Not sure if we want this
+	public void clear_output(Widgets.Widget widget, bool wait) {
+	    var header = Header("clear_output");
+	    var metadata = new Dictionary<string, object>();
+	    var content = widget.GetDisplay();
+	    content["wait"] = wait;
+	    iopub_channel.send(iopub_channel, header, new Dictionary<string, object>(), metadata, content);
+	}
+	*/
+
 	public void display_widget(Widgets.Widget widget) {
 	    widget.execution_count = session.current_execution_count;
 	    var header = Header("comm_open");
@@ -241,6 +251,19 @@ public static class ZMQServer {
 	    header = Header("comm_msg");
 	    metadata = new Dictionary<string, object>();
 	    content = widget.GetDisplay();
+	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	}
+
+	public void clear_output() {
+	    clear_output(false);
+	}
+
+	public void clear_output(bool wait) {
+	    var header = Header("clear_output");
+	    var metadata = new Dictionary<string, object>();
+	    var content = new Dictionary<string, object> {
+		{"wait", wait},
+	    };
 	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
 	}
 
