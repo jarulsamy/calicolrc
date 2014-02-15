@@ -13,14 +13,18 @@ import edu.rice.cs.dynamicjava.Options;
 
 import static edu.rice.cs.plt.debug.DebugUtil.debug;
 
+import edu.rice.cs.dynamicjava.symbol.LocalVariable;
+import edu.rice.cs.dynamicjava.symbol.type.IntType;
+import java.util.ArrayList;
+
 /**
  * The external interface for the interpreter.
  */
 public class Interpreter {
 
-  private final Options _opt;
-  private TypeContext _typeContext;
-  private RuntimeBindings _bindings;
+  public final Options _opt;
+  public TypeContext _typeContext;
+  public RuntimeBindings _bindings;
   
   public Interpreter(Options opt, TypeContext typeContext, RuntimeBindings bindings) {
     _opt = opt;
@@ -58,13 +62,32 @@ public class Interpreter {
     return evalResult.second();
   }
   
-  private Iterable<Node> parse(String code) throws InterpreterException {
+  public Iterable<Node> parse(String code) throws InterpreterException {
     try {
       return new JavaCCParser(new StringReader(code), _opt).parseStream();
     }
     catch (ParseError e) {
       throw new ParserException(e);
     }
+  }
+
+  public RuntimeBindings getBindings() {
+      return _bindings;
+  }
+
+  public void getLocalVariable(String name) {
+  }
+
+  public ArrayList<String> getVariableNames() {
+      return _bindings.getVariableNames();
+  }
+
+  public void defineVariable(String name, Object value) {
+      _bindings = new RuntimeBindings(_bindings, new LocalVariable(name, new IntType(), true), 42);
+  }
+  
+  public void setVariable(String name, Object value) {
+      _bindings.set(name, value);
   }
   
   private TypeContext typeCheck(Iterable<Node> tree) throws InterpreterException {

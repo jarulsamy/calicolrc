@@ -1,9 +1,9 @@
 // Ladybug
 import static Processing.*;
 
-Processing.window(400, 400);
-Processing.background(255);
-Processing.smooth();
+window(400, 400);
+background(255);
+smooth();
 
 // Head
 fill(0);

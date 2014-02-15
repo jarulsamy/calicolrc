@@ -73,6 +73,9 @@ class MyLanguageEngine(Calico.Engine):
         self.interpreter = edu.rice.cs.dynamicjava.interpreter.Interpreter(
             options, loader)
         self.interpreter.interpret("import cli.*;") # makes all DLLs available at top
+        self.interpreter.interpret("cli.Calico.MainWindow calico;")
+        print("calico is:", calico)
+        self.interpreter.setVariable("calico", calico)
 
     def SetRedirects(self, stdout, stderr):
         out = OutputStream()

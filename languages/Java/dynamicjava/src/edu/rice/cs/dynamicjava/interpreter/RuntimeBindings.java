@@ -10,6 +10,8 @@ import edu.rice.cs.dynamicjava.symbol.*;
 import edu.rice.cs.dynamicjava.symbol.type.Type;
 import edu.rice.cs.dynamicjava.symbol.type.VariableType;
 
+import java.util.ArrayList;
+
 /** An environment used for evaluation. All keys in the environment are global -- there are no
   * shadowing concerns.  Thus, instances can be used very flexibly during evaluation, given that
   * a program is statically safe.  For example, the environment used to call a function can extend
@@ -21,10 +23,10 @@ public class RuntimeBindings {
   
   public static final RuntimeBindings EMPTY = new RuntimeBindings();
   
-  private final RuntimeBindings _parent;
-  private final Map<LocalVariable, Object> _vars;
-  private final Map<VariableType, Type> _tvars; // might be useful someday...
-  private final Map<DJClass, Object> _thisVals;
+  public final RuntimeBindings _parent;
+  public final Map<LocalVariable, Object> _vars;
+  public final Map<VariableType, Type> _tvars; // might be useful someday...
+  public final Map<DJClass, Object> _thisVals;
   
   public RuntimeBindings(RuntimeBindings parent, Map<LocalVariable, Object> vars,
                          Map<VariableType, Type> tvars, Map<DJClass, Object> thisVals) {
@@ -48,7 +50,20 @@ public class RuntimeBindings {
     this(parent, makeMap(vars, vals), Collections.<VariableType, Type>emptyMap(),
          Collections.<DJClass, Object>emptyMap());
   }
-  
+
+  public ArrayList<String> getVariableNames() {
+      ArrayList<String> arrayList;
+      if (_parent == null)
+	  arrayList = new ArrayList<String>();
+      else {
+	  arrayList = _parent.getVariableNames();
+      }
+      for (LocalVariable var : _vars.keySet()) {
+	  arrayList.add(var.declaredName());
+      }
+      return arrayList;
+  }
+    
   private static <K, V> Map<K, V> makeMap(Iterable<? extends K> keys, Iterable<? extends V> vals) {
     Map<K, V> result = new HashMap<K, V>();
     for (Pair<K, V> entry : IterUtil.zip(keys, vals)) { result.put(entry.first(), entry.second()); }
@@ -70,6 +85,33 @@ public class RuntimeBindings {
     if (_vars.containsKey(v)) { _vars.put(v, val); }
     else if (_parent != null) { _parent.set(v, val); }
     else { throw new IllegalArgumentException("Variable " + v + " is undefined"); }
+  }
+
+  public boolean set(String v, Object value) {
+      RuntimeBindings current = this;
+      while (current != null) {
+	  for (LocalVariable lv : current._vars.keySet()) {
+	      if (lv.declaredName().equals(v)) {
+		  current.set(lv, value);
+		  return true;
+	      }
+	  }
+	  current = current._parent;
+      }
+      return false;
+  }
+
+  public LocalVariable get(String v) {
+      RuntimeBindings current = this;
+      while (current != null) {
+	  for (LocalVariable lv : current._vars.keySet()) {
+	      if (lv.declaredName().equals(v)) {
+		  return lv;
+	      }
+	  }
+	  current = current._parent;
+      }
+      return null;
   }
 
   public Type get(VariableType v) {

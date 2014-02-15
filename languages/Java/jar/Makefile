@@ -3,7 +3,7 @@ MONO_LIB_PATH=/usr/lib/mono/4.0
 #IKVMSTUB=ikvmstub.exe
 IKVMSTUB=../lib/ikvmstub.exe -lib:$(MONO_LIB_PATH) -lib:../../../bin/
 
-all: Common.jar Csv.jar Math.jar mscorlib.jar Reflection.jar Rhyduino.jar Graphics.jar FarseerPhysics.jar Games.jar Kinect.jar Processing.jar Myro.jar gtk-sharp.jar gdk-sharp.jar 
+all: Common.jar Csv.jar Math.jar mscorlib.jar Reflection.jar Rhyduino.jar Graphics.jar FarseerPhysics.jar Games.jar Kinect.jar Processing.jar Myro.jar gtk-sharp.jar gdk-sharp.jar Calico.jar
 
 Common.jar: ../../../modules/Common.dll
 	 $(IKVMSTUB) -lib:../../../bin/ -lib:/usr/lib/cli/gtk-sharp-2.0/ -lib:/usr/lib/cli/glib-sharp-2.0/ -lib:/usr/lib/cli/atk-sharp-2.0/ -lib:/usr/lib/cli/gdk-sharp-2.0/ -lib:/usr/lib/cli/pango-sharp-2.0/ ../../../modules/Common.dll
@@ -48,3 +48,5 @@ gtk-sharp.jar:
 gdk-sharp.jar:
 	$(IKVMSTUB) -lib:../../../bin/ -lib:/usr/lib/cli/gtk-sharp-2.0/ -lib:/usr/lib/cli/glib-sharp-2.0/ -lib:/usr/lib/cli/atk-sharp-2.0/ -lib:/usr/lib/cli/gdk-sharp-2.0/ -lib:/usr/lib/cli/pango-sharp-2.0/ /usr/lib/mono/gac/gdk-sharp/2.12.0.0__35e10195dab3c99f/gdk-sharp.dll
 
+Calico.jar:
+	$(IKVMSTUB) -lib:../../../bin/ -lib:/usr/lib/cli/gtk-sharp-2.0/ -lib:/usr/lib/cli/glib-sharp-2.0/ -lib:/usr/lib/cli/atk-sharp-2.0/ -lib:/usr/lib/cli/gdk-sharp-2.0/ -lib:/usr/lib/cli/pango-sharp-2.0/ ../../../bin/Calico.exe
