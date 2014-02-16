@@ -70,14 +70,18 @@ namespace Calico {
 	}
 	
 	public override IDictionary<string, string> GetRepresentations() {
-	    byte [] buffer;
+	    byte [] buffer = new byte[0];
 	    if (filename.StartsWith ("http://")) {
-		HttpWebRequest req = (HttpWebRequest)WebRequest.Create (filename);
-		req.KeepAlive = false;
-		req.Timeout = 10000;        
-		WebResponse resp = req.GetResponse ();
-		Stream s = resp.GetResponseStream ();
-		buffer = ReadToEnd(s);
+		try {
+		    HttpWebRequest req = (HttpWebRequest)WebRequest.Create (filename);
+		    req.KeepAlive = false;
+		    req.Timeout = 10000;        
+		    WebResponse resp = req.GetResponse ();
+		    Stream s = resp.GetResponseStream ();
+		    buffer = ReadToEnd(s);
+		} catch (Exception e) {
+		    System.Console.Error.WriteLine(e.ToString());
+		}
 	    } else {
 		buffer = File.ReadAllBytes(filename);
 	    }
@@ -146,12 +150,16 @@ namespace Calico {
 	    string png_string;
 	    string jpg_string;
 	    if (filename.StartsWith ("http://")) {
-		HttpWebRequest req = (HttpWebRequest)WebRequest.Create (filename);
-		req.KeepAlive = false;
-		req.Timeout = 10000;        
-		WebResponse resp = req.GetResponse ();
-		Stream s = resp.GetResponseStream ();
-		pixbuf = new Gdk.Pixbuf (s);
+		try {
+		    HttpWebRequest req = (HttpWebRequest)WebRequest.Create (filename);
+		    req.KeepAlive = false;
+		    req.Timeout = 10000;        
+		    WebResponse resp = req.GetResponse ();
+		    Stream s = resp.GetResponseStream ();
+		    pixbuf = new Gdk.Pixbuf (s);
+		} catch (Exception e) {
+		    System.Console.Error.WriteLine(e.ToString());
+		}
 	    } else {
 		pixbuf = new Gdk.Pixbuf (filename);
 	    }

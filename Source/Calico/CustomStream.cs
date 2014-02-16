@@ -26,10 +26,10 @@ namespace Calico {
 
     public class CustomStream : Stream {
         public Calico.Tag tag;
-        Calico.MainWindow window;
+        Calico.MainWindow calico;
 
-        public CustomStream(Calico.MainWindow window, Tag tag) : base() {
-            this.window = window;
+        public CustomStream(Calico.MainWindow calico, Tag tag) : base() {
+            this.calico = calico;
             this.tag = tag;
         }
 
@@ -41,7 +41,7 @@ namespace Calico {
                 // clear screen?
             } else {
                 string text = System.Text.Encoding.UTF8.GetString(bytes, offset, count);
-                window.Print(tag, text);              
+                calico.Print(tag, text);              
             }
         }
 
@@ -50,19 +50,19 @@ namespace Calico {
         }
 
         public void PrintLine(string text) {
-            window.Print(tag, text + "\n");
+            calico.Print(tag, text + "\n");
         }
 
         public void Print(string text) {
-            window.Print(tag, text);
+            calico.Print(tag, text);
         }
 
         public void PrintLine(Calico.Tag mytag, string text) {
-            window.Print(mytag, text + "\n");
+            calico.Print(mytag, text + "\n");
         }
 
         public void Print(Calico.Tag mytag, string text) {
-            window.Print(mytag, text);
+            calico.Print(mytag, text);
         }
 
         public override int Read(Byte [] bytes, int offset, int count) {

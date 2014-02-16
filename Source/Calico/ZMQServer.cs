@@ -521,6 +521,8 @@ public static class ZMQServer {
 		if (retval is Widgets.Widget) {
 		    // Widgets inject themselves to output, but have no return repr
 		    session.display_widget((Widgets.Widget)retval);
+		//} else if (retval is Representation) {
+		//session.display((Representation)retval);
 		} else {
 		    content = new Dictionary<string, object>
 			{

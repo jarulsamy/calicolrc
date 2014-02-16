@@ -264,7 +264,7 @@ namespace Calico {
                 PrintLine("Please activate and restart Calico to use this language.");
                 return null;
             }
-	    Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
+	    Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression;
 	    Microsoft.Scripting.Hosting.ScriptSource source;
 	    Microsoft.Scripting.Hosting.CompiledCode compiledCode;
 	    try {
@@ -284,7 +284,7 @@ namespace Calico {
 	    } catch {
 		// let's try to Execute, before giving up:
 		try { 
-		    sctype = Microsoft.Scripting.SourceCodeKind.Expression;
+		    sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
 		    source = engine.CreateScriptSourceFromString(text, sctype);
 		    if (compiler_options != null) {
 			compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);

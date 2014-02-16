@@ -4393,6 +4393,14 @@ del _invoke, _
 	public MimeRepresentation HTML(string text) {
 	    return new MimeRepresentation("text/html", text, "text/plain", "<HTML>");
 	}
+
+	public MimeRepresentation Latex(string text) {
+	    return new MimeRepresentation("text/latex", text, "text/plain", "<Latex>");
+	}
+	
+	public MimeRepresentation Math(string text) {
+	    return new MimeRepresentation("text/latex", "$$" + text + "$$", "text/plain", "<Math>");
+	}
 	
 	public MimeRepresentation Javascript(string text) {
 	    return new MimeRepresentation("application/javascript", text, "text/plain", "<JavaScript>");
@@ -4400,6 +4408,29 @@ del _invoke, _
 
 	public ImageRepresentation Image(string filename) {
 	    return new ImageRepresentation(filename);
+	}
+
+	public MimeRepresentation Table(IList<IList> list) {
+	    string text = "<table border=\"1\">";
+	    int count = 1;
+	    text += "<tr>";
+	    foreach (IList cols in list) {
+		foreach (object col in cols) {
+		    text += String.Format("<th>Item{0}</th>", count);
+		    count += 1;
+		}
+		break;
+	    }
+	    text += "</tr>";
+	    foreach (IList cols in list) {
+		text += "<tr>";
+		foreach (object col in cols) {
+		    text += String.Format("<td>{0}</td>", col);
+		}
+		text += "</tr>";
+	    }
+	    text += "</table>";
+	    return new MimeRepresentation("text/html", text, "text/plain", "<Table>");
 	}
 
 	// JSON, PNG, JPEG, SVG, Math, LaTeX, Audio, Video, IFrame
@@ -4769,11 +4800,24 @@ del _invoke, _
 					       visible);
 	}
 
-	public void display(object obj) {
-	    if (ZMQServer.session != null)
-		ZMQServer.session.display(obj);
-	    else
-		PrintLine(Repr(obj));
+	public void display(object obj1) {
+	    display(obj1, new object [0]);
+	}
+
+	// These two display functions are written to work with Scheme
+	// which is having issues with calling params
+	public void display(object obj1, params object [] objs) {
+	    if (ZMQServer.session != null) {
+		ZMQServer.session.display(obj1);
+		foreach (object obj in objs) {
+		    ZMQServer.session.display(obj);
+		}
+	    } else {
+		PrintLine(Repr(obj1));
+		foreach (object obj in objs) {
+		    PrintLine(Repr(obj));
+		}
+	    }
 	}
 
 	public void clear_output() {

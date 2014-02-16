@@ -24,7 +24,11 @@ using IronPython;
 public static class ReflectionExtensions {
 
     public static object InvokeWithNamedParameters(this MethodBase self, object obj, object [] args, IDictionary<string, object> namedParameters) { 
-        return self.Invoke(obj, MapParameters(self, args, namedParameters));
+	try {
+	    return self.Invoke(obj, MapParameters(self, args, namedParameters));
+	} catch {
+	    return String.Format("ERROR: Scheme unable to invoke ({0} {1})", obj, Scheme.array_to_string(args));
+	}
     }
 
     public static object[] MapParameters(MethodBase method, object [] args, IDictionary<string, object> namedParameters)
