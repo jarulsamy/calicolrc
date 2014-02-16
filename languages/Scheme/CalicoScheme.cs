@@ -129,7 +129,9 @@ public class CalicoSchemeEngine : Engine
   public override bool Execute(string text) {
     initialize_execute();
     object result = PJScheme.execute_string_rm(text);
-    return HandleOutput(result, true);
+    if (CheckGood(result))
+	return HandleOutput(result, true);
+    return false;
   }
 
   public override object Evaluate(string text) {
@@ -144,7 +146,9 @@ public class CalicoSchemeEngine : Engine
   public override bool ExecuteFile(string filename) {
     initialize_execute();
     object obj = PJScheme.execute_file_rm(filename);
-    return HandleOutput(obj, true);
+    if (CheckGood(obj))
+	return HandleOutput(obj, true);
+    return false;
   }
 
   public override bool ReadyToExecute(string text) {
