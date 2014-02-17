@@ -337,11 +337,62 @@ namespace Calico {
         }
 		
         public override bool Execute(string text, bool ok) {
-	    Evaluate(text);
-	    if (ok) {
-		PrintLine(Tag.Info, "Ok");
-	    }
-	    return true;
+		  // This is called by RunInBackground() in the MainWindow
+		  //manager.calico.last_error = ""
+		  if (engine == null) {
+			PrintLine("Please activate and restart Calico to use this language.");
+			return false;
+		  }
+		  Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
+		  Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
+		  Microsoft.Scripting.Hosting.CompiledCode compiledCode = null;
+		  try {
+		      if (compiler_options != null) {
+			  compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
+		      } else {
+			  compiledCode = source.Compile();
+		      }
+		  } catch {
+			sctype = Microsoft.Scripting.SourceCodeKind.Statements;
+			source = engine.CreateScriptSourceFromString(text, sctype);
+			try {
+			  if (compiler_options != null) {
+				compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
+			  } else {
+				compiledCode = source.Compile();
+			  }
+			} catch (Exception e) {
+			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+			  PrintLine(eo.FormatException(e));
+			  return false;
+			}
+		  }
+		  try {
+			if (manager != null && manager.UseSharedScope)
+			  compiledCode.Execute(manager.scope);
+			else
+			  compiledCode.Execute(scope);
+		  } catch (System.Threading.ThreadAbortException) {
+			PrintLine("[Script stopped----------]");
+			System.Threading.Thread.Sleep(100);
+			try {
+			    System.Threading.Thread.ResetAbort();
+			} catch {
+			    // pass
+			}
+		  } catch (Exception e) {
+			if (e.Message.Contains("Thread was being aborted")) {
+			  PrintLine("[Script stopped----------]");
+			} else {
+			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+			  PrintLine(eo.FormatException(e));
+			}
+			return false;
+		  }
+		  if (ok) {
+		      PrintLine(Tag.Info, "Ok");
+		  }
+		  return true;
         }
 		
         public override bool ExecuteFile(string filename) {
