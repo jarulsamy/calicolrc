@@ -4443,87 +4443,87 @@ del _invoke, _
 	public Widgets.Widget makeBoundedIntTextWidget() {
 	    return BoundedIntTextWidget();
 	}
-	public Widgets.Widget makeButtonWidget() {
+	public Widgets.ButtonWidget makeButtonWidget() {
 	    return ButtonWidget();
 	}
-	public Widgets.Widget makeCheckboxWidget() {
+	public Widgets.CheckboxWidget makeCheckboxWidget() {
 	    return CheckboxWidget();
 	}
-	public Widgets.Widget makeDropdownWidget() {
+	public Widgets.DropdownWidget makeDropdownWidget() {
 	    return DropdownWidget();
 	}
-	public Widgets.Widget makeFloatProgressWidget() {
+	public Widgets.FloatProgressWidget makeFloatProgressWidget() {
 	    return FloatProgressWidget();
 	}
-	public Widgets.Widget makeFloatSliderWidget() {
+	public Widgets.FloatSliderWidget makeFloatSliderWidget() {
 	    return FloatSliderWidget();
 	}
-	public Widgets.Widget makeFloatTextProgressWidget() {
+	public Widgets.FloatTextProgressWidget makeFloatTextProgressWidget() {
 	    return FloatTextProgressWidget();
 	}
-	public Widgets.Widget makeFloatTextWidget() {
+	public Widgets.FloatTextWidget makeFloatTextWidget() {
 	    return FloatTextWidget();
 	}
-	public Widgets.Widget makeHTMLWidget() {
+	public Widgets.HTMLWidget makeHTMLWidget() {
 	    return HTMLWidget();
 	}
-	public Widgets.Widget makeImageWidget() {
+	public Widgets.ImageWidget makeImageWidget() {
 	    return ImageWidget();
 	}
-	public Widgets.Widget makeIntProgressWidget() {
+	public Widgets.IntProgressWidget makeIntProgressWidget() {
 	    return IntProgressWidget();
 	}
-	public Widgets.Widget makeIntSliderWidget() {
+	public Widgets.IntSliderWidget makeIntSliderWidget() {
 	    return IntSliderWidget();
 	}
-	public Widgets.Widget makeIntTextWidget() {
+	public Widgets.IntTextWidget makeIntTextWidget() {
 	    return IntTextWidget();
 	}
-	public Widgets.Widget makeLatexWidget() {
+	public Widgets.LatexWidget makeLatexWidget() {
 	    return LatexWidget();
 	}
-	public Widgets.Widget makeRadioButtonsWidget() {
+	public Widgets.RadioButtonsWidget makeRadioButtonsWidget() {
 	    return RadioButtonsWidget();
 	}
-	public Widgets.Widget makeSelectWidget() {
+	public Widgets.SelectWidget makeSelectWidget() {
 	    return SelectWidget();
 	}
-	public Widgets.Widget makeTextWidget() {
+	public Widgets.TextWidget makeTextWidget() {
 	    return TextWidget();
 	}
-	public Widgets.Widget makeTextareaWidget() {
+	public Widgets.TextareaWidget makeTextareaWidget() {
 	    return TextareaWidget();
 	}
-	public Widgets.Widget makeToggleButtonWidget() {
+	public Widgets.ToggleButtonWidget makeToggleButtonWidget() {
 	    return ToggleButtonWidget();
 	}
-	public Widgets.Widget makeToogleButtonsWidget() {
-	    return ToogleButtonsWidget();
+	public Widgets.ToggleButtonsWidget makeToggleButtonsWidget() {
+	    return ToggleButtonsWidget();
 	}
-	public Widgets.Widget makeContainerWidget() {
+	public Widgets.ContainerWidget makeContainerWidget() {
 	    return ContainerWidget();
 	}
-	public Widgets.Widget makePopupWidget() {
+	public Widgets.PopupWidget makePopupWidget() {
 	    return PopupWidget();
 	}
-	public Widgets.Widget makeSelectionWidget() {
+	public Widgets.SelectionWidget makeSelectionWidget() {
 	    return SelectionWidget();
 	}
 
-	public Widgets.Widget BoundedFloatTextWidget(double min=0.0, 
-						     double max=100.0, 
-						     double step=0.1, 
-						     double value=0.0, 
-						     string description="", 
-						     bool disabled=false, 
-						     bool visible=true)  {
+	public Widgets.BoundedFloatTextWidget BoundedFloatTextWidget(double min=0.0, 
+								     double max=100.0, 
+								     double step=0.1, 
+								     double value=0.0, 
+								     string description="", 
+								     bool disabled=false, 
+								     bool visible=true)  {
 	    return new Widgets.BoundedFloatTextWidget(ZMQServer.session,
 						      min, max, step, 
 						      value, description, 
 						      disabled, visible);
 	}
 	
-	public Widgets.Widget BoundedIntTextWidget(Int64 min=0, 
+	public Widgets.BoundedIntTextWidget BoundedIntTextWidget(Int64 min=0, 
 						   Int64 max=100, 
 						   Int64 step=1, 
 						   Int64 value=0, 
@@ -4536,14 +4536,14 @@ del _invoke, _
 						    disabled, visible);
 	}
 
-	public Widgets.Widget ButtonWidget(string description="", 
+	public Widgets.ButtonWidget ButtonWidget(string description="", 
 					   bool disabled=false, 
 					   bool visible=true) {
 	    return new Widgets.ButtonWidget(ZMQServer.session, description, 
 					    disabled, visible);
 	}
 
-	public Widgets.Widget CheckboxWidget(string description="", 
+	public Widgets.CheckboxWidget CheckboxWidget(string description="", 
 					     bool value=false,
 					     bool disabled=false, 
 					     bool visible=true) {
@@ -4554,7 +4554,7 @@ del _invoke, _
 					      visible);
 	}
 
-	public Widgets.Widget DropdownWidget(string description="", 
+	public Widgets.DropdownWidget DropdownWidget(string description="", 
 					     bool disabled=false, 
 					     bool visible=true) {
 	    return new Widgets.DropdownWidget(ZMQServer.session,
@@ -4563,7 +4563,7 @@ del _invoke, _
 					      visible);
 	}
 
-	public Widgets.Widget FloatProgressWidget(double min=0.0, 
+	public Widgets.FloatProgressWidget FloatProgressWidget(double min=0.0, 
 						  double max=100.0, 
 						  double step=0.1, 
 						  double value=0.0, 
@@ -4580,7 +4580,7 @@ del _invoke, _
 						   visible);
 	}
 
-	public Widgets.Widget FloatSliderWidget(double min=0.0, 
+	public Widgets.FloatSliderWidget FloatSliderWidget(double min=0.0, 
 						double max=100.0, 
 						double step=0.1, 
 						double value=0.0, 
@@ -4595,7 +4595,7 @@ del _invoke, _
 						 disabled, visible);
 	}
 
-	public Widgets.Widget FloatTextProgressWidget(double min=0.0, 
+	public Widgets.FloatTextProgressWidget FloatTextProgressWidget(double min=0.0, 
 						      double max=100.0, 
 						      double step=0.1, 
 						      double value=0.0,
@@ -4612,7 +4612,7 @@ del _invoke, _
 						       visible);
 	}
 
-	public Widgets.Widget FloatTextWidget(double value=0.0,
+	public Widgets.FloatTextWidget FloatTextWidget(double value=0.0,
 					      string description="", 
 					      bool disabled=false, 
 					      bool visible=true) {
@@ -4623,7 +4623,7 @@ del _invoke, _
 					       visible);
 	}
 
-	public Widgets.Widget HTMLWidget(string value="",
+	public Widgets.HTMLWidget HTMLWidget(string value="",
 					 string description="", 
 					 bool disabled=false, 
 					 bool visible=true) {
@@ -4634,7 +4634,7 @@ del _invoke, _
 					  visible);
 	}
 
-	public Widgets.Widget ImageWidget(byte [] value=null, 
+	public Widgets.ImageWidget ImageWidget(byte [] value=null, 
 					  string format="png", 
 					  string width="", 
 					  string height="", 
@@ -4651,7 +4651,7 @@ del _invoke, _
 					   visible);
 	}
 
-	public Widgets.Widget IntProgressWidget(Int64 min=0, 
+	public Widgets.IntProgressWidget IntProgressWidget(Int64 min=0, 
 						Int64 max=100, 
 						Int64 step=1, 
 						Int64 value=0, 
@@ -4668,7 +4668,7 @@ del _invoke, _
 						 visible);
 	}
 
-	public Widgets.Widget IntSliderWidget(Int64 min=0, 
+	public Widgets.IntSliderWidget IntSliderWidget(Int64 min=0, 
 					      Int64 max=100, 
 					      Int64 step=1, 
 					      Int64 value=0, 
@@ -4689,7 +4689,7 @@ del _invoke, _
 					       visible);
 	}
 
-	public Widgets.Widget IntTextWidget(Int64 value=0,
+	public Widgets.IntTextWidget IntTextWidget(Int64 value=0,
 					    string description="",
 					    bool disabled=false, 
 					    bool visible=true) {
@@ -4700,7 +4700,7 @@ del _invoke, _
 					     visible=true);
 	}
 
-	public Widgets.Widget LatexWidget(string value="",
+	public Widgets.LatexWidget LatexWidget(string value="",
 					  string description="", 
 					  bool disabled=false, 
 					  bool visible=true) {
@@ -4711,7 +4711,7 @@ del _invoke, _
 					   visible);
 	}
 
-	public Widgets.Widget RadioButtonsWidget(string description="", 
+	public Widgets.RadioButtonsWidget RadioButtonsWidget(string description="", 
 						 bool disabled=false, 
 						 bool visible=true) {
 	    return new Widgets.RadioButtonsWidget(ZMQServer.session,
@@ -4720,7 +4720,7 @@ del _invoke, _
 						  visible);
 	}
 
-	public Widgets.Widget SelectWidget(string description="", 
+	public Widgets.SelectWidget SelectWidget(string description="", 
 					   bool disabled=false, 
 					   bool visible=true) {
 	    return new Widgets.SelectWidget(ZMQServer.session,
@@ -4729,7 +4729,7 @@ del _invoke, _
 					    visible);
 	}
 
-	public Widgets.Widget TextWidget(string value="",
+	public Widgets.TextWidget TextWidget(string value="",
 					 string description="", 
 					 bool disabled=false, 
 					 bool visible=true) {
@@ -4740,7 +4740,7 @@ del _invoke, _
 					  visible);
 	}
 
-	public Widgets.Widget TextareaWidget(string value="",
+	public Widgets.TextareaWidget TextareaWidget(string value="",
 					     string description="", 
 					     bool disabled=false, 
 					     bool visible=true) {
@@ -4751,7 +4751,7 @@ del _invoke, _
 					      visible);
 	}
 
-	public Widgets.Widget ToggleButtonWidget(bool value=false,
+	public Widgets.ToggleButtonWidget ToggleButtonWidget(bool value=false,
 						 string description="", 
 						 bool disabled=false, 
 						 bool visible=true) {
@@ -4762,16 +4762,16 @@ del _invoke, _
 						  visible);
 	}
 	
-	public Widgets.Widget ToogleButtonsWidget(string description="", 
+	public Widgets.ToggleButtonsWidget ToggleButtonsWidget(string description="", 
 						  bool disabled=false, 
 						  bool visible=true) {
-	    return new Widgets.ToogleButtonsWidget(ZMQServer.session,
+	    return new Widgets.ToggleButtonsWidget(ZMQServer.session,
 						   description, 
 						   disabled, 
 						   visible); 
 	}
 
-	public Widgets.Widget ContainerWidget(IList children=null, 
+	public Widgets.ContainerWidget ContainerWidget(IList children=null, 
 					      bool disabled=false, 
 					      bool visible=true) {
 	    return new Widgets.ContainerWidget(ZMQServer.session,
@@ -4780,7 +4780,7 @@ del _invoke, _
 					       visible);
 	}
 
-	public Widgets.Widget PopupWidget(string button_text="", 
+	public Widgets.PopupWidget PopupWidget(string button_text="", 
 					  string description="", 
 					  bool disabled=false, 
 					  bool visible=true) {
@@ -4791,7 +4791,7 @@ del _invoke, _
 					   visible);
 	}
 
-	public Widgets.Widget SelectionWidget(string description="", 
+	public Widgets.SelectionWidget SelectionWidget(string description="", 
 					      bool disabled=false, 
 					      bool visible=true) {
 	    return new Widgets.SelectionWidget(ZMQServer.session,

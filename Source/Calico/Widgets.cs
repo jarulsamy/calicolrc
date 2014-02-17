@@ -840,8 +840,8 @@ public static class Widgets {
 	}
     }
 
-    public class ToogleButtonsWidget : SelectionWidget {
-	public ToogleButtonsWidget(ZMQServer.Session session,
+    public class ToggleButtonsWidget : SelectionWidget {
+	public ToggleButtonsWidget(ZMQServer.Session session,
 				   string description="", 
 				   bool disabled=false, 
 				   bool visible=true) : 
