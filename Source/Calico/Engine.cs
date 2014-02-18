@@ -120,6 +120,14 @@ namespace Calico {
 
         public virtual void Close() {
         }
+
+	public virtual object GetMember(object value, string part) {
+	    return null;
+	}
+
+	public virtual IList<string> GetMemberNames(object obj) {
+	    return new List<string>();
+	}
     }
     
     public class DLREngine : Engine {
@@ -450,28 +458,12 @@ namespace Calico {
             return retval;
         }
 
-        /*
-        public IronPython.Compiler.Ast.PythonAst Parse() {
-            IronPython.Runtime.CodeContext context = new IronPython.Runtime.CodeContext();
-            SourceUnit sourceUnit = new SourceUnit();
-            string mode = "";
-            Parser parser = Parser.CreateParser(
-                new CompilerContext(sourceUnit, compiler_options, ThrowingErrorSink.Default),
-                (PythonOptions)context.LanguageContext.Options);
-
-            PythonAst ast = parser.ParseFile(true);
-        }
-        
-            Microsoft.Scripting.Runtime.LanguageContext context =
-            Microsoft.Scripting.SourceUnit sourceUnit = new Microsoft.Scripting.SourceUnit(context);
-             IronPython.Compiler.Parser parser = IronPython.Compiler.Parser.CreateParser(
-                         new Microsoft.Scripting.Runtime.CompilerContext(sourceUnit,
-                                compiler_options,
-                                ThrowingErrorSink.Default),
-                                (IronPython.PythonOptions)context.LanguageContext.Options);
-
-             PythonAst ast = parser.ParseFile(true);
-        }
-         */
+	public override object GetMember(object value, string part) {
+	    return engine.Operations.GetMember(value, part);	
+	}
+	
+	public override IList<string> GetMemberNames(object obj) {
+	    return engine.Operations.GetMemberNames(obj);
+	}
     }
 }

@@ -341,6 +341,7 @@ public static class ZMQServer {
 				    IDictionary<string, object> m_parent_header, 
 				    IDictionary<string, object> m_metadata, 
 				    IDictionary<string, object> m_content) {
+	    throw new Exception(this.ToString() + ": unknown msg_type: " + m_header["msg_type"]);
 	}
 
 	public void send(Channel channel,
@@ -421,6 +422,12 @@ public static class ZMQServer {
 		// ---------------------------------------------------
 		// First, handle any Calico metacommands:
 		string code = m_content["code"].ToString().Trim();
+		// code may end with ? (show help)
+		//send: ['F3853494D83649BE88088630B9D9DDD3', '<IDS|MSG>', '134ff5274c043013d9c65a8f82eaee5786143bc0097b901a1475192082506901', '{"date":"2014-02-18T14:54:36.659168","username":"kernel","session":"ed5790ca-a841-43d8-969d-a1acc1c9764c","msg_id":"ef7d68b6-9fae-457c-b35b-2f7cfc442950","msg_type":"execute_reply"}', '{"username":"username","msg_id":"EBC34EFB59584DFC8468D7F7928C2C93","msg_type":"execute_request","session":"F3853494D83649BE88088630B9D9DDD3"}', '{"dependencies_met":true,"engine":"47ae2106-447b-4f2c-a8fa-09bb4e410bb7","status":"ok","started":"2014-02-18T14:54:36.652879"}', '{"status":"ok","execution_count":3,"user_variables":{},"payload":[{"text":"\\u001b[1;31mType:       \\u001b[0mfunction\\n\\u001b[1;31mString Form:\\u001b[0m<function display_html at 0x1a93140>\\n\\u001b[1;31mFile:       \\u001b[0m/usr/local/lib/python2.7/dist-packages/IPython/core/display.py\\n\\u001b[1;31mDefinition: \\u001b[0m\\u001b[0mIPython\\u001b[0m\\u001b[1;33m.\\u001b[0m\\u001b[0mdisplay\\u001b[0m\\u001b[1;33m.\\u001b[0m\\u001b[0mdisplay_html\\u001b[0m\\u001b[1;33m(\\u001b[0m\\u001b[1;33m*\\u001b[0m\\u001b[0mobjs\\u001b[0m\\u001b[1;33m,\\u001b[0m \\u001b[1;33m**\\u001b[0m\\u001b[0mkwargs\\u001b[0m\\u001b[1;33m)\\u001b[0m\\u001b[1;33m\\u001b[0m\\u001b[0m\\n\\u001b[1;31mDocstring:\\u001b[0m\\nDisplay the HTML representation of an object.\\n\\nParameters\\n----------\\nobjs : tuple of objects\\n    The Python objects to display, or if raw=True raw HTML data to\\n    display.\\nraw : bool\\n    Are the data objects raw data or Python objects that need to be\\n    formatted before display? [default: False]\\nmetadata : dict (optional)\\n    Metadata to be associated with the specific mimetype output.","html":null,"start_line_number":0,"source":"page"}],"user_expressions":{}}']
+
+		// code may end with ?? (show source code!)
+		// send: ['F3853494D83649BE88088630B9D9DDD3', '<IDS|MSG>', '8cc2f48bd53be4eab892f6073672dcb10f5270e834c6c8822c6d6bea0e5c5420', '{"date":"2014-02-18T14:57:34.068692","username":"kernel","session":"ed5790ca-a841-43d8-969d-a1acc1c9764c","msg_id":"36ea8e60-4dad-412f-818d-1984133b0ac8","msg_type":"execute_reply"}', '{"username":"username","msg_id":"8ADF32F2006349759F521CC336B26B6E","msg_type":"execute_request","session":"F3853494D83649BE88088630B9D9DDD3"}', '{"dependencies_met":true,"engine":"47ae2106-447b-4f2c-a8fa-09bb4e410bb7","status":"ok","started":"2014-02-18T14:57:34.061489"}', '{"status":"ok","execution_count":6,"user_variables":{},"payload":[{"text":"\\u001b[1;31mType:       \\u001b[0mfunction\\n\\u001b[1;31mString Form:\\u001b[0m<function display_html at 0x1a93140>\\n\\u001b[1;31mFile:       \\u001b[0m/usr/local/lib/python2.7/dist-packages/IPython/core/display.py\\n\\u001b[1;31mDefinition: \\u001b[0m\\u001b[0mIPython\\u001b[0m\\u001b[1;33m.\\u001b[0m\\u001b[0mdisplay\\u001b[0m\\u001b[1;33m.\\u001b[0m\\u001b[0mdisplay_html\\u001b[0m\\u001b[1;33m(\\u001b[0m\\u001b[1;33m*\\u001b[0m\\u001b[0mobjs\\u001b[0m\\u001b[1;33m,\\u001b[0m \\u001b[1;33m**\\u001b[0m\\u001b[0mkwargs\\u001b[0m\\u001b[1;33m)\\u001b[0m\\u001b[1;33m\\u001b[0m\\u001b[0m\\n\\u001b[1;31mSource:\\u001b[0m\\n\\u001b[1;32mdef\\u001b[0m \\u001b[0mdisplay_html\\u001b[0m\\u001b[1;33m(\\u001b[0m\\u001b[1;33m*\\u001b[0m\\u001b[0mobjs\\u001b[0m\\u001b[1;33m,\\u001b[0m \\u001b[1;33m**\\u001b[0m\\u001b[0mkwargs\\u001b[0m\\u001b[1;33m)\\u001b[0m\\u001b[1;33m:\\u001b[0m\\u001b[1;33m\\u001b[0m\\n\\u001b[1;33m\\u001b[0m    \\u001b[1;34m\\"\\"\\"Display the HTML representation of an object.\\u001b[0m\\n\\u001b[1;34m\\u001b[0m\\n\\u001b[1;34m    Parameters\\u001b[0m\\n\\u001b[1;34m    ----------\\u001b[0m\\n\\u001b[1;34m    objs : tuple of objects\\u001b[0m\\n\\u001b[1;34m        The Python objects to display, or if raw=True raw HTML data to\\u001b[0m\\n\\u001b[1;34m        display.\\u001b[0m\\n\\u001b[1;34m    raw : bool\\u001b[0m\\n\\u001b[1;34m        Are the data objects raw data or Python objects that need to be\\u001b[0m\\n\\u001b[1;34m        formatted before display? [default: False]\\u001b[0m\\n\\u001b[1;34m    metadata : dict (optional)\\u001b[0m\\n\\u001b[1;34m        Metadata to be associated with the specific mimetype output.\\u001b[0m\\n\\u001b[1;34m    \\"\\"\\"\\u001b[0m\\u001b[1;33m\\u001b[0m\\n\\u001b[1;33m\\u001b[0m    \\u001b[0m_display_mimetype\\u001b[0m\\u001b[1;33m(\\u001b[0m\\u001b[1;34m\'text/html\'\\u001b[0m\\u001b[1;33m,\\u001b[0m \\u001b[0mobjs\\u001b[0m\\u001b[1;33m,\\u001b[0m \\u001b[1;33m**\\u001b[0m\\u001b[0mkwargs\\u001b[0m\\u001b[1;33m)\\u001b[0m\\u001b[1;33m\\u001b[0m\\u001b[0m\\n","html":null,"start_line_number":0,"source":"page"}],"user_expressions":{}}']
+
 		if (code.StartsWith(":lang") && session.calico != null) { // :lang 
 		    string [] lines = code.Split(new string[] { "\r\n", "\n" }, 
 						 System.StringSplitOptions.None);
@@ -494,13 +501,56 @@ public static class ZMQServer {
 		    };
 		send(session.shell_channel, header, m_header, m_metadata, content);
 	    } else if (m_header["msg_type"].ToString() == "object_info_request") {
-		// FIXME: add object_info_request, shutdown_request, complete_request
+		// for filling in details on function calls: x(<pause>
+		// content: {"detail_level":0,"oname":"x"}
+		string oname = m_content["oname"].ToString();
+		// ask language to give help on oname
+		// return:
+		var header = session.Header("object_info_reply");
+		var meta = new Dictionary<string, object>();
+		var content = new Dictionary<string, object> {
+		    {"base_class" ,null},    // <type ...>
+		    {"init_definition", null},
+		    {"type_name", null},     // function
+		    {"name", oname}, 
+		    {"definition", null}, // has control codes
+		    {"isclass", null},
+		    {"docstring", null}, // get this
+		    {"isalias", null},
+		    {"init_docstring", null},
+		    {"argspec", null},        // dictionary {"args":[],"varkw":"kwargs","defaults":null,"varargs":"objs"}
+		    {"source", null},
+		    {"length", null},
+		    {"call_def", null},
+		    {"call_docstring", null},
+		    {"file", null},           // path/to/filename
+		    {"string_form", null},    // <function ...>
+		    {"found", false},         // true
+		    {"class_docstring", null},
+		    {"namespace", null},      // Interactive
+		    {"ismagic", null}
+		};
+		send(session.shell_channel, header, m_header, meta, content);
+	    } else if (m_header["msg_type"].ToString() == "complete_request") {
+		// content: {"text":"","line":"x.he","block":null,"cursor_pos":4}']
+		string to_match = m_content["line"].ToString();
+		// ask language to complete to_match
+		var tc = new TabCompletion(session.calico.manager, session.calico.CurrentLanguage, null, to_match);
+		// return:
+		var header = session.Header("complete_reply");
+		var meta = new Dictionary<string, object>();
+		var content = new Dictionary<string, object> {
+		    {"matches", tc.getItems(to_match)},
+		    {"status", "ok"},
+		    {"matched_text", to_match},
+		};
+		send(session.shell_channel, header, m_header, meta, content);
 	    } else if (m_header["msg_type"].ToString() == "comm_msg") {
 		Widgets.Dispatch(m_content["comm_id"].ToString(),
 				 (IDictionary<string, object>)m_content["data"],
 				 m_header);
 	    } else {
-		throw new Exception("unknown msg_type: " + m_header["msg_type"]);
+		throw new Exception("ShellChannel: unknown msg_type: " + m_header["msg_type"]);
 	    }
 	}
 

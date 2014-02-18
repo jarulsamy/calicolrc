@@ -25,6 +25,7 @@ using System.Collections.Generic;
 namespace Calico {
 
     public class TabCompletion {
+	LanguageManager manager = null;
         public List<string> items = null;
         Mono.TextEditor.TextEditor shell;
         int tab_position;
@@ -45,41 +46,54 @@ namespace Calico {
             return temp.ToArray();
         }
 
-        public bool hasattr(MainWindow calico, object value, string part) {
-            return dir(calico, value).Contains(part);
+        public bool hasattr(string language, object value, string part) {
+            return dir(language, value).Contains(part);
         }
 
-        public object getattr(MainWindow calico, object value, string part) {
-            return ((DLREngine)calico.manager[calico.CurrentLanguage].engine).engine.Operations.GetMember(value, part);
+        public object getattr(string language, object value, string part) {
+            return manager[language].engine.GetMember(value, part);
         }
 
-        public IList<string> dir(MainWindow calico, object obj) {
-            return ((DLREngine)calico.manager[calico.CurrentLanguage].engine).engine.Operations.GetMemberNames(obj);
+        public IList<string> dir(string language, object obj) {
+            return manager[language].engine.GetMemberNames(obj);
         }
 
-        public TabCompletion(MainWindow calico, Mono.TextEditor.TextEditor shell, string text) {
+        public IList<string> getItems(string prefix) {
+	    List<string> full_items = new List<string>();
+	    foreach (string item in items) {
+		full_items.Add(prefix + item);
+	    }
+	    return full_items;
+        }
+
+        public TabCompletion(LanguageManager manager, 
+			     string language, 
+			     Mono.TextEditor.TextEditor shell, 
+			     string text) {
+	    this.manager = manager;
             this.shell = shell;
             tab_position = 0;
-            original_offset = shell.Caret.Offset;
+	    if (shell != null) 
+		original_offset = shell.Caret.Offset;
             variable = find_variable(text);
             partial = "";
             items = new List<string>();
             if (variable != null) {
-                string [] parts = calico.manager[calico.CurrentLanguage].engine.getVariableParts(variable);
+                string [] parts = manager[language].engine.getVariableParts(variable);
                 if (parts.Length == 1) { // Easy, just get the vars that match:
                     string root = parts[0];
                     partial = root;
-                    items = calico.manager[calico.CurrentLanguage].engine.getCompletions(root);
+                    items = manager[language].engine.getCompletions(root);
                     // and not hasattr(x, "DeclaringType")]
                 } else {
                     string root = parts[0];
                     bool found;
                     object value = null;
-                    found = calico.manager[calico.CurrentLanguage].engine.tryGetVariable(root, out value);
+                    found = manager[language].engine.tryGetVariable(root, out value);
                     if (found) {
                         foreach (string part in ArrayRange(parts, 1, -1)) {
-                            if (hasattr(calico, value, part)) {
-                                value = getattr(calico, value, part);
+                            if (hasattr(language, value, part)) {
+                                value = getattr(language, value, part);
                             } else {
                                 value = null;
                                 break;
@@ -88,7 +102,7 @@ namespace Calico {
                         if (value != null) {
                             partial = parts[parts.Length - 1];
                             items = new List<string>();
-                            foreach(string x in dir(calico, value)) {
+                            foreach(string x in dir(language, value)) {
                                 if (x.StartsWith(partial) && ! x.StartsWith("_"))
                                     items.Add(x);
                             }

@@ -2373,7 +2373,7 @@ namespace Calico {
                 string text = line.Substring(0, ShellEditor.Caret.Column - 1);
                 if (text.Trim() != "") { // something there!
                     if (completion == null) {
-                        completion = new TabCompletion(this, ShellEditor, text);
+                        completion = new TabCompletion(manager, CurrentLanguage, ShellEditor, text);
                         if (completion.items != null) { // first time:
                             Print(completion.format());
                         }
