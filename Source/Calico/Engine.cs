@@ -79,19 +79,6 @@ namespace Calico {
         public virtual void PostSetup(MainWindow calico) {
         }
 
-        public virtual bool tryGetVariable(string variable, out object value) {
-            value = null;
-            return false;
-        }
-
-        public string [] getVariableParts(string variable) {
-            return variable.Split('.');
-        }
-
-        public virtual List<string> getCompletions(string root) {
-            return new List<string>();
-        }
-
         public virtual void SetTraceOn(MainWindow calico) {
             this.calico = calico;
             trace = true;
@@ -121,6 +108,12 @@ namespace Calico {
         public virtual void Close() {
         }
 
+        public virtual string [] GetVariableParts(string variable) {
+            return variable.Split('.');
+        }
+
+	// -----------------------------------------------------
+
 	public virtual object GetMember(object value, string part) {
 	    return null;
 	}
@@ -128,6 +121,14 @@ namespace Calico {
 	public virtual IList<string> GetMemberNames(object obj) {
 	    return new List<string>();
 	}
+
+        public virtual Calico.Variable TryGetVariable(string variable) {
+	    return new Variable(false, null);
+        }
+
+        public virtual IList<string> GetCompletions(string root) {
+            return new List<string>();
+        }
     }
     
     public class DLREngine : Engine {
@@ -446,10 +447,13 @@ namespace Calico {
 		  return true;
         }
 		
-        public override bool tryGetVariable(string variable, out object value) {
-            return manager.scope.TryGetVariable(variable, out value);
+        public override Variable TryGetVariable(string variable) {
+	    object value;
+            bool found = manager.scope.TryGetVariable(variable, out value);
+	    return new Variable(found, value);
         }
-        public override List<string> getCompletions(string root) {
+
+        public override IList<string> GetCompletions(string root) {
             List<string> retval = new List<string>();
             foreach (string x in manager.scope.GetVariableNames()) {
                 if (x.StartsWith(root))

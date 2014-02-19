@@ -540,7 +540,7 @@ public static class ZMQServer {
 		var header = session.Header("complete_reply");
 		var meta = new Dictionary<string, object>();
 		var content = new Dictionary<string, object> {
-		    {"matches", tc.getItems(to_match)},
+		    {"matches", tc.getItems()},
 		    {"status", "ok"},
 		    {"matched_text", to_match},
 		};

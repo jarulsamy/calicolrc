@@ -24,14 +24,25 @@ using System.Collections.Generic;
 
 namespace Calico {
 
+    public class Variable {
+	public bool valid;
+	public object value;
+
+	public Variable(bool valid, object value) {
+	    this.valid = valid;
+	    this.value = value;
+	}
+    }
+
     public class TabCompletion {
 	LanguageManager manager = null;
-        public List<string> items = null;
+        public IList<string> items = null;
         Mono.TextEditor.TextEditor shell;
         int tab_position;
         int original_offset;
         string variable;
         string partial;
+	string prefix = "";
 
         public static string [] ArrayRange(string [] array, int start, int stop) {
             List<string> temp = new List<string>();
@@ -58,7 +69,7 @@ namespace Calico {
             return manager[language].engine.GetMemberNames(obj);
         }
 
-        public IList<string> getItems(string prefix) {
+        public IList<string> getItems() {
 	    List<string> full_items = new List<string>();
 	    foreach (string item in items) {
 		full_items.Add(prefix + item);
@@ -79,21 +90,22 @@ namespace Calico {
             partial = "";
             items = new List<string>();
             if (variable != null) {
-                string [] parts = manager[language].engine.getVariableParts(variable);
+                string [] parts = manager[language].engine.GetVariableParts(variable);
                 if (parts.Length == 1) { // Easy, just get the vars that match:
                     string root = parts[0];
                     partial = root;
-                    items = manager[language].engine.getCompletions(root);
+                    items = manager[language].engine.GetCompletions(root);
                     // and not hasattr(x, "DeclaringType")]
                 } else {
                     string root = parts[0];
-                    bool found;
-                    object value = null;
-                    found = manager[language].engine.tryGetVariable(root, out value);
-                    if (found) {
+                    Calico.Variable cvariable = manager[language].engine.TryGetVariable(root);
+		    object value = cvariable.value;
+		    prefix = root + ".";
+                    if (cvariable.valid) {
                         foreach (string part in ArrayRange(parts, 1, -1)) {
                             if (hasattr(language, value, part)) {
                                 value = getattr(language, value, part);
+				prefix += part + ".";
                             } else {
                                 value = null;
                                 break;

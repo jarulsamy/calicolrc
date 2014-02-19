@@ -174,6 +174,68 @@ class MyLanguageEngine(Calico.Engine):
         return (lines[-1].strip() == "" or # empty line
                 (not lines[-1].startswith(" ") and lines[-1].endswith(";"))) # statement
 
+    def GetMember(self, object_value, string_part):
+        """
+        Given and object and a string, return the member object.
+        """
+        try:
+            wrapped_class = object_value.getClass()
+            unwrapped_class = wrapped_class.unwrap()
+        except:
+            return None
+
+    def GetMemberNames(self, object_obj):
+        """
+        Given an oject, return a list of attribute names.
+        """
+        try: # Java objects:
+            wrapped_list = object_obj.getClass().getMethods()
+            array_of_methods = wrapped_list.unwrap()
+            ## nalize', 'getAnnotation', 'getAnnotations', 'getClass', 'getDeclaredAnnotations', 
+            ## 'getDeclaringClass', 'getDefaultValue', 'getExceptionTypes', 'getGenericExceptionTypes', 
+            ## 'getGenericParameterTypes', 'getGenericReturnType', 'getModifiers', 'getName', 
+            ## 'getParameterAnnotations', 'getParameterTypes', 'getReturnType', 'getTypeParameters', 
+            ## 'hashCode', 'instancehelper_equals', 'instancehelper_getClass', 'instancehelper_hashCode', 
+            ## 'instancehelper_notify', 'instancehelper_notifyAll', 'instancehelper_toString', 
+            ## 'instancehelper_wait', 'invoke', 'isAccessible', 'isAnnotationPresent', 'isBridge', 
+            ## 'isSynthetic', 'isVarArgs', 'notify', 'notifyAll', 'setAccessible', 'toGenericString', 
+            ## 'toString', 'wait'
+            return sorted(set([method.getName() for method in array_of_methods]))
+        except:
+            try: # C# objects:
+                methods = object_obj.GetType().GetMethods()
+                return sorted(set([method.Name for method in methods 
+                                   if method.Name[0] not in "ABCDEFGHIJKLMNOPQRSTUVWXYZ_"]))
+            except:
+                return []
+
+    def TryGetVariable(self, string_variable):
+        """
+        See if the variable is valid and return if it is.
+        """
+        try:
+            retval = self.interpreter.interpret(string_variable)
+            try:
+                retval = retval.unwrap()
+            except:
+                pass
+            if isNone(retval):
+                retval = None
+            else:
+                retval = toType(retval)
+            valid = True
+        except:
+            retval = None
+            valid = False
+        return Calico.Variable(valid, retval)
+
+    def GetCompletions(self, string_root):
+        """
+        Given a string, return all of the matching things.
+        """
+        array_list = self.interpreter.getVariableNames()
+        return [x for x in array_list if x.startswith(string_root)]
+
 class MyLanguage(Calico.Language):
     """
     The Language class holds the Document and the Engine classes, and
