@@ -238,7 +238,12 @@ namespace Calico {
                 }
                 return Console.ReadLine();
             } else {
-                string retval = le.Edit(prompt, indent);
+		string retval = "";
+		try {
+		    retval = le.Edit(prompt, indent);
+		} catch {
+		    // ignore
+		}
 		return retval;
             }
         }
