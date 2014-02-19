@@ -42,6 +42,7 @@ namespace Calico {
         int original_offset;
         string variable;
         string partial;
+	public string full_prefix = "";
 	string prefix = "";
 
         public static string [] ArrayRange(string [] array, int start, int stop) {
@@ -113,12 +114,15 @@ namespace Calico {
                         }
                         if (value != null) {
                             partial = parts[parts.Length - 1];
+			    full_prefix = prefix + partial;
                             items = new List<string>();
                             foreach(string x in dir(language, value)) {
                                 if (x.StartsWith(partial) && ! x.StartsWith("_"))
                                     items.Add(x);
                             }
-                        }
+                        } else {
+			    full_prefix = prefix;
+			}
                     }
                 }
             }

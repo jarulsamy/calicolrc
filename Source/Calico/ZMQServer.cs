@@ -537,7 +537,7 @@ public static class ZMQServer {
 		var content = new Dictionary<string, object> {
 		    {"matches", tc.getItems()},
 		    {"status", "ok"},
-		    {"matched_text", to_match},
+		    {"matched_text", tc.full_prefix},
 		};
 		send(session.shell_channel, header, m_header, meta, content);
 	    } else if (m_header["msg_type"].ToString() == "comm_msg") {
