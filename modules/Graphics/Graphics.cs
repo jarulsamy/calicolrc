@@ -4388,7 +4388,7 @@ public static class Graphics
 			    // Now, do what Picture(pixbuf) does:
 			    _pixbuf = pixbuf;
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
 			    }
 			    set_points (new Point (0, 0), 
 					new Point (_pixbuf.Width, 0),
@@ -4413,7 +4413,7 @@ public static class Graphics
 			    // Now, do what Picture(pixbuf) does:
 			    _pixbuf = pixbuf;
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
 			    }
 			    set_points (new Point (0, 0), 
 					new Point (_pixbuf.Width, 0),
@@ -4440,7 +4440,7 @@ public static class Graphics
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (original._pixbuf.Colorspace, true, 8, original.getWidth (), original.getHeight ());
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
 			    }
 			    for (int x=0; x < _pixbuf.Width; x++) {
 				for (int y=0; y < _pixbuf.Height; y++) {
@@ -4470,7 +4470,7 @@ public static class Graphics
 		    InvokeBlocking (delegate {
 			    _pixbuf = pixbuf;
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
 			    }
 			    set_points (new Point (0, 0), 
 					new Point (_pixbuf.Width, 0),
@@ -4491,7 +4491,7 @@ public static class Graphics
 			    // FIXME: convert bitmap.palette to colormap
 			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
 			    }
 			    int xstep = 1;
 			    if (fluke1) xstep = 2;
@@ -4587,7 +4587,7 @@ public static class Graphics
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
 			    }
 			    for (int x=0; x < _pixbuf.Width; x++) {
 				for (int y=0; y < _pixbuf.Height; y++) {
@@ -4619,7 +4619,7 @@ public static class Graphics
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
 			    }
 			    for (int x=0; x < _pixbuf.Width; x++) {
 				for (int y=0; y < _pixbuf.Height; y++) {
@@ -4651,7 +4651,7 @@ public static class Graphics
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
 			    }
 			    // WORKAROUND: image needs alpha set to zero (full opacity/no
 			    // transparency). Might as well set default color, too:
@@ -4682,7 +4682,7 @@ public static class Graphics
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (true, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
 			    }
 			    // WORKAROUND: image needs alpha set to zero (full opacity/no
 			    // transparency). Might as well set default color, too:
