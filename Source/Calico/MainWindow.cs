@@ -4835,5 +4835,11 @@ del _invoke, _
 		// pass
 	    }
 	}
+
+	public IDictionary<string,object> GetHelp(string oname) {
+	    // Given an object name, get help on it from the current
+	    // language, environment:
+	    return manager[CurrentLanguage].engine.GetHelp(oname);
+	}
     }
 }

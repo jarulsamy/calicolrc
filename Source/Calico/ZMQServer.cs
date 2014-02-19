@@ -508,28 +508,7 @@ public static class ZMQServer {
 		// return:
 		var header = session.Header("object_info_reply");
 		var meta = new Dictionary<string, object>();
-		var content = new Dictionary<string, object> {
-		    {"base_class" ,null},    // <type ...>
-		    {"init_definition", null},
-		    {"type_name", null},     // function
-		    {"name", oname}, 
-		    {"definition", null}, // has control codes
-		    {"isclass", null},
-		    {"docstring", null}, // get this
-		    {"isalias", null},
-		    {"init_docstring", null},
-		    {"argspec", null},        // dictionary {"args":[],"varkw":"kwargs","defaults":null,"varargs":"objs"}
-		    {"source", null},
-		    {"length", null},
-		    {"call_def", null},
-		    {"call_docstring", null},
-		    {"file", null},           // path/to/filename
-		    {"string_form", null},    // <function ...>
-		    {"found", false},         // true
-		    {"class_docstring", null},
-		    {"namespace", null},      // Interactive
-		    {"ismagic", null}
-		};
+		var content = session.calico.GetHelp(oname);
 		send(session.shell_channel, header, m_header, meta, content);
 	    } else if (m_header["msg_type"].ToString() == "complete_request") {
 		// content: {"text":"","line":"x.he","block":null,"cursor_pos":4}']

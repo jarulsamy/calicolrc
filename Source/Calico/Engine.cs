@@ -129,6 +129,31 @@ namespace Calico {
         public virtual IList<string> GetCompletions(string root) {
             return new List<string>();
         }
+
+	public virtual IDictionary<string,object> GetHelp(string oname) {
+	    return new Dictionary<string, object> {
+		    {"base_class" ,null},    // <type ...>
+		    {"init_definition", null},
+		    {"type_name", null},     // function
+		    {"name", oname}, 
+		    {"definition", null}, // has control codes
+		    {"isclass", null},
+		    {"docstring", null}, // get this
+		    {"isalias", null},
+		    {"init_docstring", null},
+		    {"argspec", null},        // dictionary {"args":[],"varkw":"kwargs","defaults":null,"varargs":"objs"}
+		    {"source", null},
+		    {"length", null},
+		    {"call_def", null},
+		    {"call_docstring", null},
+		    {"file", null},           // path/to/filename
+		    {"string_form", null},    // <function ...>
+		    {"found", false},         // true
+		    {"class_docstring", null},
+		    {"namespace", null},      // Interactive
+		    {"ismagic", null}
+		};
+	}
     }
     
     public class DLREngine : Engine {
@@ -341,6 +366,40 @@ namespace Calico {
 	    return retval;
         }
 
+        public object TryEvaluate(string text) {
+            if (engine == null) {
+                return null;
+            }
+	    Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression;
+	    Microsoft.Scripting.Hosting.ScriptSource source;
+	    Microsoft.Scripting.Hosting.CompiledCode compiledCode;
+	    try {
+		source = engine.CreateScriptSourceFromString(text, sctype);
+		compiledCode = null;
+	    } catch {
+		return null;
+	    }
+	    try {
+		if (compiler_options != null) {
+		    compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
+		} else {
+		    compiledCode = source.Compile();
+		}
+	    } catch {
+		// pass
+	    }
+	    object retval = null;
+	    try {
+		if (manager != null && manager.UseSharedScope)
+		    retval = compiledCode.Execute(manager.scope);
+		else
+		    retval = compiledCode.Execute(scope);
+	    } catch {
+		// pass
+	    }
+	    return retval;
+        }
+
         public override bool Execute(string text) {
 		  return Execute(text, true);
         }
@@ -468,6 +527,49 @@ namespace Calico {
 	
 	public override IList<string> GetMemberNames(object obj) {
 	    return engine.Operations.GetMemberNames(obj);
+	}
+
+	public override IDictionary<string,object> GetHelp(string oname) {
+	    var retval = new Dictionary<string, object> {
+		    {"base_class" ,null},    // <type ...>
+		    {"init_definition", null},
+		    {"type_name", null},     // function
+		    {"name", oname}, 
+		    {"definition", null}, // has control codes
+		    {"isclass", null},
+		    {"docstring", null}, // get this
+		    {"isalias", null},
+		    {"init_docstring", null},
+		    {"argspec", null},        // dictionary {"args":[],"varkw":"kwargs","defaults":null,"varargs":"objs"}
+		    {"source", null},
+		    {"length", null},
+		    {"call_def", null},
+		    {"call_docstring", null},
+		    {"file", null},           // path/to/filename
+		    {"string_form", null},    // <function ...>
+		    {"found", false},         // true
+		    {"class_docstring", null},
+		    {"namespace", null},      // Interactive
+		    {"ismagic", null}
+		};
+	    object obj = TryEvaluate(oname);
+	    if (obj != null) {
+		retval["found"] = true;
+		retval["base_class"] = obj.GetType().ToString();
+		retval["string_form"] = obj.ToString();
+		retval["namespace"] = "Interactive";
+		retval["definition"] = "This is the definition";
+		retval["docstring"] = "This is the docstring";
+		retval["type_name"] = obj.GetType().ToString();
+		retval["file"] = "/home/user/test";
+		retval["argspec"] = new Dictionary<string,object> {
+		    {"args", new List<string>()},
+		    {"varkw", "kwargs"},
+		    {"defaults", null},
+		    {"varargs", "objs"}
+		};
+	    }
+	    return retval;
 	}
     }
 }
