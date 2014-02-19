@@ -22,8 +22,6 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-//using IronPython.Hosting;
-//using IronPython.Modules;
 
 namespace Calico {
 
@@ -518,6 +516,7 @@ namespace Calico {
                 if (x.StartsWith(root))
                     retval.Add(x);
             }
+	    retval.Sort();
             return retval;
         }
 
@@ -526,7 +525,12 @@ namespace Calico {
 	}
 	
 	public override IList<string> GetMemberNames(object obj) {
-	    return engine.Operations.GetMemberNames(obj);
+	    List<string> retval = new List<string>();
+	    foreach (string name in engine.Operations.GetMemberNames(obj)) {
+		retval.Add(name);
+	    }
+	    retval.Sort();
+	    return retval;
 	}
 
 	public override IDictionary<string,object> GetHelp(string oname) {
