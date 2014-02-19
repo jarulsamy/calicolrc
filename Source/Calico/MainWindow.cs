@@ -3926,7 +3926,7 @@ del _invoke, _
                                        0, Gtk.MessageType.Question,
                                        Gtk.ButtonsType.OkCancel,
                                        title);
-                foreach (string choice in (List<string>)question) {
+                foreach (string choice in (IList<string>)question) {
                     Gtk.HBox hbox = new Gtk.HBox();
                     Gtk.Label label = new Gtk.Label(choice);
                     Gtk.Entry entry = new Gtk.Entry();

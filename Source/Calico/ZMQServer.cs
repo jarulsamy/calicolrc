@@ -81,6 +81,8 @@ public static class ZMQServer {
     }
 
     public class Session {
+	public bool need_restart = false;
+	public bool request_quit = false;
 	public string filename;
 	public string session_id;
 	public HeartBeatChannel hb_channel;
@@ -132,6 +134,13 @@ public static class ZMQServer {
 	    shell_channel.thread.Start();
 	    control_channel.thread.Start();
 	    stdin_channel.thread.Start();
+	}
+
+	public void stop() {
+	    hb_channel.stop();
+	    shell_channel.stop();
+	    control_channel.stop();
+	    stdin_channel.stop();
 	}
 
 	public void SetOutputs(int execution_count, IDictionary<string, object> m_header) {
@@ -382,6 +391,13 @@ public static class ZMQServer {
 		count++;
 	    }
 	}
+
+	public void stop() {
+	    thread.Abort();
+	    socket.Linger = System.TimeSpan.FromSeconds(1);
+	    socket.Close();
+	    context.Terminate();
+	}
     }
 
     public class ShellChannel : Channel {
@@ -610,6 +626,27 @@ public static class ZMQServer {
 			    string port) : 
 	    base(session, auth, transport, address, port, SocketType.DEALER) {
 	}
+
+	public override void on_recv(string m_signature, 
+				IDictionary<string, object> m_header, 
+				IDictionary<string, object> m_parent_header, 
+				IDictionary<string, object> m_metadata, 
+				IDictionary<string, object> m_content) {
+
+	    // Control handler
+	    if (m_header["msg_type"].ToString() == "shutdown_request") {
+		// respond?
+		var header = session.Header("status", m_header["session"].ToString());
+		var metadata = new Dictionary<string, object>();
+		var content = new Dictionary<string, object>();
+		// pause, then:
+		if (Convert.ToBoolean(m_content["restart"])) { 
+		    session.need_restart = true;
+		} else {
+		    session.request_quit = true;
+		}
+	    }
+	}
     }
 
     public class StdInChannel : Channel {
@@ -673,6 +710,16 @@ public static class ZMQServer {
 	session = new Session(calico, config_file);
 	session.start();
 	while (true) {
+	    if (session.need_restart) {
+		session.need_restart = false;
+		session.stop();
+		session = new Session(calico, config_file);
+		session.start();
+	    }
+	    if (session.request_quit) {
+		session.stop();
+		System.Environment.Exit(0);
+	    }
 	    Thread.Sleep ((int)(1 * 1000)); // seconds
 	}
     }
