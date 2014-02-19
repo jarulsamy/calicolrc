@@ -234,7 +234,7 @@ class MyLanguageEngine(Calico.Engine):
         Given a string, return all of the matching things.
         """
         array_list = self.interpreter.getVariableNames()
-        return [x for x in array_list if x.startswith(string_root)]
+        return sorted([x for x in array_list if x.startswith(string_root)])
 
 class MyLanguage(Calico.Language):
     """

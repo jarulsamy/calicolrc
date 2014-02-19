@@ -9,6 +9,7 @@ import System
 import Calico
 clr.AddReference("Mono.TextEditor") 
 import Mono.TextEditor
+import random
 
 # Now, define the Document, Engine, and Language classes:
 class MyLanguageEngine(Calico.Engine):
@@ -26,8 +27,15 @@ class MyLanguageEngine(Calico.Engine):
         for line in text.split("\n"):
             print(line)
         if feedback:
-            print("Done!")
+            print(random.choice(["Ok", "Thank you!", "I'm sorry, Dave, I can't do that.", "Huh?"]))
         return True
+
+    def Evaluate(self, text):
+        """
+        This is where you do something for the text (code). This is
+        the interpreter.
+        """
+        return random.choice(["Ok", "Thank you!", "I'm sorry, Dave, I can't do that.", "Huh?"])
 
     def ExecuteFile(self, filename):
         """
@@ -47,6 +55,30 @@ class MyLanguageEngine(Calico.Engine):
         interactively type text into the Calico Shell.
         """
         return True
+
+    def GetMember(self, object_value, string_part):
+        """
+        Given and object and a string, return the member object.
+        """
+        return "Ok"
+
+    def GetMemberNames(self, object_obj):
+        """
+        Given an oject, return a list of attribute names.
+        """
+        return sorted(["Apple", "Bannana", "Orange", "Grapefruit"])
+
+    def TryGetVariable(self, string_variable):
+        """
+        See if the variable is valid and return if it is.
+        """
+        return Calico.Variable(True, 42)
+
+    def GetCompletions(self, string_root):
+        """
+        Given a string, return all of the matching things.
+        """
+        return ["A", "B", "C", "D"]
 
 class MyLanguageDocument(Calico.TextDocument):
     """
