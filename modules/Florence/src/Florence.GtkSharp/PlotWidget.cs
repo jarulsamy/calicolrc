@@ -293,6 +293,38 @@ namespace Florence.GtkSharp
             this.Allocated = true;
             this.QueueDraw();
         }
+	public IDictionary<string, string> GetRepresentations() {
+	    byte [] buffer;
+	    string png_string;
+	    string jpg_string;
+	    
+	    Gdk.Drawable drawable = this.GdkWindow;
+	    Gdk.Colormap colormap = drawable.Colormap;
+	    int _width = 0;
+	    int _height = 0;
+	    drawable.GetSize (out _width, out _height);
+	    var pixbuf = Gdk.Pixbuf.FromDrawable (drawable, colormap, 0, 0, 0, 0, _width, _height);
 
+	    try {
+		buffer = pixbuf.SaveToBuffer("png"); // drawable
+		png_string = System.Convert.ToBase64String(buffer, 0, buffer.Length);
+	    } catch {
+		png_string = "";
+	    }
+	    try {
+		buffer = pixbuf.SaveToBuffer("jpeg");
+		jpg_string = System.Convert.ToBase64String(buffer, 0, buffer.Length);
+	    } catch {
+		jpg_string = "";
+	    }
+	    
+	    var retval = new Dictionary<string, string>();
+	    retval["text/plain"] =  this.ToString();
+	    if (png_string != "")
+		retval["image/png"] = png_string;
+	    if (jpg_string != "")
+		retval["image/jpeg"] = jpg_string;
+	    return retval;
+	}
     }
 }

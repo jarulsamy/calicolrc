@@ -33,6 +33,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
@@ -543,6 +544,11 @@ namespace Florence
         /// </summary>
         public virtual void ProcessUpdates(bool updateChildren)
         {
+        }
+
+	public virtual IDictionary<string, string> GetRepresentations() 
+	{
+	    return new Dictionary<string, string>();
         }
 
         #endregion

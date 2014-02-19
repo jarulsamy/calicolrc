@@ -32,6 +32,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Florence
 {
@@ -216,6 +217,8 @@ namespace Florence
 		/// Gets an array list containing all drawables currently added to the PlotSurface2D.
 		/// </summary>
 		ArrayList Drawables { get; }
+
+	        IDictionary<string,string> GetRepresentations();
 
 /*
 		/// <summary>

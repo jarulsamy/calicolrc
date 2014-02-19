@@ -34,6 +34,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Florence.Bitmap
 {
@@ -533,5 +534,12 @@ namespace Florence.Bitmap
 				return ps_.Drawables;
 			}
 		}
+
+		public IDictionary<string, string> GetRepresentations() 
+		{
+		    return new Dictionary<string, string>();
+		}
+
 	}
+
 }

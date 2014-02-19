@@ -35,6 +35,7 @@ using System;
 using System.Drawing;
 using System.Diagnostics;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Florence
 {
@@ -1362,6 +1363,11 @@ namespace Florence
 			}
 		}
 		int legendZOrder_ = -1;
+
+		public IDictionary<string, string> GetRepresentations() 
+		{
+		    return new Dictionary<string, string>();
+		}
     } 
 } 
 

@@ -957,7 +957,12 @@ public static class Graphics
 			}
 		}
     
-	}
+		public IDictionary<string, string> GetRepresentations() {
+		    IDictionary<string, string> retval = window.GetRepresentations();
+		    retval["text/plain"] =  this.ToString();
+		    return retval;
+		}
+	} // end of Plot
 
 	public class BarChart
 	{
@@ -1013,6 +1018,12 @@ public static class Graphics
 		public void append (double datum)
 		{
 			data.Add (datum);
+		}
+
+		public IDictionary<string, string> GetRepresentations() {
+		    IDictionary<string, string> retval = window.GetRepresentations();
+		    retval["text/plain"] =  this.ToString();
+		    return retval;
 		}
 	}
 
