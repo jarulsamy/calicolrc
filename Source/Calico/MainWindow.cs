@@ -4386,6 +4386,21 @@ del _invoke, _
 	    return "gtk";
 	}
 
+        public void SetVariable(string name, object value) {
+	    manager.SetVariable(name, value);
+	}
+
+	public object TryGetVariable(string name) {
+	    return manager.TryGetVariable(name);
+	}
+
+	public IList<string> GetVariableNames() {
+	    return manager.GetVariableNames();
+	}
+
+	// -----------------------------------------------------------------------------
+	// IPython stuff:
+
 	public AudioRepresentation Audio(string filename) {
 	    return new AudioRepresentation(filename);
 	}

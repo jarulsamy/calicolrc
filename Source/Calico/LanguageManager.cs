@@ -107,6 +107,26 @@ namespace Calico {
                 scope.SetVariable("calico", calico);
         }
 
+        public void SetVariable(string name, object value) {
+            if (scope != null)
+                scope.SetVariable(name, value);
+        }
+
+	public object TryGetVariable(string name) {
+	    object value = null;
+	    bool found = false;
+            if (scope != null)
+		found = scope.TryGetVariable(name, out value);
+	    return new Calico.Variable(found, value);
+	}
+
+	public IList<string> GetVariableNames() {
+            if (scope != null)
+		return (IList<string>)scope.GetVariableNames();
+	    else
+		return new List<string>();
+	}
+
         public void SetRedirects(CustomStream stdout, CustomStream stderr) {
             // textviews:
             this.stderr = stderr;
