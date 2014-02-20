@@ -135,6 +135,7 @@ namespace Calico {
 		while (!proc.StandardOutput.EndOfStream) {
 		    ipython_path = proc.StandardOutput.ReadLine();
 		}
+		ipython_path = System.IO.Path.Combine(ipython_path, "profile_calico");
 		// Now, copy recursively:
 		DirectoryCopy(System.IO.Path.Combine(path, "..", "notebooks", "profile_calico"), ipython_path, true);
                 System.Environment.Exit(0);
@@ -298,18 +299,25 @@ namespace Calico {
 		if (withGraphics) {
 		    Application.Init();
 		    // run in background if repl:
-		    if (((IList<string>)args).Contains("--repl") || ((IList<string>)args).Contains("--server")) {
-			System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
-				Application.Run();
-			    });
-			//thread.IsBackground = true;
-			thread.Start();
-		    }
-		    if (((IList<string>)args).Contains("--server")) {
-			win = new CalicoServer(args, manager, Debug, config); 
-		    } else {
-			win = new CalicoConsole(args, manager, Debug, config, ((IList<string>)args).Contains("--repl")); 
-		    }
+		    //if (((IList<string>)args).Contains("--repl") || ((IList<string>)args).Contains("--server")) {
+		    //	System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
+		    //		Application.Run();
+		    //	    });
+		    //	//thread.IsBackground = true;
+			//	thread.Start();
+		    //}
+
+		    GLib.Timeout.Add( 500, delegate { 
+			    if (((IList<string>)args).Contains("--server")) {
+				win = new CalicoServer(args, manager, Debug, config); 
+			    } else {
+				win = new CalicoConsole(args, manager, Debug, config, ((IList<string>)args).Contains("--repl")); 
+			    }
+			    return false; 
+			}); 
+
+		    // How does GUI thread get set correctly?
+		    Application.Run();
 		} else {
 		    if (((IList<string>)args).Contains("--server")) {
 			win = new CalicoServer(args, manager, Debug, config); 
@@ -325,12 +333,16 @@ namespace Calico {
                 if (withGraphics) {
                     Application.Init();
 		    // run in background:
-		    System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
-			    Application.Run();
-			});
+		    //System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
+		    //	    Application.Run();
+		    //	});
 		    //thread.IsBackground = true;
-		    thread.Start();
-		    win = new CalicoConsole(args, manager, Debug, config, true);  
+		    //thread.Start();
+		    GLib.Timeout.Add( 500, delegate { 
+			    win = new CalicoConsole(args, manager, Debug, config, true);  
+			    return false;
+			});
+		    Application.Run();
 		} else {
 		    win = new CalicoConsoleNoGUI(args, manager, Debug, config, true);  
 		}
