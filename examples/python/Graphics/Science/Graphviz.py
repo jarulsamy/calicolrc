@@ -168,7 +168,7 @@ for content, options in [(hello_world, {"label": "Hello World",
                                         "default_shape" : "circle",
                                         }),
                          (fsm, {"label": "Finite State Machine", "default_shape":"doublecircle"}),
-                         (kennedys, {"label": "Kennedys", "default_shape": "circle", "width": 800}),
+                         (kennedys, {"label": "Kennedys", "default_shape": "circle"}),
                          (phil, {"default_shape":"box"}),
                          (tree, {"label": "Binary Tree", "default_shape" : "box", "line_type": "line"})
                         ]:

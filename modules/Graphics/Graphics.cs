@@ -2320,6 +2320,10 @@ public static class Graphics
 		public Cairo.ImageSurface finalsurface;
 		public bool need_to_draw_surface = false;
     
+		public Canvas (int width, int height) : this("auto", width, height)
+		{
+		}
+    
 		public Canvas (string mode, int width, int height) : base(null, null)
 		{
 			this.mode = mode;
@@ -2394,6 +2398,12 @@ public static class Graphics
 				}
 			}
 			return base.OnExposeEvent (args);
+		}
+
+		public IDictionary<string, string> GetRepresentations() {
+		    IDictionary<string, string> retval = new Picture (this).GetRepresentations();
+		    retval["text/plain"] =  this.ToString();
+		    return retval;
 		}
 	}
   
@@ -4424,6 +4434,13 @@ public static class Graphics
 			});
 		}
 
+		public Picture (Canvas canvas) : this(true)
+		{ 
+		    InvokeBlocking (delegate {
+			    // FIXME: how to go from canvas.finalsurface to pixbuf?
+			});
+		}
+
 		public Picture (System.Drawing.Bitmap bitmap) : this(bitmap, bitmap.Width, bitmap.Height)
 		{ 
 		}
@@ -6392,7 +6409,7 @@ public static class Graphics
 	    public Graphics.WindowClass window = null;
 	    public Dictionary<string,Dictionary<string,Shape>> vertices = new Dictionary<string,Dictionary<string,Shape>> ();
 	    public Dictionary<string,Dictionary<string,object>> edges = new Dictionary<string, Dictionary<string,object>> ();
-	    public Dictionary<string,object> options = new Dictionary<string, object> {
+	    public Dictionary<string,object> options = new Dictionary<string,object> {
 		{"default_shape", "circle"},
 		{"default_outline", "black"},
 		{"fill", "white"},
@@ -6406,8 +6423,27 @@ public static class Graphics
 	    public string post_text;
 	    double scale = 1.0;
 	    
-	    public Graph ()
-	    {
+	    public Graph () {
+	    }
+	    
+	    public Graph (string text) {
+		layout(text, true);
+		draw();
+	    }
+	    
+	    public Graph (string text, bool process) {
+		layout(text, process);
+		draw();
+	    }
+
+	    public Graph (string text, 
+			  IDictionary<string,object> options, 
+			  bool process) {
+		layout(text, process);
+		foreach(KeyValuePair<string,object> kvp in (IDictionary<string,object>)options) {
+		    this.options[kvp.Key] = kvp.Value;
+		}
+		draw();
 	    }
 	    
 	    public void addNode(string name) {
@@ -6458,8 +6494,8 @@ public static class Graphics
 		// used in graphviz graphics
 		Point p = null;
 		InvokeBlocking( delegate {
-			p = new Point(x * scale + window._width/2 - graph.Width/ 2 * scale,
-				      (graph.Height - y) * scale + window._height/2 - graph.Height/ 2 * scale);
+			p = new Point(x * scale + window._width/2 - graph.Width/ 2 * scale + 16,
+				      (graph.Height - y) * scale + window._height/2 - graph.Height/ 2 * scale + 16);
 		    });
 		return p;
 	    }
@@ -6578,18 +6614,18 @@ public static class Graphics
 			Graph.graph_count++;
 		    }
 		    if (options.ContainsKey("width")) {
-			_width = (int)options["width"];
+			_width = ((int)options["width"]) + 64;
 		    } else {
-			_width = (int)graph.Width;
+			_width = ((int)graph.Width) + 64;
 		    }
 		    if (options.ContainsKey("height")) {
-			_height = (int)options["height"];
+			_height = ((int)options["height"]) + 64;
 		    } else {
-			_height = (int)graph.Height;
+			_height = ((int)graph.Height) + 64;
 		    }
 		    window = Graphics.Window(label, _width, _height);
 		    // in case we need them:
-		    window.addScrollbars((int)graph.Width, (int)graph.Height);
+		    window.addScrollbars(((int)graph.Width) + 32, ((int)graph.Height) + 32);
 		}
 		if (options.ContainsKey("scale")) {
 		    scale = (double)options["scale"];
@@ -8616,7 +8652,7 @@ public static class Graphics
 	    } else if (window != null) {
 		retval = window.GetRepresentations();
 	    } else if (canvas != null) {
-		//retval = canvas.GetRepresentations();
+		retval = canvas.GetRepresentations();
 	    } else if (shape != null) {
 		// find something that this is represented on, and return it
 		//retval = canvas.GetRepresentations();
