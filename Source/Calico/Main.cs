@@ -299,12 +299,21 @@ namespace Calico {
 		if (withGraphics) {
 		    Application.Init();
 			if (((IList<string>)args).Contains("--server")) {
+
+			  System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
+                    win = new CalicoServer(args, manager, Debug, config); 
+                  });
+              thread.Start();
+			  Application.Run();
+
+              /*
 			  System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
 					Application.Run();
 				  });
 			  //thread.IsBackground = true;
 			  thread.Start();
 			  win = new CalicoServer(args, manager, Debug, config); 
+              */
 			} else {
 			  // THIS MAY NOT WOK ON MAC
 			  GLib.Timeout.Add( 500, delegate { 
