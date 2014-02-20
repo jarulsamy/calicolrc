@@ -158,16 +158,24 @@ namespace CalicoPython
 		    }
 		}
 		
-        public override void PostSetup(MainWindow calico) {
-			base.PostSetup(calico);
-            // Set up input and recursion limit
-            Execute(
-                "from Myro import ask as _ask;" +
+		public override void PostSetup(MainWindow calico) {
+		    base.PostSetup(calico);
+		    // Set up input and recursion limit
+		    if (Calico.MainWindow.gui_thread_id != -1) {
+			Execute(
+				"from Myro import ask as _ask;" +
 				"from sys import setrecursionlimit as _srl;" +
-                "__builtins__['input'] = _ask;" +
-                "__builtins__['raw_input'] = _ask;" +
+				"__builtins__['input'] = _ask;" +
+				"__builtins__['raw_input'] = _ask;" +
 				"_srl(1024);" + 
-                "del _ask, _srl;", false);
+				"del _ask, _srl;", false);
+		    } else {
+			Execute(
+				"from sys import setrecursionlimit as _srl;" +
+				"__builtins__['input'] = raw_input;" +
+				"_srl(1024);" + 
+				"del _srl;", false);
+		    }
 		}
 	}
 

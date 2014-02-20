@@ -468,7 +468,8 @@ public static class Myro
 	[method: JigsawTab(null)]
 	public static bool needInvoke ()
 	{
-	  return (Thread.CurrentThread.ManagedThreadId != 1);
+	    return ((Thread.CurrentThread.ManagedThreadId != gui_thread_id) &&
+		    (gui_thread_id != -1));
 	}
 	
 	[method: JigsawTab(null)]

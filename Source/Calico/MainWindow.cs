@@ -4856,5 +4856,9 @@ del _invoke, _
 	    // language, environment:
 	    return manager[CurrentLanguage].engine.GetHelp(oname);
 	}
+
+	public int GetGuiThreadID() {
+	    return gui_thread_id;
+	}
     }
 }
