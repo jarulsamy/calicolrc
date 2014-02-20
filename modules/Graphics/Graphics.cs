@@ -753,7 +753,8 @@ public static class Graphics
 			_lastWindow.Remove(_lastWindow.widget);
 			_lastWindow.Add(widget);
 			_lastWindow.widget = widget;
-			widget.ShowAll();
+			if (gui_thread_id != -1)
+			    widget.ShowAll();
 		    }
 		    _lastWindow = _windows [title];
 		    _lastWindow.KeepAbove = true;
@@ -1270,7 +1271,8 @@ public static class Graphics
 		    this.widget = widget;
 		    Add(widget);
 		    DeleteEvent += OnDelete;
-		    ShowAll();
+		    if (gui_thread_id != -1)
+			ShowAll();
 		}
 
 		public WindowClass (string title="Calico Graphics",
@@ -1301,7 +1303,8 @@ public static class Graphics
 			//ConfigureEvent += configureEventBefore;
 			DeleteEvent += OnDelete;
 			Add(_canvas);
-			ShowAll ();
+			if (gui_thread_id != -1)
+			    ShowAll ();
 		}
 		
 		/*
@@ -1896,7 +1899,8 @@ public static class Graphics
 				DateTime now = DateTime.Now;
 				last_update = now;
 				_dirty = false;
-				base.Show (); 
+				if (gui_thread_id != -1)
+				    base.Show (); 
 			});
 		}
 
@@ -1906,7 +1910,8 @@ public static class Graphics
 				DateTime now = DateTime.Now;
 				last_update = now;
 				_dirty = false;
-				base.ShowAll (); 
+				if (gui_thread_id != -1)
+				    base.ShowAll (); 
 			});
 		}
 
@@ -2124,6 +2129,7 @@ public static class Graphics
         [method: JigsawTab("G/Windows")]
 	public static void ShowAll (object o)
 	{
+	    if (gui_thread_id != -1)
 		Invoke (delegate {
 			((Gtk.Widget)o).ShowAll (); });
 	}
@@ -2131,6 +2137,7 @@ public static class Graphics
         [method: JigsawTab("G/Windows")]
 	public static void Show (object o)
 	{
+	    if (gui_thread_id != -1)
 		Invoke (delegate {
 			((Gtk.Widget)o).Show (); });
 	}
@@ -5415,7 +5422,8 @@ public static class Graphics
 		{ // button
 		    InvokeBlocking (delegate {
 			    window = win;
-			    Show ();
+			    if (gui_thread_id != -1)
+				Show ();
 			    window.getCanvas ().Put (this, (int)_x, (int)_y);
 			    window.QueueDraw ();
 			});
@@ -5488,10 +5496,11 @@ public static class Graphics
      { // button
          window = win;
          Invoke (delegate {
-             Show ();
-             window.getCanvas ().Put (this, (int)_x, (int)_y);
-             window.QueueDraw ();
-         });
+		 if (gui_thread_id != -1)
+		     Show ();
+		 window.getCanvas ().Put (this, (int)_x, (int)_y);
+		 window.QueueDraw ();
+	     });
 	 return new GraphicsRepresentation(win);
      }
 
@@ -5572,7 +5581,8 @@ public static class Graphics
 		{ // hslider
 			window = win;
 			Invoke (delegate {
-				Show ();
+				if (gui_thread_id != -1)
+				    Show ();
 				window.getCanvas ().Put (this, (int)_x, (int)_y);
 				window.QueueDraw ();
 			});
