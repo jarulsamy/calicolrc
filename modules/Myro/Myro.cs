@@ -3110,53 +3110,53 @@ public static class Myro
 	    
 	    void onMouseUp (object obj, Gtk.ButtonReleaseEventArgs args)
 	    {
-		state = "up";
-		arrow.points [1].x = 0;
-		arrow.points [1].y = 0;
-		window.QueueDraw ();
-		if (getRobot () != null) {
-		    stop ();
-		}
+		  state = "up";
+		  arrow.points [1].x = 0;
+		  arrow.points [1].y = 0;
+		  window.QueueDraw ();
+		  if (getRobot () != null) {
+			stop ();
+		  }
 	    }
 	    
 	    void onMouseDown (object obj, Gtk.ButtonPressEventArgs args)
 	    {
-		x = args.Event.X;
-		y = args.Event.Y;
-		center_x = window.width / 2;
-		center_y = window.height / 2;
-		r = (center_x - x) / (center_x - radius);
-		t = (center_y - y) / (center_y - radius);
-		r = Math.Min (Math.Max (r, -1), 1);
-		t = Math.Min (Math.Max (t, -1), 1);
-		arrow.points [1].x = x - center_x;
-		arrow.points [1].y = y - center_y;
-		window.QueueDraw ();
-		state = "down";
-		if (getRobot () != null) {
-		    move (t, r);
-		    wait(.1);
-		}
+		  x = args.Event.X;
+		  y = args.Event.Y;
+		  center_x = window._width / 2;
+		  center_y = window._height / 2;
+		  r = (center_x - x) / (center_x - radius);
+		  t = (center_y - y) / (center_y - radius);
+		  r = Math.Min (Math.Max (r, -1), 1);
+		  t = Math.Min (Math.Max (t, -1), 1);
+		  arrow.points [1].x = x - center_x;
+		  arrow.points [1].y = y - center_y;
+		  window.QueueDraw ();
+		  state = "down";
+		  if (getRobot () != null) {
+			move (t, r);
+			wait(.1);
+		  }
 	    }
 	    
 	    void onMouseMove (object obj, Gtk.MotionNotifyEventArgs args)
 	    {
-		if (state == "down") {
-		    x = args.Event.X;
-		    y = args.Event.Y;
-		    center_x = window.width / 2;
-		    center_y = window.height / 2;
-		    r = (center_x - x) / (center_x - radius);
-		    t = (center_y - y) / (center_y - radius);
-		    r = Math.Min (Math.Max (r, -1), 1);
-		    t = Math.Min (Math.Max (t, -1), 1);
-		    arrow.points [1].x = x - center_x;
-		    arrow.points [1].y = y - center_y;
-		    window.QueueDraw ();
-		    if (getRobot () != null) {
-			move (t, r);
-		    }
-		}
+		  if (state == "down") {
+			x = args.Event.X;
+			y = args.Event.Y;
+			center_x = window._width / 2;
+			center_y = window._height / 2;
+			r = (center_x - x) / (center_x - radius);
+			t = (center_y - y) / (center_y - radius);
+			r = Math.Min (Math.Max (r, -1), 1);
+			t = Math.Min (Math.Max (t, -1), 1);
+			arrow.points [1].x = x - center_x;
+			arrow.points [1].y = y - center_y;
+			window.QueueDraw ();
+			if (getRobot () != null) {
+			  move (t, r);
+			}
+		  }
 	    }
 	}
 
