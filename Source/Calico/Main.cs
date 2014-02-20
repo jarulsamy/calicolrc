@@ -298,26 +298,21 @@ namespace Calico {
 		// implies running with noconsole, with or without repl
 		if (withGraphics) {
 		    Application.Init();
-		    // run in background if repl:
-		    //if (((IList<string>)args).Contains("--repl") || ((IList<string>)args).Contains("--server")) {
-		    //	System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
-		    //		Application.Run();
-		    //	    });
-		    //	//thread.IsBackground = true;
-			//	thread.Start();
-		    //}
-
-		    GLib.Timeout.Add( 500, delegate { 
-			    if (((IList<string>)args).Contains("--server")) {
-				win = new CalicoServer(args, manager, Debug, config); 
-			    } else {
-				win = new CalicoConsole(args, manager, Debug, config, ((IList<string>)args).Contains("--repl")); 
-			    }
-			    return false; 
-			}); 
-
-		    // How does GUI thread get set correctly?
-		    Application.Run();
+			if (((IList<string>)args).Contains("--server")) {
+			  System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
+					Application.Run();
+				  });
+			  //thread.IsBackground = true;
+			  thread.Start();
+			  win = new CalicoServer(args, manager, Debug, config); 
+			} else {
+			  // THIS MAY NOT WOK ON MAC
+			  GLib.Timeout.Add( 500, delegate { 
+					win = new CalicoConsole(args, manager, Debug, config, ((IList<string>)args).Contains("--repl")); 
+					return false; 
+				  }); 
+			  Application.Run();
+			}
 		} else {
 		    if (((IList<string>)args).Contains("--server")) {
 			win = new CalicoServer(args, manager, Debug, config); 
