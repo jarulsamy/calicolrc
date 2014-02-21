@@ -121,8 +121,19 @@ namespace Calico {
                 System.Environment.Exit(0);
             } else if (((IList<string>)args).Contains("--create-profile")) {
 		// Copy the /notebook/profile_calico to $(ipython locate)
-		// first, get destination:
+		// First, make a default profile:
 		var proc = new Process {
+			StartInfo = new ProcessStartInfo {
+				FileName = "ipython",
+				    Arguments = "profile create calico",
+				    UseShellExecute = false,
+				    RedirectStandardOutput = false,
+				    CreateNoWindow = true
+				    }
+		    };
+		proc.Start();
+		// Next, get destination:
+		proc = new Process {
 			StartInfo = new ProcessStartInfo {
 				FileName = "ipython",
 				    Arguments = "locate",
