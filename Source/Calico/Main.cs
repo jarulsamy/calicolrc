@@ -26,6 +26,7 @@ using Mono.Unix;
 using System.IO;
 using System.Reflection;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Calico {
     class MainClass {
@@ -298,57 +299,39 @@ namespace Calico {
 		// implies running with noconsole, with or without repl
 		if (withGraphics) {
 		    Application.Init();
-			if (((IList<string>)args).Contains("--server")) {
-
-			  System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
-                    win = new CalicoServer(args, manager, Debug, config); 
-                  });
-              thread.Start();
-			  Application.Run();
-
-              /*
-			  System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
-					Application.Run();
-				  });
-			  //thread.IsBackground = true;
-			  thread.Start();
-			  win = new CalicoServer(args, manager, Debug, config); 
-              */
-			} else {
-			  // THIS MAY NOT WOK ON MAC
-			  GLib.Timeout.Add( 500, delegate { 
-					win = new CalicoConsole(args, manager, Debug, config, ((IList<string>)args).Contains("--repl")); 
-					return false; 
-				  }); 
-			  Application.Run();
-			}
+		    if (((IList<string>)args).Contains("--server")) {
+			
+			System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
+				win = new CalicoServer(args, manager, Debug, config, Thread.CurrentThread.ManagedThreadId); 
+			    });
+			thread.Start();
+			Application.Run();
+		    } else {
+			// THIS MAY NOT WOK ON MAC
+			GLib.Timeout.Add( 500, delegate { 
+				win = new CalicoConsole(args, manager, Debug, config, ((IList<string>)args).Contains("--repl"),
+							Thread.CurrentThread.ManagedThreadId);
+				return false; 
+			    }); 
+			Application.Run();
+		    }
 		} else {
 		    if (((IList<string>)args).Contains("--server")) {
-			win = new CalicoServer(args, manager, Debug, config); 
+			win = new CalicoServer(args, manager, Debug, config, -1);
 		    } else {
-			win = new CalicoConsoleNoGUI(args, manager, Debug, config, ((IList<string>)args).Contains("--repl")); 
+			win = new CalicoConsoleNoGUI(args, manager, Debug, config, ((IList<string>)args).Contains("--repl"), -1);
 		    }
-		}
-		// run now, if not repl:
-		if (!((IList<string>)args).Contains("--repl")) {
-		    Application.Run();
 		}
             } else if (((IList<string>)args).Contains("--repl")) {
                 if (withGraphics) {
                     Application.Init();
-		    // run in background:
-		    //System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
-		    //	    Application.Run();
-		    //	});
-		    //thread.IsBackground = true;
-		    //thread.Start();
 		    GLib.Timeout.Add( 500, delegate { 
-			    win = new CalicoConsole(args, manager, Debug, config, true);  
+			    win = new CalicoConsole(args, manager, Debug, config, true, Thread.CurrentThread.ManagedThreadId);  
 			    return false;
 			});
 		    Application.Run();
 		} else {
-		    win = new CalicoConsoleNoGUI(args, manager, Debug, config, true);  
+		    win = new CalicoConsoleNoGUI(args, manager, Debug, config, true, -1);  
 		}
             } else {
                 // Catch SIGINT
@@ -371,7 +354,7 @@ namespace Calico {
                 // Ok, we are going to run this thing!
                 // If Gui, let's go:
                 Application.Init();
-                win = new MainWindow(args, manager, Debug, config, signal_thread);
+                win = new MainWindow(args, manager, Debug, config, signal_thread, Thread.CurrentThread.ManagedThreadId);
                 win.Show();
                 Application.Run();
             }

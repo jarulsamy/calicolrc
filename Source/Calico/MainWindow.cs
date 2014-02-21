@@ -181,8 +181,9 @@ namespace Calico {
         }
 
         public MainWindow(string[] args, LanguageManager manager, bool Debug, Config config, 
-              System.Threading.Thread signal_thread) :
+			  System.Threading.Thread signal_thread, int gui_thread_id) :
                 base(Gtk.WindowType.Toplevel) {
+            MainWindow.gui_thread_id = gui_thread_id;
 	    this.args = args;
             this.signal_thread = signal_thread;
             _mainWindow = this;
@@ -237,12 +238,6 @@ namespace Calico {
             Build();
             this.KeepAbove = true;
             
-            /*Gtk.Application.Invoke(delegate {
-                gui_thread_id = Thread.CurrentThread.ManagedThreadId;
-            }
-            );*/
-
-            gui_thread_id = Thread.CurrentThread.ManagedThreadId;
             PostBuild();
             foreach (Gtk.TextTag tag in tags.Values) {
                 Output.Buffer.TagTable.Add(tag);
@@ -262,7 +257,7 @@ namespace Calico {
 
             // Run this in in the GUI thread, after we start:
 	    if (!((IList<string>)args).Contains("--nomodules")) {
-	        Invoke(delegate {
+	        InvokeBlocking(delegate {
 	           manager.PostSetup(this);
                 });
             }
@@ -1248,8 +1243,9 @@ namespace Calico {
         }
 
         public static bool needInvoke() {
-		  return (Thread.CurrentThread.ManagedThreadId != 1);
-		}
+	    return ((Thread.CurrentThread.ManagedThreadId != gui_thread_id) &&
+		    (gui_thread_id != -1));
+	}
 
         public delegate void InvokeDelegate();
 

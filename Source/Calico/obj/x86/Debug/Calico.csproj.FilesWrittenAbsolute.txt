@@ -6,3 +6,11 @@
 /Users/keithohara/calico/bin/Calico.exe
 /Users/keithohara/calico/Source/Calico/obj/x86/Debug/Calico.exe
 /Users/keithohara/calico/Source/Calico/obj/x86/Debug/Calico.exe.mdb
+/home/dblank/Calico/Source/Calico/obj/x86/Debug/Calico.gtk-gui.gui.stetic
+/home/dblank/Calico/Source/Calico/obj/x86/Debug/Calico.abstract-butterfly-icon.gif
+/home/dblank/Calico/Source/Calico/obj/x86/Debug/Calico.icon-1.png
+/home/dblank/Calico/Source/Calico/obj/x86/Debug/Calico.icon-2.png
+/home/dblank/Calico/Source/Calico/obj/x86/Debug/Calico.exe
+/home/dblank/Calico/Source/Calico/obj/x86/Debug/Calico.exe.mdb
+/home/dblank/Calico/bin/Calico.exe.mdb
+/home/dblank/Calico/bin/Calico.exe

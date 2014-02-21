@@ -36,12 +36,10 @@ namespace Calico {
        
         public CalicoConsole(): base(){}
 
-        public CalicoConsole(string[] args, LanguageManager manager, bool Debug, Config config, bool startREPL):
+        public CalicoConsole(string[] args, LanguageManager manager, bool Debug, Config config, bool startREPL,
+			     int gui_thread_id):
         base() {
-            Gtk.Application.Invoke(delegate {
-		    gui_thread_id = Thread.CurrentThread.ManagedThreadId;
-		});
-
+	    MainWindow.gui_thread_id = gui_thread_id;
 	    this.args = args;
             this.config = config;
             this.Debug = Debug;
@@ -292,7 +290,9 @@ namespace Calico {
 
     public partial class CalicoConsoleNoGUI: CalicoConsole{
 	// ran with --nographics
-        public CalicoConsoleNoGUI(string[] args, LanguageManager manager, bool Debug, Config config, bool startREPL){
+        public CalicoConsoleNoGUI(string[] args, LanguageManager manager, bool Debug, Config config, bool startREPL,
+				  int gui_thread_id){
+	    MainWindow.gui_thread_id = gui_thread_id;
 	    this.args = args;
             this.config = config;
             this.Debug = Debug;
@@ -341,10 +341,9 @@ namespace Calico {
     }
 
     public partial class CalicoServer: CalicoConsole {
-        public CalicoServer (string[] args, LanguageManager manager, bool Debug, Config config) {
-            Gtk.Application.Invoke(delegate {
-		    gui_thread_id = Thread.CurrentThread.ManagedThreadId;
-		});
+        public CalicoServer (string[] args, LanguageManager manager, bool Debug, Config config,
+			     int gui_thread_id) {
+	    MainWindow.gui_thread_id = gui_thread_id;
 	    this.serverMode = true;
 	    this.args = args;
             this.config = config;
