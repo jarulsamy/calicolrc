@@ -153,23 +153,31 @@ namespace Calico {
 		// Now, put the top level ipython_config.py
 		string ipython_config = "";
 		if (System.Environment.OSVersion.Platform.ToString().Contains("Win")) {
-		    string executable_path = System.IO.Path.Combine(path, "..", "StartCalico.bat");
+		    string executable_path = System.IO.Path.Combine(path, "Calico.exe");
 		    ipython_config = 
 			"# Configuration file for ipython.\n" +
 			"\n" +
 			"c = get_config()\n" +
 			"c.KernelManager.kernel_cmd = [\n" +
-			String.Format("      '{0}', \n", executable_path) +
+			String.Format("      'mono', '{0}', \n", executable_path) +
 			(((IList<string>)args).Contains("--nographics") ? "     '--nographics',\n" : "") +
 			("     '--server', '{connection_file}']\n");
 		} else { // Linux, Mac OSX, etc
-		    string executable_path = System.IO.Path.Combine(path, "..", "StartCalico");
+		    string executable_path = System.IO.Path.Combine(path, "Calico.exe");
 		    ipython_config = 
 			"# Configuration file for ipython.\n" +
 			"\n" +
+			"# set environment vars for Mac:\n" +
+			"import os \n" +
+			"if \"LD_LIBRARY_PATH\" in os.environ:\n" +
+			"    os.environ[\"LD_LIBRARY_PATH\"] = (\"/Library/Frameworks/Mono.framework/Libraries/\" + \n" +
+			"        os.pathsep + os.environ[\"LD_LIBRARY_PATH\"]) \n" +
+			"else:\n" +
+			"    os.environ[\"LD_LIBRARY_PATH\"] = \"/Library/Frameworks/Mono.framework/Libraries/\"\n" +
+			"\n" +
 			"c = get_config()\n" +
 			"c.KernelManager.kernel_cmd = [\n" +
-			String.Format("      'sh', '{0}', \n", executable_path) +
+			String.Format("      'mono', '{0}', \n", executable_path) +
 			(((IList<string>)args).Contains("--nographics") ? "     '--nographics',\n" : "") +
 			("     '--server', '{connection_file}']\n");
 		}
