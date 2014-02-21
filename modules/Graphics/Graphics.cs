@@ -8669,15 +8669,11 @@ public static class Graphics
 	}
 
 	public virtual IDictionary<string, string> GetRepresentations() {
-	    bool need_to_refresh = true;
 	    if (window != null) {
+		window.step();
 	    } else if (canvas != null) {
 	    } else if (shape != null) {
 	    } else {
-		need_to_refresh = false;
-	    }
-	    if (need_to_refresh) {
-		wait(1); // hack
 	    }
 	    IDictionary<string, string> retval = null;
 	    if (text != null) {
