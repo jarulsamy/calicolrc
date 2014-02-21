@@ -1701,6 +1701,27 @@ namespace Calico {
             dialog.Respond(Gtk.ResponseType.Ok);
         }
 
+        public void RequestInterrupt() {
+	    // kill execution of runn server script
+            if (executeThread != null) {
+                executeThread.Abort(new Microsoft.Scripting.KeyboardInterruptException(""));
+                executeThread = null;
+                manager["python"].engine.Execute(@"
+def _invoke():
+    if _.robot:
+        _.robot.flush()
+        _.robot.stop()
+import Myro as _
+_.InvokeBlocking(_invoke)
+del _invoke, _
+");
+            }
+	}
+
+	public virtual void Start() {
+	    // override in Server
+	}
+
         public bool RequestQuit() {
             bool retval = Close();
             if (retval) {

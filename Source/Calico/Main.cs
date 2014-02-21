@@ -33,6 +33,7 @@ namespace Calico {
         public static string Version = "2.5.0";
         public static bool IsLoadLanguages = true;
         public static bool verbose = false;
+	// Handle interrupt:
 
        /*
        private static bool IsApplicationRunningOnMono(string processName)
@@ -283,9 +284,8 @@ namespace Calico {
             // End of loading languages
             // -------------------------------------------
 
-            // Handle interrupt:
-            MainWindow win = null;
             // Global settings:
+	    MainWindow win = null;
             bool Debug = false;
             if (((IList<string>)args).Contains("--debug")) {
                 Debug = true;
@@ -300,9 +300,23 @@ namespace Calico {
 		if (withGraphics) {
 		    Application.Init();
 		    if (((IList<string>)args).Contains("--server")) {
-			
+			///---------------------
+			System.Threading.Thread  signal_thread = null;
+			if (!System.Environment.OSVersion.Platform.ToString().Contains("Win")) {
+                            UnixSignal[] signals = new UnixSignal [] {
+                                new UnixSignal (Mono.Unix.Native.Signum.SIGINT),
+                            };
+                            signal_thread = new System.Threading.Thread (delegate () {
+                                    // Wait for a signal to be delivered
+                                    UnixSignal.WaitAny (signals, -1);
+				    win.RequestInterrupt(); 
+                                });
+                            signal_thread.Start();
+			}
+			///-----------------------
 			System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
 				win = new CalicoServer(args, manager, Debug, config, Thread.CurrentThread.ManagedThreadId); 
+				win.Start();
 			    });
 			thread.Start();
 			Application.Run();
@@ -317,7 +331,22 @@ namespace Calico {
 		    }
 		} else {
 		    if (((IList<string>)args).Contains("--server")) {
+			///---------------------
+			System.Threading.Thread  signal_thread = null;
+			if (!System.Environment.OSVersion.Platform.ToString().Contains("Win")) {
+                            UnixSignal[] signals = new UnixSignal [] {
+                                new UnixSignal (Mono.Unix.Native.Signum.SIGINT),
+                            };
+                            signal_thread = new System.Threading.Thread (delegate () {
+                                    // Wait for a signal to be delivered
+                                    UnixSignal.WaitAny (signals, -1);
+				    win.RequestInterrupt(); 
+                                });
+                            signal_thread.Start();
+			}
+			///-----------------------
 			win = new CalicoServer(args, manager, Debug, config, -1);
+			win.Start();
 		    } else {
 			win = new CalicoConsoleNoGUI(args, manager, Debug, config, ((IList<string>)args).Contains("--repl"), -1);
 		    }

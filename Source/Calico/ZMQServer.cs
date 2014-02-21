@@ -447,6 +447,22 @@ public static class ZMQServer {
 
 		// code may end with ?? (show source code!)
 		// send: ['F3853494D83649BE88088630B9D9DDD3', '<IDS|MSG>', '8cc2f48bd53be4eab892f6073672dcb10f5270e834c6c8822c6d6bea0e5c5420', '{"date":"2014-02-18T14:57:34.068692","username":"kernel","session":"ed5790ca-a841-43d8-969d-a1acc1c9764c","msg_id":"36ea8e60-4dad-412f-818d-1984133b0ac8","msg_type":"execute_reply"}', '{"username":"username","msg_id":"8ADF32F2006349759F521CC336B26B6E","msg_type":"execute_request","session":"F3853494D83649BE88088630B9D9DDD3"}', '{"dependencies_met":true,"engine":"47ae2106-447b-4f2c-a8fa-09bb4e410bb7","status":"ok","started":"2014-02-18T14:57:34.061489"}', '{"status":"ok","execution_count":6,"user_variables":{},"payload":[{"text":"\\u001b[1;31mType:       \\u001b[0mfunction\\n\\u001b[1;31mString Form:\\u001b[0m<function display_html at 0x1a93140>\\n\\u001b[1;31mFile:       \\u001b[0m/usr/local/lib/python2.7/dist-packages/IPython/core/display.py\\n\\u001b[1;31mDefinition: \\u001b[0m\\u001b[0mIPython\\u001b[0m\\u001b[1;33m.\\u001b[0m\\u001b[0mdisplay\\u001b[0m\\u001b[1;33m.\\u001b[0m\\u001b[0mdisplay_html\\u001b[0m\\u001b[1;33m(\\u001b[0m\\u001b[1;33m*\\u001b[0m\\u001b[0mobjs\\u001b[0m\\u001b[1;33m,\\u001b[0m \\u001b[1;33m**\\u001b[0m\\u001b[0mkwargs\\u001b[0m\\u001b[1;33m)\\u001b[0m\\u001b[1;33m\\u001b[0m\\u001b[0m\\n\\u001b[1;31mSource:\\u001b[0m\\n\\u001b[1;32mdef\\u001b[0m \\u001b[0mdisplay_html\\u001b[0m\\u001b[1;33m(\\u001b[0m\\u001b[1;33m*\\u001b[0m\\u001b[0mobjs\\u001b[0m\\u001b[1;33m,\\u001b[0m \\u001b[1;33m**\\u001b[0m\\u001b[0mkwargs\\u001b[0m\\u001b[1;33m)\\u001b[0m\\u001b[1;33m:\\u001b[0m\\u001b[1;33m\\u001b[0m\\n\\u001b[1;33m\\u001b[0m    \\u001b[1;34m\\"\\"\\"Display the HTML representation of an object.\\u001b[0m\\n\\u001b[1;34m\\u001b[0m\\n\\u001b[1;34m    Parameters\\u001b[0m\\n\\u001b[1;34m    ----------\\u001b[0m\\n\\u001b[1;34m    objs : tuple of objects\\u001b[0m\\n\\u001b[1;34m        The Python objects to display, or if raw=True raw HTML data to\\u001b[0m\\n\\u001b[1;34m        display.\\u001b[0m\\n\\u001b[1;34m    raw : bool\\u001b[0m\\n\\u001b[1;34m        Are the data objects raw data or Python objects that need to be\\u001b[0m\\n\\u001b[1;34m        formatted before display? [default: False]\\u001b[0m\\n\\u001b[1;34m    metadata : dict (optional)\\u001b[0m\\n\\u001b[1;34m        Metadata to be associated with the specific mimetype output.\\u001b[0m\\n\\u001b[1;34m    \\"\\"\\"\\u001b[0m\\u001b[1;33m\\u001b[0m\\n\\u001b[1;33m\\u001b[0m    \\u001b[0m_display_mimetype\\u001b[0m\\u001b[1;33m(\\u001b[0m\\u001b[1;34m\'text/html\'\\u001b[0m\\u001b[1;33m,\\u001b[0m \\u001b[0mobjs\\u001b[0m\\u001b[1;33m,\\u001b[0m \\u001b[1;33m**\\u001b[0m\\u001b[0mkwargs\\u001b[0m\\u001b[1;33m)\\u001b[0m\\u001b[1;33m\\u001b[0m\\u001b[0m\\n","html":null,"start_line_number":0,"source":"page"}],"user_expressions":{}}']
+		
+		// Response to a KeyboardInterrupt -------------------------------------------------------------------
+		// header: {"date":"2014-02-20T23:59:12.520437","username":"kernel","session":"b0818a7a-1e25-48e4-a842-b7a534e02a92","msg_id":"db86cd17-501a-4751-a5eb-da2339596691","msg_type":"pyerr"}
+		// parent: {"username":"username","msg_id":"2B93F9E69880465B9A7B44C189EA3C8E","msg_type":"execute_request","session":"9AAB231FF67D4493833C5805A973F4C3"}
+		// meta: {}
+		// content: {"ename":"KeyboardInterrupt","evalue":"","traceback":["\\u001b[1;31m---------------------------------------------------------------------------\\u001b[0m\\n\\u001b[1;31mKeyboardInterrupt\\u001b[0m                         Traceback (most recent call last)","\\u001b[1;32m<ipython-input-1-f33f8312bb4d>\\u001b[0m in \\u001b[0;36m<module>\\u001b[1;34m()\\u001b[0m\\n\\u001b[1;32m----> 1\\u001b[1;33m \\u001b[1;32mwhile\\u001b[0m \\u001b[0mTrue\\u001b[0m\\u001b[1;33m:\\u001b[0m\\u001b[1;33m\\u001b[0m\\u001b[0m\\n\\u001b[0m\\u001b[0;32m      2\\u001b[0m     \\u001b[0mx\\u001b[0m \\u001b[1;33m=\\u001b[0m \\u001b[1;36m1\\u001b[0m\\u001b[1;33m\\u001b[0m\\u001b[0m\\n","\\u001b[1;31mKeyboardInterrupt\\u001b[0m: "]}
+		// Followed by: -------------------------------------------------------------------
+		// header: {"date":"2014-02-20T23:59:12.521471","username":"kernel","session":"b0818a7a-1e25-48e4-a842-b7a534e02a92","msg_id":"aa2acecb-b4dc-4e49-a7b5-772848c4ef1c","msg_type":"execute_reply"}', 
+		// parent: {"username":"username","msg_id":"2B93F9E69880465B9A7B44C189EA3C8E","msg_type":"execute_request","session":"9AAB231FF67D4493833C5805A973F4C3"}', 
+		// meta: {"dependencies_met":true,"engine":"8fb03435-a217-4061-bf49-c219bcdc0ca5","status":"error","started":"2014-02-20T23:59:04.873898"}', 
+		// content: {"status":"error","ename":"KeyboardInterrupt","user_variables":{},"evalue":"","traceback":["\\u001b[1;31m---------------------------------------------------------------------------\\u001b[0m\\n\\u001b[1;31mKeyboardInterrupt\\u001b[0m                         Traceback (most recent call last)","\\u001b[1;32m<ipython-input-1-f33f8312bb4d>\\u001b[0m in \\u001b[0;36m<module>\\u001b[1;34m()\\u001b[0m\\n\\u001b[1;32m----> 1\\u001b[1;33m \\u001b[1;32mwhile\\u001b[0m \\u001b[0mTrue\\u001b[0m\\u001b[1;33m:\\u001b[0m\\u001b[1;33m\\u001b[0m\\u001b[0m\\n\\u001b[0m\\u001b[0;32m      2\\u001b[0m     \\u001b[0mx\\u001b[0m \\u001b[1;33m=\\u001b[0m \\u001b[1;36m1\\u001b[0m\\u001b[1;33m\\u001b[0m\\u001b[0m\\n","\\u001b[1;31mKeyboardInterrupt\\u001b[0m: "],"execution_count":1,"user_expressions":{},"engine_info":{"engine_uuid":"8fb03435-a217-4061-bf49-c219bcdc0ca5","method":"execute","engine_id":-1},"payload":[]}']
+		// and idle: -------------------------------------------------------------------
+		// header: {"date":"2014-02-20T23:59:12.521844","username":"kernel","session":"b0818a7a-1e25-48e4-a842-b7a534e02a92","msg_id":"6aa17dad-37b9-4f7d-9bea-a30d8c1621ab","msg_type":"status"}
+		// parent: {"username":"username","msg_id":"2B93F9E69880465B9A7B44C189EA3C8E","msg_type":"execute_request","session":"9AAB231FF67D4493833C5805A973F4C3"}
+		// meta: {}
+		// content: {"execution_state":"idle"}
 
 		if (code.StartsWith(":lang") && session.calico != null) { // :lang 
 		    string [] lines = code.Split(new string[] { "\r\n", "\n" }, 
@@ -570,56 +586,60 @@ public static class ZMQServer {
 	    object retval = null;
 	    session.SetOutputs(execution_count, m_header);
 	    if (session.calico != null) {
-		try {
-		    retval = session.calico.Evaluate(code);
-		} catch (Exception e) {
-		    retval = e;
-		}
+		session.calico.executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
+			    try {
+				retval = session.calico.Evaluate(code);
+			    } catch (Exception e) {
+				retval = e;
+			    }
+			    Dictionary<string, object> content = null;
+			    if (retval != null) {
+				if (retval is Widgets.Widget) {
+				    // Widgets inject themselves to output, but have no return repr
+				    session.display_widget((Widgets.Widget)retval);
+				    //} else if (retval is Representation) {
+				    //session.display((Representation)retval);
+				} else {
+				    content = new Dictionary<string, object>
+					{
+					    {"execution_count", execution_count},
+					    {"data", ZMQServer.session.GetRepresentations(retval)},
+					    {"metadata", new Dictionary<string, object>()}
+					};
+				    send(session.iopub_channel, header, m_header, metadata, content);
+				}
+			    }
+			    session.SetOutputs(0, null); // wait till after widget displays
+			    // ---------------------------------------------------
+			    header = session.Header("status", m_header["session"].ToString());
+			    metadata = new Dictionary<string, object>();
+			    content = new Dictionary<string, object>
+			    {
+				{"execution_state", "idle"}
+			    };
+			    send(session.iopub_channel, header, m_header, metadata, content);
+			    // ---------------------------------------------------
+			    header = session.Header("execute_reply", m_header["session"].ToString());
+			    metadata = new Dictionary<string, object>
+			    {
+				{"dependencies_met", true},
+				{"engine", session.engine_id},
+				{"status", "ok"},
+				{"started", now()}
+			    };
+			    content = new Dictionary<string, object>
+			    {
+				{"status", "ok"},
+				{"execution_count", execution_count},
+				{"user_variables", new Dictionary<string, object>()},
+				{"payload", new List<object>()},
+				{"user_expressions", new Dictionary<string, object>()}
+			    };
+			    send(session.shell_channel, header, m_header, metadata, content);
+			}));
+		session.calico.executeThread.IsBackground = true;
+		session.calico.executeThread.Start();
 	    }
-	    Dictionary<string, object> content = null;
-	    if (retval != null) {
-		if (retval is Widgets.Widget) {
-		    // Widgets inject themselves to output, but have no return repr
-		    session.display_widget((Widgets.Widget)retval);
-		//} else if (retval is Representation) {
-		//session.display((Representation)retval);
-		} else {
-		    content = new Dictionary<string, object>
-			{
-			    {"execution_count", execution_count},
-			    {"data", ZMQServer.session.GetRepresentations(retval)},
-			    {"metadata", new Dictionary<string, object>()}
-			};
-		    send(session.iopub_channel, header, m_header, metadata, content);
-		}
-	    }
-	    session.SetOutputs(0, null); // wait till after widget displays
-	    // ---------------------------------------------------
-	    header = session.Header("status", m_header["session"].ToString());
-	    metadata = new Dictionary<string, object>();
-	    content = new Dictionary<string, object>
-		{
-		    {"execution_state", "idle"}
-		};
-	    send(session.iopub_channel, header, m_header, metadata, content);
-	    // ---------------------------------------------------
-	    header = session.Header("execute_reply", m_header["session"].ToString());
-	    metadata = new Dictionary<string, object>
-		{
-		    {"dependencies_met", true},
-		    {"engine", session.engine_id},
-		    {"status", "ok"},
-		    {"started", now()}
-		};
-	    content = new Dictionary<string, object>
-		{
-		    {"status", "ok"},
-		    {"execution_count", execution_count},
-		    {"user_variables", new Dictionary<string, object>()},
-		    {"payload", new List<object>()},
-		    {"user_expressions", new Dictionary<string, object>()}
-		};
-	    send(session.shell_channel, header, m_header, metadata, content);
 	}
     }
 
@@ -641,6 +661,8 @@ public static class ZMQServer {
 			    string port) : 
 	    base(session, auth, transport, address, port, SocketType.DEALER) {
 	}
+
+	// FIXME: handle ZMQServer+ControlChannel: unknown msg_type: shutdown_request
     }
 
     public class StdInChannel : Channel {

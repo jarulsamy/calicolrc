@@ -341,6 +341,8 @@ namespace Calico {
     }
 
     public partial class CalicoServer: CalicoConsole {
+	string config_file = "";
+
         public CalicoServer (string[] args, LanguageManager manager, bool Debug, Config config,
 			     int gui_thread_id) {
 	    MainWindow.gui_thread_id = gui_thread_id;
@@ -362,7 +364,7 @@ namespace Calico {
 		manager.PostSetup(this); 
 	    }
 
-	    string config_file = "";
+	    config_file = "";
             for(int i = 0; i < args.Length; i++) {
 		string arg = args[i];
                 if (arg.StartsWith("--")) {
@@ -388,8 +390,11 @@ namespace Calico {
 		    }
                 }
             }
-	    ZMQServer.Start(this, config_file);
         }
+
+	public override void Start() {
+	    ZMQServer.Start(this, config_file);
+	}
 
         public override void Print(Tag tag, string format) {
 	    if (tag == Tag.Error) {
