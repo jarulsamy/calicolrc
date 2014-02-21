@@ -120,7 +120,7 @@ namespace Calico {
                 Usage();
                 System.Environment.Exit(0);
             } else if (((IList<string>)args).Contains("--create-profile")) {
-		// Copy the /notebook/profile_calico to $(ipython locate)
+		// Copy the /notebooks/profile to $(ipython locate)
 		// First, make a default profile:
 		var proc = new Process {
 			StartInfo = new ProcessStartInfo {
@@ -149,7 +149,7 @@ namespace Calico {
 		}
 		ipython_path = System.IO.Path.Combine(ipython_path, "profile_calico");
 		// Now, copy recursively:
-		DirectoryCopy(System.IO.Path.Combine(path, "..", "notebooks", "profile_calico"), ipython_path, true);
+		DirectoryCopy(System.IO.Path.Combine(path, "..", "notebooks", "profile"), ipython_path, true);
 		// Now, put the top level ipython_config.py
 		string ipython_config = "";
 		if (System.Environment.OSVersion.Platform.ToString().Contains("Win")) {
