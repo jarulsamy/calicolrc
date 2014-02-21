@@ -4446,6 +4446,29 @@ public static class Graphics
 		{ 
 		    InvokeBlocking (delegate {
 			    // FIXME: how to go from canvas.finalsurface to pixbuf?
+			    Cairo.ImageSurface surface = canvas.finalsurface;
+			    int w = surface.Width;
+			    int h = surface.Height;
+			    Gdk.Pixmap pixmap = new Gdk.Pixmap(null, w, h, 24);
+			    using (Cairo.Context cr = Gdk.CairoHelper.Create(pixmap)) {
+				cr.Operator = Cairo.Operator.Source;
+				cr.SetSource(surface);
+				cr.Paint();
+			    }
+			    // maybe use: pixmap.Colormap
+			    //_pixbuf = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, true, 8, w, h);
+			    //_pixbuf = _pixbuf.GetFromDrawable(pixmap, Gdk.Colormap.System, 0, 0, 0, 0, w, h);
+			    // or maybe:
+			    _pixbuf = Gdk.Pixbuf.FromDrawable(pixmap, Gdk.Colormap.System, 0, 0, 0, 0, w, h);
+			    if (!_pixbuf.HasAlpha) {
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
+			    }
+			    set_points (new Point (0, 0), 
+					new Point (_pixbuf.Width, 0),
+					new Point (_pixbuf.Width, _pixbuf.Height), 
+					new Point (0, _pixbuf.Height));			
+			    _cacheWidth = _pixbuf.Width;
+			    _cacheHeight = _pixbuf.Height;
 			});
 		}
 
