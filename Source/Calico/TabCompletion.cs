@@ -95,6 +95,7 @@ namespace Calico {
                 if (parts.Length == 1) { // Easy, just get the vars that match:
                     string root = parts[0];
                     partial = root;
+		    full_prefix = root;
                     items = manager[language].engine.GetCompletions(root);
                     // and not hasattr(x, "DeclaringType")]
                 } else {
