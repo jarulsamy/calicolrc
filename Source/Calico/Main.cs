@@ -33,7 +33,6 @@ namespace Calico {
         public static string Version = "2.5.0";
         public static bool IsLoadLanguages = true;
         public static bool verbose = false;
-	// Handle interrupt:
 
        /*
        private static bool IsApplicationRunningOnMono(string processName)
@@ -80,7 +79,7 @@ namespace Calico {
 	    FileInfo[] files = dir.GetFiles();
 	    foreach (FileInfo file in files) {
 		string temppath = Path.Combine(destDirName, file.Name);
-		System.Console.WriteLine("    Copying \"{0}\" to \"{1}\"...", file.FullName, temppath);
+		//System.Console.WriteLine("    Copying \"{0}\" to \"{1}\"...", file.FullName, temppath);
 		file.CopyTo(temppath, true);
 	    }
 	    if (copySubDirs) {
@@ -120,7 +119,7 @@ namespace Calico {
             if (((IList<string>)args).Contains("--help")) {
                 Usage();
                 System.Environment.Exit(0);
-            } else if (((IList<string>)args).Contains("--profile")) {
+            } else if (((IList<string>)args).Contains("--create-profile")) {
 		// Copy the /notebook/profile_calico to $(ipython locate)
 		// first, get destination:
 		var proc = new Process {
@@ -140,6 +139,34 @@ namespace Calico {
 		ipython_path = System.IO.Path.Combine(ipython_path, "profile_calico");
 		// Now, copy recursively:
 		DirectoryCopy(System.IO.Path.Combine(path, "..", "notebooks", "profile_calico"), ipython_path, true);
+		// Now, put the top level ipython_config.py
+		string ipython_config = "";
+		if (System.Environment.OSVersion.Platform.ToString().Contains("Win")) {
+		    string executable_path = System.IO.Path.Combine(path, "..", "StartCalico.bat");
+		    ipython_config = 
+			"# Configuration file for ipython.\n" +
+			"\n" +
+			"c = get_config()\n" +
+			"c.KernelManager.kernel_cmd = [\n" +
+			String.Format("      '{0}', \n", executable_path) +
+			(((IList<string>)args).Contains("--nographics") ? "     '--nographics',\n" : "") +
+			("     '--server', '{connection_file}']\n");
+		} else { // Linux, Mac OSX, etc
+		    string executable_path = System.IO.Path.Combine(path, "..", "StartCalico");
+		    ipython_config = 
+			"# Configuration file for ipython.\n" +
+			"\n" +
+			"c = get_config()\n" +
+			"c.KernelManager.kernel_cmd = [\n" +
+			String.Format("      'sh', '{0}', \n", executable_path) +
+			(((IList<string>)args).Contains("--nographics") ? "     '--nographics',\n" : "") +
+			("     '--server', '{connection_file}']\n");
+		}
+		string filename = System.IO.Path.Combine(ipython_path, "ipython_config.py");
+		System.Console.WriteLine("    Creating ipython config: \"{0}\"...", filename);
+		System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
+		sw.Write(ipython_config);
+		sw.Close();
                 System.Environment.Exit(0);
             } else if (((IList<string>)args).Contains("--version")) {
                 Print("Calico Project, version {0} on {1}", Version, System.Environment.OSVersion.VersionString);
@@ -308,8 +335,10 @@ namespace Calico {
                             };
                             signal_thread = new System.Threading.Thread (delegate () {
                                     // Wait for a signal to be delivered
-                                    UnixSignal.WaitAny (signals, -1);
-				    win.RequestInterrupt(); 
+				    while (true) {
+					UnixSignal.WaitAny (signals, -1);
+					win.RequestInterrupt(); 
+				    }
                                 });
                             signal_thread.Start();
 			}
@@ -339,8 +368,10 @@ namespace Calico {
                             };
                             signal_thread = new System.Threading.Thread (delegate () {
                                     // Wait for a signal to be delivered
-                                    UnixSignal.WaitAny (signals, -1);
-				    win.RequestInterrupt(); 
+				    while (true) {
+					UnixSignal.WaitAny (signals, -1);
+					win.RequestInterrupt(); 
+				    }
                                 });
                             signal_thread.Start();
 			}
@@ -424,7 +455,7 @@ namespace Calico {
             Print(_("  StartCalico --debug            Calico output goes to console rather than GUI"));
             Print(_("  StartCalico --debug-handler    Calico will not catch system errors"));
             Print(_("  StartCalico --reset            Resets config settings to factory defaults"));
-            Print(_("  StartCalico --profile          Create a Calico profile for IPython"));
+            Print(_("  StartCalico --create-profile   Create a Calico profile for IPython"));
             Print(_("  StartCalico --server FILENAME  Used as a backend language kernel for IPython"));
             Print(_("  StartCalico --help             Displays this message"));
             Print("");
