@@ -4877,5 +4877,9 @@ del _invoke, _
 	public int GetGuiThreadID() {
 	    return gui_thread_id;
 	}
+
+	public override string ToString() {
+	    return String.Format("<Calico instance, version {0}>", MainClass.Version);
+	}
     }
 }
