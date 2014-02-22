@@ -737,9 +737,9 @@ public static class Graphics
 		    }
 		    _lastWindow = _windows [title];
 		    _lastWindow.KeepAbove = true;
-		    if (picture != null)
-			picture.draw(_lastWindow);
 		});
+	    if (picture != null)
+		picture.draw(_lastWindow);
 	    return _windows [title];
 	}
 

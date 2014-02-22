@@ -323,17 +323,21 @@ public static class ZMQServer {
 	}
 		   
 	public virtual void loop() {
+	    string message, signature, s_header, s_parent_header, s_metadata, s_content;
 	    while (true) {
-		string message = socket.Receive(Encoding.UTF8);
-		while (message != "<IDS|MSG>") {
+		try {
 		    message = socket.Receive(Encoding.UTF8);
+		    while (message != "<IDS|MSG>") {
+			message = socket.Receive(Encoding.UTF8);
+		    }
+		    signature = socket.Receive(Encoding.UTF8);
+		    s_header = socket.Receive(Encoding.UTF8);
+		    s_parent_header = socket.Receive(Encoding.UTF8);
+		    s_metadata = socket.Receive(Encoding.UTF8);
+		    s_content = socket.Receive(Encoding.UTF8);
+		} catch {
+		    continue;
 		}
-		string signature = socket.Receive(Encoding.UTF8);
-		string s_header = socket.Receive(Encoding.UTF8);
-		string s_parent_header = socket.Receive(Encoding.UTF8);
-		string s_metadata = socket.Receive(Encoding.UTF8);
-		string s_content = socket.Receive(Encoding.UTF8);
-		
 		string comp_sig = auth.sign(new List<string>() {
 			s_header, s_parent_header, s_metadata, s_content});
 		
