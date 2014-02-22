@@ -704,7 +704,7 @@ public static class Graphics
 			  if (!(_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized))) {
 				_windows [title] = new Graphics.WindowClass (title, width, height);
 			  } else {
-				_windows [title].clear(false);
+				_windows [title].reset(false);
 				_windows [title].Resize(width, height);
 			  }
 			  _lastWindow = _windows [title];
@@ -1258,7 +1258,6 @@ public static class Graphics
 		public double time = 0.0;
 		public double simulationStepTime = 0.01;
 		public string state = "init";
-		public Gdk.Color bg = new Gdk.Color (255, 255, 255);
 		public bool requestStop = false;
 		Gtk.ScrolledWindow _scrolledWindow = null;
 		public int _cacheHeight;
@@ -1374,18 +1373,15 @@ public static class Graphics
 			});
 		}
 		
-		public void clear ()
+		public void reset ()
 		{
-			clear (true);
+			reset (true);
 		}
     
-		public void clear (bool redraw)
+		public void reset (bool redraw)
 		{
 		    Invoke (delegate {
-			    _canvas.surface = new Cairo.ImageSurface (Cairo.Format.Argb32, 
-								      // FIXME: w,h of Window?
-								      (int)800, 
-								      (int)600);
+			    _canvas.surface = new Cairo.ImageSurface (Cairo.Format.Argb32, width, height);
 			    _canvas.need_to_draw_surface = false;
 			    
 			    mode = "auto";
@@ -1408,10 +1404,10 @@ public static class Graphics
 			    state = "init";
 			    lock (_canvas.shapes)
 				_canvas.shapes.Clear ();
-			    Gdk.Color bg = new Gdk.Color (242, 241, 240);
 			    foreach (Gtk.Widget child in _canvas.Children) {
 				_canvas.Remove (child);
 			    }
+			    Gdk.Color bg = new Gdk.Color (242, 241, 240);
 			    _canvas.ModifyBg (Gtk.StateType.Normal, bg);
 			    if (redraw)
 				QueueDraw();
@@ -1441,7 +1437,7 @@ public static class Graphics
 		public void setBackground (Color color)
 		{
 		    Invoke( delegate {
-			    bg = new Gdk.Color ((byte)color.red, 
+			    Gdk.Color bg = new Gdk.Color ((byte)color.red, 
 						(byte)color.green, 
 						(byte)color.blue);
 			    _canvas.ModifyBg (Gtk.StateType.Normal, bg);
@@ -2328,14 +2324,17 @@ public static class Graphics
 		public Cairo.ImageSurface finalsurface;
 		public bool need_to_draw_surface = false;
     
-		public Canvas (int width, int height) : this("auto", width, height)
+		public Canvas (int width, int height) : this("bitmap", width, height)
 		{
 		}
     
 		public Canvas (string mode, int width, int height) : base(null, null)
 		{
-			this.mode = mode;
-			resize (width, height);
+		    this.mode = mode;
+		    resize (width, height);
+		    if (mode == "bitmap" || mode == "bitmapmanual") {
+			setBackground(new Graphics.Color(255, 255, 255));
+		    }
 		}
     
 		public Canvas (string mode, Gtk.Adjustment h, Gtk.Adjustment v) : base(h, v)
@@ -2362,6 +2361,12 @@ public static class Graphics
 			}
 		}
     
+		public void setBackground(Graphics.Color color) {
+		    var background = new Rectangle(new List<int> {0,0}, new List<int> {width,height});
+		    background.color = color;
+		    background.draw(this);
+		}
+
 		void initPhysics ()
 		{
 			world = new FarseerPhysics.Dynamics.World (new Vector2 (0.0f, 9.8f));
@@ -2369,16 +2374,11 @@ public static class Graphics
 
 		void resetSurfaces ()
 		{
-			surface = new Cairo.ImageSurface (Cairo.Format.Argb32, 
-				       width,
-				       height);	  
+			surface = new Cairo.ImageSurface (Cairo.Format.Argb32, width, height);	  
 			if (mode == "bitmapmanual") {
-				finalsurface = new Cairo.ImageSurface (Cairo.Format.Argb32, 
-				// FIXME: w,h of Window?
-						 width, 
-						 height);
+			    finalsurface = new Cairo.ImageSurface (Cairo.Format.Argb32, width, height);
 			} else {
-				finalsurface = surface;      	      
+			    finalsurface = surface;      	      
 			}      
 		}
 
@@ -4406,7 +4406,7 @@ public static class Graphics
 			    // Now, do what Picture(pixbuf) does:
 			    _pixbuf = pixbuf;
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
 			    }
 			    set_points (new Point (0, 0), 
 					new Point (_pixbuf.Width, 0),
@@ -4431,7 +4431,7 @@ public static class Graphics
 			    // Now, do what Picture(pixbuf) does:
 			    _pixbuf = pixbuf;
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
 			    }
 			    set_points (new Point (0, 0), 
 					new Point (_pixbuf.Width, 0),
@@ -4445,7 +4445,6 @@ public static class Graphics
 		public Picture (Canvas canvas) : this(true)
 		{ 
 		    InvokeBlocking (delegate {
-			    // FIXME: how to go from canvas.finalsurface to pixbuf?
 			    Cairo.ImageSurface surface = canvas.finalsurface;
 			    int w = surface.Width;
 			    int h = surface.Height;
@@ -4455,13 +4454,9 @@ public static class Graphics
 				cr.SetSource(surface);
 				cr.Paint();
 			    }
-			    // maybe use: pixmap.Colormap
-			    //_pixbuf = new Gdk.Pixbuf(Gdk.Colorspace.Rgb, true, 8, w, h);
-			    //_pixbuf = _pixbuf.GetFromDrawable(pixmap, Gdk.Colormap.System, 0, 0, 0, 0, w, h);
-			    // or maybe:
 			    _pixbuf = Gdk.Pixbuf.FromDrawable(pixmap, Gdk.Colormap.System, 0, 0, 0, 0, w, h);
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
 			    }
 			    set_points (new Point (0, 0), 
 					new Point (_pixbuf.Width, 0),
@@ -4488,7 +4483,7 @@ public static class Graphics
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (original._pixbuf.Colorspace, true, 8, original.getWidth (), original.getHeight ());
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
 			    }
 			    for (int x=0; x < _pixbuf.Width; x++) {
 				for (int y=0; y < _pixbuf.Height; y++) {
@@ -4518,7 +4513,7 @@ public static class Graphics
 		    InvokeBlocking (delegate {
 			    _pixbuf = pixbuf;
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
 			    }
 			    set_points (new Point (0, 0), 
 					new Point (_pixbuf.Width, 0),
@@ -4539,7 +4534,7 @@ public static class Graphics
 			    // FIXME: convert bitmap.palette to colormap
 			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
 			    }
 			    int xstep = 1;
 			    if (fluke1) xstep = 2;
@@ -4635,7 +4630,7 @@ public static class Graphics
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
 			    }
 			    for (int x=0; x < _pixbuf.Width; x++) {
 				for (int y=0; y < _pixbuf.Height; y++) {
@@ -4667,7 +4662,7 @@ public static class Graphics
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
 			    }
 			    for (int x=0; x < _pixbuf.Width; x++) {
 				for (int y=0; y < _pixbuf.Height; y++) {
@@ -4699,7 +4694,7 @@ public static class Graphics
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
 			    }
 			    // WORKAROUND: image needs alpha set to zero (full opacity/no
 			    // transparency). Might as well set default color, too:
@@ -4730,7 +4725,7 @@ public static class Graphics
 			    // Colorspace, has_alpha, bits_per_sample, width, height:
 			    _pixbuf = new Gdk.Pixbuf (new Gdk.Colorspace (), true, 8, width, height);
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); // alpha color?
+				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
 			    }
 			    // WORKAROUND: image needs alpha set to zero (full opacity/no
 			    // transparency). Might as well set default color, too:
@@ -5391,6 +5386,10 @@ public static class Graphics
 		    if (jpg_string != "")
 			retval["image/jpeg"] = jpg_string;
 		    return retval;
+		}
+
+		public void setAlphaColor(int red, int green, int blue) {
+		    _pixbuf = _pixbuf.AddAlpha (true, Convert.ToByte(red), Convert.ToByte(green), Convert.ToByte(blue)); 
 		}
 
 	} // -- end of Picture class
