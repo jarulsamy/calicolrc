@@ -96,8 +96,8 @@ public class CalicoFSharpEngine : Engine
             //Console.Error.WriteLine(e.Message);
             //Console.Error.WriteLine(e.InnerException);
         }finally{
-            Console.WriteLine(sbOut);
-            Console.Error.WriteLine(sbErr);
+            Console.Write(sbOut);
+            Console.Error.Write(sbErr);
             sbOut.Clear();
             sbErr.Clear();
         }
@@ -136,8 +136,8 @@ public class CalicoFSharpEngine : Engine
             //Console.Error.WriteLine(e.Message);
             //Console.Error.WriteLine(e.InnerException);
         }finally{
-            Console.WriteLine(sbOut);
-            Console.Error.WriteLine(sbErr);
+            Console.Write(sbOut);
+            Console.Error.Write(sbErr);
             sbOut.Clear();
             sbErr.Clear();
         }
