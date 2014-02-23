@@ -124,6 +124,15 @@ namespace Calico {
 	    return new Variable(false, null);
         }
 
+	public virtual TabCompletion GetTabCompletion(string to_match) {
+	    return new TabCompletion(this, null, to_match);
+	}
+
+	public virtual TabCompletion GetTabCompletion(string to_match, 
+					 Mono.TextEditor.TextEditor shell) {
+	    return new TabCompletion(this, shell, to_match);
+	}
+
         public virtual IList<string> GetCompletions(string root) {
             return new List<string>();
         }

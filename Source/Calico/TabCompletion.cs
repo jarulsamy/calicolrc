@@ -35,7 +35,7 @@ namespace Calico {
     }
 
     public class TabCompletion {
-	LanguageManager manager = null;
+	Engine engine = null;
         public IList<string> items = null;
         Mono.TextEditor.TextEditor shell;
         int tab_position;
@@ -58,16 +58,16 @@ namespace Calico {
             return temp.ToArray();
         }
 
-        public bool hasattr(string language, object value, string part) {
-            return dir(language, value).Contains(part);
+        public bool hasattr(object value, string part) {
+            return dir(value).Contains(part);
         }
 
-        public object getattr(string language, object value, string part) {
-            return manager[language].engine.GetMember(value, part);
+        public object getattr(object value, string part) {
+            return engine.GetMember(value, part);
         }
 
-        public IList<string> dir(string language, object obj) {
-            return manager[language].engine.GetMemberNames(obj);
+        public IList<string> dir(object obj) {
+            return engine.GetMemberNames(obj);
         }
 
         public IList<string> getItems() {
@@ -78,11 +78,10 @@ namespace Calico {
 	    return full_items;
         }
 
-        public TabCompletion(LanguageManager manager, 
-			     string language, 
+        public TabCompletion(Engine engine, 
 			     Mono.TextEditor.TextEditor shell, 
 			     string text) {
-	    this.manager = manager;
+	    this.engine = engine;
             this.shell = shell;
             tab_position = 0;
 	    if (shell != null) 
@@ -91,22 +90,22 @@ namespace Calico {
             partial = "";
             items = new List<string>();
             if (variable != null) {
-                string [] parts = manager[language].engine.GetVariableParts(variable);
+                string [] parts = engine.GetVariableParts(variable);
                 if (parts.Length == 1) { // Easy, just get the vars that match:
                     string root = parts[0];
                     partial = root;
 		    full_prefix = root;
-                    items = manager[language].engine.GetCompletions(root);
+                    items = engine.GetCompletions(root);
                     // and not hasattr(x, "DeclaringType")]
                 } else {
                     string root = parts[0];
-                    Calico.Variable cvariable = manager[language].engine.TryGetVariable(root);
+                    Calico.Variable cvariable = engine.TryGetVariable(root);
 		    object value = cvariable.value;
 		    prefix = root + ".";
                     if (cvariable.valid) {
                         foreach (string part in ArrayRange(parts, 1, -1)) {
-                            if (hasattr(language, value, part)) {
-                                value = getattr(language, value, part);
+                            if (hasattr(value, part)) {
+                                value = getattr(value, part);
 				prefix += part + ".";
                             } else {
                                 value = null;
@@ -117,7 +116,7 @@ namespace Calico {
                             partial = parts[parts.Length - 1];
 			    full_prefix = prefix + partial;
                             items = new List<string>();
-                            foreach(string x in dir(language, value)) {
+                            foreach(string x in dir(value)) {
                                 if (x.StartsWith(partial) && ! x.StartsWith("_"))
                                     items.Add(x);
                             }
