@@ -264,15 +264,20 @@ public class SimScribbler : Myro.Robot
 		{
 		    double target;
 		    if (units == "deg") {
-			target = (Math.PI / 180.0) * angle; // degrees to rad
+			target = -(Math.PI / 180.0) * angle; // degrees to rad
 		    } else {
-			target = angle; // radians
+			target = -angle; // radians
 		    }
 		    double current_rotation = getRotation(); // convert from degrees
-		    turnTo((int)(standard_range(current_rotation + target) * 180/Math.PI - 360));
+		    _turnTo((int)(standard_range(current_rotation + target) * 180/Math.PI - 360));
 		}
 		
-		public override void turnTo (int angle, string units = "deg")
+		public override void turnTo (int angle, string units = "deg") 
+		{
+		    _turnTo(-angle, units);
+		}
+
+		public void _turnTo (int angle, string units = "deg")
 		{
 		    // uses internal idea of what direction it is pointing to (dead-reckoning)
 		    ManualResetEvent ev = new ManualResetEvent(false);
