@@ -118,6 +118,8 @@ namespace Calico {
         Gtk.Widget _lastSelectedPage = null;
         private bool searchMode; // true: search-only; false: replace
 	public string[] args = null;
+	public System.IO.TextWriter stdout = System.Console.Out;
+	public System.IO.TextWriter stderr = System.Console.Error;
 	public bool toolSwapped {
 	    get {
 		return (bool) config.GetValue("config", "toolSwapped");

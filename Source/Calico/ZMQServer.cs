@@ -103,8 +103,24 @@ public static class ZMQServer {
 	    //this.log = new System.IO.StreamWriter("zmqserver.log");
 	    session_id = System.Guid.NewGuid().ToString();
 	    engine_id = System.Guid.NewGuid().ToString();
-	    string json = File.ReadAllText(filename);
-	    var config = decode(json);
+	    string json;
+	    IDictionary<string,object> config;
+	    if (filename != "") {
+		json = File.ReadAllText(filename);
+		config = decode(json);
+	    } else {
+		config = new Dictionary<string,object> {
+		    {"key", System.Guid.NewGuid().ToString()},
+		    {"signature_scheme", "hmac-sha256"},
+		    {"transport", "tcp"},
+		    {"ip", "127.0.0.1"},
+		    {"hb_port", "0"},
+		    {"shell_port", "0"},
+		    {"iopub_port", "0"},
+		    {"control_port", "0"},
+		    {"stdin_port", "0"},
+		};
+	    }
 	    auth = new Authorization(config["key"].ToString(),
 				     config["signature_scheme"].ToString());
 	    hb_channel = new HeartBeatChannel(this, auth,
@@ -127,6 +143,48 @@ public static class ZMQServer {
 		    config["transport"].ToString(), 
 		    config["ip"].ToString(),
 		    config["stdin_port"].ToString());
+
+	    if (filename == "") {
+		config["hb_port"] = hb_channel.port;
+		config["shell_port"] = shell_channel.port;
+		config["iopub_port"] = iopub_channel.port;
+		config["control_port"] = control_channel.port;
+		config["stdin_port"]  = stdin_channel.port;
+		this.filename = String.Format("kernel-{0}.json", 
+			      System.Diagnostics.Process.GetCurrentProcess().Id);
+		string ipython_config = ("{{\n" +
+					 "  \"hb_port\": {0},\n" +
+					 "  \"shell_port\": {1},\n" +
+					 "  \"iopub_port\": {2},\n" +
+					 "  \"control_port\": {3},\n" +
+					 "  \"stdin_port\": {4},\n" +
+					 "  \"ip\": \"{5}\",\n" +
+					 "  \"signature_scheme\": \"{6}\",\n" +
+					 "  \"key\": \"{7}\",\n" +
+					 "  \"transport\": \"{8}\"\n" +
+					 "}}");
+		ipython_config = String.Format(ipython_config, 
+					       config["hb_port"],
+					       config["shell_port"],
+					       config["iopub_port"],
+					       config["control_port"],
+					       config["stdin_port"],
+					       config["ip"],
+					       config["signature_scheme"],
+					       config["key"],
+					       config["transport"]);
+		string full_path = System.IO.Path.Combine(((string)calico.config.GetValue("ipython", "security")), this.filename);
+		System.IO.StreamWriter sw = new System.IO.StreamWriter(full_path);
+		sw.Write(ipython_config);
+		sw.Close();
+		calico.stdout.WriteLine("IPython config file written to:");
+		calico.stdout.WriteLine("   \"{0}\"", full_path);
+		calico.stdout.WriteLine("To exit, you will have to explicitly quit this process, by either sending");
+		calico.stdout.WriteLine("\"quit\" from a client, or using Ctrl-\\ in UNIX-like environments.");
+		calico.stdout.WriteLine("To read more about this, see https://github.com/ipython/ipython/issues/2049");
+		calico.stdout.WriteLine("To connect another client to this kernel, use:");
+ 		calico.stdout.WriteLine("    --existing {0} --profile calico", this.filename);
+	    }
 	}
 
 	public void start() {
@@ -316,9 +374,32 @@ public static class ZMQServer {
 	    this.port = port;
 	    context = ZmqContext.Create();
 	    socket = context.CreateSocket(socket_type);
-	    socket.Bind(
-		String.Format("{0}://{1}:{2}", 
-			      this.transport, this.address, this.port));
+	    if (port == "0") {
+		Random rand = new Random();
+		int min_port = 49152; 
+		int max_port = 65536;
+		int max_tries = 100;
+		int p = 0;
+		int i;
+		for (i = 0; i < 100; i++) {
+		    p = rand.Next(min_port, max_port);
+		    string addr = String.Format("{0}://{1}:{2}", 
+						this.transport, this.address, p);
+		    try {
+			socket.Bind(addr);
+		    } catch {
+			continue;
+		    }
+		    break;
+		}
+		if (i == 100) {
+		    throw new Exception("Exhausted tries looking for random port");
+		}
+		this.port = "" + p;
+	    } else {
+		socket.Bind(String.Format("{0}://{1}:{2}", 
+			       this.transport, this.address, this.port));
+	    }
 	    thread = new Thread (new ThreadStart (loop));
 	}
 		   
@@ -728,6 +809,7 @@ public static class ZMQServer {
 
     public static void Start(Calico.MainWindow calico, string config_file) {
 	session = new Session(calico, config_file);
+	config_file = session.filename;
 	session.start();
 	while (true) {
 	    if (session.need_restart) {

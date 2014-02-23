@@ -372,8 +372,10 @@ namespace Calico {
 			string [] parts = arg.Split('=');
 			CurrentLanguage = parts[1];
 		    } else if (arg == "--server") {
-			config_file = args[i + 1];
-			i++;
+			if (i + 1 < args.Length && !args[i + 1].StartsWith("--")) {
+			    config_file = args[i + 1];
+			    i++;
+			}
 		    }
 		} else {
                     CurrentLanguage = manager.GetLanguageFromExtension(arg);
