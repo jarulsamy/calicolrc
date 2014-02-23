@@ -40,6 +40,7 @@ namespace Calico {
 			     int gui_thread_id):
         base() {
 	    MainWindow.gui_thread_id = gui_thread_id;
+            _mainWindow = this;
 	    this.args = args;
             this.config = config;
             this.Debug = Debug;
@@ -293,6 +294,7 @@ namespace Calico {
         public CalicoConsoleNoGUI(string[] args, LanguageManager manager, bool Debug, Config config, bool startREPL,
 				  int gui_thread_id){
 	    MainWindow.gui_thread_id = gui_thread_id;
+            _mainWindow = this;
 	    this.args = args;
             this.config = config;
             this.Debug = Debug;
@@ -346,6 +348,7 @@ namespace Calico {
         public CalicoServer (string[] args, LanguageManager manager, bool Debug, Config config,
 			     int gui_thread_id) {
 	    MainWindow.gui_thread_id = gui_thread_id;
+            _mainWindow = this;
 	    this.serverMode = true;
 	    this.args = args;
             this.config = config;
