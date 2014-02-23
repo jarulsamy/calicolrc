@@ -105,7 +105,9 @@ public class CalicoFSharpEngine : Engine
     }
 
     public override bool Execute(string code) {
-        try
+        Evaluate(code);
+        /*
+            try
         { 
             loadAssemblies();
             var value = fsiSession.EvalExpression(code);
@@ -120,9 +122,8 @@ public class CalicoFSharpEngine : Engine
             Console.Error.WriteLine(sbErr);
             sbOut.Clear();
             sbErr.Clear();
-        }
+            }*/
         return false;
-
     }
 	
     public override bool ExecuteFile(string filename) {
