@@ -80,6 +80,8 @@ public class CalicoFSharpEngine : Engine
 
     
     public override object Evaluate(string code) {      
+        bool shouldReturn = false;
+
         try
         {
             loadAssemblies();
@@ -96,16 +98,38 @@ public class CalicoFSharpEngine : Engine
             //Console.Error.WriteLine(e.Message);
             //Console.Error.WriteLine(e.InnerException);
         }finally{
-            Console.Write(sbOut);
+            shouldReturn = sbOut.ToString().Contains("val it :");
+            if (!shouldReturn) Console.Write(sbOut);
             Console.Error.Write(sbErr);
             sbOut.Clear();
             sbErr.Clear();
         }
+        
+        if (shouldReturn)
+        {
+            try
+            { 
+                var value = fsiSession.EvalExpression("it");
+                if (FSharpOption<Shell.FsiValue>.get_IsSome(value)) 
+                {
+                    return (value.Value.ReflectionValue);
+                }
+            }catch (Exception e) {
+                //Console.Error.WriteLine(e.Message);
+                //Console.Error.WriteLine(e.InnerException);
+            }finally{
+                //Console.Write(sbOut);
+                //Console.Error.Write(sbErr);
+                sbOut.Clear();
+                sbErr.Clear();
+            }
+        }
         return null;
     }
-
+    
     public override bool Execute(string code) {
-        Evaluate(code);
+        object v = Evaluate(code);
+        Console.WriteLine(v);
         /*
             try
         { 
