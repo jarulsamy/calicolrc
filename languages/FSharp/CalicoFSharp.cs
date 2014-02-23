@@ -1,8 +1,9 @@
 //
-//  CalicoScheme.cs
+//  CalicoFSharp.cs
 //  
 //  Author:
 //       Douglas S. Blank <dblank@cs.brynmawr.edu>
+//       Keith O'Hara <kohara@bard.edu>
 // 
 //  Copyright (c) 2011 The Calico Project
 // 
@@ -23,171 +24,131 @@
 
 using System;
 using System.IO;
+using System.Reflection;
 using System.Diagnostics;
 using System.Threading;
 using System.Collections.Generic;
 using Calico;
+using System.CodeDom.Compiler;
+using System.Text;
+using Microsoft.FSharp.Compiler.CodeDom;
 
 public class CalicoFSharpEngine : Engine
 {
-     public Process process;
-
-	 public CalicoFSharpEngine (LanguageManager manager) : base(manager)
-	 {
-	   string path = make_path("");
-	   string gtk = make_path("gtk-sharp");
-	   string gdk = make_path("gdk-sharp");
-	   string glib = make_path("glib-sharp");
-	   string atk = make_path("atk-sharp");
-	   string gtk_dotnet = make_path("gtk-dotnet");
-	   string fsi = combine(path, "fsi.exe");
-	   ProcessStartInfo startInfo = new ProcessStartInfo();
-	   // FIXME: on windows, run directly; on others need mono in path
-	   string arguments = "";
-	   if (System.Environment.OSVersion.Platform.ToString().Contains("Win")) {
-	     startInfo.FileName = fsi;
-	   } else {
-	     startInfo.FileName = "mono";
-	     arguments = "\"" + fsi + "\" ";
-	   }
-	   startInfo.Arguments = (
-				  arguments + 
-				  "--readline- " + 
-				  "--lib:\"" + combine(path, "..", "..", "modules") +"\" " +
-				  "--lib:\"" + combine(path, "..", "..", "bin") + "\" " +
-				  "--lib:\"" + gtk + "\" " +
-				  "--lib:\"" + gdk + "\" " +
-				  "--lib:\"" + glib + "\" " +
-				  "--lib:\"" + atk + "\" " +
-				  "--lib:\"" + gtk_dotnet + "\" " +
-				  "-r:atk-sharp.dll " +
-				  "-r:gdk-sharp.dll " +
-				  "-r:glib-sharp.dll " +
-				  "-r:gtk-sharp.dll " +
-				  "-r:gtk-dotnet.dll " +
-				  "-r:Mono.Cairo.dll " +
-				  "-r:IronPython.dll " +
-				  "-r:Microsoft.Dynamic.dll " +
-				  "-r:System.Drawing.dll " +
-
-				  "-r:Calico.exe " +
-				  "-r:JigsawAttributes.dll " +
-				  "-r:SQL.dll " +
-				  "-r:Kinect.dll " +
-				  "-r:Rhyduino.dll " +
-				  "-r:Graphviz4Net.dll " +
-				  "-r:Common.dll " +
-				  "-r:Math.dll " +
-				  "-r:Reflection.dll " +
-				  "-r:SdlDotNet.dll " +
-				  "-r:crypto.dll " +
-				  "-r:MathNet.Iridium.dll " +
-				  "-r:Csv.dll " +
-				  "-r:FarseerPhysics.dll " +
-				  "-r:Myro.dll " +
-				  "-r:Processing.dll " +
-				  "-r:Florence.GtkSharp.dll " +
-				  "-r:Florence.dll " +
-				  "-r:Games.dll " +
-				  "-r:Graphics.dll " +
-				  "-r:Shapes.dll " +
-				  "-r:Sprites.dll "
-				  );
-	   startInfo.UseShellExecute = false;
-	   startInfo.RedirectStandardError = true;
-	   startInfo.CreateNoWindow = true;
-	   startInfo.RedirectStandardOutput = true;
-	   startInfo.RedirectStandardInput = true;
-
-	   //System.Console.WriteLine(startInfo.FileName);
-	   //System.Console.WriteLine(startInfo.Arguments);
-
-	   
-	   process = Process.Start(startInfo);
-	   process.EnableRaisingEvents = true;
-	   process.OutputDataReceived += new DataReceivedEventHandler(outputHandler);
-	   process.ErrorDataReceived += new DataReceivedEventHandler(errorHandler);
-	   process.BeginOutputReadLine();
-	   process.BeginErrorReadLine();
+    FSharpCodeProvider compiler; 
+    System.CodeDom.Compiler.CompilerParameters cp;
+	 public CalicoFSharpEngine (LanguageManager manager) : base(manager)    
+     {
+         int x = CalicoFSharpMod.testvaluez;
      }
 
-     public static string combine(params string [] items) {
-       string retval = "";
-       foreach (string item in items) {
-	 if (retval == "")
-	   retval = item;
-	 else
-	   retval = System.IO.Path.Combine(retval, item);
-       }
-       return retval;
+    public static string combine(params string [] items) {
+        string retval = "";
+        foreach (string item in items) {
+            if (retval == "")
+                retval = item;
+            else
+                retval = System.IO.Path.Combine(retval, item);
+        }
+        return retval;
      }
 	 
-     public static string make_path(string assembly) {
-	   string retval = "";
-	   if (assembly == "") {
-		 retval = System.IO.Path.GetDirectoryName(
-			 System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).Substring(5);
-	   } else {
-		 retval = System.IO.Path.GetDirectoryName(
-             System.Reflection.Assembly.LoadWithPartialName(assembly).CodeBase).Substring(5);
-	   }
-	   if (retval.StartsWith("\\")) {
-		 retval = retval.Substring(1);
-	   }
-	   return retval;
-     }
-	 
-	 public override bool Execute(string text) {
-	   process.StandardInput.WriteLine(text);
-	   return true;
+	 public override object Evaluate(string code) {
+         return Execute(code);
+     }	 
+
+	 public override bool Execute(string code) {
+
+         compiler = new FSharpCodeProvider();
+         cp = new System.CodeDom.Compiler.CompilerParameters();
+          
+         foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()){
+             try{
+                 cp.ReferencedAssemblies.Add(assembly.Location);                 
+                 //System.Console.WriteLine(assembly);
+             }catch (Exception e){
+                 //System.Console.WriteLine(e);
+                 //System.Console.WriteLine(assembly);
+             }
+         }
+         
+         cp.GenerateInMemory = false;
+         string filename = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".exe";
+         cp.OutputAssembly = filename;
+         cp.WarningLevel = 4;
+         cp.GenerateExecutable = true;
+         cp.TreatWarningsAsErrors = false;    
+
+         var cr = compiler.CompileAssemblyFromSource(cp, "module CalicoFSharpMod\nopen CalicoFSharpMod\n" + code);
+         //var cr = compiler.CompileAssemblyFromSource(cp, code + " |> System.Console.WriteLine");
+         foreach (object s in cr.Output){            
+             System.Console.WriteLine(s);
+         }
+         foreach (object s in cr.Errors){            
+             System.Console.Error.WriteLine(s);             
+         }
+         try{             
+             cr.CompiledAssembly.EntryPoint.Invoke(null, null);
+         }catch{
+         }
+         return true;
 	 }
 	 
      public override void Close() {
-	   if (process != null) {
-		 //process.StandardInput.Close();
-		 try {
-		   process.Kill();
-		 } catch {
-		   // not running, can't kill
-		 }
-	   }
      }
-	 
-     private static void outputHandler(object sendingProcess,
-		 DataReceivedEventArgs outLine) {
-	   if (!String.IsNullOrEmpty(outLine.Data)) {
-		 System.Console.WriteLine(outLine.Data);
-	   }
-     }
-	 
-     private static void errorHandler(object sendingProcess,
-		 DataReceivedEventArgs outLine) {
-	   if (!String.IsNullOrEmpty(outLine.Data)) {
-		 System.Console.Error.WriteLine(outLine.Data);
-	   }
-     }
-	 
+	 	 
 	 public override void PostSetup(MainWindow calico) {
 	   base.PostSetup(calico);
 	 }
 	 
-	 public override bool ExecuteFile(string filename) {
-	   Execute(String.Format("#load \"{0}\";;", filename));
-	   return true;
-	 }
-	 
-	 public override bool ReadyToExecute(string text) {
-	   string [] lines = text.Split('\n');
-	   int last = lines.Length - 1;
-	   if (lines[last].Trim() == "") {
-		 return true;
-	   } else if (lines[last].StartsWith(" ")) {
-		 return false;
-	   } else if (! lines[last].Trim().EndsWith(";;")) {
-		 return false;
-	   }
-	   return true;
-	 }
+    public override bool ExecuteFile(string filename) {
+        StringBuilder sb = new StringBuilder();
+        String line;
+        using (StreamReader sr = new StreamReader(filename))
+        {            
+            while ((line = sr.ReadLine()) != null) sb.AppendLine(line);           
+        }
+
+        compiler = new FSharpCodeProvider();
+        cp = new System.CodeDom.Compiler.CompilerParameters();
+        
+        foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()){
+            try{
+                cp.ReferencedAssemblies.Add(assembly.Location);                 
+                //System.Console.WriteLine(assembly);
+            }catch (Exception e){
+                //System.Console.WriteLine(e);
+                //System.Console.WriteLine(assembly);
+            }
+        }
+        
+        cp.GenerateInMemory = false;
+        string filenamez = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".exe";
+        cp.OutputAssembly = filenamez;
+        cp.WarningLevel = 4;
+        cp.GenerateExecutable = true;
+        cp.TreatWarningsAsErrors = false;    
+        
+        
+        var cr = compiler.CompileAssemblyFromSource(cp, "module CalicoFSharpMod\nopen CalicoFSharpMod\n" + sb.ToString());
+        //var cr = compiler.CompileAssemblyFromSource(cp, code + " |> System.Console.WriteLine");
+        foreach (object s in cr.Output){            
+            System.Console.WriteLine(s);
+        }
+        foreach (object s in cr.Errors){            
+            System.Console.WriteLine(s);             
+        }
+        try{             
+            cr.CompiledAssembly.EntryPoint.Invoke(null, null);
+        }catch{
+        }
+        return true;
+    }
+    
+	
+    public override bool ReadyToExecute(string text) {
+        return true;
+    }
 }
 
 public class CalicoFSharpDocument : TextDocument {
