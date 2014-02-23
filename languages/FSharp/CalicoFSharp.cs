@@ -29,123 +29,101 @@ using System.Diagnostics;
 using System.Threading;
 using System.Collections.Generic;
 using Calico;
-using System.CodeDom.Compiler;
 using System.Text;
-using Microsoft.FSharp.Compiler.CodeDom;
+using Microsoft.FSharp.Compiler;
+using Microsoft.FSharp.Compiler.Interactive;
+using Microsoft.FSharp.Core;
 
 public class CalicoFSharpEngine : Engine
 {
-    FSharpCodeProvider compiler; 
-    System.CodeDom.Compiler.CompilerParameters cp;
-	 public CalicoFSharpEngine (LanguageManager manager) : base(manager)    
-     {
-         int x = CalicoFSharpMod.testvaluez;
-     }
-
-    public static string combine(params string [] items) {
-        string retval = "";
-        foreach (string item in items) {
-            if (retval == "")
-                retval = item;
-            else
-                retval = System.IO.Path.Combine(retval, item);
-        }
-        return retval;
-     }
-	 
-	 public override object Evaluate(string code) {
-         return Execute(code);
-     }	 
-
-	 public override bool Execute(string code) {
-
-         compiler = new FSharpCodeProvider();
-         cp = new System.CodeDom.Compiler.CompilerParameters();
-          
-         foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()){
-             try{
-                 cp.ReferencedAssemblies.Add(assembly.Location);                 
-                 //System.Console.WriteLine(assembly);
-             }catch (Exception e){
-                 //System.Console.WriteLine(e);
-                 //System.Console.WriteLine(assembly);
-             }
-         }
-         
-         cp.GenerateInMemory = false;
-         string filename = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".exe";
-         cp.OutputAssembly = filename;
-         cp.WarningLevel = 4;
-         cp.GenerateExecutable = true;
-         cp.TreatWarningsAsErrors = false;    
-
-         var cr = compiler.CompileAssemblyFromSource(cp, "module CalicoFSharpMod\nopen CalicoFSharpMod\n" + code);
-         //var cr = compiler.CompileAssemblyFromSource(cp, code + " |> System.Console.WriteLine");
-         foreach (object s in cr.Output){            
-             System.Console.WriteLine(s);
-         }
-         foreach (object s in cr.Errors){            
-             System.Console.Error.WriteLine(s);             
-         }
-         try{             
-             cr.CompiledAssembly.EntryPoint.Invoke(null, null);
-         }catch{
-         }
-         return true;
-	 }
-	 
-     public override void Close() {
-     }
-	 	 
-	 public override void PostSetup(MainWindow calico) {
-	   base.PostSetup(calico);
-	 }
-	 
-    public override bool ExecuteFile(string filename) {
-        StringBuilder sb = new StringBuilder();
-        String line;
-        using (StreamReader sr = new StreamReader(filename))
-        {            
-            while ((line = sr.ReadLine()) != null) sb.AppendLine(line);           
-        }
-
-        compiler = new FSharpCodeProvider();
-        cp = new System.CodeDom.Compiler.CompilerParameters();
+    Shell.FsiEvaluationSession fsiSession;
+    StringBuilder sbOut = new StringBuilder();
+    StringBuilder sbErr = new StringBuilder();
+    
+    public CalicoFSharpEngine (LanguageManager manager) : base(manager)    
+    {
+        var inStream = new StringReader("");
+        var outStream = new StringWriter(sbOut);
+        var errStream = new StringWriter(sbErr);
+            
+        // Build command line arguments & start FSI session
+        string[] allArgs = { "--noninteractive", "--lib:/Users/keithohara/calico/modules"};
         
-        foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()){
-            try{
-                cp.ReferencedAssemblies.Add(assembly.Location);                 
-                //System.Console.WriteLine(assembly);
-            }catch (Exception e){
-                //System.Console.WriteLine(e);
-                //System.Console.WriteLine(assembly);
-            }
-        }
+        var fsiConfig = Shell.FsiEvaluationSession.GetDefaultConfiguration();
+        fsiSession = new Shell.FsiEvaluationSession(fsiConfig, allArgs, inStream, 
+                                                    outStream,
+                                                    errStream);
         
-        cp.GenerateInMemory = false;
-        string filenamez = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".exe";
-        cp.OutputAssembly = filenamez;
-        cp.WarningLevel = 4;
-        cp.GenerateExecutable = true;
-        cp.TreatWarningsAsErrors = false;    
-        
-        
-        var cr = compiler.CompileAssemblyFromSource(cp, "module CalicoFSharpMod\nopen CalicoFSharpMod\n" + sb.ToString());
-        //var cr = compiler.CompileAssemblyFromSource(cp, code + " |> System.Console.WriteLine");
-        foreach (object s in cr.Output){            
-            System.Console.WriteLine(s);
-        }
-        foreach (object s in cr.Errors){            
-            System.Console.WriteLine(s);             
-        }
-        try{             
-            cr.CompiledAssembly.EntryPoint.Invoke(null, null);
-        }catch{
-        }
-        return true;
     }
     
+    public override object Evaluate(string code) {
+        try
+        {
+            var results = fsiSession.ParseAndCheckInteraction(code);
+            //Console.WriteLine(results.Item2.Errors);
+            //var value = fsiSession.EvalExpression(code);
+            fsiSession.EvalInteraction(code);
+            //return value.Value.ReflectionValue;
+            
+            /*let  errors3, exitCode3, dynAssembly3 = 
+              scs.CompileToDynamicAssembly([| "-o"; fn3; "-a"; fn2 |], Some(stdout,stderr))*/
+            
+        }catch (Exception e) {
+            //Console.Error.WriteLine(e.Message);
+            //Console.Error.WriteLine(e.InnerException);
+        }finally{
+            Console.WriteLine(sbOut);
+            Console.Error.WriteLine(sbErr);
+            sbOut.Clear();
+            sbErr.Clear();
+        }
+        return null;
+    }
+
+    public override bool Execute(string code) {
+        try
+        {
+            var value = fsiSession.EvalExpression(code);
+            if (FSharpOption<Shell.FsiValue>.get_IsSome(value)) 
+                System.Console.WriteLine(value.Value.ReflectionValue);
+            return true;
+        }catch (Exception e) {
+            //Console.Error.WriteLine(e.Message);
+            //Console.Error.WriteLine(e.InnerException);
+        }finally{
+            Console.WriteLine(sbOut);
+            Console.Error.WriteLine(sbErr);
+            sbOut.Clear();
+            sbErr.Clear();
+        }
+        return false;
+
+    }
+	 
+    public override void Close() {
+     }
+    
+    public override void PostSetup(MainWindow calico) {
+        base.PostSetup(calico);
+	 }
 	
+    public override bool ExecuteFile(string filename) {
+        try
+        {
+            fsiSession.EvalScript(filename);
+            return true;
+        }catch (Exception e) {
+            //Console.Error.WriteLine(e.Message);
+            //Console.Error.WriteLine(e.InnerException);
+        }finally{
+            Console.WriteLine(sbOut);
+            Console.Error.WriteLine(sbErr);
+            sbOut.Clear();
+            sbErr.Clear();
+        }
+        return false;
+    }
+    	
     public override bool ReadyToExecute(string text) {
         return true;
     }
