@@ -90,6 +90,25 @@ namespace Calico {
 	    }
 	}
 	
+	public static string GetIPythonPath() {
+	    Process proc = new Process {
+		    StartInfo = new ProcessStartInfo {
+			    FileName = "ipython",
+				Arguments = "locate",
+				UseShellExecute = false,
+				RedirectStandardOutput = true,
+				CreateNoWindow = true
+				}
+		};
+	    proc.Start();
+	    string ipython_path = "";
+	    while (!proc.StandardOutput.EndOfStream) {
+		ipython_path = proc.StandardOutput.ReadLine();
+	    }
+	    return ipython_path;
+	}
+
+
         [STAThread]
         public static void Main(string[] args) {
             System.Console.WriteLine(_("Loading Calico version {0}..."), Version);
@@ -133,21 +152,8 @@ namespace Calico {
 		    };
 		proc.Start();
 		// Next, get destination:
-		proc = new Process {
-			StartInfo = new ProcessStartInfo {
-				FileName = "ipython",
-				    Arguments = "locate",
-				    UseShellExecute = false,
-				    RedirectStandardOutput = true,
-				    CreateNoWindow = true
-				    }
-		    };
-		proc.Start();
-		string ipython_path = "";
-		while (!proc.StandardOutput.EndOfStream) {
-		    ipython_path = proc.StandardOutput.ReadLine();
-		}
-		ipython_path = System.IO.Path.Combine(ipython_path, "profile_calico");
+		string ipython_base = GetIPythonPath();
+		string ipython_path = System.IO.Path.Combine(ipython_base, "profile_calico");
 		// Now, copy recursively:
 		DirectoryCopy(System.IO.Path.Combine(path, "..", "notebooks", "profile"), ipython_path, true);
 		// Now, put the top level ipython_config.py
@@ -362,6 +368,8 @@ namespace Calico {
                             signal_thread.Start();
 			}
 			///-----------------------
+			string ipython_base = GetIPythonPath();
+			config.SetValue("ipython", "security", "string", System.IO.Path.Combine(ipython_base, "profile_calico", "security"));
 			System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
 				win = new CalicoServer(args, manager, Debug, config, Thread.CurrentThread.ManagedThreadId); 
 				win.Start();
@@ -395,6 +403,8 @@ namespace Calico {
                             signal_thread.Start();
 			}
 			///-----------------------
+			string ipython_base = GetIPythonPath();
+			config.SetValue("ipython", "security", "string", System.IO.Path.Combine(ipython_base, "profile_calico", "security"));
 			win = new CalicoServer(args, manager, Debug, config, -1);
 			win.Start();
 		    } else {
@@ -475,7 +485,7 @@ namespace Calico {
             Print(_("  StartCalico --debug-handler    Calico will not catch system errors"));
             Print(_("  StartCalico --reset            Resets config settings to factory defaults"));
             Print(_("  StartCalico --create-profile   Create a Calico profile for IPython"));
-            Print(_("  StartCalico --server FILENAME  Used as a backend language kernel for IPython"));
+            Print(_("  StartCalico --server [FILE]    Used as a backend language kernel for IPython"));
             Print(_("  StartCalico --help             Displays this message"));
             Print("");
         }
