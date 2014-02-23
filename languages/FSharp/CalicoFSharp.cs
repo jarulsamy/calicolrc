@@ -39,7 +39,8 @@ public class CalicoFSharpEngine : Engine
     Shell.FsiEvaluationSession fsiSession;
     StringBuilder sbOut = new StringBuilder();
     StringBuilder sbErr = new StringBuilder();
-    
+    Boolean firstEval = true;
+
     public CalicoFSharpEngine (LanguageManager manager) : base(manager)    
     {
         var inStream = new StringReader("");
@@ -47,17 +48,41 @@ public class CalicoFSharpEngine : Engine
         var errStream = new StringWriter(sbErr);
             
         // Build command line arguments & start FSI session
-        string[] allArgs = { "--noninteractive"}; //"--lib:/Users/keithohara/calico/modules"};
+        string[] allArgs = { "--noninteractive", "--lib:modules/"};
         
         var fsiConfig = Shell.FsiEvaluationSession.GetDefaultConfiguration();
         fsiSession = new Shell.FsiEvaluationSession(fsiConfig, allArgs, inStream, 
                                                     outStream, errStream);
-       
     }
+    
+    // Like for this to occur in PostSetup but that doesnt' seem to be the right thing either
+    private void loadAssemblies()
+    {
+        if (firstEval)
+        {
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()){
+                try{
+                    if (assembly.Location != "")   
+                        fsiSession.EvalInteraction("#r \"" + assembly.Location.Replace(".dll.dll", ".dll") + "\";;");
+                    //Console.WriteLine("#r \"" + assembly.Location.Replace(".dll.dll", ".dll") + "\";;");
+                }catch {
+                    //System.Console.WriteLine(e);
+                    //System.Console.WriteLine(assembly);
+                }
+            }                
+            firstEval = false;
+            //Console.WriteLine(sbOut);
+            //Console.Error.WriteLine(sbErr);
+            sbOut.Clear();
+            sbErr.Clear();
+        }
+    }   
+
     
     public override object Evaluate(string code) {      
         try
         {
+            loadAssemblies();
             var results = fsiSession.ParseAndCheckInteraction(code);
             //Console.WriteLine(results.Item2.Errors);
             //var value = fsiSession.EvalExpression(code);
@@ -81,7 +106,8 @@ public class CalicoFSharpEngine : Engine
 
     public override bool Execute(string code) {
         try
-        {
+        { 
+            loadAssemblies();
             var value = fsiSession.EvalExpression(code);
             if (FSharpOption<Shell.FsiValue>.get_IsSome(value)) 
                 System.Console.WriteLine(value.Value.ReflectionValue);
@@ -98,29 +124,11 @@ public class CalicoFSharpEngine : Engine
         return false;
 
     }
-	 
-    public override void Close() {
-     }
-    
-    public override void PostSetup(MainWindow calico) {
-        base.PostSetup(calico);
-        System.Console.WriteLine("Post Setup");
-        foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()){
-            try{
-                if (assembly.Location != "")   
-                    Evaluate("#r \"" + assembly.Location + "\";;");
-                System.Console.WriteLine("#r " + assembly.Location);
-            }catch {
-                //System.Console.WriteLine(e);
-                //System.Console.WriteLine(assembly);
-             }
-         }
-
-	 }
 	
     public override bool ExecuteFile(string filename) {
         try
         {
+            loadAssemblies();
             fsiSession.EvalScript(filename);
             return true;
         }catch (Exception e) {
@@ -134,6 +142,14 @@ public class CalicoFSharpEngine : Engine
         }
         return false;
     }
+
+	 
+    public override void Close() {
+     }
+    
+    public override void PostSetup(MainWindow calico) {
+        base.PostSetup(calico);
+	 }
     	
     public override bool ReadyToExecute(string text) {
         return true;
