@@ -554,7 +554,7 @@ public static class ZMQServer {
 		// content: {"text":"","line":"x.he","block":null,"cursor_pos":4}']
 		string to_match = m_content["line"].ToString();
 		// ask language to complete to_match
-		var tc = new TabCompletion(session.calico.manager, session.calico.CurrentLanguage, null, to_match);
+		var tc = session.calico.GetTabCompletion(to_match);
 		// return:
 		var header = session.Header("complete_reply");
 		var meta = new Dictionary<string, object>();

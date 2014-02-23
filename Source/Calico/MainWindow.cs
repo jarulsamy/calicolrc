@@ -2390,7 +2390,7 @@ del _invoke, _
                 string text = line.Substring(0, ShellEditor.Caret.Column - 1);
                 if (text.Trim() != "") { // something there!
                     if (completion == null) {
-                        completion = new TabCompletion(manager, CurrentLanguage, ShellEditor, text);
+                        completion = GetTabCompletion(text, ShellEditor);
                         if (completion.items != null) { // first time:
                             Print(completion.format());
                         }
@@ -4872,6 +4872,15 @@ del _invoke, _
 	    // Given an object name, get help on it from the current
 	    // language, environment:
 	    return manager[CurrentLanguage].engine.GetHelp(oname);
+	}
+
+	public TabCompletion GetTabCompletion(string to_match) {
+	    return manager[CurrentLanguage].engine.GetTabCompletion(to_match);
+	}
+
+	public TabCompletion GetTabCompletion(string to_match, 
+					      Mono.TextEditor.TextEditor shell) {
+	    return manager[CurrentLanguage].engine.GetTabCompletion(to_match, shell);
 	}
 
 	public int GetGuiThreadID() {
