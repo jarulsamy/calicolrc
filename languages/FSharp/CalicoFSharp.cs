@@ -69,7 +69,13 @@ public class CalicoFSharpEngine : Engine
                     //System.Console.WriteLine(e);
                     //System.Console.WriteLine(assembly);
                 }
-            }                
+            }
+            try
+            {
+                fsiSession.EvalInteraction("let calico = Calico.MainWindow._mainWindow;;");               
+            }
+            catch{                
+            }
             firstEval = false;
             //Console.WriteLine(sbOut);
             //Console.Error.WriteLine(sbErr);
