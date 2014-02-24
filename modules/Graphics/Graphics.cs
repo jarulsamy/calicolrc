@@ -704,8 +704,8 @@ public static class Graphics
 			  if (!(_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized))) {
 				_windows [title] = new Graphics.WindowClass (title, width, height);
 			  } else {
-				_windows [title].reset(false);
-				_windows [title].Resize(width, height);
+			      _windows [title].reset(false);
+			      _windows [title].Resize(width, height);
 			  }
 			  _lastWindow = _windows [title];
 			  _lastWindow.KeepAbove = true;
@@ -1381,9 +1381,10 @@ public static class Graphics
 		public void reset (bool redraw)
 		{
 		    Invoke (delegate {
+			    /* bad, causes lock up in IPython... don't know why
 			    _canvas.surface = new Cairo.ImageSurface (Cairo.Format.Argb32, width, height);
 			    _canvas.need_to_draw_surface = false;
-			    
+			    */
 			    mode = "auto";
 			    //Resize (width, height); // removed because of scrollbar issue
 			    timer_running = false;
@@ -1394,6 +1395,7 @@ public static class Graphics
 			    onMouseUpCallbacks = new List ();
 			    onKeyPressCallbacks = new List ();
 			    onKeyReleaseCallbacks = new List ();
+			    
 			    // clear listeners:
 			    clearListeners();
 			    _lastKey = "";
@@ -1413,7 +1415,7 @@ public static class Graphics
 				QueueDraw();
 			});
 		}
-		
+
 		public Gtk.ScrolledWindow ScrolledWindow {
 			get { return _scrolledWindow; }
 		}
