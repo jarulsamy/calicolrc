@@ -2481,11 +2481,15 @@ del _invoke, _
         }
 
         public bool Execute(string text, string language) {
-            return manager [language].engine.Execute(text, false);
+	    if (manager[language].engine != null) {
+		return manager [language].engine.Execute(text, false);
+	    } else {
+		return false;
+	    }
 	}
 
         public void Execute(string text) {
-	    if (CurrentLanguage == null)
+	    if (CurrentLanguage == null || manager[CurrentLanguage].engine == null)
 		return;
 	    manager [CurrentLanguage].engine.Execute(text);
         }
@@ -2513,15 +2517,19 @@ del _invoke, _
         }
 
         public object Evaluate(string text, string language) {
+	    if (manager[language].engine == null)
+		return null;
             return manager [language].engine.Evaluate(text);
         }
 
         public object Evaluate(string text) {
+	    if (CurrentLanguage == null || manager[CurrentLanguage].engine == null)
+		return null;
             return manager [CurrentLanguage].engine.Evaluate(text);
         }
 
         public void ExecuteInBackground(string text) {
-	    if (CurrentLanguage == null)
+	    if (CurrentLanguage == null || manager[CurrentLanguage].engine == null)
 		return;
             // This is the only approved method of running code
             executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
@@ -2608,6 +2616,8 @@ del _invoke, _
 
         public void ExecuteFile(string filename) {
             string language = manager.GetLanguageFromExtension(filename);
+	    if (manager[language].engine == null)
+		return;
 	    manager [language].engine.ExecuteFile(filename); 
 	}
 
@@ -3008,6 +3018,8 @@ del _invoke, _
         }
 
         public virtual void trace_off() {
+	    if (CurrentLanguage == null || manager[CurrentLanguage].engine == null)
+		return;
             manager [CurrentLanguage].engine.SetTraceOff();
         }
 
@@ -4873,16 +4885,28 @@ del _invoke, _
 	public IDictionary<string,object> GetHelp(string oname) {
 	    // Given an object name, get help on it from the current
 	    // language, environment:
-	    return manager[CurrentLanguage].engine.GetHelp(oname);
+	    if (CurrentLanguage != null && manager[CurrentLanguage].engine != null) {
+		return manager[CurrentLanguage].engine.GetHelp(oname);
+	    } else {
+		return manager["python"].engine.GetHelp(oname);
+	    }
 	}
 
 	public TabCompletion GetTabCompletion(string to_match) {
-	    return manager[CurrentLanguage].engine.GetTabCompletion(to_match);
+	    if (CurrentLanguage != null && manager[CurrentLanguage].engine != null) {
+		return manager[CurrentLanguage].engine.GetTabCompletion(to_match);
+	    } else {
+		return manager["python"].engine.GetTabCompletion(to_match);
+	    }
 	}
 
 	public TabCompletion GetTabCompletion(string to_match, 
 					      Mono.TextEditor.TextEditor shell) {
-	    return manager[CurrentLanguage].engine.GetTabCompletion(to_match, shell);
+	    if (CurrentLanguage != null && manager[CurrentLanguage].engine != null) {
+		return manager[CurrentLanguage].engine.GetTabCompletion(to_match, shell);
+	    } else {
+		return manager["python"].engine.GetTabCompletion(to_match, shell);
+	    }
 	}
 
 	public int GetGuiThreadID() {
