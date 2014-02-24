@@ -48,18 +48,11 @@ public class CalicoFSharpEngine : Engine
         var errStream = new StringWriter(sbErr);
             
         // Build command line arguments & start FSI session
-        string[] allArgs = { "--noninteractive", "--lib:/Users/keithohara/calico/modules/", "--lib:/Users/keithohara/calico/bin/"};
+        string[] allArgs = { "--noninteractive"};
         
         var fsiConfig = Shell.FsiEvaluationSession.GetDefaultConfiguration();
         fsiSession = new Shell.FsiEvaluationSession(fsiConfig, allArgs, inStream, 
                                                     outStream, errStream);
-
-        try
-        {
-            fsiSession.EvalInteraction("printfn \"Calico FSharp\";; 5 + 5;;");
-        }
-        catch{                
-        }
 
         //Console.WriteLine(sbOut);
         //Console.Error.WriteLine(sbErr);
@@ -124,7 +117,7 @@ public class CalicoFSharpEngine : Engine
             }
             firstEval = false;
             //Console.WriteLine(sbOut);
-            Console.Error.WriteLine(sbErr);
+            //Console.Error.WriteLine(sbErr);
             sbOut.Clear();
             sbErr.Clear();
         }
