@@ -48,11 +48,23 @@ public class CalicoFSharpEngine : Engine
         var errStream = new StringWriter(sbErr);
             
         // Build command line arguments & start FSI session
-        string[] allArgs = { "--noninteractive", "--lib:modules/"};
+        string[] allArgs = { "--noninteractive", "--lib:/Users/keithohara/calico/modules/", "--lib:/Users/keithohara/calico/bin/"};
         
         var fsiConfig = Shell.FsiEvaluationSession.GetDefaultConfiguration();
         fsiSession = new Shell.FsiEvaluationSession(fsiConfig, allArgs, inStream, 
                                                     outStream, errStream);
+
+        try
+        {
+            fsiSession.EvalInteraction("printfn \"Calico FSharp\";; 5 + 5;;");
+        }
+        catch{                
+        }
+
+        //Console.WriteLine(sbOut);
+        //Console.Error.WriteLine(sbErr);
+        sbOut.Clear();
+        sbErr.Clear();
     }
     
     // Like for this to occur in PostSetup but that doesnt' seem to be the right thing either
@@ -60,38 +72,73 @@ public class CalicoFSharpEngine : Engine
     {
         if (firstEval)
         {
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()){
-                try{
-                    if (assembly.Location != "")   
-                        fsiSession.EvalInteraction("#r \"" + assembly.Location.Replace(".dll.dll", ".dll") + "\";;");
-                    //Console.WriteLine("#r \"" + assembly.Location.Replace(".dll.dll", ".dll") + "\";;");
-                }catch {
-                    //System.Console.WriteLine(e);
-                    //System.Console.WriteLine(assembly);
+            //fsiSession.EvalInteraction("#I \"/Users/keithohara/calico/modules/\"");
+            StringBuilder assemblyList = new StringBuilder("");
+            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            Array.Reverse(assemblies);
+            foreach (Assembly assemblyName in assemblies)
+            {
+                
+            //foreach (System.Reflection.AssemblyName assemblyName in System.Reflection.Assembly.GetExecutingAssembly().GetReferencedAssemblies()) {
+                try
+                {
+                    string assembly =  assemblyName.Location;                    
+                    if (assembly != "")
+                    {
+                        fsiSession.EvalInteraction("#r \"\"\"" + assembly.Replace(".dll.dll", "") + "\"\"\";;");
+                        //assemblyList.Append("#r \"\"\"" + assembly.Replace(".dll.dll", ".dll") + "\"\"\";;\n");
+                    }
                 }
+                catch
+                {
+                    
+                }
+                finally
+                {
+                    //Console.Out.WriteLine(sbOut);
+                    //Console.Error.WriteLine(sbErr);
+                    sbErr.Clear();
+                    sbOut.Clear();
+                }            
             }
+            
+            //System.Console.WriteLine(assemblyList);
+            try{                
+                fsiSession.EvalInteraction(assemblyList.ToString());
+            }catch(Exception e){                    
+            }
+            finally
+            {
+                //System.Console.WriteLine(e);
+                //Console.Out.WriteLine(sbOut);
+                //Console.Error.WriteLine(sbErr);
+                sbErr.Clear();
+                sbOut.Clear();
+            }
+            
             try
             {
-                fsiSession.EvalInteraction("let calico = Calico.MainWindow._mainWindow;;");               
+                //fsiSession.EvalInteraction("let calico = Calico.MainWindow._mainWindow;;");               
             }
             catch{                
             }
             firstEval = false;
             //Console.WriteLine(sbOut);
-            //Console.Error.WriteLine(sbErr);
+            Console.Error.WriteLine(sbErr);
             sbOut.Clear();
             sbErr.Clear();
         }
-    }   
+    }
+   
 
     
     public override object Evaluate(string code) {      
         bool shouldReturn = false;
+        loadAssemblies();
 
         try
         {
-            loadAssemblies();
-            var results = fsiSession.ParseAndCheckInteraction(code);
+            //var results = fsiSession.ParseAndCheckInteraction(code);
             //Console.WriteLine(results.Item2.Errors);
             //var value = fsiSession.EvalExpression(code);
             fsiSession.EvalInteraction(code);
@@ -157,9 +204,9 @@ public class CalicoFSharpEngine : Engine
     }
 	
     public override bool ExecuteFile(string filename) {
+        loadAssemblies();
         try
         {
-            loadAssemblies();
             fsiSession.EvalScript(filename);
             return true;
         }catch (Exception e) {
