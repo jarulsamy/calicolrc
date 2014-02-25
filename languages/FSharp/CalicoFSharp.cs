@@ -40,6 +40,7 @@ public class CalicoFSharpEngine : Engine
     StringBuilder sbOut = new StringBuilder();
     StringBuilder sbErr = new StringBuilder();
     Boolean finishedLoading = false;
+    object loadingLock;
     
     public CalicoFSharpEngine (LanguageManager manager) : base(manager)    
     {
@@ -53,19 +54,59 @@ public class CalicoFSharpEngine : Engine
         var fsiConfig = Shell.FsiEvaluationSession.GetDefaultConfiguration();
         fsiSession = new Shell.FsiEvaluationSession(fsiConfig, allArgs, inStream, 
                                                     outStream, errStream);
-        
-        Report();
-        finishedLoading = false;
+	loadingLock = new object();
+	lock (loadingLock) {
+	    finishedLoading = false;
+	}
     }
 
     private void Report()
     {
-        Console.Write(sbOut);
-        Console.Error.Write(sbErr);
-        sbOut.Clear();
-        sbErr.Clear();       
+	if (calico != null && calico.Debug) {
+	    Console.Write(sbOut);
+	    Console.Error.Write(sbErr);
+	    sbOut.Clear();
+	    sbErr.Clear();    
+	}   
     }
-    
+
+
+    public IList<Assembly> GetCalicoLibraries() {
+	List<Assembly> assemblies = new List<Assembly>();
+	// First, get system assemblies:
+	foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies()) {
+	    assemblies.Add(assembly);
+	}
+	// Add Calico.exe
+	Assembly calico_assembly = System.Reflection.Assembly.LoadFile(Path.Combine(calico.path, "Calico.exe"));
+	assemblies.Add(calico_assembly);
+	// Now manually get the Calico libraries:
+	string os_specific_dir = null;
+	if (calico.OS == "Windows") {
+	    os_specific_dir = "windows";
+	} else if (calico.OS == "Mac") {
+	    os_specific_dir = "mac";
+	} else {
+	    os_specific_dir = "linux";
+	}
+	foreach (DirectoryInfo dir in new DirectoryInfo[] {new DirectoryInfo(Path.Combine(calico.path, "..", "modules")),
+							   new DirectoryInfo(Path.Combine(calico.path, os_specific_dir)),
+	    }) {
+	    foreach (FileInfo f in dir.GetFiles("*.dll")) {
+		string assembly_name = f.FullName;
+		Assembly assembly = System.Reflection.Assembly.LoadFile(assembly_name);
+		if (assembly != null) {
+		    // if already in, move it to end of line:
+		    if (assemblies.Contains(assembly)) {
+			assemblies.Remove(assembly);
+		    }
+		    assemblies.Add(assembly);
+		}
+	    }
+	}
+	return assemblies;
+    }
+
     private void loadAssemblies()
     {
         string modules_path = Path.Combine(calico.path, "..", "modules");
@@ -75,9 +116,8 @@ public class CalicoFSharpEngine : Engine
             Report();
         }
         fsiSession.EvalInteraction(modules_path);
-        Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+        IList<Assembly> assemblies = GetCalicoLibraries();
         var load_thread = new System.Threading.Thread (delegate () {
-                Array.Reverse(assemblies);
                 foreach (Assembly assemblyName in assemblies) {
                     try {
                         string assembly =  assemblyName.Location;                    
@@ -87,9 +127,6 @@ public class CalicoFSharpEngine : Engine
                                 Console.WriteLine(assembly_path);
                             }
                             fsiSession.EvalInteraction(assembly_path);
-                            if (calico.Debug) {
-                                Report();
-                            }
                         }
                     } catch {
                         if (calico.Debug) {
@@ -112,15 +149,19 @@ public class CalicoFSharpEngine : Engine
                 sbOut.Clear();
                 sbErr.Clear();
 
-                finishedLoading = true;
+		lock(loadingLock) {
+		    finishedLoading = true;
+		}
             });
         load_thread.Start();
     }
     
      public override object Evaluate(string code) {      
-         if (! finishedLoading) {
-             return null;
-         }
+	 lock(loadingLock) {
+	     if (! finishedLoading) {
+		 return null;
+	     }
+	 }
          bool shouldReturn = false;
          
          try
@@ -151,9 +192,11 @@ public class CalicoFSharpEngine : Engine
      }
     
     public override bool Execute(string code) {
-        if (! finishedLoading) {
-            return false;
-        }
+	lock(loadingLock) {
+	    if (! finishedLoading) {
+		return false;
+	    }
+	}
         object v = Evaluate(code);
         Console.WriteLine(v);
         /*
@@ -176,9 +219,11 @@ public class CalicoFSharpEngine : Engine
     }
     
     public override bool ExecuteFile(string filename) {
-        if (! finishedLoading) {
-            return false;
-        }
+	lock(loadingLock) {
+	    if (! finishedLoading) {
+		return false;
+	    }
+	}
         try {
             fsiSession.EvalScript(filename);
             return true;
@@ -200,7 +245,9 @@ public class CalicoFSharpEngine : Engine
     }
     
     public override bool ReadyToExecute(string text) {
-        return finishedLoading;
+	lock(loadingLock) {
+	    return finishedLoading;
+	}
     }
 }
 
