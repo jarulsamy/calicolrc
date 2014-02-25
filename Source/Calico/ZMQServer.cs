@@ -381,7 +381,7 @@ public static class ZMQServer {
 		int max_tries = 100;
 		int p = 0;
 		int i;
-		for (i = 0; i < 100; i++) {
+		for (i = 0; i < max_tries; i++) {
 		    p = rand.Next(min_port, max_port);
 		    string addr = String.Format("{0}://{1}:{2}", 
 						this.transport, this.address, p);

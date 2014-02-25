@@ -34,7 +34,7 @@ public static class Widgets {
 
     public class Widget {
 	public string target_name;
-	public Dictionary<string,object> data;
+	public IDictionary<string,object> data;
 	public string comm_id;
 	public System.Func<object,object> on_click_func;
 	public Dictionary<string,Callback> on_value_change_callback = new Dictionary<string,Callback>();
@@ -45,6 +45,13 @@ public static class Widgets {
 	    this.session = session;
 	    target_name = "WidgetModel";
 	    data = new Dictionary<string, object>();
+	    data["_view_name"] = "WidgetView";
+	    data["state"] = new Dictionary<string, object>();
+	    data["_css"] = get_css();
+	    data["disabled"] = false;
+	    data["visible"] = true;
+	    data["description"] = "A generic Widget";
+	    data["method"] = "update";
 	    comm_id = System.Guid.NewGuid().ToString();
 	    // Register this widget:
 	    Widgets.register(this);
