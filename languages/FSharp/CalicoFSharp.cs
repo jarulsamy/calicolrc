@@ -62,14 +62,11 @@ public class CalicoFSharpEngine : Engine
 
     private void Report()
     {
-	if (calico != null && calico.Debug) {
-	    Console.Write(sbOut);
-	    Console.Error.Write(sbErr);
-	    sbOut.Clear();
-	    sbErr.Clear();    
-	}   
+	Console.Write(sbOut);
+	Console.Error.Write(sbErr);
+	sbOut.Clear();
+	sbErr.Clear();    
     }
-
 
     public IList<Assembly> GetCalicoLibraries() {
 	List<Assembly> assemblies = new List<Assembly>();
@@ -199,22 +196,6 @@ public class CalicoFSharpEngine : Engine
 	}
         object v = Evaluate(code);
         Console.WriteLine(v);
-        /*
-          try
-          { 
-          var value = fsiSession.EvalExpression(code);
-          if (FSharpOption<Shell.FsiValue>.get_IsSome(value)) 
-          System.Console.WriteLine(value.Value.ReflectionValue);
-          return true;
-          }catch (Exception e) {
-          //Console.Error.WriteLine(e.Message);
-          //Console.Error.WriteLine(e.InnerException);
-          }finally{
-          Console.WriteLine(sbOut);
-          Console.Error.WriteLine(sbErr);
-          sbOut.Clear();
-          sbErr.Clear();
-          }*/
         return false;
     }
     
@@ -229,7 +210,7 @@ public class CalicoFSharpEngine : Engine
             return true;
         } catch {
         } finally{
-            Report();
+            Report(); // FIXME: may want to print out as we go
         }
         return false;
     }
