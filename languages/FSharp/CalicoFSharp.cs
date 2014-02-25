@@ -54,11 +54,16 @@ public class CalicoFSharpEngine : Engine
         fsiSession = new Shell.FsiEvaluationSession(fsiConfig, allArgs, inStream, 
                                                     outStream, errStream);
         
-        Console.WriteLine(sbOut);
-        Console.Error.WriteLine(sbErr);
-        sbOut.Clear();
-        sbErr.Clear();
+        Report();
         finishedLoading = false;
+    }
+
+    private void Report()
+    {
+        Console.Write(sbOut);
+        Console.Error.Write(sbErr);
+        sbOut.Clear();
+        sbErr.Clear();       
     }
     
     private void loadAssemblies()
@@ -67,10 +72,7 @@ public class CalicoFSharpEngine : Engine
         modules_path = String.Format("#I \"\"\"{0}\"\"\";;", modules_path);
         if (calico.Debug) {
             Console.WriteLine(modules_path);
-            Console.WriteLine("DEBUG: " + sbOut);
-            Console.Error.WriteLine("DEBUG: " + sbErr);
-            sbOut.Clear();
-            sbErr.Clear();
+            Report();
         }
         fsiSession.EvalInteraction(modules_path);
         Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -86,10 +88,7 @@ public class CalicoFSharpEngine : Engine
                             }
                             fsiSession.EvalInteraction(assembly_path);
                             if (calico.Debug) {
-                                Console.WriteLine("DEBUG: " + sbOut);
-                                Console.Error.WriteLine("DEBUG: " + sbErr);
-                                sbOut.Clear();
-                                sbErr.Clear();
+                                Report();
                             }
                         }
                     } catch {
@@ -185,10 +184,7 @@ public class CalicoFSharpEngine : Engine
             return true;
         } catch {
         } finally{
-            Console.Write(sbOut);
-            Console.Error.Write(sbErr);
-            sbOut.Clear();
-            sbErr.Clear();
+            Report();
         }
         return false;
     }
