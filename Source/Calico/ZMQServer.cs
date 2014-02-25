@@ -724,6 +724,11 @@ public static class ZMQServer {
 			}));
 		session.calico.executeThread.IsBackground = true;
 		session.calico.executeThread.Start();
+		// wait here to finish for non-blocking behavior
+		// control+c at this point will kill just the thread
+		session.calico.executeThread.Join();
+		// TODO: for a non-blocking kernel... what else needs
+		// to change?
 	    }
 	}
     }
