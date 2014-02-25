@@ -39,7 +39,7 @@ public class CalicoFSharpEngine : Engine
     Shell.FsiEvaluationSession fsiSession;
     StringBuilder sbOut = new StringBuilder();
     StringBuilder sbErr = new StringBuilder();
-    Boolean firstEval = true;
+    Boolean finishedLoading = false;
 
     public CalicoFSharpEngine (LanguageManager manager) : base(manager)    
     {
@@ -58,6 +58,7 @@ public class CalicoFSharpEngine : Engine
         //Console.Error.WriteLine(sbErr);
         sbOut.Clear();
         sbErr.Clear();
+	finishedLoading = false;
     }
     
     // Like for this to occur in PostSetup but that doesnt' seem to be the right thing either
@@ -67,36 +68,35 @@ public class CalicoFSharpEngine : Engine
 	StringBuilder assemblyList = new StringBuilder("");
 	Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
 	Array.Reverse(assemblies);
-	foreach (Assembly assemblyName in assemblies) {
-	    
-	    //foreach (System.Reflection.AssemblyName assemblyName in System.Reflection.Assembly.GetExecutingAssembly().GetReferencedAssemblies()) {
-	    try {
-		string assembly =  assemblyName.Location;                    
-		if (assembly != "") {
-		    fsiSession.EvalInteraction("#r \"\"\"" + assembly.Replace(".dll.dll", "") + "\"\"\";;");
-		    //assemblyList.Append("#r \"\"\"" + assembly.Replace(".dll.dll", ".dll") + "\"\"\";;\n");
-		}
-	    } catch {
-	    } finally {
-		//Console.Out.WriteLine(sbOut);
-		//Console.Error.WriteLine(sbErr);
-		sbErr.Clear();
-		sbOut.Clear();
-	    }            
-	    try {
-		fsiSession.EvalInteraction("let calico = Calico.MainWindow._mainWindow;;");               
-	    } catch {                
-	    }
-	    //Console.WriteLine(sbOut);
-	    //Console.Error.WriteLine(sbErr);
-	    sbOut.Clear();
-	    sbErr.Clear();
-	}
-    }
-   
 
+	var load_thread = new System.Threading.Thread (delegate () {
+		foreach (Assembly assemblyName in assemblies) {
+		    try {
+			string assembly =  assemblyName.Location;                    
+			if (assembly != "") {
+			    fsiSession.EvalInteraction("#r \"\"\"" + assembly.Replace(".dll.dll", "") + "\"\"\";;");
+			}
+		    } catch {
+		    } finally {
+			sbErr.Clear();
+			sbOut.Clear();
+		    }            
+		    try {
+			fsiSession.EvalInteraction("let calico = Calico.MainWindow._mainWindow;;");               
+		    } catch {                
+		    }
+		    sbOut.Clear();
+		    sbErr.Clear();
+		}
+		finishedLoading = true;
+	    });
+	load_thread.Start();
+    }
     
     public override object Evaluate(string code) {      
+	if (! finishedLoading) {
+	    return null;
+	}
         bool shouldReturn = false;
 
         try
@@ -144,6 +144,9 @@ public class CalicoFSharpEngine : Engine
     }
     
     public override bool Execute(string code) {
+	if (! finishedLoading) {
+	    return false;
+	}
         object v = Evaluate(code);
         Console.WriteLine(v);
         /*
@@ -167,7 +170,9 @@ public class CalicoFSharpEngine : Engine
     }
 	
     public override bool ExecuteFile(string filename) {
-        loadAssemblies();
+	if (! finishedLoading) {
+	    return false;
+	}
         try
         {
             fsiSession.EvalScript(filename);
@@ -195,7 +200,7 @@ public class CalicoFSharpEngine : Engine
     }
     	
     public override bool ReadyToExecute(string text) {
-        return true;
+        return finishedLoading;
     }
 }
 
