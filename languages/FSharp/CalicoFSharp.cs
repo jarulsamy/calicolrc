@@ -61,7 +61,6 @@ public class CalicoFSharpEngine : Engine
         finishedLoading = false;
     }
     
-    // Like for this to occur in PostSetup but that doesnt' seem to be the right thing either
     private void loadAssemblies()
     {
         string modules_path = Path.Combine(calico.path, "..", "modules");
@@ -110,10 +109,10 @@ public class CalicoFSharpEngine : Engine
                 if (calico.Debug) {
                     Console.WriteLine("DEBUG: " + sbOut);
                     Console.Error.WriteLine("DEBUG: " + sbErr);
-                } else {
-                    sbOut.Clear();
-                    sbErr.Clear();
                 }
+                sbOut.Clear();
+                sbErr.Clear();
+
                 finishedLoading = true;
             });
         load_thread.Start();
