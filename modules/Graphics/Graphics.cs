@@ -645,7 +645,7 @@ public static class Graphics
         [method: JigsawTab("G/Pictures")]
 	public static Picture makePicture (string filename)
 	{
-		return new Picture (filename);
+	        return new Picture (filename);
 	}
   
         [method: JigsawTab("G/Pictures")]
@@ -4373,13 +4373,18 @@ public static class Graphics
 		{
 		    this.filename = filename;
 		    InvokeBlocking (delegate {
-			    if (filename.StartsWith ("http://")) {
+			    if (filename.StartsWith ("http://") || filename.StartsWith ("https://")) {
 				HttpWebRequest req = (HttpWebRequest)WebRequest.Create (filename);
 				req.KeepAlive = false;
 				req.Timeout = 10000;        
 				WebResponse resp = req.GetResponse ();
 				Stream s = resp.GetResponseStream ();
 				_pixbuf = new Gdk.Pixbuf (s);
+			    } else if (filename.StartsWith("data:")) {
+				// "data:image/png;base64,..."
+				string [] parts = filename.Split(new char[] {','}, 2, StringSplitOptions.None);
+				Byte [] bytes = System.Convert.FromBase64String(parts[1]);
+				_pixbuf = new Gdk.Pixbuf(bytes);
 			    } else {
 				_pixbuf = new Gdk.Pixbuf (filename);
 			    }
