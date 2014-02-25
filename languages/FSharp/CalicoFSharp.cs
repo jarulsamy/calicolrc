@@ -63,71 +63,41 @@ public class CalicoFSharpEngine : Engine
     // Like for this to occur in PostSetup but that doesnt' seem to be the right thing either
     private void loadAssemblies()
     {
-        if (firstEval)
-        {
-            //fsiSession.EvalInteraction("#I \"/Users/keithohara/calico/modules/\"");
-            StringBuilder assemblyList = new StringBuilder("");
-            Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-            Array.Reverse(assemblies);
-            foreach (Assembly assemblyName in assemblies)
-            {
-                
-            //foreach (System.Reflection.AssemblyName assemblyName in System.Reflection.Assembly.GetExecutingAssembly().GetReferencedAssemblies()) {
-                try
-                {
-                    string assembly =  assemblyName.Location;                    
-                    if (assembly != "")
-                    {
-                        fsiSession.EvalInteraction("#r \"\"\"" + assembly.Replace(".dll.dll", "") + "\"\"\";;");
-                        //assemblyList.Append("#r \"\"\"" + assembly.Replace(".dll.dll", ".dll") + "\"\"\";;\n");
-                    }
-                }
-                catch
-                {
-                    
-                }
-                finally
-                {
-                    //Console.Out.WriteLine(sbOut);
-                    //Console.Error.WriteLine(sbErr);
-                    sbErr.Clear();
-                    sbOut.Clear();
-                }            
-            }
-            
-            //System.Console.WriteLine(assemblyList);
-            try{                
-                fsiSession.EvalInteraction(assemblyList.ToString());
-            }catch(Exception e){                    
-            }
-            finally
-            {
-                //System.Console.WriteLine(e);
-                //Console.Out.WriteLine(sbOut);
-                //Console.Error.WriteLine(sbErr);
-                sbErr.Clear();
-                sbOut.Clear();
-            }
-            
-            try
-            {
-                //fsiSession.EvalInteraction("let calico = Calico.MainWindow._mainWindow;;");               
-            }
-            catch{                
-            }
-            firstEval = false;
-            //Console.WriteLine(sbOut);
-            //Console.Error.WriteLine(sbErr);
-            sbOut.Clear();
-            sbErr.Clear();
-        }
+	//fsiSession.EvalInteraction("#I \"/Users/keithohara/calico/modules/\"");
+	StringBuilder assemblyList = new StringBuilder("");
+	Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+	Array.Reverse(assemblies);
+	foreach (Assembly assemblyName in assemblies) {
+	    
+	    //foreach (System.Reflection.AssemblyName assemblyName in System.Reflection.Assembly.GetExecutingAssembly().GetReferencedAssemblies()) {
+	    try {
+		string assembly =  assemblyName.Location;                    
+		if (assembly != "") {
+		    fsiSession.EvalInteraction("#r \"\"\"" + assembly.Replace(".dll.dll", "") + "\"\"\";;");
+		    //assemblyList.Append("#r \"\"\"" + assembly.Replace(".dll.dll", ".dll") + "\"\"\";;\n");
+		}
+	    } catch {
+	    } finally {
+		//Console.Out.WriteLine(sbOut);
+		//Console.Error.WriteLine(sbErr);
+		sbErr.Clear();
+		sbOut.Clear();
+	    }            
+	    try {
+		fsiSession.EvalInteraction("let calico = Calico.MainWindow._mainWindow;;");               
+	    } catch {                
+	    }
+	    //Console.WriteLine(sbOut);
+	    //Console.Error.WriteLine(sbErr);
+	    sbOut.Clear();
+	    sbErr.Clear();
+	}
     }
    
 
     
     public override object Evaluate(string code) {      
         bool shouldReturn = false;
-        loadAssemblies();
 
         try
         {
@@ -220,7 +190,9 @@ public class CalicoFSharpEngine : Engine
     
     public override void PostSetup(MainWindow calico) {
         base.PostSetup(calico);
-	 }
+	this.calico = calico;
+        loadAssemblies();
+    }
     	
     public override bool ReadyToExecute(string text) {
         return true;
