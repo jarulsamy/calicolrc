@@ -64,27 +64,53 @@ public class CalicoFSharpEngine : Engine
     // Like for this to occur in PostSetup but that doesnt' seem to be the right thing either
     private void loadAssemblies()
     {
-	//fsiSession.EvalInteraction("#I \"/Users/keithohara/calico/modules/\"");
-	StringBuilder assemblyList = new StringBuilder("");
+	string modules_path = Path.Combine(calico.path, "..", "modules");
+	modules_path = String.Format("#I \"\"\"{0}\"\"\";;", modules_path);
+	if (calico.Debug) {
+	    Console.WriteLine(modules_path);
+	    Console.WriteLine("DEBUG: " + sbOut);
+	    Console.Error.WriteLine("DEBUG: " + sbErr);
+	    sbOut.Clear();
+	    sbErr.Clear();
+	}
+	fsiSession.EvalInteraction(modules_path);
 	Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
-	Array.Reverse(assemblies);
-
 	var load_thread = new System.Threading.Thread (delegate () {
+		Array.Reverse(assemblies);
 		foreach (Assembly assemblyName in assemblies) {
 		    try {
 			string assembly =  assemblyName.Location;                    
+			string assembly_path = "#r \"\"\"" + assembly.Replace(".dll", "") + "\"\"\";;";
 			if (assembly != "") {
-			    fsiSession.EvalInteraction("#r \"\"\"" + assembly.Replace(".dll.dll", "") + "\"\"\";;");
+			    if (calico.Debug) {
+				Console.WriteLine(assembly_path);
+			    }
+			    fsiSession.EvalInteraction(assembly_path);
+			    if (calico.Debug) {
+				Console.WriteLine("DEBUG: " + sbOut);
+				Console.Error.WriteLine("DEBUG: " + sbErr);
+				sbOut.Clear();
+				sbErr.Clear();
+			    }
 			}
 		    } catch {
+			if (calico.Debug) {
+			    Console.Error.WriteLine("load failed: \"{0}\"", assemblyName);
+			}
 		    } finally {
-			sbErr.Clear();
 			sbOut.Clear();
+			sbErr.Clear();
 		    }            
-		    try {
-			fsiSession.EvalInteraction("let calico = Calico.MainWindow._mainWindow;;");               
-		    } catch {                
-		    }
+		}
+		try {
+		    fsiSession.EvalInteraction("let calico = Calico.MainWindow._mainWindow;;");               
+		} catch {                
+		    calico.stderr.WriteLine("F# error: setting 'calico' variable failed");
+		}
+		if (calico.Debug) {
+		    Console.WriteLine("DEBUG: " + sbOut);
+		    Console.Error.WriteLine("DEBUG: " + sbErr);
+		} else {
 		    sbOut.Clear();
 		    sbErr.Clear();
 		}
@@ -110,9 +136,7 @@ public class CalicoFSharpEngine : Engine
             /*let  errors3, exitCode3, dynAssembly3 = 
               scs.CompileToDynamicAssembly([| "-o"; fn3; "-a"; fn2 |], Some(stdout,stderr))*/
             
-        }catch (Exception e) {
-            //Console.Error.WriteLine(e.Message);
-            //Console.Error.WriteLine(e.InnerException);
+        }catch {
         }finally{
             shouldReturn = sbOut.ToString().Contains("val it :");
             if (!shouldReturn) Console.Write(sbOut);
@@ -130,12 +154,8 @@ public class CalicoFSharpEngine : Engine
                 {
                     return (value.Value.ReflectionValue);
                 }
-            }catch (Exception e) {
-                //Console.Error.WriteLine(e.Message);
-                //Console.Error.WriteLine(e.InnerException);
-            }finally{
-                //Console.Write(sbOut);
-                //Console.Error.Write(sbErr);
+            } catch {
+            } finally {
                 sbOut.Clear();
                 sbErr.Clear();
             }
@@ -177,10 +197,8 @@ public class CalicoFSharpEngine : Engine
         {
             fsiSession.EvalScript(filename);
             return true;
-        }catch (Exception e) {
-            //Console.Error.WriteLine(e.Message);
-            //Console.Error.WriteLine(e.InnerException);
-        }finally{
+        } catch {
+        } finally{
             Console.Write(sbOut);
             Console.Error.Write(sbErr);
             sbOut.Clear();
