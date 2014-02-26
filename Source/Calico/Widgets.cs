@@ -1035,7 +1035,7 @@ public static class Widgets {
 "});"));
 	}
 
-	public void takePicture() {
+	public void click() {
 	    this.session.calico.display(session.calico.Javascript("document.getElementById('picture_button').click();"));
 	}
     }
