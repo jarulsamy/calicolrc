@@ -978,7 +978,7 @@ public static class Widgets {
 "            // based on https://developer.mozilla.org/en-US/docs/WebRTC/taking_webcam_photos \n" +
 "            var video        = $('<video>')[0]; \n" +
 "            var canvas       = $('<canvas>')[0]; \n" +
-"            var startbutton  = $('<button id='picture_button'>Take Picture</button>')[0]; \n" +
+"            var startbutton  = $('<button id=picture_button>Take Picture</button>')[0]; \n" +
 "            var width = 320; \n" +
 "            var height = 0; \n" +
 "            var that = this; \n" +
