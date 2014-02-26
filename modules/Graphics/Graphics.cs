@@ -435,7 +435,7 @@ public static class Graphics
 	}
   
         [method: JigsawTab("G/Pictures")]
-	public static IEnumerable getPixels (Picture picture)
+	public static IEnumerable<Pixel> getPixels (Picture picture)
 	{
 		for (int x=0; x < picture._cacheWidth; x++) {
 			for (int y=0; y < picture._cacheHeight; y++) {
