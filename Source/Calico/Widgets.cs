@@ -970,6 +970,7 @@ public static class Widgets {
 
 	public CameraWidget(ZMQServer.Session session) : base(session) {
 	    ((IDictionary<string,object>)data["state"])["_view_name"] = "CameraView";
+	    ((IDictionary<string,object>)data["state"])["imageurl"] = "";
 	    session.calico.display(
 		   session.calico.Javascript(
 "require([\"notebook/js/widgets/widget\"], function(WidgetManager){ \n" +
