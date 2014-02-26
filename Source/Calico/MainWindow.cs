@@ -4425,6 +4425,10 @@ del _invoke, _
 	    return manager.TryGetVariable(name);
 	}
 
+	public object GetVariable(string name) {
+	    return manager.GetVariable(name);
+	}
+
 	public IList<string> GetVariableNames() {
 	    return manager.GetVariableNames();
 	}

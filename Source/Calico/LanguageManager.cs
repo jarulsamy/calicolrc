@@ -112,7 +112,15 @@ namespace Calico {
                 scope.SetVariable(name, value);
         }
 
-	public object TryGetVariable(string name) {
+        public object GetVariable(string variable) {
+	    Calico.Variable var = TryGetVariable(variable);
+	    if (var.valid)
+		return var.value;
+	    else
+		throw new Exception(String.Format("Undefined variable '{0}'", variable));
+        }
+
+	public Variable TryGetVariable(string name) {
 	    object value = null;
 	    bool found = false;
             if (scope != null)
