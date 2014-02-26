@@ -37,6 +37,7 @@ public static class Widgets {
 	public IDictionary<string,object> data;
 	public string comm_id;
 	public System.Func<object,object> on_click_func;
+	public System.Func<object,object> on_submit_func;
 	public Dictionary<string,Callback> on_value_change_callback = new Dictionary<string,Callback>();
 	internal ZMQServer.Session session = null;
 	public int execution_count;
@@ -106,8 +107,10 @@ public static class Widgets {
 		string evt = ((Dictionary<string,object>)data["content"])["event"].ToString();
 		if (evt == "click") {
 		    onClick();
+		} else if (evt == "submit") {
+		    onSubmit();
 		} else {
-		    System.Console.Error.WriteLine("Need to handle event: " + evt);
+		    System.Console.Error.WriteLine("Widget.Dispatch() needs to handle event: " + evt);
 		}
 	    }
 	    // And back to idle:
@@ -127,6 +130,10 @@ public static class Widgets {
 	    on_click_func = function;
 	}
 
+	public void on_submit(System.Func<object,object> function) {
+	    on_submit_func = function;
+	}
+
 	public void on_value_change(System.Func<string,object,object> function, string value_name) {
 	    on_value_change_callback[value_name] = new Callback(function);
 	}
@@ -135,6 +142,16 @@ public static class Widgets {
 	    if (on_click_func != null) {
 		try {
 		    on_click_func(this);
+		} catch (Exception e) {
+		    System.Console.Error.WriteLine(e.ToString());
+		}
+	    }
+	}
+
+	public void onSubmit() {
+	    if (on_submit_func != null) {
+		try {
+		    on_submit_func(this);
 		} catch (Exception e) {
 		    System.Console.Error.WriteLine(e.ToString());
 		}
@@ -749,7 +766,7 @@ public static class Widgets {
 			    bool disabled=false, 
 			    bool visible=true) : 
 	         base(session, description, disabled, visible) {
-	    ((IDictionary<string,object>)data["state"])["_view_name"] = "ToggleButtonsView";
+	    ((IDictionary<string,object>)data["state"])["_view_name"] = "RadioButtonsView";
 	}
     }
 
