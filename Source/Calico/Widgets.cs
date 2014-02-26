@@ -38,7 +38,7 @@ public static class Widgets {
 	public string comm_id;
 	public System.Func<object,object> on_click_func;
 	public Dictionary<string,Callback> on_value_change_callback = new Dictionary<string,Callback>();
-	ZMQServer.Session session = null;
+	internal ZMQServer.Session session = null;
 	public int execution_count;
 
 	public Widget(ZMQServer.Session session) {
@@ -937,6 +937,8 @@ public static class Widgets {
     // FIXME: SelectionContainerWidget
 
     public class PasswordWidget : Widgets.TextWidget {
+	// based on work by Jonathan Frederic
+	// http://nbviewer.ipython.org/gist/jdfreder/8795537
 	public PasswordWidget(ZMQServer.Session session,
 			      string value="",
 			      string description="", 
@@ -959,6 +961,8 @@ public static class Widgets {
     }
     
     public class CameraWidget : Widgets.Widget {
+	// based on work by Jason Grout
+	// http://nbviewer.ipython.org/gist/jasongrout/9210458
 	public string imageurl {
 	    get { return Convert.ToString(get("imageurl")); }
 	    set { set("imageurl", Convert.ToString(value)); }
@@ -974,7 +978,7 @@ public static class Widgets {
 "            // based on https://developer.mozilla.org/en-US/docs/WebRTC/taking_webcam_photos \n" +
 "            var video        = $('<video>')[0]; \n" +
 "            var canvas       = $('<canvas>')[0]; \n" +
-"            var startbutton  = $('<button id = ipythonpic>Take Pic</button>')[0]; \n" +
+"            var startbutton  = $('<button id='picture_button'>Take Picture</button>')[0]; \n" +
 "            var width = 320; \n" +
 "            var height = 0; \n" +
 "            var that = this; \n" +
@@ -1029,6 +1033,10 @@ public static class Widgets {
 "    WidgetManager.register_widget_view('CameraView', CameraView); \n" +
 " \n" +
 "});"));
+	}
+
+	public void takePicture() {
+	    this.session.calico.display(session.calico.Javascript("document.getElementById('picture_button').click();"));
 	}
     }
 }
