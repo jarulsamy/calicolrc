@@ -4202,7 +4202,7 @@ public static class Myro
 	}	
 	
 	[method: JigsawTab("M/Misc")]
-	public static IEnumerable timer (double seconds)
+	public static IEnumerable<double> timer (double seconds)
 	{
 		double start = currentTime ();
 		while (currentTime() - start < seconds) {
@@ -4331,7 +4331,7 @@ public static class Myro
 	}
   
 	[method: JigsawTab("M/Picture")]
-	public static IEnumerable getPixels (Graphics.Picture picture)
+	public static IEnumerable<Graphics.Pixel> getPixels (Graphics.Picture picture)
 	{
 		return Graphics.getPixels (picture);
 	}
