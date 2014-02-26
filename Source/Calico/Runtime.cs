@@ -126,9 +126,9 @@ namespace Calico {
 
 	public void usage() {
 	    Console.WriteLine("Calico command-line usage:");
-	    Console.WriteLine("   :lang LANGUAGE  - where LANGUAGE python, ruby, scheme, etc.");
-	    Console.WriteLine("   :run FILENAME   - where FILENAME is a Calico Language program");
-	    Console.WriteLine("   :help           - this message");
+	    Console.WriteLine("   %lang LANGUAGE  - where LANGUAGE python, ruby, scheme, etc.");
+	    Console.WriteLine("   %run FILENAME   - where FILENAME is a Calico Language program");
+	    Console.WriteLine("   %help           - this message");
 	    Console.WriteLine("   COMMAND         - a command in the current LANGAUGE");
 	    Console.WriteLine("   ^d              - <control>d will exit");
 	}
@@ -168,9 +168,9 @@ namespace Calico {
 		    }
 		    continue;
 		}
-                if (line.StartsWith(":")) {
+                if (line.StartsWith("%")) {
                     string[] t = line.Split();
-                    if (t [0] == ":lang") {
+                    if (t [0] == "%lang" || t [0] == "%%lang" || t [0] == "%%%lang") {
                         if (Array.Find(manager.getLanguages(), delegate(string lang) {
                             return lang == t [1];
                         }) != null) {
@@ -179,9 +179,9 @@ namespace Calico {
                         expr = "";
                         prompt = CurrentLanguage + "> ";
                         indent = "";
-                    } else if (t [0] == ":help") {
+                    } else if (t [0] == "%help") {
 			usage();
-                    } else if (t [0] == ":run") {
+                    } else if (t [0] == "%run") {
 			string arg = t[1];
 			CurrentLanguage = manager.GetLanguageFromExtension(arg);
 			string filename = System.IO.Path.GetFullPath(arg);

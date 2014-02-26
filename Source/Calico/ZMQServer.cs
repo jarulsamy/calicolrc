@@ -22,11 +22,13 @@ namespace Calico {
 	public string command = "magic";
 	public bool evaluate = true;
 	public string code = null;
+	public ZMQServer.Session session = null;
 	
 	public Magic() {
 	}
 
-	public Magic(string code) {
+	public Magic(ZMQServer.Session session, string code) {
+	    this.session = session;
 	    this.code = code;
 	}
 
@@ -38,6 +40,9 @@ namespace Calico {
 
 	public virtual object cell_stop(object result) {
 	    return result;
+	}
+
+	public virtual void notebook(string args) {
 	}
     }
 }
@@ -220,7 +225,8 @@ public static class ZMQServer {
 	}
 
 	public Magic GetMagic(string text) {
-	    string [] lines = text.Split('\n');
+	    string [] lines = text.Split(new string[] { "\r\n", "\n" },
+		System.StringSplitOptions.None);
 	    string code = "";
 	    string args = "";
 	    string name;
@@ -253,15 +259,15 @@ public static class ZMQServer {
 	    if (magic_assembly != null) {
 		Type type = magic_assembly.GetType(name);
 		if (type != null) {
-		    ConstructorInfo constructor = type.GetConstructor(new[] { typeof(string) });
+		    ConstructorInfo constructor = type.GetConstructor(new[] {typeof(Session), typeof(string) });
 		    if (constructor != null) {
-			Magic retval = (Magic)constructor.Invoke(new object [] {code});
+			Magic retval = (Magic)constructor.Invoke(new object [] {this, code});
 			if (range == "line") {
 			    retval.line(args);
 			} else if (range == "cell") {
 			    retval.cell_start(args);
-			} else {
-			    // do notebook-level something (change language)
+			} else if (range == "notebook") {
+			    retval.notebook(args);
 			}
 			return retval;
 		    }
@@ -632,25 +638,29 @@ public static class ZMQServer {
 		// meta: {}
 		// content: {"execution_state":"idle"}
 
-		if (code.StartsWith(":lang") && session.calico != null) { // :lang 
+		// TODO: move to a magic handler:
+		if (code.StartsWith("%%%lang") && session.calico != null) { // :lang 
 		    string [] lines = code.Split(new string[] { "\r\n", "\n" }, 
 						 System.StringSplitOptions.None);
-		    string language = lines[0].Substring(6).Trim().ToLower();
+		    string language = lines[0].Substring(8).Trim().ToLower();
 		    if (lines.Length > 1) {
 			code = String.Join("\n", lines.Slice(1)).Trim();
 		    } else {
 			code = "";
 		    }
-		    string message = String.Format("Unknown language: \"{0}\"", language);
+		    session.SetOutputs(execution_count, m_header);
 		    if (session.calico.manager.ContainsKey(language)) {
 			session.calico.ActivateLanguage(language, session.calico.CurrentLanguage);
-			message = String.Format("Calico Language is now \"{0}\"", session.calico.GetCurrentProperLanguage());
+			Console.WriteLine("Calico Language is now \"{0}\"", session.calico.GetCurrentProperLanguage());
+		    } else {
+			Console.Error.WriteLine("Unknown language: \"{0}\"", language);
 		    }
+		    session.SetOutputs(0, null); 
 		    header = session.Header("pyout", m_header["session"].ToString());
 		    content = new Dictionary<string, object>
 			{
 			    {"execution_count", execution_count},
-			    {"data", ZMQServer.session.GetRepresentations(message)},
+			    {"data", null},
 			    {"metadata", new Dictionary<string, object>()}
 			};
 		    send(session.iopub_channel, header, m_header, metadata, content);
@@ -692,9 +702,9 @@ public static class ZMQServer {
 		var content = new Dictionary<string, object>
 		    {
 			{"protocol_version", new List<int>() {4, 0}},
-			{"ipython_version", new List<object>() {1, 1, 0, ""}},
-			{"language_version", new List<int>() {0, 0, 1}},
-			{"language", "simple_kernel"},
+			{"ipython_version", new List<object>() {2, 0, 0, ""}},
+			{"language_version", new List<int>() {2, 5, 0}},
+			{"language", "calico"},
 		    };
 		send(session.shell_channel, header, m_header, metadata, content);
 	    } else if (m_header["msg_type"].ToString() == "history_request") {

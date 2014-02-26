@@ -5,7 +5,7 @@ namespace Calico {
     public class Time : Calico.Magic {
 	System.Diagnostics.Stopwatch sw;
 
-	public Time(string code) : base(code) {
+	public Time(ZMQServer.Session session, string code) : base(session, code) {
 	    command = "time";
 	    sw = new System.Diagnostics.Stopwatch();
 	    evaluate = true; // run the code
@@ -33,7 +33,7 @@ namespace Calico {
     
     public class File : Calico.Magic {
 	
-	public File(string code) : base(code){
+	public File(ZMQServer.Session session, string code) : base(session, code){
 	    command = "file";
 	    evaluate = false;
 	}
