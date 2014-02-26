@@ -4537,6 +4537,9 @@ del _invoke, _
 	public Widgets.TextWidget makeTextWidget() {
 	    return TextWidget();
 	}
+	public Widgets.PasswordWidget makePasswordWidget() {
+	    return PasswordWidget();
+	}
 	public Widgets.TextareaWidget makeTextareaWidget() {
 	    return TextareaWidget();
 	}
@@ -4554,6 +4557,9 @@ del _invoke, _
 	}
 	public Widgets.SelectionWidget makeSelectionWidget() {
 	    return SelectionWidget();
+	}
+	public Widgets.CameraWidget makeCameraWidget() {
+	    return CameraWidget();
 	}
 
 	public Widgets.BoundedFloatTextWidget BoundedFloatTextWidget(double min=0.0, 
@@ -4786,6 +4792,17 @@ del _invoke, _
 					  visible);
 	}
 
+	public Widgets.PasswordWidget PasswordWidget(string value="",
+					 string description="", 
+					 bool disabled=false, 
+					 bool visible=true) {
+	    return new Widgets.PasswordWidget(ZMQServer.session,
+					  value,
+					  description, 
+					  disabled, 
+					  visible);
+	}
+
 	public Widgets.TextareaWidget TextareaWidget(string value="",
 					     string description="", 
 					     bool disabled=false, 
@@ -4845,6 +4862,14 @@ del _invoke, _
 					       disabled, 
 					       visible);
 	}
+
+
+	public Widgets.CameraWidget CameraWidget() {
+	    return new Widgets.CameraWidget(ZMQServer.session);
+	}
+
+
+	// ---------- end of Widgets
 
 	public void display(object obj1) {
 	    display(obj1, new object [0]);

@@ -935,4 +935,100 @@ public static class Widgets {
 	}
     }
     // FIXME: SelectionContainerWidget
+
+    public class PasswordWidget : Widgets.TextWidget {
+	public PasswordWidget(ZMQServer.Session session,
+			      string value="",
+			      string description="", 
+			      bool disabled=false, 
+			      bool visible=true) : 
+	    base(session, value, description, disabled, visible) {
+
+	    ((IDictionary<string,object>)data["state"])["_view_name"] = "PasswordView";
+	    session.calico.display(
+		   session.calico.Javascript("require([\"notebook/js/widgets/widget\"], function(WidgetManager){" +
+					     "  var PasswordView = WidgetManager._view_types['TextView'].extend({  " +
+					     "         update: function(options){" +
+					     "            this.$textbox.attr('type', 'password');" +
+					     "            return PasswordView.__super__.update.apply(this);" +
+					     "         }," +
+					     "   });" +
+					     "   WidgetManager.register_widget_view('PasswordView', PasswordView);" +
+					     "});"));
+	}
+    }
+    
+    public class CameraWidget : Widgets.Widget {
+	public string imgurl {
+	    get { return Convert.ToString(get("imgurl")); }
+	    set { set("imgurl", Convert.ToString(value)); }
+	}
+
+	public CameraWidget(ZMQServer.Session session) : base(session) {
+	    ((IDictionary<string,object>)data["state"])["_view_name"] = "CameraView";
+	    session.calico.display(
+		   session.calico.Javascript(
+"require([\"notebook/js/widgets/widget\"], function(WidgetManager){ \n" +
+"    var CameraView = IPython.DOMWidgetView.extend({ \n" +
+"        render: function(){ \n" +
+"            // based on https://developer.mozilla.org/en-US/docs/WebRTC/taking_webcam_photos \n" +
+"            var video        = $('<video>')[0]; \n" +
+"            var canvas       = $('<canvas>')[0]; \n" +
+"            var startbutton  = $('<button>Take Pic</button>')[0]; \n" +
+"            var width = 320; \n" +
+"            var height = 0; \n" +
+"            var that = this; \n" +
+" \n" +
+"            this.$el.append(video).append(startbutton).append(canvas); \n" +
+"            var streaming = false; \n" +
+"            navigator.getMedia = ( navigator.getUserMedia || \n" +
+"                                 navigator.webkitGetUserMedia || \n" +
+"                                 navigator.mozGetUserMedia || \n" +
+"                                 navigator.msGetUserMedia); \n" +
+" \n" +
+"            navigator.getMedia({video: true, audio: false}, \n" +
+"                function(stream) { \n" +
+"                  if (navigator.mozGetUserMedia) { \n" +
+"                    video.mozSrcObject = stream; \n" +
+"                  } else { \n" +
+"                    var vendorURL = window.URL || window.webkitURL; \n" +
+"                    video.src = vendorURL.createObjectURL(stream); \n" +
+"                  } \n" +
+"                  video.play(); \n" +
+"                }, \n" +
+"                function(err) { \n" +
+"                  console.log(\"An error occured! \" + err); \n" +
+"                } \n" +
+"            ); \n" +
+" \n" +
+"            video.addEventListener('canplay', function(ev){ \n" +
+"                if (!streaming) { \n" +
+"                  height = video.videoHeight / (video.videoWidth/width); \n" +
+"                  video.setAttribute('width', width); \n" +
+"                  video.setAttribute('height', height); \n" +
+"                  canvas.setAttribute('width', width); \n" +
+"                  canvas.setAttribute('height', height); \n" +
+"                  streaming = true; \n" +
+"                } \n" +
+"            }, false); \n" +
+"            function takepicture() { \n" +
+"                canvas.width = width; \n" +
+"                canvas.height = height; \n" +
+"                canvas.getContext('2d').drawImage(video, 0, 0, width, height); \n" +
+"                that.model.set('imageurl',canvas.toDataURL('image/png')); \n" +
+"                that.model.save_changes(that); \n" +
+"            } \n" +
+"            startbutton.addEventListener('click', function(ev){ \n" +
+"                takepicture(); \n" +
+"                ev.preventDefault(); \n" +
+"            }, false); \n" +
+"        }, \n" +
+"    }); \n" +
+"    \n" +
+"    // Register the DatePickerView with the widget manager. \n" +
+"    WidgetManager.register_widget_view('CameraView', CameraView); \n" +
+" \n" +
+"});"));
+	}
+    }
 }
