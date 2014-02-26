@@ -959,9 +959,9 @@ public static class Widgets {
     }
     
     public class CameraWidget : Widgets.Widget {
-	public string imgurl {
-	    get { return Convert.ToString(get("imgurl")); }
-	    set { set("imgurl", Convert.ToString(value)); }
+	public string imageurl {
+	    get { return Convert.ToString(get("imageurl")); }
+	    set { set("imageurl", Convert.ToString(value)); }
 	}
 
 	public CameraWidget(ZMQServer.Session session) : base(session) {
