@@ -17,6 +17,31 @@ using System.Reflection;// IEnumerator
 
 using Calico;
 
+namespace Calico {
+    public class Magic {
+	public string command = "magic";
+	public bool evaluate = true;
+	public string code = null;
+	
+	public Magic() {
+	}
+
+	public Magic(string code) {
+	    this.code = code;
+	}
+
+	public virtual void line(string text) {
+	}
+	
+	public virtual void cell_start(string args) {
+	}
+
+	public virtual object cell_stop(object result) {
+	    return result;
+	}
+    }
+}
+
 public static class ZMQServer {
 
     public static string encode(IDictionary<string, object> dict) {
@@ -96,6 +121,7 @@ public static class ZMQServer {
 	public int current_execution_count = 0;
 	public IDictionary<string, object> parent_header;
 	public System.IO.StreamWriter log;
+	public Assembly magic_assembly;
 
 	public Session(Calico.MainWindow calico, string filename) {
 	    this.calico = calico;
@@ -144,6 +170,8 @@ public static class ZMQServer {
 		    config["ip"].ToString(),
 		    config["stdin_port"].ToString());
 
+	    magic_assembly = Assembly.LoadFrom(Path.Combine(calico.path, "..", "magics", "Magics.dll"));
+
 	    if (filename == "") {
 		config["hb_port"] = hb_channel.port;
 		config["shell_port"] = shell_channel.port;
@@ -185,6 +213,61 @@ public static class ZMQServer {
 		calico.stdout.WriteLine("To connect another client to this kernel, use:");
  		calico.stdout.WriteLine("    --existing {0} --profile calico", this.filename);
 	    }
+	}
+
+	public string TitleCase(string text) {
+	    return char.ToUpper(text[0]) + text.Substring(1);
+	}
+
+	public Magic GetMagic(string text) {
+	    string [] lines = text.Split('\n');
+	    string code = "";
+	    string args = "";
+	    string name;
+	    string range;
+	    if (lines.Length > 1) {
+		for (int i = 1; i < lines.Length; i++) {
+		    code += lines[i] + "\n";
+		}
+	    }
+	    string [] command = lines[0].Split(new char [] {' '}, 2, 
+					       System.StringSplitOptions.None);
+	    if (command.Length > 1) {
+		args = command[1].Trim();
+	    } 
+	    if (command[0].StartsWith("%%%")) {
+		// Notebook command
+		name = "Calico." + TitleCase(command[0].Substring(3));
+		range = "notebook";
+	    } else if (command[0].StartsWith("%%")) {
+		// Cell
+		name = "Calico." + TitleCase(command[0].Substring(2));
+		range = "cell";
+	    } else if (command[0].StartsWith("%")) {
+		// Line
+		name = "Calico." + TitleCase(command[0].Substring(1));
+		range = "line";
+	    } else {
+		throw new Exception("invalid magic");
+	    }
+	    if (magic_assembly != null) {
+		Type type = magic_assembly.GetType(name);
+		if (type != null) {
+		    ConstructorInfo constructor = type.GetConstructor(new[] { typeof(string) });
+		    if (constructor != null) {
+			Magic retval = (Magic)constructor.Invoke(new object [] {code});
+			if (range == "line") {
+			    retval.line(args);
+			} else if (range == "cell") {
+			    retval.cell_start(args);
+			} else {
+			    // do notebook-level something (change language)
+			}
+			return retval;
+		    }
+		}
+	    }
+	    return null;
 	}
 
 	public void start() {
@@ -672,11 +755,25 @@ public static class ZMQServer {
 	    session.SetOutputs(execution_count, m_header);
 	    if (session.calico != null) {
 		session.calico.executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
-			    try {
-				retval = session.calico.Evaluate(code);
-			    } catch (Exception e) {
-				retval = e;
+			    // --------------------------------------
+			    Magic magic = null;
+			    if (code.StartsWith("%")) { //----------------- Magics
+				magic = session.GetMagic(code);
+				if (magic != null) 
+				    code = magic.code;
+			    } 
+			    //---------------- Code
+			    if (magic == null || ((magic != null) && magic.evaluate)) {
+				try {
+				    retval = session.calico.Evaluate(code);
+				} catch (Exception e) {
+				    retval = e;
+				}
 			    }
+			    if (magic != null) {
+				retval = magic.cell_stop(retval);
+			    }
+			    // --------------------------------------
 			    Dictionary<string, object> content = null;
 			    if (retval != null) {
 				if (retval is Widgets.Widget) {
