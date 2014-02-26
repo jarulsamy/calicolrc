@@ -4449,7 +4449,7 @@ del _invoke, _
 	}
 	
 	public MimeRepresentation Javascript(string text) {
-	    return new MimeRepresentation("application/javascript", text, "text/plain", "<JavaScript>");
+	    return new MimeRepresentation("application/javascript", text);
 	}
 
 	public ImageRepresentation Image(string filename) {
