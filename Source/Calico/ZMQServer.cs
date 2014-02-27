@@ -19,30 +19,64 @@ using Calico;
 
 namespace Calico {
     public class Magic {
-	public string command = "magic";
-	public bool evaluate = true;
-	public string code = null;
-	public ZMQServer.Session session = null;
+	public string command = "magic";         // magic text, eg %%file
+	public string mtype = "";                // "cell", "line", or "notebook"
+	public bool evaluate = true;             // should we evaluate code next?
+	public string code = null;               // code to return after init
+	public ZMQServer.Session session = null; // current session
+
+	public string __doc__() {
+	    return String.Format("This is some helpful documentation on \"{0}\"", 
+				 command);
+	}
 	
 	public Magic() {
 	}
 
-	public Magic(ZMQServer.Session session, string code) {
+	public Magic(ZMQServer.Session session, string code) : base() {
 	    this.session = session;
 	    this.code = code;
 	}
 
-	public virtual void line(string text) {
-	}
-	
-	public virtual void cell_start(string args) {
+	public Magic(ZMQServer.Session session, string code, 
+		     string mtype, string args)
+	    : this(session, code) {
+	    // The type of magic we are doing
+	    this.mtype = mtype;
+	    if (mtype == "line") {
+		line(args);
+	    } else if (mtype == "cell") {
+		cell(args);
+	    } else if (mtype == "notebook") {
+		notebook(args);
+	    }
 	}
 
-	public virtual object cell_stop(object result) {
-	    return result;
+	public virtual void line(string text) {
+	    // line magic
+	    mtype = "line";
+	}
+	
+	public virtual void cell(string args) {
+	    // cell magic
+	    mtype = "cell";
 	}
 
 	public virtual void notebook(string args) {
+	    // notebook magic
+	    mtype = "notebook";
+	}
+
+	public virtual object post_process(object result) {
+	    // possiblility to post process the result of
+	    // computation, decorator style
+	    return result;
+	}
+
+	public virtual string get_code() {
+	    // return rest of code to process after 
+	    // construction
+	    return code;
 	}
     }
 }
@@ -261,14 +295,7 @@ public static class ZMQServer {
 		if (type != null) {
 		    ConstructorInfo constructor = type.GetConstructor(new[] {typeof(Session), typeof(string) });
 		    if (constructor != null) {
-			Magic retval = (Magic)constructor.Invoke(new object [] {this, code});
-			if (range == "line") {
-			    retval.line(args);
-			} else if (range == "cell") {
-			    retval.cell_start(args);
-			} else if (range == "notebook") {
-			    retval.notebook(args);
-			}
+			Magic retval = (Magic)constructor.Invoke(new object [] {this, code, range, args});
 			return retval;
 		    }
 		}
@@ -770,7 +797,7 @@ public static class ZMQServer {
 			    if (code.StartsWith("%")) { //----------------- Magics
 				magic = session.GetMagic(code);
 				if (magic != null) 
-				    code = magic.code;
+				    code = magic.get_code();
 			    } 
 			    //---------------- Code
 			    if (magic == null || ((magic != null) && magic.evaluate)) {
@@ -781,7 +808,7 @@ public static class ZMQServer {
 				}
 			    }
 			    if (magic != null) {
-				retval = magic.cell_stop(retval);
+				retval = magic.post_process(retval);
 			    }
 			    // --------------------------------------
 			    Dictionary<string, object> content = null;
