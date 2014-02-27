@@ -4884,6 +4884,16 @@ del _invoke, _
 	    display(obj1, new object [0]);
 	}
 
+	public void update_display(object obj1) {
+	    clear_output(true);
+	    display(obj1, new object [0]);
+	}
+
+	public void update_display(object obj1, params object [] objs) {
+	    clear_output(true);
+	    display(obj1, objs);
+	}
+
 	// These two display functions are written to work with Scheme
 	// which is having issues with calling params
 	public void display(object obj1, params object [] objs) {
