@@ -145,6 +145,7 @@ public static class ZMQServer {
     }
 
     public class Session {
+	internal bool blocking = true;
 	public bool need_restart = false;
 	public bool request_quit = false;
 	public string filename;
@@ -252,6 +253,14 @@ public static class ZMQServer {
 		calico.stdout.WriteLine("To connect another client to this kernel, use:");
  		calico.stdout.WriteLine("    --existing {0} --profile calico", this.filename);
 	    }
+	}
+
+	public void SetBlocking(bool blocking) {
+	    this.blocking = blocking;
+	}
+
+	public bool GetBlocking() {
+	    return blocking;
 	}
 
 	public string TitleCase(string text) {
@@ -860,7 +869,8 @@ public static class ZMQServer {
 		session.calico.executeThread.Start();
 		// wait here to finish for non-blocking behavior
 		// control+c at this point will kill just the thread
-		session.calico.executeThread.Join();
+		if (session.blocking)
+		    session.calico.executeThread.Join();
 		// TODO: for a non-blocking kernel... what else needs
 		// to change?
 	    }
