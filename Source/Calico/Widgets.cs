@@ -115,7 +115,7 @@ public static class Widgets {
 	    }
 	    // And back to idle:
 	    session.update_status("idle", parent_header);
-	    session.SetOutputs(0, null); // wait till after widget displays
+	    //session.SetOutputs(0, null); // wait till after widget displays
 	}
 
 	public Dictionary<string,object> get_css() {

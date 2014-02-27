@@ -1093,6 +1093,17 @@ namespace Calico {
             }
         }
 
+        public string FindLanguage(string name) {
+	    name = name.Trim();
+            foreach (string lang in manager.getLanguages()) {
+                if ((name.ToLower() == manager.languages [lang].name.ToLower()) ||
+		    (name.ToLower() == manager.languages [lang].proper_name.ToLower())) {
+                    return lang;
+                }
+            }
+            return null;
+        }
+
         public Language GetLanguageFromName(string name) {
             foreach (string lang in manager.getLanguages()) {
                 if (name == manager.languages [lang].name) {

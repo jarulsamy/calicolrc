@@ -29,20 +29,17 @@ namespace Calico {
 	    return String.Format("This is some helpful documentation on \"{0}\"", 
 				 command);
 	}
-	
+
 	public Magic() {
 	}
-
-	public Magic(ZMQServer.Session session, string code) : base() {
+	
+	public Magic(ZMQServer.Session session, string code, 
+		     string mtype, string args) {
+	    // The type of magic we are doing
 	    this.session = session;
 	    this.code = code;
-	}
-
-	public Magic(ZMQServer.Session session, string code, 
-		     string mtype, string args)
-	    : this(session, code) {
-	    // The type of magic we are doing
 	    this.mtype = mtype;
+	    // --------------------------------
 	    if (mtype == "line") {
 		line(args);
 	    } else if (mtype == "cell") {
@@ -53,18 +50,12 @@ namespace Calico {
 	}
 
 	public virtual void line(string text) {
-	    // line magic
-	    mtype = "line";
 	}
 	
 	public virtual void cell(string args) {
-	    // cell magic
-	    mtype = "cell";
 	}
 
 	public virtual void notebook(string args) {
-	    // notebook magic
-	    mtype = "notebook";
 	}
 
 	public virtual object post_process(object result) {
@@ -171,8 +162,8 @@ public static class ZMQServer {
 	    engine_id = System.Guid.NewGuid().ToString();
 	    string json;
 	    IDictionary<string,object> config;
-	    if (filename != "") {
-		json = File.ReadAllText(filename);
+	    if (this.filename != "") {
+		json = File.ReadAllText(this.filename);
 		config = decode(json);
 	    } else {
 		config = new Dictionary<string,object> {
@@ -212,13 +203,13 @@ public static class ZMQServer {
 
 	    magic_assembly = Assembly.LoadFrom(Path.Combine(calico.path, "..", "magics", "Magics.dll"));
 
-	    if (filename == "") {
+	    if (this.filename == "") {
 		config["hb_port"] = hb_channel.port;
 		config["shell_port"] = shell_channel.port;
 		config["iopub_port"] = iopub_channel.port;
 		config["control_port"] = control_channel.port;
 		config["stdin_port"]  = stdin_channel.port;
-		this.filename = String.Format("kernel-{0}.json", 
+		string kernelname = String.Format("kernel-{0}.json", 
 			      System.Diagnostics.Process.GetCurrentProcess().Id);
 		string ipython_config = ("{{\n" +
 					 "  \"hb_port\": {0},\n" +
@@ -241,17 +232,17 @@ public static class ZMQServer {
 					       config["signature_scheme"],
 					       config["key"],
 					       config["transport"]);
-		string full_path = System.IO.Path.Combine(((string)calico.config.GetValue("ipython", "security")), this.filename);
-		System.IO.StreamWriter sw = new System.IO.StreamWriter(full_path);
+		this.filename = System.IO.Path.Combine(((string)calico.config.GetValue("ipython", "security")), kernelname);
+		System.IO.StreamWriter sw = new System.IO.StreamWriter(this.filename);
 		sw.Write(ipython_config);
 		sw.Close();
 		calico.stdout.WriteLine("IPython config file written to:");
-		calico.stdout.WriteLine("   \"{0}\"", full_path);
+		calico.stdout.WriteLine("   \"{0}\"", this.filename);
 		calico.stdout.WriteLine("To exit, you will have to explicitly quit this process, by either sending");
 		calico.stdout.WriteLine("\"quit\" from a client, or using Ctrl-\\ in UNIX-like environments.");
 		calico.stdout.WriteLine("To read more about this, see https://github.com/ipython/ipython/issues/2049");
 		calico.stdout.WriteLine("To connect another client to this kernel, use:");
- 		calico.stdout.WriteLine("    --existing {0} --profile calico", this.filename);
+ 		calico.stdout.WriteLine("    --existing {0} --profile calico", kernelname);
 	    }
 	}
 
@@ -309,8 +300,6 @@ public static class ZMQServer {
 		    if (constructor != null) {
 			Magic retval = (Magic)constructor.Invoke(new object [] {this, code, mtype, args});
 			//Console.WriteLine("Checking for magic: '{0}'", retval);
-			if (retval != null)
-			    //Console.WriteLine("Checking for code: '{0}'", retval.get_code());
 			return retval;
 		    }
 		}
@@ -680,61 +669,6 @@ public static class ZMQServer {
 		// meta: {}
 		// content: {"execution_state":"idle"}
 
-		// TODO: move to a magic handler:
-		if (code.StartsWith("%%%lang") && session.calico != null) { // :lang 
-		    string [] lines = code.Split(new string[] { "\r\n", "\n" }, 
-						 System.StringSplitOptions.None);
-		    string language = lines[0].Substring(8).Trim().ToLower();
-		    if (lines.Length > 1) {
-			code = String.Join("\n", lines.Slice(1)).Trim();
-		    } else {
-			code = "";
-		    }
-		    session.SetOutputs(execution_count, m_header);
-		    if (session.calico.manager.ContainsKey(language)) {
-			session.calico.ActivateLanguage(language, session.calico.CurrentLanguage);
-			Console.WriteLine("Calico Language is now \"{0}\"", session.calico.GetCurrentProperLanguage());
-		    } else {
-			Console.Error.WriteLine("Unknown language: \"{0}\"", language);
-		    }
-		    session.SetOutputs(0, null); 
-		    header = session.Header("pyout", m_header["session"].ToString());
-		    content = new Dictionary<string, object>
-			{
-			    {"execution_count", execution_count},
-			    {"data", null},
-			    {"metadata", new Dictionary<string, object>()}
-			};
-		    send(session.iopub_channel, header, m_header, metadata, content);
-		}
-		if (code == "") {
-		    header = session.Header("status", m_header["session"].ToString());
-		    metadata = new Dictionary<string, object>();
-		    content = new Dictionary<string, object>
-			{
-			    {"execution_state", "idle"}
-			};
-		    send(session.iopub_channel, header, m_header, metadata, content);
-		    // ---------------------------------------------------
-		    header = session.Header("execute_reply", m_header["session"].ToString());
-		    metadata = new Dictionary<string, object>
-			{
-			    {"dependencies_met", true},
-			    {"engine", session.engine_id},
-			    {"status", "ok"},
-			    {"started", now()}
-			};
-		    content = new Dictionary<string, object>
-			{
-			    {"status", "ok"},
-			    {"execution_count", execution_count},
-			    {"user_variables", new Dictionary<string, object>()},
-			    {"payload", new List<object>()},
-			    {"user_expressions", new Dictionary<string, object>()}
-			};
-		    send(session.shell_channel, header, m_header, metadata, content);
-		    return;
-		}
 		// Execute in background, and report results
 		ExecuteInBackground(code, m_header, execution_count);
 		execution_count += 1;
@@ -809,13 +743,16 @@ public static class ZMQServer {
 		session.calico.executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
 			    // --------------------------------------
 			    Magic magic = null;
-			    if (code.StartsWith("%")) { //----------------- Magics
+			    while (code.StartsWith("%")) { //----------------- Magics
 				magic = session.GetMagic(code);
-				if (magic != null) 
+				if (magic != null) {
 				    code = magic.get_code();
+				    if (! magic.evaluate) // signal to exit, maybe error or no block
+					break;
+				}
 			    } 
 			    //---------------- Code
-			    if (magic == null || ((magic != null) && magic.evaluate)) {
+			    if ((magic == null || ((magic != null) && magic.evaluate)) && code.Trim() != "") {
 				try {
 				    retval = session.calico.Evaluate(code);
 				} catch (Exception e) {
@@ -843,7 +780,6 @@ public static class ZMQServer {
 				    send(session.iopub_channel, header, m_header, metadata, content);
 				}
 			    }
-			    session.SetOutputs(0, null); // wait till after widget displays
 			    // ---------------------------------------------------
 			    header = session.Header("status", m_header["session"].ToString());
 			    metadata = new Dictionary<string, object>();
@@ -870,6 +806,7 @@ public static class ZMQServer {
 				{"user_expressions", new Dictionary<string, object>()}
 			    };
 			    send(session.shell_channel, header, m_header, metadata, content);
+			    //session.SetOutputs(0, null); // wait till after widget displays
 			}));
 		session.calico.executeThread.IsBackground = true;
 		session.calico.executeThread.Start();
