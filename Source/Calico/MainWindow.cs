@@ -4875,6 +4875,11 @@ del _invoke, _
 
 	// ---------- end of Widgets
 
+	public ZMQServer.Session GetSession() {
+	    // return zmq server session
+	    return ZMQServer.session;
+	}
+
 	public void display(object obj1) {
 	    display(obj1, new object [0]);
 	}

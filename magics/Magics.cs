@@ -5,9 +5,9 @@ namespace Calico {
     public class Time : Calico.Magic {
 	System.Diagnostics.Stopwatch sw;
 
-	public Time(ZMQServer.Session session, string code) : base(session, code) {
+	public Time(ZMQServer.Session session, string code,
+		    string mtype, string args) : base(session, code, mtype, args){
 	    command = "time";
-	    sw = new System.Diagnostics.Stopwatch();
 	    evaluate = true; // run the code
 	}
 
@@ -19,6 +19,7 @@ namespace Calico {
 	public override void cell(string args) {
 	    base.cell(args);
 	    // start the clock!
+	    sw = new System.Diagnostics.Stopwatch();
 	    sw.Start();
 	}
 
@@ -35,7 +36,8 @@ namespace Calico {
     
     public class File : Calico.Magic {
 	
-	public File(ZMQServer.Session session, string code) : base(session, code){
+	public File(ZMQServer.Session session, string code,
+		    string mtype, string args) : base(session, code, mtype, args){
 	    command = "file";
 	    evaluate = false;
 	}
@@ -61,7 +63,8 @@ namespace Calico {
 
     public class Language : Calico.Magic {
 	
-	public Language(ZMQServer.Session session, string code) : base(session, code){
+	public Language(ZMQServer.Session session, string code,
+		    string mtype, string args) : base(session, code, mtype, args){
 	    command = "lang";
 	    evaluate = false;
 	}

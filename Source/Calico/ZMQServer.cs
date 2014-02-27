@@ -299,13 +299,18 @@ public static class ZMQServer {
 	    } else {
 		throw new Exception("invalid magic");
 	    }
+	    //Console.WriteLine("Checking for magic... type: '{0}', args: '{1}'", mtype, args);
 	    if (magic_assembly != null) {
+		//Console.WriteLine("Checking for name... name: '{0}'", name);
 		Type type = magic_assembly.GetType(name);
 		if (type != null) {
 		    ConstructorInfo constructor = type.GetConstructor(
 		        new[] {typeof(Session), typeof(string), typeof(string), typeof(string) });
 		    if (constructor != null) {
 			Magic retval = (Magic)constructor.Invoke(new object [] {this, code, mtype, args});
+			//Console.WriteLine("Checking for magic: '{0}'", retval);
+			if (retval != null)
+			    //Console.WriteLine("Checking for code: '{0}'", retval.get_code());
 			return retval;
 		    }
 		}
