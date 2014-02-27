@@ -1038,6 +1038,7 @@ public static class Widgets {
 "                canvas.height = height; \n" +
 "                canvas.getContext('2d').drawImage(video, 0, 0, width, height); \n" +
 "                that.model.set('imageurl',canvas.toDataURL('image/png')); \n" +
+//"                that.touch(); \n" +
 "                that.model.save_changes(that); \n" +
 "            } \n" +
 "            startbutton.addEventListener('click', function(ev){ \n" +
