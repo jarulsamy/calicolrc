@@ -273,7 +273,7 @@ public static class ZMQServer {
 	    string code = "";
 	    string args = "";
 	    string name;
-	    string range;
+	    string mtype;
 	    if (lines.Length > 1) {
 		for (int i = 1; i < lines.Length; i++) {
 		    code += lines[i] + "\n";
@@ -287,24 +287,25 @@ public static class ZMQServer {
 	    if (command[0].StartsWith("%%%")) {
 		// Notebook command
 		name = "Calico." + TitleCase(command[0].Substring(3));
-		range = "notebook";
+		mtype = "notebook";
 	    } else if (command[0].StartsWith("%%")) {
 		// Cell
 		name = "Calico." + TitleCase(command[0].Substring(2));
-		range = "cell";
+		mtype = "cell";
 	    } else if (command[0].StartsWith("%")) {
 		// Line
 		name = "Calico." + TitleCase(command[0].Substring(1));
-		range = "line";
+		mtype = "line";
 	    } else {
 		throw new Exception("invalid magic");
 	    }
 	    if (magic_assembly != null) {
 		Type type = magic_assembly.GetType(name);
 		if (type != null) {
-		    ConstructorInfo constructor = type.GetConstructor(new[] {typeof(Session), typeof(string) });
+		    ConstructorInfo constructor = type.GetConstructor(
+		        new[] {typeof(Session), typeof(string), typeof(string), typeof(string) });
 		    if (constructor != null) {
-			Magic retval = (Magic)constructor.Invoke(new object [] {this, code, range, args});
+			Magic retval = (Magic)constructor.Invoke(new object [] {this, code, mtype, args});
 			return retval;
 		    }
 		}
