@@ -13,6 +13,7 @@ namespace Calico {
 	    // time a single line?
 	    command = "time";
 	    evaluate = true;
+	    Console.Error.WriteLine("Can't time a line; use %%time to time cell");
 	}
 	
 	public override void cell(string args) {
@@ -68,10 +69,15 @@ namespace Calico {
 	}
 
 	public override void line(string args) {
-	    Console.Error.WriteLine("No line magic for lang; use %%lang or %%%lang");
+	    Console.WriteLine("Calico Language is currently \"{0}\"", session.calico.GetCurrentProperLanguage());
+	    Console.WriteLine("");
+	    Console.WriteLine("Use: %%lang LANGUAGE to change language for a cell");
+	    Console.WriteLine("     %%%lang LANGUAGE to change language (sticky)");
+	    Console.WriteLine("");
+	    Console.WriteLine("Possible languages are: Python, Ruby, Java, F#, Basic,");
+	    Console.WriteLine("  Logo, Boo, Console, LC3, Scheme, BrainScrew, etc.");
 	    command = "lang";
-	    evaluate = false;
-	    Console.WriteLine(2);
+	    evaluate = true;
 	}
 	
 	public override void cell(string args) {
@@ -143,6 +149,41 @@ namespace Calico {
 	    System.Diagnostics.Process.Start("/usr/bin/env", "ipython qtconsole --profile calico --existing " + session_name + " " + args);
 	}
 	
+    }    
+
+    public class Edit : Calico.Magic {
+	
+	public Edit(ZMQServer.Session session, string code, 
+		    string mtype, string args) : base(session, code, mtype, args) {
+	}
+
+	public override void line(string args) {
+	    command = "edit";
+	    evaluate = true;
+	    System.Diagnostics.Process.Start("/usr/bin/env", "emacsclient " + args);
+	}
+	
+    }    
+
+    public class Magics : Calico.Magic {
+	
+	public Magics(ZMQServer.Session session, string code, 
+		      string mtype, string args) : base(session, code, mtype, args) {
+	}
+
+	public override void line(string args) {
+	    command = "magics";
+	    evaluate = true;
+	    Console.WriteLine("%edit FILENAME      - edit a file in an external editor");
+	    Console.WriteLine("%%file FILENAME     - create a filename with contents of cell");
+	    Console.WriteLine("%lang               - get information on current language");
+	    Console.WriteLine("%%lang LANGUAGE     - change language for just this cell");
+	    Console.WriteLine("%%%lang LANGUAGE    - change language for rest of cells");
+	    Console.WriteLine("%magics             - get information on magics");
+	    Console.WriteLine("%qtconsole          - start a qtconsole");
+	    Console.WriteLine("%run FILENAME       - run a file (language determined by extension)");
+	    Console.WriteLine("%%time              - time how long it takes to run this cell");
+	}	
     }    
 }
 
