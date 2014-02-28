@@ -29,8 +29,10 @@ def happyFace( x, y, diam ):
     ellipse(x-offset, y-offset, eyeDiam, eyeDiam)
     ellipse(x+offset, y-offset, eyeDiam, eyeDiam)
 
-def onPressed(.3):
+def onPressed():
     diam = random(30, 60)
     happyFace( mouseX(), mouseY(), diam )
 
 onMousePressed += onPressed
+
+loop()
