@@ -47,3 +47,9 @@
  * @class customjs
  * @static
  */
+
+
+$([IPython.events]).on('app_initialized.NotebookApp', function(){
+  //... 
+  require(['/static/custom/drag-and-drop.js'])
+});
