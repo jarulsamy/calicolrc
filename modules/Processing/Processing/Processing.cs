@@ -2561,7 +2561,7 @@
 
 		_invokePImage ( delegate { 
 			try {
-			    img = _p.get (x, y, width, height); // DSB
+			    img = _p.get (x, y, width, height); 
 			} catch (System.NullReferenceException e){
 				debug ( String.Format("get() ignored extra tick: {0}", e.ToString()), 1);
 			}
@@ -2872,22 +2872,6 @@ public class PImage
 
 	public PImage(int width, int height) : this(width, height, Cairo.Format.ARGB32) { }
 	public PImage() : this(300, 300, Cairo.Format.ARGB32) { }
-
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public PImage _get(int x, int y, int width, int height)
-	{	// Create a new image from a portion of the existing image.
-	    PImage img = new PImage(width, height);
-	    try {
-		using (Context g = new Context(img._img))
-		    {			
-			_img.Show (g, -x, -y);
-		    }
-	    } catch (System.NullReferenceException e){
-		string msg = String.Format ("get() ignored extra tick: {0}", e);
-		throw new Exception(msg);
-	    }
-	    return img;
-	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public PImage get(int x, int y, int width, int height)
