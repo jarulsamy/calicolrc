@@ -856,20 +856,11 @@ public static class Graphics
 			rect.outline = new Color ("black");
 			rect.tag = "line";
 			rect.draw (window);
-			// x ticks:
-			int interval = (width - border * 2) / 10;
-			for (int x = border; x <= width - border; x += interval) {
-				tick = new Line (new Point (x, height - border), 
-                        new Point (x, height - border + 10));
-				tick.outline = new Color ("black");
-				tick.tag = "line";
-				tick.draw (window);
-			}
 			// y ticks:
-			interval = (height - border * 2) / 10;
+			int interval = (height - border * 2) / 10;
 			for (int y = height - border; y >= border; y -= interval) {
 				tick = new Line (new Point (border - 10, y), 
-                        new Point (border, y));
+						 new Point (border, y));
 				tick.outline = new Color ("black");
 				tick.tag = "line";
 				tick.draw (window);
@@ -898,15 +889,12 @@ public static class Graphics
 				line.outline = new Color ("red");
 				int col = 0;
 				double h;
-				int increment = (window.width - 2 * border) / (data.Count - 1);
+				int increment = Math.Max((window.width - 2 * border) / (data.Count - 1), 1);
 				double min = 10000;
 				double max = -10000;
 				foreach (double i in data) {
 					min = Math.Min (min, i);
 					max = Math.Max (max, i);
-				}
-				if (increment == 0) {
-					increment = 1;
 				}
 				foreach (double i in data) {
 					if (max != min) {
@@ -932,20 +920,29 @@ public static class Graphics
 					}
 				}
 				// x ticks:
-				int interval = (window.width - border * 2) / 10;
-				int int_value = data.Count / 10;
+				Line tick;
 				int count = 1;
+				increment = Math.Max((window.width - 2 * border) / (data.Count - 1), 1);
 				Text text;
-				for (int x = border; x <= window.width - border; x += interval) {
+				int last_tick = 0;
+				for (int x = border; x <= window.width - border; x += increment) {
+				    if (x - last_tick > 40) {
+				        tick = new Line (new Point (x, window.height - border), 
+							 new Point (x, window.height - border + 10));
+					tick.outline = new Color ("black");
+					tick.tag = "tick";
+					tick.draw (window);
 					text = new Text (new Point (x, h2 - border + 20), count.ToString ());
 					text.outline = new Color ("black");
 					text.fontSize = 9;
 					text.tag = "tick";
 					text.draw (window);
-					count += int_value;
+					last_tick = x;
+				    }
+				    count += 1;
 				}
 				// y ticks:
-				interval = (((int)h2) - border * 2) / 10;
+				int interval = (((int)h2) - border * 2) / 10;
 				double interval_value = (max - min) / 10;
 				double sum = min;
 				for (int y = ((int)h2) - border; y >= border; y -= interval) {
