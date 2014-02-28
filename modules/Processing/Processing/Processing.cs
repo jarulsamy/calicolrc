@@ -259,6 +259,13 @@
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab(null)]
+	public static int get_gui_thread_id ()
+	{
+		return _guiThreadId;
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab("P/Environ")]
 	public static void window(int w = 400, int h = 300) 
 	{
@@ -1342,7 +1349,7 @@
 		if (_p == null) return;
 		_invoke ( delegate { 
 			try {
-			  PImage img = _p.get(0, 0, _width, _height);
+			  PImage img = _p.get (0, 0, _width, _height);
 			  img.save(filename);
 			} catch (System.NullReferenceException e){
 				debug(String.Format ("save() ignored extra tick: {0}", e.ToString()), 1);
@@ -2554,7 +2561,7 @@
 
 		_invokePImage ( delegate { 
 			try {
-			    img = _p.get (x, y, width, height);
+			    img = _p.get (x, y, width, height); // DSB
 			} catch (System.NullReferenceException e){
 				debug ( String.Format("get() ignored extra tick: {0}", e.ToString()), 1);
 			}
@@ -2564,6 +2571,7 @@
 		ev.WaitOne();
 		return img;
 	}
+     
 	[JigsawTab("P/Images")]
 	public static PImage get() { return get(0, 0, _width, _height); }
 
@@ -2840,6 +2848,14 @@ public class PImage
 	   ev.WaitOne();
 	}
 
+
+        public PImage(int width, int height, Cairo.Format format, bool flag)
+	{	// Create a new PImage from a Cairo ImageSurface
+		_img = new ImageSurface(format, width, height);
+		_width = width;
+		_height = height;
+	}
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public PImage(int width, int height, Cairo.Format format)
 	{	// Create a new PImage from a Cairo ImageSurface
@@ -2856,6 +2872,22 @@ public class PImage
 
 	public PImage(int width, int height) : this(width, height, Cairo.Format.ARGB32) { }
 	public PImage() : this(300, 300, Cairo.Format.ARGB32) { }
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public PImage _get(int x, int y, int width, int height)
+	{	// Create a new image from a portion of the existing image.
+	    PImage img = new PImage(width, height);
+	    try {
+		using (Context g = new Context(img._img))
+		    {			
+			_img.Show (g, -x, -y);
+		    }
+	    } catch (System.NullReferenceException e){
+		string msg = String.Format ("get() ignored extra tick: {0}", e);
+		throw new Exception(msg);
+	    }
+	    return img;
+	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public PImage get(int x, int y, int width, int height)

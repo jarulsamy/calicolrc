@@ -788,10 +788,10 @@ internal class PWindow : Gtk.Window
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public PImage get(int x, int y, int width, int height)
 	{	// Create a new image from a portion of the existing image.
-		PImage img = new PImage(width, height);
+    	        PImage img = new PImage(width, height, Cairo.Format.ARGB32, true); // DSB
 
 		using (Context g = new Context(img._img)) {
-			_img.Show (g, -x, -y);
+		    _img.Show (g, -x, -y);
 		}
 
 		return img;
