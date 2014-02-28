@@ -1038,9 +1038,9 @@ public static class Widgets {
       "            function takepicture() {\n" +
       "                canvas.width = width;\n" +
       "                canvas.height = height;\n" +
-      "                video.pause();\n" +
-      "                $(video).fadeTo(1,0).delay(100).fadeTo(1,100);\n" +
-      "                setTimeout(function() {video.play()}, 3000);\n" +
+//      "                video.pause();\n" +
+//      "                $(video).fadeTo(1,0).delay(100).fadeTo(1,100);\n" +
+//      "                setTimeout(function() {video.play()}, 3000);\n" +
       "                canvas.getContext('2d').drawImage(video, 0, 0, width, height);\n" +
       "                that.model.set('imageurl',canvas.toDataURL('image/png'));\n" +
       "                that.touch();\n" +

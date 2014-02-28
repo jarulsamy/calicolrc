@@ -370,11 +370,15 @@ namespace Calico {
 			///-----------------------
 			string ipython_base = GetIPythonPath();
 			config.SetValue("ipython", "security", "string", System.IO.Path.Combine(ipython_base, "profile_calico", "security"));
-			System.Threading.Thread thread = new System.Threading.Thread ( delegate() {
-				win = new CalicoServer(args, manager, Debug, config, Thread.CurrentThread.ManagedThreadId); 
-				win.Start();
-			    });
-			thread.Start();
+			GLib.Timeout.Add( 500, delegate { 
+                    int t =  Thread.CurrentThread.ManagedThreadId;
+                    System.Threading.Thread thread = new System.Threading.Thread ( delegate() {                            
+                            win = new CalicoServer(args, manager, Debug, config, t); //Thread.CurrentThread.ManagedThreadId); 
+                            win.Start();
+                        });
+                    thread.Start();
+                    return false; 
+                }); 
 			Application.Run();
 		    } else {
 			// THIS MAY NOT WOK ON MAC
@@ -419,7 +423,7 @@ namespace Calico {
 			    return false;
 			});
 		    Application.Run();
-		} else {
+               } else {
 		    win = new CalicoConsoleNoGUI(args, manager, Debug, config, true, -1);  
 		}
             } else {
