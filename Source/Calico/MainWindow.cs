@@ -3117,10 +3117,18 @@ del _invoke, _
         }
 
         public static string ArrayTypeToString(Array args) {
+	    return ArrayTypeToString(args, -1);
+	}
+
+        public static string ArrayTypeToString(Array args, int limit) {
             string retval = "";
             if (args != null) {
                 int count = ((Array)args).Length;
                 for (int i = 0; i < count; i++) {
+		    if (i >= limit && limit != -1) {
+			retval += ", ...";
+			break;
+		    }
                     if (args.GetValue(i) is object[]) {
                         retval += ArrayToString((object[])args.GetValue(i));
                     } else if (args.GetValue(i) is Array) {
@@ -3137,10 +3145,18 @@ del _invoke, _
         }
 
         public static string ArrayToString(object[] args) {
+	    return ArrayToString(args, -1);
+	}
+
+        public static string ArrayToString(object[] args, int limit) {
             string retval = "";
             if (args != null) {
                 int count = ((Array)args).Length;
                 for (int i = 0; i < count; i++) {
+		    if (i >= limit && limit != -1) {
+			retval += ", ...";
+			break;
+		    }
                     if (args [i] is object[]) {
                         retval += ArrayToString((object[])args [i]);
                     } else {
@@ -3204,13 +3220,7 @@ del _invoke, _
 		if (array.Rank == 1) {
 		    repr = (string)ArrayTypeToString((Array)obj);
 		} else {
-		    repr = "";
-		    foreach (object row in array) {
-			if (repr != "")
-			    repr += ", ";
-			repr += "[" + Repr(row) + "]";
-		    }
-		    repr = "[" + repr + "]";
+		    repr = String.Format("<Multidimensional array, rank={0}>", array.Rank);
 		}
             } else if (obj is string) {
                 repr = String.Format("'{0}'", obj);
