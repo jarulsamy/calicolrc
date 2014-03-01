@@ -4257,7 +4257,7 @@ public static class Graphics
 		}
 	}
 
-	public class Pixel
+	public class Pixel: IComparable
 	{
 		private Picture picture;
 		public int x;
@@ -4351,6 +4351,16 @@ public static class Graphics
 		{
 			picture.setAlpha (x, y, value);
 		}
+        public int CompareTo(Object obj)
+        {
+            if (obj == null) return 1;
+
+            Pixel otherPixel = obj as Pixel;
+            if (getGray() == otherPixel.getGray()) return 0;
+            else if (getGray() < otherPixel.getGray()) return -1;
+            else return 1;
+        }
+
 	}
   
 	public class Picture : Shape
@@ -4421,7 +4431,7 @@ public static class Graphics
 			});
 		}
 
-		
+
 		public Picture (WindowClass window) : this(true)
 		{ 
 		    InvokeBlocking (delegate {
