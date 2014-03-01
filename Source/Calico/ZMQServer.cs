@@ -743,9 +743,11 @@ public static class ZMQServer {
 		session.calico.executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
 			    // --------------------------------------
 			    Magic magic = null;
+			    //List<Magic> stack = new List<Magic>();
 			    while (code.StartsWith("%")) { //----------------- Magics
 				magic = session.GetMagic(code);
 				if (magic != null) {
+				    //stack.Add(magic);
 				    code = magic.get_code();
 				    if (! magic.evaluate) // signal to exit, maybe error or no block
 					break;
@@ -759,6 +761,7 @@ public static class ZMQServer {
 				    retval = e;
 				}
 			    }
+			    // may need to undo stack
 			    if (magic != null) {
 				retval = magic.post_process(retval);
 			    }

@@ -120,6 +120,9 @@ namespace Calico {
 	public string[] args = null;
 	public System.IO.TextWriter stdout = System.Console.Out;
 	public System.IO.TextWriter stderr = System.Console.Error;
+	public CustomStream cstdout;
+	public CustomStream cstderr;
+
 	public bool toolSwapped {
 	    get {
 		return (bool) config.GetValue("config", "toolSwapped");
@@ -602,15 +605,15 @@ namespace Calico {
 
         public void configureIO() {
             if (! Debug) {
-                CustomStream nout = GetStdOut();
-                CustomStream nerr = GetStdErr();
-                manager.SetRedirects(nout, nerr);
+                cstdout = GetStdOut();
+                cstderr = GetStdErr();
+                manager.SetRedirects(cstdout, cstderr);
 
-                StreamWriter swout = new StreamWriter(nout);
+                StreamWriter swout = new StreamWriter(cstdout);
                 swout.AutoFlush = true;
                 Console.SetOut(swout);
                 
-                StreamWriter swerr = new StreamWriter(nerr);
+                StreamWriter swerr = new StreamWriter(cstderr);
                 swerr.AutoFlush = true;
                 Console.SetError(swerr);
             }
@@ -1315,6 +1318,7 @@ namespace Calico {
 		manager[language].engine.Setup(path);
 		manager[language].engine.Start(path);
 		manager[language].engine.PostSetup(this);
+		manager[language].engine.SetRedirects(cstdout, cstderr);
 	    }
 	    if (manager[CurrentLanguage].engine == null) {
 		CurrentLanguage = backup;
@@ -4452,19 +4456,23 @@ del _invoke, _
 	}
 	
 	public MimeRepresentation HTML(string text) {
-	    return new MimeRepresentation("text/html", text, "text/plain", "<HTML>");
+	    return new MimeRepresentation("text/html", text, 
+					  "text/plain", "<HTML viewable in notebook>");
 	}
 
 	public MimeRepresentation Latex(string text) {
-	    return new MimeRepresentation("text/latex", text, "text/plain", "<Latex>");
+	    return new MimeRepresentation("text/latex", text, 
+					  "text/plain", "<Latex viewable in notebook>");
 	}
 	
 	public MimeRepresentation Math(string text) {
-	    return new MimeRepresentation("text/latex", "$$" + text + "$$", "text/plain", "<Math>");
+	    return new MimeRepresentation("text/latex", "$$" + text + "$$", 
+					  "text/plain", "<Math viewable in notebook>");
 	}
 	
 	public MimeRepresentation Javascript(string text) {
-	    return new MimeRepresentation("application/javascript", text);
+	    return new MimeRepresentation("application/javascript", text,
+					  "text/plain", "<JavaScript viewable in executing notebook>");
 	}
 
 	public ImageRepresentation Image(string filename) {
@@ -4491,7 +4499,8 @@ del _invoke, _
 		text += "</tr>";
 	    }
 	    text += "</table>";
-	    return new MimeRepresentation("text/html", text, "text/plain", "<Table>");
+	    return new MimeRepresentation("text/html", text, 
+					  "text/plain", "<Table>");
 	}
 
 	// JSON, PNG, JPEG, SVG, Math, LaTeX, Audio, Video, IFrame
