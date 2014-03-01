@@ -24,6 +24,7 @@
  using System.Threading;
  using System.Collections.Generic;
  using System.Collections;
+ using System.Net;
  using Cairo;
  using Gtk;
 
@@ -852,17 +853,23 @@
 
 		PImage img = null;
 
-		// Make a complete path, if not rooted
-		if (!System.IO.Path.IsPathRooted(path)) {
-			path = System.IO.Path.Combine ( Directory.GetCurrentDirectory(), path );
-		}
-
-		// Check if the file exists
-		if (!File.Exists (path) ) {
-			println ("Error: Can't find image file at ", path);
-			return null;
-		}
-
+        if (!(path.StartsWith ("http://") || 
+              path.StartsWith ("https://") || 
+              path.StartsWith("data:"))){
+            
+            
+            // Make a complete path, if not rooted
+            if (!System.IO.Path.IsPathRooted(path)) {
+                path = System.IO.Path.Combine ( Directory.GetCurrentDirectory(), path );
+            }
+            
+            // Check if the file exists
+            if (!File.Exists (path) ) {
+                println ("Error: Can't find image file at ", path);
+                return null;
+            }
+        }
+        
 		// Attempt to open the file
 		img = new PImage(path);
 
@@ -2815,41 +2822,72 @@ public class PImage
 		// Check file type
 		string ext = System.IO.Path.GetExtension(path).ToLower ();
 
-		// Load from file 
-		switch (ext) {
-		case ".png":
-			_img = new ImageSurface(path);
-			_width = _img.Width;
-			_height = _img.Height;
-			break;
-		case ".gif":
-		case ".jpg":	// See http://mono.1490590.n4.nabble.com/checking-the-Gdk-Pixbuf-support-for-JPEG-td3747144.html
-		case ".jpeg":
-		case ".tif":
-		case ".tiff":
-		case ".xpm":
-		case ".xbm":
-			Gdk.Pixbuf pb = new Gdk.Pixbuf(path);
-			if (!pb.HasAlpha) pb = pb.AddAlpha (false, 0, 0, 0); 
-			_img = new ImageSurface(Format.Argb32, pb.Width, pb.Height);
-			_width = pb.Width;
-			_height = pb.Height;
-			using (Context g = new Cairo.Context(_img)) {
-				Gdk.CairoHelper.SetSourcePixbuf(g, pb, 0.0, 0.0);
-				g.Paint ();
-			};
-			break;
-		default:
-			string msg = String.Format ("Don't know how to load an image file with extension {0}", ext);
-			throw new Exception(msg);
-		}
-		ev.Set();
-	     });
-	   ev.WaitOne();
-	}
-
-
-        public PImage(int width, int height, Cairo.Format format, bool flag)
+        if (path.StartsWith ("http://") || 
+            path.StartsWith ("https://") || 
+            path.StartsWith("data:")) {
+            Gdk.Pixbuf pb = null;
+            
+            if (path.StartsWith ("http://") || path.StartsWith ("https://")) {
+                HttpWebRequest req = (HttpWebRequest)WebRequest.Create (path);
+                req.KeepAlive = false;
+                req.Timeout = 10000;        
+                WebResponse resp = req.GetResponse ();
+                Stream s = resp.GetResponseStream ();
+                pb = new Gdk.Pixbuf (s);
+            } else if (path.StartsWith("data:")) {                    
+                // "data:image/png;base64,..."
+                string [] parts = path.Split(new char[] {','}, 2, StringSplitOptions.None);
+                Byte [] bytes = System.Convert.FromBase64String(parts[1]);
+                pb = new Gdk.Pixbuf(bytes);
+            }
+            
+            if (!pb.HasAlpha) pb = pb.AddAlpha (false, 0, 0, 0); 
+            _img = new ImageSurface(Format.Argb32, pb.Width, pb.Height);
+            _width = pb.Width;
+            _height = pb.Height;
+            using (Context g = new Cairo.Context(_img)) {
+                Gdk.CairoHelper.SetSourcePixbuf(g, pb, 0.0, 0.0);
+                g.Paint ();
+            };
+        }                            
+        else
+        {            
+            // Load from file 
+            switch (ext) {
+            case ".png":
+                _img = new ImageSurface(path);
+                _width = _img.Width;
+                _height = _img.Height;
+                break;
+            case ".gif":
+            case ".jpg":	// See http://mono.1490590.n4.nabble.com/checking-the-Gdk-Pixbuf-support-for-JPEG-td3747144.html
+            case ".jpeg":
+            case ".tif":
+            case ".tiff":
+            case ".xpm":
+            case ".xbm":
+                Gdk.Pixbuf pb = new Gdk.Pixbuf(path);
+                 if (!pb.HasAlpha) pb = pb.AddAlpha (false, 0, 0, 0); 
+                 _img = new ImageSurface(Format.Argb32, pb.Width, pb.Height);
+                 _width = pb.Width;
+                 _height = pb.Height;
+                 using (Context g = new Cairo.Context(_img)) {
+                     Gdk.CairoHelper.SetSourcePixbuf(g, pb, 0.0, 0.0);
+                     g.Paint ();
+                 };
+             break;
+            default:
+                string msg = String.Format ("Don't know how to load an image file with extension {0}", ext);
+                throw new Exception(msg);
+            }
+        }
+        ev.Set();
+           });
+       ev.WaitOne();
+    
+    }
+    
+    public PImage(int width, int height, Cairo.Format format, bool flag)
 	{	// Create a new PImage from a Cairo ImageSurface
 		_img = new ImageSurface(format, width, height);
 		_width = width;
