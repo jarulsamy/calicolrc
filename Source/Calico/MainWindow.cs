@@ -605,17 +605,17 @@ namespace Calico {
 
         public void configureIO() {
             if (! Debug) {
-                cstdout = GetStdOut();
-                cstderr = GetStdErr();
-                manager.SetRedirects(cstdout, cstderr);
-
-                StreamWriter swout = new StreamWriter(cstdout);
-                swout.AutoFlush = true;
-                Console.SetOut(swout);
-                
-                StreamWriter swerr = new StreamWriter(cstderr);
-                swerr.AutoFlush = true;
-                Console.SetError(swerr);
+		cstdout = GetStdOut();
+		cstderr = GetStdErr();
+		manager.SetRedirects(cstdout, cstderr);
+		
+		StreamWriter swout = new StreamWriter(cstdout);
+		swout.AutoFlush = true;
+		Console.SetOut(swout);
+		
+		StreamWriter swerr = new StreamWriter(cstderr);
+		swerr.AutoFlush = true;
+		Console.SetError(swerr);
             }
         }
 
@@ -4904,12 +4904,12 @@ del _invoke, _
 	    display(obj1, new object [0]);
 	}
 
-	public void update_display(object obj1) {
+	public void animate(object obj1) {
 	    clear_output(true);
 	    display(obj1, new object [0]);
 	}
 
-	public void update_display(object obj1, params object [] objs) {
+	public void animate(object obj1, params object [] objs) {
 	    clear_output(true);
 	    display(obj1, objs);
 	}
