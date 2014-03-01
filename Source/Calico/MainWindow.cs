@@ -4969,7 +4969,7 @@ del _invoke, _
 	}
 
 	public override string ToString() {
-	    return String.Format("<Calico instance, version {0}>", MainClass.Version);
+	    return String.Format("<Calico, version {0}, language {1}>", MainClass.Version, CurrentProperLanguage);
 	}
     }
 }
