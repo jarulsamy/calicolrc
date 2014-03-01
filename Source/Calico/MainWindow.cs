@@ -3200,7 +3200,18 @@ del _invoke, _
             } else if (obj is object[]) {
                 repr = (string)ArrayToString((object[])obj);
             } else if (obj is Array) {
-                repr = (string)ArrayTypeToString((Array)obj);
+		Array array = (Array)obj;
+		if (array.Rank == 1) {
+		    repr = (string)ArrayTypeToString((Array)obj);
+		} else {
+		    repr = "";
+		    foreach (object row in array) {
+			if (repr != "")
+			    repr += ", ";
+			repr += "[" + Repr(row) + "]";
+		    }
+		    repr = "[" + repr + "]";
+		}
             } else if (obj is string) {
                 repr = String.Format("'{0}'", obj);
             }
