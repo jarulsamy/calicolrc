@@ -29,7 +29,7 @@ namespace Calico {
 	    TimeSpan ts = sw.Elapsed;
 	    Console.WriteLine(String.Format("Time: {0:00} s, {1:00} ms",
 					    ts.Seconds,
-					    ts.Milliseconds / 10));
+					    ts.Milliseconds));
 	    return result;
 	}
     }
