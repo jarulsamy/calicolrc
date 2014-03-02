@@ -268,12 +268,26 @@
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	[JigsawTab("P/Environ")]
+	public static void canvas(int w = 400, int h = 300) 
+	{
+	    window(w, h, false);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab("P/Environ")]
 	public static void window(int w = 400, int h = 300) 
+	{
+	    window(w, h, true);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	[JigsawTab(null)]
+	public static void window(int w = 400, int h = 300, bool show = true) 
 	{
 		// If the current thread is the same as the main GUI thread, use the window2() method instead
 		if (_guiThreadId == Thread.CurrentThread.ManagedThreadId)
 		{
-			window2 (w, h);
+		        window2 (w, h, show);
 			return;
 		}
 
@@ -291,9 +305,9 @@
 			if (wchars != null) {
 				int x = wchars[0]; 
 				int y = wchars[1];
-				_p = new PWindow(w, h, x, y, true);
+				_p = new PWindow(w, h, x, y, true, show);
 			} else {
-				_p = new PWindow(w, h, true);
+			    _p = new PWindow(w, h, true, show);
 			}
 
 			// Init window parameters
@@ -312,7 +326,8 @@
 			_p.windowClosed += _onWindowClosed;
 
 			// Show the new window
-			_p.ShowAll ();
+			if (show)
+			    _p.ShowAll ();
 
 			// Signal the manual reset event
 			ev.Set ();
@@ -346,7 +361,7 @@
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	//[JigsawTab("P/Environ")]
 	[JigsawTab(null)]
-	public static void window2(int w = 400, int h = 300) 
+	public static void window2(int w = 400, int h = 300, bool show = true) 
 	{	// Create window on current thread, not a new one. Jigsaw needs this.
 
 		//_guiThreadId = Thread.CurrentThread.ManagedThreadId;
@@ -379,7 +394,8 @@
 		_p._cvs.KeyReleaseEvent += _onKeyReleaseEvent;
 		_p.windowClosed += _onWindowClosed;
 		
-		_p.ShowAll ();
+		if (show)
+		    _p.ShowAll ();
 
 		// Signal the manual reset event
 		ev.Set ();

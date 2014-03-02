@@ -61,7 +61,13 @@ internal class PWindow : Gtk.Window
 	public event DeleteEventHandler windowClosed;				// Raised when window is closed
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-	public PWindow (int w, int h, int x, int y, bool needsQuit ) : base(WindowType.Toplevel)
+	public PWindow (int w, int h, int x, int y, bool needsQuit ) 
+	    : this(w, h, x, y, needsQuit, true)
+	{
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	public PWindow (int w, int h, int x, int y, bool needsQuit, bool show) : base(WindowType.Toplevel)
 	{
 		_needsQuit = needsQuit;
 		_frameCount = 0;
@@ -85,9 +91,12 @@ internal class PWindow : Gtk.Window
 
 		//log ("PWindow.PWindow: " + Thread.CurrentThread.ManagedThreadId.ToString(), "proc.txt");
 
-		this.ShowAll ();
+		if (show)
+		    this.ShowAll ();
 	}
-	public PWindow (int w, int h, bool needsQuit ): this(w, h, -10000, -10000, needsQuit) {}
+	public PWindow (int w, int h, bool needsQuit ): this(w, h, -10000, -10000, needsQuit, true) {}
+
+	public PWindow (int w, int h, bool needsQuit, bool show): this(w, h, -10000, -10000, needsQuit, show) {}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	public void log(object msg, string path) {
