@@ -4524,10 +4524,6 @@ del _invoke, _
 					  "text/plain", "<Table>");
 	}
 
-	// JSON, PNG, JPEG, SVG, Math, LaTeX, Audio, Video, IFrame
-	// display_pretty, display_html, display_jpeg, display_png, 
-	// display_json, display_latex, display_svg, display_audio, display_video
-
 	public Widgets.Widget makeBoundedFloatTextWidget() {
 	    return BoundedFloatTextWidget();
 	}
@@ -4920,6 +4916,10 @@ del _invoke, _
 	    // return zmq server session
 	    return ZMQServer.session;
 	}
+
+	// JSON, PNG, JPEG, SVG, Math, LaTeX, Audio, Video, IFrame
+	// display_pretty, display_html, display_jpeg, display_png, 
+	// display_json, display_latex, display_svg, display_audio, display_video
 
 	public void display(object obj1) {
 	    display(obj1, new object [0]);

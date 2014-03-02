@@ -464,9 +464,11 @@ namespace Calico {
 			}
 			return false;
 		  }
+		  /*
 		  if (ok) {
 		      PrintLine(Tag.Info, "Ok");
 		  }
+		  */
 		  return true;
         }
 		
@@ -509,7 +511,7 @@ namespace Calico {
 			}
 			return false;
 		  }
-		  PrintLine(Tag.Info, "Done");
+		  //PrintLine(Tag.Info, "Done");
 		  return true;
         }
 		
