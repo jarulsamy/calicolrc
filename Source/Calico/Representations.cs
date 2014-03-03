@@ -145,7 +145,7 @@ namespace Calico {
 	}
 	
 	public override IDictionary<string, string> GetRepresentations() {
-	    Gdk.Pixbuf pixbuf;
+            Gdk.Pixbuf pixbuf = null;
 	    byte [] buffer;
 	    string png_string;
 	    string jpg_string;
