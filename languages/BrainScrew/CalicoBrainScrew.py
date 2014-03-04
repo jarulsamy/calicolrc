@@ -18,6 +18,10 @@ class MyEngine(Calico.Engine):
         self.interpreter.run_commands(text)
         return True
 
+    def Evaluate(self, text):
+        retval = self.interpreter.run_commands(text)
+        return retval
+
     def ExecuteFile(self, filename):
         fp = file(filename)
         text = "".join(fp.readlines())

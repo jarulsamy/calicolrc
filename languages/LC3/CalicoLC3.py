@@ -54,7 +54,7 @@ class Screen(object):
 
     def clear(self):
         self.memory = [[0 for i in range(self.rows)] for j in range(self.cols)]
-        self.window.clear()
+        self.window.reset()
         self.cursor = (0,0)
         self.window.setBackground(Graphics.Color(0,0,0))
 
@@ -68,7 +68,7 @@ class Screen(object):
             x, y = (0, self.rows - 1)   # scroll up, stay at bottom
             self.window.updateNow()
             dump = Graphics.Picture(self.window)
-            self.window.clear()
+            self.window.reset()
             self.window.setBackground(Graphics.Color(0,0,0))
             dump.move(0, -self.my)
             dump.draw(self.window)
@@ -508,6 +508,10 @@ class MyEngine(Calico.Engine):
                 self.calico.Error(exc.message + "\n")
 
         return ok
+
+    def Evaluate(self, text):
+        self.Execute(text)
+        return None
 
     def ExecuteFile(self, filename):
         self.lc3.reset_registers()
