@@ -5056,7 +5056,7 @@ public static class Graphics
 			this.setRGBA (x, y, red, green, blue, alpha);
 		}
 
-		public IEnumerable getPixels ()
+		public IEnumerable<Pixel> getPixels ()
 		{
 			for (int x=0; x < _cacheWidth; x++) {
 				for (int y=0; y < _cacheHeight; y++) {
