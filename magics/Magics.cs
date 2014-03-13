@@ -152,7 +152,7 @@ namespace Calico {
     }    
 
     public class Edit : Calico.MagicBase {
-	
+
 	public Edit(ZMQServer.Session session, string code, 
 		    string mtype, string args) : base(session, code, mtype, args) {
 	}
@@ -174,18 +174,74 @@ namespace Calico {
 	public override void line(string args) {
 	    command = "magics";
 	    evaluate = true;
+	    Console.WriteLine("%connect_info       - show ICalico JSON connection information");
 	    Console.WriteLine("%edit FILENAME      - edit a file in an external editor");
 	    Console.WriteLine("%%file FILENAME     - create a filename with contents of cell");
+	    Console.WriteLine("%%html              - treat the cell as HTML");
 	    Console.WriteLine("%lang               - get information on current language");
 	    Console.WriteLine("%%lang LANGUAGE     - change language for just this cell");
 	    Console.WriteLine("%%%lang LANGUAGE    - change language for rest of cells");
-	    Console.WriteLine("%magics             - get information on magics");
+	    Console.WriteLine("%magic              - get information on magic meta-commands");
 	    Console.WriteLine("%qtconsole          - start a qtconsole");
 	    Console.WriteLine("%run FILENAME       - run a file (language determined by extension)");
 	    Console.WriteLine("%%time              - time how long it takes to run this cell");
 	}	
     }    
+
+    public class Connect_info : Calico.MagicBase {
+	
+	public Connect_info(ZMQServer.Session session, string code, 
+			    string mtype, string args) : base(session, code, mtype, args) {
+	}
+
+	public override void line(string args) {
+	    command = "connect_info";
+	    evaluate = true;
+	    Console.WriteLine("{");
+	    Console.WriteLine("  \"stdin_port\": {0},", session.config["stdin_port"]);
+	    Console.WriteLine("  \"shell_port\": {0},", session.config["shell_port"]);
+	    Console.WriteLine("  \"iopub_port\": {0},", session.config["iopub_port"]);
+	    Console.WriteLine("  \"hb_port\": {0},", session.config["hb_port"]);
+	    Console.WriteLine("  \"ip\": \"{0}\",", session.config["ip"]);
+	    Console.WriteLine("  \"key\": \"{0}\",", session.config["key"]);
+	    Console.WriteLine("  \"signature_scheme\": \"{0}\",", session.config["signature_scheme"]);
+	    Console.WriteLine("  \"transport\": \"{0}\"", session.config["transport"]);
+	    Console.WriteLine("}");
+	    Console.WriteLine("");
+	    Console.WriteLine("Paste the above JSON into a file, and connect with:");
+	    Console.WriteLine("    $> ipython <app> --profile calico --existing <filename>");
+	    Console.WriteLine("or, if you are local, you can connect with just:");
+	    Console.WriteLine("    $> ipython <app> --profile calico --existing {0} ", 
+			      System.IO.Path.GetFileName(session.filename));
+	    Console.WriteLine("or even just:");
+	    Console.WriteLine("    $> ipython <app> --profile calico --existing ");
+	    Console.WriteLine("if this is the most recent ICalico session you have started.");
+	}	
+    }    
+
+    public class Html : Calico.MagicBase {
+	
+	public Html(ZMQServer.Session session, string code, 
+		    string mtype, string args) : base(session, code, mtype, args) {
+	}
+
+	public override void cell(string args) {
+	    command = "html";
+	    evaluate = false;
+	    session.display(session.calico.HTML(code));
+	}
+    }
+
+    public class Javascript : Calico.MagicBase {
+	
+	public Javascript(ZMQServer.Session session, string code, 
+			  string mtype, string args) : base(session, code, mtype, args) {
+	}
+
+	public override void cell(string args) {
+	    command = "javascript";
+	    evaluate = false;
+	    session.display(session.calico.Javascript(code));
+	}
+    }
 }
-
-
-

@@ -4967,13 +4967,21 @@ del _invoke, _
 	    }
 	}
 
-	public IDictionary<string,object> GetHelp(string oname) {
+	public IDictionary<string,object> GetHelpOnFunctionCall(string oname) {
 	    // Given an object name, get help on it from the current
 	    // language, environment:
 	    if (CurrentLanguage != null && manager[CurrentLanguage].engine != null) {
-		return manager[CurrentLanguage].engine.GetHelp(oname);
+		return manager[CurrentLanguage].engine.GetHelpOnFunctionCall(oname);
 	    } else {
-		return manager["python"].engine.GetHelp(oname);
+		return manager["python"].engine.GetHelpOnFunctionCall(oname);
+	    }
+	}
+
+	public string GetHelpOn(string expression) {
+	    if (CurrentLanguage != null && manager[CurrentLanguage].engine != null) {
+		return manager[CurrentLanguage].engine.GetHelpOn(expression);
+	    } else {
+		return manager["python"].engine.GetHelpOn(expression);
 	    }
 	}
 
