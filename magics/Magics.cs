@@ -2,7 +2,7 @@ using System;
 
 namespace Calico {
 
-    public class Time : Calico.Magic {
+    public class Time : Calico.MagicBase {
 	System.Diagnostics.Stopwatch sw;
 
 	public Time(ZMQServer.Session session, string code, 
@@ -34,7 +34,7 @@ namespace Calico {
 	}
     }
     
-    public class File : Calico.Magic {
+    public class File : Calico.MagicBase {
 	
 	public File(ZMQServer.Session session, string code, 
 		    string mtype, string args) : base(session, code, mtype, args) {
@@ -61,7 +61,7 @@ namespace Calico {
 	}
     }    
 
-    public class Lang : Calico.Magic {
+    public class Lang : Calico.MagicBase {
 	string tempLanguage = null;
 	
 	public Lang(ZMQServer.Session session, string code, 
@@ -117,7 +117,7 @@ namespace Calico {
 	}
     }    
 
-    public class Run : Calico.Magic {
+    public class Run : Calico.MagicBase {
 	
 	public Run(ZMQServer.Session session, string code, 
 		    string mtype, string args) : base(session, code, mtype, args) {
@@ -135,7 +135,7 @@ namespace Calico {
 	}
     }    
     
-    public class Qtconsole : Calico.Magic {
+    public class Qtconsole : Calico.MagicBase {
 	
 	public Qtconsole(ZMQServer.Session session, string code, 
 		    string mtype, string args) : base(session, code, mtype, args) {
@@ -151,7 +151,7 @@ namespace Calico {
 	
     }    
 
-    public class Edit : Calico.Magic {
+    public class Edit : Calico.MagicBase {
 	
 	public Edit(ZMQServer.Session session, string code, 
 		    string mtype, string args) : base(session, code, mtype, args) {
@@ -165,9 +165,9 @@ namespace Calico {
 	
     }    
 
-    public class Magics : Calico.Magic {
+    public class Magic : Calico.MagicBase {
 	
-	public Magics(ZMQServer.Session session, string code, 
+	public Magic(ZMQServer.Session session, string code, 
 		      string mtype, string args) : base(session, code, mtype, args) {
 	}
 

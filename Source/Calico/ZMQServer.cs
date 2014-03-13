@@ -18,7 +18,7 @@ using System.Reflection;// IEnumerator
 using Calico;
 
 namespace Calico {
-    public class Magic {
+    public class MagicBase {
 	public string command = "magic";         // magic text, eg %%file
 	public string mtype = "";                // "cell", "line", or "notebook"
 	public bool evaluate = true;             // should we evaluate code next?
@@ -30,10 +30,10 @@ namespace Calico {
 				 command);
 	}
 
-	public Magic() {
+	public MagicBase() {
 	}
 	
-	public Magic(ZMQServer.Session session, string code, 
+	public MagicBase(ZMQServer.Session session, string code, 
 		     string mtype, string args) {
 	    // The type of magic we are doing
 	    this.session = session;
@@ -153,6 +153,12 @@ public static class ZMQServer {
 	public IDictionary<string, object> parent_header;
 	public System.IO.StreamWriter log;
 	public Assembly magic_assembly;
+	public Dictionary<int,string> In = new Dictionary<int,string>();
+	public Dictionary<int,object> Out = new Dictionary<int,object>();
+	public object __ = null;
+	public object ___ = null;
+	public object _ii = null;
+	public object _iii = null;
 
 	public Session(Calico.MainWindow calico, string filename) {
 	    this.calico = calico;
@@ -201,8 +207,11 @@ public static class ZMQServer {
 		    config["ip"].ToString(),
 		    config["stdin_port"].ToString());
 
+	    // FIXME: load all files in this directory, and user local directory:
 	    magic_assembly = Assembly.LoadFrom(Path.Combine(calico.path, "..", "magics", "Magics.dll"));
 
+	    calico.SetVariable("In", In);
+	    calico.SetVariable("Out", Out);
 	    if (this.filename == "") {
 		config["hb_port"] = hb_channel.port;
 		config["shell_port"] = shell_channel.port;
@@ -258,7 +267,7 @@ public static class ZMQServer {
 	    return char.ToUpper(text[0]) + text.Substring(1);
 	}
 
-	public Magic GetMagic(string text) {
+	public MagicBase GetMagic(string text) {
 	    string [] lines = text.Split(new string[] { "\r\n", "\n" },
 		System.StringSplitOptions.None);
 	    string code = "";
@@ -298,7 +307,7 @@ public static class ZMQServer {
 		    ConstructorInfo constructor = type.GetConstructor(
 		        new[] {typeof(Session), typeof(string), typeof(string), typeof(string) });
 		    if (constructor != null) {
-			Magic retval = (Magic)constructor.Invoke(new object [] {this, code, mtype, args});
+			MagicBase retval = (MagicBase)constructor.Invoke(new object [] {this, code, mtype, args});
 			//Console.WriteLine("Checking for magic: '{0}'", retval);
 			return retval;
 		    }
@@ -741,32 +750,139 @@ public static class ZMQServer {
 	    session.SetOutputs(execution_count, m_header);
 	    if (session.calico != null) {
 		session.calico.executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
+			    MagicBase magic = null;
+			    List<MagicBase> stack = new List<MagicBase>();
+			    List<object> payload = new List<object>();
 			    // --------------------------------------
-			    Magic magic = null;
-			    List<Magic> stack = new List<Magic>();
-			    while (code.StartsWith("%")) { //----------------- Magics
-				magic = session.GetMagic(code);
-				if (magic != null) {
-				    stack.Add(magic);
-				    code = magic.get_code();
-				    if (! magic.evaluate) // signal to exit, maybe error or no block
-					break;
+			    // Handle query:
+			    if (code.Trim() == "?") {
+				Dictionary<string,object> message = new Dictionary<string,object>();
+				message["text"] = ("\n" +
+"ICalico -- An enhanced Interactive Scripting Shell for Calico\n"+
+"=============================================================\n"+
+"\n"+
+"ICalico offers a combination of convenient shell features, special commands\n"+
+"and a history mechanism for both input (command history) and output (results\n"+
+"caching, similar to Mathematica).\n" +
+"\n"+
+"MAIN FEATURES\n"+
+"-------------\n"+
+"\n"+
+"* Magic commands: type %magic for information on the magic subsystem.\n"+
+"\n"+
+"* Dynamic object information:\n"+
+"\n"+
+"  Typing ?word or word? prints detailed information about an object.\n"+
+"\n"+
+"* Completion in the local namespace, by typing TAB at the prompt.\n"+
+"\n"+
+"  At any time, hitting tab will complete any available commands or\n"+
+"  variable names, and show you a list of the possible completions if there's\n"+
+"  no unambiguous one. It will also complete filenames in the current directory.\n"+
+"\n"+
+"  - %hist: search history by index\n"+
+"\n"+
+"* Persistent command history across sessions.\n"+
+"\n"+
+"* Logging of input with the ability to save and restore a working session.\n"+
+"\n"+
+"* Input caching system:\n"+
+"\n"+
+"  ICalico offers numbered prompts (In/Out) with input and output caching. All\n"+
+"  input is saved and can be retrieved as variables (besides the usual arrow\n"+
+"  key recall).\n"+
+"\n"+
+"  The following GLOBAL variables always exist (so don't overwrite them!):\n"+
+"  _i: stores previous input.\n"+
+"  _ii: next previous.\n"+
+"  _iii: next-next previous.\n"+
+"  _ih : a list of all input _ih[n] is the input from line n.\n"+
+"\n"+
+"  Additionally, global variables named _i<n> are dynamically created (<n>\n"+
+"  being the prompt counter), such that _i<n> == _ih[<n>]\n"+
+"\n"+
+"  For example, what you typed at prompt 14 is available as _i14 and _ih[14].\n"+
+"\n"+
+"  You can create macros which contain multiple input lines from this history,\n"+
+"  for later re-execution, with the %macro function.\n"+
+"\n"+
+"  The history function %hist allows you to see any part of your input history\n"+
+"  by printing a range of the _i variables. Note that inputs which contain\n"+
+"  magic functions (%) appear in the history with a prepended comment. This is\n"+
+"  because they aren't really valid code, so you can't execute them.\n"+
+"\n"+
+"* Output caching system:\n"+
+"\n"+
+"  For output that is returned from actions, a system similar to the input\n"+
+"  cache exists but using _ instead of _i. Only actions that produce a result\n"+
+"  (NOT assignments, for example) are cached. If you are familiar with\n"+
+"  Mathematica, ICalico's _ variables behave exactly like Mathematica's %\n"+
+"  variables.\n"+
+"\n"+
+"  The following GLOBAL variables always exist (so don't overwrite them!):\n"+
+"  _ (one underscore): previous output.\n"+
+"  __ (two underscores): next previous.\n"+
+"  ___ (three underscores): next-next previous.\n"+
+"\n"+
+"  Global variables named _<n> are dynamically created (<n> being the prompt\n"+
+"  counter), such that the result of output <n> is always available as _<n>.\n"+
+"\n"+
+"  Finally, a global dictionary named _oh exists with entries for all lines\n"+
+				    "  which generated output.\n");
+				message["html"] = null;
+				message["start_line_number"] = 0;
+				message["source"] = "page";
+				payload.Add(message);
+			    } else if (code.StartsWith("?") || code.EndsWith("?")) {
+				// give help on command
+				Dictionary<string,object> message = new Dictionary<string,object>();
+				message["text"] = String.Format("FIXME: get help on '{0}'", code);
+				message["html"] = String.Format("<b>FIXME</b>: get help on '{0}'", code);
+				message["start_line_number"] = 0;
+				message["source"] = "page";
+				payload.Add(message);
+			    } else { // Handle code and magics:
+				// --------------------------------------
+				// Handle magics:
+				while (code.StartsWith("%")) { //----------------- Magics
+				    magic = session.GetMagic(code);
+				    if (magic != null) {
+					stack.Add(magic);
+					code = magic.get_code();
+					if (! magic.evaluate) // signal to exit, maybe error or no block
+					    break;
+				    }
+				} 
+				//---------------- Code
+				if ((magic == null || ((magic != null) && magic.evaluate)) && code.Trim() != "") {
+				    try {
+					retval = session.calico.Evaluate(code);
+				    } catch (Exception e) {
+					retval = e;
+				    }
 				}
-			    } 
-			    //---------------- Code
-			    if ((magic == null || ((magic != null) && magic.evaluate)) && code.Trim() != "") {
-				try {
-				    retval = session.calico.Evaluate(code);
-				} catch (Exception e) {
-				    retval = e;
+				stack.Reverse();
+				foreach (MagicBase m in stack) {
+				    retval = m.post_process(retval);
 				}
 			    }
-			    stack.Reverse();
-			    foreach (Magic m in stack) {
-				retval = m.post_process(retval);
-			    }
 			    // --------------------------------------
+			    // Handle in's and out's
 			    Dictionary<string, object> content = null;
+			    session.In[execution_count] = code;
+			    session.calico.SetVariable("_iii", session._iii);
+			    session.calico.SetVariable("_ii", session._ii);
+			    session.calico.SetVariable("_i", code);
+			    session.calico.SetVariable("_i" + execution_count, code);
+			    session._iii = session._ii;
+			    session._ii = code;
+			    session.Out[execution_count] = retval;
+			    session.calico.SetVariable("___", session.___);
+			    session.calico.SetVariable("__", session.__);
+			    session.calico.SetVariable("_", retval);
+			    session.calico.SetVariable("_" + execution_count, retval);
+			    session.___ = session.__;
+			    session.__ = retval;
 			    if (retval != null) {
 				if (retval is Widgets.Widget) {
 				    // Widgets inject themselves to output, but have no return repr
@@ -805,7 +921,7 @@ public static class ZMQServer {
 				{"status", "ok"},
 				{"execution_count", execution_count},
 				{"user_variables", new Dictionary<string, object>()},
-				{"payload", new List<object>()},
+				{"payload", payload},
 				{"user_expressions", new Dictionary<string, object>()}
 			    };
 			    send(session.shell_channel, header, m_header, metadata, content);
