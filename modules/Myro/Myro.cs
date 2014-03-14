@@ -507,53 +507,73 @@ public static class Myro
 		}
 	}
 
+    static Thread gamepadthread = null;
 	[method: JigsawTab("M/Movement")]
 	public static void gamepad ()
 	{
-		// sample robot controller
-		PythonDictionary results = (PythonDictionary)getGamepadNow ();
-		List button = (List)results ["button"];
-		string name = "Scribby";
-		try {
-			name = getName ();
-		} catch {
-			// ignore
-		}
-		List phrases = Graphics.PyList (
-		   String.Format ("Hello. My name is {0}.", name),
-		                 "Ouch! I'm a sensitive robot.", 
-				 "I'm hungry. Do you have any batteries?");
-    
-		Console.WriteLine ("        Pad   Action");
-		Console.WriteLine ("     ------   -------");
-		Console.WriteLine (" Left/Right   turnLeft() and turnRight()");
-		Console.WriteLine ("    Up/Down   forward() and backward()");
-		Console.WriteLine ("");
-    
-		if (button.Count > 0) {
-			Console.WriteLine ("     Button   Action");
-			Console.WriteLine ("     ------   -------");
-			Console.WriteLine ("          1   stop()");
-			if (button.Count > 1) 
-				Console.WriteLine ("          2   takePicture()");
-			if (button.Count > 2) 
-				Console.WriteLine ("          3   beep(.25, 523)");
-			if (button.Count > 3) 
-				Console.WriteLine ("          4   beep(.25, 587)");
-			if (button.Count > 4) 
-				Console.WriteLine ("          5   beep(.25, 659)");
-			if (button.Count > 5) 
-				Console.WriteLine (String.Format ("          6   speak('{0}')", 
-					phrases [0]));
-			if (button.Count > 6) 
-				Console.WriteLine (String.Format ("          7   speak('{0}')",
-					phrases [1]));
-			if (button.Count > 7) 
-				Console.WriteLine (String.Format ("          8   speak('{0}')",
-					phrases [2]));
-			Console.WriteLine ("");
-		}
-    
+        // if there isn't a gamepad thread or the old one is finished
+        if (gamepadthread == null || !gamepadthread.IsAlive){
+            gamepadthread = new Thread (new ThreadStart (gamepadhelper));        
+            gamepadthread.Start();
+        }
+        // there is still a gamepad thread active
+        else{
+            Console.WriteLine("Gamepad already running");
+        }
+    }
+
+	[method: JigsawTab("M/Movement")]
+	public static void gamepadhelper ()
+	{
+        // sample robot controller
+        if (gamepads.numGamepads() <= 0)
+        {
+            Console.Error.WriteLine("Zero gamepads available");
+            return;            
+        }
+        PythonDictionary results = (PythonDictionary)getGamepadNow ();
+        List button = (List)results ["button"];
+        string name = "Scribby";
+        try {
+            name = getName ();
+        } catch {
+            // ignore
+        }
+        List phrases = Graphics.PyList (
+                                        String.Format ("Hello. My name is {0}.", name),
+                                        "Ouch! I'm a sensitive robot.", 
+                                        "I'm hungry. Do you have any batteries?");
+        
+        Console.WriteLine ("        Pad   Action");
+        Console.WriteLine ("     ------   -------");
+        Console.WriteLine (" Left/Right   turnLeft() and turnRight()");
+        Console.WriteLine ("    Up/Down   forward() and backward()");
+        Console.WriteLine ("");
+        
+        if (button.Count > 0) {
+            Console.WriteLine ("     Button   Action");
+            Console.WriteLine ("     ------   -------");
+            Console.WriteLine ("          1   stop()");
+            if (button.Count > 1) 
+                Console.WriteLine ("          2   takePicture()");
+            if (button.Count > 2) 
+                Console.WriteLine ("          3   beep(.25, 523)");
+            if (button.Count > 3) 
+                Console.WriteLine ("          4   beep(.25, 587)");
+            if (button.Count > 4) 
+                Console.WriteLine ("          5   beep(.25, 659)");
+            if (button.Count > 5) 
+                Console.WriteLine (String.Format ("          6   speak('{0}')", 
+                                                  phrases [0]));
+            if (button.Count > 6) 
+                Console.WriteLine (String.Format ("          7   speak('{0}')",
+                                                  phrases [1]));
+            if (button.Count > 7) 
+                Console.WriteLine (String.Format ("          8   speak('{0}')",
+                                                  phrases [2]));
+            Console.WriteLine ("");
+        }
+        
 		Console.WriteLine ("Gamepad is now running... Press button 1 to stop.");
     
 		List lastMove = Graphics.PyList (0, 0);
@@ -650,6 +670,7 @@ public static class Myro
 				}
 			}
 		}
+        Console.WriteLine("Gamepad stopping");
 	}
 		
 	[method: JigsawTab(null)]
@@ -814,7 +835,19 @@ public static class Myro
 
 		public Gamepads ()
 		{
-			try {
+		}
+
+        public int numGamepads()
+        {            
+            lazyInit();
+            return handles == null ? 0: handles.Length;
+        }
+
+        public void lazyInit()
+        {
+            if (handles != null && handles.Length == Sdl.SDL_NumJoysticks ()) return;
+            
+            try {
 				Sdl.SDL_Init (Sdl.SDL_INIT_JOYSTICK);
 				handles = new IntPtr [Sdl.SDL_NumJoysticks ()];
 				for (int i=0; i < Sdl.SDL_NumJoysticks(); i++) {
@@ -823,10 +856,11 @@ public static class Myro
 			} catch {
 				Console.Error.WriteLine ("WARNING: SDL is not installed.");
 			}
-		}
+        }
 
 		public List getHatStates (int index)
 		{
+            lazyInit();
 			List retval = new List ();
 			int num = Sdl.SDL_JoystickNumHats (handles [index]);
 			for (int button = 0; button < num; button++) {
@@ -837,6 +871,7 @@ public static class Myro
 
 		public List getBallStates (int index)
 		{
+            lazyInit();
 			List retval = new List ();
 			int num = Sdl.SDL_JoystickNumBalls (handles [index]);
 			for (int button = 0; button < num; button++) {
@@ -849,6 +884,7 @@ public static class Myro
 
 		public List getButtonStates (int index)
 		{
+            lazyInit();
 			List retval = new List ();
 			int num = Sdl.SDL_JoystickNumButtons (handles [index]);
 			for (int button = 0; button < num; button++) {
@@ -859,6 +895,7 @@ public static class Myro
 
 		public List getAxisStates (int index)
 		{
+            lazyInit();
 			List retval = new List ();
 			int num = Sdl.SDL_JoystickNumAxes (handles [index]);
 			for (int button = 0; button < num; button++) {
@@ -869,6 +906,7 @@ public static class Myro
 
 		public PythonDictionary getGamepadNow (int index, List whats)
 		{
+            lazyInit();
 			PythonDictionary retval = new PythonDictionary ();
 			foreach (string what in whats) {
 				retval [what] = getGamepadNow (index, what);
@@ -878,6 +916,7 @@ public static class Myro
 
 		public object getGamepadNow (int index, string what)
 		{
+            lazyInit();
 			if (what == "all") {
 				return getGamepadNow (index, 
                              Graphics.PyList ("name", "axis", "ball", 
@@ -904,7 +943,7 @@ public static class Myro
 			}
 		}
 
-	        [method: JigsawTab(null)]
+        [method: JigsawTab(null)]
 		public static bool Same (object o1, object o2)
 		{
 			if (o1 is PythonDictionary) {
@@ -936,6 +975,7 @@ public static class Myro
 
 		public object getGamepad (List indices, string what)
 		{
+            lazyInit();
 			List initials = new List ();
 			foreach (int index in indices) {
 				initials.append (getGamepadNow (index, what));
@@ -958,6 +998,7 @@ public static class Myro
 
 		public object getGamepad (int index, string what)
 		{
+            lazyInit();
 			object initial = getGamepadNow (index, what);
 			Sdl.SDL_JoystickUpdate ();
 			object current = getGamepadNow (index, what);
@@ -971,6 +1012,7 @@ public static class Myro
 
 		public object getGamepad (List indices, List whats)
 		{
+            lazyInit();
 			List initials = new List ();
 			foreach (int index in indices) {
 				initials.append (getGamepadNow (index, whats));
@@ -993,6 +1035,7 @@ public static class Myro
 
 		public object getGamepad (int index, List whats)
 		{
+            lazyInit();
 			object initial = getGamepadNow (index, whats);
 			Sdl.SDL_JoystickUpdate ();
 			object current = getGamepadNow (index, whats);
@@ -4296,18 +4339,6 @@ public static class Myro
 
 	[method: JigsawTab("M/Graphics")]
 	public static Graphics.Color makeColor (string color)
-	{
-		return Graphics.makeColor (color);
-	}
-
-	[method: JigsawTab("M/Graphics")]
-	public static Graphics.Color Color (IList rgb)
-	{
-		return Graphics.makeColor ((int)rgb [0], (int)rgb [1], (int)rgb [2]);
-	}
-
-	[method: JigsawTab("M/Graphics")]
-	public static Graphics.Color Color (string color)
 	{
 		return Graphics.makeColor (color);
 	}
