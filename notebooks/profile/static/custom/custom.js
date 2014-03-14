@@ -49,7 +49,9 @@
  */
 
 
-$([IPython.events]).on('app_initialized.NotebookApp', function(){
+$([IPython.events]).on('app_initialized.NotebookApp', function() {
   //... 
-  require(['/static/custom/drag-and-drop.js'])
+  require(['/static/custom/drag-and-drop.js']);
+  var img = $('.container img')[0];
+  img.src = "/static/custom/icalico_logo.png";
 });

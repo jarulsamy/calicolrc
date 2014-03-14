@@ -18,7 +18,7 @@ using System.Reflection;// IEnumerator
 using Calico;
 
 namespace Calico {
-    public class Magic {
+    public class MagicBase {
 	public string command = "magic";         // magic text, eg %%file
 	public string mtype = "";                // "cell", "line", or "notebook"
 	public bool evaluate = true;             // should we evaluate code next?
@@ -30,10 +30,10 @@ namespace Calico {
 				 command);
 	}
 
-	public Magic() {
+	public MagicBase() {
 	}
 	
-	public Magic(ZMQServer.Session session, string code, 
+	public MagicBase(ZMQServer.Session session, string code, 
 		     string mtype, string args) {
 	    // The type of magic we are doing
 	    this.session = session;
@@ -153,6 +153,13 @@ public static class ZMQServer {
 	public IDictionary<string, object> parent_header;
 	public System.IO.StreamWriter log;
 	public Assembly magic_assembly;
+	public IDictionary<string,object> config;
+	public Dictionary<int,string> In = new Dictionary<int,string>();
+	public Dictionary<int,object> Out = new Dictionary<int,object>();
+	public object __ = null;
+	public object ___ = null;
+	public object _ii = null;
+	public object _iii = null;
 
 	public Session(Calico.MainWindow calico, string filename) {
 	    this.calico = calico;
@@ -161,7 +168,6 @@ public static class ZMQServer {
 	    session_id = System.Guid.NewGuid().ToString();
 	    engine_id = System.Guid.NewGuid().ToString();
 	    string json;
-	    IDictionary<string,object> config;
 	    if (this.filename != "") {
 		json = File.ReadAllText(this.filename);
 		config = decode(json);
@@ -201,8 +207,11 @@ public static class ZMQServer {
 		    config["ip"].ToString(),
 		    config["stdin_port"].ToString());
 
+	    // FIXME: load all files in this directory, and user local directory:
 	    magic_assembly = Assembly.LoadFrom(Path.Combine(calico.path, "..", "magics", "Magics.dll"));
 
+	    calico.SetVariable("In", In);
+	    calico.SetVariable("Out", Out);
 	    if (this.filename == "") {
 		config["hb_port"] = hb_channel.port;
 		config["shell_port"] = shell_channel.port;
@@ -258,7 +267,7 @@ public static class ZMQServer {
 	    return char.ToUpper(text[0]) + text.Substring(1);
 	}
 
-	public Magic GetMagic(string text) {
+	public MagicBase GetMagic(string text) {
 	    string [] lines = text.Split(new string[] { "\r\n", "\n" },
 		System.StringSplitOptions.None);
 	    string code = "";
@@ -298,7 +307,7 @@ public static class ZMQServer {
 		    ConstructorInfo constructor = type.GetConstructor(
 		        new[] {typeof(Session), typeof(string), typeof(string), typeof(string) });
 		    if (constructor != null) {
-			Magic retval = (Magic)constructor.Invoke(new object [] {this, code, mtype, args});
+			MagicBase retval = (MagicBase)constructor.Invoke(new object [] {this, code, mtype, args});
 			//Console.WriteLine("Checking for magic: '{0}'", retval);
 			return retval;
 		    }
@@ -611,6 +620,79 @@ public static class ZMQServer {
 
     public class ShellChannel : Channel {
 	public int execution_count = 1;
+	public static string USAGE = (
+"\n" +
+"ICalico -- An enhanced Interactive Scripting Shell for Calico\n"+
+"=============================================================\n"+
+"\n"+
+"ICalico offers a combination of convenient shell features, special commands\n"+
+"and a history mechanism for both input (command history) and output (results\n"+
+"caching, similar to Mathematica).\n" +
+"\n"+
+"MAIN FEATURES\n"+
+"-------------\n"+
+"\n"+
+"* Magic commands: type %magic for information on the magic subsystem.\n"+
+"\n"+
+"* Dynamic object information:\n"+
+"\n"+
+"  Typing ?word or word? prints detailed information about an object.\n"+
+"\n"+
+"* Completion in the local namespace, by typing TAB at the prompt.\n"+
+"\n"+
+"  At any time, hitting tab will complete any available commands or\n"+
+"  variable names, and show you a list of the possible completions if there's\n"+
+"  no unambiguous one. It will also complete filenames in the current directory.\n"+
+"\n"+
+"  - %hist: search history by index\n"+
+"\n"+
+"* Persistent command history across sessions.\n"+
+"\n"+
+"* Logging of input with the ability to save and restore a working session.\n"+
+"\n"+
+"* Input caching system:\n"+
+"\n"+
+"  ICalico offers numbered prompts (In/Out) with input and output caching. All\n"+
+"  input is saved and can be retrieved as variables (besides the usual arrow\n"+
+"  key recall).\n"+
+"\n"+
+"  The following GLOBAL variables always exist (so don't overwrite them!):\n"+
+"  _i: stores previous input.\n"+
+"  _ii: next previous.\n"+
+"  _iii: next-next previous.\n"+
+"  _ih : a list of all input _ih[n] is the input from line n.\n"+
+"\n"+
+"  Additionally, global variables named _i<n> are dynamically created (<n>\n"+
+"  being the prompt counter), such that _i<n> == _ih[<n>]\n"+
+"\n"+
+"  For example, what you typed at prompt 14 is available as _i14 and _ih[14].\n"+
+"\n"+
+"  You can create macros which contain multiple input lines from this history,\n"+
+"  for later re-execution, with the %macro function.\n"+
+"\n"+
+"  The history function %hist allows you to see any part of your input history\n"+
+"  by printing a range of the _i variables. Note that inputs which contain\n"+
+"  magic functions (%) appear in the history with a prepended comment. This is\n"+
+"  because they aren't really valid code, so you can't execute them.\n"+
+"\n"+
+"* Output caching system:\n"+
+"\n"+
+"  For output that is returned from actions, a system similar to the input\n"+
+"  cache exists but using _ instead of _i. Only actions that produce a result\n"+
+"  (NOT assignments, for example) are cached. If you are familiar with\n"+
+"  Mathematica, ICalico's _ variables behave exactly like Mathematica's %\n"+
+"  variables.\n"+
+"\n"+
+"  The following GLOBAL variables always exist (so don't overwrite them!):\n"+
+"  _ (one underscore): previous output.\n"+
+"  __ (two underscores): next previous.\n"+
+"  ___ (three underscores): next-next previous.\n"+
+"\n"+
+"  Global variables named _<n> are dynamically created (<n> being the prompt\n"+
+"  counter), such that the result of output <n> is always available as _<n>.\n"+
+"\n"+
+"  Finally, a global dictionary named _oh exists with entries for all lines\n"+
+"  which generated output.\n");
 
 	public ShellChannel(Session session, 
 			    Authorization auth, 
@@ -627,7 +709,8 @@ public static class ZMQServer {
 				IDictionary<string, object> m_content) {
 
 	    // Shell handler
-	    if (m_header["msg_type"].ToString() == "execute_request") {
+	    string msg_type = m_header["msg_type"].ToString();
+	    if (msg_type == "execute_request") {
 		var header = session.Header("status", m_header["session"].ToString());
 		var metadata = new Dictionary<string, object>();
 		var content = new Dictionary<string, object>
@@ -645,52 +728,30 @@ public static class ZMQServer {
 		};
 		send(session.iopub_channel, header, m_header, metadata, content);
 		// ---------------------------------------------------
-		// First, handle any Calico metacommands:
 		string code = m_content["code"].ToString().Trim();
-		// code may end with ? (show help)
-		//send: ['F3853494D83649BE88088630B9D9DDD3', '<IDS|MSG>', '134ff5274c043013d9c65a8f82eaee5786143bc0097b901a1475192082506901', '{"date":"2014-02-18T14:54:36.659168","username":"kernel","session":"ed5790ca-a841-43d8-969d-a1acc1c9764c","msg_id":"ef7d68b6-9fae-457c-b35b-2f7cfc442950","msg_type":"execute_reply"}', '{"username":"username","msg_id":"EBC34EFB59584DFC8468D7F7928C2C93","msg_type":"execute_request","session":"F3853494D83649BE88088630B9D9DDD3"}', '{"dependencies_met":true,"engine":"47ae2106-447b-4f2c-a8fa-09bb4e410bb7","status":"ok","started":"2014-02-18T14:54:36.652879"}', '{"status":"ok","execution_count":3,"user_variables":{},"payload":[{"text":"\\u001b[1;31mType:       \\u001b[0mfunction\\n\\u001b[1;31mString Form:\\u001b[0m<function display_html at 0x1a93140>\\n\\u001b[1;31mFile:       \\u001b[0m/usr/local/lib/python2.7/dist-packages/IPython/core/display.py\\n\\u001b[1;31mDefinition: \\u001b[0m\\u001b[0mIPython\\u001b[0m\\u001b[1;33m.\\u001b[0m\\u001b[0mdisplay\\u001b[0m\\u001b[1;33m.\\u001b[0m\\u001b[0mdisplay_html\\u001b[0m\\u001b[1;33m(\\u001b[0m\\u001b[1;33m*\\u001b[0m\\u001b[0mobjs\\u001b[0m\\u001b[1;33m,\\u001b[0m \\u001b[1;33m**\\u001b[0m\\u001b[0mkwargs\\u001b[0m\\u001b[1;33m)\\u001b[0m\\u001b[1;33m\\u001b[0m\\u001b[0m\\n\\u001b[1;31mDocstring:\\u001b[0m\\nDisplay the HTML representation of an object.\\n\\nParameters\\n----------\\nobjs : tuple of objects\\n    The Python objects to display, or if raw=True raw HTML data to\\n    display.\\nraw : bool\\n    Are the data objects raw data or Python objects that need to be\\n    formatted before display? [default: False]\\nmetadata : dict (optional)\\n    Metadata to be associated with the specific mimetype output.","html":null,"start_line_number":0,"source":"page"}],"user_expressions":{}}']
-
-		// code may end with ?? (show source code!)
-		// send: ['F3853494D83649BE88088630B9D9DDD3', '<IDS|MSG>', '8cc2f48bd53be4eab892f6073672dcb10f5270e834c6c8822c6d6bea0e5c5420', '{"date":"2014-02-18T14:57:34.068692","username":"kernel","session":"ed5790ca-a841-43d8-969d-a1acc1c9764c","msg_id":"36ea8e60-4dad-412f-818d-1984133b0ac8","msg_type":"execute_reply"}', '{"username":"username","msg_id":"8ADF32F2006349759F521CC336B26B6E","msg_type":"execute_request","session":"F3853494D83649BE88088630B9D9DDD3"}', '{"dependencies_met":true,"engine":"47ae2106-447b-4f2c-a8fa-09bb4e410bb7","status":"ok","started":"2014-02-18T14:57:34.061489"}', '{"status":"ok","execution_count":6,"user_variables":{},"payload":[{"text":"\\u001b[1;31mType:       \\u001b[0mfunction\\n\\u001b[1;31mString Form:\\u001b[0m<function display_html at 0x1a93140>\\n\\u001b[1;31mFile:       \\u001b[0m/usr/local/lib/python2.7/dist-packages/IPython/core/display.py\\n\\u001b[1;31mDefinition: \\u001b[0m\\u001b[0mIPython\\u001b[0m\\u001b[1;33m.\\u001b[0m\\u001b[0mdisplay\\u001b[0m\\u001b[1;33m.\\u001b[0m\\u001b[0mdisplay_html\\u001b[0m\\u001b[1;33m(\\u001b[0m\\u001b[1;33m*\\u001b[0m\\u001b[0mobjs\\u001b[0m\\u001b[1;33m,\\u001b[0m \\u001b[1;33m**\\u001b[0m\\u001b[0mkwargs\\u001b[0m\\u001b[1;33m)\\u001b[0m\\u001b[1;33m\\u001b[0m\\u001b[0m\\n\\u001b[1;31mSource:\\u001b[0m\\n\\u001b[1;32mdef\\u001b[0m \\u001b[0mdisplay_html\\u001b[0m\\u001b[1;33m(\\u001b[0m\\u001b[1;33m*\\u001b[0m\\u001b[0mobjs\\u001b[0m\\u001b[1;33m,\\u001b[0m \\u001b[1;33m**\\u001b[0m\\u001b[0mkwargs\\u001b[0m\\u001b[1;33m)\\u001b[0m\\u001b[1;33m:\\u001b[0m\\u001b[1;33m\\u001b[0m\\n\\u001b[1;33m\\u001b[0m    \\u001b[1;34m\\"\\"\\"Display the HTML representation of an object.\\u001b[0m\\n\\u001b[1;34m\\u001b[0m\\n\\u001b[1;34m    Parameters\\u001b[0m\\n\\u001b[1;34m    ----------\\u001b[0m\\n\\u001b[1;34m    objs : tuple of objects\\u001b[0m\\n\\u001b[1;34m        The Python objects to display, or if raw=True raw HTML data to\\u001b[0m\\n\\u001b[1;34m        display.\\u001b[0m\\n\\u001b[1;34m    raw : bool\\u001b[0m\\n\\u001b[1;34m        Are the data objects raw data or Python objects that need to be\\u001b[0m\\n\\u001b[1;34m        formatted before display? [default: False]\\u001b[0m\\n\\u001b[1;34m    metadata : dict (optional)\\u001b[0m\\n\\u001b[1;34m        Metadata to be associated with the specific mimetype output.\\u001b[0m\\n\\u001b[1;34m    \\"\\"\\"\\u001b[0m\\u001b[1;33m\\u001b[0m\\n\\u001b[1;33m\\u001b[0m    \\u001b[0m_display_mimetype\\u001b[0m\\u001b[1;33m(\\u001b[0m\\u001b[1;34m\'text/html\'\\u001b[0m\\u001b[1;33m,\\u001b[0m \\u001b[0mobjs\\u001b[0m\\u001b[1;33m,\\u001b[0m \\u001b[1;33m**\\u001b[0m\\u001b[0mkwargs\\u001b[0m\\u001b[1;33m)\\u001b[0m\\u001b[1;33m\\u001b[0m\\u001b[0m\\n","html":null,"start_line_number":0,"source":"page"}],"user_expressions":{}}']
-		
-		// Response to a KeyboardInterrupt -------------------------------------------------------------------
-		// header: {"date":"2014-02-20T23:59:12.520437","username":"kernel","session":"b0818a7a-1e25-48e4-a842-b7a534e02a92","msg_id":"db86cd17-501a-4751-a5eb-da2339596691","msg_type":"pyerr"}
-		// parent: {"username":"username","msg_id":"2B93F9E69880465B9A7B44C189EA3C8E","msg_type":"execute_request","session":"9AAB231FF67D4493833C5805A973F4C3"}
-		// meta: {}
-		// content: {"ename":"KeyboardInterrupt","evalue":"","traceback":["\\u001b[1;31m---------------------------------------------------------------------------\\u001b[0m\\n\\u001b[1;31mKeyboardInterrupt\\u001b[0m                         Traceback (most recent call last)","\\u001b[1;32m<ipython-input-1-f33f8312bb4d>\\u001b[0m in \\u001b[0;36m<module>\\u001b[1;34m()\\u001b[0m\\n\\u001b[1;32m----> 1\\u001b[1;33m \\u001b[1;32mwhile\\u001b[0m \\u001b[0mTrue\\u001b[0m\\u001b[1;33m:\\u001b[0m\\u001b[1;33m\\u001b[0m\\u001b[0m\\n\\u001b[0m\\u001b[0;32m      2\\u001b[0m     \\u001b[0mx\\u001b[0m \\u001b[1;33m=\\u001b[0m \\u001b[1;36m1\\u001b[0m\\u001b[1;33m\\u001b[0m\\u001b[0m\\n","\\u001b[1;31mKeyboardInterrupt\\u001b[0m: "]}
-		// Followed by: -------------------------------------------------------------------
-		// header: {"date":"2014-02-20T23:59:12.521471","username":"kernel","session":"b0818a7a-1e25-48e4-a842-b7a534e02a92","msg_id":"aa2acecb-b4dc-4e49-a7b5-772848c4ef1c","msg_type":"execute_reply"}', 
-		// parent: {"username":"username","msg_id":"2B93F9E69880465B9A7B44C189EA3C8E","msg_type":"execute_request","session":"9AAB231FF67D4493833C5805A973F4C3"}', 
-		// meta: {"dependencies_met":true,"engine":"8fb03435-a217-4061-bf49-c219bcdc0ca5","status":"error","started":"2014-02-20T23:59:04.873898"}', 
-		// content: {"status":"error","ename":"KeyboardInterrupt","user_variables":{},"evalue":"","traceback":["\\u001b[1;31m---------------------------------------------------------------------------\\u001b[0m\\n\\u001b[1;31mKeyboardInterrupt\\u001b[0m                         Traceback (most recent call last)","\\u001b[1;32m<ipython-input-1-f33f8312bb4d>\\u001b[0m in \\u001b[0;36m<module>\\u001b[1;34m()\\u001b[0m\\n\\u001b[1;32m----> 1\\u001b[1;33m \\u001b[1;32mwhile\\u001b[0m \\u001b[0mTrue\\u001b[0m\\u001b[1;33m:\\u001b[0m\\u001b[1;33m\\u001b[0m\\u001b[0m\\n\\u001b[0m\\u001b[0;32m      2\\u001b[0m     \\u001b[0mx\\u001b[0m \\u001b[1;33m=\\u001b[0m \\u001b[1;36m1\\u001b[0m\\u001b[1;33m\\u001b[0m\\u001b[0m\\n","\\u001b[1;31mKeyboardInterrupt\\u001b[0m: "],"execution_count":1,"user_expressions":{},"engine_info":{"engine_uuid":"8fb03435-a217-4061-bf49-c219bcdc0ca5","method":"execute","engine_id":-1},"payload":[]}']
-		// and idle: -------------------------------------------------------------------
-		// header: {"date":"2014-02-20T23:59:12.521844","username":"kernel","session":"b0818a7a-1e25-48e4-a842-b7a534e02a92","msg_id":"6aa17dad-37b9-4f7d-9bea-a30d8c1621ab","msg_type":"status"}
-		// parent: {"username":"username","msg_id":"2B93F9E69880465B9A7B44C189EA3C8E","msg_type":"execute_request","session":"9AAB231FF67D4493833C5805A973F4C3"}
-		// meta: {}
-		// content: {"execution_state":"idle"}
-
 		// Execute in background, and report results
 		ExecuteInBackground(code, m_header, execution_count);
 		execution_count += 1;
-	    } else if (m_header["msg_type"].ToString() == "kernel_info_request") {
+	    } else if (msg_type == "kernel_info_request") {
 		var header = session.Header("kernel_info_reply", m_header["session"].ToString());
 		var metadata = new Dictionary<string, object>();
 		var content = new Dictionary<string, object>
 		    {
-			{"protocol_version", new List<int>() {4, 0}},
+			{"protocol_version", new List<int>() {4, 1}},
 			{"ipython_version", new List<object>() {2, 0, 0, ""}},
 			{"language_version", new List<int>() {2, 5, 0}},
 			{"language", "calico"},
 		    };
 		send(session.shell_channel, header, m_header, metadata, content);
-	    } else if (m_header["msg_type"].ToString() == "history_request") {
+	    } else if (msg_type == "history_request") {
+		// FIXME: handle history_request
 		var header = session.Header("kernel_info_reply", m_header["session"].ToString());
 		var content = new Dictionary<string, object>
 		    {
 			{"output", false}
 		    };
 		send(session.shell_channel, header, m_header, m_metadata, content);
-	    } else if (m_header["msg_type"].ToString() == "object_info_request") {
+	    } else if (msg_type == "object_info_request") {
 		// for filling in details on function calls: x(<pause>
 		// content: {"detail_level":0,"oname":"x"}
 		string oname = m_content["oname"].ToString();
@@ -698,9 +759,9 @@ public static class ZMQServer {
 		// return:
 		var header = session.Header("object_info_reply");
 		var meta = new Dictionary<string, object>();
-		var content = session.calico.GetHelp(oname);
+		var content = session.calico.GetHelpOnFunctionCall(oname);
 		send(session.shell_channel, header, m_header, meta, content);
-	    } else if (m_header["msg_type"].ToString() == "complete_request") {
+	    } else if (msg_type == "complete_request") {
 		// content: {"text":"","line":"x.he","block":null,"cursor_pos":4}']
 		string to_match = m_content["line"].ToString();
 		// ask language to complete to_match
@@ -714,11 +775,11 @@ public static class ZMQServer {
 		    {"matched_text", tc.full_prefix},
 		};
 		send(session.shell_channel, header, m_header, meta, content);
-	    } else if (m_header["msg_type"].ToString() == "comm_msg") {
+	    } else if (msg_type == "comm_msg") {
 		Widgets.Dispatch(m_content["comm_id"].ToString(),
 				 (IDictionary<string, object>)m_content["data"],
 				 m_header);
-	    } else if (m_header["msg_type"].ToString() == "shutdown_request") {
+	    } else if (msg_type == "shutdown_request") {
 		// respond?
 		var header = session.Header("status", m_header["session"].ToString());
 		var metadata = new Dictionary<string, object>();
@@ -730,7 +791,7 @@ public static class ZMQServer {
 		    session.request_quit = true;
 		}
 	    } else {
-		throw new Exception("ShellChannel: unknown msg_type: " + m_header["msg_type"]);
+		throw new Exception("ShellChannel: unknown msg_type: " + msg_type);
 	    }
 	}
 
@@ -741,33 +802,77 @@ public static class ZMQServer {
 	    session.SetOutputs(execution_count, m_header);
 	    if (session.calico != null) {
 		session.calico.executeThread = new System.Threading.Thread(new System.Threading.ThreadStart(delegate {
+			    MagicBase magic = null;
+			    List<MagicBase> stack = new List<MagicBase>();
+			    List<object> payload = new List<object>();
 			    // --------------------------------------
-			    Magic magic = null;
-			    List<Magic> stack = new List<Magic>();
-			    while (code.StartsWith("%")) { //----------------- Magics
-				magic = session.GetMagic(code);
-				if (magic != null) {
-				    stack.Add(magic);
-				    code = magic.get_code();
-				    if (! magic.evaluate) // signal to exit, maybe error or no block
+			    // Handle query:
+			    if (code.Trim() == "?") {
+				Dictionary<string,object> message = new Dictionary<string,object>();
+				message["text"] = USAGE;
+				message["html"] = null;
+				message["start_line_number"] = 0;
+				message["source"] = "page";
+				payload.Add(message);
+			    } else if (code.StartsWith("?") || code.EndsWith("?")) {
+				if (code.StartsWith("?"))
+				    code = code.Substring(1);
+				else
+				    code = code.Substring(0, code.Length - 1);
+				// give help on command
+				Dictionary<string,object> message = new Dictionary<string,object>();
+				message["text"] = session.calico.GetHelpOn(code);
+				message["html"] = null;
+				message["start_line_number"] = 0;
+				message["source"] = "page";
+				payload.Add(message);
+			    } else { // Handle code and magics:
+				// --------------------------------------
+				// Handle magics:
+				while (code.StartsWith("%")) { //----------------- Magics
+				    magic = session.GetMagic(code);
+				    if (magic != null) {
+					stack.Add(magic);
+					code = magic.get_code();
+					if (! magic.evaluate) // signal to exit, maybe error or no block
+					    break;
+				    } else {
 					break;
+				    }
+				} 
+				//---------------- Code
+				if ((magic == null || ((magic != null) && magic.evaluate)) && code.Trim() != "") {
+				    try {
+					retval = session.calico.Evaluate(code);
+				    } catch (Exception e) {
+					retval = e;
+				    }
 				}
-			    } 
-			    //---------------- Code
-			    if ((magic == null || ((magic != null) && magic.evaluate)) && code.Trim() != "") {
-				try {
-				    retval = session.calico.Evaluate(code);
-				} catch (Exception e) {
-				    retval = e;
+				stack.Reverse();
+				foreach (MagicBase m in stack) {
+				    retval = m.post_process(retval);
 				}
-			    }
-			    stack.Reverse();
-			    foreach (Magic m in stack) {
-				retval = m.post_process(retval);
 			    }
 			    // --------------------------------------
+			    // Handle in's
 			    Dictionary<string, object> content = null;
+			    session.In[execution_count] = code;
+			    session.calico.SetVariable("_iii", session._iii);
+			    session.calico.SetVariable("_ii", session._ii);
+			    session.calico.SetVariable("_i", code);
+			    session.calico.SetVariable("_i" + execution_count, code);
+			    session._iii = session._ii;
+			    session._ii = code;
 			    if (retval != null) {
+				// --------------------------------------
+				// Handle out's (only when non-null)
+				session.Out[execution_count] = retval;
+				session.calico.SetVariable("___", session.___);
+				session.calico.SetVariable("__", session.__);
+				session.calico.SetVariable("_", retval);
+				session.calico.SetVariable("_" + execution_count, retval);
+				session.___ = session.__;
+				session.__ = retval;
 				if (retval is Widgets.Widget) {
 				    // Widgets inject themselves to output, but have no return repr
 				    session.display_widget((Widgets.Widget)retval);
@@ -805,7 +910,7 @@ public static class ZMQServer {
 				{"status", "ok"},
 				{"execution_count", execution_count},
 				{"user_variables", new Dictionary<string, object>()},
-				{"payload", new List<object>()},
+				{"payload", payload},
 				{"user_expressions", new Dictionary<string, object>()}
 			    };
 			    send(session.shell_channel, header, m_header, metadata, content);

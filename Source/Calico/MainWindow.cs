@@ -4496,6 +4496,12 @@ del _invoke, _
 					  "text/plain", "<JavaScript viewable in executing notebook>");
 	}
 
+	public MimeRepresentation Javascript(string text, string lib) {
+	    return new MimeRepresentation("application/javascript",  
+					  String.Format("require(['{0}'], function () {{\n{1}\n}});\n", lib, text),
+					  "text/plain", "<JavaScript viewable in executing notebook>");
+	}
+
 	public ImageRepresentation Image(string filename) {
 	    return new ImageRepresentation(filename);
 	}
@@ -4967,13 +4973,21 @@ del _invoke, _
 	    }
 	}
 
-	public IDictionary<string,object> GetHelp(string oname) {
+	public IDictionary<string,object> GetHelpOnFunctionCall(string oname) {
 	    // Given an object name, get help on it from the current
 	    // language, environment:
 	    if (CurrentLanguage != null && manager[CurrentLanguage].engine != null) {
-		return manager[CurrentLanguage].engine.GetHelp(oname);
+		return manager[CurrentLanguage].engine.GetHelpOnFunctionCall(oname);
 	    } else {
-		return manager["python"].engine.GetHelp(oname);
+		return manager["python"].engine.GetHelpOnFunctionCall(oname);
+	    }
+	}
+
+	public string GetHelpOn(string expression) {
+	    if (CurrentLanguage != null && manager[CurrentLanguage].engine != null) {
+		return manager[CurrentLanguage].engine.GetHelpOn(expression);
+	    } else {
+		return manager["python"].engine.GetHelpOn(expression);
 	    }
 	}
 

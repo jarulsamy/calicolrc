@@ -137,7 +137,11 @@ namespace Calico {
             return new List<string>();
         }
 
-	public virtual IDictionary<string,object> GetHelp(string oname) {
+	public virtual string GetHelpOn(string expression) {
+	    return String.Format("No available help on expression '{0}'", expression);
+	}
+
+	public virtual IDictionary<string,object> GetHelpOnFunctionCall(string oname) {
 	    return new Dictionary<string, object> {
 		    {"base_class" ,null},    // <type ...>
 		    {"init_definition", null},
@@ -544,7 +548,11 @@ namespace Calico {
 	    return retval;
 	}
 
-	public override IDictionary<string,object> GetHelp(string oname) {
+	public override string GetHelpOn(string expression) {
+	    return String.Format("No available help on expression '{0}'", expression);
+	}
+
+	public override IDictionary<string,object> GetHelpOnFunctionCall(string oname) {
 	    var retval = new Dictionary<string, object> {
 		    {"base_class" ,null},    // <type ...>
 		    {"init_definition", null},
