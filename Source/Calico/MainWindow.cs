@@ -4496,6 +4496,12 @@ del _invoke, _
 					  "text/plain", "<JavaScript viewable in executing notebook>");
 	}
 
+	public MimeRepresentation Javascript(string text, string lib) {
+	    return new MimeRepresentation("application/javascript",  
+					  String.Format("require(['{0}'], function () {{\n{1}\n}});\n", lib, text),
+					  "text/plain", "<JavaScript viewable in executing notebook>");
+	}
+
 	public ImageRepresentation Image(string filename) {
 	    return new ImageRepresentation(filename);
 	}
