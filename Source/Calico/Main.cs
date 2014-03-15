@@ -172,8 +172,8 @@ namespace Calico {
 			"\n" +
 			"# set environment vars for Windows:\n" +
 			"import os \n" +
-                        "os.environ[\"MONO_PATH\"] = r\"{0}\..\mono\lib\4.0;{0}\..\mono\lib\gtk-sharp-2.0;{0};{0}\..\mono\lib\2.0;{0}\..\mono\lib\3.5;{0}\windows\" \n" +
-			"os.environ[\"PATH\"] = os.environ[\"PATH\"] + r\";c:\Python27\Scripts\" \n" +
+                        "os.environ[\"MONO_PATH\"] = r\"{0}\\..\\mono\\lib\\4.0;{0}\\..\\mono\\lib\\gtk-sharp-2.0;{0};{0}\\..\\mono\\lib\\2.0;{0}\\..\\mono\\lib\\3.5;{0}\\windows\" \n" +
+			"os.environ[\"PATH\"] = os.environ[\"PATH\"] + r\";c:\\Python27\\Scripts\" \n" +
 			"\n" +
 			"c = get_config()\n" +
 			"c.KernelManager.kernel_cmd = [\n" +
