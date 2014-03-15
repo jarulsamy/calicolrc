@@ -27,15 +27,21 @@ public static class Shapes
 	}
 
         [method: JigsawTab("S/Windows")]
-	public static string getKeyState ()
+	public static string getLastKey ()
 	{
-		return Graphics.getKeyState ();
+		return Graphics.getLastKey ();
 	}
 
-        [method: JigsawTab("S/Windows")]
-	public static string getKeyPressed ()
+    [method: JigsawTab("S/Windows")]
+	public static bool getKeyPressed ()
 	{
 		return Graphics.getKeyPressed ();
+	}
+
+    [method: JigsawTab("S/Windows")]
+	public static bool getKeyPressed (string key)
+	{
+		return Graphics.getKeyPressed (key);
 	}
 
         [method: JigsawTab("S/Pictures")]

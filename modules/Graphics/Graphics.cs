@@ -330,15 +330,21 @@ public static class Graphics
 	}
 
         [method: JigsawTab("G/Windows")]
-	public static string getKeyState ()
+	public static string getLastKey ()
 	{
-		return getWindow ().getKeyState ();
+		return getWindow ().getLastKey ();
 	}
 
         [method: JigsawTab("G/Windows")]
-	public static string getKeyPressed ()
+	public static bool getKeyPressed ()
 	{
 		return getWindow ().getKeyPressed ();
+	}
+
+        [method: JigsawTab("G/Windows")]
+	public static bool getKeyPressed (string key)
+	{
+		return getWindow ().getKeyPressed (key);
 	}
 
         [method: JigsawTab("G/Windows")]
@@ -1250,7 +1256,8 @@ public static class Graphics
 		public PythonTuple _lastClick;
 		public string _lastKey = "";
 		public string _mouseState = "up";
-		public string _keyState = "up";
+		public bool _keyState = false;
+		public Dictionary<string, bool> _keyStates;
 		ManualResetEvent _lastClickFlag = new ManualResetEvent (false);
 		public double time = 0.0;
 		public double simulationStepTime = 0.01;
@@ -1281,7 +1288,8 @@ public static class Graphics
 			//DoubleBuffered = false;
 			AllowGrow = true;
 			AllowShrink = true;
-			SetDefaultSize (width, height);
+            _keyStates = new Dictionary<string, bool>();
+            SetDefaultSize (width, height);
 			AddEvents ((int)Gdk.EventMask.ButtonPressMask);
 			AddEvents ((int)Gdk.EventMask.ButtonReleaseMask);
 			AddEvents ((int)Gdk.EventMask.PointerMotionMask);
@@ -1397,7 +1405,8 @@ public static class Graphics
 			    clearListeners();
 			    _lastKey = "";
 			    _mouseState = "up";
-			    _keyState = "up";
+			    _keyState = false;
+			    _keyStates = new Dictionary<string, bool>();
 			    time = 0.0;
 			    simulationStepTime = 0.01;
 			    state = "init";
@@ -1672,7 +1681,8 @@ public static class Graphics
                                       Gtk.KeyPressEventArgs args)
 		{
 			_lastKey = args.Event.Key.ToString ();
-			_keyState = "down";
+			_keyState = true;
+            _keyStates[_lastKey] = true;
 			if (HandleKeyPressOnShape){
 			    lock (canvas.shapes) {
 				foreach (Shape shape in canvas.shapes) {
@@ -1699,7 +1709,9 @@ public static class Graphics
 		private void HandleKeyReleaseCallbacks (object obj,
                                       Gtk.KeyReleaseEventArgs args)
 		{
-			_keyState = "up";
+			_keyState = false;
+			string lastKey = args.Event.Key.ToString ();
+            _keyStates[lastKey] = false;
 			if (HandleKeyReleaseOnShape){
 			    lock (canvas.shapes) {
 				foreach (Shape shape in canvas.shapes) {
@@ -1791,6 +1803,15 @@ public static class Graphics
 				_update_interval = value;
 			}
 		}
+
+		public double getUpdateInterval ()
+        {
+            return updateInterval;
+        }
+		public void setUpdateInterval (double u)
+        {
+            updateInterval = u;
+        }
     
 		public int height {
 		    get {
@@ -1876,16 +1897,21 @@ public static class Graphics
 			return _mouseState;
 		}
     
-		public string getKeyPressed ()
+		public string getLastKey ()
 		{
 			string lk = _lastKey;
-			_lastKey = "";
+			//_lastKey = ""; //consume the event
 			return lk;
 		}
     
-		public string getKeyState ()
+		public bool getKeyPressed ()
 		{
 			return _keyState;
+		}
+
+		public bool getKeyPressed (string key)
+		{
+            return _keyStates.ContainsKey(key) ? _keyStates[key]: false;
 		}
     
 		public new void Show ()
@@ -2359,6 +2385,16 @@ public static class Graphics
 					throw new Exception ("canvas mode must be 'manual', 'auto', 'bitmap', 'bitmapmanual' or 'physics'");
 			}
 		}
+
+        public void setMode(string m)
+        {
+            mode = m;
+        }
+
+        public string getMode()
+        {
+            return mode;
+        }
     
 		public void setBackground(Graphics.Color color) {
 		    var background = new Rectangle(new List<int> {0,0}, new List<int> {width,height});
@@ -3515,6 +3551,14 @@ public static class Graphics
 		    return _gradient;
 		} 
 	    }
+
+        public Gradient getGradient(){
+            return gradient;
+        }
+	    
+        public void setGradient(Gradient g){
+            gradient = g;
+        }
 	    
 		public Color color {
 			set {
@@ -3534,6 +3578,16 @@ public static class Graphics
 				} else
 					return null;
 			}
+		}       
+
+		public void setColor (Color value)
+		{
+            color = value;
+		}
+
+		public Color getColor ()
+		{
+            return color;
 		}
 
 		public void setFill (Color value)
@@ -3545,7 +3599,12 @@ public static class Graphics
 			}
 			QueueDraw ();
 		}
-    
+
+		public Color getFill ()
+		{
+            return fill;
+		}
+        
 		public virtual Color fill {
 			set {
 				if (value == null) {
@@ -3572,6 +3631,11 @@ public static class Graphics
 				_outline = ((Color)value).Copy ();
 			}
 			QueueDraw ();
+		}
+
+		public Color getOutline ()
+		{
+            return outline;
 		}
     
 		public Color outline {
@@ -3664,14 +3728,35 @@ public static class Graphics
 	public class Text : Shape
 	{
 		public string _text;
-		public string fontFace = "sans serif";
+		public string _fontFace = "sans serif";
 		public Cairo.FontWeight fontWeight = Cairo.FontWeight.Normal;
 		public Cairo.FontSlant fontSlant = Cairo.FontSlant.Normal;
 		double _fontSize = 18;
-		public string xJustification = "center"; // left, center, right
-		public string yJustification = "center"; // top, center, bottom
+		public string _xJustification = "center"; // left, center, right
+		public string _yJustification = "center"; // top, center, bottom
 
-		// FIXME: add wrappers around justifications, weight, slant, face
+		// FIXME: add wrappers around weight, slant
+
+		public string xJustification {
+			get {
+				return _xJustification;
+			}
+			set {
+				_xJustification = value;
+				QueueDraw ();
+			}
+		}
+
+		public string yJustification {
+			get {
+				return _xJustification;
+			}
+			set {
+				_xJustification = value;
+				QueueDraw ();
+			}
+		}
+
 
 		public double fontSize {
 			get {
@@ -3682,6 +3767,68 @@ public static class Graphics
 				QueueDraw ();
 			}
 		}
+
+        public void setFontSize(double fontSize)
+        {
+            _fontSize = fontSize;
+        }
+
+
+        public double getFontSize()
+        {
+            return _fontSize;
+        }
+
+
+		public string fontFace {
+			get {
+				return _fontFace;
+			}
+			set {
+				_fontFace = value;
+				QueueDraw ();
+			}
+		}
+
+        public string getFontFace()
+        {
+            return _fontFace;
+        }
+
+        public void setFontFace(string fontFace)
+        {
+            _fontFace = fontFace;
+        }
+
+        public string getXJustification()
+        {
+            return xJustification;
+        }
+
+        public void setXJustification(string just)
+        {
+            xJustification = just;
+        }
+
+        public string getYJustification()
+        {
+            return yJustification;
+        }
+
+        public void setYJustification(string just)
+        {
+            yJustification = just;
+        }
+
+        public string getText()
+        {
+            return _text;
+        }
+
+        public void setText(string text)
+        {
+            _text = text;
+        }
 
 		public string text {
 			get {
