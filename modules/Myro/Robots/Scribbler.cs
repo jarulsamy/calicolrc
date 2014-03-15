@@ -244,7 +244,7 @@ public class Scribbler: Myro.Robot
         serial = new SerialPort (port, baud);
         lock (serial) {
             serial.ReadTimeout = 1000; // milliseconds
-            serial.WriteTimeout = 1000; // milliseconds
+            //serial.WriteTimeout = 1000; // milliseconds
             try {
                 serial.Open ();
             } catch {

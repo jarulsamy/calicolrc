@@ -41,26 +41,26 @@ public class SimScribbler : Myro.Robot
 			for (int i =0; i < sx.Length; i++) {
 				body.append (new Graphics.Point (sx [i] * 250, sy [i] * 250));
 			}
-			body.fill = Myro.Color ("red");
+			body.fill = Myro.makeColor ("red");
 			body.draw (frame);
 			// Draw wheels:
 			Graphics.Rectangle wheel1 = new Graphics.Rectangle (new Graphics.Point (-10, -23),
 							 new Graphics.Point (10, -17));
-			wheel1.color = Myro.Color ("black");
+			wheel1.color = Myro.makeColor ("black");
 			wheel1.draw (frame);
 			Graphics.Rectangle wheel2 = new Graphics.Rectangle (new Graphics.Point (-10, 23),
 							 new Graphics.Point (10, 17));
-			wheel2.color = Myro.Color ("black");
+			wheel2.color = Myro.makeColor ("black");
 			wheel2.draw (frame);
       
 			// Details
 			Graphics.Circle hole = new Graphics.Circle (new Graphics.Point (0, 0), 3);
-			hole.fill = Myro.Color ("black");
+			hole.fill = Myro.makeColor ("black");
 			hole.draw (frame);
       
 			Graphics.Rectangle fluke = new Graphics.Rectangle (new Graphics.Point (15, -10),
 							new Graphics.Point (19, 10));
-			fluke.color = Myro.Color ("green");
+			fluke.color = Myro.makeColor ("green");
 			fluke.draw (frame);
       
 			// light sensors

@@ -4727,15 +4727,21 @@ public static class Myro
 	}
 
 	[method: JigsawTab("M/Graphics")]
-	public static string getKeyState ()
+	public static string getLastKey ()
 	{
-		return Graphics.getKeyState ();
+		return Graphics.getLastKey ();
 	}
 
 	[method: JigsawTab("M/Graphics")]
-	public static string getKeyPressed ()
+	public static bool getKeyPressed ()
 	{
 		return Graphics.getKeyPressed ();
+	}
+
+	[method: JigsawTab("M/Graphics")]
+	public static bool getKeyPressed (string key)
+	{
+		return Graphics.getKeyPressed (key);
 	}
 
 	[method: JigsawTab("M/Graphics")]
