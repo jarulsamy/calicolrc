@@ -177,7 +177,7 @@ namespace Calico {
 			"\n" +
 			"c = get_config()\n" +
 			"c.KernelManager.kernel_cmd = [\n" +
-			"      r'{0}\\mono\\bin\\mono.exe', r'{1}', \n", path, executable_path) +
+			"      r'{0}\\..\\mono\\bin\\mono.exe', r'{1}', \n", path, executable_path) +
 			(((IList<string>)args).Contains("--nographics") ? "     '--nographics',\n" : "") +
                         lang_string +												     
 			("     '--server', '{connection_file}']\n");
