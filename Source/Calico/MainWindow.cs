@@ -4910,11 +4910,18 @@ del _invoke, _
 					       visible);
 	}
 
-
 	public Widgets.CameraWidget CameraWidget() {
 	    return new Widgets.CameraWidget(ZMQServer.session);
 	}
 
+	public Widgets.GeoChart GeoChart(IEnumerable<string> keys, IDictionary<string,object> data) {
+	    return new Widgets.GeoChart(ZMQServer.session, keys, data);
+	}
+
+	public Widgets.GeoChart GeoChart(IEnumerable<string> keys, IDictionary<string,object> data, 
+					 IDictionary<string,object> options) {
+	    return new Widgets.GeoChart(ZMQServer.session, keys, data, options);
+	}
 
 	// ---------- end of Widgets
 

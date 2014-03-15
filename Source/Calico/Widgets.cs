@@ -245,7 +245,6 @@ public static class Widgets {
 	    get { return Convert.ToString(get("description")); }
 	    set { set("description", Convert.ToString(value)); }
 	}
-	// FIXME: Should these be ints or strings?
 	public Int64 min {
 	    get { return Convert.ToInt64(get("min")); }
 	    set { set("min", Convert.ToInt64(value)); }
@@ -558,12 +557,10 @@ public static class Widgets {
 	    get { return Convert.ToString(get("format")); }
 	    set { set("format", Convert.ToString(value)); }
 	}
-	// FIXME: CastingUnicode: int
 	public string width {
 	    get { return Convert.ToString(get("width")); }
 	    set { set("width", Convert.ToString(value)); }
 	}
-	// FIXME: CastingUnicode: int
 	public string height {
 	    get { return Convert.ToString(get("height")); }
 	    set { set("height", Convert.ToString(value)); }
@@ -964,6 +961,7 @@ public static class Widgets {
 	    base(session, value, description, disabled, visible) {
 
 	    ((IDictionary<string,object>)data["state"])["_view_name"] = "PasswordView";
+	    // FIXME: make this a Representation
 	    session.calico.display(
 		   session.calico.Javascript("require([\"widgets/js/widget\"], function(WidgetManager){" +
 					     "  var PasswordView = WidgetManager._view_types['TextView'].extend({  " +
@@ -988,6 +986,7 @@ public static class Widgets {
 	public CameraWidget(ZMQServer.Session session) : base(session) {
 	    ((IDictionary<string,object>)data["state"])["_view_name"] = "CameraView";
 	    ((IDictionary<string,object>)data["state"])["imageurl"] = "";
+	    // FIXME: make this a Representation
 	    session.calico.display(
 		   session.calico.Javascript(
       "require([\"widgets/js/widget\"], function(WidgetManager){\n" +
@@ -1060,6 +1059,81 @@ public static class Widgets {
 
 	public void click() {
 	    session.calico.display(session.calico.Javascript("document.getElementById('picture_button').click();"));
+	}
+    }
+
+    // ---------------------------------------------------------------
+    // Not exactly widgets, but related Objects
+
+    public static string ToJSON(object value) {
+	if (value is bool) 
+	    return ToJSON((bool)value);
+	else if (value is IDictionary<string,object>) 
+	    return ToJSON((IDictionary<string,object>)value);
+	else if (value == null) 
+	    return "null";
+	else if (value is IEnumerable<string>) 
+	    return ToJSON((IEnumerable<string>)value);
+	else
+	    return value.ToString();
+    }
+
+    public static string ToJSON(bool value) {
+	return ((bool)value) ? "true" : "false";
+    }
+
+    public static string ToJSON(IDictionary<string,object> dict) {
+	string retval = "";
+	foreach (string key in dict.Keys) {
+	    if (retval != "") {
+		retval += ", ";
+	    }
+	    object value = dict[key];
+	    retval += String.Format("'{0}': {1}", key, ToJSON(value));
+	}
+	return String.Format("{{{0}}}", retval);
+    }
+
+    public static string ToJSON(string item) {
+	return String.Format("'{0}'", item);
+    }
+    
+    public static string ToJSON(IEnumerable<string> items) {
+	// ['item', 'item']
+	string retval = "";
+	foreach (string item in items) {
+	    if (retval != "") {
+		retval += ", ";
+	    }
+	    retval += ToJSON(item);
+	}
+	return String.Format("[{0}]", retval);
+    }
+
+    public class GeoChart {
+	public GeoChart(ZMQServer.Session session, IEnumerable<string> keys, IDictionary<string,object> data) 
+	    : this(session, keys, data, new Dictionary<string,object>()) {
+	}
+
+	public GeoChart(ZMQServer.Session session, IEnumerable<string> keys, IDictionary<string,object> data, IDictionary<string,object> options) {
+	    // GeoChart(calico.sesssion, ['Country', 'Size'], {"Canada": 562, "United States": 987}, {"height"=300, "legend"=False})
+	    string table = ToJSON(keys);
+	    foreach (string key in data.Keys) {
+		if (table != "") {
+		    table += ",\n";
+		}
+		table += String.Format("['{0}', {1}]", key, ToJSON(data[key]));
+	    }
+	    // FIXME: make this a Representation
+	    session.calico.display(
+	      session.calico.Javascript(
+	         String.Format("function draw() {{" +
+			       "  var chart = new google.visualization.GeoChart(element[0]);\n" +
+			       "  chart.draw(google.visualization.arrayToDataTable([{0}]), {1});\n" + 
+			       "}}\n" +
+			       "google.load('visualization', '1.0',\n" + 
+			       "            {{'callback': draw, 'packages':['geochart']}});\n", table, ToJSON(options)), // FIXME: options to JSON
+		 "https://www.google.com/jsapi"));
 	}
     }
 }
