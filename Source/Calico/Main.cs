@@ -158,25 +158,32 @@ namespace Calico {
 		DirectoryCopy(System.IO.Path.Combine(path, "..", "notebooks", "profile"), ipython_path, true);
 		// Now, put the top level ipython_config.py
 		string ipython_config = "";
+		string lang_string = "";
+		foreach (string arg in args) { 
+		    if (arg.StartsWith("--lang=")) {
+			lang_string = String.Format("      '{0}', \n", arg);
+			break;
+		    }
+		}
 		if (System.Environment.OSVersion.Platform.ToString().Contains("Win")) {
 		    string executable_path = System.IO.Path.Combine(path, "Calico.exe");
-		    ipython_config = 
+		    ipython_config = String.Format(
 			"# Configuration file for ipython.\n" +
+			"\n" +
+			"# set environment vars for Windows:\n" +
+			"import os \n" +
+                        "os.environ[\"MONO_PATH\"] = r\"{0}\\..\\mono\\lib\\4.0;{0}\\..\\mono\\lib\\gtk-sharp-2.0;{0};{0}\\..\\mono\\lib\\2.0;{0}\\..\\mono\\lib\\3.5;{0}\\windows\" \n" +
+			"os.environ[\"PATH\"] = os.environ[\"PATH\"] + r\";c:\\Python27\\Scripts\" \n" +
 			"\n" +
 			"c = get_config()\n" +
 			"c.KernelManager.kernel_cmd = [\n" +
-			String.Format("      'mono', '{0}', \n", executable_path) +
+			"      r'{0}\\..\\mono\\bin\\mono.exe', r'{1}', \n", path, executable_path) +
 			(((IList<string>)args).Contains("--nographics") ? "     '--nographics',\n" : "") +
+                        lang_string +												     
 			("     '--server', '{connection_file}']\n");
 		} else { // Linux, Mac OSX, etc
 		    string executable_path = System.IO.Path.Combine(path, "Calico.exe");
 		    string maclib_path = System.IO.Path.Combine(path, "mac");
-		    string lang_string = "";
-		    foreach (string arg in args) { 
-			if (arg.StartsWith("--lang=")) {
-			    lang_string = String.Format("      '{0}', \n", arg);
-			}
-		    }
 		    ipython_config = String.Format(
 			"# Configuration file for ipython.\n" +
 			"\n" +

@@ -13,7 +13,7 @@ SET PATH=%PATH%;%CD%\bin;%CD%\modules
 REM SET MONO_LOG_LEVEL=debug
 
 REM Set the MONO_PATH as we no longer use the GAC:
-SET MONO_PATH=%CD%\mono\lib\4.0;%CD%\mono\lib\gtk-sharp-2.0;%CD%\bin;%CD%\mono\lib\2.0;%CD%\mono\lib\3.5;
+SET MONO_PATH=%CD%\mono\lib\4.0;%CD%\mono\lib\gtk-sharp-2.0;%CD%\bin;%CD%\mono\lib\2.0;%CD%\mono\lib\3.5;%CD%\bin\windows
 
 REM Start up Calico in the background with no terminal:
 "mono\bin\mono.exe" bin\Calico.exe %*
