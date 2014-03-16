@@ -40,7 +40,7 @@ def main():
             gis.center_ll = gis.xy2ll(x, y)
         print("Center at (%s North, %s West) at zoom %s" % (gis.center_ll[0], gis.center_ll[1], gis.zoom))
         gis.center = gis.ll2px(gis.center_ll[0], gis.center_ll[1], gis.zoom) # center of map, in global XY
-        win.clear()
+        win.reset()
         gis.drawStates(win)
         gis.drawCapitals(win)
         gis.displayControls(win)
