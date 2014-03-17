@@ -561,7 +561,7 @@ public static class ZMQServer {
 		   
 	public virtual void loop() {
 	    string message, signature, s_header, s_parent_header, s_metadata, s_content;
-	    while (true) {
+	    while (! session.request_quit) {
 		try {
 		    message = socket.Receive(Encoding.UTF8);
 		    while (message != "<IDS|MSG>") {
@@ -997,9 +997,13 @@ public static class ZMQServer {
 	}
 
 	public override void loop() {
-	    while (true) {
-		string message = socket.Receive(Encoding.UTF8);
-		socket.Send(message, Encoding.UTF8);
+	    while (! session.request_quit) {
+		try {
+		    string message = socket.Receive(Encoding.UTF8);
+		    socket.Send(message, Encoding.UTF8);
+		} catch {
+		    break; // all done?
+		}
 	    }
 	}
     }
