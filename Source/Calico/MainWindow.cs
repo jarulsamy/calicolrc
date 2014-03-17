@@ -4622,6 +4622,12 @@ del _invoke, _
 	public Widgets.PopupWidget makePopupWidget() {
 	    return PopupWidget();
 	}
+	public Widgets.AccordionWidget makeAccordionWidget() {
+	    return AccordionWidget();
+	}
+	public Widgets.TabWidget makeTabWidget() {
+	    return TabWidget();
+	}
 	public Widgets.SelectionWidget makeSelectionWidget() {
 	    return SelectionWidget();
 	}
@@ -4901,22 +4907,42 @@ del _invoke, _
 						   visible); 
 	}
 
-	public Widgets.ContainerWidget ContainerWidget(IList children=null, 
-					      bool disabled=false, 
-					      bool visible=true) {
+	public Widgets.ContainerWidget ContainerWidget(IList<Widgets.Widget> children=null,
+						       bool disabled=false, 
+						       bool visible=true) {
 	    return new Widgets.ContainerWidget(ZMQServer.session,
 					       children, 
 					       disabled, 
 					       visible);
 	}
 
+	public Widgets.AccordionWidget AccordionWidget(IList<Widgets.Widget> children=null,
+						       bool disabled=false, 
+						       bool visible=true) {
+	    return new Widgets.AccordionWidget(ZMQServer.session,
+					       children, 
+					       disabled, 
+					       visible);
+	}
+
+	public Widgets.TabWidget TabWidget(IList<Widgets.Widget> children=null,
+						 bool disabled=false, 
+						 bool visible=true) {
+	    return new Widgets.TabWidget(ZMQServer.session,
+					 children, 
+					 disabled, 
+					 visible);
+	}
+
 	public Widgets.PopupWidget PopupWidget(string button_text="", 
-					  string description="", 
-					  bool disabled=false, 
-					  bool visible=true) {
+					       string description="", 
+					       IList<Widgets.Widget> children=null,
+					       bool disabled=false, 
+					       bool visible=true) {
 	    return new Widgets.PopupWidget(ZMQServer.session,
 					   button_text, 
 					   description, 
+					   children,
 					   disabled, 
 					   visible);
 	}

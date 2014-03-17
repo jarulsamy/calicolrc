@@ -872,31 +872,40 @@ public static class Widgets {
     }
 
     public class ContainerWidget : Widget {
-	// Attributes
-	public IList children {
-	    get { return (IList)get("children"); }
-	    set { set("children", value); }
-	}
+	public List<Widget> children = new List<Widget>(); 
+	public Dictionary<string,Widget> widgets = new Dictionary<string,Widget>();
 
 	public ContainerWidget(ZMQServer.Session session,
-				   IList children=null, 
+				   IList<Widget> children=null, 
 				   bool disabled=false, 
 				   bool visible=true) : base(session) {
-	    if (children == null) {
-		children = new List<Widget>();
-	    }
 	    data["state"] = new Dictionary<string,object> {
 		{"_view_name",  "ContainerView"},
 		{"_css",        get_css()},
 		{"disabled",    disabled},
 		{"visible",     visible},
-		{"children",    children},
 	    };
+	    set("_children", new List<string>());
 	    data["method"] = "update";
+	    widgets[comm_id] = this; // add yourself to list of widgets
+	    if (children != null) {
+		foreach (Widget widget in children) {
+		    AddChild(widget);
+		}
+	    }
+	}
+
+	public void AddChild(Widget widget) {
+	    List<string> _children = (List<string>)get("_children");
+	    _children.Add(widget.comm_id);
+	    children.Add(widget);
+	    widgets[widget.comm_id] = widget;
+	    // notify client:
+	    session.added_child_widget(widget);
 	}
     }
 
-    public class PopupWidget : Widget {
+    public class PopupWidget : ContainerWidget {
 	// Attributes
 	public string description {
 	    get { return Convert.ToString(get("description")); }
@@ -908,19 +917,34 @@ public static class Widgets {
 	}
 
 	public PopupWidget(ZMQServer.Session session,
-			    string button_text="", 
-			    string description="", 
-			    bool disabled=false, 
-			    bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "PopupView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"description", description},
-		{"button_text", button_text},
-	    };
-	    data["method"] = "update";
+			   string button_text="", 
+			   string description="", 
+			   IList<Widget> children=null,
+			   bool disabled=false, 
+			   bool visible=true) : base(session, children, disabled, visible) {
+	    set("_view_name",  "PopupView");
+	    set("description", description);
+	    set("button_text", button_text);
+	}
+    }
+
+    public class AccordionWidget : ContainerWidget {
+
+	public AccordionWidget(ZMQServer.Session session,
+			       IList<Widget> children=null,
+			       bool disabled=false, 
+			       bool visible=true) : base(session, children, disabled, visible) {
+	    set("_view_name",  "AccordianView");
+	}
+    }
+
+    public class TabWidget : ContainerWidget {
+
+	public TabWidget(ZMQServer.Session session,
+			 IList<Widget> children=null,
+			 bool disabled=false, 
+			 bool visible=true) : base(session, children, disabled, visible) {
+	    set("_view_name",  "TabView");
 	}
     }
 

@@ -452,11 +452,26 @@ public static class ZMQServer {
 	    iopub_channel.send(iopub_channel, header, new Dictionary<string, object>(), metadata, content);
 	}
 
-	public void display_widget(Widgets.Widget widget) {
+	public void added_child_widget(Widgets.Widget widget) {
+	    IDictionary<string,object> header;
+	    IDictionary<string,object> metadata;
+	    IDictionary<string,object> content;
 	    widget.execution_count = session.current_execution_count;
-	    var header = Header("comm_open");
-	    var metadata = new Dictionary<string, object>();
-	    var content = widget.GetInitialState();
+	    header = Header("comm_open");
+	    metadata = new Dictionary<string, object>();
+	    content = widget.GetInitialState();
+	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	    update_state(widget, parent_header);
+	}
+
+	public void display_widget(Widgets.Widget widget) {
+	    IDictionary<string,object> header;
+	    IDictionary<string,object> metadata;
+	    IDictionary<string,object> content;
+	    widget.execution_count = session.current_execution_count;
+	    header = Header("comm_open");
+	    metadata = new Dictionary<string, object>();
+	    content = widget.GetInitialState();
 	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
 	    update_state(widget, parent_header);
 	    header = Header("comm_msg");
