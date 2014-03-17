@@ -375,6 +375,10 @@ public static class ZMQServer {
 	}
 
 	public Dictionary<string, string> GetRepresentations(object obj) {
+	    return GetRepresentations(obj, null);
+	}
+
+	public Dictionary<string, string> GetRepresentations(object obj, string mime_type) {
 	    var data = new Dictionary<string, string>();
 	    // Everything has a text fallback:
 	    if (obj == null) {
@@ -385,9 +389,18 @@ public static class ZMQServer {
 		Type type = obj.GetType();
 		System.Reflection.MethodInfo method = type.GetMethod("GetRepresentations");
 		if (method != null) {
+		    // FIXME: don't make extra reprs if not needed (pass in mime_type to filter):
 		    IDictionary<string, string> reprs = (IDictionary<string, string>) method.Invoke(obj, new object [] {});
-		    foreach (KeyValuePair<string, string> kvp in (IDictionary<string, string>)reprs) {
-			data[kvp.Key] = kvp.Value;
+		    if (mime_type != null) {
+			try {
+			    data[mime_type] = reprs[mime_type];
+			} catch {
+			    data["plain/text"] = String.Format("Error: no such mime_type: '{0}'", mime_type);
+			}
+		    } else {
+			foreach (KeyValuePair<string, string> kvp in (IDictionary<string, string>)reprs) {
+			    data[kvp.Key] = kvp.Value;
+			}
 		    }
 		}
 	    }
@@ -466,6 +479,20 @@ public static class ZMQServer {
 	}
 
 	public void display(object obj) {
+	    if (obj is Widgets.Widget) {
+		display_widget((Widgets.Widget)obj);
+		return;
+	    }
+	    var header = Header("display_data");
+	    var metadata = new Dictionary<string, object>();
+	    var content = new Dictionary<string, object> {
+		{"source", "display"},
+		{"data", GetRepresentations(obj)}
+	    };
+	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	}
+
+	public void display_png(object obj) {
 	    if (obj is Widgets.Widget) {
 		display_widget((Widgets.Widget)obj);
 		return;

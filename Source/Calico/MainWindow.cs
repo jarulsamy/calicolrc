@@ -4472,6 +4472,9 @@ del _invoke, _
 	// -----------------------------------------------------------------------------
 	// IPython stuff:
 
+	// FIXME: add:
+	// JSON, PNG, JPEG, SVG
+
 	public AudioRepresentation Audio(string filename) {
 	    return new AudioRepresentation(filename);
 	}
@@ -4496,6 +4499,23 @@ del _invoke, _
 					  "text/plain", "<JavaScript viewable in executing notebook>");
 	}
 
+	public MimeRepresentation YouTubeVideo(string id) {
+	    return new MimeRepresentation("text/html",  
+					  String.Format("<iframe width=\"400\" height=\"300\" " + 
+							"src=\"http://www.youtube.com/embed/{0}\" " +
+							"frameborder=\"0\" allowfullscreen=\"\"></iframe>", id),
+					  "text/plain", "<YouTubeVideo viewable in executing notebook>");
+	}
+
+	public MimeRepresentation IFrame(string url, int width, int height) {
+	    return new MimeRepresentation("text/html",  
+					  String.Format("<iframe width=\"{0}\" height=\"{1}\" " + 
+							"src=\"{2}\" " +
+							"frameborder=\"0\" allowfullscreen=\"\"></iframe>", 
+							width, height, url),
+					  "text/plain", "<IFrame viewable in executing notebook>");
+	}
+	
 	public MimeRepresentation Javascript(string text, string lib) {
 	    return new MimeRepresentation("application/javascript",  
 					  String.Format("require(['{0}'], function () {{\n{1}\n}});\n", lib, text),
@@ -4930,7 +4950,7 @@ del _invoke, _
 	    return ZMQServer.session;
 	}
 
-	// JSON, PNG, JPEG, SVG, Math, LaTeX, Audio, Video, IFrame
+	// FIXME: add:
 	// display_pretty, display_html, display_jpeg, display_png, 
 	// display_json, display_latex, display_svg, display_audio, display_video
 
