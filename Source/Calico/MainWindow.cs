@@ -4968,6 +4968,10 @@ del _invoke, _
 	    display(obj1, objs);
 	}
 
+	public string input(string prompt="") {
+	    return ZMQServer.session.input(prompt);
+	}
+
 	// These two display functions are written to work with Scheme
 	// which is having issues with calling params
 	public void display(object obj1, params object [] objs) {

@@ -165,10 +165,10 @@ namespace CalicoPython
 			Execute(
 				"from Myro import ask as _ask;" +
 				"from sys import setrecursionlimit as _srl;" +
-				"__builtins__['input'] = _ask;" +
-				"__builtins__['raw_input'] = _ask;" +
+				"__builtins__['input'] = lambda p='': calico.input(p) if calico.GetSession() else _ask(p);" +
+				"__builtins__['raw_input'] = lambda p='': calico.input(p) if calico.GetSession() else _ask(p);" +
 				"_srl(1024);" + 
-				"del _ask, _srl;", false);
+				"del _srl;", false);
 		    } else {
 			Execute(
 				"from sys import setrecursionlimit as _srl;" +

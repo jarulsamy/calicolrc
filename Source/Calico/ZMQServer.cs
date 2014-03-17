@@ -478,6 +478,20 @@ public static class ZMQServer {
 	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
 	}
 
+	public string input(string prompt="") {
+	    var header = Header("input_request");
+	    var metadata = new Dictionary<string, object>();
+	    var content = new Dictionary<string, object> {
+		{"prompt", prompt}
+	    };
+	    stdin_channel.SetState("waiting", ""); // wait for recv "input_reply"
+	    stdin_channel.send(stdin_channel, header, parent_header, metadata, content);
+	    while (stdin_channel.GetState() == "waiting") {
+		Thread.Sleep(100); // miliseconds
+	    }
+	    return stdin_channel.input_reply;
+	}
+
 	public void display(object obj) {
 	    if (obj is Widgets.Widget) {
 		display_widget((Widgets.Widget)obj);
@@ -974,16 +988,59 @@ public static class ZMQServer {
 	    base(session, auth, transport, address, port, SocketType.DEALER) {
 	}
 
-	// FIXME: handle ZMQServer+ControlChannel: unknown msg_type: shutdown_request
+	public override void on_recv(string m_signature, 
+				IDictionary<string, object> m_header, 
+				IDictionary<string, object> m_parent_header, 
+				IDictionary<string, object> m_metadata, 
+				IDictionary<string, object> m_content) {
+	    // Control handler
+	    string msg_type = m_header["msg_type"].ToString();
+	    if (msg_type == "shutdown_request") {
+		session.request_quit = true;
+	    } else {
+		throw new Exception("ControlChannel: unknown msg_type: " + msg_type);
+	    }
+	}
     }
 
     public class StdInChannel : Channel {
+	string state = "normal"; // "waiting", "ready"
+	public string input_reply = "";
+	
+	public string GetState() {
+	    lock(state) {
+		return state;
+	    }
+	}
+	
+	public void SetState(string newstate, string result) {
+	    lock(state) {
+		state = newstate;
+		input_reply = result;
+	    }
+	}
+
 	public StdInChannel(Session session, 
 			    Authorization auth, 
 			    string transport, 
 			    string address, 
 			    string port) : 
 	    base(session, auth, transport, address, port, SocketType.DEALER) {
+	}
+
+	
+	public override void on_recv(string m_signature, 
+				IDictionary<string, object> m_header, 
+				IDictionary<string, object> m_parent_header, 
+				IDictionary<string, object> m_metadata, 
+				IDictionary<string, object> m_content) {
+	    // StdIn handler
+	    string msg_type = m_header["msg_type"].ToString();
+	    if (msg_type == "input_reply") {
+		SetState("ready", m_content["value"].ToString());
+	    } else {
+		throw new Exception("StdInChannel: unknown msg_type: " + msg_type);
+	    }
 	}
     }
 
