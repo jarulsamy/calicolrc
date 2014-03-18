@@ -4473,7 +4473,7 @@ del _invoke, _
 	// IPython stuff:
 
 	// FIXME: add:
-	// JSON, PNG, JPEG, SVG
+	// PNG, JPEG
 
 	public AudioRepresentation Audio(string filename) {
 	    return new AudioRepresentation(filename);
@@ -4484,6 +4484,16 @@ del _invoke, _
 					  "text/plain", "<HTML viewable in notebook>");
 	}
 
+	public MimeRepresentation SVG(string text) {
+	    return new MimeRepresentation("image/svg+xml", text, 
+					  "text/plain", "<SVG viewable in notebook>");
+	}
+
+	public MimeRepresentation JSON(string text) {
+	    return new MimeRepresentation("application/json", text, 
+					  "text/plain", "<JSON viewable in notebook>");
+	}
+	
 	public MimeRepresentation Latex(string text) {
 	    return new MimeRepresentation("text/latex", text, 
 					  "text/plain", "<Latex viewable in notebook>");
@@ -4497,6 +4507,29 @@ del _invoke, _
 	public MimeRepresentation Javascript(string text) {
 	    return new MimeRepresentation("application/javascript", text,
 					  "text/plain", "<JavaScript viewable in executing notebook>");
+	}
+
+	public MimeRepresentation FileLink(string filename) {
+	    return new MimeRepresentation("text/html", 
+					  String.Format("<a href=\"{0}\" target=\"_blank\">{0}</a>", filename),
+					  "text/plain", String.Format("'{0}'", filename));
+	}
+
+	public MimeRepresentation FileLinks(string directory) {
+	    string html_retval = "";
+	    string text_retval = "";
+	    DirectoryInfo dir = new DirectoryInfo(directory);
+	    // FIXME: traverse subdirectories, all the way down:
+	    foreach (FileInfo file in dir.GetFiles()) {
+		if (html_retval != "")
+		    html_retval += "<br/>";
+		if (text_retval != "")
+		    html_retval += "\n";
+		html_retval += String.Format("<a href=\"{0}\" target=\"_blank\">{0}</a>", file.Name);
+		text_retval += String.Format("'{0}'", file.Name);
+	    }
+	    return new MimeRepresentation("text/html", html_retval,
+					  "text/plain", text_retval);
 	}
 
 	public MimeRepresentation YouTubeVideo(string id) {

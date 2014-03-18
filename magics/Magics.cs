@@ -178,12 +178,14 @@ namespace Calico {
 	    Console.WriteLine("%edit FILENAME      - edit a file in an external editor");
 	    Console.WriteLine("%%file FILENAME     - create a filename with contents of cell");
 	    Console.WriteLine("%%html              - treat the cell as HTML");
+	    Console.WriteLine("%%javascript        - treat the cell as Javascript data");
 	    Console.WriteLine("%lang               - get information on current language");
 	    Console.WriteLine("%%lang LANGUAGE     - change language for just this cell");
 	    Console.WriteLine("%%%lang LANGUAGE    - change language for rest of cells");
 	    Console.WriteLine("%magic              - get information on magic meta-commands");
 	    Console.WriteLine("%qtconsole          - start a qtconsole");
 	    Console.WriteLine("%run FILENAME       - run a file (language determined by extension)");
+	    Console.WriteLine("%%svg               - treat the cell as SVG data");
 	    Console.WriteLine("%%time              - time how long it takes to run this cell");
 	}	
     }    
@@ -228,7 +230,7 @@ namespace Calico {
 	public override void cell(string args) {
 	    command = "html";
 	    evaluate = false;
-	    session.display(session.calico.HTML(code));
+	    session.display_html(session.calico.HTML(code));
 	}
     }
 
@@ -241,7 +243,20 @@ namespace Calico {
 	public override void cell(string args) {
 	    command = "javascript";
 	    evaluate = false;
-	    session.display(session.calico.Javascript(code));
+	    session.display_javascript(session.calico.Javascript(code));
+	}
+    }
+
+    public class Svg : Calico.MagicBase {
+	
+	public Svg(ZMQServer.Session session, string code, 
+		   string mtype, string args) : base(session, code, mtype, args) {
+	}
+
+	public override void cell(string args) {
+	    command = "svg";
+	    evaluate = false;
+	    session.display_svg(session.calico.SVG(code));
 	}
     }
 }
