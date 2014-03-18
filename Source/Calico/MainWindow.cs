@@ -4984,6 +4984,31 @@ del _invoke, _
 	    display(obj1, new object [0]);
 	}
 
+	public void display_png(object obj) {
+	    ZMQServer.session.display_mimetype(obj, "image/png");
+	}
+	public void display_jpeg(object obj) {
+	    ZMQServer.session.display_mimetype(obj, "image/jpeg");
+	}
+	public void display_html(object obj) {
+	    ZMQServer.session.display_mimetype(obj, "text/html");
+	}
+	public void display_javascript(object obj) {
+	    ZMQServer.session.display_mimetype(obj, "application/javascript");
+	}
+	public void display_json(object obj) {
+	    ZMQServer.session.display_mimetype(obj, "application/json");
+	}
+	public void display_latex(object obj) {
+	    ZMQServer.session.display_mimetype(obj, "text/latex");
+	}
+	public void display_pdf(object obj) {
+	    ZMQServer.session.display_mimetype(obj, "application/pdf");
+	}
+	public void display_svg(object obj) {
+	    ZMQServer.session.display_mimetype(obj, "image/svg+xml");
+	}
+
 	public void animate(object obj1) {
 	    clear_output(true);
 	    display(obj1, new object [0]);
