@@ -521,7 +521,7 @@ public static class ZMQServer {
 	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
 	}
 
-	public void display_png(object obj) {
+	public void display_mimetype(object obj, string mimetype) {
 	    if (obj is Widgets.Widget) {
 		display_widget((Widgets.Widget)obj);
 		return;
@@ -530,9 +530,34 @@ public static class ZMQServer {
 	    var metadata = new Dictionary<string, object>();
 	    var content = new Dictionary<string, object> {
 		{"source", "display"},
-		{"data", GetRepresentations(obj)}
+		{"data", GetRepresentations(obj, mimetype)}
 	    };
 	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	}
+
+	public void display_png(object obj) {
+	    display_mimetype(obj, "image/png");
+	}
+	public void display_jpeg(object obj) {
+	    display_mimetype(obj, "image/jpeg");
+	}
+	public void display_html(object obj) {
+	    display_mimetype(obj, "text/html");
+	}
+	public void display_javascript(object obj) {
+	    display_mimetype(obj, "application/javascript");
+	}
+	public void display_json(object obj) {
+	    display_mimetype(obj, "application/json");
+	}
+	public void display_latex(object obj) {
+	    display_mimetype(obj, "text/latex");
+	}
+	public void display_pdf(object obj) {
+	    display_mimetype(obj, "application/pdf");
+	}
+	public void display_svg(object obj) {
+	    display_mimetype(obj, "image/svg+xml");
 	}
     }
 
