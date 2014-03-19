@@ -1,6 +1,6 @@
 class Main < Myro
-    init
-    pic = Myro::takePicture
+    init "sim"
+    pic = takePicture
     show pic
     backward 1, 1
     forward 1, 1
