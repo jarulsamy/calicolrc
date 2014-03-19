@@ -2201,6 +2201,15 @@ public static class Myro
 	}
 
 	[method: JigsawTab("M/Senses")]
+	public static void configureBlob (int y_low, int y_high, int u_low, int u_high, int v_low, int v_high)
+	{
+	    if (robot != null) 
+            robot.configureBlob (y_low, y_high, u_low, u_high, v_low, v_high);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Senses")]
 	public static object getData (params int [] position)
 	{
 	    if (robot != null) 
@@ -3431,6 +3440,12 @@ public static class Myro
 		}
     
 		public virtual void sendIRMessage (string data)
+		{
+		}
+    
+        public virtual void configureBlob (int y_low, int y_high, 
+                                           int u_low, int u_high, 
+                                           int v_low, int v_high)
 		{
 		}
     

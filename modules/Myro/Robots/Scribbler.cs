@@ -2201,6 +2201,11 @@ public class Scribbler: Myro.Robot
         return Graphics.PyTuple (0, 254, minU, maxU, minV, maxV);
     }
     
+	public  void configureBlob (int y_low, int y_high, int u_low, int u_high, int v_low, int v_high)
+    {
+        conf_rle(y_low, y_high, u_low, u_high, v_low, v_high);
+    }
+
     public void conf_rle (int y_low=0, int y_high=254,
                           int u_low=51, int u_high=136,
                           int v_low=190, int v_high=254, int delay = 90, int smooth_thresh = 4)
