@@ -109,6 +109,35 @@ public class CalicoRubyEngine : DLREngine {
     return true;
   }
 
+  public override object Evaluate(string text) {
+      if (engine == null) {
+	  PrintLine("Please restart Calico to use this language.");
+	  return false;
+      }
+      object retval = null;
+      Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression; 
+      //Microsoft.Scripting.SourceCodeKind.InteractiveCode;
+      Microsoft.Scripting.Hosting.ScriptSource source = engine.CreateScriptSourceFromString(text, sctype);
+      try {
+	  if (manager != null && manager.UseSharedScope)			  
+	      retval = source.Execute(manager.scope);			  
+	  else
+	      retval = source.Execute(scope);
+      } catch (System.Threading.ThreadAbortException) {
+	  PrintLine("[Script stopped----------]");
+	  System.Threading.Thread.Sleep(100);
+	  System.Threading.Thread.ResetAbort();
+      } catch (Exception e) {
+	  if (e.Message.Contains("Thread was being aborted")) {
+	      PrintLine("[Script stopped----------]");
+	  } else {
+	      Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+	      PrintLine(eo.FormatException(e));
+	  }
+      }
+      return retval;
+  }
+
   public override bool ExecuteFile(string filename) {
     //manager.calico.last_error = ""
     //IronPython.Hosting.Python.GetSysModule(self.engine).settrace(self.trace)
