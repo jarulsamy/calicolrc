@@ -7089,9 +7089,21 @@ public static class Graphics
     
 		public override void moveTo (double x, double y)
 		{
+		    // need an offset to moveTo for each
+		    // first compute center
+		    if (items.Count > 0) {
+			double cx = 0;
+			double cy = 0;
 			foreach (Shape shape in items) {
-				shape.moveTo (x, y);
+			    cx += shape.x;
+			    cy += shape.y;
 			}
+			cx = cx / (items.Count);
+			cy = cy / (items.Count);
+			foreach (Shape shape in items) {
+			    shape.move(x -cx, y - cy);
+			}
+		    }
 		}
     
 		public override void move (double x, double y)
