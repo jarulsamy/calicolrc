@@ -2201,7 +2201,9 @@ public static class Myro
 	}
 
 	[method: JigsawTab("M/Senses")]
-	public static void configureBlob (int y_low, int y_high, int u_low, int u_high, int v_low, int v_high)
+	public static void configureBlob (int y_low=0, int y_high=254, 
+                                      int u_low=51, int u_high=136, 
+                                      int v_low=190, int v_high=254)
 	{
 	    if (robot != null) 
             robot.configureBlob (y_low, y_high, u_low, u_high, v_low, v_high);
