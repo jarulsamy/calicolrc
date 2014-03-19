@@ -4540,6 +4540,14 @@ del _invoke, _
 					  "text/plain", "<YouTubeVideo viewable in executing notebook>");
 	}
 
+	public MimeRepresentation VimeoVideo(string id) {
+	    return new MimeRepresentation("text/html",  
+					  String.Format("<iframe width=\"400\" height=\"300\" " + 
+							"src=\"https:/player.vimeo.com/video/{0}\" " +
+							"frameborder=\"0\" allowfullscreen=\"\"></iframe>", id),
+					  "text/plain", "<VimeoVideo viewable in executing notebook>");
+	}
+
 	public MimeRepresentation IFrame(string url, int width, int height) {
 	    return new MimeRepresentation("text/html",  
 					  String.Format("<iframe width=\"{0}\" height=\"{1}\" " + 
