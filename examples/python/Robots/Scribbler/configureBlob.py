@@ -10,7 +10,7 @@ p = None
 def handleMouseUp(obj, event):
     global x1,y1,x2,y2,p
     x2,y2= event.x, event.y
-    print (Myro.robot.set_blob_yuv(p, x1, y1, x2, y2))
+    configureBlob(p, x1, y1, x2, y2)
     show(takePicture('blob'), "blob image")
     x1, y1, x2, y2 = None, None, None, None
 
@@ -29,10 +29,10 @@ def handleMouseDown(obj, event):
     global x1,y1
     x1,y1= event.x, event.y
 
-def configureBlob():
+def main():
     global p, w
     p = takePicture()
-    w = Window(256, 192)
+    w = Window(getWidth(p), getHeight(p))
     p.draw(w)
     w.onMouseMovement(handleMouseMovement)
     w.onMouseUp(handleMouseUp)
