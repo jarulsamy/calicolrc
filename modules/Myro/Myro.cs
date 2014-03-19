@@ -2212,6 +2212,17 @@ public static class Myro
 	}
 
 	[method: JigsawTab("M/Senses")]
+	public static void configureBlob (Graphics.Picture p, 
+                                      int x1, int y1, 
+                                      int x2, int y2)
+	{
+	    if (robot != null) 
+            robot.configureBlob (p, x1, y1, x2, y2);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	[method: JigsawTab("M/Senses")]
 	public static object getData (params int [] position)
 	{
 	    if (robot != null) 
@@ -3449,6 +3460,13 @@ public static class Myro
                                            int u_low, int u_high, 
                                            int v_low, int v_high)
 		{
+		}
+    
+
+        public virtual void configureBlob (Graphics.Picture p,
+                                           int x1, int y1,
+                                           int x2, int y2)
+        {
 		}
     
 		public virtual List getBlob ()
