@@ -1,15 +1,15 @@
-from Myro import makeRobot, Simulation, Color, yesno
+from Myro import makeRobot, Simulation, makeColor, yesno
 from ai.conx import *
 
 network = Network()
 network.addLayers(2, 5, 1)
 
 width, height = 500, 400
-sim = Simulation("Learning Simulation", width, height, Color("lightgrey"))
-sim.addWall((0, 0), (width, 10), Color("black"))
-sim.addWall((0, 0), (10, height), Color("black"))
-sim.addWall((width - 10, 0), (width, height), Color("black"))
-sim.addWall((0, height- 10), (width, height), Color("black"))
+sim = Simulation("Learning Simulation", width, height, makeColor("lightgrey"))
+sim.addWall((0, 0), (width, 10), makeColor("black"))
+sim.addWall((0, 0), (10, height), makeColor("black"))
+sim.addWall((width - 10, 0), (width, height), makeColor("black"))
+sim.addWall((0, height- 10), (width, height), makeColor("black"))
 
 robot = makeRobot("SimPioneer", sim)
 sim.setOption(0, "show-sensors", True)

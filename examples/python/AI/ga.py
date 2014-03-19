@@ -547,7 +547,7 @@ def test():
     # Here is a test to evolve the weights/biases in a neural network
     # that solves the XOR problem:
 
-    from conx import Network
+    from ai.conx import Network, Layer
     class NNGA(GA):
         def __init__(self, cnt):
             n = Network()

@@ -92,7 +92,7 @@ def plotMoreSound(function, color, width=500):
     prev = (0, width)
     for i in range(0, width, 2):
         l = Graphics.Line(prev, (i/2, array[i]))
-        l.color = Myro.Color(color)
+        l.color = Myro.makeColor(color)
         l.draw(win)
         prev = (i/2, array[i])
 
