@@ -4,7 +4,7 @@
 //  Author:
 //       Douglas S. Blank <dblank@cs.brynmawr.edu>
 // 
-//  Copyright (c) 2011-2013 The Calico Project
+//  Copyright (c) 2011-2014 The Calico Project
 //
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -1926,7 +1926,7 @@ del _invoke, _
                 String.Format(_("Mono: {0}") + "\n", System.Environment.Version) +
                 String.Format(_("Gtk: {0}"), typeof(Gtk.Window).Assembly.GetName().Version)
                       );
-            aboutDialog.Copyright = _("(c) 2011-2013, Institute for Personal Robots in Education");
+            aboutDialog.Copyright = _("(c) 2011-2014, Institute for Personal Robots in Education");
             //aboutDialog.Documenters
             //aboutDialog.License
             //aboutDialog.Logo

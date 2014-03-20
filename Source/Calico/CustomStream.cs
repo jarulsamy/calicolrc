@@ -4,7 +4,7 @@
 //  Author:
 //       Douglas S. Blank <dblank@cs.brynmawr.edu>
 // 
-//  Copyright (c) 2011 The Calico Project
+//  Copyright (c) 2011-2014 The Calico Project
 // 
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,6 +27,11 @@ namespace Calico {
     public class CustomStream : Stream {
         public Calico.Tag tag;
         Calico.MainWindow calico;
+	bool DEBUG = false;
+	// FIXME: Ruby has strange \r\n and a zero-length string
+	// that messes up the output when not in a console (eg, web)
+	// This hack makes output visible:
+	bool skip_next = false; 
 
         public CustomStream(Calico.MainWindow calico, Tag tag) : base() {
             this.calico = calico;
@@ -35,17 +40,34 @@ namespace Calico {
 
         public override void Write(Byte [] bytes, int offset, int count) {
             // FIXME: Ruby generates \r\n 13 10
-            //if (bytes[0] == 13)
-            //    return;
+            if (bytes[0] == 10 && skip_next) {
+		skip_next = false;
+		return;
+	    }
             if (count == 3 && offset == 0 && bytes [0] == 239 && bytes [1] == 187 && bytes [2] == 191) {
                 // clear screen?
             } else {
-                string text = System.Text.Encoding.UTF8.GetString(bytes, offset, count);
-                calico.Print(tag, text);              
+		if (count > 0) {
+		    string text = System.Text.Encoding.UTF8.GetString(bytes, offset, count);
+		    if (DEBUG) {
+			if (count == 1)
+			    PrintLine(tag, String.Format("DEBUG: Write(\"{0}\", {1}, {2})", bytes[0], offset, count));
+			else if (count == 2)
+			    PrintLine(tag, String.Format("DEBUG: Write(\"{0}{1}\", {2}, {3})", bytes[0], bytes[1], offset, count));
+			else
+			    PrintLine(tag, String.Format("DEBUG: Write(\"{0}\", {1}, {2})", text, offset, count));
+		    }
+		    calico.Print(tag, text);              
+		} else {
+		    if (DEBUG) PrintLine(tag, String.Format("DEBUG: Write(\"{0}\", {1}, {2})", "", offset, count));
+		    calico.PrintLine(tag, "");              
+		    skip_next = true;
+		}
             }
         }
 
         public override void WriteByte(Byte b){
+	    if (DEBUG) PrintLine(tag, String.Format("DEBUG: WriteByte({0})", b));
             Write(new byte[] {b}, 0, 1);
         }
 
@@ -70,15 +92,24 @@ namespace Calico {
         }
 
         public override bool CanRead {
-            get {return false;}
+            get {
+		if (DEBUG) PrintLine(tag, String.Format("DEBUG: CanRead -> false"));
+		return false;
+	    }
         }
 
         public override bool CanSeek {
-            get {return false;}
+            get {
+		if (DEBUG) PrintLine(tag, String.Format("DEBUG: CanSeek -> false"));
+		return false;
+	    }
         }
 
         public override bool CanWrite {
-            get {return true;}
+            get {
+		if (DEBUG) PrintLine(tag, String.Format("DEBUG: CanWrite -> true"));
+		return true;
+	    }
         }
 
         public override void Flush() {
@@ -104,6 +135,7 @@ namespace Calico {
         }
 
         public override void SetLength(long l) {
+	    if (DEBUG) PrintLine(tag, String.Format("DEBUG: SetLength({0})", l));
         }
     }
 }

@@ -53,28 +53,6 @@ public class CalicoRubyEngine : DLREngine {
     // set some ruby options
   }
 
-
-  public override void PostSetup(MainWindow calico) {
-    base.PostSetup(calico);
-    // Set up input
-    // "require 'stringio'; ostdout = $stdout; $stdout = fake = StringIO.new; $stdout = ostdout", 
-    DirectoryInfo dir = new System.IO.DirectoryInfo(System.IO.Path.Combine(calico.path, 
-									   System.IO.Path.Combine("..", "modules")));
-
-    try
-      {
-	if (engine != null)
-	  {
-	    System.Collections.Generic.ICollection<string> paths = new List<string>();
-	    paths.Add(String.Format("{0}", dir));
-	    engine.SetSearchPaths(paths);
-	  }
-      }catch(Exception e)
-      {
-	Console.WriteLine(e);
-      }
-  }
-
   public override bool Execute(string text, bool ok) {
     // This is called by RunInBackground() in the MainWindow
     //manager.calico.last_error = ""
