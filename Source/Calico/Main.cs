@@ -30,7 +30,7 @@ using System.Threading;
 
 namespace Calico {
     class MainClass {
-        public static string Version = "2.5.0";
+        public static string Version = "3.0.0";
         public static bool IsLoadLanguages = true;
         public static bool verbose = false;
 
