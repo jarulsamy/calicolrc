@@ -160,7 +160,7 @@ namespace Calico {
 	public override void line(string args) {
 	    command = "edit";
 	    evaluate = true;
-	    System.Diagnostics.Process.Start("/usr/bin/env", "emacsclient " + args);
+	    System.Diagnostics.Process.Start("/usr/bin/env", "emacs " + args);
 	}
 	
     }    
@@ -169,6 +169,14 @@ namespace Calico {
 	
 	public Magic(ZMQServer.Session session, string code, 
 		      string mtype, string args) : base(session, code, mtype, args) {
+	}
+
+	public override void cell(string args) {
+	    line(args);
+	}
+
+	public override void notebook(string args) {
+	    line(args);
 	}
 
 	public override void line(string args) {
