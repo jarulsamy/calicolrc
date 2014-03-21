@@ -1837,39 +1837,36 @@ public class Scribbler: Myro.Robot
         }
         int px = 0;
         int counter = 0;
-        int val = 128;
+        byte val = 128;
         bool inside = true;
-        for (int i=0; i < height; i++) {
-            for (int j=0; j < width; j+=1) {
-                if (counter < 1 && px < buffer.Length) {
-                    counter = buffer [px];
-                    px += 1;
-                    counter = (counter << 8) | buffer [px];
-                    px += 1;
-                    //Fluke 2 large image requires a 3 byte counter
-                    if (isFluke2()){
-                        counter = (counter << 8) | buffer[px];
-                        px += 1;						
-                    }
-                    // each count is 4 pixels
-                    counter = counter * 4;
-
-                    if (inside) {
-                        val = 0;
-                        inside = false;
-                    } else {
-                        val = 255;
-                        inside = true;
-                    }
+        int bufpos = 0;
+        for (int i=0; i < blobs.Length; i++) {
+            if (counter < 1 && px < buffer.Length) {
+                counter = buffer [px];
+                px += 1;
+                counter = (counter << 8) | buffer [px];
+                px += 1;
+                //Fluke 2 large image requires a 3 byte counter
+                if (isFluke2()){
+                    counter = (counter << 8) | buffer[px];
+                    px += 1;						
                 }
-                blobs [(i*width*3) + 3*j] = (byte)val;   //r
-                blobs [(i*width*3) + 3*j+1] = (byte)val; //g
-                blobs [(i*width*3) + 3*j+2] = (byte)val; //b
+                // each count is 4 pixels
+                counter = counter * 4;
 
-                //blobs [i * width * 3 + j + 3] = (byte)val;
-
-                counter -= 1;
+                // each pixel is 3 bytes (r, g, b)
+                counter = counter * 3;
+                
+                if (inside) {
+                    val = 0;
+                    inside = false;
+                } else {
+                    val = 255;
+                    inside = true;
+                }
             }
+            blobs[i] = val;                       
+            counter -= 1;
         }
         return blobs;
     }
