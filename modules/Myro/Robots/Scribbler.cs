@@ -1840,7 +1840,7 @@ public class Scribbler: Myro.Robot
         int val = 128;
         bool inside = true;
         for (int i=0; i < height; i++) {
-            for (int j=0; j < width; j+=4) {
+            for (int j=0; j < width; j+=1) {
                 if (counter < 1 && px < buffer.Length) {
                     counter = buffer [px];
                     px += 1;
@@ -1851,6 +1851,8 @@ public class Scribbler: Myro.Robot
                         counter = (counter << 8) | buffer[px];
                         px += 1;						
                     }
+                    // each count is 4 pixels
+                    counter = counter * 4;
 
                     if (inside) {
                         val = 0;
@@ -1860,12 +1862,10 @@ public class Scribbler: Myro.Robot
                         inside = true;
                     }
                 }
-                for (int z = 0; z < 4; z++)
-                {
-                    blobs [(i * width *3) + 3*(j+z)] = (byte)val;   //r
-                    blobs [(i * width * 3) + 3*(j+z)+1] = (byte)val; //g
-                    blobs [(i * width * 3) + 3*(j+z)+2] = (byte)val; //b
-                }
+                blobs [(i*width*3) + 3*j] = (byte)val;   //r
+                blobs [(i*width*3) + 3*j+1] = (byte)val; //g
+                blobs [(i*width*3) + 3*j+2] = (byte)val; //b
+
                 //blobs [i * width * 3 + j + 3] = (byte)val;
 
                 counter -= 1;
