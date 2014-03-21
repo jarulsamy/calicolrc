@@ -1159,4 +1159,35 @@ public static class ZMQServer {
 	    Thread.Sleep ((int)(1 * 1000)); // seconds
 	}
     }
+
+    public class Client {
+
+	public Client(string path=null, string sshserver=null) {
+	}
+
+	// % ipython profile create pcalico --parallel
+	// % ipcluster start np=5 --profile calico
+	// open the profile_calico/security/ipcontroller-client.json
+	/*
+	  {
+	  "control": 37052, 
+	  "task": 53034, 
+	  "notification": 37699, 
+	  "task_scheme": "leastload", 
+	  "mux": 36320, 
+	  "iopub": 39858, 
+	  "ssh": "", 
+	  "key": "181729da-2fa6-467c-857e-9d5c619fd22a", 
+	  "registration": 46506, 
+	  "interface": "tcp://127.0.0.1", 
+	  "signature_scheme": "hmac-sha256", 
+	  "pack": "json", 
+	  "unpack": "json", 
+	  "location": "192.168.1.100"
+	  }
+	*/
+	// talk to hub: get machine list
+	// send it a command, machine list
+	// receive results (json?)
+    }
 }

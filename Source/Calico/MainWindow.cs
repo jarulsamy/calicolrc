@@ -5010,6 +5010,16 @@ del _invoke, _
 	    return new Widgets.GeoChart(ZMQServer.session, keys, data, options);
 	}
 
+	public Widgets.ScatterChart ScatterChart(IEnumerable<string> keys, IList<IList<object>> data,
+						 IDictionary<string,object> options) {
+	    return new Widgets.ScatterChart(ZMQServer.session, keys, data, options);
+	}
+
+	public Widgets.ScatterChart ScatterChart(IEnumerable<string> keys, IList<IList<object>> data) {
+	    return new Widgets.ScatterChart(ZMQServer.session, keys, data);
+	}
+
+
 	// ---------- end of Widgets
 
 	public ZMQServer.Session GetSession() {
@@ -5017,9 +5027,12 @@ del _invoke, _
 	    return ZMQServer.session;
 	}
 
+	public ZMQServer.Client Client(string path=null, string sshserver=null) {
+	    return new ZMQServer.Client(path, sshserver);
+	}
+
 	// FIXME: add:
-	// display_pretty, display_html, display_jpeg, display_png, 
-	// display_json, display_latex, display_svg, display_audio, display_video
+	// display_pretty, display_audio, display_video
 
 	public void display(object obj1) {
 	    display(obj1, new object [0]);
