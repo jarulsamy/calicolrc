@@ -2218,6 +2218,10 @@ public static class Graphics
 			this.y = dot.y;
 		}
 
+		public static double operator -(Point p1, Point p2) {
+		    return p1.distance(p2);
+		}
+		
 		public double distance (Point p)
 		{
 			return Math.Sqrt (Math.Pow (x - p.x, 2) + Math.Pow (y - p.y, 2));

@@ -5019,6 +5019,14 @@ del _invoke, _
 	    return new Widgets.ScatterChart(ZMQServer.session, keys, data);
 	}
 
+	public Widgets.LineChart LineChart(IList<IList<object>> data,
+					   IDictionary<string,object> options) {
+	    return new Widgets.LineChart(ZMQServer.session, data, options);
+	}
+
+	public Widgets.LineChart LineChart(IList<IList<object>> data) {
+	    return new Widgets.LineChart(ZMQServer.session, data);
+	}
 
 	// ---------- end of Widgets
 

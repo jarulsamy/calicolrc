@@ -1205,4 +1205,42 @@ public static class Widgets {
 		 "https://www.google.com/jsapi"));
 	}
     }
+
+    public class LineChart {
+	ZMQServer.Session session;
+
+	public LineChart(ZMQServer.Session session, IList<IList<object>> data) 
+	    : this(session, data, new Dictionary<string,object>()) {
+	}
+
+	public LineChart(ZMQServer.Session session, IList<IList<object>> data, IDictionary<string,object> options) {
+	    /*
+	      var data = google.visualization.arrayToDataTable([
+	      ['Year', 'Sales', 'Expenses'],
+	      ['2004',  1000,      400],
+	      ['2005',  1170,      460],
+	      ['2006',  660,       1120],
+	      ['2007',  1030,      540]
+	      ]);
+	    */
+	    this.session = session;
+	    string table = "";
+	    foreach (IList<object> row in data) {
+		if (table != "") {
+		    table += ",\n";
+		}
+		table += ToJSON(row);
+	    }
+	    // FIXME: make this a Representation
+	    session.calico.display(
+	      session.calico.Javascript(
+	         String.Format("function draw() {{" +
+			       "  var chart = new google.visualization.LineChart(element[0]);\n" +
+			       "  chart.draw(google.visualization.arrayToDataTable([{0}]), {1});\n" + 
+			       "}}\n" +
+			       "google.load('visualization', '1.0',\n" + 
+			       "            {{'callback': draw, 'packages':['corechart']}});\n", table, ToJSON(options)), 
+		 "https://www.google.com/jsapi"));
+	}
+    }
 }
