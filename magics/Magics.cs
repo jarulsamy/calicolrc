@@ -185,19 +185,20 @@ namespace Calico {
 	public override void line(string args) {
 	    command = "magics";
 	    evaluate = true;
-	    Console.WriteLine("%connect_info       - show ICalico JSON connection information");
-	    Console.WriteLine("%edit FILENAME      - edit a file in an external editor");
-	    Console.WriteLine("%%file FILENAME     - create a filename with contents of cell");
-	    Console.WriteLine("%%html              - treat the cell as HTML");
-	    Console.WriteLine("%%javascript        - treat the cell as Javascript data");
-	    Console.WriteLine("%lang               - get information on current language");
-	    Console.WriteLine("%%lang LANGUAGE     - change language for just this cell");
-	    Console.WriteLine("%%%lang LANGUAGE    - change language for rest of cells");
-	    Console.WriteLine("%magic              - get information on magic meta-commands");
-	    Console.WriteLine("%qtconsole          - start a qtconsole");
-	    Console.WriteLine("%run FILENAME       - run a file (language determined by extension)");
-	    Console.WriteLine("%%svg               - treat the cell as SVG data");
-	    Console.WriteLine("%%time              - time how long it takes to run this cell");
+	    Console.WriteLine("%connect_info        - show ICalico JSON connection information");
+	    Console.WriteLine("%download url [file] - download a URL to a file");
+	    Console.WriteLine("%edit FILENAME       - edit a file in an external editor");
+	    Console.WriteLine("%%file FILENAME      - create a filename with contents of cell");
+	    Console.WriteLine("%%html               - treat the cell as HTML");
+	    Console.WriteLine("%%javascript         - treat the cell as Javascript data");
+	    Console.WriteLine("%lang                - get information on current language");
+	    Console.WriteLine("%%lang LANGUAGE      - change language for just this cell");
+	    Console.WriteLine("%%%lang LANGUAGE     - change language for rest of cells");
+	    Console.WriteLine("%magic               - get information on magic meta-commands");
+	    Console.WriteLine("%qtconsole           - start a qtconsole");
+	    Console.WriteLine("%run FILENAME        - run a file (language determined by extension)");
+	    Console.WriteLine("%%svg                - treat the cell as SVG data");
+	    Console.WriteLine("%%time               - time how long it takes to run this cell");
 	}	
     }    
 
@@ -295,14 +296,20 @@ namespace Calico {
 		evaluate = false;
 		return;
 	    }
-	    if (filename.StartsWith ("http://") || filename.StartsWith ("https://")) {
-		HttpWebRequest req = (HttpWebRequest)WebRequest.Create (filename);
+	    if (url.StartsWith ("http://") || url.StartsWith ("https://")) {
+		HttpWebRequest req = (HttpWebRequest)WebRequest.Create (url);
 		req.KeepAlive = false;
 		req.Timeout = 10000;        
 		WebResponse resp = req.GetResponse ();
 		Stream s = resp.GetResponseStream ();
-		System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
-		sw.Write(s);
+		//System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
+		System.IO.FileStream sw = new System.IO.FileStream(filename, System.IO.FileMode.Create,
+								   System.IO.FileAccess.Write);
+		byte[] buffer = new byte[8 * 1024];
+		int len;
+		while ((len = s.Read(buffer, 0, buffer.Length)) > 0) {
+		    sw.Write(buffer, 0, len);
+		}    
 		sw.Close();
 	    }
 	}
