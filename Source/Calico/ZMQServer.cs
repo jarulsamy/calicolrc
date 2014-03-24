@@ -69,6 +69,48 @@ namespace Calico {
 	    // construction
 	    return code;
 	}
+
+	public virtual List<string> Split(string args) {
+	    args = args.Trim();
+	    List<string> retval = new List<string>();
+	    string current = "";
+	    string state = null;
+	    for (int i=0; i < args.Length; i++) {
+		string c = args.Substring(i, 1);
+		if (c == "\\") {
+		    i++;
+		    c = args.Substring(i, 1);
+		    current += c;
+		} else if (state == null) {
+		    if (c == "\"") {
+			state = "double-quote";
+			if (current != "") {
+			    retval.Add(current);
+			}
+			current = "";
+		    } else if (c == " ") { // delimiter
+			if (current != "") {
+			    retval.Add(current);
+			}
+			current = "";
+		    } else {
+			current += c;
+		    }
+		} else if (state == "double-quote") {
+		    if (c == "\"") {
+			state = null;
+			retval.Add(current);
+			current = "";
+		    } else {
+			current += c;
+		    }
+		}
+	    }
+	    if (current != "") {
+		retval.Add(current);
+	    }
+	    return retval;
+	}
     }
 }
 
