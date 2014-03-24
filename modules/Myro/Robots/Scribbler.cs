@@ -1703,54 +1703,52 @@ public class Scribbler: Myro.Robot
         }
         //start = 0);
         //create the image from the YUV layer
-        for (int i=0; i < height; i++) {
-            for (int j=0; j < width; j++) {
-                if (j >= 3) {
-                    // go to the left for other values
-                    vy = -1;
-                    vu = -2;
-                    y1v = -1;
-                    y1u = -3;
-                    uy = -1;
-                    uv = -2;
-                    y2u = -1;
-                    y2v = -3;
-                } else {
-                    // go to the right for other values
-                    vy = 1;
-                    vu = 2;
-                    y1v = 3;
-                    y1u = 1;
-                    uy = 1;
-                    uv = 2;
-                    y2u = 3;
-                    y2v = 1;
-                }
-                //   0123 0123 0123
-                if ((j % 4) == 0) { //3 #2   VYUY VYUY VYUY
-                    V = line [i * width + j];
-                    Y = line [i * width + j + vy];
-                    U = line [i * width + j + vu];
-                } else if ((j % 4) == 1) { //0 #3
-                    Y = line [i * width + j];
-                    V = line [i * width + j + y1v];
-                    U = line [i * width + j + y1u];
-                } else if ((j % 4) == 2) { //1 #0
-                    U = line [i * width + j];
-                    Y = line [i * width + j + uy];
-                    V = line [i * width + j + uv];
-                } else if ((j % 4) == 3) { //2 #1
-                    Y = line [i * width + j];
-                    U = line [i * width + j + y2u];
-                    V = line [i * width + j + y2v];
-                }
-                U = U - 128;
-                V = V - 128;
-                // Y = Y;
-                buffer [(i * width + j) * 3 + 0] = (byte)Math.Max (Math.Min (Y + 1.13983 * V, 255), 0);
-                buffer [(i * width + j) * 3 + 1] = (byte)Math.Max (Math.Min (Y - 0.39466 * U - 0.58060 * V, 255), 0);
-                buffer [(i * width + j) * 3 + 2] = (byte)Math.Max (Math.Min (Y + 2.03211 * U, 255), 0);
+        for (int j=0; j < width*height; j++) {
+            if (j % width >= 3) {
+                // go to the left for values
+                vy = -1;
+                vu = -2;
+                y1v = -1;
+                y1u = -3;
+                uy = -1;
+                uv = -2;
+                y2u = -1;
+                y2v = -3;
+            } else {
+                // go to the right for other values
+                vy = 1;
+                vu = 2;
+                y1v = 3;
+                y1u = 1;
+                uy = 1;
+                uv = 2;
+                y2u = 3;
+                y2v = 1;
             }
+            //   0123 0123 0123
+            if ((j % 4) == 0) { //3 #2   VYUY VYUY VYUY
+                V = line [j];
+                Y = line [j + vy];
+                U = line [j + vu];
+            } else if ((j % 4) == 1) { //0 #3
+                Y = line [j];
+                V = line [j + y1v];
+                U = line [j + y1u];
+            } else if ((j % 4) == 2) { //1 #0
+                U = line [j];
+                Y = line [j + uy];
+                V = line [j + uv];
+            } else if ((j % 4) == 3) { //2 #1
+                Y = line [j];
+                U = line [j + y2u];
+                V = line [j + y2v];
+            }
+            U = U - 128;
+            V = V - 128;
+            // Y = Y;
+            buffer [3*j + 0] = (byte)Math.Max (Math.Min (Y + 1.13983 * V, 255), 0);
+            buffer [3*j + 1] = (byte)Math.Max (Math.Min (Y - 0.39466 * U - 0.58060 * V, 255), 0);
+            buffer [3*j + 2] = (byte)Math.Max (Math.Min (Y + 2.03211 * U, 255), 0);            
         }            
         return buffer;
     }
