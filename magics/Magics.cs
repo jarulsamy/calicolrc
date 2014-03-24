@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic; // List
+using System.Net; // http stuff
+using System.IO; // stream
 
 namespace Calico {
 
@@ -265,6 +268,43 @@ namespace Calico {
 	    command = "svg";
 	    evaluate = false;
 	    session.display_svg(session.calico.SVG(code));
+	}
+    }
+
+    public class Download : Calico.MagicBase {
+	
+	public Download(ZMQServer.Session session, string code, 
+			string mtype, string args) : base(session, code, mtype, args) {
+	}
+
+	public override void line(string args) {
+	    command = "download";
+	    evaluate = true;
+	    List<string> arg = Split(args);
+	    string url;
+	    string filename;
+	    if (arg.Count == 1) {
+		url = arg[0];
+		var uri = new System.Uri(url);
+		filename = System.IO.Path.GetFileName(uri.LocalPath);
+	    } else if (arg.Count == 2) {
+		url = arg[0];
+		filename = arg[1];
+	    } else {
+		System.Console.Error.WriteLine("Incorrect number of arguments to %download: expected 1 or 2, received {0}", arg.Count);
+		evaluate = false;
+		return;
+	    }
+	    if (filename.StartsWith ("http://") || filename.StartsWith ("https://")) {
+		HttpWebRequest req = (HttpWebRequest)WebRequest.Create (filename);
+		req.KeepAlive = false;
+		req.Timeout = 10000;        
+		WebResponse resp = req.GetResponse ();
+		Stream s = resp.GetResponseStream ();
+		System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
+		sw.Write(s);
+		sw.Close();
+	    }
 	}
     }
 }
