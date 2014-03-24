@@ -1094,8 +1094,8 @@ public static class Widgets {
 	    return ToJSON((bool)value);
 	else if (value is string) 
 	    return ToJSON((string)value);
-	else if (value is IDictionary<string,object>) 
-	    return ToJSON((IDictionary<string,object>)value);
+	else if (value is IDictionary) 
+	    return ToJSON((IDictionary)value);
 	else if (value == null) 
 	    return "null";
 	else if (value is IEnumerable<string>) 
@@ -1106,7 +1106,7 @@ public static class Widgets {
 	    return value.ToString();
     }
 
-    public static string ToJSON(IDictionary<string,object> dict) {
+    public static string ToJSON(IDictionary dict) {
 	string retval = "";
 	foreach (string key in dict.Keys) {
 	    if (retval != "") {
@@ -1134,6 +1134,27 @@ public static class Widgets {
 	return String.Format("[{0}]", retval);
     }
 
+    public static IList Lines(int size) {
+        List<List<object>> retval = new List<List<object>>() {new List<object>() { "x" }};
+        for(int i=0; i < size; i++) {
+            retval.Add( new List<object>() { String.Format("{0}", i + 1) });
+	}
+	return (IList)retval;
+    }
+
+    public static IList Lines(IList previous, IList data, string label=null) {
+        IList retval = previous;
+	((IList)retval[0]).Add(label == null ? "Line " + ((IList)retval[0]).Count : label);
+        int count = 0;
+        foreach (IList row in retval) {
+	    if (count > 0) {
+		row.Add(data[count - 1]);
+	    }
+            count += 1;
+	}
+	return (IList)retval;
+    }
+
     public static string ToJSON(IList<object> items) {
 	// ['item', 'item']
 	string retval = "";
@@ -1149,11 +1170,11 @@ public static class Widgets {
     public class GeoChart {
 	ZMQServer.Session session;
 
-	public GeoChart(ZMQServer.Session session, IEnumerable<string> keys, IDictionary<string,object> data) 
+	public GeoChart(ZMQServer.Session session, IEnumerable<string> keys, IDictionary data) 
 	    : this(session, keys, data, new Dictionary<string,object>()) {
 	}
 
-	public GeoChart(ZMQServer.Session session, IEnumerable<string> keys, IDictionary<string,object> data, IDictionary<string,object> options) {
+	public GeoChart(ZMQServer.Session session, IEnumerable<string> keys, IDictionary data, IDictionary options) {
 	    // GeoChart(calico.sesssion, ['Country', 'Size'], {"Canada": 562, "United States": 987}, {"height"=300, "legend"=False})
 	    this.session = session;
 	    string table = ToJSON(keys);
@@ -1179,11 +1200,11 @@ public static class Widgets {
     public class ScatterChart {
 	ZMQServer.Session session;
 
-	public ScatterChart(ZMQServer.Session session, IEnumerable<string> keys, IList<IList<object>> data) 
+	public ScatterChart(ZMQServer.Session session, IEnumerable<string> keys, IList data) 
 	    : this(session, keys, data, new Dictionary<string,object>()) {
 	}
 
-	public ScatterChart(ZMQServer.Session session, IEnumerable<string> keys, IList<IList<object>> data, IDictionary<string,object> options) {
+	public ScatterChart(ZMQServer.Session session, IEnumerable<string> keys, IList data, IDictionary options) {
 	    // ScatterChart(["X", "Y"], [[8, 12], [10, 9], [9, 10], [8, 12]], height=300, width=500, lineWidth=1, legend='"none"')
 	    this.session = session;
 	    string table = ToJSON(keys);
@@ -1198,6 +1219,44 @@ public static class Widgets {
 	      session.calico.Javascript(
 	         String.Format("function draw() {{" +
 			       "  var chart = new google.visualization.ScatterChart(element[0]);\n" +
+			       "  chart.draw(google.visualization.arrayToDataTable([{0}]), {1});\n" + 
+			       "}}\n" +
+			       "google.load('visualization', '1.0',\n" + 
+			       "            {{'callback': draw, 'packages':['corechart']}});\n", table, ToJSON(options)), 
+		 "https://www.google.com/jsapi"));
+	}
+    }
+
+    public class LineChart {
+	ZMQServer.Session session;
+
+	public LineChart(ZMQServer.Session session, IList data) 
+	    : this(session, data, new Dictionary<string,object>()) {
+	}
+
+	public LineChart(ZMQServer.Session session, IList data, IDictionary options) {
+	    /*
+	      var data = google.visualization.arrayToDataTable([
+	      ['Year', 'Sales', 'Expenses'],
+	      ['2004',  1000,      400],
+	      ['2005',  1170,      460],
+	      ['2006',  660,       1120],
+	      ['2007',  1030,      540]
+	      ]);
+	    */
+	    this.session = session;
+	    string table = "";
+	    foreach (IList<object> row in data) {
+		if (table != "") {
+		    table += ",\n";
+		}
+		table += ToJSON(row);
+	    }
+	    // FIXME: make this a Representation
+	    session.calico.display(
+	      session.calico.Javascript(
+	         String.Format("function draw() {{" +
+			       "  var chart = new google.visualization.LineChart(element[0]);\n" +
 			       "  chart.draw(google.visualization.arrayToDataTable([{0}]), {1});\n" + 
 			       "}}\n" +
 			       "google.load('visualization', '1.0',\n" + 

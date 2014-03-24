@@ -5001,24 +5001,32 @@ del _invoke, _
 	    return new Widgets.CameraWidget(ZMQServer.session);
 	}
 
-	public Widgets.GeoChart GeoChart(IEnumerable<string> keys, IDictionary<string,object> data) {
+	public Widgets.GeoChart GeoChart(IEnumerable<string> keys, IDictionary data) {
 	    return new Widgets.GeoChart(ZMQServer.session, keys, data);
 	}
 
-	public Widgets.GeoChart GeoChart(IEnumerable<string> keys, IDictionary<string,object> data, 
-					 IDictionary<string,object> options) {
+	public Widgets.GeoChart GeoChart(IEnumerable<string> keys, IDictionary data, 
+					 IDictionary options) {
 	    return new Widgets.GeoChart(ZMQServer.session, keys, data, options);
 	}
 
-	public Widgets.ScatterChart ScatterChart(IEnumerable<string> keys, IList<IList<object>> data,
-						 IDictionary<string,object> options) {
+	public Widgets.ScatterChart ScatterChart(IEnumerable<string> keys, IList data,
+						 IDictionary options) {
 	    return new Widgets.ScatterChart(ZMQServer.session, keys, data, options);
 	}
 
-	public Widgets.ScatterChart ScatterChart(IEnumerable<string> keys, IList<IList<object>> data) {
+	public Widgets.ScatterChart ScatterChart(IEnumerable<string> keys, IList data) {
 	    return new Widgets.ScatterChart(ZMQServer.session, keys, data);
 	}
 
+	public Widgets.LineChart LineChart(IList data,
+					   IDictionary options) {
+	    return new Widgets.LineChart(ZMQServer.session, data, options);
+	}
+
+	public Widgets.LineChart LineChart(IList data) {
+	    return new Widgets.LineChart(ZMQServer.session, data);
+	}
 
 	// ---------- end of Widgets
 
