@@ -194,6 +194,7 @@ namespace Calico {
 	    Console.WriteLine("%lang                - get information on current language");
 	    Console.WriteLine("%%lang LANGUAGE      - change language for just this cell");
 	    Console.WriteLine("%%%lang LANGUAGE     - change language for rest of cells");
+	    Console.WriteLine("%%latex              - treat the cell as Latex");
 	    Console.WriteLine("%magic               - get information on magic meta-commands");
 	    Console.WriteLine("%qtconsole           - start a qtconsole");
 	    Console.WriteLine("%run FILENAME        - run a file (language determined by extension)");
@@ -243,6 +244,19 @@ namespace Calico {
 	    command = "html";
 	    evaluate = false;
 	    session.display_html(session.calico.HTML(code));
+	}
+    }
+
+    public class Latex : Calico.MagicBase {
+	
+	public Latex(ZMQServer.Session session, string code, 
+		    string mtype, string args) : base(session, code, mtype, args) {
+	}
+
+	public override void cell(string args) {
+	    command = "latex";
+	    evaluate = false;
+	    session.display_latex(session.calico.Latex(code));
 	}
     }
 

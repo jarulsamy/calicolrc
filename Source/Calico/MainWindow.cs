@@ -4476,119 +4476,63 @@ del _invoke, _
 	// PNG, JPEG
 
 	public AudioRepresentation Audio(string filename) {
-	    return new AudioRepresentation(filename);
+	    return Representation.Audio(filename);
 	}
 	
 	public MimeRepresentation HTML(string text) {
-	    return new MimeRepresentation("text/html", text, 
-					  "text/plain", "<HTML viewable in notebook>");
+	    return Representation.HTML(text);
 	}
 
 	public MimeRepresentation SVG(string text) {
-	    return new MimeRepresentation("image/svg+xml", text, 
-					  "text/plain", "<SVG viewable in notebook>");
+	    return Representation.SVG(text);
 	}
 
 	public MimeRepresentation JSON(string text) {
-	    return new MimeRepresentation("application/json", text, 
-					  "text/plain", "<JSON viewable in notebook>");
+	    return Representation.JSON(text);
 	}
 	
 	public MimeRepresentation Latex(string text) {
-	    return new MimeRepresentation("text/latex", text, 
-					  "text/plain", "<Latex viewable in notebook>");
+	    return Representation.Latex(text);
 	}
 	
 	public MimeRepresentation Math(string text) {
-	    return new MimeRepresentation("text/latex", "$$" + text + "$$", 
-					  "text/plain", "<Math viewable in notebook>");
+	    return Representation.Math(text);
 	}
 	
 	public MimeRepresentation Javascript(string text) {
-	    return new MimeRepresentation("application/javascript", text,
-					  "text/plain", "<JavaScript viewable in executing notebook>");
+	    return Representation.Javascript(text);
 	}
 
 	public MimeRepresentation FileLink(string filename) {
-	    return new MimeRepresentation("text/html", 
-					  String.Format("<a href=\"{0}\" target=\"_blank\">{0}</a>", filename),
-					  "text/plain", String.Format("'{0}'", filename));
+	    return FileLink(filename);
 	}
 
 	public MimeRepresentation FileLinks(string directory) {
-	    string html_retval = "";
-	    string text_retval = "";
-	    DirectoryInfo dir = new DirectoryInfo(directory);
-	    // FIXME: traverse subdirectories, all the way down:
-	    foreach (FileInfo file in dir.GetFiles()) {
-		if (html_retval != "")
-		    html_retval += "<br/>";
-		if (text_retval != "")
-		    html_retval += "\n";
-		html_retval += String.Format("<a href=\"{0}\" target=\"_blank\">{0}</a>", file.Name);
-		text_retval += String.Format("'{0}'", file.Name);
-	    }
-	    return new MimeRepresentation("text/html", html_retval,
-					  "text/plain", text_retval);
+	    return Representation.FileLinks(directory);
 	}
 
 	public MimeRepresentation YouTubeVideo(string id) {
-	    return new MimeRepresentation("text/html",  
-					  String.Format("<iframe width=\"400\" height=\"300\" " + 
-							"src=\"http://www.youtube.com/embed/{0}\" " +
-							"frameborder=\"0\" allowfullscreen=\"\"></iframe>", id),
-					  "text/plain", "<YouTubeVideo viewable in executing notebook>");
+	    return Representation.YouTubeVideo(id);
 	}
 
 	public MimeRepresentation VimeoVideo(string id) {
-	    return new MimeRepresentation("text/html",  
-					  String.Format("<iframe width=\"400\" height=\"300\" " + 
-							"src=\"https:/player.vimeo.com/video/{0}\" " +
-							"frameborder=\"0\" allowfullscreen=\"\"></iframe>", id),
-					  "text/plain", "<VimeoVideo viewable in executing notebook>");
+	    return Representation.VimeoVideo(id);
 	}
 
 	public MimeRepresentation IFrame(string url, int width, int height) {
-	    return new MimeRepresentation("text/html",  
-					  String.Format("<iframe width=\"{0}\" height=\"{1}\" " + 
-							"src=\"{2}\" " +
-							"frameborder=\"0\" allowfullscreen=\"\"></iframe>", 
-							width, height, url),
-					  "text/plain", "<IFrame viewable in executing notebook>");
+	    return Representation.IFrame(url, width, height);
 	}
 	
 	public MimeRepresentation Javascript(string text, string lib) {
-	    return new MimeRepresentation("application/javascript",  
-					  String.Format("require(['{0}'], function () {{\n{1}\n}});\n", lib, text),
-					  "text/plain", "<JavaScript viewable in executing notebook>");
+	    return Representation.Javascript(text, lib);
 	}
 
 	public ImageRepresentation Image(string filename) {
-	    return new ImageRepresentation(filename);
+	    return Representation.Image(filename);
 	}
 
 	public MimeRepresentation Table(IList<IList> list) {
-	    string text = "<table border=\"1\">";
-	    int count = 1;
-	    text += "<tr>";
-	    foreach (IList cols in list) {
-		foreach (object col in cols) {
-		    text += String.Format("<th>Item{0}</th>", count);
-		    count += 1;
-		}
-		break;
-	    }
-	    text += "</tr>";
-	    foreach (IList cols in list) {
-		text += "<tr>";
-		foreach (object col in cols) {
-		    text += String.Format("<td>{0}</td>", col);
-		}
-		text += "</tr>";
-	    }
-	    text += "</table>";
-	    return new MimeRepresentation("text/html", text, 
-					  "text/plain", "<Table>");
+	    return Representation.Table(list);
 	}
 
 	public Widgets.Widget makeBoundedFloatTextWidget() {
