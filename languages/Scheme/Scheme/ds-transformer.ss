@@ -202,7 +202,7 @@
 ;;				(error (quote ,apply-name) (format "invalid procedure: ~a" ,obj-name)))))
 		       `(,define-sym ,apply-name
 			  (lambda (,obj-name ,@arg-names)
-			    (apply+ (caddr ,obj-name) ,@arg-names (cdddr ,obj-name))))))
+			    (apply+ (cadr ,obj-name) ,@arg-names (cddr ,obj-name))))))
  		     (make-function-code
 		       ;; must use define, not define* here
 		      `(define ,make-name
@@ -497,7 +497,7 @@
 		(make-name (dt 'get-make-name)))
 	   (if *generate-apply-functions-with-record-case-code?*
 	       `(,make-name (quote ,tag) ,@fields)
-	       `(,make-name (quote ,tag) ,tag ,@fields))))
+	       `(,make-name ,tag ,@fields))))
 	((datatype-application? code)
 	 (let ((dt (get-datatype 'datatype-application? code all-datatypes)))
 	   ((transform params) (cons (dt 'get-apply-name) code))))
