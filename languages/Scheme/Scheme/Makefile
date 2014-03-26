@@ -4,7 +4,7 @@ MCS=MONO_PATH=../../../bin:../../../modules dmcs -sdk:4
 #	$(MCS) -debug Scheme.cs pjscheme.cs ObjectType.cs -target:library -lib:../../../bin -r:Microsoft.Scripting -r:IronPython.dll -r:Microsoft.Dynamic -r:Microsoft.Scripting.Core -r:Calico.exe -pkg:gtk-sharp-2.0 -r:Mono.TextEditor.dll -out:../PJScheme.dll
 
 ../PJScheme.dll: pjscheme.cs Scheme.cs pjscheme-rm.ss Makefile ObjectType.cs Rational.cs
-	sed -i "s/= >/=>/" pjscheme.cs
+	sed -i.BAK "s/= >/=>/" pjscheme.cs
 	$(MCS) Scheme.cs pjscheme.cs ObjectType.cs Rational.cs -target:library -lib:../../../bin -r:Microsoft.Scripting -r:Microsoft.CSharp -r:IronPython.dll -r:Microsoft.Dynamic -r:Calico.exe -pkg:gtk-sharp-2.0 -r:Mono.TextEditor.dll -r:System.Numerics -out:../PJScheme.dll
 
 #Scheme.dll: Scheme.cs Makefile
