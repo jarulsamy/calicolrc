@@ -371,7 +371,7 @@
 	      (let* ((let-exp (caddr body)) ;; body is a preprocessed lambda
 		     (let-vars (map car (cadr let-exp)))
 		     (let-bodies (cddr let-exp)))
-		`(define ,name (lambda ,let-vars ,@(map transform let-bodies)))))
+		`(define ,name (lambda ,let-vars ,@(consolidate(map transform let-bodies))))))
 	    (apply+ args
 	      `(apply ,(car args) ,(rac args)))
 ;;	    (define+ (name body)
