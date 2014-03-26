@@ -1136,8 +1136,16 @@ public static class Widgets {
 
     public static IList Lines(int size) {
         List<List<object>> retval = new List<List<object>>() {new List<object>() { "x" }};
-        for(int i=0; i < size; i++) {
+        for(int i=0; i < size; i += 1) {
             retval.Add( new List<object>() { String.Format("{0}", i + 1) });
+	}
+	return (IList)retval;
+    }
+
+    public static IList Lines(int start, int stop, int step) {
+        List<List<object>> retval = new List<List<object>>() {new List<object>() { "x" }};
+        for(int i=start; i < stop; i += step) {
+            retval.Add( new List<object>() { String.Format("{0}", i) });
 	}
 	return (IList)retval;
     }
