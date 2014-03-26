@@ -138,7 +138,7 @@
 	  (add-temps (temps)
 	    (set! temp-vars (union temps temp-vars))
 	    'ok)
-	  (else (error 'register-table "bad message: ~a" msg)))))))
+	  (else (error 'register-table (format "bad message: ~a" msg))))))))
 
 (define register-table (make-register-table))
 
@@ -164,9 +164,9 @@
 		      (set! eopl-defs (cons exp eopl-defs)))
 		     ((ignore-definition? exp)
 		      (printf "skipping ~a definition\n" (cadr exp)))
-		     ((or (define? exp) (define*? exp))
+		     ((or (define? exp) (define*? exp) (define+? exp))
 		      (set! defs (cons (preprocess-define exp) defs)))
-		     ((or (define+? exp) (define-native? exp))
+		     ((define-native? exp)
 		      (set! defs (cons exp defs)))
 		     ;; skip top level calls to load
 		     (else 'skip))
@@ -256,7 +256,7 @@
   (lambda (def)
     (cond
       ((mit-style-define? def) (preprocess-define (mit-define->define def)))
-      ((define*? def)
+      ((or (define*? def) (define+? def))
        (let* ((name (cadr def))
 	      (lambda-exp (caddr def))
 	      (formals (cadr lambda-exp))
@@ -265,7 +265,7 @@
 	      (new-bodies (cddr new-lambda)))
 	 (register-table 'add-function name registers)
 	 (if *include-define*-in-registerized-code?*
-	     `(define* ,name (lambda () ,@new-bodies))
+	     `(,(car def) ,name (lambda () ,@new-bodies)) ;; define* or define+
 	     `(define ,name (lambda () ,@new-bodies)))))
       (else def))))
 
@@ -366,17 +366,25 @@
 		  `(begin ,@new-exps))))
 	    ((define define* define-native) (name body)
 	      `(,(car code) ,name ,(transform body)))
+	    ;; streamlining record-case 3/26/2014
 	    (define+ (name body)
-	      (let* ((formals (cadr body))
-		     (let-exp (caddr body))
-		     (let-bindings (cadr let-exp))
+	      (let* ((let-exp (caddr body)) ;; body is a preprocessed lambda
+		     (let-vars (map car (cadr let-exp)))
 		     (let-bodies (cddr let-exp)))
-		`(define ,name
-		   (lambda ,formals
-		     (let ,let-bindings ,@(map transform let-bodies))))))
-	    ;; leave apply+ in final registerized code for now, as a
-	    ;; flag for the C# transformer to use
-	    (apply+ args code)
+		`(define ,name (lambda ,let-vars ,@(map transform let-bodies)))))
+	    (apply+ args
+	      `(apply ,(car args) ,(rac args)))
+;;	    (define+ (name body)
+;;	      (let* ((formals (cadr body))
+;;		     (let-exp (caddr body))
+;;		     (let-bindings (cadr let-exp))
+;;		     (let-bodies (cddr let-exp)))
+;;		`(define ,name
+;;		   (lambda ,formals
+;;		     (let ,let-bindings ,@(map transform let-bodies))))))
+;;	     leave apply+ in final registerized code for now, as a
+;;	     flag for the C# transformer to use
+;;	    (apply+ args code)
 	    (define-syntax args code)
 	    (and exps
 	      `(and ,@(map transform exps)))

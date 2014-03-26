@@ -13,7 +13,7 @@
 ;; default transformer settings
 (define *include-eopl-define-datatype-in-ds-code?* #t)
 (define *include-define*-in-ds-code?* #t)
-(define *generate-apply-functions-with-record-case-code?* #t)
+(define *generate-apply-functions-with-record-case-code?* #f)
 
 ;; assumes:
 ;; - lambda-cont, lambda-proc, etc. datatype forms
@@ -194,12 +194,12 @@
  			  (lambda (,obj-name ,@arg-names)
 			    (record-case (cdr ,obj-name)
 			      ,@(reverse clauses)
-			      (else (error (quote ,apply-name) ,error-string ,obj-name)))))
+			      (else (error (quote ,apply-name) (format ,error-string ,obj-name))))))
 ;;			    (if (pair? ,obj-name)
 ;;				(record-case (cdr ,obj-name)
 ;;				    ,@(reverse clauses)
-;;				    (else (error (quote ,apply-name) ,error-string ,obj-name)))
-;;				(error (quote ,apply-name) "invalid procedure: ~a" ,obj-name))))
+;;				    (else (error (quote ,apply-name) (format ,error-string ,obj-name))))
+;;				(error (quote ,apply-name) (format "invalid procedure: ~a" ,obj-name)))))
 		       `(,define-sym ,apply-name
 			  (lambda (,obj-name ,@arg-names)
 			    (apply+ (caddr ,obj-name) ,@arg-names (cdddr ,obj-name))))))
@@ -219,7 +219,7 @@
 		      (pretty-print (make-obj-function arg-names clause) output-port)
 		      (newline output-port))
 		    (reverse clauses))))))
-	  (else (error 'datatype "bad message: ~a" msg)))))))
+	  (else (error 'datatype (format "bad message: ~a" msg))))))))
 
 ;;------------------------------------------------------------------------
 ;; continuation records look like this if
@@ -705,7 +705,7 @@
 	    (union (free exp params)
 		   (union-all (map (free-in-record-case-clause params) clauses))))
 	  (else (if (member (car code) syntactic-keywords)
-		  (error 'free "don't know how to process ~a" code)
+		  (error 'free (format "don't know how to process ~a" code))
 		  (all-free code params))))))))
 
 (define all-free
@@ -927,7 +927,7 @@
 		 `(cases ,type ,(rename exp)
 		    ,@(map rename-record-case-clause clauses)))
 	       (else (if (member (car exp) syntactic-keywords)
-		       (error 'rename "don't know how to process ~a" exp)
+		       (error 'rename (format "don't know how to process ~a" exp))
 		       (map rename exp))))))))
        (rename-in-quasiquote
 	 (lambda (datum)
@@ -996,7 +996,7 @@
 	       (cases (type rexp . clauses)
 		 (unsafe? (record-case-transformer `(record-case ,rexp ,@clauses) (lambda (v) v))))
 	       (else (if (member (car exp) syntactic-keywords)
-		       (error 'unsafe? "don't know how to process ~a" exp)
+		       (error 'unsafe? (format "don't know how to process ~a" exp))
 		       (ormap unsafe? exp))))))))
        (unsafe-in-quasiquote?
 	 (lambda (datum)
