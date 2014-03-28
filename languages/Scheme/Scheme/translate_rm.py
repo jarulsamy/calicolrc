@@ -31,7 +31,7 @@ class Translator:
     def function_q(self, expr):
         if len(expr) > 2:
             if isinstance(expr[2], list):
-                if expr[0] in ["define", "define+"] and len(expr[2]) > 0:
+                if expr[0] in ["define", "define+", "define*"] and len(expr[2]) > 0:
                     if expr[2][0] == "lambda":
                         return True
                     elif isinstance(expr[1], list):
@@ -43,6 +43,8 @@ class Translator:
             return "emptylist"
         elif name == "def":
             return "def_"
+        elif name == "-":
+            return "minus"
         elif name == "input":
             return "input_"
         elif name == "class":
@@ -285,7 +287,7 @@ class PythonTranslator(Translator):
         for pair in expr[1]:
             print(" " * indent, end="")
             # locals:
-            print("%s = %s" % (self.fix_name(pair[0]), pair[1]))
+            print("%s = %s" % (self.fix_name(pair[0]), self.process_bool(pair[1])))
         locals.extend([pair[0] for pair in expr[1]])
         body = expr[2:]
         for statement in body:
@@ -332,7 +334,10 @@ class PythonTranslator(Translator):
         self.process_statement(expr[1][1], locals, indent + 4)
         for rest in expr[2:]:
             print(" " * indent, end="")
-            print("elif %s:" % self.process_bool(rest[0]))
+            if rest[0] == "else":
+                print("else:")
+            else:
+                print("elif %s:" % self.process_bool(rest[0]))
             self.process_statement(rest[1], locals, indent + 4)
 
     def process_statement(self, expr, locals, indent):
@@ -341,10 +346,12 @@ class PythonTranslator(Translator):
                 self.process_function_definition(expr, locals, indent)
         elif expr[0] == "define":
             self.process_definition(expr, locals, indent)
-        elif expr[0] == "define-native":
-            pass
         elif expr[0] == "define*":
             self.process_function_definition(expr, locals, indent)
+        elif expr[0] == "define+":
+            self.process_function_definition(expr, locals, indent)
+        elif expr[0] == "define-native":
+            pass
         elif expr[0] == "let":
             self.process_let(expr, locals, indent)
         elif expr[0] == "if":

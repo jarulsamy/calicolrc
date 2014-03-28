@@ -185,6 +185,9 @@ def char_is__q(c1, c2):
 def plus(a, b):
     return a + b
 
+def minus(a, b):
+    return a - b
+
 def pair_q(item):
     return isinstance(item, cons)
 
@@ -219,4 +222,7 @@ def append(*objs):
             
 def string_to_symbol(string):
     return Symbol(string)
+
+def display(item):
+    print(item)
 

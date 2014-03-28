@@ -11,9 +11,14 @@
 (load "parser-cps.ss")
 
 ;;----------------------------------------------------------------------------
+;; to run the scheme data structure machine within Petite:
+;; % petite pjscheme-ds.ss
+;; > (start)
+
+;;----------------------------------------------------------------------------
 ;; to run the scheme register machine within Petite:
 ;; % petite pjscheme-rm.ss
-;; > (start-rm)
+;; > (run start-rm)
 
 ;;----------------------------------------------------------------------------
 ;; used by scheme CPS, DS, RM, and C# RM code
@@ -1576,9 +1581,9 @@
 ;; dir
 (define dir-prim
   (lambda-proc (args env2 info handler fail k2)
-    (make-set (dir args env2) env2 info handler fail k2)))
+    (make-set (directory args env2) env2 info handler fail k2)))
 
-(define dir
+(define directory
   (lambda (args env)
     (if (or (null? args) (environment? (car args)))
 	(sort symbol<? (if (null? args)
