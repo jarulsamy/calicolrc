@@ -237,6 +237,7 @@ class PythonTranslator(Translator):
 
     def process_function_definition(self, expr, locals, indent):
         ## (define x (lambda (x) (cond ((test? x) (func x)) (else return))))
+        convert_args = ""
         if isinstance(expr[1], list):
             function_name = self.fix_name(expr[1][0])
             # FIXME: handle more than one arg
@@ -247,9 +248,15 @@ class PythonTranslator(Translator):
                 args = ", ".join(map(self.fix_name, expr[2][1]))
             else:
                 args = "*%s" % self.fix_name(expr[2][1]) # var args
+                convert_args = "%s = List(*%s)" % (self.fix_name(expr[2][1]), 
+                                                   self.fix_name(expr[2][1]))
         if ", dot," in args:
+            # FIXME: turn vector to List
             args = args.replace(", dot,", ", *") # var args on end
         print("def %s(%s):" % (function_name, args))
+        if convert_args:
+            print(" " * (indent + 4), end="")
+            print(convert_args)
         body = expr[2][2:]
         for statement in body:
             self.process_statement(statement, locals, indent + 4)

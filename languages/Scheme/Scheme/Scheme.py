@@ -143,7 +143,7 @@ def raw_read_line(prompt):
     return raw_input(prompt)
 
 def make_proc(*args):
-    return cons(symbol_procedure, args)
+    return cons(symbol_procedure, List(*args))
 
 def make_macro(*args):
     return cons(symbol_macro_transformer, List(*args))
@@ -217,3 +217,6 @@ def append(*objs):
             current = current.cdr
     return retval
             
+def string_to_symbol(string):
+    return Symbol(string)
+
