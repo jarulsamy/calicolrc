@@ -3,7 +3,7 @@ from __future__ import division, print_function
 class Translator:
     def __init__(self):
         self.program = []
-        self.symbols = []
+        self.symbols = ["()"]
 
     def functions_to_ignore(self):
         return [
@@ -31,14 +31,24 @@ class Translator:
     def function_q(self, expr):
         if len(expr) > 2:
             if isinstance(expr[2], list):
-                if len(expr[2]) > 0:
+                if expr[0] in ["define", "define+"] and len(expr[2]) > 0:
                     return expr[2][0] == "lambda"
         return False
 
     def fix_name(self, name):
-        if name.startswith("#"):
+        if name == "()":
+            return "emptylist"
+        elif name == "def":
+            return "def_"
+        elif name == "class":
+            return "class_"
+        elif name == "list":
+            return "List"
+        elif name.startswith('"'):
+            return name
+        elif name.startswith("#"):
             return self.replace_char(name)
-        if name.startswith("<") and name.endswith(">"):
+        elif name.startswith("<") and name.endswith(">"):
             name = name[1:-1]
         for pattern in [("->", "_to_"), (">", "to_"), ("<", "LessThan"), ("*", "_star"),
                         ("=", "_is_"), ("-", "_"), ("?", "_q"), ("!", "_b"), ("/", "slash"),
@@ -139,7 +149,11 @@ class Translator:
         elif name == "#\\backspace":
             return "'\\b'"
         elif name == "#\\page":
-            return chr(12)
+            return "u\"\\u000C\""
+        elif name == "#\\'":
+            return "\"'\""
+        elif name == "#\\\\":
+            return "'\\\\'"
         elif len(name) == 3:
             return "'%s'" % name[2]
         else:
@@ -180,7 +194,8 @@ class Translator:
                         i += 1
                         current.append(self.make_symbol_name(lexed[i]))
                     else:
-                        current.append(item)
+                        i += 2
+                        current.append("symbol_emptylist")
                 else: # same as any item
                     current.append(item)
             else:
@@ -198,6 +213,30 @@ class PythonTranslator(Translator):
 class Symbol:
     def __init__(self, name):
         self.name = name
+
+def box(item):
+    return item
+
+class cons:
+    def __init__(self, car, cdr):
+        self.car = car
+        self.cdr = cdr
+
+class List:
+    def __init__(self, *args):
+        pass
+
+def tagged_list_(tag, f, arg_count):
+    def tagged_list(*args):
+        return list(tag, *args)
+    return tagged_list
+
+def _is_(a, b):
+    return a == b
+
+def to__is_(a, b):
+    return a >= b
+
 """)
 
     def process_function_definition(self, expr, indent):
@@ -208,7 +247,7 @@ class Symbol:
         else:
             args = "*%s" % self.fix_name(expr[2][1]) # var args
         if ", dot," in args:
-            args.replace(", dot,", ", *") # var args on end
+            args = args.replace(", dot,", ", *") # var args on end
         print("def %s(%s):" % (function_name, args))
         body = expr[2][2]
         if isinstance(body[0], list):
@@ -224,6 +263,10 @@ class Symbol:
                 return "(%s %s %s)" % (self.process_bool(expr[1]),
                                        expr[0],
                                        self.process_bool(expr[2]))
+            elif expr[0] == 'if':
+                return "(%s if %s else %s)" % (self.process_bool(expr[2]),
+                                               self.process_bool(expr[1]),
+                                               self.process_bool(expr[3]))
             else:
                 ## function call:
                 return "%s(%s)" % (self.fix_name(expr[0]),
@@ -276,6 +319,10 @@ class Symbol:
                 self.process_function_definition(expr, indent)
         elif expr[0] == "define":
             self.process_definition(expr, indent)
+        elif expr[0] == "define-native":
+            pass
+        elif expr[0] == "define*":
+            pass
         elif expr[0] == "let":
             self.process_let(expr, indent)
         elif expr[0] == "if":
@@ -300,3 +347,8 @@ class Symbol:
         print()
         for statement in self.program:
             self.process_statement(statement, 0)
+
+if __name__ == "__main__":
+    pt = PythonTranslator()
+    pt.parse_file("pjscheme-rm.ss")
+    pt.translate()
