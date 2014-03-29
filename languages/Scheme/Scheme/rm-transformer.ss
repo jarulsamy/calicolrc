@@ -233,7 +233,7 @@
 	       output-port)
 	     (newline output-port)
 	     (pretty-print
-	       '(define run (lambda (setup . args) (apply setup args) (trampoline)))
+	       '(define run (lambda (setup . args) (apply setup args) (return* (trampoline))))
 	       output-port)
 	     (newline output-port))))
 	(call-with-input-file source-file
