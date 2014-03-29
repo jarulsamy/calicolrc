@@ -6,8 +6,9 @@ class Translator:
         self.symbols = ["()"]
 
     def functions_to_ignore(self):
+        # FIXME: get rid of these by marking them as native:
         return [
-            "void-value", "restart-rm", "raw-read-line",
+            "void-value", "restart-rm", "raw-read-line", "trampoline",
             "read-line", "Main", "read-content", "string->integer",
             "string->decimal", "string->rational", "tagged-list", "testall", 
             "string-split", "get-current-time", "type?", 
@@ -242,7 +243,6 @@ class PythonTranslator(Translator):
         convert_args = ""
         if isinstance(expr[1], list):
             function_name = self.fix_name(expr[1][0])
-            # FIXME: handle more than one arg
             args = self.fix_name(expr[1][1])
         else:
             function_name = self.fix_name(expr[1])
@@ -252,9 +252,10 @@ class PythonTranslator(Translator):
                 args = "*%s" % self.fix_name(expr[2][1]) # var args
                 convert_args = "%s = List(*%s)" % (self.fix_name(expr[2][1]), 
                                                    self.fix_name(expr[2][1]))
-        if ", dot," in args:
-            # FIXME: turn vector to List
-            args = args.replace(", dot,", ", *") # var args on end
+        if ", dot, " in args:
+            args = args.replace(", dot, ", ", *") # var args on end
+            var_arg = args.rsplit("*", 1)[1]
+            convert_args = "%s = List(*%s)" % (var_arg, var_arg)
         print("def %s(%s):" % (function_name, args))
         if convert_args:
             print(" " * (indent + 4), end="")
@@ -264,20 +265,20 @@ class PythonTranslator(Translator):
             self.process_statement(statement, locals, indent + 4)
         print()
 
-    def process_bool(self, expr):
+    def process_app(self, expr):
         if isinstance(expr, list):
             if expr[0] in ['and', 'or']:
-                return "(%s %s %s)" % (self.process_bool(expr[1]),
+                return "(%s %s %s)" % (self.process_app(expr[1]),
                                        expr[0],
-                                       self.process_bool(expr[2]))
+                                       self.process_app(expr[2]))
             elif expr[0] == 'if':
-                return "(%s if %s else %s)" % (self.process_bool(expr[2]),
-                                               self.process_bool(expr[1]),
-                                               self.process_bool(expr[3]))
+                return "(%s if %s else %s)" % (self.process_app(expr[2]),
+                                               self.process_app(expr[1]),
+                                               self.process_app(expr[3]))
             else:
                 ## function call:
                 return "%s(%s)" % (self.fix_name(expr[0]),
-                                   ", ".join([self.process_bool(e) for e in expr[1:]]))
+                                   ", ".join([self.process_app(e) for e in expr[1:]]))
                 
         else:
             return self.fix_name(expr)
@@ -287,7 +288,7 @@ class PythonTranslator(Translator):
         for pair in expr[1]:
             print(" " * indent, end="")
             # locals:
-            print("%s = %s" % (self.fix_name(pair[0]), self.process_bool(pair[1])))
+            print("%s = %s" % (self.fix_name(pair[0]), self.process_app(pair[1])))
         locals.extend([pair[0] for pair in expr[1]])
         body = expr[2:]
         for statement in body:
@@ -296,7 +297,7 @@ class PythonTranslator(Translator):
     def process_if(self, expr, locals, indent):
         ## (if 1 2 3)
         print(" " * indent, end="")
-        print("if %s:" % self.process_bool(expr[1]))
+        print("if %s:" % self.process_app(expr[1]))
         self.process_statement(expr[2], locals, indent + 4)
         if len(expr) > 3:
             print(" " * indent, end="")
@@ -316,28 +317,28 @@ class PythonTranslator(Translator):
     def process_assignment(self, expr, locals, indent):
         print(" " * indent, end="")
         print("%s = %s" % (self.check_global(expr[1], locals), 
-                           self.process_bool(expr[2])))
+                           self.process_app(expr[2])))
 
     def process_return(self, expr, indent):
         print(" " * indent, end="")
-        print("return %s" % self.process_bool(expr[1]))
+        print("return %s" % self.process_app(expr[1]))
 
     def process_definition(self, expr, locals, indent):
         print(" " * indent, end="")
         # global
-        print("%s = %s" % (self.fix_name(expr[1]), self.process_bool(expr[2])))
+        print("%s = %s" % (self.fix_name(expr[1]), self.process_app(expr[2])))
 
     def process_cond(self, expr, locals, indent):
         ## (cond (test result) ...)
         print(" " * indent, end="")
-        print("if %s:" % self.process_bool(expr[1][0]))
+        print("if %s:" % self.process_app(expr[1][0]))
         self.process_statement(expr[1][1], locals, indent + 4)
         for rest in expr[2:]:
             print(" " * indent, end="")
             if rest[0] == "else":
                 print("else:")
             else:
-                print("elif %s:" % self.process_bool(rest[0]))
+                print("elif %s:" % self.process_app(rest[0]))
             self.process_statement(rest[1], locals, indent + 4)
 
     def process_statement(self, expr, locals, indent):
@@ -369,7 +370,7 @@ class PythonTranslator(Translator):
             self.process_return(expr, indent)
         else: # must be a function call
             print(" " * indent, end="")
-            print(self.process_bool(expr))
+            print(self.process_app(expr))
 
     def translate(self):
         self.preamble()

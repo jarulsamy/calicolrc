@@ -28,8 +28,6 @@
 ;;----------------------------------------------------------------------
 ;; main program
 
-(define fib (lambda (n) (fib-cps n REP-k)))
-
 (define*
   fib-cps
   (lambda (n k)
@@ -37,6 +35,8 @@
       ((= n 1) (apply-cont k 1))
       ((= n 2) (apply-cont k 1))
       (else (fib-cps (- n 1) (make-cont <cont-2> n k))))))
+
+(define fib (lambda (n) (fib-cps n REP-k)))
 
 (define REP-k (make-cont <cont-3>))
 

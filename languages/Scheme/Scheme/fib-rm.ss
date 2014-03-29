@@ -32,12 +32,6 @@
 (define <cont-3>
   (lambda () (set! final_reg value_reg) (set! pc #f)))
 
-(define fib
-  (lambda (n)
-    (set! k_reg REP-k)
-    (set! n_reg n)
-    (set! pc fib-cps)))
-
 (define*
   fib-cps
   (lambda ()
@@ -50,14 +44,17 @@
               (set! n_reg (- n_reg 1))
               (set! pc fib-cps))))))
 
+(define fib
+  (lambda (n)
+    (set! k_reg REP-k)
+    (set! n_reg n)
+    (set! pc fib-cps)))
+
 (define REP-k (make-cont <cont-3>))
 
 ;; the trampoline
 (define trampoline
-  (lambda ()
-    (if pc
-        (begin (pc) (return* (trampoline)))
-        (return* final_reg))))
+  (lambda () (if pc (begin (pc) (trampoline)) final_reg)))
 
 (define run
   (lambda (setup . args)

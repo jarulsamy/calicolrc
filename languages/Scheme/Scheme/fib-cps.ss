@@ -1,9 +1,5 @@
 (load "transformer-macros.ss")
 
-(define fib
-  (lambda (n)
-    (fib-cps n REP-k)))
-
 (define* fib-cps
   (lambda (n k)
     (cond
@@ -15,7 +11,12 @@
 		  (lambda-cont (v2)
 		    (k (+ v1 v2))))))))))
 
+(define fib
+  (lambda (n)
+    (fib-cps n REP-k)))
+
 (define REP-k
   (lambda-cont (v)
     (halt* v)))
 
+;; (run fib 5)

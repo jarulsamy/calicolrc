@@ -12,12 +12,16 @@
 class Symbol:
     def __init__(self, name):
         self.name = name
+        self.hash = hash(name)
 
     def __repr__(self):
         return "'%s" % self.name
 
+    def __eq__(self, other):
+        return isinstance(other, Symbol) and self.hash == other.hash
+
 def box(item):
-    return item
+    return List(item)
 
 def car(lyst):
     return lyst.car
@@ -25,11 +29,17 @@ def car(lyst):
 def cdr(lyst):
     return lyst.cdr
 
+def caar(lyst):
+    return lyst.car.car
+
 def cadr(lyst):
     return lyst.cdr.car
 
 def cddr(lyst):
     return lyst.cdr.cdr
+
+def cdar(lyst):
+    return lyst.car.cdr
 
 def set_car_b(lyst, item):
     lyst.car = item
@@ -97,8 +107,11 @@ class cons:
 def List(*args):
     # Scheme list
     retval = symbol_emptylist
-    for arg in reversed(args):
+    i = 0
+    while i < len(args):
+        arg = args[len(args) - i - 1]
         retval = cons(arg, retval)
+        i += 1
     return retval
 
 def reverse(lyst):
@@ -152,31 +165,31 @@ def raw_read_line(prompt):
     return raw_input(prompt)
 
 def make_proc(*args):
-    return cons(symbol_procedure, List(*args))
+    return List(symbol_procedure, *args)
 
 def make_macro(*args):
-    return cons(symbol_macro_transformer, List(*args))
+    return List(symbol_macro_transformer, *args)
 
 def make_cont(*args):
-    return cons(symbol_continuation, List(*args))
+    return List(symbol_continuation, *args)
 
 def make_cont2(*args):
-    return cons(symbol_continuation2, List(*args))
+    return List(symbol_continuation2, *args)
 
 def make_cont3(*args):
-    return cons(symbol_continuation3, List(*args))
+    return List(symbol_continuation3, *args)
 
 def make_cont4(*args):
-    return cons(symbol_continuation4, List(*args))
+    return List(symbol_continuation4, *args)
 
 def make_fail(*args):
-    return cons(symbol_fail_continuation, List(*args))
+    return List(symbol_fail_continuation, *args)
 
 def make_handler(*args):
-    return cons(symbol_handler, List(*args))
+    return List(symbol_handler, *args)
 
 def make_handler2(*args):
-    return cons(symbol_handler2, List(*args))
+    return List(symbol_handler2, *args)
 
 def char_whitespace_q(c):
     return c in [' ', '\t', '\n', '\0', '\r']
@@ -235,6 +248,10 @@ def string_to_symbol(string):
 def display(item):
     print(item)
 
+def trampoline():
+    while pc:
+        pc()
+    return final_reg
 
 symbol_emptylist = Symbol("()")
 symbol_undefined = Symbol("undefined")
@@ -263,11 +280,6 @@ def cont_3():
     globals()['final_reg'] = value_reg
     globals()['pc'] = False
 
-def fib(n):
-    globals()['k_reg'] = REP_k
-    globals()['n_reg'] = n
-    globals()['pc'] = fib_cps
-
 def fib_cps():
     if Equal(n_reg, 1):
         globals()['value_reg'] = 1
@@ -281,15 +293,14 @@ def fib_cps():
             globals()['n_reg'] = minus(n_reg, 1)
             globals()['pc'] = fib_cps
 
-REP_k = make_cont(cont_3)
-def trampoline():
-    if pc:
-        pc()
-        return trampoline()
-    else:
-        return final_reg
+def fib(n):
+    globals()['k_reg'] = REP_k
+    globals()['n_reg'] = n
+    globals()['pc'] = fib_cps
 
-def run(setup, * args):
+REP_k = make_cont(cont_3)
+def run(setup, *args):
+    args = List(*args)
     Apply(setup, args)
     return trampoline()
 
