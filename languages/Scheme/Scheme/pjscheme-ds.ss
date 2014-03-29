@@ -3167,7 +3167,8 @@
   <proc-85>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
-      (make-set (dir args env2) env2 info handler fail k2))))
+      (make-set (directory args env2) env2 info handler fail
+        k2))))
 
 (define+
   <proc-86>
@@ -5663,7 +5664,7 @@
        (append-all (cdr lists) info handler fail
          (make-cont2 <cont2-89> lists k2))))))
 
-(define dir
+(define directory
   (lambda (args env)
     (if (or (null? args) (environment? (car args)))
         (sort

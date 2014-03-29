@@ -3283,7 +3283,7 @@
 
 (define <proc-85>
   (lambda ()
-    (set! lst_reg (dir args_reg env2_reg))
+    (set! lst_reg (directory args_reg env2_reg))
     (set! pc make-set)))
 
 (define <proc-86>
@@ -6781,7 +6781,7 @@
                   (set! lists_reg (cdr lists_reg))
                   (set! pc append-all)))))))
 
-(define dir
+(define directory
   (lambda (args env)
     (if (or (null? args) (environment? (car args)))
         (return*
@@ -7755,5 +7755,7 @@
   (lambda () (if pc (begin (pc) (trampoline)) final_reg)))
 
 (define run
-  (lambda (setup . args) (apply setup args) (trampoline)))
+  (lambda (setup . args)
+    (apply setup args)
+    (return* (trampoline))))
 
