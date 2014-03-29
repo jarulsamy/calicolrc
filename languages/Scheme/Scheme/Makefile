@@ -40,7 +40,7 @@ pjscheme.cs: pjscheme-rm.ss scheme-to-csharp.ss
 	echo "(convert-file \"pjscheme-rm.ss\" \"pjscheme.cs\")" >> make-pjscheme.ss
 	echo "(exit)" >> make-pjscheme.ss
 	petite make-pjscheme.ss
-	indent -di0 -i3 pjscheme.cs &> /dev/null
+	indent -di0 -i3 pjscheme.cs 
 
 clean:
 	$(RM) *.exe *~ pjscheme-ds.ss pjscheme-rm.ss compile-rm.ss compile-ds.ss make-fact.ss \
