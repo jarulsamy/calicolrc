@@ -3,6 +3,11 @@
 # These are native implementations of functions to allow
 # the register machine translation to run in Python
 
+import fractions
+import time
+
+## Global symbols:
+
 class Symbol:
     def __init__(self, name):
         self.name = name
@@ -13,7 +18,6 @@ class Symbol:
 
     def __eq__(self, other):
         return isinstance(other, Symbol) and self.hash == other.hash
-
 
 void_value = Symbol("<void>")
 
@@ -87,7 +91,7 @@ def append(*objs):
             retval = cons(current.car, retval)
             current = current.cdr
     return retval
-            
+
 def car(lyst):
     return lyst.car
 
@@ -108,6 +112,15 @@ def cdar(lyst):
 
 def caddr(lyst):
     return lyst.cdr.cdr.car
+
+def cadar(lyst):
+    return lyst.car.cdr.car
+
+def cadddr(lyst):
+    return lyst.cdr.cdr.cdr.car
+
+def cddddr(lyst):
+    return lyst.cdr.cdr.cdr.cdr
 
 def set_car_b(cell, item):
     cell.car = item
@@ -156,7 +169,7 @@ def make_handler2(*args):
 ### Questions:
 
 def eq_q(o1, o2):
-    return o1 == o2
+    return o1 is o2
 
 def char_q(item):
     return isinstance(item, str) and len(item) == 1
@@ -181,7 +194,7 @@ def pair_q(item):
     return isinstance(item, cons)
 
 def number_q(item):
-    return isinstance(item, (int, long, float))
+    return isinstance(item, (int, long, float, Fraction))
 
 def null_q(item):
     return item == symbol_emptylist
@@ -206,6 +219,12 @@ def pair_q(item):
 
 ### Math and applications:
 
+class Fraction(fractions.Fraction):
+    def __repr__(self):
+        return "%s/%s" % (self.numerator, self.denominator)
+    def __str__(self):
+        return "%s/%s" % (self.numerator, self.denominator)
+
 def plus(a, b):
     return a + b
 
@@ -215,8 +234,8 @@ def minus(a, b):
 def Equal(a, b):
     return a == b
 
-def eq_q(a, b):
-    return a is b
+def LessThan(a, b):
+    return a < b
 
 def LessThanEqual(a, b):
     return a <= b
@@ -225,7 +244,13 @@ def GreaterThanEqual(a, b):
     return a >= b
 
 def memq(item, lyst):
-    return item in list_to_vector(lyst)
+    retval = symbol_emptylist
+    current = lyst
+    while isinstance(current, cons):
+        if current.car == item:
+            return current.cdr
+        current = current.cdr
+    return False
 
 ### Converters:
 
@@ -251,6 +276,9 @@ def list_to_vector(lyst):
         current = current.cdr
     return retval
 
+def vector_to_list(vector):
+    return List(*vector)
+
 ### Strings:
 
 def string_append(s1, s2):
@@ -261,6 +289,38 @@ def string_ref(string, pos):
 
 def string(s):
     return str(s)
+
+def string_to_decimal(s):
+    return float(s)
+
+def string_to_rational(s):
+    return Fraction(s)
+
+def string_split(string, delim):
+    return List(*string.split(delim))
+
+def symbol_to_string(symbol):
+    return symbol.name
+
+def member(item, lyst):
+    current = lyst
+    while isinstance(current, cons):
+        if item == lyst:
+            return True
+        current = current.cdr
+    return False
+
+def string_is__q(s1, s2):
+    return s1 == s2
+
+#def string_to_number(s):
+
+# string_is__q
+# string_length
+# stringLessThan_q
+# string_split
+# string_to_list
+# string_to_number
 
 ### Functions:
 
@@ -301,6 +361,90 @@ def format(string, *args):
 
 def safe_print(item):
     print(item)
+
+def search_frame(frame, variable):
+    if isinstance(frame, cons):
+        bindings = car(frame)
+        variables = cadr(frame)
+        i = 0
+        while not null_q(variables):
+            if eq_q(car(variables), variable):
+                return bindings[i];
+            variables = cdr(variables)
+            i += 1
+        return False
+    else:
+        raise Exception("invalid frame")
+
+def read_content(filename):
+    return open(filename).read()
+
+def get_current_time():
+    return time.time()
+
+def dlr_env_contains(item):
+    return False
+
+# _
+# apply_star
+# assv
+# char_to_integer
+# current_directory
+# callback0
+# callback1
+# callback2
+# dlr_apply
+# dlr_env_contains
+# dlr_env_lookup
+# dlr_func
+# dlr_object_contains
+# dlr_proc_q
+# equal_q
+# even_q
+# file_exists_q
+# for_each
+# get_external_member
+# get_external_members
+# get_iterator
+# get_type
+# handle_debug_info
+# highlight_expression
+# integer_to_char
+# iterator_q
+# length
+# list_head
+# list_q
+# list_tail
+# make_vector
+# map_hat
+# member
+# memv
+# modulo
+# newline
+# next_item
+# number_to_string
+# odd_q
+# printf
+# printf_prim
+# procedure_q
+# quotient
+# read_content
+# remainder
+# set_external_member_b
+# set_global_docstring_b
+# set_global_value_b
+# slash
+# sort
+# sqrt
+# _star
+# substring
+# symbol_to_string
+# to_
+# using_prim
+# vector_length
+# vector_native
+# vector_ref
+# vector_set_b
 
 # end of Scheme.py
 #############################################################

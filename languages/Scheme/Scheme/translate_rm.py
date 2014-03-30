@@ -9,15 +9,17 @@ class Translator:
         # FIXME: get rid of these by marking them as native:
         return [
             "void-value", "restart-rm", "raw-read-line", "trampoline",
-            "read-line", "Main", "read-content", "string->integer",
-            "string->decimal", "string->rational", "testall", 
-            "string-split", "get-current-time", "type?", 
+            "read-content", 
+            "string->integer", "string->decimal", "string->rational", 
+            "string-split", 
+            "get-current-time", "type?", 
             "execute", "execute-loop", "execute-string", "execute-file",
             "read-eval-print-loop", "unparse", "unparse-exps", "qq-expand-cps_",
-            "qq-expand-list-cps_", "init-cont", "init-cont2", "init-cont3", "init-cont4",
-            "init-handler", "init-handler2", "init-fail",
+            "qq-expand-list-cps_", 
             ## defined in Scheme.cs:
             "true?", "safe-print", "make-safe",
+            "init-cont", "init-cont2", "init-cont3", "init-cont4",
+            "init-handler", "init-handler2", "init-fail",
             "make-cont", "make-cont2", "make-cont3", "make-cont4", "make-macro", "make-proc",
             "make-fail", "make-handler", "make-handler2"
         ]
@@ -44,8 +46,6 @@ class Translator:
             return "emptylist"
         elif name == "def":
             return "def_"
-        elif name == "-":
-            return "minus"
         elif name == "input":
             return "input_"
         elif name == "class":
@@ -62,6 +62,8 @@ class Translator:
             return "LessThanEqual"
         elif name == ">=":
             return "GreaterThanEqual"
+        elif name == "read":
+            return "raw_input"
         elif name.startswith('"'):
             return name
         elif name.startswith("#"):
@@ -264,7 +266,7 @@ class PythonTranslator(Translator):
             self.process_statement(statement, locals, indent + 4)
         print()
 
-    def process_short_circuit_op(self, expr):
+    def process_infix_op(self, expr):
         retval = "(%s)" % self.process_app(expr[1])
         for e in expr[2:]:
             retval += " %s (%s)" % (expr[0], self.process_app(e))
@@ -272,8 +274,8 @@ class PythonTranslator(Translator):
 
     def process_app(self, expr):
         if isinstance(expr, list):
-            if expr[0] in ['and', 'or']:
-                return self.process_short_circuit_op(expr)
+            if expr[0] in ['and', 'or', '+', '-', '*']:
+                return self.process_infix_op(expr)
             if expr[0] == 'if':
                 return "(%s if %s else %s)" % (self.process_app(expr[2]),
                                                self.process_app(expr[1]),
@@ -371,7 +373,7 @@ class PythonTranslator(Translator):
         else: # must be a function call
             print(" " * indent, end="")
             print(self.process_app(expr))
-
+                
     def translate(self):
         self.preamble()
         for symbol in self.symbols:

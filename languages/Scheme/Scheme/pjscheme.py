@@ -11,6 +11,11 @@
 # These are native implementations of functions to allow
 # the register machine translation to run in Python
 
+import fractions
+import time
+
+## Global symbols:
+
 class Symbol:
     def __init__(self, name):
         self.name = name
@@ -21,7 +26,6 @@ class Symbol:
 
     def __eq__(self, other):
         return isinstance(other, Symbol) and self.hash == other.hash
-
 
 void_value = Symbol("<void>")
 
@@ -95,7 +99,7 @@ def append(*objs):
             retval = cons(current.car, retval)
             current = current.cdr
     return retval
-            
+
 def car(lyst):
     return lyst.car
 
@@ -116,6 +120,15 @@ def cdar(lyst):
 
 def caddr(lyst):
     return lyst.cdr.cdr.car
+
+def cadar(lyst):
+    return lyst.car.cdr.car
+
+def cadddr(lyst):
+    return lyst.cdr.cdr.cdr.car
+
+def cddddr(lyst):
+    return lyst.cdr.cdr.cdr.cdr
 
 def set_car_b(cell, item):
     cell.car = item
@@ -164,7 +177,7 @@ def make_handler2(*args):
 ### Questions:
 
 def eq_q(o1, o2):
-    return o1 == o2
+    return o1 is o2
 
 def char_q(item):
     return isinstance(item, str) and len(item) == 1
@@ -189,7 +202,7 @@ def pair_q(item):
     return isinstance(item, cons)
 
 def number_q(item):
-    return isinstance(item, (int, long, float))
+    return isinstance(item, (int, long, float, Fraction))
 
 def null_q(item):
     return item == symbol_emptylist
@@ -214,6 +227,12 @@ def pair_q(item):
 
 ### Math and applications:
 
+class Fraction(fractions.Fraction):
+    def __repr__(self):
+        return "%s/%s" % (self.numerator, self.denominator)
+    def __str__(self):
+        return "%s/%s" % (self.numerator, self.denominator)
+
 def plus(a, b):
     return a + b
 
@@ -223,8 +242,8 @@ def minus(a, b):
 def Equal(a, b):
     return a == b
 
-def eq_q(a, b):
-    return a is b
+def LessThan(a, b):
+    return a < b
 
 def LessThanEqual(a, b):
     return a <= b
@@ -233,7 +252,13 @@ def GreaterThanEqual(a, b):
     return a >= b
 
 def memq(item, lyst):
-    return item in list_to_vector(lyst)
+    retval = symbol_emptylist
+    current = lyst
+    while isinstance(current, cons):
+        if current.car == item:
+            return current.cdr
+        current = current.cdr
+    return False
 
 ### Converters:
 
@@ -259,6 +284,9 @@ def list_to_vector(lyst):
         current = current.cdr
     return retval
 
+def vector_to_list(vector):
+    return List(*vector)
+
 ### Strings:
 
 def string_append(s1, s2):
@@ -269,6 +297,38 @@ def string_ref(string, pos):
 
 def string(s):
     return str(s)
+
+def string_to_decimal(s):
+    return float(s)
+
+def string_to_rational(s):
+    return Fraction(s)
+
+def string_split(string, delim):
+    return List(*string.split(delim))
+
+def symbol_to_string(symbol):
+    return symbol.name
+
+def member(item, lyst):
+    current = lyst
+    while isinstance(current, cons):
+        if item == lyst:
+            return True
+        current = current.cdr
+    return False
+
+def string_is__q(s1, s2):
+    return s1 == s2
+
+#def string_to_number(s):
+
+# string_is__q
+# string_length
+# stringLessThan_q
+# string_split
+# string_to_list
+# string_to_number
 
 ### Functions:
 
@@ -309,6 +369,90 @@ def format(string, *args):
 
 def safe_print(item):
     print(item)
+
+def search_frame(frame, variable):
+    if isinstance(frame, cons):
+        bindings = car(frame)
+        variables = cadr(frame)
+        i = 0
+        while not null_q(variables):
+            if eq_q(car(variables), variable):
+                return bindings[i];
+            variables = cdr(variables)
+            i += 1
+        return False
+    else:
+        raise Exception("invalid frame")
+
+def read_content(filename):
+    return open(filename).read()
+
+def get_current_time():
+    return time.time()
+
+def dlr_env_contains(item):
+    return False
+
+# _
+# apply_star
+# assv
+# char_to_integer
+# current_directory
+# callback0
+# callback1
+# callback2
+# dlr_apply
+# dlr_env_contains
+# dlr_env_lookup
+# dlr_func
+# dlr_object_contains
+# dlr_proc_q
+# equal_q
+# even_q
+# file_exists_q
+# for_each
+# get_external_member
+# get_external_members
+# get_iterator
+# get_type
+# handle_debug_info
+# highlight_expression
+# integer_to_char
+# iterator_q
+# length
+# list_head
+# list_q
+# list_tail
+# make_vector
+# map_hat
+# member
+# memv
+# modulo
+# newline
+# next_item
+# number_to_string
+# odd_q
+# printf
+# printf_prim
+# procedure_q
+# quotient
+# read_content
+# remainder
+# set_external_member_b
+# set_global_docstring_b
+# set_global_value_b
+# slash
+# sort
+# sqrt
+# _star
+# substring
+# symbol_to_string
+# to_
+# using_prim
+# vector_length
+# vector_native
+# vector_ref
+# vector_set_b
 
 # end of Scheme.py
 #############################################################
@@ -467,7 +611,7 @@ symbol_environment = Symbol("<environment>")
 symbol_Map = Symbol("map")
 symbol__star = Symbol("*")
 symbol_plus = Symbol("+")
-symbol_minus = Symbol("-")
+symbol__ = Symbol("-")
 symbol_slash = Symbol("/")
 symbol_p = Symbol("%")
 symbol_LessThan = Symbol("<")
@@ -1085,7 +1229,7 @@ def cont_45(x, y, k):
 def cont_46(i, v1, v2, k):
     if value_reg:
         globals()['k_reg'] = k
-        globals()['i_reg'] = minus(i, 1)
+        globals()['i_reg'] = (i) - (1)
         globals()['v2_reg'] = v2
         globals()['v1_reg'] = v1
         globals()['pc'] = equal_vectors_q
@@ -1712,7 +1856,7 @@ def cont2_74(e, handler):
     globals()['pc'] = apply_handler2
 
 def cont2_75(trace_depth, k2):
-    globals()['trace_depth'] = minus(trace_depth, 1)
+    globals()['trace_depth'] = (trace_depth) - (1)
     printf("~areturn: ~s~%", make_trace_depth_string(trace_depth), value1_reg)
     globals()['k_reg'] = k2
     globals()['pc'] = apply_cont2
@@ -2220,7 +2364,7 @@ def proc_2(bodies, formals, runt, env):
 def proc_3(bodies, name, trace_depth, formals, env):
     if Equal(length(args_reg), length(formals)):
         printf("~acall: ~s~%", make_trace_depth_string(trace_depth), cons(name, args_reg))
-        globals()['trace_depth'] = plus(trace_depth, 1)
+        globals()['trace_depth'] = (trace_depth) + (1)
         globals()['k_reg'] = make_cont2(cont2_75, trace_depth, k2_reg)
         globals()['env_reg'] = extend(env, formals, args_reg)
         globals()['exps_reg'] = bodies
@@ -2234,7 +2378,7 @@ def proc_4(bodies, name, trace_depth, formals, runt, env):
         new_env = symbol_undefined
         new_env = extend(env, cons(runt, formals), cons(list_tail(args_reg, length(formals)), list_head(args_reg, length(formals))))
         printf("~acall: ~s~%", make_trace_depth_string(trace_depth), cons(name, args_reg))
-        globals()['trace_depth'] = plus(trace_depth, 1)
+        globals()['trace_depth'] = (trace_depth) + (1)
         globals()['k_reg'] = make_cont2(cont2_75, trace_depth, k2_reg)
         globals()['env_reg'] = new_env
         globals()['exps_reg'] = bodies
@@ -2723,7 +2867,7 @@ def proc_54():
             globals()['pc'] = runtime_error
         else:
             globals()['value2_reg'] = fail_reg
-            globals()['value1_reg'] = Apply(minus, args_reg)
+            globals()['value1_reg'] = Apply(_, args_reg)
             globals()['k_reg'] = k2_reg
             globals()['pc'] = apply_cont2
 
@@ -3450,7 +3594,7 @@ def next_avail(n):
     return string_ref(chars_to_scan, n)
 
 def remaining(n):
-    return plus(1, n)
+    return (1) + (n)
 
 def initialize_scan_counters():
     globals()['scan_line'] = 1
@@ -3465,11 +3609,11 @@ def increment_scan_counters(chars):
     globals()['last_scan_char'] = scan_char
     globals()['last_scan_position'] = scan_position
     if char_is__q(next_avail(chars), '\n'):
-        globals()['scan_line'] = plus(1, scan_line)
+        globals()['scan_line'] = (1) + (scan_line)
         globals()['scan_char'] = 1
     else:
-        globals()['scan_char'] = plus(1, scan_char)
-    globals()['scan_position'] = plus(1, scan_position)
+        globals()['scan_char'] = (1) + (scan_char)
+    globals()['scan_position'] = (1) + (scan_position)
 
 def mark_token_start():
     globals()['token_start_line'] = scan_line
@@ -4078,7 +4222,7 @@ def length_hat(asexp):
     if null_q_hat(asexp):
         return 0
     else:
-        return plus(1, length_hat(cdr_hat(asexp)))
+        return (1) + (length_hat(cdr_hat(asexp)))
 
 def cons_hat(a, b, info):
     return List(pair_tag, a, b, info)
@@ -4857,7 +5001,7 @@ def get_lexical_address():
             globals()['contours_reg'] = car(senv_reg)
             globals()['pc'] = get_lexical_address_offset
         else:
-            globals()['depth_reg'] = plus(depth_reg, 1)
+            globals()['depth_reg'] = (depth_reg) + (1)
             globals()['senv_reg'] = cdr(senv_reg)
             globals()['pc'] = get_lexical_address
 
@@ -4867,7 +5011,7 @@ def get_lexical_address_offset():
         globals()['value1_reg'] = lexical_address_aexp(depth_reg, offset_reg, id_reg, info_reg)
         globals()['pc'] = apply_cont2
     else:
-        globals()['offset_reg'] = plus(offset_reg, 1)
+        globals()['offset_reg'] = (offset_reg) + (1)
         globals()['contours_reg'] = cdr(contours_reg)
         globals()['pc'] = get_lexical_address_offset
 
@@ -5024,14 +5168,14 @@ def process_macro_clauses_hat():
 def qq_expand_cps():
     if quasiquote_q_hat(ax_reg):
         globals()['k_reg'] = make_cont(cont_35, k_reg)
-        globals()['depth_reg'] = plus(depth_reg, 1)
+        globals()['depth_reg'] = (depth_reg) + (1)
         globals()['ax_reg'] = cdr_hat(ax_reg)
         globals()['pc'] = qq_expand_cps
     else:
         if (unquote_q_hat(ax_reg)) or (unquote_splicing_q_hat(ax_reg)):
             if to_(depth_reg, 0):
                 globals()['k_reg'] = make_cont(cont_34, ax_reg, k_reg)
-                globals()['depth_reg'] = minus(depth_reg, 1)
+                globals()['depth_reg'] = (depth_reg) - (1)
                 globals()['ax_reg'] = cdr_hat(ax_reg)
                 globals()['pc'] = qq_expand_cps
             else:
@@ -5063,14 +5207,14 @@ def qq_expand_cps():
 def qq_expand_list_cps():
     if quasiquote_q_hat(ax_reg):
         globals()['k_reg'] = make_cont(cont_40, k_reg)
-        globals()['depth_reg'] = plus(depth_reg, 1)
+        globals()['depth_reg'] = (depth_reg) + (1)
         globals()['ax_reg'] = cdr_hat(ax_reg)
         globals()['pc'] = qq_expand_cps
     else:
         if (unquote_q_hat(ax_reg)) or (unquote_splicing_q_hat(ax_reg)):
             if to_(depth_reg, 0):
                 globals()['k_reg'] = make_cont(cont_39, ax_reg, k_reg)
-                globals()['depth_reg'] = minus(depth_reg, 1)
+                globals()['depth_reg'] = (depth_reg) - (1)
                 globals()['ax_reg'] = cdr_hat(ax_reg)
                 globals()['pc'] = qq_expand_cps
             else:
@@ -5260,6 +5404,12 @@ def aunparse(aexp):
 
 def exception_q(x):
     return (pair_q(x)) and (eq_q(car(x), symbol_exception))
+
+def read_line(prompt):
+    printf(prompt)
+    input_ = symbol_undefined
+    input_ = raw_input()
+    return format("~s", input_)
 
 def start_rm():
     globals()['toplevel_env'] = make_toplevel_env()
@@ -5746,7 +5896,7 @@ def make_trace_depth_string(level):
     if Equal(level, 0):
         return ""
     else:
-        return string_append(" |", make_trace_depth_string(minus(level, 1)))
+        return string_append(" |", make_trace_depth_string((level) - (1)))
 
 def trace_closure(name, formals, bodies, env):
     trace_depth = symbol_undefined
@@ -5774,7 +5924,7 @@ def length_at_least_q(n, ls):
         if (null_q(ls)) or (not(pair_q(ls))):
             return False
         else:
-            return length_at_least_q(minus(n, 1), cdr(ls))
+            return length_at_least_q((n) - (1), cdr(ls))
 
 def all_numeric_q(ls):
     return (null_q(ls)) or ((number_q(car(ls))) and (all_numeric_q(cdr(ls))))
@@ -5797,7 +5947,7 @@ def environment_object_q(x):
 def ends_with_newline_q(s):
     len = symbol_undefined
     len = string_length(s)
-    return equal_q(substring(s, minus(len, 1), len), "\n")
+    return equal_q(substring(s, (len) - (1), len), "\n")
 
 def load_file():
     if member(filename_reg, load_stack):
@@ -5850,7 +6000,7 @@ def length_loop():
             globals()['msg_reg'] = format("length called on improper list ~s", ls_reg)
             globals()['pc'] = runtime_error
         else:
-            globals()['sum_reg'] = plus(sum_reg, 1)
+            globals()['sum_reg'] = (sum_reg) + (1)
             globals()['x_reg'] = cdr(x_reg)
             globals()['pc'] = length_loop
 
@@ -5877,7 +6027,7 @@ def equal_objects_q():
             globals()['pc'] = equal_objects_q
         else:
             if (vector_q(x_reg)) and (vector_q(y_reg)) and (Equal(vector_length(x_reg), vector_length(y_reg))):
-                globals()['i_reg'] = minus(vector_length(x_reg), 1)
+                globals()['i_reg'] = (vector_length(x_reg)) - (1)
                 globals()['v2_reg'] = y_reg
                 globals()['v1_reg'] = x_reg
                 globals()['pc'] = equal_vectors_q
@@ -6130,7 +6280,7 @@ def for_each_primitive():
 
 def make_toplevel_env():
     primitives = symbol_undefined
-    primitives = List(List(symbol__star, times_prim), List(symbol_plus, plus_prim), List(symbol_minus, minus_prim), List(symbol_slash, divide_prim), List(symbol_p, modulo_prim), List(symbol_LessThan, lt_prim), List(symbol_LessThanEqual, lt_or_eq_prim), List(symbol_Equal, equal_sign_prim), List(symbol_to_, gt_prim), List(symbol_GreaterThanEqual, gt_or_eq_prim), List(symbol_abort, abort_prim), List(symbol_abs, abs_prim), List(symbol_append, append_prim), List(symbol_Apply, apply_prim), List(symbol_assv, assv_prim), List(symbol_boolean_q, boolean_q_prim), List(symbol_caddr, caddr_prim), List(symbol_cadr, cadr_prim), List(symbol_call_with_current_continuation, callslashcc_prim), List(symbol_callslashcc, callslashcc_prim), List(symbol_car, car_prim), List(symbol_cdr, cdr_prim), List(symbol_char_q, char_q_prim), List(symbol_char_is__q, char_is__q_prim), List(symbol_char_whitespace_q, char_whitespace_q_prim), List(symbol_char_alphabetic_q, char_alphabetic_q_prim), List(symbol_char_numeric_q, char_numeric_q_prim), List(symbol_char_to_integer, char_to_integer_prim), List(symbol_cons, cons_prim), List(symbol_current_time, current_time_prim), List(symbol_cut, cut_prim), List(symbol_dir, dir_prim), List(symbol_display, display_prim), List(symbol_current_environment, current_environment_prim), List(symbol_eq_q, eq_q_prim), List(symbol_equal_q, equal_q_prim), List(symbol_error, error_prim), List(symbol_eval, eval_prim), List(symbol_eval_ast, eval_ast_prim), List(symbol_exit, exit_prim), List(symbol_for_each, for_each_prim), List(symbol_get, get_prim), List(symbol_get_stack_trace, get_stack_trace_prim), List(symbol_import, import_prim), List(symbol_integer_to_char, integer_to_char_prim), List(symbol_length, length_prim), List(symbol_List, list_prim), List(symbol_list_to_vector, list_to_vector_prim), List(symbol_list_to_string, list_to_string_prim), List(symbol_list_ref, list_ref_prim), List(symbol_load, load_prim), List(symbol_make_set, make_set_prim), List(symbol_make_vector, make_vector_prim), List(symbol_Map, map_prim), List(symbol_member, member_prim), List(symbol_memq, memq_prim), List(symbol_memv, memv_prim), List(symbol_newline, newline_prim), List(symbol_not, not_prim), List(symbol_null_q, null_q_prim), List(symbol_number_to_string, number_to_string_prim), List(symbol_number_q, number_q_prim), List(symbol_pair_q, pair_q_prim), List(symbol_parse, parse_prim), List(symbol_parse_string, parse_string_prim), List(symbol_print, print_prim), List(symbol_printf, printf_primitive), List(symbol_range, range_prim), List(symbol_read_string, read_string_prim), List(symbol_require, require_prim), List(symbol_reverse, reverse_prim), List(symbol_set_car_b, set_car_b_prim), List(symbol_set_cdr_b, set_cdr_b_prim), List(symbol_sqrt, sqrt_prim), List(symbol_odd_q, odd_q_prim), List(symbol_even_q, even_q_prim), List(symbol_quotient, quotient_prim), List(symbol_remainder, remainder_prim), List(symbol_string, string_prim), List(symbol_string_length, string_length_prim), List(symbol_string_ref, string_ref_prim), List(symbol_string_q, string_q_prim), List(symbol_string_to_number, string_to_number_prim), List(symbol_string_is__q, string_is__q_prim), List(symbol_substring, substring_prim), List(symbol_symbol_q, symbol_q_prim), List(symbol_unparse, unparse_prim), List(symbol_unparse_procedure, unparse_procedure_prim), List(symbol_using, using_primitive), List(symbol_vector, vector_prim), List(symbol_vector_ref, vector_ref_prim), List(symbol_vector_set_b, vector_set_b_prim), List(symbol_void, void_prim), List(symbol_zero_q, zero_q_prim), List(symbol_current_directory, current_directory_prim), List(symbol_cd, current_directory_prim), List(symbol_round, round_prim))
+    primitives = List(List(symbol__star, times_prim), List(symbol_plus, plus_prim), List(symbol__, minus_prim), List(symbol_slash, divide_prim), List(symbol_p, modulo_prim), List(symbol_LessThan, lt_prim), List(symbol_LessThanEqual, lt_or_eq_prim), List(symbol_Equal, equal_sign_prim), List(symbol_to_, gt_prim), List(symbol_GreaterThanEqual, gt_or_eq_prim), List(symbol_abort, abort_prim), List(symbol_abs, abs_prim), List(symbol_append, append_prim), List(symbol_Apply, apply_prim), List(symbol_assv, assv_prim), List(symbol_boolean_q, boolean_q_prim), List(symbol_caddr, caddr_prim), List(symbol_cadr, cadr_prim), List(symbol_call_with_current_continuation, callslashcc_prim), List(symbol_callslashcc, callslashcc_prim), List(symbol_car, car_prim), List(symbol_cdr, cdr_prim), List(symbol_char_q, char_q_prim), List(symbol_char_is__q, char_is__q_prim), List(symbol_char_whitespace_q, char_whitespace_q_prim), List(symbol_char_alphabetic_q, char_alphabetic_q_prim), List(symbol_char_numeric_q, char_numeric_q_prim), List(symbol_char_to_integer, char_to_integer_prim), List(symbol_cons, cons_prim), List(symbol_current_time, current_time_prim), List(symbol_cut, cut_prim), List(symbol_dir, dir_prim), List(symbol_display, display_prim), List(symbol_current_environment, current_environment_prim), List(symbol_eq_q, eq_q_prim), List(symbol_equal_q, equal_q_prim), List(symbol_error, error_prim), List(symbol_eval, eval_prim), List(symbol_eval_ast, eval_ast_prim), List(symbol_exit, exit_prim), List(symbol_for_each, for_each_prim), List(symbol_get, get_prim), List(symbol_get_stack_trace, get_stack_trace_prim), List(symbol_import, import_prim), List(symbol_integer_to_char, integer_to_char_prim), List(symbol_length, length_prim), List(symbol_List, list_prim), List(symbol_list_to_vector, list_to_vector_prim), List(symbol_list_to_string, list_to_string_prim), List(symbol_list_ref, list_ref_prim), List(symbol_load, load_prim), List(symbol_make_set, make_set_prim), List(symbol_make_vector, make_vector_prim), List(symbol_Map, map_prim), List(symbol_member, member_prim), List(symbol_memq, memq_prim), List(symbol_memv, memv_prim), List(symbol_newline, newline_prim), List(symbol_not, not_prim), List(symbol_null_q, null_q_prim), List(symbol_number_to_string, number_to_string_prim), List(symbol_number_q, number_q_prim), List(symbol_pair_q, pair_q_prim), List(symbol_parse, parse_prim), List(symbol_parse_string, parse_string_prim), List(symbol_print, print_prim), List(symbol_printf, printf_primitive), List(symbol_range, range_prim), List(symbol_read_string, read_string_prim), List(symbol_require, require_prim), List(symbol_reverse, reverse_prim), List(symbol_set_car_b, set_car_b_prim), List(symbol_set_cdr_b, set_cdr_b_prim), List(symbol_sqrt, sqrt_prim), List(symbol_odd_q, odd_q_prim), List(symbol_even_q, even_q_prim), List(symbol_quotient, quotient_prim), List(symbol_remainder, remainder_prim), List(symbol_string, string_prim), List(symbol_string_length, string_length_prim), List(symbol_string_ref, string_ref_prim), List(symbol_string_q, string_q_prim), List(symbol_string_to_number, string_to_number_prim), List(symbol_string_is__q, string_is__q_prim), List(symbol_substring, substring_prim), List(symbol_symbol_q, symbol_q_prim), List(symbol_unparse, unparse_prim), List(symbol_unparse_procedure, unparse_procedure_prim), List(symbol_using, using_primitive), List(symbol_vector, vector_prim), List(symbol_vector_ref, vector_ref_prim), List(symbol_vector_set_b, vector_set_b_prim), List(symbol_void, void_prim), List(symbol_zero_q, zero_q_prim), List(symbol_current_directory, current_directory_prim), List(symbol_cd, current_directory_prim), List(symbol_round, round_prim))
     return make_initial_env_extended(Map(car, primitives), Map(cadr, primitives))
 
 def make_initial_env_extended(names, procs):
