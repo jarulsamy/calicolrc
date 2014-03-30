@@ -1,4 +1,7 @@
-# included from Scheme.py
+#############################################################
+# Scheme.py
+# These are native implementations of functions to allow
+# the register machine translation to run in Python
 
 class Symbol:
     def __init__(self, name):
@@ -11,59 +14,10 @@ class Symbol:
     def __eq__(self, other):
         return isinstance(other, Symbol) and self.hash == other.hash
 
-def box(item):
-    return List(item)
 
-def car(lyst):
-    return lyst.car
+void_value = Symbol("<void>")
 
-def cdr(lyst):
-    return lyst.cdr
-
-def caar(lyst):
-    return lyst.car.car
-
-def cadr(lyst):
-    return lyst.cdr.car
-
-def cddr(lyst):
-    return lyst.cdr.cdr
-
-def cdar(lyst):
-    return lyst.car.cdr
-
-def set_car_b(lyst, item):
-    lyst.car = item
-
-def string_append(s1, s2):
-    if s1 is None:
-        if s2 is None:
-            return ""
-        else:
-            return s2
-    elif s2 is None:
-        return s1
-    else:
-        return str(s1) + str(s2)
-
-def eq_q(o1, o2):
-    return o1 == o2
-
-def list_ref(lyst, pos):
-    current = lyst
-    while pos != 0:
-        current = current.cdr
-        pos = pos - 1
-    return current.car
-
-def string_ref(string, pos):
-    return string[pos]
-
-def string(s):
-    return str(s)
-
-def error(function, *args):
-    print("Error in %s: %s" % (function, args))
+### Lists:
 
 class cons:
     # build a cons cell
@@ -125,35 +79,52 @@ def Map(f, lyst):
         raise Exception("not a proper list")
     return retval
 
-def Apply(f, lyst):
-    return apply(f, list_to_vector(lyst))
-
-def tagged_list_hat(tag, f, arg_count):
-    def tagged_list(*args):
-        if not f(len(args)):
-            raise Exception("invalid arguments to " + tag)
-        return List(tag, *args)
-    return tagged_list
-
-def Equal(a, b):
-    return a == b
-
-def LessThanEqual(a, b):
-    return a <= b
-
-def GreaterThanEqual(a, b):
-    return a >= b
-
-def list_to_vector(lyst):
-    retval = list()
-    current = lyst
-    while isinstance(current, cons):
-        retval.append(current.car)
-        current = current.cdr
+def append(*objs):
+    retval = objs[-1]
+    for obj in reversed(objs[:-1]):
+        current = reverse(obj)
+        while isinstance(current, cons):
+            retval = cons(current.car, retval)
+            current = current.cdr
     return retval
+            
+def car(lyst):
+    return lyst.car
 
-def raw_read_line(prompt):
-    return raw_input(prompt)
+def cdr(lyst):
+    return lyst.cdr
+
+def caar(lyst):
+    return lyst.car.car
+
+def cadr(lyst):
+    return lyst.cdr.car
+
+def cddr(lyst):
+    return lyst.cdr.cdr
+
+def cdar(lyst):
+    return lyst.car.cdr
+
+def caddr(lyst):
+    return lyst.cdr.cdr.car
+
+def set_car_b(cell, item):
+    cell.car = item
+
+def set_cdr_b(cell, item):
+    cell.cdr = item
+
+def list_ref(lyst, pos):
+    if pos < 0:
+        raise Exception("invalid list-ref position: " + pos)
+    current = lyst
+    while pos != 0:
+        current = current.cdr
+        pos = pos - 1
+    return current.car
+
+### Native make- functions:
 
 def make_proc(*args):
     return List(symbol_procedure, *args)
@@ -182,8 +153,19 @@ def make_handler(*args):
 def make_handler2(*args):
     return List(symbol_handler2, *args)
 
+### Questions:
+
+def eq_q(o1, o2):
+    return o1 == o2
+
+def char_q(item):
+    return isinstance(item, str) and len(item) == 1
+
+def string_q(item):
+    return isinstance(item, str)
+
 def char_whitespace_q(c):
-    return c in [' ', '\t', '\n', '\0', '\r']
+    return c in [' ', '\t', '\n', '\r']
 
 def char_alphabetic_q(c):
     return (('A' <= c <= 'Z') or 
@@ -195,20 +177,63 @@ def char_numeric_q(c):
 def char_is__q(c1, c2):
     return c1 == c2
 
-def plus(a, b):
-    return a + b
-
-def minus(a, b):
-    return a - b
-
 def pair_q(item):
     return isinstance(item, cons)
 
 def number_q(item):
     return isinstance(item, (int, long, float))
 
-def safe_print(item):
-    print(item)
+def null_q(item):
+    return item == symbol_emptylist
+
+def boolean_q(item):
+    return item in [True, False]
+
+def true_q(item):
+    if item is False:
+        return False
+    else:
+        return True
+
+def symbol_q(item):
+    return isinstance(item, Symbol)
+
+def vector_q(item):
+    return isinstance(item, list)
+
+def pair_q(item):
+    return isinstance(item, cons)
+
+### Math and applications:
+
+def plus(a, b):
+    return a + b
+
+def minus(a, b):
+    return a - b
+
+def Equal(a, b):
+    return a == b
+
+def eq_q(a, b):
+    return a is b
+
+def LessThanEqual(a, b):
+    return a <= b
+
+def GreaterThanEqual(a, b):
+    return a >= b
+
+def memq(item, lyst):
+    return item in list_to_vector(lyst)
+
+### Converters:
+
+def string_to_integer(s):
+    return int(s)
+
+def string_to_symbol(string):
+    return Symbol(string)
 
 def list_to_string(lyst):
     retval = ""
@@ -218,23 +243,41 @@ def list_to_string(lyst):
         current = current.cdr
     return retval
 
-def string_to_integer(s):
-    return int(s)
-
-def null_q(item):
-    return item == symbol_emptylist
-
-def append(*objs):
-    retval = objs[-1]
-    for obj in reversed(objs[:-1]):
-        current = reverse(obj)
-        while isinstance(current, cons):
-            retval = cons(current.car, retval)
-            current = current.cdr
+def list_to_vector(lyst):
+    retval = list()
+    current = lyst
+    while isinstance(current, cons):
+        retval.append(current.car)
+        current = current.cdr
     return retval
-            
-def string_to_symbol(string):
-    return Symbol(string)
+
+### Strings:
+
+def string_append(s1, s2):
+    return str(s1) + str(s2)
+
+def string_ref(string, pos):
+    return string[pos]
+
+def string(s):
+    return str(s)
+
+### Functions:
+
+def Apply(f, lyst):
+    return apply(f, list_to_vector(lyst))
+
+### Annotated expression support:
+
+def tagged_list_hat(keyword, op, length):
+    def tagged_list(asexp):
+        return (list_q_hat(asexp) and
+                op(length_hat(asexp), length) and
+                symbol_q_hat(car_hat(asexp)) and 
+                eq_q_hat(car_hat(asexp), keyword))
+    return tagged_list
+
+### Misc:
 
 def display(item):
     print(item)
@@ -243,3 +286,21 @@ def trampoline():
     while pc:
         pc()
     return final_reg
+
+def box(item):
+    return List(item)
+
+def error(function, *args):
+    print("Error in %s: %s" % (function, args))
+
+def raw_read_line(prompt):
+    return raw_input(prompt)
+
+def format(string, *args):
+    return "format(%s, %s)" % (string, args)
+
+def safe_print(item):
+    print(item)
+
+# end of Scheme.py
+#############################################################

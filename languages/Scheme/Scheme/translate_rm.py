@@ -5,19 +5,19 @@ class Translator:
         self.program = []
         self.symbols = ["()"]
 
-    def functions_to_ignore(self):
+    def to_ignore(self):
         # FIXME: get rid of these by marking them as native:
         return [
             "void-value", "restart-rm", "raw-read-line", "trampoline",
             "read-line", "Main", "read-content", "string->integer",
-            "string->decimal", "string->rational", "tagged-list", "testall", 
+            "string->decimal", "string->rational", "testall", 
             "string-split", "get-current-time", "type?", 
             "execute", "execute-loop", "execute-string", "execute-file",
             "read-eval-print-loop", "unparse", "unparse-exps", "qq-expand-cps_",
             "qq-expand-list-cps_", "init-cont", "init-cont2", "init-cont3", "init-cont4",
             "init-handler", "init-handler2", "init-fail",
             ## defined in Scheme.cs:
-            "true?", "atom-tag", "pair-tag", "safe-print", "make-safe",
+            "true?", "safe-print", "make-safe",
             "make-cont", "make-cont2", "make-cont3", "make-cont4", "make-macro", "make-proc",
             "make-fail", "make-handler", "make-handler2"
         ]
@@ -227,8 +227,7 @@ class Translator:
 
 class PythonTranslator(Translator):
     def preamble(self):
-        print("""
-####################################################
+        print("""####################################################
 ## Scheme in Python
 ##
 ##
@@ -265,13 +264,17 @@ class PythonTranslator(Translator):
             self.process_statement(statement, locals, indent + 4)
         print()
 
+    def process_short_circuit_op(self, expr):
+        retval = "(%s)" % self.process_app(expr[1])
+        for e in expr[2:]:
+            retval += " %s (%s)" % (expr[0], self.process_app(e))
+        return retval
+
     def process_app(self, expr):
         if isinstance(expr, list):
             if expr[0] in ['and', 'or']:
-                return "(%s %s %s)" % (self.process_app(expr[1]),
-                                       expr[0],
-                                       self.process_app(expr[2]))
-            elif expr[0] == 'if':
+                return self.process_short_circuit_op(expr)
+            if expr[0] == 'if':
                 return "(%s if %s else %s)" % (self.process_app(expr[2]),
                                                self.process_app(expr[1]),
                                                self.process_app(expr[3]))
@@ -304,7 +307,7 @@ class PythonTranslator(Translator):
             print("else:")
             self.process_statement(expr[3], locals, indent + 4)
 
-    def get_function_name(self, expr):
+    def get_define_name(self, expr):
         ## (define function ...)
         return expr[1]
 
@@ -343,14 +346,11 @@ class PythonTranslator(Translator):
 
     def process_statement(self, expr, locals, indent):
         if self.function_q(expr):
-            if not self.get_function_name(expr) in self.functions_to_ignore():
+            if not self.get_define_name(expr) in self.to_ignore():
                 self.process_function_definition(expr, locals, indent)
-        elif expr[0] == "define":
-            self.process_definition(expr, locals, indent)
-        elif expr[0] == "define*":
-            self.process_function_definition(expr, locals, indent)
-        elif expr[0] == "define+":
-            self.process_function_definition(expr, locals, indent)
+        elif expr[0] == "define": # global variable
+            if not self.get_define_name(expr) in self.to_ignore():
+                self.process_definition(expr, locals, indent)
         elif expr[0] == "define-native":
             pass
         elif expr[0] == "let":
