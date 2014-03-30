@@ -19,7 +19,17 @@ class Symbol:
     def __eq__(self, other):
         return isinstance(other, Symbol) and self.hash == other.hash
 
-void_value = Symbol("<void>")
+    def __hash__(self):
+        return hash(self.name)
+
+symbols = {}
+
+def make_symbol(string):
+    if not (string in symbols):
+        symbols[string] = Symbol(string)
+    return symbols[string]
+
+void_value = make_symbol("<void>")
 
 ### Lists:
 
@@ -208,6 +218,18 @@ def true_q(item):
     else:
         return True
 
+def list_q(item):
+    ## return proper_list?
+    if isinstance(item, cons):
+        current = item
+        while isinstance(current, cons):
+            current = current.cdr
+        return current is symbol_emptylist
+    return False
+
+def procedure_q(item):
+    return pair_q(item) and (car(item) == symbol_procedure)
+
 def symbol_q(item):
     return isinstance(item, Symbol)
 
@@ -258,7 +280,7 @@ def string_to_integer(s):
     return int(s)
 
 def string_to_symbol(string):
-    return Symbol(string)
+    return make_symbol(string)
 
 def list_to_string(lyst):
     retval = ""
@@ -278,6 +300,9 @@ def list_to_vector(lyst):
 
 def vector_to_list(vector):
     return List(*vector)
+
+def vector_ref(vector, position):
+    return vector[position]
 
 ### Strings:
 
@@ -383,6 +408,9 @@ def get_current_time():
     return time.time()
 
 def dlr_env_contains(item):
+    return False
+
+def dlr_proc_q(item):
     return False
 
 # _

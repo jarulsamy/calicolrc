@@ -377,7 +377,7 @@ class PythonTranslator(Translator):
     def translate(self):
         self.preamble()
         for symbol in self.symbols:
-            print("%s = Symbol(\"%s\")" % (self.make_symbol_name(symbol), symbol))
+            print("%s = make_symbol(\"%s\")" % (self.make_symbol_name(symbol), symbol))
         print()
         for statement in self.program:
             self.process_statement(statement, [], 0)
