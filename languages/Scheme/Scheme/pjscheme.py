@@ -13,6 +13,7 @@
 
 from __future__ import print_function
 import fractions
+import operator
 import math
 import time
 import sys
@@ -50,6 +51,11 @@ def make_symbol(string):
     return symbols[string]
 
 void_value = make_symbol("<void>")
+
+def make_initial_env_extended(names, procs):
+    return make_initial_environment(
+        cons(make_symbol("void"), names), 
+        cons(None, procs))
 
 ### Lists:
 
@@ -242,6 +248,32 @@ def make_handler(*args):
 def make_handler2(*args):
     return List(symbol_handler2, *args)
 
+### Native other functions:
+
+def length_one_q(ls):
+    return isinstance(ls, cons) and (ls.cdr is symbol_emptylist)
+
+def length_two_q(ls):
+    return (isinstance(ls, cons) and 
+            isinstance(ls.cdr, cons) and 
+            (ls.cdr.cdr is symbol_emptylist))
+
+def length_at_least_q(n, ls):
+    length = len(list(ls))
+    return length >= n
+
+def all_numeric_q(ls):
+    for item in ls:
+        if not number_q(item):
+            return False
+    return True
+
+def all_char_q(ls):
+    for item in ls:
+        if not char_q(item):
+            return False
+    return True
+
 ### Questions:
 
 def even_q(n):
@@ -331,14 +363,19 @@ class Fraction(fractions.Fraction):
 def sqrt(number):
     return math.sqrt(number)
 
-def plus(a, b):
-    return a + b
+def plus(*args):
+    return reduce(operator.add, args, 0)
 
-def minus(a, b):
-    return a - b
+def minus(*args):
+    if len(args) == 0:
+        return 0
+    elif len(args) == 1:
+        return -args[0]
+    else:
+        return reduce(operator.sub, args[1:], args[0])
 
-def multiply(a, b):
-    return a * b
+def multiply(*args):
+    return reduce(operator.mul, args, 1)
 
 def Equal(a, b):
     return a == b
@@ -471,7 +508,7 @@ def display(item):
     print(item, end="")
 
 def printf_prim(formatting, *items):
-    print(format(formatting, *items))
+    print(format(formatting, *items), end="")
 
 def newline():
     print()
@@ -6031,24 +6068,6 @@ def get_procedure_name(aexp):
         else:
             return symbol_unknown
 
-def old_get_procedure_name(exp):
-    if (car(exp)) is (symbol_lexical_address_aexp):
-        id = symbol_undefined
-        id = list_ref(exp, 3)
-        return id
-    else:
-        if (car(exp)) is (symbol_var_aexp):
-            id = symbol_undefined
-            id = list_ref(exp, 1)
-            return id
-        else:
-            if (car(exp)) is (symbol_app_aexp):
-                operator = symbol_undefined
-                operator = list_ref(exp, 1)
-                return get_procedure_name(operator)
-            else:
-                return symbol_unknown
-
 def format_stack_trace(exp):
     info = symbol_undefined
     info = rac(exp)
@@ -6133,24 +6152,6 @@ def mu_trace_closure(name, formals, runt, bodies, env):
     trace_depth = symbol_undefined
     trace_depth = 0
     return make_proc(proc_4, bodies, name, trace_depth, formals, runt, env)
-
-def length_one_q(ls):
-    return (not(null_q(ls))) and (null_q(cdr(ls)))
-
-def length_two_q(ls):
-    return (not(null_q(ls))) and (not(null_q(cdr(ls)))) and (null_q(cddr(ls)))
-
-def length_at_least_q(n, ls):
-    if LessThan(n, 1):
-        return True
-    else:
-        if (null_q(ls)) or (not(pair_q(ls))):
-            return False
-        else:
-            return length_at_least_q((n) - (1), cdr(ls))
-
-def all_numeric_q(ls):
-    return (null_q(ls)) or ((number_q(car(ls))) and (all_numeric_q(cdr(ls))))
 
 def all_char_q(ls):
     return (null_q(ls)) or ((char_q(car(ls))) and (all_char_q(cdr(ls))))
@@ -6505,9 +6506,6 @@ def make_toplevel_env():
     primitives = symbol_undefined
     primitives = List(List(symbol_multiply, times_prim), List(symbol_plus, plus_prim), List(symbol_minus, minus_prim), List(symbol_slash, divide_prim), List(symbol_p, modulo_prim), List(symbol_LessThan, lt_prim), List(symbol_LessThanEqual, lt_or_eq_prim), List(symbol_Equal, equal_sign_prim), List(symbol_GreaterThan, gt_prim), List(symbol_GreaterThanEqual, gt_or_eq_prim), List(symbol_abort, abort_prim), List(symbol_abs, abs_prim), List(symbol_append, append_prim), List(symbol_Apply, apply_prim), List(symbol_assv, assv_prim), List(symbol_boolean_q, boolean_q_prim), List(symbol_caddr, caddr_prim), List(symbol_cadr, cadr_prim), List(symbol_call_with_current_continuation, callslashcc_prim), List(symbol_callslashcc, callslashcc_prim), List(symbol_car, car_prim), List(symbol_cdr, cdr_prim), List(symbol_char_q, char_q_prim), List(symbol_char_is__q, char_is__q_prim), List(symbol_char_whitespace_q, char_whitespace_q_prim), List(symbol_char_alphabetic_q, char_alphabetic_q_prim), List(symbol_char_numeric_q, char_numeric_q_prim), List(symbol_char_to_integer, char_to_integer_prim), List(symbol_cons, cons_prim), List(symbol_current_time, current_time_prim), List(symbol_cut, cut_prim), List(symbol_dir, dir_prim), List(symbol_display, display_prim), List(symbol_current_environment, current_environment_prim), List(symbol_eq_q, eq_q_prim), List(symbol_equal_q, equal_q_prim), List(symbol_error, error_prim), List(symbol_eval, eval_prim), List(symbol_eval_ast, eval_ast_prim), List(symbol_exit, exit_prim), List(symbol_for_each, for_each_prim), List(symbol_format, format_prim), List(symbol_get, get_prim), List(symbol_get_stack_trace, get_stack_trace_prim), List(symbol_import, import_prim), List(symbol_integer_to_char, integer_to_char_prim), List(symbol_length, length_prim), List(symbol_List, list_prim), List(symbol_list_to_vector, list_to_vector_prim), List(symbol_list_to_string, list_to_string_prim), List(symbol_list_ref, list_ref_prim), List(symbol_load, load_prim), List(symbol_make_set, make_set_prim), List(symbol_make_vector, make_vector_prim), List(symbol_Map, map_prim), List(symbol_member, member_prim), List(symbol_memq, memq_prim), List(symbol_memv, memv_prim), List(symbol_newline, newline_prim), List(symbol_not, not_prim), List(symbol_null_q, null_q_prim), List(symbol_number_to_string, number_to_string_prim), List(symbol_number_q, number_q_prim), List(symbol_pair_q, pair_q_prim), List(symbol_parse, parse_prim), List(symbol_parse_string, parse_string_prim), List(symbol_print, print_prim), List(symbol_printf, printf_primitive), List(symbol_Range, range_prim), List(symbol_read_string, read_string_prim), List(symbol_require, require_prim), List(symbol_reverse, reverse_prim), List(symbol_set_car_b, set_car_b_prim), List(symbol_set_cdr_b, set_cdr_b_prim), List(symbol_snoc, snoc_prim), List(symbol_rac, rac_prim), List(symbol_rdc, rdc_prim), List(symbol_sqrt, sqrt_prim), List(symbol_odd_q, odd_q_prim), List(symbol_even_q, even_q_prim), List(symbol_quotient, quotient_prim), List(symbol_remainder, remainder_prim), List(symbol_string, string_prim), List(symbol_string_length, string_length_prim), List(symbol_string_ref, string_ref_prim), List(symbol_string_q, string_q_prim), List(symbol_string_to_number, string_to_number_prim), List(symbol_string_is__q, string_is__q_prim), List(symbol_substring, substring_prim), List(symbol_symbol_q, symbol_q_prim), List(symbol_unparse, unparse_prim), List(symbol_unparse_procedure, unparse_procedure_prim), List(symbol_using, using_primitive), List(symbol_vector, vector_prim), List(symbol_vector_ref, vector_ref_prim), List(symbol_vector_set_b, vector_set_b_prim), List(symbol_void, void_prim), List(symbol_zero_q, zero_q_prim), List(symbol_current_directory, current_directory_prim), List(symbol_cd, current_directory_prim), List(symbol_round, round_prim))
     return make_initial_env_extended(Map(car, primitives), Map(cadr, primitives))
-
-def make_initial_env_extended(names, procs):
-    return make_initial_environment(names, procs)
 
 def make_external_proc(external_function_object):
     return make_proc(proc_105, external_function_object)

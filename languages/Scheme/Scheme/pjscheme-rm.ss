@@ -6430,22 +6430,6 @@
                                       (return* 'application))))))))
             (return* 'unknown)))))
 
-(define old-get-procedure-name
-  (lambda (exp)
-    (if (eq? (car exp) 'lexical-address-aexp)
-        (let ((id 'undefined))
-          (set! id (list-ref exp 3))
-          (return* id))
-        (if (eq? (car exp) 'var-aexp)
-            (let ((id 'undefined))
-              (set! id (list-ref exp 1))
-              (return* id))
-            (if (eq? (car exp) 'app-aexp)
-                (let ((operator 'undefined))
-                  (set! operator (list-ref exp 1))
-                  (return* (get-procedure-name operator)))
-                (return* 'unknown))))))
-
 (define format-stack-trace
   (lambda (exp)
     (let ((info 'undefined))
@@ -6571,31 +6555,6 @@
       (return*
         (make-proc <proc-4> bodies name trace-depth formals runt
           env)))))
-
-(define length-one?
-  (lambda (ls)
-    (return* (and (not (null? ls)) (null? (cdr ls))))))
-
-(define length-two?
-  (lambda (ls)
-    (return*
-      (and (not (null? ls))
-           (not (null? (cdr ls)))
-           (null? (cddr ls))))))
-
-(define length-at-least?
-  (lambda (n ls)
-    (if (< n 1)
-        (return* #t)
-        (if (or (null? ls) (not (pair? ls)))
-            (return* #f)
-            (return* (length-at-least? (- n 1) (cdr ls)))))))
-
-(define all-numeric?
-  (lambda (ls)
-    (return*
-      (or (null? ls)
-          (and (number? (car ls)) (all-numeric? (cdr ls)))))))
 
 (define all-char?
   (lambda (ls)
@@ -7157,10 +7116,6 @@
           (map car primitives)
           (map cadr primitives))))))
 
-(define make-initial-env-extended
-  (lambda (names procs)
-    (return* (make-initial-environment names procs))))
-
 (define make-external-proc
   (lambda (external-function-object)
     (return* (make-proc <proc-105> external-function-object))))
@@ -7592,6 +7547,32 @@
                            (filter continuation-object? (cddr k))))
                     '<???>))))))
 
+(define-native
+  length-one?
+  (lambda (ls) (and (not (null? ls)) (null? (cdr ls)))))
+
+(define-native
+  length-two?
+  (lambda (ls)
+    (and (not (null? ls))
+         (not (null? (cdr ls)))
+         (null? (cddr ls)))))
+
+(define-native
+  length-at-least?
+  (lambda (n ls)
+    (if (< n 1)
+        #t
+        (if (or (null? ls) (not (pair? ls)))
+            #f
+            (length-at-least? (- n 1) (cdr ls))))))
+
+(define-native
+  all-numeric?
+  (lambda (ls)
+    (or (null? ls)
+        (and (number? (car ls)) (all-numeric? (cdr ls))))))
+
 (define void-prim (make-proc <proc-5>))
 
 (define void-value '<void>)
@@ -7816,6 +7797,11 @@
 (define current-directory-prim (make-proc <proc-103>))
 
 (define round-prim (make-proc <proc-104>))
+
+(define-native
+  make-initial-env-extended
+  (lambda (names procs)
+    (make-initial-environment names procs)))
 
 (define toplevel-env (make-toplevel-env))
 

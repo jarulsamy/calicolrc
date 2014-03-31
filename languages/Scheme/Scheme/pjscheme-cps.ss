@@ -260,12 +260,6 @@
 	    (set-cdr! retval (list x))
 	    front))))
 
-;; (define snoc
-;;   (lambda (x ls)
-;;     (cond
-;;       ((null? ls) (list x))
-;;       (else (cons (car ls) (snoc x (cdr ls)))))))
-
 ;;------------------------------------------------------------------------
 ;; character categories
 
@@ -2866,49 +2860,6 @@
     (set! *last-fail* REP-fail)))
 
 ;;----------------------------------------------------------------------------
-;; old read-eval-print loop
-
-;; redefined as REP-k when no-csharp-support.ss is loaded
-;;(define scheme-REP-k
-;;  (lambda-cont2 (v fail)
-;;    (if (not (void? v))
-;;	(safe-print v))
-;;    (if *need-newline*
-;;      (newline))
-;;    (read-eval-print fail)))
-
-;; redefined as REP-handler when no-csharp-support.ss is loaded
-;;(define scheme-REP-handler
-;;  (lambda-handler2 (e fail)
-;;    (REP-k `(uncaught exception: ,e) fail)))
-
-;; redefined as REP-fail when no-csharp-support.ss is loaded
-;;(define scheme-REP-fail
-;;  (lambda-fail ()
-;;    (REP-k "no more choices" REP-fail)))
-
-;;(define start
-;;  (lambda ()
-;;    ;; start with fresh environments
-;;    (set! toplevel-env (make-toplevel-env))
-;;    (set! macro-env (make-macro-env^))
-;;    (read-eval-print REP-fail)))
-
-;; avoids reinitializing environments on startup (useful for crash recovery)
-;;(define restart
-;;  (lambda ()
-;;    (printf "Restarting...\n")
-;;    (read-eval-print REP-fail)))
-
-;;(define* read-eval-print
-;;  (lambda (fail)
-;;    (set! load-stack '())  ;; in case a previous load encountered an error
-;;    (let ((input (raw-read-line "==> ")))  ;; read-line or raw-read-line
-;;      (scan-input input 'stdin REP-handler fail
-;;	(lambda-cont2 (tokens fail)
-;;	  (read-and-eval-asexps tokens 'stdin toplevel-env REP-handler fail REP-k))))))
-
-;;----------------------------------------------------------------------------
 
 (define *tracing-on?* #f)
 
@@ -2967,12 +2918,6 @@
     ;;(printf "~a: ~a\n" 'pop exp)
     (if (not (null? (car *stack-trace*)))
 	(set-car! *stack-trace* (cdr (car *stack-trace*))))))
-
-;; (define make-pop-stack-trace-k
-;;   (lambda (exp k2)
-;;     (lambda-cont2 (v fail)
-;;        (pop-stack-trace exp)
-;;        (k2 v fail))))
 
 (define* m
   (lambda (exp env handler fail k)   ;; fail is a lambda-handler2; k is a lambda-cont2
@@ -3130,15 +3075,6 @@
 	      (else 'application)))
 	  (else 'unknown)))))
 
-(define old-get-procedure-name
-  (lambda (exp)
-    (cases aexpression exp
-      (lexical-address-aexp (depth offset id info) id)
-      (var-aexp (id info) id)
-      (app-aexp (operator operands info)
-	  (get-procedure-name operator))
-      (else 'unknown))))
-
 (define format-stack-trace
   (lambda (exp)
     (let ((info (rac exp)))
@@ -3294,22 +3230,22 @@
 ;;----------------------------------------------------------------------------
 ;; Primitives
 
-(define length-one?
+(define-native length-one?
   (lambda (ls)
     (and (not (null? ls)) (null? (cdr ls)))))
 
-(define length-two?
+(define-native length-two?
   (lambda (ls)
     (and (not (null? ls)) (not (null? (cdr ls))) (null? (cddr ls)))))
 
-(define length-at-least?
+(define-native length-at-least?
   (lambda (n ls)
     (cond
       ((< n 1) #t)
       ((or (null? ls) (not (pair? ls))) #f)
       (else (length-at-least? (- n 1) (cdr ls))))))
 
-(define all-numeric?
+(define-native all-numeric?
   (lambda (ls)
     (or (null? ls)
 	(and (number? (car ls))
@@ -4579,7 +4515,7 @@
       (make-initial-env-extended (map car primitives) (map cadr primitives)))))
 
 ;; this is here as a hook for extending environments in C# etc.
-(define make-initial-env-extended
+(define-native make-initial-env-extended
   (lambda (names procs)
     (make-initial-environment names procs)))
 
@@ -4592,22 +4528,6 @@
   (lambda (external-function-object)
     (lambda-proc (args env2 info handler fail k2)
       (k2 (apply* external-function-object args) fail))))
-
-;; not used
-(define Main
-  (lambda filenames
-    (printf "Calico Scheme (0.2)\n")
-    (printf "(c) 2009-2011, IPRE\n")
-    (set! toplevel-env (make-toplevel-env))
-    (set! macro-env (make-macro-env^))
-    (set! load-stack '())
-    ;; in the register machine, this call just sets up the registers
-    (load-files filenames toplevel-env 'none REP-handler REP-fail REP-k)
-    ;; starts the computation after registers are set up
-    (trampoline)))
-
-;; temporary - remove before transforming to C#
-;;(load "no-csharp-support.ss")
 (load "transformer-macros.ss")
 
 ;; Unification pattern-matcher

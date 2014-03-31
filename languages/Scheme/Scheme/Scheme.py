@@ -5,6 +5,7 @@
 
 from __future__ import print_function
 import fractions
+import operator
 import math
 import time
 import sys
@@ -42,6 +43,11 @@ def make_symbol(string):
     return symbols[string]
 
 void_value = make_symbol("<void>")
+
+def make_initial_env_extended(names, procs):
+    return make_initial_environment(
+        cons(make_symbol("void"), names), 
+        cons(None, procs))
 
 ### Lists:
 
@@ -234,6 +240,32 @@ def make_handler(*args):
 def make_handler2(*args):
     return List(symbol_handler2, *args)
 
+### Native other functions:
+
+def length_one_q(ls):
+    return isinstance(ls, cons) and (ls.cdr is symbol_emptylist)
+
+def length_two_q(ls):
+    return (isinstance(ls, cons) and 
+            isinstance(ls.cdr, cons) and 
+            (ls.cdr.cdr is symbol_emptylist))
+
+def length_at_least_q(n, ls):
+    length = len(list(ls))
+    return length >= n
+
+def all_numeric_q(ls):
+    for item in ls:
+        if not number_q(item):
+            return False
+    return True
+
+def all_char_q(ls):
+    for item in ls:
+        if not char_q(item):
+            return False
+    return True
+
 ### Questions:
 
 def even_q(n):
@@ -323,14 +355,19 @@ class Fraction(fractions.Fraction):
 def sqrt(number):
     return math.sqrt(number)
 
-def plus(a, b):
-    return a + b
+def plus(*args):
+    return reduce(operator.add, args, 0)
 
-def minus(a, b):
-    return a - b
+def minus(*args):
+    if len(args) == 0:
+        return 0
+    elif len(args) == 1:
+        return -args[0]
+    else:
+        return reduce(operator.sub, args[1:], args[0])
 
-def multiply(a, b):
-    return a * b
+def multiply(*args):
+    return reduce(operator.mul, args, 1)
 
 def Equal(a, b):
     return a == b
@@ -463,7 +500,7 @@ def display(item):
     print(item, end="")
 
 def printf_prim(formatting, *items):
-    print(format(formatting, *items))
+    print(format(formatting, *items), end="")
 
 def newline():
     print()
