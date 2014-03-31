@@ -60,10 +60,20 @@ class Translator:
             return "Equal"
         elif name == "<=":
             return "LessThanEqual"
+        elif name == "<":
+            return "LessThan"
+        elif name == ">":
+            return "GreaterThan"
         elif name == ">=":
             return "GreaterThanEqual"
         elif name == "read":
             return "raw_input"
+        elif name == "-":
+            return "minus"
+        elif name == "*":
+            return "multiply"
+        elif name == "+":
+            return "plus"
         elif name.startswith('"'):
             return name
         elif name.startswith("#"):

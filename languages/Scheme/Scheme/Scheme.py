@@ -3,8 +3,10 @@
 # These are native implementations of functions to allow
 # the register machine translation to run in Python
 
+from __future__ import print_function
 import fractions
 import time
+import os
 
 ## Global symbols:
 
@@ -21,6 +23,14 @@ class Symbol:
 
     def __hash__(self):
         return hash(self.name)
+
+    def __iter__(self):
+        # So that EmptyList will be treated as []
+        return self
+
+    def next(self):
+        # So that EmptyList will be treated as []
+        raise StopIteration
 
 symbols = {}
 
@@ -56,7 +66,7 @@ class cons:
         return self
 
     def next(self): # Python 3: def __next__(self)
-        if isinstance(self.current, cons):
+        if not isinstance(self.current, cons):
             raise StopIteration
         else:
             retval = self.current.car
@@ -83,19 +93,43 @@ def reverse(lyst):
         raise Exception("not a proper list")
     return retval
 
+def length(lyst):
+    current = lyst
+    count = 0
+    while isinstance(current, cons):
+        current = current.cdr
+        count += 1
+    if current != symbol_emptylist:
+        raise Exception("not a proper list")
+    return count
+
 def Map(f, lyst):
     retval = symbol_emptylist
-    current = reverse(lyst)
+    current = lyst
     while isinstance(current, cons):
         retval = cons(f(current.car), retval)
         current = current.cdr
     if current != symbol_emptylist:
         raise Exception("not a proper list")
-    return retval
+    # FIXME: rewrite without reverse
+    return reverse(retval)
+
+def sort(lyst):
+    return List(*sorted(lyst))
+
+def for_each(f, lyst):
+    current = lyst
+    while isinstance(current, cons):
+        f(current.car)
+        current = current.cdr
+    if current != symbol_emptylist:
+        raise Exception("not a proper list")
 
 def append(*objs):
     retval = objs[-1]
+    # FIXME: rewrite without reversed
     for obj in reversed(objs[:-1]):
+        # FIXME: rewrite without reverse
         current = reverse(obj)
         while isinstance(current, cons):
             retval = cons(current.car, retval)
@@ -137,6 +171,25 @@ def set_car_b(cell, item):
 
 def set_cdr_b(cell, item):
     cell.cdr = item
+
+def list_tail(lyst, pos):
+    if pos < 0:
+        raise Exception("invalid list-ref position: " + pos)
+    current = lyst
+    while pos != 0:
+        current = current.cdr
+        pos = pos - 1
+    return current
+
+def list_head(lyst, pos):
+    retval = symbol_emptylist
+    current = lyst
+    while pos != 0:
+        retval = cons(current.car, retval)
+        current = current.cdr
+        pos = pos - 1
+    # FIXME: rewrite without reverse
+    return reverse(retval)
 
 def list_ref(lyst, pos):
     if pos < 0:
@@ -181,6 +234,9 @@ def make_handler2(*args):
 def eq_q(o1, o2):
     return o1 is o2
 
+def equal_q(o1, o2):
+    return o1 == o2
+
 def char_q(item):
     return isinstance(item, str) and len(item) == 1
 
@@ -207,7 +263,7 @@ def number_q(item):
     return isinstance(item, (int, long, float, Fraction))
 
 def null_q(item):
-    return item == symbol_emptylist
+    return item is symbol_emptylist
 
 def boolean_q(item):
     return item in [True, False]
@@ -228,7 +284,7 @@ def list_q(item):
     return False
 
 def procedure_q(item):
-    return pair_q(item) and (car(item) == symbol_procedure)
+    return pair_q(item) and (car(item) is symbol_procedure)
 
 def symbol_q(item):
     return isinstance(item, Symbol)
@@ -238,6 +294,12 @@ def vector_q(item):
 
 def pair_q(item):
     return isinstance(item, cons)
+
+def iterator_q(item):
+    return not list_q(item)
+
+def get_iterator(generator):
+    return iter(generator)
 
 ### Math and applications:
 
@@ -253,6 +315,9 @@ def plus(a, b):
 def minus(a, b):
     return a - b
 
+def multiply(a, b):
+    return a * b
+
 def Equal(a, b):
     return a == b
 
@@ -265,6 +330,9 @@ def LessThanEqual(a, b):
 def GreaterThanEqual(a, b):
     return a >= b
 
+def GreaterThan(a, b):
+    return a > b
+
 def memq(item, lyst):
     retval = symbol_emptylist
     current = lyst
@@ -275,6 +343,9 @@ def memq(item, lyst):
     return False
 
 ### Converters:
+
+def number_to_string(number):
+    return str(number)
 
 def string_to_integer(s):
     return int(s)
@@ -291,12 +362,8 @@ def list_to_string(lyst):
     return retval
 
 def list_to_vector(lyst):
-    retval = list()
-    current = lyst
-    while isinstance(current, cons):
-        retval.append(current.car)
-        current = current.cdr
-    return retval
+    # this works because cons implements iter
+    return list(lyst)
 
 def vector_to_list(vector):
     return List(*vector)
@@ -338,14 +405,25 @@ def member(item, lyst):
 def string_is__q(s1, s2):
     return s1 == s2
 
-#def string_to_number(s):
+def string_length(s):
+    return len(s)
 
-# string_is__q
-# string_length
-# stringLessThan_q
-# string_split
-# string_to_list
-# string_to_number
+def string_to_number(s):
+    if "/" in s:
+        return string_to_rational(s)
+    elif "." in s:
+        return string_to_decimal(s)
+    else:
+        return string_to_integer(s)
+
+def string_to_list(s):
+    return List(*s.split())
+
+def stringLessThan_q(s1, s2):
+    return s1 < s2
+
+def substring(s, start, stop):
+    return s[start:stop]
 
 ### Functions:
 
@@ -365,7 +443,13 @@ def tagged_list_hat(keyword, op, length):
 ### Misc:
 
 def display(item):
-    print(item)
+    print(item, end="")
+
+def printf_prim(formatting, *items):
+    print(format(formatting, *items))
+
+def newline():
+    print()
 
 def trampoline():
     while pc:
@@ -375,14 +459,11 @@ def trampoline():
 def box(item):
     return List(item)
 
-def error(function, *args):
-    print("Error in %s: %s" % (function, args))
-
 def raw_read_line(prompt):
     return raw_input(prompt)
 
-def format(string, *args):
-    return "format(%s, %s)" % (string, args)
+def format(formatting, *args):
+    return "format(%s, %s)" % (formatting, args)
 
 def safe_print(item):
     print(item)
@@ -404,6 +485,9 @@ def search_frame(frame, variable):
 def read_content(filename):
     return open(filename).read()
 
+def file_exists_q(path):
+    return os.path.isfile(path)
+
 def get_current_time():
     return time.time()
 
@@ -413,6 +497,13 @@ def dlr_env_contains(item):
 def dlr_proc_q(item):
     return False
 
+# dlr_apply
+# dlr_env_contains
+# dlr_env_lookup
+# dlr_func
+# dlr_object_contains
+# dlr_proc_q
+
 # _
 # apply_star
 # assv
@@ -421,40 +512,23 @@ def dlr_proc_q(item):
 # callback0
 # callback1
 # callback2
-# dlr_apply
-# dlr_env_contains
-# dlr_env_lookup
-# dlr_func
-# dlr_object_contains
-# dlr_proc_q
 # equal_q
 # even_q
-# file_exists_q
 # for_each
 # get_external_member
 # get_external_members
-# get_iterator
 # get_type
 # handle_debug_info
 # highlight_expression
 # integer_to_char
-# iterator_q
-# length
-# list_head
-# list_q
-# list_tail
 # make_vector
-# map_hat
-# member
 # memv
 # modulo
 # newline
 # next_item
-# number_to_string
 # odd_q
 # printf
 # printf_prim
-# procedure_q
 # quotient
 # read_content
 # remainder
@@ -465,13 +539,10 @@ def dlr_proc_q(item):
 # sort
 # sqrt
 # _star
-# substring
-# symbol_to_string
 # to_
 # using_prim
 # vector_length
 # vector_native
-# vector_ref
 # vector_set_b
 
 # end of Scheme.py

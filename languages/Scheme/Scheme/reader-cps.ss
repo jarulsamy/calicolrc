@@ -544,7 +544,7 @@
   (lambda (a b info)
     (list pair-tag a b info)))
 
-(define-native map^
+(define map^
   (lambda (f^ asexp)
     (cond
       ((null?^ asexp) (list atom-tag '() 'none))

@@ -4458,6 +4458,13 @@
 (define cons^
   (lambda (a b info) (return* (list pair-tag a b info))))
 
+(define map^
+  (lambda (f^ asexp)
+    (if (null?^ asexp)
+        (return* (list atom-tag '() 'none))
+        (return*
+          (cons^ (f^ (car^ asexp)) (map^ f^ (cdr^ asexp)) 'none)))))
+
 (define*
   annotate-cps
   (lambda ()
@@ -7270,13 +7277,6 @@
 (define atom-tag (box 'atom))
 
 (define pair-tag (box 'pair))
-
-(define-native
-  map^
-  (lambda (f^ asexp)
-    (if (null?^ asexp)
-        (list atom-tag '() 'none)
-        (cons^ (f^ (car^ asexp)) (map^ f^ (cdr^ asexp)) 'none))))
 
 (define *reader-generates-annotated-sexps?* #t)
 
