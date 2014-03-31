@@ -226,21 +226,39 @@
 
 (define rac
   (lambda (ls)
-    (cond
-     ((null? (cdr ls)) (car ls))
-     (else (rac (cdr ls))))))
+      (if (null? (cdr ls))
+	  (car ls)
+	  (let ((current (cdr ls)))
+	    (while (pair? (cdr current))
+	       (set! current (cdr current)))
+	    (car current)))))
 
 (define rdc
   (lambda (ls)
-    (cond
-     ((null? (cdr ls)) '())
-     (else (cons (car ls) (rdc (cdr ls)))))))
+      (if (null? (cdr ls))
+	  (list)
+	  (let* ((retval (list (car ls)))
+		 (front retval)
+		 (current (cdr ls)))
+	    (while (pair? (cdr current))
+	       (set-cdr! retval (list (car current)))
+	       (set! retval (cdr retval))
+	       (set! current (cdr current)))
+	    front))))
 
 (define snoc
   (lambda (x ls)
-    (cond
-      ((null? ls) (list x))
-      (else (cons (car ls) (snoc x (cdr ls)))))))
+      (if (null? ls)
+	  (list x)
+	  (let* ((retval (list (car ls)))
+		 (front retval)
+		 (current (cdr ls)))
+	    (while (pair? current)
+	       (set-cdr! retval (list (car current)))
+	       (set! retval (cdr retval))
+	       (set! current (cdr current)))
+	    (set-cdr! retval (list x))
+	    front))))
 
 ;;------------------------------------------------------------------------
 ;; character categories

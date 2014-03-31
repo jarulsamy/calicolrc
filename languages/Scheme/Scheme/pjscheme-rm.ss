@@ -3052,6 +3052,27 @@
 
 (define <proc-69>
   (lambda ()
+    (set! value2_reg fail_reg)
+    (set! value1_reg (apply snoc args_reg))
+    (set! k_reg k2_reg)
+    (set! pc apply-cont2)))
+
+(define <proc-70>
+  (lambda ()
+    (set! value2_reg fail_reg)
+    (set! value1_reg (apply rac args_reg))
+    (set! k_reg k2_reg)
+    (set! pc apply-cont2)))
+
+(define <proc-71>
+  (lambda ()
+    (set! value2_reg fail_reg)
+    (set! value1_reg (apply rdc args_reg))
+    (set! k_reg k2_reg)
+    (set! pc apply-cont2)))
+
+(define <proc-72>
+  (lambda ()
     (if (not (length-two? args_reg))
         (begin
           (set! msg_reg "incorrect number of arguments to set-car!")
@@ -3067,7 +3088,7 @@
               (set! k_reg k2_reg)
               (set! pc apply-cont2))))))
 
-(define <proc-70>
+(define <proc-73>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -3084,7 +3105,7 @@
               (set! k_reg k2_reg)
               (set! pc apply-cont2))))))
 
-(define <proc-71>
+(define <proc-74>
   (lambda ()
     (let ((filename 'undefined))
       (set! filename (car args_reg))
@@ -3102,27 +3123,27 @@
             (set! var_reg module-name)
             (set! pc lookup-binding-in-first-frame))))))
 
-(define <proc-72>
+(define <proc-75>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (car *stack-trace*))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-73>
+(define <proc-76>
   (lambda ()
     (set! k_reg k2_reg)
     (set! env_reg env2_reg)
     (set! pc get-primitive)))
 
-(define <proc-74>
+(define <proc-77>
   (lambda (k)
     (set! value2_reg fail_reg)
     (set! value1_reg (car args_reg))
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <proc-75>
+(define <proc-78>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -3135,7 +3156,7 @@
                 (set! msg_reg "call/cc called with non-procedure")
                 (set! pc runtime-error))
               (let ((fake-k 'undefined))
-                (set! fake-k (make-proc <proc-74> k2_reg))
+                (set! fake-k (make-proc <proc-77> k2_reg))
                 (if (dlr-proc? proc)
                     (begin
                       (set! value2_reg fail_reg)
@@ -3147,7 +3168,7 @@
                       (set! proc_reg proc)
                       (set! pc apply-proc)))))))))
 
-(define <proc-76>
+(define <proc-79>
   (lambda ()
     (if (null? args_reg)
         (begin
@@ -3161,7 +3182,7 @@
           (set! k_reg REP-k)
           (set! pc apply-cont2)))))
 
-(define <proc-77>
+(define <proc-80>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -3175,7 +3196,7 @@
               (set! pc apply-cont2))
             (set! pc apply-fail)))))
 
-(define <proc-78>
+(define <proc-81>
   (lambda ()
     (if (not (null? args_reg))
         (begin
@@ -3187,7 +3208,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-79>
+(define <proc-82>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -3206,10 +3227,10 @@
               (set! k_reg k2_reg)
               (set! pc apply-cont2))))))
 
-(define <proc-80>
+(define <proc-83>
   (lambda () (set! lists_reg args_reg) (set! pc append-all)))
 
-(define <proc-81>
+(define <proc-84>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -3222,7 +3243,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-82>
+(define <proc-85>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -3234,7 +3255,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-83>
+(define <proc-86>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -3254,7 +3275,7 @@
               (set! k_reg k2_reg)
               (set! pc apply-cont2))))))
 
-(define <proc-84>
+(define <proc-87>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -3281,19 +3302,19 @@
                   (set! k_reg k2_reg)
                   (set! pc apply-cont2)))))))
 
-(define <proc-85>
+(define <proc-88>
   (lambda ()
     (set! lst_reg (directory args_reg env2_reg))
     (set! pc make-set)))
 
-(define <proc-86>
+(define <proc-89>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (get-current-time))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-87>
+(define <proc-90>
   (lambda ()
     (set! k_reg k2_reg)
     (set! env_reg env2_reg)
@@ -3301,7 +3322,7 @@
     (set! args_reg (cdr args_reg))
     (set! pc map-primitive)))
 
-(define <proc-88>
+(define <proc-91>
   (lambda ()
     (set! k_reg k2_reg)
     (set! env_reg env2_reg)
@@ -3309,21 +3330,33 @@
     (set! proc_reg (car args_reg))
     (set! pc for-each-primitive)))
 
-(define <proc-89>
+(define <proc-92>
+  (lambda ()
+    (if (< (length args_reg) 1)
+        (begin
+          (set! msg_reg "incorrect number of arguments to format")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply format args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-93>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg env2_reg)
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-90>
+(define <proc-94>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (using-prim args_reg env2_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-91>
+(define <proc-95>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -3335,7 +3368,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-92>
+(define <proc-96>
   (lambda ()
     (apply printf-prim args_reg)
     (set! value2_reg fail_reg)
@@ -3343,14 +3376,14 @@
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-93>
+(define <proc-97>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (apply vector_native args_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-94>
+(define <proc-98>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg
@@ -3361,21 +3394,21 @@
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-95>
+(define <proc-99>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (apply vector-ref args_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-96>
+(define <proc-100>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (apply make-vector args_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-97>
+(define <proc-101>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -3389,7 +3422,7 @@
           (set! msg_reg message)
           (set! pc runtime-error)))))
 
-(define <proc-98>
+(define <proc-102>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -3401,7 +3434,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-99>
+(define <proc-103>
   (lambda ()
     (if (null? args_reg)
         (begin
@@ -3424,7 +3457,7 @@
                 "incorrect number of arguments to current-directory")
               (set! pc runtime-error))))))
 
-(define <proc-100>
+(define <proc-104>
   (lambda ()
     (if (and (length-one? args_reg) (number? (car args_reg)))
         (begin
@@ -3436,7 +3469,7 @@
           (set! msg_reg "round requires exactly one number")
           (set! pc runtime-error)))))
 
-(define <proc-101>
+(define <proc-105>
   (lambda (external-function-object)
     (set! value2_reg fail_reg)
     (set! value1_reg (apply* external-function-object args_reg))
@@ -4074,19 +4107,45 @@
   (lambda (ls)
     (if (null? (cdr ls))
         (return* (car ls))
-        (return* (rac (cdr ls))))))
+        (let ((current 'undefined))
+          (set! current (cdr ls))
+          (while (pair? (cdr current)) (set! current (cdr current)))
+          (return* (car current))))))
 
 (define rdc
   (lambda (ls)
     (if (null? (cdr ls))
-        (return* '())
-        (return* (cons (car ls) (rdc (cdr ls)))))))
+        (return* (list))
+        (let ((retval 'undefined)
+              (front 'undefined)
+              (current 'undefined))
+          (set! retval (list (car ls)))
+          (set! front retval)
+          (set! current (cdr ls))
+          (while
+            (pair? (cdr current))
+            (set-cdr! retval (list (car current)))
+            (set! retval (cdr retval))
+            (set! current (cdr current)))
+          (return* front)))))
 
 (define snoc
   (lambda (x ls)
     (if (null? ls)
         (return* (list x))
-        (return* (cons (car ls) (snoc x (cdr ls)))))))
+        (let ((retval 'undefined)
+              (front 'undefined)
+              (current 'undefined))
+          (set! retval (list (car ls)))
+          (set! front retval)
+          (set! current (cdr ls))
+          (while
+            (pair? current)
+            (set-cdr! retval (list (car current)))
+            (set! retval (cdr retval))
+            (set! current (cdr current)))
+          (set-cdr! retval (list x))
+          (return* front)))))
 
 (define char-delimiter?
   (lambda (c)
@@ -7051,7 +7110,8 @@
          (list 'eq? eq?-prim) (list 'equal? equal?-prim)
          (list 'error error-prim) (list 'eval eval-prim)
          (list 'eval-ast eval-ast-prim) (list 'exit exit-prim)
-         (list 'for-each for-each-prim) (list 'get get-prim)
+         (list 'for-each for-each-prim) (list 'format format-prim)
+         (list 'get get-prim)
          (list 'get-stack-trace get-stack-trace-prim)
          (list 'import import-prim)
          (list 'integer->char integer->char-prim)
@@ -7073,9 +7133,10 @@
          (list 'read-string read-string-prim)
          (list 'require require-prim) (list 'reverse reverse-prim)
          (list 'set-car! set-car!-prim)
-         (list 'set-cdr! set-cdr!-prim) (list 'sqrt sqrt-prim)
-         (list 'odd? odd?-prim) (list 'even? even?-prim)
-         (list 'quotient quotient-prim)
+         (list 'set-cdr! set-cdr!-prim) (list 'snoc snoc-prim)
+         (list 'rac rac-prim) (list 'rdc rdc-prim)
+         (list 'sqrt sqrt-prim) (list 'odd? odd?-prim)
+         (list 'even? even?-prim) (list 'quotient quotient-prim)
          (list 'remainder remainder-prim) (list 'string string-prim)
          (list 'string-length string-length-prim)
          (list 'string-ref string-ref-prim)
@@ -7102,7 +7163,7 @@
 
 (define make-external-proc
   (lambda (external-function-object)
-    (return* (make-proc <proc-101> external-function-object))))
+    (return* (make-proc <proc-105> external-function-object))))
 
 (define pattern?
   (lambda (x)
@@ -7667,6 +7728,12 @@
 
 (define range-prim (make-proc <proc-68>))
 
+(define snoc-prim (make-proc <proc-69>))
+
+(define rac-prim (make-proc <proc-70>))
+
+(define rdc-prim (make-proc <proc-71>))
+
 (define-native
   range
   (lambda args
@@ -7682,71 +7749,73 @@
               (range (car args) (cadr args) 1 '())
               (range (car args) (cadr args) (caddr args) '()))))))
 
-(define set-car!-prim (make-proc <proc-69>))
+(define set-car!-prim (make-proc <proc-72>))
 
-(define set-cdr!-prim (make-proc <proc-70>))
+(define set-cdr!-prim (make-proc <proc-73>))
 
-(define import-prim (make-proc <proc-71>))
+(define import-prim (make-proc <proc-74>))
 
-(define get-stack-trace-prim (make-proc <proc-72>))
+(define get-stack-trace-prim (make-proc <proc-75>))
 
-(define get-prim (make-proc <proc-73>))
+(define get-prim (make-proc <proc-76>))
 
-(define call/cc-prim (make-proc <proc-75>))
+(define call/cc-prim (make-proc <proc-78>))
 
-(define abort-prim (make-proc <proc-76>))
+(define abort-prim (make-proc <proc-79>))
 
-(define require-prim (make-proc <proc-77>))
+(define require-prim (make-proc <proc-80>))
 
-(define cut-prim (make-proc <proc-78>))
+(define cut-prim (make-proc <proc-81>))
 
-(define reverse-prim (make-proc <proc-79>))
+(define reverse-prim (make-proc <proc-82>))
 
-(define append-prim (make-proc <proc-80>))
+(define append-prim (make-proc <proc-83>))
 
-(define string->number-prim (make-proc <proc-81>))
+(define string->number-prim (make-proc <proc-84>))
 
-(define string=?-prim (make-proc <proc-82>))
+(define string=?-prim (make-proc <proc-85>))
 
-(define list-to-vector-prim (make-proc <proc-83>))
+(define list-to-vector-prim (make-proc <proc-86>))
 
-(define list->string-prim (make-proc <proc-84>))
+(define list->string-prim (make-proc <proc-87>))
 
-(define dir-prim (make-proc <proc-85>))
+(define dir-prim (make-proc <proc-88>))
 
-(define current-time-prim (make-proc <proc-86>))
+(define current-time-prim (make-proc <proc-89>))
 
-(define map-prim (make-proc <proc-87>))
+(define map-prim (make-proc <proc-90>))
 
-(define for-each-prim (make-proc <proc-88>))
+(define for-each-prim (make-proc <proc-91>))
 
-(define current-environment-prim (make-proc <proc-89>))
+(define format-prim (make-proc <proc-92>))
 
-(define using-primitive (make-proc <proc-90>))
+(define current-environment-prim (make-proc <proc-93>))
 
-(define not-prim (make-proc <proc-91>))
+(define using-primitive (make-proc <proc-94>))
 
-(define printf-primitive (make-proc <proc-92>))
+(define not-prim (make-proc <proc-95>))
 
-(define vector-prim (make-proc <proc-93>))
+(define printf-primitive (make-proc <proc-96>))
+
+(define vector-prim (make-proc <proc-97>))
 
 (define-native
   vector_native
   (lambda args (apply vector args)))
 
-(define vector-set!-prim (make-proc <proc-94>))
+(define vector-set!-prim (make-proc <proc-98>))
 
-(define vector-ref-prim (make-proc <proc-95>))
+(define vector-ref-prim (make-proc <proc-99>))
 
-(define make-vector-prim (make-proc <proc-96>))
+(define make-vector-prim (make-proc <proc-100>))
 
-(define error-prim (make-proc <proc-97>))
+(define error-prim (make-proc <proc-101>))
 
-(define list-ref-prim (make-proc <proc-98>))
+(define list-ref-prim (make-proc <proc-102>))
 
-(define current-directory-prim (make-proc <proc-99>))
+(define current-directory-prim (make-proc <proc-103>))
 
-(define round-prim (make-proc <proc-100>))
+(define round-prim (make-proc <proc-104>))
 
 (define toplevel-env (make-toplevel-env))
 

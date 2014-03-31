@@ -13,7 +13,6 @@ class Translator:
             "string->integer", "string->decimal", "string->rational", 
             "string-split", 
             "get-current-time", "type?", 
-            "execute", "execute-loop", "execute-string", "execute-file",
             "read-eval-print-loop", "unparse", "unparse-exps", "qq-expand-cps_",
             "qq-expand-list-cps_", 
             ## defined in Scheme.cs:
@@ -54,6 +53,8 @@ class Translator:
             return "List"
         elif name == "apply":
             return "Apply"
+        elif name == "range":
+            return "Range"
         elif name == "map":
             return "Map"
         elif name == "=":
@@ -242,8 +243,8 @@ class PythonTranslator(Translator):
         print("""####################################################
 ## Scheme in Python
 ##
-##
-##
+## Jim Marshall
+## Doug Blank
 ####################################################
 
 """)
@@ -276,17 +277,19 @@ class PythonTranslator(Translator):
             self.process_statement(statement, locals, indent + 4)
         print()
 
-    def process_infix_op(self, expr):
+    def process_infix_op(self, expr, op):
         retval = "(%s)" % self.process_app(expr[1])
         for e in expr[2:]:
-            retval += " %s (%s)" % (expr[0], self.process_app(e))
+            retval += " %s (%s)" % (op, self.process_app(e))
         return retval
 
     def process_app(self, expr):
         if isinstance(expr, list):
             if expr[0] in ['and', 'or', '+', '-', '*']:
-                return self.process_infix_op(expr)
-            if expr[0] == 'if':
+                return self.process_infix_op(expr, expr[0])
+            elif expr[0] == "eq?":
+                return self.process_infix_op(expr, "is")
+            elif expr[0] == 'if':
                 return "(%s if %s else %s)" % (self.process_app(expr[2]),
                                                self.process_app(expr[1]),
                                                self.process_app(expr[3]))
@@ -294,9 +297,16 @@ class PythonTranslator(Translator):
                 ## function call:
                 return "%s(%s)" % (self.fix_name(expr[0]),
                                    ", ".join([self.process_app(e) for e in expr[1:]]))
-                
         else:
             return self.fix_name(expr)
+
+    def process_while(self, expr, locals, indent):
+        # (while test body...)
+        print(" " * indent, end="")
+        print("while %s:" % self.process_app(expr[1]))
+        body = expr[2:]
+        for statement in body:
+            self.process_statement(statement, locals, indent + 4)
 
     def process_let(self, expr, locals, indent):
         # (let ((x 1)(y u)) ...)
@@ -358,6 +368,7 @@ class PythonTranslator(Translator):
 
     def process_statement(self, expr, locals, indent):
         if self.function_q(expr):
+            # handles all define/*/+ functions
             if not self.get_define_name(expr) in self.to_ignore():
                 self.process_function_definition(expr, locals, indent)
         elif expr[0] == "define": # global variable
@@ -371,6 +382,8 @@ class PythonTranslator(Translator):
             self.process_if(expr, locals, indent)
         elif expr[0] == "cond":
             self.process_cond(expr, locals, indent)
+        elif expr[0] == "while":
+            self.process_while(expr, locals, indent)
         elif expr[0] == "load":
             pass
         elif expr[0] == "set!":
@@ -391,6 +404,9 @@ class PythonTranslator(Translator):
         print()
         for statement in self.program:
             self.process_statement(statement, [], 0)
+        print()
+        print("if __name__ == '__main__':")
+        print("    start_rm()")
 
 if __name__ == "__main__":
     import sys

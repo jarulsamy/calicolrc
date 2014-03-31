@@ -1,11 +1,14 @@
 MCS=MONO_PATH=../../../bin:../../../modules dmcs -sdk:4
 
+pjscheme.py: pjscheme-rm.ss translate_rm.py Scheme.py
+	python translate_rm.py "pjscheme-rm.ss" > pjscheme.py
+
 #../PJScheme.dll: pjscheme.cs Scheme.cs pjscheme-rm.ss Makefile ObjectType.cs 
 #	$(MCS) -debug Scheme.cs pjscheme.cs ObjectType.cs -target:library -lib:../../../bin -r:Microsoft.Scripting -r:IronPython.dll -r:Microsoft.Dynamic -r:Microsoft.Scripting.Core -r:Calico.exe -pkg:gtk-sharp-2.0 -r:Mono.TextEditor.dll -out:../PJScheme.dll
 
-../PJScheme.dll: pjscheme.cs Scheme.cs pjscheme-rm.ss Makefile ObjectType.cs Rational.cs
-	sed -i.BAK "s/= >/=>/" pjscheme.cs
-	$(MCS) Scheme.cs pjscheme.cs ObjectType.cs Rational.cs -target:library -lib:../../../bin -r:Microsoft.Scripting -r:Microsoft.CSharp -r:IronPython.dll -r:Microsoft.Dynamic -r:Calico.exe -pkg:gtk-sharp-2.0 -r:Mono.TextEditor.dll -r:System.Numerics -out:../PJScheme.dll
+#../PJScheme.dll: pjscheme.cs Scheme.cs pjscheme-rm.ss Makefile ObjectType.cs Rational.cs
+#	sed -i.BAK "s/= >/=>/" pjscheme.cs
+#	$(MCS) Scheme.cs pjscheme.cs ObjectType.cs Rational.cs -target:library -lib:../../../bin -r:Microsoft.Scripting -r:Microsoft.CSharp -r:IronPython.dll -r:Microsoft.Dynamic -r:Calico.exe -pkg:gtk-sharp-2.0 -r:Mono.TextEditor.dll -r:System.Numerics -out:../PJScheme.dll
 
 #Scheme.dll: Scheme.cs Makefile
 #	$(MCS) -debug Scheme.cs -target:library -lib:../../../bin -r:Microsoft.Scripting -r:IronPython.dll -r:Microsoft.Dynamic -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting.Core -out:Scheme.dll
@@ -34,13 +37,13 @@ run: pjscheme-rm.ss no-csharp-support.ss
 	echo "(begin (display (run start)) (newline))" >> pjscheme-run.ss
 	petite pjscheme-run.ss
 
-pjscheme.cs: pjscheme-rm.ss scheme-to-csharp.ss
-	echo "(load \"scheme-to-csharp.ss\")" > make-pjscheme.ss
-	echo "(delete-file \"pjscheme.cs\")" >> make-pjscheme.ss
-	echo "(convert-file \"pjscheme-rm.ss\" \"pjscheme.cs\")" >> make-pjscheme.ss
-	echo "(exit)" >> make-pjscheme.ss
-	petite make-pjscheme.ss
-	indent -di0 -i3 pjscheme.cs 
+#pjscheme.cs: pjscheme-rm.ss scheme-to-csharp.ss
+#	echo "(load \"scheme-to-csharp.ss\")" > make-pjscheme.ss
+#	echo "(delete-file \"pjscheme.cs\")" >> make-pjscheme.ss
+#	echo "(convert-file \"pjscheme-rm.ss\" \"pjscheme.cs\")" >> make-pjscheme.ss
+#	echo "(exit)" >> make-pjscheme.ss
+#	petite make-pjscheme.ss
+#	indent -di0 -i3 pjscheme.cs 
 
 clean:
 	$(RM) *.exe *~ pjscheme-ds.ss pjscheme-rm.ss compile-rm.ss compile-ds.ss make-fact.ss \

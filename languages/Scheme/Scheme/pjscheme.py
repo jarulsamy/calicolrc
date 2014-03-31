@@ -1,8 +1,8 @@
 ####################################################
 ## Scheme in Python
 ##
-##
-##
+## Jim Marshall
+## Doug Blank
 ####################################################
 
 
@@ -13,18 +13,20 @@
 
 from __future__ import print_function
 import fractions
+import math
 import time
+import sys
 import os
 
 ## Global symbols:
 
-class Symbol:
+class Symbol(object):
     def __init__(self, name):
         self.name = name
         self.hash = hash(name)
 
     def __repr__(self):
-        return "'%s" % self.name
+        return "%s" % self.name
 
     def __eq__(self, other):
         return isinstance(other, Symbol) and self.hash == other.hash
@@ -51,7 +53,7 @@ void_value = make_symbol("<void>")
 
 ### Lists:
 
-class cons:
+class cons(object):
     # build a cons cell
     def __init__(self, car, cdr):
         self.car = car
@@ -122,9 +124,6 @@ def Map(f, lyst):
     # FIXME: rewrite without reverse
     return reverse(retval)
 
-def sort(lyst):
-    return List(*sorted(lyst))
-
 def for_each(f, lyst):
     current = lyst
     while isinstance(current, cons):
@@ -132,6 +131,9 @@ def for_each(f, lyst):
         current = current.cdr
     if current != symbol_emptylist:
         raise Exception("not a proper list")
+
+def sort(f, lyst):
+    return List(*sorted(lyst))
 
 def append(*objs):
     retval = objs[-1]
@@ -167,6 +169,9 @@ def caddr(lyst):
 
 def cadar(lyst):
     return lyst.car.cdr.car
+
+def cdddr(lyst):
+    return lyst.cdr.cdr.cdr
 
 def cadddr(lyst):
     return lyst.cdr.cdr.cdr.car
@@ -239,6 +244,12 @@ def make_handler2(*args):
 
 ### Questions:
 
+def even_q(n):
+    return n % 2 == 0
+
+def odd_q(n):
+    return n % 2 == 1
+
 def eq_q(o1, o2):
     return o1 is o2
 
@@ -274,7 +285,7 @@ def null_q(item):
     return item is symbol_emptylist
 
 def boolean_q(item):
-    return item in [True, False]
+    return isinstance(item, bool)
 
 def true_q(item):
     if item is False:
@@ -316,6 +327,9 @@ class Fraction(fractions.Fraction):
         return "%s/%s" % (self.numerator, self.denominator)
     def __str__(self):
         return "%s/%s" % (self.numerator, self.denominator)
+
+def sqrt(number):
+    return math.sqrt(number)
 
 def plus(a, b):
     return a + b
@@ -450,6 +464,9 @@ def tagged_list_hat(keyword, op, length):
 
 ### Misc:
 
+def error(function, formatting, *args):
+    sys.stderr.write(format(formatting, *args))
+
 def display(item):
     print(item, end="")
 
@@ -460,21 +477,65 @@ def newline():
     print()
 
 def trampoline():
+    start = time.clock()
     while pc:
         pc()
+        #if end_of_session_q(final_reg):
+        #    break
+        #elif exception_q(final_reg):
+        #    break
+    print(time.clock() - start)
     return final_reg
 
 def box(item):
     return List(item)
 
 def raw_read_line(prompt):
-    return raw_input(prompt)
+    try:
+        return raw_input(prompt)
+    except EOFError:
+        return ""
 
-def format(formatting, *args):
-    return "format(%s, %s)" % (formatting, args)
+def format(formatting, *lyst):
+    args = list_to_vector(lyst)
+    retval = ""
+    i = 0
+    count = 0
+    while i < len(formatting):
+        if formatting[i] == '\\':
+            i += 1
+            retval += formatting[i]
+        elif formatting[i] == "~":
+            if formatting[i+1] == 's':
+                i += 1
+                retval += repr(args[count])
+                count += 1
+            elif formatting[i+1] == 'a':
+                i += 1
+                retval += str(args[count])
+                count += 1
+            elif formatting[i+1] == '%':
+                i += 1
+                retval += "\n"
+            else:
+                retval += formatting[i] # unknown ~X
+        else:
+            retval += formatting[i]
+        i += 1
+    return retval
 
 def safe_print(item):
-    print(item)
+    if procedure_q(item):
+        print(car(item))
+    elif environment_q(item):
+        print("<environment>")
+    elif boolean_q(item):
+        if item:
+            print("#t")
+        else:
+            print("#f")
+    else:
+        print(item)
 
 def search_frame(frame, variable):
     if isinstance(frame, cons):
@@ -505,6 +566,9 @@ def dlr_env_contains(item):
 def dlr_proc_q(item):
     return False
 
+def Range(*args):
+    return List(*range(*args))
+
 # dlr_apply
 # dlr_env_contains
 # dlr_env_lookup
@@ -521,7 +585,6 @@ def dlr_proc_q(item):
 # callback1
 # callback2
 # equal_q
-# even_q
 # for_each
 # get_external_member
 # get_external_members
@@ -534,7 +597,6 @@ def dlr_proc_q(item):
 # modulo
 # newline
 # next_item
-# odd_q
 # printf
 # printf_prim
 # quotient
@@ -545,7 +607,6 @@ def dlr_proc_q(item):
 # set_global_value_b
 # slash
 # sort
-# sqrt
 # _star
 # to_
 # using_prim
@@ -741,6 +802,7 @@ symbol_eval = make_symbol("eval")
 symbol_eval_ast = make_symbol("eval-ast")
 symbol_exit = make_symbol("exit")
 symbol_for_each = make_symbol("for-each")
+symbol_format = make_symbol("format")
 symbol_get = make_symbol("get")
 symbol_get_stack_trace = make_symbol("get-stack-trace")
 symbol_import = make_symbol("import")
@@ -760,12 +822,15 @@ symbol_parse = make_symbol("parse")
 symbol_parse_string = make_symbol("parse-string")
 symbol_print = make_symbol("print")
 symbol_printf = make_symbol("printf")
-symbol_range = make_symbol("range")
+symbol_Range = make_symbol("range")
 symbol_read_string = make_symbol("read-string")
 symbol_require = make_symbol("require")
 symbol_reverse = make_symbol("reverse")
 symbol_set_car_b = make_symbol("set-car!")
 symbol_set_cdr_b = make_symbol("set-cdr!")
+symbol_snoc = make_symbol("snoc")
+symbol_rac = make_symbol("rac")
+symbol_rdc = make_symbol("rdc")
 symbol_sqrt = make_symbol("sqrt")
 symbol_odd_q = make_symbol("odd?")
 symbol_even_q = make_symbol("even?")
@@ -3151,11 +3216,29 @@ def proc_68():
             globals()['pc'] = runtime_error
         else:
             globals()['value2_reg'] = fail_reg
-            globals()['value1_reg'] = Apply(range, args_reg)
+            globals()['value1_reg'] = Apply(Range, args_reg)
             globals()['k_reg'] = k2_reg
             globals()['pc'] = apply_cont2
 
 def proc_69():
+    globals()['value2_reg'] = fail_reg
+    globals()['value1_reg'] = Apply(snoc, args_reg)
+    globals()['k_reg'] = k2_reg
+    globals()['pc'] = apply_cont2
+
+def proc_70():
+    globals()['value2_reg'] = fail_reg
+    globals()['value1_reg'] = Apply(rac, args_reg)
+    globals()['k_reg'] = k2_reg
+    globals()['pc'] = apply_cont2
+
+def proc_71():
+    globals()['value2_reg'] = fail_reg
+    globals()['value1_reg'] = Apply(rdc, args_reg)
+    globals()['k_reg'] = k2_reg
+    globals()['pc'] = apply_cont2
+
+def proc_72():
     if not(length_two_q(args_reg)):
         globals()['msg_reg'] = "incorrect number of arguments to set-car!"
         globals()['pc'] = runtime_error
@@ -3169,7 +3252,7 @@ def proc_69():
             globals()['k_reg'] = k2_reg
             globals()['pc'] = apply_cont2
 
-def proc_70():
+def proc_73():
     if not(length_two_q(args_reg)):
         globals()['msg_reg'] = "incorrect number of arguments to set-cdr!"
         globals()['pc'] = runtime_error
@@ -3183,7 +3266,7 @@ def proc_70():
             globals()['k_reg'] = k2_reg
             globals()['pc'] = apply_cont2
 
-def proc_71():
+def proc_74():
     filename = symbol_undefined
     filename = car(args_reg)
     if null_q(cdr(args_reg)):
@@ -3199,24 +3282,24 @@ def proc_71():
         globals()['var_reg'] = module_name
         globals()['pc'] = lookup_binding_in_first_frame
 
-def proc_72():
+def proc_75():
     globals()['value2_reg'] = fail_reg
     globals()['value1_reg'] = car(_starstack_trace_star)
     globals()['k_reg'] = k2_reg
     globals()['pc'] = apply_cont2
 
-def proc_73():
+def proc_76():
     globals()['k_reg'] = k2_reg
     globals()['env_reg'] = env2_reg
     globals()['pc'] = get_primitive
 
-def proc_74(k):
+def proc_77(k):
     globals()['value2_reg'] = fail_reg
     globals()['value1_reg'] = car(args_reg)
     globals()['k_reg'] = k
     globals()['pc'] = apply_cont2
 
-def proc_75():
+def proc_78():
     if not(length_one_q(args_reg)):
         globals()['msg_reg'] = "incorrect number of arguments to call/cc"
         globals()['pc'] = runtime_error
@@ -3228,7 +3311,7 @@ def proc_75():
             globals()['pc'] = runtime_error
         else:
             fake_k = symbol_undefined
-            fake_k = make_proc(proc_74, k2_reg)
+            fake_k = make_proc(proc_77, k2_reg)
             if dlr_proc_q(proc):
                 globals()['value2_reg'] = fail_reg
                 globals()['value1_reg'] = dlr_apply(proc, List(fake_k))
@@ -3239,7 +3322,7 @@ def proc_75():
                 globals()['proc_reg'] = proc
                 globals()['pc'] = apply_proc
 
-def proc_76():
+def proc_79():
     if null_q(args_reg):
         globals()['value2_reg'] = fail_reg
         globals()['value1_reg'] = void_value
@@ -3251,7 +3334,7 @@ def proc_76():
         globals()['k_reg'] = REP_k
         globals()['pc'] = apply_cont2
 
-def proc_77():
+def proc_80():
     if not(length_one_q(args_reg)):
         globals()['msg_reg'] = "incorrect number of arguments to require"
         globals()['pc'] = runtime_error
@@ -3264,7 +3347,7 @@ def proc_77():
         else:
             globals()['pc'] = apply_fail
 
-def proc_78():
+def proc_81():
     if not(null_q(args_reg)):
         globals()['msg_reg'] = "incorrect number of arguments to cut"
         globals()['pc'] = runtime_error
@@ -3274,7 +3357,7 @@ def proc_78():
         globals()['k_reg'] = k2_reg
         globals()['pc'] = apply_cont2
 
-def proc_79():
+def proc_82():
     if not(length_one_q(args_reg)):
         globals()['msg_reg'] = "incorrect number of arguments to reverse"
         globals()['pc'] = runtime_error
@@ -3288,11 +3371,11 @@ def proc_79():
             globals()['k_reg'] = k2_reg
             globals()['pc'] = apply_cont2
 
-def proc_80():
+def proc_83():
     globals()['lists_reg'] = args_reg
     globals()['pc'] = append_all
 
-def proc_81():
+def proc_84():
     if not(length_one_q(args_reg)):
         globals()['msg_reg'] = "incorrect number of arguments to string->number"
         globals()['pc'] = runtime_error
@@ -3302,7 +3385,7 @@ def proc_81():
         globals()['k_reg'] = k2_reg
         globals()['pc'] = apply_cont2
 
-def proc_82():
+def proc_85():
     if not(length_two_q(args_reg)):
         globals()['msg_reg'] = "incorrect number of arguments to string=?"
         globals()['pc'] = runtime_error
@@ -3312,7 +3395,7 @@ def proc_82():
         globals()['k_reg'] = k2_reg
         globals()['pc'] = apply_cont2
 
-def proc_83():
+def proc_86():
     if not(length_one_q(args_reg)):
         globals()['msg_reg'] = "incorrect number of arguments to list->vector"
         globals()['pc'] = runtime_error
@@ -3326,7 +3409,7 @@ def proc_83():
             globals()['k_reg'] = k2_reg
             globals()['pc'] = apply_cont2
 
-def proc_84():
+def proc_87():
     if not(length_one_q(args_reg)):
         globals()['msg_reg'] = "incorrect number of arguments to list->string"
         globals()['pc'] = runtime_error
@@ -3344,43 +3427,53 @@ def proc_84():
                 globals()['k_reg'] = k2_reg
                 globals()['pc'] = apply_cont2
 
-def proc_85():
+def proc_88():
     globals()['lst_reg'] = directory(args_reg, env2_reg)
     globals()['pc'] = make_set
 
-def proc_86():
+def proc_89():
     globals()['value2_reg'] = fail_reg
     globals()['value1_reg'] = get_current_time()
     globals()['k_reg'] = k2_reg
     globals()['pc'] = apply_cont2
 
-def proc_87():
+def proc_90():
     globals()['k_reg'] = k2_reg
     globals()['env_reg'] = env2_reg
     globals()['proc_reg'] = car(args_reg)
     globals()['args_reg'] = cdr(args_reg)
     globals()['pc'] = map_primitive
 
-def proc_88():
+def proc_91():
     globals()['k_reg'] = k2_reg
     globals()['env_reg'] = env2_reg
     globals()['lists_reg'] = cdr(args_reg)
     globals()['proc_reg'] = car(args_reg)
     globals()['pc'] = for_each_primitive
 
-def proc_89():
+def proc_92():
+    if LessThan(length(args_reg), 1):
+        globals()['msg_reg'] = "incorrect number of arguments to format"
+        globals()['pc'] = runtime_error
+    else:
+        globals()['value2_reg'] = fail_reg
+        globals()['value1_reg'] = Apply(format, args_reg)
+        globals()['k_reg'] = k2_reg
+        globals()['pc'] = apply_cont2
+
+def proc_93():
     globals()['value2_reg'] = fail_reg
     globals()['value1_reg'] = env2_reg
     globals()['k_reg'] = k2_reg
     globals()['pc'] = apply_cont2
 
-def proc_90():
+def proc_94():
     globals()['value2_reg'] = fail_reg
     globals()['value1_reg'] = using_prim(args_reg, env2_reg)
     globals()['k_reg'] = k2_reg
     globals()['pc'] = apply_cont2
 
-def proc_91():
+def proc_95():
     if not(length_one_q(args_reg)):
         globals()['msg_reg'] = "incorrect number of arguments to not"
         globals()['pc'] = runtime_error
@@ -3390,38 +3483,38 @@ def proc_91():
         globals()['k_reg'] = k2_reg
         globals()['pc'] = apply_cont2
 
-def proc_92():
+def proc_96():
     Apply(printf_prim, args_reg)
     globals()['value2_reg'] = fail_reg
     globals()['value1_reg'] = void_value
     globals()['k_reg'] = k2_reg
     globals()['pc'] = apply_cont2
 
-def proc_93():
+def proc_97():
     globals()['value2_reg'] = fail_reg
     globals()['value1_reg'] = Apply(vector_native, args_reg)
     globals()['k_reg'] = k2_reg
     globals()['pc'] = apply_cont2
 
-def proc_94():
+def proc_98():
     globals()['value2_reg'] = fail_reg
     globals()['value1_reg'] = vector_set_b(car(args_reg), cadr(args_reg), caddr(args_reg))
     globals()['k_reg'] = k2_reg
     globals()['pc'] = apply_cont2
 
-def proc_95():
+def proc_99():
     globals()['value2_reg'] = fail_reg
     globals()['value1_reg'] = Apply(vector_ref, args_reg)
     globals()['k_reg'] = k2_reg
     globals()['pc'] = apply_cont2
 
-def proc_96():
+def proc_100():
     globals()['value2_reg'] = fail_reg
     globals()['value1_reg'] = Apply(make_vector, args_reg)
     globals()['k_reg'] = k2_reg
     globals()['pc'] = apply_cont2
 
-def proc_97():
+def proc_101():
     if not(length_two_q(args_reg)):
         globals()['msg_reg'] = "incorrect number of arguments to 'error' (should be 2)"
         globals()['pc'] = runtime_error
@@ -3433,7 +3526,7 @@ def proc_97():
         globals()['msg_reg'] = message
         globals()['pc'] = runtime_error
 
-def proc_98():
+def proc_102():
     if not(length_two_q(args_reg)):
         globals()['msg_reg'] = "incorrect number of arguments to list-ref"
         globals()['pc'] = runtime_error
@@ -3443,7 +3536,7 @@ def proc_98():
         globals()['k_reg'] = k2_reg
         globals()['pc'] = apply_cont2
 
-def proc_99():
+def proc_103():
     if null_q(args_reg):
         globals()['value2_reg'] = fail_reg
         globals()['value1_reg'] = current_directory()
@@ -3463,7 +3556,7 @@ def proc_99():
             globals()['msg_reg'] = "incorrect number of arguments to current-directory"
             globals()['pc'] = runtime_error
 
-def proc_100():
+def proc_104():
     if (length_one_q(args_reg)) and (number_q(car(args_reg))):
         globals()['value2_reg'] = fail_reg
         globals()['value1_reg'] = round(car(args_reg))
@@ -3473,7 +3566,7 @@ def proc_100():
         globals()['msg_reg'] = "round requires exactly one number"
         globals()['pc'] = runtime_error
 
-def proc_101(external_function_object):
+def proc_105(external_function_object):
     globals()['value2_reg'] = fail_reg
     globals()['value1_reg'] = apply_star(external_function_object, args_reg)
     globals()['k_reg'] = k2_reg
@@ -3732,7 +3825,7 @@ def scan_input_loop():
     globals()['pc'] = apply_action
 
 def apply_action():
-    if eq_q(car(action_reg), symbol_shift):
+    if (car(action_reg)) is (symbol_shift):
         next = symbol_undefined
         next = list_ref(action_reg, 1)
         increment_scan_counters(chars_reg)
@@ -3741,7 +3834,7 @@ def apply_action():
         globals()['action_reg'] = next
         globals()['pc'] = apply_action
     else:
-        if eq_q(car(action_reg), symbol_replace):
+        if (car(action_reg)) is (symbol_replace):
             new_char = symbol_undefined
             next = symbol_undefined
             next = list_ref(action_reg, 2)
@@ -3752,7 +3845,7 @@ def apply_action():
             globals()['action_reg'] = next
             globals()['pc'] = apply_action
         else:
-            if eq_q(car(action_reg), symbol_drop):
+            if (car(action_reg)) is (symbol_drop):
                 next = symbol_undefined
                 next = list_ref(action_reg, 1)
                 increment_scan_counters(chars_reg)
@@ -3760,20 +3853,20 @@ def apply_action():
                 globals()['action_reg'] = next
                 globals()['pc'] = apply_action
             else:
-                if eq_q(car(action_reg), symbol_goto):
+                if (car(action_reg)) is (symbol_goto):
                     state = symbol_undefined
                     state = list_ref(action_reg, 1)
-                    if eq_q(state, symbol_token_start_state):
+                    if (state) is (symbol_token_start_state):
                         mark_token_start()
                     action = symbol_undefined
                     action = apply_state(state, next_avail(chars_reg))
-                    if eq_q(action, symbol_error):
+                    if (action) is (symbol_error):
                         globals()['pc'] = unexpected_char_error
                     else:
                         globals()['action_reg'] = action
                         globals()['pc'] = apply_action
                 else:
-                    if eq_q(car(action_reg), symbol_emit):
+                    if (car(action_reg)) is (symbol_emit):
                         token_type = symbol_undefined
                         token_type = list_ref(action_reg, 1)
                         globals()['k_reg'] = make_cont(cont_1, chars_reg, fail_reg, k_reg)
@@ -3803,35 +3896,35 @@ def unexpected_char_error():
 def convert_buffer_to_token():
     buffer = symbol_undefined
     buffer = reverse(buffer_reg)
-    if eq_q(token_type_reg, symbol_end_marker):
+    if (token_type_reg) is (symbol_end_marker):
         globals()['value_reg'] = make_token1(symbol_end_marker)
         globals()['pc'] = apply_cont
     else:
-        if eq_q(token_type_reg, symbol_integer):
+        if (token_type_reg) is (symbol_integer):
             globals()['value_reg'] = make_token2(symbol_integer, list_to_string(buffer))
             globals()['pc'] = apply_cont
         else:
-            if eq_q(token_type_reg, symbol_decimal):
+            if (token_type_reg) is (symbol_decimal):
                 globals()['value_reg'] = make_token2(symbol_decimal, list_to_string(buffer))
                 globals()['pc'] = apply_cont
             else:
-                if eq_q(token_type_reg, symbol_rational):
+                if (token_type_reg) is (symbol_rational):
                     globals()['value_reg'] = make_token2(symbol_rational, list_to_string(buffer))
                     globals()['pc'] = apply_cont
                 else:
-                    if eq_q(token_type_reg, symbol_identifier):
+                    if (token_type_reg) is (symbol_identifier):
                         globals()['value_reg'] = make_token2(symbol_identifier, string_to_symbol(list_to_string(buffer)))
                         globals()['pc'] = apply_cont
                     else:
-                        if eq_q(token_type_reg, symbol_boolean):
+                        if (token_type_reg) is (symbol_boolean):
                             globals()['value_reg'] = make_token2(symbol_boolean, (char_is__q(car(buffer), 't')) or (char_is__q(car(buffer), 'T')))
                             globals()['pc'] = apply_cont
                         else:
-                            if eq_q(token_type_reg, symbol_character):
+                            if (token_type_reg) is (symbol_character):
                                 globals()['value_reg'] = make_token2(symbol_character, car(buffer))
                                 globals()['pc'] = apply_cont
                             else:
-                                if eq_q(token_type_reg, symbol_named_character):
+                                if (token_type_reg) is (symbol_named_character):
                                     name = symbol_undefined
                                     name = list_to_string(buffer)
                                     if string_is__q(name, "nul"):
@@ -3871,7 +3964,7 @@ def convert_buffer_to_token():
                                                                     globals()['msg_reg'] = format("invalid character name #\\~a", name)
                                                                     globals()['pc'] = scan_error
                                 else:
-                                    if eq_q(token_type_reg, symbol_string):
+                                    if (token_type_reg) is (symbol_string):
                                         globals()['value_reg'] = make_token2(symbol_string, list_to_string(buffer))
                                         globals()['pc'] = apply_cont
                                     else:
@@ -3883,7 +3976,7 @@ def make_token1(token_type):
     end = symbol_undefined
     end = List(last_scan_line, last_scan_char, last_scan_position)
     start = List(token_start_line, token_start_char, token_start_position)
-    if eq_q(token_type, symbol_end_marker):
+    if (token_type) is (symbol_end_marker):
         return List(token_type, end, end)
     else:
         return List(token_type, start, end)
@@ -3892,7 +3985,7 @@ def make_token2(token_type, token_info):
     return List(token_type, token_info, List(token_start_line, token_start_char, token_start_position), List(last_scan_line, last_scan_char, last_scan_position))
 
 def token_type_q(token, class_):
-    return eq_q(car(token), class_)
+    return (car(token)) is (class_)
 
 def get_token_start(token):
     return rac(rdc(token))
@@ -3913,19 +4006,44 @@ def rac(ls):
     if null_q(cdr(ls)):
         return car(ls)
     else:
-        return rac(cdr(ls))
+        current = symbol_undefined
+        current = cdr(ls)
+        while pair_q(cdr(current)):
+            current = cdr(current)
+        return car(current)
 
 def rdc(ls):
     if null_q(cdr(ls)):
-        return symbol_emptylist
+        return List()
     else:
-        return cons(car(ls), rdc(cdr(ls)))
+        retval = symbol_undefined
+        front = symbol_undefined
+        current = symbol_undefined
+        retval = List(car(ls))
+        front = retval
+        current = cdr(ls)
+        while pair_q(cdr(current)):
+            set_cdr_b(retval, List(car(current)))
+            retval = cdr(retval)
+            current = cdr(current)
+        return front
 
 def snoc(x, ls):
     if null_q(ls):
         return List(x)
     else:
-        return cons(car(ls), snoc(x, cdr(ls)))
+        retval = symbol_undefined
+        front = symbol_undefined
+        current = symbol_undefined
+        retval = List(car(ls))
+        front = retval
+        current = cdr(ls)
+        while pair_q(current):
+            set_cdr_b(retval, List(car(current)))
+            retval = cdr(retval)
+            current = cdr(current)
+        set_cdr_b(retval, List(x))
+        return front
 
 def char_delimiter_q(c):
     return (char_whitespace_q(c)) or (char_is__q(c, "'")) or (char_is__q(c, '(')) or (char_is__q(c, '[')) or (char_is__q(c, ')')) or (char_is__q(c, ']')) or (char_is__q(c, '"')) or (char_is__q(c, ';')) or (char_is__q(c, '#')) or (char_is__q(c, '\0'))
@@ -3946,7 +4064,7 @@ def char_boolean_q(c):
     return (char_is__q(c, 't')) or (char_is__q(c, 'T')) or (char_is__q(c, 'f')) or (char_is__q(c, 'F'))
 
 def apply_state(state, c):
-    if eq_q(state, symbol_start_state):
+    if (state) is (symbol_start_state):
         if char_whitespace_q(c):
             return List(symbol_drop, List(symbol_goto, symbol_start_state))
         else:
@@ -3958,7 +4076,7 @@ def apply_state(state, c):
                 else:
                     return List(symbol_goto, symbol_token_start_state)
     else:
-        if eq_q(state, symbol_token_start_state):
+        if (state) is (symbol_token_start_state):
             if char_is__q(c, '('):
                 return List(symbol_drop, List(symbol_emit, symbol_lparen))
             else:
@@ -4000,7 +4118,7 @@ def apply_state(state, c):
                                                             else:
                                                                 return symbol_error
         else:
-            if eq_q(state, symbol_comment_state):
+            if (state) is (symbol_comment_state):
                 if char_is__q(c, '\n'):
                     return List(symbol_drop, List(symbol_goto, symbol_start_state))
                 else:
@@ -4009,13 +4127,13 @@ def apply_state(state, c):
                     else:
                         return List(symbol_drop, List(symbol_goto, symbol_comment_state))
             else:
-                if eq_q(state, symbol_comma_state):
+                if (state) is (symbol_comma_state):
                     if char_is__q(c, '@'):
                         return List(symbol_drop, List(symbol_emit, symbol_comma_at))
                     else:
                         return List(symbol_emit, symbol_comma)
                 else:
-                    if eq_q(state, symbol_hash_prefix_state):
+                    if (state) is (symbol_hash_prefix_state):
                         if char_boolean_q(c):
                             return List(symbol_shift, List(symbol_emit, symbol_boolean))
                         else:
@@ -4027,7 +4145,7 @@ def apply_state(state, c):
                                 else:
                                     return symbol_error
                     else:
-                        if eq_q(state, symbol_character_state):
+                        if (state) is (symbol_character_state):
                             if char_alphabetic_q(c):
                                 return List(symbol_shift, List(symbol_goto, symbol_alphabetic_character_state))
                             else:
@@ -4036,19 +4154,19 @@ def apply_state(state, c):
                                 else:
                                     return symbol_error
                         else:
-                            if eq_q(state, symbol_alphabetic_character_state):
+                            if (state) is (symbol_alphabetic_character_state):
                                 if char_alphabetic_q(c):
                                     return List(symbol_shift, List(symbol_goto, symbol_named_character_state))
                                 else:
                                     return List(symbol_emit, symbol_character)
                             else:
-                                if eq_q(state, symbol_named_character_state):
+                                if (state) is (symbol_named_character_state):
                                     if char_delimiter_q(c):
                                         return List(symbol_emit, symbol_named_character)
                                     else:
                                         return List(symbol_shift, List(symbol_goto, symbol_named_character_state))
                                 else:
-                                    if eq_q(state, symbol_string_state):
+                                    if (state) is (symbol_string_state):
                                         if char_is__q(c, '"'):
                                             return List(symbol_drop, List(symbol_emit, symbol_string))
                                         else:
@@ -4060,7 +4178,7 @@ def apply_state(state, c):
                                                 else:
                                                     return symbol_error
                                     else:
-                                        if eq_q(state, symbol_string_escape_state):
+                                        if (state) is (symbol_string_escape_state):
                                             if char_is__q(c, '"'):
                                                 return List(symbol_shift, List(symbol_goto, symbol_string_state))
                                             else:
@@ -4084,7 +4202,7 @@ def apply_state(state, c):
                                                                     else:
                                                                         return symbol_error
                                         else:
-                                            if eq_q(state, symbol_identifier_state):
+                                            if (state) is (symbol_identifier_state):
                                                 if char_subsequent_q(c):
                                                     return List(symbol_shift, List(symbol_goto, symbol_identifier_state))
                                                 else:
@@ -4093,7 +4211,7 @@ def apply_state(state, c):
                                                     else:
                                                         return symbol_error
                                             else:
-                                                if eq_q(state, symbol_signed_state):
+                                                if (state) is (symbol_signed_state):
                                                     if char_numeric_q(c):
                                                         return List(symbol_shift, List(symbol_goto, symbol_whole_number_state))
                                                     else:
@@ -4108,7 +4226,7 @@ def apply_state(state, c):
                                                                 else:
                                                                     return symbol_error
                                                 else:
-                                                    if eq_q(state, symbol_decimal_point_state):
+                                                    if (state) is (symbol_decimal_point_state):
                                                         if char_numeric_q(c):
                                                             return List(symbol_shift, List(symbol_goto, symbol_fractional_number_state))
                                                         else:
@@ -4120,7 +4238,7 @@ def apply_state(state, c):
                                                                 else:
                                                                     return symbol_error
                                                     else:
-                                                        if eq_q(state, symbol_signed_decimal_point_state):
+                                                        if (state) is (symbol_signed_decimal_point_state):
                                                             if char_numeric_q(c):
                                                                 return List(symbol_shift, List(symbol_goto, symbol_fractional_number_state))
                                                             else:
@@ -4132,7 +4250,7 @@ def apply_state(state, c):
                                                                     else:
                                                                         return symbol_error
                                                         else:
-                                                            if eq_q(state, symbol_whole_number_state):
+                                                            if (state) is (symbol_whole_number_state):
                                                                 if char_numeric_q(c):
                                                                     return List(symbol_shift, List(symbol_goto, symbol_whole_number_state))
                                                                 else:
@@ -4153,7 +4271,7 @@ def apply_state(state, c):
                                                                                     else:
                                                                                         return symbol_error
                                                             else:
-                                                                if eq_q(state, symbol_fractional_number_state):
+                                                                if (state) is (symbol_fractional_number_state):
                                                                     if char_numeric_q(c):
                                                                         return List(symbol_shift, List(symbol_goto, symbol_fractional_number_state))
                                                                     else:
@@ -4168,7 +4286,7 @@ def apply_state(state, c):
                                                                                 else:
                                                                                     return symbol_error
                                                                 else:
-                                                                    if eq_q(state, symbol_rational_number_state):
+                                                                    if (state) is (symbol_rational_number_state):
                                                                         if char_numeric_q(c):
                                                                             return List(symbol_shift, List(symbol_goto, symbol_rational_number_state_star))
                                                                         else:
@@ -4180,7 +4298,7 @@ def apply_state(state, c):
                                                                                 else:
                                                                                     return symbol_error
                                                                     else:
-                                                                        if eq_q(state, symbol_rational_number_state_star):
+                                                                        if (state) is (symbol_rational_number_state_star):
                                                                             if char_numeric_q(c):
                                                                                 return List(symbol_shift, List(symbol_goto, symbol_rational_number_state_star))
                                                                             else:
@@ -4192,7 +4310,7 @@ def apply_state(state, c):
                                                                                     else:
                                                                                         return symbol_error
                                                                         else:
-                                                                            if eq_q(state, symbol_suffix_state):
+                                                                            if (state) is (symbol_suffix_state):
                                                                                 if char_sign_q(c):
                                                                                     return List(symbol_shift, List(symbol_goto, symbol_signed_exponent_state))
                                                                                 else:
@@ -4207,7 +4325,7 @@ def apply_state(state, c):
                                                                                             else:
                                                                                                 return symbol_error
                                                                             else:
-                                                                                if eq_q(state, symbol_signed_exponent_state):
+                                                                                if (state) is (symbol_signed_exponent_state):
                                                                                     if char_numeric_q(c):
                                                                                         return List(symbol_shift, List(symbol_goto, symbol_exponent_state))
                                                                                     else:
@@ -4219,7 +4337,7 @@ def apply_state(state, c):
                                                                                             else:
                                                                                                 return symbol_error
                                                                                 else:
-                                                                                    if eq_q(state, symbol_exponent_state):
+                                                                                    if (state) is (symbol_exponent_state):
                                                                                         if char_numeric_q(c):
                                                                                             return List(symbol_shift, List(symbol_goto, symbol_exponent_state))
                                                                                         else:
@@ -4234,22 +4352,22 @@ def apply_state(state, c):
                                                                                         error(symbol_apply_state, "invalid state: ~a", state)
 
 def aatom_q(x):
-    return (pair_q(x)) and (eq_q(car(x), atom_tag))
+    return (pair_q(x)) and ((car(x)) is (atom_tag))
 
 def apair_q(x):
-    return (pair_q(x)) and (eq_q(car(x), pair_tag))
+    return (pair_q(x)) and ((car(x)) is (pair_tag))
 
 def annotated_q(x):
-    return (pair_q(x)) and ((eq_q(car(x), atom_tag)) or (eq_q(car(x), pair_tag)))
+    return (pair_q(x)) and (((car(x)) is (atom_tag)) or ((car(x)) is (pair_tag)))
 
 def untag_atom_hat(aatom):
     return cadr(aatom)
 
 def atom_q_hat(asexp):
-    return eq_q(car(asexp), atom_tag)
+    return (car(asexp)) is (atom_tag)
 
 def pair_q_hat(asexp):
-    return eq_q(car(asexp), pair_tag)
+    return (car(asexp)) is (pair_tag)
 
 def null_q_hat(asexp):
     return (atom_q_hat(asexp)) and (null_q(untag_atom_hat(asexp)))
@@ -4300,7 +4418,7 @@ def cadddr_hat(asexp):
     return car_hat(cdr_hat(cdr_hat(cdr_hat(asexp))))
 
 def eq_q_hat(asexp, sym):
-    return eq_q(cadr(asexp), sym)
+    return (cadr(asexp)) is (sym)
 
 def vector_to_list_hat(asexp):
     return vector_to_list(cadr(asexp))
@@ -4407,10 +4525,10 @@ def get_source_info(asexp):
     return rac(asexp)
 
 def source_info_q(x):
-    return (eq_q(x, symbol_none)) or (list_q(x))
+    return ((x) is (symbol_none)) or (list_q(x))
 
 def has_source_info_q(asexp):
-    return not(eq_q(get_source_info(asexp), symbol_none))
+    return not((get_source_info(asexp)) is (symbol_none))
 
 def original_source_info_q(asexp):
     return (has_source_info_q(asexp)) and (Equal(length(get_source_info(asexp)), 7))
@@ -4447,7 +4565,7 @@ def read_sexp():
     start = get_token_start(first(tokens_reg))
     temp_1 = symbol_undefined
     temp_1 = first(tokens_reg)
-    if eq_q(car(temp_1), symbol_integer):
+    if (car(temp_1)) is (symbol_integer):
         str = symbol_undefined
         str = list_ref(temp_1, 1)
         globals()['k_reg'] = make_cont(cont_9, end, tokens_reg, fail_reg, k_reg)
@@ -4455,7 +4573,7 @@ def read_sexp():
         globals()['x_reg'] = string_to_integer(str)
         globals()['pc'] = annotate_cps
     else:
-        if eq_q(car(temp_1), symbol_decimal):
+        if (car(temp_1)) is (symbol_decimal):
             str = symbol_undefined
             str = list_ref(temp_1, 1)
             globals()['k_reg'] = make_cont(cont_9, end, tokens_reg, fail_reg, k_reg)
@@ -4463,7 +4581,7 @@ def read_sexp():
             globals()['x_reg'] = string_to_decimal(str)
             globals()['pc'] = annotate_cps
         else:
-            if eq_q(car(temp_1), symbol_rational):
+            if (car(temp_1)) is (symbol_rational):
                 str = symbol_undefined
                 str = list_ref(temp_1, 1)
                 num = symbol_undefined
@@ -4477,7 +4595,7 @@ def read_sexp():
                     globals()['msg_reg'] = format("cannot represent ~a", str)
                     globals()['pc'] = read_error
             else:
-                if eq_q(car(temp_1), symbol_boolean):
+                if (car(temp_1)) is (symbol_boolean):
                     bool = symbol_undefined
                     bool = list_ref(temp_1, 1)
                     globals()['k_reg'] = make_cont(cont_9, end, tokens_reg, fail_reg, k_reg)
@@ -4485,7 +4603,7 @@ def read_sexp():
                     globals()['x_reg'] = bool
                     globals()['pc'] = annotate_cps
                 else:
-                    if eq_q(car(temp_1), symbol_character):
+                    if (car(temp_1)) is (symbol_character):
                         char = symbol_undefined
                         char = list_ref(temp_1, 1)
                         globals()['k_reg'] = make_cont(cont_9, end, tokens_reg, fail_reg, k_reg)
@@ -4493,7 +4611,7 @@ def read_sexp():
                         globals()['x_reg'] = char
                         globals()['pc'] = annotate_cps
                     else:
-                        if eq_q(car(temp_1), symbol_string):
+                        if (car(temp_1)) is (symbol_string):
                             str = symbol_undefined
                             str = list_ref(temp_1, 1)
                             globals()['k_reg'] = make_cont(cont_9, end, tokens_reg, fail_reg, k_reg)
@@ -4501,7 +4619,7 @@ def read_sexp():
                             globals()['x_reg'] = str
                             globals()['pc'] = annotate_cps
                         else:
-                            if eq_q(car(temp_1), symbol_identifier):
+                            if (car(temp_1)) is (symbol_identifier):
                                 id = symbol_undefined
                                 id = list_ref(temp_1, 1)
                                 globals()['k_reg'] = make_cont(cont_9, end, tokens_reg, fail_reg, k_reg)
@@ -4509,23 +4627,23 @@ def read_sexp():
                                 globals()['x_reg'] = id
                                 globals()['pc'] = annotate_cps
                             else:
-                                if eq_q(car(temp_1), symbol_apostrophe):
+                                if (car(temp_1)) is (symbol_apostrophe):
                                     globals()['keyword_reg'] = symbol_quote
                                     globals()['pc'] = read_abbreviation
                                 else:
-                                    if eq_q(car(temp_1), symbol_backquote):
+                                    if (car(temp_1)) is (symbol_backquote):
                                         globals()['keyword_reg'] = symbol_quasiquote
                                         globals()['pc'] = read_abbreviation
                                     else:
-                                        if eq_q(car(temp_1), symbol_comma):
+                                        if (car(temp_1)) is (symbol_comma):
                                             globals()['keyword_reg'] = symbol_unquote
                                             globals()['pc'] = read_abbreviation
                                         else:
-                                            if eq_q(car(temp_1), symbol_comma_at):
+                                            if (car(temp_1)) is (symbol_comma_at):
                                                 globals()['keyword_reg'] = symbol_unquote_splicing
                                                 globals()['pc'] = read_abbreviation
                                             else:
-                                                if eq_q(car(temp_1), symbol_lparen):
+                                                if (car(temp_1)) is (symbol_lparen):
                                                     tokens = symbol_undefined
                                                     tokens = rest_of(tokens_reg)
                                                     globals()['k_reg'] = make_cont4(cont4_2, src_reg, start, k_reg)
@@ -4533,7 +4651,7 @@ def read_sexp():
                                                     globals()['tokens_reg'] = tokens
                                                     globals()['pc'] = read_sexp_sequence
                                                 else:
-                                                    if eq_q(car(temp_1), symbol_lbracket):
+                                                    if (car(temp_1)) is (symbol_lbracket):
                                                         tokens = symbol_undefined
                                                         tokens = rest_of(tokens_reg)
                                                         globals()['k_reg'] = make_cont4(cont4_2, src_reg, start, k_reg)
@@ -4541,7 +4659,7 @@ def read_sexp():
                                                         globals()['tokens_reg'] = tokens
                                                         globals()['pc'] = read_sexp_sequence
                                                     else:
-                                                        if eq_q(car(temp_1), symbol_lvector):
+                                                        if (car(temp_1)) is (symbol_lvector):
                                                             globals()['k_reg'] = make_cont4(cont4_1, src_reg, start, k_reg)
                                                             globals()['tokens_reg'] = rest_of(tokens_reg)
                                                             globals()['pc'] = read_vector_sequence
@@ -4561,12 +4679,12 @@ def read_abbreviation():
 def read_vector_sequence():
     temp_1 = symbol_undefined
     temp_1 = first(tokens_reg)
-    if eq_q(car(temp_1), symbol_rparen):
+    if (car(temp_1)) is (symbol_rparen):
         globals()['expected_terminator_reg'] = symbol_rparen
         globals()['sexps_reg'] = symbol_emptylist
         globals()['pc'] = close_sexp_sequence
     else:
-        if eq_q(car(temp_1), symbol_dot):
+        if (car(temp_1)) is (symbol_dot):
             globals()['msg_reg'] = "unexpected dot (.)"
             globals()['pc'] = read_error
         else:
@@ -4580,7 +4698,7 @@ def read_sexp_sequence():
         globals()['sexps_reg'] = symbol_emptylist
         globals()['pc'] = close_sexp_sequence
     else:
-        if eq_q(car(temp_1), symbol_dot):
+        if (car(temp_1)) is (symbol_dot):
             globals()['msg_reg'] = "unexpected dot (.)"
             globals()['pc'] = read_error
         else:
@@ -4600,11 +4718,11 @@ def close_sexp_sequence():
             globals()['value1_reg'] = sexps_reg
             globals()['pc'] = apply_cont4
         else:
-            if eq_q(expected_terminator_reg, symbol_rparen):
+            if (expected_terminator_reg) is (symbol_rparen):
                 globals()['msg_reg'] = "parenthesized list terminated by bracket"
                 globals()['pc'] = read_error
             else:
-                if eq_q(expected_terminator_reg, symbol_rbracket):
+                if (expected_terminator_reg) is (symbol_rbracket):
                     globals()['msg_reg'] = "bracketed list terminated by parenthesis"
                     globals()['pc'] = read_error
     else:
@@ -4635,7 +4753,7 @@ def frame_bindings(frame):
     return car(frame)
 
 def environment_q(x):
-    return (pair_q(x)) and (eq_q(car(x), symbol_environment))
+    return (pair_q(x)) and ((car(x)) is (symbol_environment))
 
 def make_empty_environment():
     return List(symbol_environment, make_frame(symbol_emptylist, symbol_emptylist))
@@ -4836,7 +4954,7 @@ def application_q_hat(asexp):
     return (list_q_hat(asexp)) and (not(null_q_hat(asexp))) and (not(reserved_keyword_q(untag_atom_hat(car_hat(asexp)))))
 
 def reserved_keyword_q(x):
-    return (symbol_q(x)) and (not(eq_q(memq(x, get_reserved_keywords()), False)))
+    return (symbol_q(x)) and (not((memq(x, get_reserved_keywords())) is (False)))
 
 def get_reserved_keywords():
     return List(symbol_quote, symbol_func, symbol_define_b, symbol_quasiquote, symbol_lambda, symbol_if, symbol_set_b, symbol_define, symbol_begin, symbol_cond, symbol_and, symbol_or, symbol_let, symbol_let_star, symbol_letrec, symbol_case, symbol_record_case, symbol_try, symbol_catch, symbol_finally, symbol_raise, symbol_define_syntax, symbol_choose, symbol_define_datatype, symbol_cases, symbol_trace_lambda)
@@ -4848,7 +4966,7 @@ def literal_q(datum):
     return (number_q(datum)) or (boolean_q(datum)) or (null_q(datum)) or (char_q(datum)) or (string_q(datum))
 
 def literal_q_hat(asexp):
-    return (eq_q(car(asexp), atom_tag)) and ((number_q(untag_atom_hat(asexp))) or (boolean_q(untag_atom_hat(asexp))) or (null_q(untag_atom_hat(asexp))) or (char_q(untag_atom_hat(asexp))) or (string_q(untag_atom_hat(asexp))))
+    return ((car(asexp)) is (atom_tag)) and ((number_q(untag_atom_hat(asexp))) or (boolean_q(untag_atom_hat(asexp))) or (null_q(untag_atom_hat(asexp))) or (char_q(untag_atom_hat(asexp))) or (string_q(untag_atom_hat(asexp))))
 
 def syntactic_sugar_q_hat(asexp):
     return (pair_q_hat(asexp)) and (symbol_q_hat(car_hat(asexp))) and (in_first_frame_q(untag_atom_hat(car_hat(asexp)), macro_env))
@@ -5111,7 +5229,7 @@ def get_lexical_address():
             globals()['pc'] = get_lexical_address
 
 def get_lexical_address_offset():
-    if eq_q(car(contours_reg), id_reg):
+    if (car(contours_reg)) is (id_reg):
         globals()['value2_reg'] = fail_reg
         globals()['value1_reg'] = lexical_address_aexp(depth_reg, offset_reg, id_reg, info_reg)
         globals()['pc'] = apply_cont2
@@ -5217,7 +5335,7 @@ def make_pattern_macro_hat(clauses, aclauses):
     return List(symbol_pattern_macro, clauses, aclauses)
 
 def pattern_macro_q(x):
-    return (pair_q(x)) and (eq_q(car(x), symbol_pattern_macro))
+    return (pair_q(x)) and ((car(x)) is (symbol_pattern_macro))
 
 def macro_clauses(macro):
     return cadr(macro)
@@ -5352,7 +5470,7 @@ def qq_expand_list_cps():
                         globals()['pc'] = qq_expand_list_cps
 
 def aunparse(aexp):
-    if eq_q(car(aexp), symbol_lit_aexp):
+    if (car(aexp)) is (symbol_lit_aexp):
         datum = symbol_undefined
         datum = list_ref(aexp, 1)
         if literal_q(datum):
@@ -5363,17 +5481,17 @@ def aunparse(aexp):
             else:
                 return append(List(symbol_quote), List(datum))
     else:
-        if eq_q(car(aexp), symbol_var_aexp):
+        if (car(aexp)) is (symbol_var_aexp):
             id = symbol_undefined
             id = list_ref(aexp, 1)
             return id
         else:
-            if eq_q(car(aexp), symbol_lexical_address_aexp):
+            if (car(aexp)) is (symbol_lexical_address_aexp):
                 id = symbol_undefined
                 id = list_ref(aexp, 3)
                 return id
             else:
-                if eq_q(car(aexp), symbol_if_aexp):
+                if (car(aexp)) is (symbol_if_aexp):
                     test_aexp = symbol_undefined
                     then_aexp = symbol_undefined
                     else_aexp = symbol_undefined
@@ -5382,34 +5500,34 @@ def aunparse(aexp):
                     test_aexp = list_ref(aexp, 1)
                     return append(List(symbol_if), append(List(aunparse(test_aexp)), append(List(aunparse(then_aexp)), List(aunparse(else_aexp)))))
                 else:
-                    if eq_q(car(aexp), symbol_assign_aexp):
+                    if (car(aexp)) is (symbol_assign_aexp):
                         var = symbol_undefined
                         rhs_exp = symbol_undefined
                         rhs_exp = list_ref(aexp, 2)
                         var = list_ref(aexp, 1)
                         return append(List(symbol_set_b), append(List(var), List(aunparse(rhs_exp))))
                     else:
-                        if eq_q(car(aexp), symbol_func_aexp):
+                        if (car(aexp)) is (symbol_func_aexp):
                             exp = symbol_undefined
                             exp = list_ref(aexp, 1)
                             return append(List(symbol_func), List(aunparse(exp)))
                         else:
-                            if eq_q(car(aexp), symbol_callback0_aexp):
+                            if (car(aexp)) is (symbol_callback0_aexp):
                                 exp = symbol_undefined
                                 exp = list_ref(aexp, 1)
                                 return append(List(symbol_callback0), List(aunparse(exp)))
                             else:
-                                if eq_q(car(aexp), symbol_callback1_aexp):
+                                if (car(aexp)) is (symbol_callback1_aexp):
                                     exp = symbol_undefined
                                     exp = list_ref(aexp, 1)
                                     return append(List(symbol_callback1), List(aunparse(exp)))
                                 else:
-                                    if eq_q(car(aexp), symbol_callback2_aexp):
+                                    if (car(aexp)) is (symbol_callback2_aexp):
                                         exp = symbol_undefined
                                         exp = list_ref(aexp, 1)
                                         return append(List(symbol_callback2), List(aunparse(exp)))
                                     else:
-                                        if eq_q(car(aexp), symbol_define_aexp):
+                                        if (car(aexp)) is (symbol_define_aexp):
                                             id = symbol_undefined
                                             docstring = symbol_undefined
                                             rhs_exp = symbol_undefined
@@ -5421,7 +5539,7 @@ def aunparse(aexp):
                                             else:
                                                 return append(List(symbol_define), append(List(id), append(List(docstring), List(aunparse(rhs_exp)))))
                                         else:
-                                            if eq_q(car(aexp), symbol_define_b_aexp):
+                                            if (car(aexp)) is (symbol_define_b_aexp):
                                                 id = symbol_undefined
                                                 docstring = symbol_undefined
                                                 rhs_exp = symbol_undefined
@@ -5433,26 +5551,26 @@ def aunparse(aexp):
                                                 else:
                                                     return append(List(symbol_define_b), append(List(id), append(List(docstring), List(aunparse(rhs_exp)))))
                                             else:
-                                                if eq_q(car(aexp), symbol_define_syntax_aexp):
+                                                if (car(aexp)) is (symbol_define_syntax_aexp):
                                                     name = symbol_undefined
                                                     clauses = symbol_undefined
                                                     clauses = list_ref(aexp, 2)
                                                     name = list_ref(aexp, 1)
                                                     return append(List(symbol_define_syntax), append(List(name), clauses))
                                                 else:
-                                                    if eq_q(car(aexp), symbol_begin_aexp):
+                                                    if (car(aexp)) is (symbol_begin_aexp):
                                                         exps = symbol_undefined
                                                         exps = list_ref(aexp, 1)
                                                         return append(List(symbol_begin), Map(aunparse, exps))
                                                     else:
-                                                        if eq_q(car(aexp), symbol_lambda_aexp):
+                                                        if (car(aexp)) is (symbol_lambda_aexp):
                                                             formals = symbol_undefined
                                                             bodies = symbol_undefined
                                                             bodies = list_ref(aexp, 2)
                                                             formals = list_ref(aexp, 1)
                                                             return append(List(symbol_lambda), append(List(formals), Map(aunparse, bodies)))
                                                         else:
-                                                            if eq_q(car(aexp), symbol_mu_lambda_aexp):
+                                                            if (car(aexp)) is (symbol_mu_lambda_aexp):
                                                                 formals = symbol_undefined
                                                                 runt = symbol_undefined
                                                                 bodies = symbol_undefined
@@ -5461,14 +5579,14 @@ def aunparse(aexp):
                                                                 formals = list_ref(aexp, 1)
                                                                 return append(List(symbol_lambda), append(List(append(formals, runt)), Map(aunparse, bodies)))
                                                             else:
-                                                                if eq_q(car(aexp), symbol_app_aexp):
+                                                                if (car(aexp)) is (symbol_app_aexp):
                                                                     operator = symbol_undefined
                                                                     operands = symbol_undefined
                                                                     operands = list_ref(aexp, 2)
                                                                     operator = list_ref(aexp, 1)
                                                                     return append(List(aunparse(operator)), Map(aunparse, operands))
                                                                 else:
-                                                                    if eq_q(car(aexp), symbol_try_catch_aexp):
+                                                                    if (car(aexp)) is (symbol_try_catch_aexp):
                                                                         body = symbol_undefined
                                                                         catch_var = symbol_undefined
                                                                         catch_exps = symbol_undefined
@@ -5477,14 +5595,14 @@ def aunparse(aexp):
                                                                         body = list_ref(aexp, 1)
                                                                         return append(List(symbol_try), append(List(aunparse(body)), List(append(List(symbol_catch), append(List(catch_var), Map(aunparse, catch_exps))))))
                                                                     else:
-                                                                        if eq_q(car(aexp), symbol_try_finally_aexp):
+                                                                        if (car(aexp)) is (symbol_try_finally_aexp):
                                                                             body = symbol_undefined
                                                                             finally_exps = symbol_undefined
                                                                             finally_exps = list_ref(aexp, 2)
                                                                             body = list_ref(aexp, 1)
                                                                             return append(List(symbol_try), append(List(aunparse(body)), List(append(List(symbol_finally), Map(aunparse, finally_exps)))))
                                                                         else:
-                                                                            if eq_q(car(aexp), symbol_try_catch_finally_aexp):
+                                                                            if (car(aexp)) is (symbol_try_catch_finally_aexp):
                                                                                 body = symbol_undefined
                                                                                 catch_var = symbol_undefined
                                                                                 catch_exps = symbol_undefined
@@ -5495,12 +5613,12 @@ def aunparse(aexp):
                                                                                 body = list_ref(aexp, 1)
                                                                                 return append(List(symbol_try), append(List(aunparse(body)), append(List(append(List(symbol_catch), append(List(catch_var), Map(aunparse, catch_exps)))), List(append(List(symbol_finally), Map(aunparse, finally_exps))))))
                                                                             else:
-                                                                                if eq_q(car(aexp), symbol_raise_aexp):
+                                                                                if (car(aexp)) is (symbol_raise_aexp):
                                                                                     exp = symbol_undefined
                                                                                     exp = list_ref(aexp, 1)
                                                                                     return append(List(symbol_raise), List(aunparse(exp)))
                                                                                 else:
-                                                                                    if eq_q(car(aexp), symbol_choose_aexp):
+                                                                                    if (car(aexp)) is (symbol_choose_aexp):
                                                                                         exps = symbol_undefined
                                                                                         exps = list_ref(aexp, 1)
                                                                                         return append(List(symbol_choose), Map(aunparse, exps))
@@ -5508,7 +5626,7 @@ def aunparse(aexp):
                                                                                         error(symbol_aunparse, "bad abstract syntax: ~s", aexp)
 
 def exception_q(x):
-    return (pair_q(x)) and (eq_q(car(x), symbol_exception))
+    return (pair_q(x)) and ((car(x)) is (symbol_exception))
 
 def read_line(prompt):
     printf(prompt)
@@ -5625,7 +5743,7 @@ def m():
         highlight_expression(exp_reg)
     k = symbol_undefined
     k = (make_debugging_k(exp_reg, k_reg) if _startracing_on_q_star else k_reg)
-    if eq_q(car(exp_reg), symbol_lit_aexp):
+    if (car(exp_reg)) is (symbol_lit_aexp):
         datum = symbol_undefined
         datum = list_ref(exp_reg, 1)
         globals()['value2_reg'] = fail_reg
@@ -5633,7 +5751,7 @@ def m():
         globals()['k_reg'] = k
         globals()['pc'] = apply_cont2
     else:
-        if eq_q(car(exp_reg), symbol_var_aexp):
+        if (car(exp_reg)) is (symbol_var_aexp):
             id = symbol_undefined
             info = symbol_undefined
             info = list_ref(exp_reg, 2)
@@ -5643,7 +5761,7 @@ def m():
             globals()['var_reg'] = id
             globals()['pc'] = lookup_value
         else:
-            if eq_q(car(exp_reg), symbol_lexical_address_aexp):
+            if (car(exp_reg)) is (symbol_lexical_address_aexp):
                 depth = symbol_undefined
                 offset = symbol_undefined
                 offset = list_ref(exp_reg, 2)
@@ -5654,35 +5772,35 @@ def m():
                 globals()['depth_reg'] = depth
                 globals()['pc'] = lookup_value_by_lexical_address
             else:
-                if eq_q(car(exp_reg), symbol_func_aexp):
+                if (car(exp_reg)) is (symbol_func_aexp):
                     exp = symbol_undefined
                     exp = list_ref(exp_reg, 1)
                     globals()['k_reg'] = make_cont2(cont2_71, k)
                     globals()['exp_reg'] = exp
                     globals()['pc'] = m
                 else:
-                    if eq_q(car(exp_reg), symbol_callback0_aexp):
+                    if (car(exp_reg)) is (symbol_callback0_aexp):
                         exp = symbol_undefined
                         exp = list_ref(exp_reg, 1)
                         globals()['k_reg'] = make_cont2(cont2_70, k)
                         globals()['exp_reg'] = exp
                         globals()['pc'] = m
                     else:
-                        if eq_q(car(exp_reg), symbol_callback1_aexp):
+                        if (car(exp_reg)) is (symbol_callback1_aexp):
                             exp = symbol_undefined
                             exp = list_ref(exp_reg, 1)
                             globals()['k_reg'] = make_cont2(cont2_69, k)
                             globals()['exp_reg'] = exp
                             globals()['pc'] = m
                         else:
-                            if eq_q(car(exp_reg), symbol_callback2_aexp):
+                            if (car(exp_reg)) is (symbol_callback2_aexp):
                                 exp = symbol_undefined
                                 exp = list_ref(exp_reg, 1)
                                 globals()['k_reg'] = make_cont2(cont2_68, k)
                                 globals()['exp_reg'] = exp
                                 globals()['pc'] = m
                             else:
-                                if eq_q(car(exp_reg), symbol_if_aexp):
+                                if (car(exp_reg)) is (symbol_if_aexp):
                                     test_exp = symbol_undefined
                                     then_exp = symbol_undefined
                                     else_exp = symbol_undefined
@@ -5693,7 +5811,7 @@ def m():
                                     globals()['exp_reg'] = test_exp
                                     globals()['pc'] = m
                                 else:
-                                    if eq_q(car(exp_reg), symbol_assign_aexp):
+                                    if (car(exp_reg)) is (symbol_assign_aexp):
                                         var = symbol_undefined
                                         rhs_exp = symbol_undefined
                                         var_info = symbol_undefined
@@ -5704,7 +5822,7 @@ def m():
                                         globals()['exp_reg'] = rhs_exp
                                         globals()['pc'] = m
                                     else:
-                                        if eq_q(car(exp_reg), symbol_define_aexp):
+                                        if (car(exp_reg)) is (symbol_define_aexp):
                                             var = symbol_undefined
                                             docstring = symbol_undefined
                                             rhs_exp = symbol_undefined
@@ -5715,7 +5833,7 @@ def m():
                                             globals()['exp_reg'] = rhs_exp
                                             globals()['pc'] = m
                                         else:
-                                            if eq_q(car(exp_reg), symbol_define_b_aexp):
+                                            if (car(exp_reg)) is (symbol_define_b_aexp):
                                                 var = symbol_undefined
                                                 docstring = symbol_undefined
                                                 rhs_exp = symbol_undefined
@@ -5726,7 +5844,7 @@ def m():
                                                 globals()['exp_reg'] = rhs_exp
                                                 globals()['pc'] = m
                                             else:
-                                                if eq_q(car(exp_reg), symbol_define_syntax_aexp):
+                                                if (car(exp_reg)) is (symbol_define_syntax_aexp):
                                                     name = symbol_undefined
                                                     clauses = symbol_undefined
                                                     aclauses = symbol_undefined
@@ -5738,14 +5856,14 @@ def m():
                                                     globals()['var_reg'] = name
                                                     globals()['pc'] = lookup_binding_in_first_frame
                                                 else:
-                                                    if eq_q(car(exp_reg), symbol_begin_aexp):
+                                                    if (car(exp_reg)) is (symbol_begin_aexp):
                                                         exps = symbol_undefined
                                                         exps = list_ref(exp_reg, 1)
                                                         globals()['k_reg'] = k
                                                         globals()['exps_reg'] = exps
                                                         globals()['pc'] = eval_sequence
                                                     else:
-                                                        if eq_q(car(exp_reg), symbol_lambda_aexp):
+                                                        if (car(exp_reg)) is (symbol_lambda_aexp):
                                                             formals = symbol_undefined
                                                             bodies = symbol_undefined
                                                             bodies = list_ref(exp_reg, 2)
@@ -5755,7 +5873,7 @@ def m():
                                                             globals()['k_reg'] = k
                                                             globals()['pc'] = apply_cont2
                                                         else:
-                                                            if eq_q(car(exp_reg), symbol_mu_lambda_aexp):
+                                                            if (car(exp_reg)) is (symbol_mu_lambda_aexp):
                                                                 formals = symbol_undefined
                                                                 runt = symbol_undefined
                                                                 bodies = symbol_undefined
@@ -5767,7 +5885,7 @@ def m():
                                                                 globals()['k_reg'] = k
                                                                 globals()['pc'] = apply_cont2
                                                             else:
-                                                                if eq_q(car(exp_reg), symbol_trace_lambda_aexp):
+                                                                if (car(exp_reg)) is (symbol_trace_lambda_aexp):
                                                                     name = symbol_undefined
                                                                     formals = symbol_undefined
                                                                     bodies = symbol_undefined
@@ -5779,7 +5897,7 @@ def m():
                                                                     globals()['k_reg'] = k
                                                                     globals()['pc'] = apply_cont2
                                                                 else:
-                                                                    if eq_q(car(exp_reg), symbol_mu_trace_lambda_aexp):
+                                                                    if (car(exp_reg)) is (symbol_mu_trace_lambda_aexp):
                                                                         name = symbol_undefined
                                                                         formals = symbol_undefined
                                                                         runt = symbol_undefined
@@ -5793,7 +5911,7 @@ def m():
                                                                         globals()['k_reg'] = k
                                                                         globals()['pc'] = apply_cont2
                                                                     else:
-                                                                        if eq_q(car(exp_reg), symbol_try_catch_aexp):
+                                                                        if (car(exp_reg)) is (symbol_try_catch_aexp):
                                                                             body = symbol_undefined
                                                                             cvar = symbol_undefined
                                                                             cexps = symbol_undefined
@@ -5807,7 +5925,7 @@ def m():
                                                                             globals()['exp_reg'] = body
                                                                             globals()['pc'] = m
                                                                         else:
-                                                                            if eq_q(car(exp_reg), symbol_try_finally_aexp):
+                                                                            if (car(exp_reg)) is (symbol_try_finally_aexp):
                                                                                 body = symbol_undefined
                                                                                 fexps = symbol_undefined
                                                                                 fexps = list_ref(exp_reg, 2)
@@ -5819,7 +5937,7 @@ def m():
                                                                                 globals()['exp_reg'] = body
                                                                                 globals()['pc'] = m
                                                                             else:
-                                                                                if eq_q(car(exp_reg), symbol_try_catch_finally_aexp):
+                                                                                if (car(exp_reg)) is (symbol_try_catch_finally_aexp):
                                                                                     body = symbol_undefined
                                                                                     cvar = symbol_undefined
                                                                                     cexps = symbol_undefined
@@ -5835,21 +5953,21 @@ def m():
                                                                                     globals()['exp_reg'] = body
                                                                                     globals()['pc'] = m
                                                                                 else:
-                                                                                    if eq_q(car(exp_reg), symbol_raise_aexp):
+                                                                                    if (car(exp_reg)) is (symbol_raise_aexp):
                                                                                         exp = symbol_undefined
                                                                                         exp = list_ref(exp_reg, 1)
                                                                                         globals()['k_reg'] = make_cont2(cont2_57, handler_reg)
                                                                                         globals()['exp_reg'] = exp
                                                                                         globals()['pc'] = m
                                                                                     else:
-                                                                                        if eq_q(car(exp_reg), symbol_choose_aexp):
+                                                                                        if (car(exp_reg)) is (symbol_choose_aexp):
                                                                                             exps = symbol_undefined
                                                                                             exps = list_ref(exp_reg, 1)
                                                                                             globals()['k_reg'] = k
                                                                                             globals()['exps_reg'] = exps
                                                                                             globals()['pc'] = eval_choices
                                                                                         else:
-                                                                                            if eq_q(car(exp_reg), symbol_app_aexp):
+                                                                                            if (car(exp_reg)) is (symbol_app_aexp):
                                                                                                 operator = symbol_undefined
                                                                                                 operands = symbol_undefined
                                                                                                 info = symbol_undefined
@@ -5874,37 +5992,37 @@ def get_procedure_name(aexp):
     if macro_derived_source_info_q(aexp):
         return rac(get_source_info(aexp))
     else:
-        if eq_q(car(aexp), symbol_app_aexp):
+        if (car(aexp)) is (symbol_app_aexp):
             operator = symbol_undefined
             operator = list_ref(aexp, 1)
-            if eq_q(car(operator), symbol_lexical_address_aexp):
+            if (car(operator)) is (symbol_lexical_address_aexp):
                 id = symbol_undefined
                 id = list_ref(operator, 3)
                 return id
             else:
-                if eq_q(car(operator), symbol_var_aexp):
+                if (car(operator)) is (symbol_var_aexp):
                     id = symbol_undefined
                     id = list_ref(operator, 1)
                     return id
                 else:
-                    if eq_q(car(operator), symbol_lambda_aexp):
+                    if (car(operator)) is (symbol_lambda_aexp):
                         formals = symbol_undefined
                         formals = list_ref(operator, 1)
                         return append(List(symbol_lambda), append(List(formals), List(symbol_dotdotdot)))
                     else:
-                        if eq_q(car(operator), symbol_mu_lambda_aexp):
+                        if (car(operator)) is (symbol_mu_lambda_aexp):
                             formals = symbol_undefined
                             runt = symbol_undefined
                             runt = list_ref(operator, 2)
                             formals = list_ref(operator, 1)
                             return append(List(symbol_lambda), append(List(append(formals, runt)), List(symbol_dotdotdot)))
                         else:
-                            if eq_q(car(operator), symbol_trace_lambda_aexp):
+                            if (car(operator)) is (symbol_trace_lambda_aexp):
                                 name = symbol_undefined
                                 name = list_ref(operator, 1)
                                 return name
                             else:
-                                if eq_q(car(operator), symbol_mu_trace_lambda_aexp):
+                                if (car(operator)) is (symbol_mu_trace_lambda_aexp):
                                     name = symbol_undefined
                                     name = list_ref(operator, 1)
                                     return name
@@ -5914,17 +6032,17 @@ def get_procedure_name(aexp):
             return symbol_unknown
 
 def old_get_procedure_name(exp):
-    if eq_q(car(exp), symbol_lexical_address_aexp):
+    if (car(exp)) is (symbol_lexical_address_aexp):
         id = symbol_undefined
         id = list_ref(exp, 3)
         return id
     else:
-        if eq_q(car(exp), symbol_var_aexp):
+        if (car(exp)) is (symbol_var_aexp):
             id = symbol_undefined
             id = list_ref(exp, 1)
             return id
         else:
-            if eq_q(car(exp), symbol_app_aexp):
+            if (car(exp)) is (symbol_app_aexp):
                 operator = symbol_undefined
                 operator = list_ref(exp, 1)
                 return get_procedure_name(operator)
@@ -5934,13 +6052,13 @@ def old_get_procedure_name(exp):
 def format_stack_trace(exp):
     info = symbol_undefined
     info = rac(exp)
-    if eq_q(info, symbol_none):
+    if (info) is (symbol_none):
         return symbol_macro_generated_exp
     else:
         return List(get_srcfile(info), get_start_line(info), get_start_char(info), get_procedure_name(exp))
 
 def runtime_error():
-    if eq_q(info_reg, symbol_none):
+    if (info_reg) is (symbol_none):
         globals()['exception_reg'] = make_exception("RunTimeError", msg_reg, symbol_none, symbol_none, symbol_none)
         globals()['pc'] = apply_handler2
     else:
@@ -6038,16 +6156,16 @@ def all_char_q(ls):
     return (null_q(ls)) or ((char_q(car(ls))) and (all_char_q(cdr(ls))))
 
 def void_q(x):
-    return eq_q(x, void_value)
+    return (x) is (void_value)
 
 def end_of_session_q(x):
-    return eq_q(x, end_of_session)
+    return (x) is (end_of_session)
 
 def procedure_object_q(x):
-    return (procedure_q(x)) or ((pair_q(x)) and (eq_q(car(x), symbol_procedure)))
+    return (procedure_q(x)) or ((pair_q(x)) and ((car(x)) is (symbol_procedure)))
 
 def environment_object_q(x):
-    return (pair_q(x)) and (eq_q(car(x), symbol_environment))
+    return (pair_q(x)) and ((car(x)) is (symbol_environment))
 
 def ends_with_newline_q(s):
     len = symbol_undefined
@@ -6121,7 +6239,7 @@ def make_set():
         globals()['pc'] = make_set
 
 def equal_objects_q():
-    if ((null_q(x_reg)) and (null_q(y_reg))) or ((boolean_q(x_reg)) and (boolean_q(y_reg)) and (((x_reg) and (y_reg)) or ((not(x_reg)) and (not(y_reg))))) or ((symbol_q(x_reg)) and (symbol_q(y_reg)) and (eq_q(x_reg, y_reg))) or ((number_q(x_reg)) and (number_q(y_reg)) and (Equal(x_reg, y_reg))) or ((char_q(x_reg)) and (char_q(y_reg)) and (char_is__q(x_reg, y_reg))) or ((eq_q(x_reg, void_value)) and (eq_q(y_reg, void_value))) or ((string_q(x_reg)) and (string_q(y_reg)) and (string_is__q(x_reg, y_reg))):
+    if ((null_q(x_reg)) and (null_q(y_reg))) or ((boolean_q(x_reg)) and (boolean_q(y_reg)) and (((x_reg) and (y_reg)) or ((not(x_reg)) and (not(y_reg))))) or ((symbol_q(x_reg)) and (symbol_q(y_reg)) and ((x_reg) is (y_reg))) or ((number_q(x_reg)) and (number_q(y_reg)) and (Equal(x_reg, y_reg))) or ((char_q(x_reg)) and (char_q(y_reg)) and (char_is__q(x_reg, y_reg))) or (((x_reg) is (void_value)) and ((y_reg) is (void_value))) or ((string_q(x_reg)) and (string_q(y_reg)) and (string_is__q(x_reg, y_reg))):
         globals()['value_reg'] = True
         globals()['pc'] = apply_cont
     else:
@@ -6385,14 +6503,14 @@ def for_each_primitive():
 
 def make_toplevel_env():
     primitives = symbol_undefined
-    primitives = List(List(symbol_multiply, times_prim), List(symbol_plus, plus_prim), List(symbol_minus, minus_prim), List(symbol_slash, divide_prim), List(symbol_p, modulo_prim), List(symbol_LessThan, lt_prim), List(symbol_LessThanEqual, lt_or_eq_prim), List(symbol_Equal, equal_sign_prim), List(symbol_GreaterThan, gt_prim), List(symbol_GreaterThanEqual, gt_or_eq_prim), List(symbol_abort, abort_prim), List(symbol_abs, abs_prim), List(symbol_append, append_prim), List(symbol_Apply, apply_prim), List(symbol_assv, assv_prim), List(symbol_boolean_q, boolean_q_prim), List(symbol_caddr, caddr_prim), List(symbol_cadr, cadr_prim), List(symbol_call_with_current_continuation, callslashcc_prim), List(symbol_callslashcc, callslashcc_prim), List(symbol_car, car_prim), List(symbol_cdr, cdr_prim), List(symbol_char_q, char_q_prim), List(symbol_char_is__q, char_is__q_prim), List(symbol_char_whitespace_q, char_whitespace_q_prim), List(symbol_char_alphabetic_q, char_alphabetic_q_prim), List(symbol_char_numeric_q, char_numeric_q_prim), List(symbol_char_to_integer, char_to_integer_prim), List(symbol_cons, cons_prim), List(symbol_current_time, current_time_prim), List(symbol_cut, cut_prim), List(symbol_dir, dir_prim), List(symbol_display, display_prim), List(symbol_current_environment, current_environment_prim), List(symbol_eq_q, eq_q_prim), List(symbol_equal_q, equal_q_prim), List(symbol_error, error_prim), List(symbol_eval, eval_prim), List(symbol_eval_ast, eval_ast_prim), List(symbol_exit, exit_prim), List(symbol_for_each, for_each_prim), List(symbol_get, get_prim), List(symbol_get_stack_trace, get_stack_trace_prim), List(symbol_import, import_prim), List(symbol_integer_to_char, integer_to_char_prim), List(symbol_length, length_prim), List(symbol_List, list_prim), List(symbol_list_to_vector, list_to_vector_prim), List(symbol_list_to_string, list_to_string_prim), List(symbol_list_ref, list_ref_prim), List(symbol_load, load_prim), List(symbol_make_set, make_set_prim), List(symbol_make_vector, make_vector_prim), List(symbol_Map, map_prim), List(symbol_member, member_prim), List(symbol_memq, memq_prim), List(symbol_memv, memv_prim), List(symbol_newline, newline_prim), List(symbol_not, not_prim), List(symbol_null_q, null_q_prim), List(symbol_number_to_string, number_to_string_prim), List(symbol_number_q, number_q_prim), List(symbol_pair_q, pair_q_prim), List(symbol_parse, parse_prim), List(symbol_parse_string, parse_string_prim), List(symbol_print, print_prim), List(symbol_printf, printf_primitive), List(symbol_range, range_prim), List(symbol_read_string, read_string_prim), List(symbol_require, require_prim), List(symbol_reverse, reverse_prim), List(symbol_set_car_b, set_car_b_prim), List(symbol_set_cdr_b, set_cdr_b_prim), List(symbol_sqrt, sqrt_prim), List(symbol_odd_q, odd_q_prim), List(symbol_even_q, even_q_prim), List(symbol_quotient, quotient_prim), List(symbol_remainder, remainder_prim), List(symbol_string, string_prim), List(symbol_string_length, string_length_prim), List(symbol_string_ref, string_ref_prim), List(symbol_string_q, string_q_prim), List(symbol_string_to_number, string_to_number_prim), List(symbol_string_is__q, string_is__q_prim), List(symbol_substring, substring_prim), List(symbol_symbol_q, symbol_q_prim), List(symbol_unparse, unparse_prim), List(symbol_unparse_procedure, unparse_procedure_prim), List(symbol_using, using_primitive), List(symbol_vector, vector_prim), List(symbol_vector_ref, vector_ref_prim), List(symbol_vector_set_b, vector_set_b_prim), List(symbol_void, void_prim), List(symbol_zero_q, zero_q_prim), List(symbol_current_directory, current_directory_prim), List(symbol_cd, current_directory_prim), List(symbol_round, round_prim))
+    primitives = List(List(symbol_multiply, times_prim), List(symbol_plus, plus_prim), List(symbol_minus, minus_prim), List(symbol_slash, divide_prim), List(symbol_p, modulo_prim), List(symbol_LessThan, lt_prim), List(symbol_LessThanEqual, lt_or_eq_prim), List(symbol_Equal, equal_sign_prim), List(symbol_GreaterThan, gt_prim), List(symbol_GreaterThanEqual, gt_or_eq_prim), List(symbol_abort, abort_prim), List(symbol_abs, abs_prim), List(symbol_append, append_prim), List(symbol_Apply, apply_prim), List(symbol_assv, assv_prim), List(symbol_boolean_q, boolean_q_prim), List(symbol_caddr, caddr_prim), List(symbol_cadr, cadr_prim), List(symbol_call_with_current_continuation, callslashcc_prim), List(symbol_callslashcc, callslashcc_prim), List(symbol_car, car_prim), List(symbol_cdr, cdr_prim), List(symbol_char_q, char_q_prim), List(symbol_char_is__q, char_is__q_prim), List(symbol_char_whitespace_q, char_whitespace_q_prim), List(symbol_char_alphabetic_q, char_alphabetic_q_prim), List(symbol_char_numeric_q, char_numeric_q_prim), List(symbol_char_to_integer, char_to_integer_prim), List(symbol_cons, cons_prim), List(symbol_current_time, current_time_prim), List(symbol_cut, cut_prim), List(symbol_dir, dir_prim), List(symbol_display, display_prim), List(symbol_current_environment, current_environment_prim), List(symbol_eq_q, eq_q_prim), List(symbol_equal_q, equal_q_prim), List(symbol_error, error_prim), List(symbol_eval, eval_prim), List(symbol_eval_ast, eval_ast_prim), List(symbol_exit, exit_prim), List(symbol_for_each, for_each_prim), List(symbol_format, format_prim), List(symbol_get, get_prim), List(symbol_get_stack_trace, get_stack_trace_prim), List(symbol_import, import_prim), List(symbol_integer_to_char, integer_to_char_prim), List(symbol_length, length_prim), List(symbol_List, list_prim), List(symbol_list_to_vector, list_to_vector_prim), List(symbol_list_to_string, list_to_string_prim), List(symbol_list_ref, list_ref_prim), List(symbol_load, load_prim), List(symbol_make_set, make_set_prim), List(symbol_make_vector, make_vector_prim), List(symbol_Map, map_prim), List(symbol_member, member_prim), List(symbol_memq, memq_prim), List(symbol_memv, memv_prim), List(symbol_newline, newline_prim), List(symbol_not, not_prim), List(symbol_null_q, null_q_prim), List(symbol_number_to_string, number_to_string_prim), List(symbol_number_q, number_q_prim), List(symbol_pair_q, pair_q_prim), List(symbol_parse, parse_prim), List(symbol_parse_string, parse_string_prim), List(symbol_print, print_prim), List(symbol_printf, printf_primitive), List(symbol_Range, range_prim), List(symbol_read_string, read_string_prim), List(symbol_require, require_prim), List(symbol_reverse, reverse_prim), List(symbol_set_car_b, set_car_b_prim), List(symbol_set_cdr_b, set_cdr_b_prim), List(symbol_snoc, snoc_prim), List(symbol_rac, rac_prim), List(symbol_rdc, rdc_prim), List(symbol_sqrt, sqrt_prim), List(symbol_odd_q, odd_q_prim), List(symbol_even_q, even_q_prim), List(symbol_quotient, quotient_prim), List(symbol_remainder, remainder_prim), List(symbol_string, string_prim), List(symbol_string_length, string_length_prim), List(symbol_string_ref, string_ref_prim), List(symbol_string_q, string_q_prim), List(symbol_string_to_number, string_to_number_prim), List(symbol_string_is__q, string_is__q_prim), List(symbol_substring, substring_prim), List(symbol_symbol_q, symbol_q_prim), List(symbol_unparse, unparse_prim), List(symbol_unparse_procedure, unparse_procedure_prim), List(symbol_using, using_primitive), List(symbol_vector, vector_prim), List(symbol_vector_ref, vector_ref_prim), List(symbol_vector_set_b, vector_set_b_prim), List(symbol_void, void_prim), List(symbol_zero_q, zero_q_prim), List(symbol_current_directory, current_directory_prim), List(symbol_cd, current_directory_prim), List(symbol_round, round_prim))
     return make_initial_env_extended(Map(car, primitives), Map(cadr, primitives))
 
 def make_initial_env_extended(names, procs):
     return make_initial_environment(names, procs)
 
 def make_external_proc(external_function_object):
-    return make_proc(proc_101, external_function_object)
+    return make_proc(proc_105, external_function_object)
 
 def pattern_q(x):
     return (null_q(x)) or (number_q(x)) or (boolean_q(x)) or (symbol_q(x)) or ((pair_q(x)) and (pattern_q(car(x))) and (pattern_q(cdr(x))))
@@ -6487,13 +6605,13 @@ def make_sub(*args):
 def apply_sub_hat():
     temp_1 = symbol_undefined
     temp_1 = cdr(s_reg)
-    if eq_q(car(temp_1), symbol_empty):
+    if (car(temp_1)) is (symbol_empty):
         globals()['value2_reg'] = avar_reg
         globals()['value1_reg'] = var_reg
         globals()['k_reg'] = k2_reg
         globals()['pc'] = apply_cont2
     else:
-        if eq_q(car(temp_1), symbol_unit):
+        if (car(temp_1)) is (symbol_unit):
             new_var = symbol_undefined
             new_pattern = symbol_undefined
             new_apattern = symbol_undefined
@@ -6511,7 +6629,7 @@ def apply_sub_hat():
                 globals()['k_reg'] = k2_reg
                 globals()['pc'] = apply_cont2
         else:
-            if eq_q(car(temp_1), symbol_composite):
+            if (car(temp_1)) is (symbol_composite):
                 s1 = symbol_undefined
                 s2 = symbol_undefined
                 s2 = list_ref(temp_1, 2)
@@ -6646,40 +6764,47 @@ eq_q_prim = make_proc(proc_65)
 memq_prim = make_proc(proc_66)
 member_prim = make_proc(proc_67)
 range_prim = make_proc(proc_68)
-set_car_b_prim = make_proc(proc_69)
-set_cdr_b_prim = make_proc(proc_70)
-import_prim = make_proc(proc_71)
-get_stack_trace_prim = make_proc(proc_72)
-get_prim = make_proc(proc_73)
-callslashcc_prim = make_proc(proc_75)
-abort_prim = make_proc(proc_76)
-require_prim = make_proc(proc_77)
-cut_prim = make_proc(proc_78)
-reverse_prim = make_proc(proc_79)
-append_prim = make_proc(proc_80)
-string_to_number_prim = make_proc(proc_81)
-string_is__q_prim = make_proc(proc_82)
-list_to_vector_prim = make_proc(proc_83)
-list_to_string_prim = make_proc(proc_84)
-dir_prim = make_proc(proc_85)
-current_time_prim = make_proc(proc_86)
-map_prim = make_proc(proc_87)
-for_each_prim = make_proc(proc_88)
-current_environment_prim = make_proc(proc_89)
-using_primitive = make_proc(proc_90)
-not_prim = make_proc(proc_91)
-printf_primitive = make_proc(proc_92)
-vector_prim = make_proc(proc_93)
-vector_set_b_prim = make_proc(proc_94)
-vector_ref_prim = make_proc(proc_95)
-make_vector_prim = make_proc(proc_96)
-error_prim = make_proc(proc_97)
-list_ref_prim = make_proc(proc_98)
-current_directory_prim = make_proc(proc_99)
-round_prim = make_proc(proc_100)
+snoc_prim = make_proc(proc_69)
+rac_prim = make_proc(proc_70)
+rdc_prim = make_proc(proc_71)
+set_car_b_prim = make_proc(proc_72)
+set_cdr_b_prim = make_proc(proc_73)
+import_prim = make_proc(proc_74)
+get_stack_trace_prim = make_proc(proc_75)
+get_prim = make_proc(proc_76)
+callslashcc_prim = make_proc(proc_78)
+abort_prim = make_proc(proc_79)
+require_prim = make_proc(proc_80)
+cut_prim = make_proc(proc_81)
+reverse_prim = make_proc(proc_82)
+append_prim = make_proc(proc_83)
+string_to_number_prim = make_proc(proc_84)
+string_is__q_prim = make_proc(proc_85)
+list_to_vector_prim = make_proc(proc_86)
+list_to_string_prim = make_proc(proc_87)
+dir_prim = make_proc(proc_88)
+current_time_prim = make_proc(proc_89)
+map_prim = make_proc(proc_90)
+for_each_prim = make_proc(proc_91)
+format_prim = make_proc(proc_92)
+current_environment_prim = make_proc(proc_93)
+using_primitive = make_proc(proc_94)
+not_prim = make_proc(proc_95)
+printf_primitive = make_proc(proc_96)
+vector_prim = make_proc(proc_97)
+vector_set_b_prim = make_proc(proc_98)
+vector_ref_prim = make_proc(proc_99)
+make_vector_prim = make_proc(proc_100)
+error_prim = make_proc(proc_101)
+list_ref_prim = make_proc(proc_102)
+current_directory_prim = make_proc(proc_103)
+round_prim = make_proc(proc_104)
 toplevel_env = make_toplevel_env()
 def run(setup, *args):
     args = List(*args)
     Apply(setup, args)
     return trampoline()
 
+
+if __name__ == '__main__':
+    start_rm()

@@ -80,3 +80,11 @@
   (syntax-rules ()
     [(_ proc args ...) (proc args ...)]))
 
+(define-syntax while
+  (syntax-rules ()
+    [(_ test body ...) (letrec ((loop (lambda () 
+					(if test 
+					    (begin body ... (loop))
+					    #f))))
+			 (loop))]))
+

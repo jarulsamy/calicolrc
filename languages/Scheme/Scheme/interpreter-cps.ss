@@ -1396,6 +1396,18 @@
        (runtime-error "range called on non-numeric argument(s)" info handler fail))
       (else (k2 (apply range args) fail)))))
 
+(define snoc-prim
+  (lambda-proc (args env2 info handler fail k2)
+     (k2 (apply snoc args) fail)))
+
+(define rac-prim
+  (lambda-proc (args env2 info handler fail k2)
+     (k2 (apply rac args) fail)))
+
+(define rdc-prim
+  (lambda-proc (args env2 info handler fail k2)
+     (k2 (apply rdc args) fail)))
+
 (define-native range
   (lambda args
     (letrec
@@ -1752,6 +1764,14 @@
 	      (lambda-cont2 (v1 fail)
 		(for-each-primitive proc (map cdr arg-list) env handler fail k)))))))))
 
+;; format
+(define format-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((< (length args) 1)
+       (runtime-error "incorrect number of arguments to format" info handler fail))
+      (else (k2 (apply format args) fail)))))
+
 ;; env
 (define current-environment-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -1887,6 +1907,7 @@
 	    (list 'eval-ast eval-ast-prim)
 	    (list 'exit exit-prim)
 	    (list 'for-each for-each-prim)
+	    (list 'format format-prim)
 	    (list 'get get-prim)
 	    (list 'get-stack-trace get-stack-trace-prim)
 	    (list 'import import-prim)
@@ -1919,6 +1940,9 @@
 	    (list 'reverse reverse-prim)
 	    (list 'set-car! set-car!-prim)
 	    (list 'set-cdr! set-cdr!-prim)
+	    (list 'snoc snoc-prim)
+	    (list 'rac rac-prim)
+	    (list 'rdc rdc-prim)
 	    (list 'sqrt sqrt-prim)
 	    (list 'odd? odd?-prim)
 	    (list 'even? even?-prim)

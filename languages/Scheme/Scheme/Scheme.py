@@ -5,18 +5,20 @@
 
 from __future__ import print_function
 import fractions
+import math
 import time
+import sys
 import os
 
 ## Global symbols:
 
-class Symbol:
+class Symbol(object):
     def __init__(self, name):
         self.name = name
         self.hash = hash(name)
 
     def __repr__(self):
-        return "'%s" % self.name
+        return "%s" % self.name
 
     def __eq__(self, other):
         return isinstance(other, Symbol) and self.hash == other.hash
@@ -43,7 +45,7 @@ void_value = make_symbol("<void>")
 
 ### Lists:
 
-class cons:
+class cons(object):
     # build a cons cell
     def __init__(self, car, cdr):
         self.car = car
@@ -114,9 +116,6 @@ def Map(f, lyst):
     # FIXME: rewrite without reverse
     return reverse(retval)
 
-def sort(lyst):
-    return List(*sorted(lyst))
-
 def for_each(f, lyst):
     current = lyst
     while isinstance(current, cons):
@@ -124,6 +123,9 @@ def for_each(f, lyst):
         current = current.cdr
     if current != symbol_emptylist:
         raise Exception("not a proper list")
+
+def sort(f, lyst):
+    return List(*sorted(lyst))
 
 def append(*objs):
     retval = objs[-1]
@@ -159,6 +161,9 @@ def caddr(lyst):
 
 def cadar(lyst):
     return lyst.car.cdr.car
+
+def cdddr(lyst):
+    return lyst.cdr.cdr.cdr
 
 def cadddr(lyst):
     return lyst.cdr.cdr.cdr.car
@@ -231,6 +236,12 @@ def make_handler2(*args):
 
 ### Questions:
 
+def even_q(n):
+    return n % 2 == 0
+
+def odd_q(n):
+    return n % 2 == 1
+
 def eq_q(o1, o2):
     return o1 is o2
 
@@ -266,7 +277,7 @@ def null_q(item):
     return item is symbol_emptylist
 
 def boolean_q(item):
-    return item in [True, False]
+    return isinstance(item, bool)
 
 def true_q(item):
     if item is False:
@@ -308,6 +319,9 @@ class Fraction(fractions.Fraction):
         return "%s/%s" % (self.numerator, self.denominator)
     def __str__(self):
         return "%s/%s" % (self.numerator, self.denominator)
+
+def sqrt(number):
+    return math.sqrt(number)
 
 def plus(a, b):
     return a + b
@@ -442,6 +456,9 @@ def tagged_list_hat(keyword, op, length):
 
 ### Misc:
 
+def error(function, formatting, *args):
+    sys.stderr.write(format(formatting, *args))
+
 def display(item):
     print(item, end="")
 
@@ -452,21 +469,65 @@ def newline():
     print()
 
 def trampoline():
+    start = time.clock()
     while pc:
         pc()
+        #if end_of_session_q(final_reg):
+        #    break
+        #elif exception_q(final_reg):
+        #    break
+    print(time.clock() - start)
     return final_reg
 
 def box(item):
     return List(item)
 
 def raw_read_line(prompt):
-    return raw_input(prompt)
+    try:
+        return raw_input(prompt)
+    except EOFError:
+        return ""
 
-def format(formatting, *args):
-    return "format(%s, %s)" % (formatting, args)
+def format(formatting, *lyst):
+    args = list_to_vector(lyst)
+    retval = ""
+    i = 0
+    count = 0
+    while i < len(formatting):
+        if formatting[i] == '\\':
+            i += 1
+            retval += formatting[i]
+        elif formatting[i] == "~":
+            if formatting[i+1] == 's':
+                i += 1
+                retval += repr(args[count])
+                count += 1
+            elif formatting[i+1] == 'a':
+                i += 1
+                retval += str(args[count])
+                count += 1
+            elif formatting[i+1] == '%':
+                i += 1
+                retval += "\n"
+            else:
+                retval += formatting[i] # unknown ~X
+        else:
+            retval += formatting[i]
+        i += 1
+    return retval
 
 def safe_print(item):
-    print(item)
+    if procedure_q(item):
+        print(car(item))
+    elif environment_q(item):
+        print("<environment>")
+    elif boolean_q(item):
+        if item:
+            print("#t")
+        else:
+            print("#f")
+    else:
+        print(item)
 
 def search_frame(frame, variable):
     if isinstance(frame, cons):
@@ -497,6 +558,9 @@ def dlr_env_contains(item):
 def dlr_proc_q(item):
     return False
 
+def Range(*args):
+    return List(*range(*args))
+
 # dlr_apply
 # dlr_env_contains
 # dlr_env_lookup
@@ -513,7 +577,6 @@ def dlr_proc_q(item):
 # callback1
 # callback2
 # equal_q
-# even_q
 # for_each
 # get_external_member
 # get_external_members
@@ -526,7 +589,6 @@ def dlr_proc_q(item):
 # modulo
 # newline
 # next_item
-# odd_q
 # printf
 # printf_prim
 # quotient
@@ -537,7 +599,6 @@ def dlr_proc_q(item):
 # set_global_value_b
 # slash
 # sort
-# sqrt
 # _star
 # to_
 # using_prim

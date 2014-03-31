@@ -2943,6 +2943,21 @@
 (define+
   <proc-69>
   (lambda (args env2 info handler fail k2 fields)
+    (let () (apply-cont2 k2 (apply snoc args) fail))))
+
+(define+
+  <proc-70>
+  (lambda (args env2 info handler fail k2 fields)
+    (let () (apply-cont2 k2 (apply rac args) fail))))
+
+(define+
+  <proc-71>
+  (lambda (args env2 info handler fail k2 fields)
+    (let () (apply-cont2 k2 (apply rdc args) fail))))
+
+(define+
+  <proc-72>
+  (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
         ((not (length-two? args))
@@ -2960,7 +2975,7 @@
         (else (apply-cont2 k2 (apply set-car! args) fail))))))
 
 (define+
-  <proc-70>
+  <proc-73>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -2979,7 +2994,7 @@
         (else (apply-cont2 k2 (apply set-cdr! args) fail))))))
 
 (define+
-  <proc-71>
+  <proc-74>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (let ((filename (car args)))
@@ -2990,22 +3005,22 @@
                 (make-cont2 <cont2-86> filename handler k2))))))))
 
 (define+
-  <proc-72>
+  <proc-75>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (car *stack-trace*) fail))))
 
 (define+
-  <proc-73>
+  <proc-76>
   (lambda (args env2 info handler fail k2 fields)
     (let () (get-primitive args env2 info handler fail k2))))
 
 (define+
-  <proc-74>
+  <proc-77>
   (lambda (args env2 info handler fail k2 fields)
     (let ((k (car fields))) (apply-cont2 k (car args) fail))))
 
 (define+
-  <proc-75>
+  <proc-78>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (if (not (length-one? args))
@@ -3021,14 +3036,14 @@
                   info
                   handler
                   fail)
-                (let ((fake-k (make-proc <proc-74> k2)))
+                (let ((fake-k (make-proc <proc-77> k2)))
                   (if (dlr-proc? proc)
                       (apply-cont2 k2 (dlr-apply proc (list fake-k)) fail)
                       (apply-proc proc (list fake-k) env2 info handler fail
                         k2)))))))))
 
 (define+
-  <proc-76>
+  <proc-79>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (if (null? args)
@@ -3036,7 +3051,7 @@
           (apply-cont2 REP-k (car args) fail)))))
 
 (define+
-  <proc-77>
+  <proc-80>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3050,7 +3065,7 @@
         (else (apply-fail fail))))))
 
 (define+
-  <proc-78>
+  <proc-81>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (if (not (null? args))
@@ -3062,7 +3077,7 @@
           (apply-cont2 k2 'ok REP-fail)))))
 
 (define+
-  <proc-79>
+  <proc-82>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3083,12 +3098,12 @@
         (else (apply-cont2 k2 (apply reverse args) fail))))))
 
 (define+
-  <proc-80>
+  <proc-83>
   (lambda (args env2 info handler fail k2 fields)
     (let () (append-all args info handler fail k2))))
 
 (define+
-  <proc-81>
+  <proc-84>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3101,7 +3116,7 @@
         (else (apply-cont2 k2 (apply string->number args) fail))))))
 
 (define+
-  <proc-82>
+  <proc-85>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3114,7 +3129,7 @@
         (else (apply-cont2 k2 (apply string=? args) fail))))))
 
 (define+
-  <proc-83>
+  <proc-86>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3135,7 +3150,7 @@
         (else (apply-cont2 k2 (apply list->vector args) fail))))))
 
 (define+
-  <proc-84>
+  <proc-87>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3164,43 +3179,56 @@
         (else (apply-cont2 k2 (apply list->string args) fail))))))
 
 (define+
-  <proc-85>
+  <proc-88>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (make-set (directory args env2) env2 info handler fail
         k2))))
 
 (define+
-  <proc-86>
+  <proc-89>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (get-current-time) fail))))
 
 (define+
-  <proc-87>
+  <proc-90>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (map-primitive (car args) (cdr args) env2 handler fail
         k2))))
 
 (define+
-  <proc-88>
+  <proc-91>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (for-each-primitive (car args) (cdr args) env2 handler fail
         k2))))
 
 (define+
-  <proc-89>
+  <proc-92>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((< (length args) 1)
+         (runtime-error
+           "incorrect number of arguments to format"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply format args) fail))))))
+
+(define+
+  <proc-93>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 env2 fail))))
 
 (define+
-  <proc-90>
+  <proc-94>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (using-prim args env2) fail))))
 
 (define+
-  <proc-91>
+  <proc-95>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3213,19 +3241,19 @@
         (else (apply-cont2 k2 (not (car args)) fail))))))
 
 (define+
-  <proc-92>
+  <proc-96>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (apply printf-prim args)
       (apply-cont2 k2 void-value fail))))
 
 (define+
-  <proc-93>
+  <proc-97>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (apply vector_native args) fail))))
 
 (define+
-  <proc-94>
+  <proc-98>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (apply-cont2
@@ -3234,17 +3262,17 @@
         fail))))
 
 (define+
-  <proc-95>
+  <proc-99>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (apply vector-ref args) fail))))
 
 (define+
-  <proc-96>
+  <proc-100>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (apply make-vector args) fail))))
 
 (define+
-  <proc-97>
+  <proc-101>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3262,7 +3290,7 @@
            (runtime-error message info handler fail)))))))
 
 (define+
-  <proc-98>
+  <proc-102>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3275,7 +3303,7 @@
         (else (apply-cont2 k2 (apply list-ref args) fail))))))
 
 (define+
-  <proc-99>
+  <proc-103>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3296,7 +3324,7 @@
            fail))))))
 
 (define+
-  <proc-100>
+  <proc-104>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3310,7 +3338,7 @@
            fail))))))
 
 (define+
-  <proc-101>
+  <proc-105>
   (lambda (args env2 info handler fail k2 fields)
     (let ((external-function-object (car fields)))
       (apply-cont2
@@ -3749,19 +3777,40 @@
 
 (define rac
   (lambda (ls)
-    (cond ((null? (cdr ls)) (car ls)) (else (rac (cdr ls))))))
+    (if (null? (cdr ls))
+        (car ls)
+        (let ((current (cdr ls)))
+          (while (pair? (cdr current)) (set! current (cdr current)))
+          (car current)))))
 
 (define rdc
   (lambda (ls)
-    (cond
-      ((null? (cdr ls)) '())
-      (else (cons (car ls) (rdc (cdr ls)))))))
+    (if (null? (cdr ls))
+        (list)
+        (let* ((retval (list (car ls)))
+               (front retval)
+               (current (cdr ls)))
+          (while
+            (pair? (cdr current))
+            (set-cdr! retval (list (car current)))
+            (set! retval (cdr retval))
+            (set! current (cdr current)))
+          front))))
 
 (define snoc
   (lambda (x ls)
-    (cond
-      ((null? ls) (list x))
-      (else (cons (car ls) (snoc x (cdr ls)))))))
+    (if (null? ls)
+        (list x)
+        (let* ((retval (list (car ls)))
+               (front retval)
+               (current (cdr ls)))
+          (while
+            (pair? current)
+            (set-cdr! retval (list (car current)))
+            (set! retval (cdr retval))
+            (set! current (cdr current)))
+          (set-cdr! retval (list x))
+          front))))
 
 (define char-delimiter?
   (lambda (c)
@@ -5853,7 +5902,8 @@
                        (list 'error error-prim) (list 'eval eval-prim)
                        (list 'eval-ast eval-ast-prim)
                        (list 'exit exit-prim)
-                       (list 'for-each for-each-prim) (list 'get get-prim)
+                       (list 'for-each for-each-prim)
+                       (list 'format format-prim) (list 'get get-prim)
                        (list 'get-stack-trace get-stack-trace-prim)
                        (list 'import import-prim)
                        (list 'integer->char integer->char-prim)
@@ -5880,8 +5930,9 @@
                        (list 'reverse reverse-prim)
                        (list 'set-car! set-car!-prim)
                        (list 'set-cdr! set-cdr!-prim)
-                       (list 'sqrt sqrt-prim) (list 'odd? odd?-prim)
-                       (list 'even? even?-prim)
+                       (list 'snoc snoc-prim) (list 'rac rac-prim)
+                       (list 'rdc rdc-prim) (list 'sqrt sqrt-prim)
+                       (list 'odd? odd?-prim) (list 'even? even?-prim)
                        (list 'quotient quotient-prim)
                        (list 'remainder remainder-prim)
                        (list 'string string-prim)
@@ -5912,7 +5963,7 @@
 
 (define make-external-proc
   (lambda (external-function-object)
-    (make-proc <proc-101> external-function-object)))
+    (make-proc <proc-105> external-function-object)))
 
 (define pattern?
   (lambda (x)
@@ -6399,6 +6450,12 @@
 
 (define range-prim (make-proc <proc-68>))
 
+(define snoc-prim (make-proc <proc-69>))
+
+(define rac-prim (make-proc <proc-70>))
+
+(define rdc-prim (make-proc <proc-71>))
+
 (define-native
   range
   (lambda args
@@ -6411,71 +6468,73 @@
         ((null? (cddr args)) (range (car args) (cadr args) 1 '()))
         (else (range (car args) (cadr args) (caddr args) '()))))))
 
-(define set-car!-prim (make-proc <proc-69>))
+(define set-car!-prim (make-proc <proc-72>))
 
-(define set-cdr!-prim (make-proc <proc-70>))
+(define set-cdr!-prim (make-proc <proc-73>))
 
-(define import-prim (make-proc <proc-71>))
+(define import-prim (make-proc <proc-74>))
 
-(define get-stack-trace-prim (make-proc <proc-72>))
+(define get-stack-trace-prim (make-proc <proc-75>))
 
-(define get-prim (make-proc <proc-73>))
+(define get-prim (make-proc <proc-76>))
 
-(define call/cc-prim (make-proc <proc-75>))
+(define call/cc-prim (make-proc <proc-78>))
 
-(define abort-prim (make-proc <proc-76>))
+(define abort-prim (make-proc <proc-79>))
 
-(define require-prim (make-proc <proc-77>))
+(define require-prim (make-proc <proc-80>))
 
-(define cut-prim (make-proc <proc-78>))
+(define cut-prim (make-proc <proc-81>))
 
-(define reverse-prim (make-proc <proc-79>))
+(define reverse-prim (make-proc <proc-82>))
 
-(define append-prim (make-proc <proc-80>))
+(define append-prim (make-proc <proc-83>))
 
-(define string->number-prim (make-proc <proc-81>))
+(define string->number-prim (make-proc <proc-84>))
 
-(define string=?-prim (make-proc <proc-82>))
+(define string=?-prim (make-proc <proc-85>))
 
-(define list-to-vector-prim (make-proc <proc-83>))
+(define list-to-vector-prim (make-proc <proc-86>))
 
-(define list->string-prim (make-proc <proc-84>))
+(define list->string-prim (make-proc <proc-87>))
 
-(define dir-prim (make-proc <proc-85>))
+(define dir-prim (make-proc <proc-88>))
 
-(define current-time-prim (make-proc <proc-86>))
+(define current-time-prim (make-proc <proc-89>))
 
-(define map-prim (make-proc <proc-87>))
+(define map-prim (make-proc <proc-90>))
 
-(define for-each-prim (make-proc <proc-88>))
+(define for-each-prim (make-proc <proc-91>))
 
-(define current-environment-prim (make-proc <proc-89>))
+(define format-prim (make-proc <proc-92>))
 
-(define using-primitive (make-proc <proc-90>))
+(define current-environment-prim (make-proc <proc-93>))
 
-(define not-prim (make-proc <proc-91>))
+(define using-primitive (make-proc <proc-94>))
 
-(define printf-primitive (make-proc <proc-92>))
+(define not-prim (make-proc <proc-95>))
 
-(define vector-prim (make-proc <proc-93>))
+(define printf-primitive (make-proc <proc-96>))
+
+(define vector-prim (make-proc <proc-97>))
 
 (define-native
   vector_native
   (lambda args (apply vector args)))
 
-(define vector-set!-prim (make-proc <proc-94>))
+(define vector-set!-prim (make-proc <proc-98>))
 
-(define vector-ref-prim (make-proc <proc-95>))
+(define vector-ref-prim (make-proc <proc-99>))
 
-(define make-vector-prim (make-proc <proc-96>))
+(define make-vector-prim (make-proc <proc-100>))
 
-(define error-prim (make-proc <proc-97>))
+(define error-prim (make-proc <proc-101>))
 
-(define list-ref-prim (make-proc <proc-98>))
+(define list-ref-prim (make-proc <proc-102>))
 
-(define current-directory-prim (make-proc <proc-99>))
+(define current-directory-prim (make-proc <proc-103>))
 
-(define round-prim (make-proc <proc-100>))
+(define round-prim (make-proc <proc-104>))
 
 (define toplevel-env (make-toplevel-env))
 

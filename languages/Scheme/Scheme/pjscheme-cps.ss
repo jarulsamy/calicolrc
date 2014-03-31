@@ -226,21 +226,45 @@
 
 (define rac
   (lambda (ls)
-    (cond
-     ((null? (cdr ls)) (car ls))
-     (else (rac (cdr ls))))))
+      (if (null? (cdr ls))
+	  (car ls)
+	  (let ((current (cdr ls)))
+	    (while (pair? (cdr current))
+	       (set! current (cdr current)))
+	    (car current)))))
 
 (define rdc
   (lambda (ls)
-    (cond
-     ((null? (cdr ls)) '())
-     (else (cons (car ls) (rdc (cdr ls)))))))
+      (if (null? (cdr ls))
+	  (list)
+	  (let* ((retval (list (car ls)))
+		 (front retval)
+		 (current (cdr ls)))
+	    (while (pair? (cdr current))
+	       (set-cdr! retval (list (car current)))
+	       (set! retval (cdr retval))
+	       (set! current (cdr current)))
+	    front))))
 
 (define snoc
   (lambda (x ls)
-    (cond
-      ((null? ls) (list x))
-      (else (cons (car ls) (snoc x (cdr ls)))))))
+      (if (null? ls)
+	  (list x)
+	  (let* ((retval (list (car ls)))
+		 (front retval)
+		 (current (cdr ls)))
+	    (while (pair? current)
+	       (set-cdr! retval (list (car current)))
+	       (set! retval (cdr retval))
+	       (set! current (cdr current)))
+	    (set-cdr! retval (list x))
+	    front))))
+
+;; (define snoc
+;;   (lambda (x ls)
+;;     (cond
+;;       ((null? ls) (list x))
+;;       (else (cons (car ls) (snoc x (cdr ls)))))))
 
 ;;------------------------------------------------------------------------
 ;; character categories
@@ -3980,6 +4004,18 @@
        (runtime-error "range called on non-numeric argument(s)" info handler fail))
       (else (k2 (apply range args) fail)))))
 
+(define snoc-prim
+  (lambda-proc (args env2 info handler fail k2)
+     (k2 (apply snoc args) fail)))
+
+(define rac-prim
+  (lambda-proc (args env2 info handler fail k2)
+     (k2 (apply rac args) fail)))
+
+(define rdc-prim
+  (lambda-proc (args env2 info handler fail k2)
+     (k2 (apply rdc args) fail)))
+
 (define-native range
   (lambda args
     (letrec
@@ -4336,6 +4372,14 @@
 	      (lambda-cont2 (v1 fail)
 		(for-each-primitive proc (map cdr arg-list) env handler fail k)))))))))
 
+;; format
+(define format-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((< (length args) 1)
+       (runtime-error "incorrect number of arguments to format" info handler fail))
+      (else (k2 (apply format args) fail)))))
+
 ;; env
 (define current-environment-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -4471,6 +4515,7 @@
 	    (list 'eval-ast eval-ast-prim)
 	    (list 'exit exit-prim)
 	    (list 'for-each for-each-prim)
+	    (list 'format format-prim)
 	    (list 'get get-prim)
 	    (list 'get-stack-trace get-stack-trace-prim)
 	    (list 'import import-prim)
@@ -4503,6 +4548,9 @@
 	    (list 'reverse reverse-prim)
 	    (list 'set-car! set-car!-prim)
 	    (list 'set-cdr! set-cdr!-prim)
+	    (list 'snoc snoc-prim)
+	    (list 'rac rac-prim)
+	    (list 'rdc rdc-prim)
 	    (list 'sqrt sqrt-prim)
 	    (list 'odd? odd?-prim)
 	    (list 'even? even?-prim)
