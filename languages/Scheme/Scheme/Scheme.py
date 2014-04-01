@@ -6,12 +6,33 @@
 from __future__ import print_function
 import fractions
 import operator
+import types
 import math
 import time
 import sys
 import os
 
+#############################################################
+# Python implementation notes:
+#
+# Each symbol is a singleton for easy comparison reasons:
+# Symbol("x") is Symbol("x")
+#
+# Python's list is used as Scheme's vector.
+#
+# The List() class is used for Scheme's con-cell based lists.
+#
+# Lists implement iter, so you can use Python's iter tools
+# (such as [x for x in List(1, 2, 3)])
+#
+# A couple of functions are O(2n) because they have a 
+# reverse. Should be fixed to be O(n).
+#############################################################
+
 ## Global symbols:
+
+# Set to a dictionary-like object for global-shared namespace:
+DLR_ENV = globals()
 
 class Symbol(object):
     def __init__(self, name):
@@ -45,9 +66,9 @@ def make_symbol(string):
 void_value = make_symbol("<void>")
 
 def make_initial_env_extended(names, procs):
-    return make_initial_environment(
-        cons(make_symbol("void"), names), 
-        cons(None, procs))
+    ## If you wish to extend the environment to 
+    ## include native values, do so here:
+    return make_initial_environment(names, procs)
 
 ### Lists:
 
@@ -358,6 +379,15 @@ class Fraction(fractions.Fraction):
     def __str__(self):
         return "%s/%s" % (self.numerator, self.denominator)
 
+def modulo(a, b):
+    return a % b
+
+def quotient(a, b):
+    return int(a / b)
+
+def remainder(a, b):
+    return a % b
+
 def sqrt(number):
     return math.sqrt(number)
 
@@ -374,6 +404,9 @@ def minus(*args):
 
 def multiply(*args):
     return reduce(operator.mul, args, 1)
+
+def divide(*args):
+    return args[0] / args[1]
 
 def Equal(a, b):
     return a == b
@@ -400,6 +433,12 @@ def memq(item, lyst):
     return False
 
 ### Converters:
+
+def char_to_integer(c):
+    return ord(c)
+
+def integer_to_char(i):
+    return chr(i)
 
 def number_to_string(number):
     return str(number)
@@ -506,21 +545,19 @@ def error(function, formatting, *args):
 def display(item):
     print(item, end="")
 
-def printf_prim(formatting, *items):
+def printf(formatting, *items):
     print(format(formatting, *items), end="")
 
 def newline():
     print()
 
 def trampoline():
-    start = time.clock()
     while pc:
         pc()
         #if end_of_session_q(final_reg):
         #    break
         #elif exception_q(final_reg):
         #    break
-    print(time.clock() - start)
     return final_reg
 
 def box(item):
@@ -562,7 +599,7 @@ def format(formatting, *lyst):
 
 def safe_print(item):
     if procedure_q(item):
-        print(car(item))
+        print("<procedure>")
     elif environment_q(item):
         print("<environment>")
     elif boolean_q(item):
@@ -596,59 +633,110 @@ def file_exists_q(path):
 def get_current_time():
     return time.time()
 
-def dlr_env_contains(item):
-    return False
-
-def dlr_proc_q(item):
-    return False
+def current_directory():
+    return os.getcwd()
 
 def Range(*args):
     return List(*range(*args))
 
-# dlr_apply
-# dlr_env_contains
-# dlr_env_lookup
-# dlr_func
-# dlr_object_contains
-# dlr_proc_q
+def assv(x, ls):
+    while isinstance(ls, cons):
+        if x is caar(ls):
+            return ls.car
+        ls = ls.cdr
+    return False
 
-# _
-# apply_star
-# assv
-# char_to_integer
-# current_directory
+def memv(x, ls):
+    current = ls
+    while isinstance(current, cons):
+        if (item1 == current.car):
+            return current
+        current = current.cdr
+    return False
+
+def make_vector(size):
+    return [0] * size
+
+def vector_native(ls):
+    return List(ls)
+
+def vector_set_b(vec, pos, value):
+    vec[pos] = value
+
+### External env interface:
+
+def using_prim(libraries, environment):
+    retval = symbol_emptylist
+    for library in libraries:
+        lib = __import__(library)
+        sym = make_symbol(library)
+        set_global_value_b(sym, lib)
+        retval = cons(sym, retval)
+    return reverse(retval)
+
+def dlr_proc_q(item):
+    return isinstance(item, (types.BuiltinFunctionType, types.FunctionType))
+
+def dlr_env_contains(item):
+    return item.name in DLR_ENV
+
+def set_global_value_b(variable, value):
+    DLR_ENV[variable.name] = value
+
+def dlr_env_lookup(variable):
+    return DLR_ENV[variable.name]
+
+def dlr_object_contains(obj, components):
+    # components: (math sqrt)
+    retval = obj
+    for component in cdr(components):
+        if hasattr(retval, component.name):
+            retval = getattr(obj, component.name)
+        else:
+            return False
+    return True
+
+def get_external_member(obj, components):
+    # components: (math sqrt)
+    retval = obj
+    for component in cdr(components):
+        if hasattr(retval, component.name):
+            retval = getattr(obj, component.name)
+        else:
+            return void_value
+    return retval
+
+def dlr_apply(f, args):
+    return f(*args)
+
+def dlr_func(schemeProc):
+    def f(*args):
+        globals()["proc_reg"] = schemeProc
+        globals()["args_reg"] = List(*args)
+        globals()["handler_reg"] = REP_handler
+        globals()["k2_reg"] = REP_k
+        globals()["pc"] = apply_proc
+        return trampoline()
+    return f
+
+def set_global_docstring_b(variable, docstring):
+    pass
+
+def get_external_members(obj):
+    return List(*[make_symbol(x) for x in  dir(obj)])
+
+#########################################
+# Calico External functions not used here
+#########################################
+# apply_star # external apply
 # callback0
 # callback1
 # callback2
-# equal_q
-# for_each
-# get_external_member
-# get_external_members
-# get_type
 # handle_debug_info
 # highlight_expression
-# integer_to_char
-# make_vector
-# memv
-# modulo
-# newline
 # next_item
-# printf
-# printf_prim
-# quotient
-# read_content
-# remainder
 # set_external_member_b
-# set_global_docstring_b
-# set_global_value_b
-# slash
-# sort
-# _star
-# to_
-# using_prim
-# vector_length
-# vector_native
-# vector_set_b
+#########################################
 
 # end of Scheme.py
 #############################################################

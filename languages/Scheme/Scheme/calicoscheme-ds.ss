@@ -3244,7 +3244,7 @@
   <proc-96>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
-      (apply printf-prim args)
+      (apply printf args)
       (apply-cont2 k2 void-value fail))))
 
 (define+
@@ -6229,8 +6229,6 @@
 (define-native set-global-value! (lambda (var x) #f))
 
 (define-native set-global-docstring! (lambda (var x) #f))
-
-(define-native printf-prim printf)
 
 (define-native using-prim (lambda ignore #f))
 

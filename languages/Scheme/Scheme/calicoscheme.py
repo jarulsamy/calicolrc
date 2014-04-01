@@ -14,12 +14,33 @@
 from __future__ import print_function
 import fractions
 import operator
+import types
 import math
 import time
 import sys
 import os
 
+#############################################################
+# Python implementation notes:
+#
+# Each symbol is a singleton for easy comparison reasons:
+# Symbol("x") is Symbol("x")
+#
+# Python's list is used as Scheme's vector.
+#
+# The List() class is used for Scheme's con-cell based lists.
+#
+# Lists implement iter, so you can use Python's iter tools
+# (such as [x for x in List(1, 2, 3)])
+#
+# A couple of functions are O(2n) because they have a 
+# reverse. Should be fixed to be O(n).
+#############################################################
+
 ## Global symbols:
+
+# Set to a dictionary-like object for global-shared namespace:
+DLR_ENV = globals()
 
 class Symbol(object):
     def __init__(self, name):
@@ -53,9 +74,9 @@ def make_symbol(string):
 void_value = make_symbol("<void>")
 
 def make_initial_env_extended(names, procs):
-    return make_initial_environment(
-        cons(make_symbol("void"), names), 
-        cons(None, procs))
+    ## If you wish to extend the environment to 
+    ## include native values, do so here:
+    return make_initial_environment(names, procs)
 
 ### Lists:
 
@@ -366,6 +387,15 @@ class Fraction(fractions.Fraction):
     def __str__(self):
         return "%s/%s" % (self.numerator, self.denominator)
 
+def modulo(a, b):
+    return a % b
+
+def quotient(a, b):
+    return int(a / b)
+
+def remainder(a, b):
+    return a % b
+
 def sqrt(number):
     return math.sqrt(number)
 
@@ -382,6 +412,9 @@ def minus(*args):
 
 def multiply(*args):
     return reduce(operator.mul, args, 1)
+
+def divide(*args):
+    return args[0] / args[1]
 
 def Equal(a, b):
     return a == b
@@ -408,6 +441,12 @@ def memq(item, lyst):
     return False
 
 ### Converters:
+
+def char_to_integer(c):
+    return ord(c)
+
+def integer_to_char(i):
+    return chr(i)
 
 def number_to_string(number):
     return str(number)
@@ -514,21 +553,19 @@ def error(function, formatting, *args):
 def display(item):
     print(item, end="")
 
-def printf_prim(formatting, *items):
+def printf(formatting, *items):
     print(format(formatting, *items), end="")
 
 def newline():
     print()
 
 def trampoline():
-    start = time.clock()
     while pc:
         pc()
         #if end_of_session_q(final_reg):
         #    break
         #elif exception_q(final_reg):
         #    break
-    print(time.clock() - start)
     return final_reg
 
 def box(item):
@@ -570,7 +607,7 @@ def format(formatting, *lyst):
 
 def safe_print(item):
     if procedure_q(item):
-        print(car(item))
+        print("<procedure>")
     elif environment_q(item):
         print("<environment>")
     elif boolean_q(item):
@@ -604,59 +641,110 @@ def file_exists_q(path):
 def get_current_time():
     return time.time()
 
-def dlr_env_contains(item):
-    return False
-
-def dlr_proc_q(item):
-    return False
+def current_directory():
+    return os.getcwd()
 
 def Range(*args):
     return List(*range(*args))
 
-# dlr_apply
-# dlr_env_contains
-# dlr_env_lookup
-# dlr_func
-# dlr_object_contains
-# dlr_proc_q
+def assv(x, ls):
+    while isinstance(ls, cons):
+        if x is caar(ls):
+            return ls.car
+        ls = ls.cdr
+    return False
 
-# _
-# apply_star
-# assv
-# char_to_integer
-# current_directory
+def memv(x, ls):
+    current = ls
+    while isinstance(current, cons):
+        if (item1 == current.car):
+            return current
+        current = current.cdr
+    return False
+
+def make_vector(size):
+    return [0] * size
+
+def vector_native(ls):
+    return List(ls)
+
+def vector_set_b(vec, pos, value):
+    vec[pos] = value
+
+### External env interface:
+
+def using_prim(libraries, environment):
+    retval = symbol_emptylist
+    for library in libraries:
+        lib = __import__(library)
+        sym = make_symbol(library)
+        set_global_value_b(sym, lib)
+        retval = cons(sym, retval)
+    return reverse(retval)
+
+def dlr_proc_q(item):
+    return isinstance(item, (types.BuiltinFunctionType, types.FunctionType))
+
+def dlr_env_contains(item):
+    return item.name in DLR_ENV
+
+def set_global_value_b(variable, value):
+    DLR_ENV[variable.name] = value
+
+def dlr_env_lookup(variable):
+    return DLR_ENV[variable.name]
+
+def dlr_object_contains(obj, components):
+    # components: (math sqrt)
+    retval = obj
+    for component in cdr(components):
+        if hasattr(retval, component.name):
+            retval = getattr(obj, component.name)
+        else:
+            return False
+    return True
+
+def get_external_member(obj, components):
+    # components: (math sqrt)
+    retval = obj
+    for component in cdr(components):
+        if hasattr(retval, component.name):
+            retval = getattr(obj, component.name)
+        else:
+            return void_value
+    return retval
+
+def dlr_apply(f, args):
+    return f(*args)
+
+def dlr_func(schemeProc):
+    def f(*args):
+        globals()["proc_reg"] = schemeProc
+        globals()["args_reg"] = List(*args)
+        globals()["handler_reg"] = REP_handler
+        globals()["k2_reg"] = REP_k
+        globals()["pc"] = apply_proc
+        return trampoline()
+    return f
+
+def set_global_docstring_b(variable, docstring):
+    pass
+
+def get_external_members(obj):
+    return List(*[make_symbol(x) for x in  dir(obj)])
+
+#########################################
+# Calico External functions not used here
+#########################################
+# apply_star # external apply
 # callback0
 # callback1
 # callback2
-# equal_q
-# for_each
-# get_external_member
-# get_external_members
-# get_type
 # handle_debug_info
 # highlight_expression
-# integer_to_char
-# make_vector
-# memv
-# modulo
-# newline
 # next_item
-# printf
-# printf_prim
-# quotient
-# read_content
-# remainder
 # set_external_member_b
-# set_global_docstring_b
-# set_global_value_b
-# slash
-# sort
-# _star
-# to_
-# using_prim
-# vector_length
-# vector_native
-# vector_set_b
+#########################################
 
 # end of Scheme.py
 #############################################################
@@ -816,7 +904,7 @@ symbol_Map = make_symbol("map")
 symbol_multiply = make_symbol("*")
 symbol_plus = make_symbol("+")
 symbol_minus = make_symbol("-")
-symbol_slash = make_symbol("/")
+symbol_divide = make_symbol("/")
 symbol_p = make_symbol("%")
 symbol_LessThan = make_symbol("<")
 symbol_LessThanEqual = make_symbol("<=")
@@ -829,7 +917,7 @@ symbol_boolean_q = make_symbol("boolean?")
 symbol_caddr = make_symbol("caddr")
 symbol_cadr = make_symbol("cadr")
 symbol_call_with_current_continuation = make_symbol("call-with-current-continuation")
-symbol_callslashcc = make_symbol("call/cc")
+symbol_call_cc = make_symbol("call/cc")
 symbol_char_q = make_symbol("char?")
 symbol_char_is__q = make_symbol("char=?")
 symbol_char_whitespace_q = make_symbol("char-whitespace?")
@@ -3103,7 +3191,7 @@ def b_proc_56_d():
                 globals()['pc'] = runtime_error
             else:
                 globals()['value2_reg'] = fail_reg
-                globals()['value1_reg'] = Apply(slash, args_reg)
+                globals()['value1_reg'] = Apply(divide, args_reg)
                 globals()['k_reg'] = k2_reg
                 globals()['pc'] = apply_cont2
 
@@ -3528,7 +3616,7 @@ def b_proc_95_d():
         globals()['pc'] = apply_cont2
 
 def b_proc_96_d():
-    Apply(printf_prim, args_reg)
+    Apply(printf, args_reg)
     globals()['value2_reg'] = fail_reg
     globals()['value1_reg'] = void_value
     globals()['k_reg'] = k2_reg
@@ -6511,7 +6599,7 @@ def for_each_primitive():
 
 def make_toplevel_env():
     primitives = symbol_undefined
-    primitives = List(List(symbol_multiply, times_prim), List(symbol_plus, plus_prim), List(symbol_minus, minus_prim), List(symbol_slash, divide_prim), List(symbol_p, modulo_prim), List(symbol_LessThan, lt_prim), List(symbol_LessThanEqual, lt_or_eq_prim), List(symbol_Equal, equal_sign_prim), List(symbol_GreaterThan, gt_prim), List(symbol_GreaterThanEqual, gt_or_eq_prim), List(symbol_abort, abort_prim), List(symbol_abs, abs_prim), List(symbol_append, append_prim), List(symbol_Apply, apply_prim), List(symbol_assv, assv_prim), List(symbol_boolean_q, boolean_q_prim), List(symbol_caddr, caddr_prim), List(symbol_cadr, cadr_prim), List(symbol_call_with_current_continuation, callslashcc_prim), List(symbol_callslashcc, callslashcc_prim), List(symbol_car, car_prim), List(symbol_cdr, cdr_prim), List(symbol_char_q, char_q_prim), List(symbol_char_is__q, char_is__q_prim), List(symbol_char_whitespace_q, char_whitespace_q_prim), List(symbol_char_alphabetic_q, char_alphabetic_q_prim), List(symbol_char_numeric_q, char_numeric_q_prim), List(symbol_char_to_integer, char_to_integer_prim), List(symbol_cons, cons_prim), List(symbol_current_time, current_time_prim), List(symbol_cut, cut_prim), List(symbol_dir, dir_prim), List(symbol_display, display_prim), List(symbol_current_environment, current_environment_prim), List(symbol_eq_q, eq_q_prim), List(symbol_equal_q, equal_q_prim), List(symbol_error, error_prim), List(symbol_eval, eval_prim), List(symbol_eval_ast, eval_ast_prim), List(symbol_exit, exit_prim), List(symbol_for_each, for_each_prim), List(symbol_format, format_prim), List(symbol_get, get_prim), List(symbol_get_stack_trace, get_stack_trace_prim), List(symbol_import, import_prim), List(symbol_integer_to_char, integer_to_char_prim), List(symbol_length, length_prim), List(symbol_List, list_prim), List(symbol_list_to_vector, list_to_vector_prim), List(symbol_list_to_string, list_to_string_prim), List(symbol_list_ref, list_ref_prim), List(symbol_load, load_prim), List(symbol_make_set, make_set_prim), List(symbol_make_vector, make_vector_prim), List(symbol_Map, map_prim), List(symbol_member, member_prim), List(symbol_memq, memq_prim), List(symbol_memv, memv_prim), List(symbol_newline, newline_prim), List(symbol_not, not_prim), List(symbol_null_q, null_q_prim), List(symbol_number_to_string, number_to_string_prim), List(symbol_number_q, number_q_prim), List(symbol_pair_q, pair_q_prim), List(symbol_parse, parse_prim), List(symbol_parse_string, parse_string_prim), List(symbol_print, print_prim), List(symbol_printf, printf_primitive), List(symbol_Range, range_prim), List(symbol_read_string, read_string_prim), List(symbol_require, require_prim), List(symbol_reverse, reverse_prim), List(symbol_set_car_b, set_car_b_prim), List(symbol_set_cdr_b, set_cdr_b_prim), List(symbol_snoc, snoc_prim), List(symbol_rac, rac_prim), List(symbol_rdc, rdc_prim), List(symbol_sqrt, sqrt_prim), List(symbol_odd_q, odd_q_prim), List(symbol_even_q, even_q_prim), List(symbol_quotient, quotient_prim), List(symbol_remainder, remainder_prim), List(symbol_string, string_prim), List(symbol_string_length, string_length_prim), List(symbol_string_ref, string_ref_prim), List(symbol_string_q, string_q_prim), List(symbol_string_to_number, string_to_number_prim), List(symbol_string_is__q, string_is__q_prim), List(symbol_substring, substring_prim), List(symbol_symbol_q, symbol_q_prim), List(symbol_unparse, unparse_prim), List(symbol_unparse_procedure, unparse_procedure_prim), List(symbol_using, using_primitive), List(symbol_vector, vector_prim), List(symbol_vector_ref, vector_ref_prim), List(symbol_vector_set_b, vector_set_b_prim), List(symbol_void, void_prim), List(symbol_zero_q, zero_q_prim), List(symbol_current_directory, current_directory_prim), List(symbol_cd, current_directory_prim), List(symbol_round, round_prim))
+    primitives = List(List(symbol_multiply, times_prim), List(symbol_plus, plus_prim), List(symbol_minus, minus_prim), List(symbol_divide, divide_prim), List(symbol_p, modulo_prim), List(symbol_LessThan, lt_prim), List(symbol_LessThanEqual, lt_or_eq_prim), List(symbol_Equal, equal_sign_prim), List(symbol_GreaterThan, gt_prim), List(symbol_GreaterThanEqual, gt_or_eq_prim), List(symbol_abort, abort_prim), List(symbol_abs, abs_prim), List(symbol_append, append_prim), List(symbol_Apply, apply_prim), List(symbol_assv, assv_prim), List(symbol_boolean_q, boolean_q_prim), List(symbol_caddr, caddr_prim), List(symbol_cadr, cadr_prim), List(symbol_call_with_current_continuation, call_cc_prim), List(symbol_call_cc, call_cc_prim), List(symbol_car, car_prim), List(symbol_cdr, cdr_prim), List(symbol_char_q, char_q_prim), List(symbol_char_is__q, char_is__q_prim), List(symbol_char_whitespace_q, char_whitespace_q_prim), List(symbol_char_alphabetic_q, char_alphabetic_q_prim), List(symbol_char_numeric_q, char_numeric_q_prim), List(symbol_char_to_integer, char_to_integer_prim), List(symbol_cons, cons_prim), List(symbol_current_time, current_time_prim), List(symbol_cut, cut_prim), List(symbol_dir, dir_prim), List(symbol_display, display_prim), List(symbol_current_environment, current_environment_prim), List(symbol_eq_q, eq_q_prim), List(symbol_equal_q, equal_q_prim), List(symbol_error, error_prim), List(symbol_eval, eval_prim), List(symbol_eval_ast, eval_ast_prim), List(symbol_exit, exit_prim), List(symbol_for_each, for_each_prim), List(symbol_format, format_prim), List(symbol_get, get_prim), List(symbol_get_stack_trace, get_stack_trace_prim), List(symbol_import, import_prim), List(symbol_integer_to_char, integer_to_char_prim), List(symbol_length, length_prim), List(symbol_List, list_prim), List(symbol_list_to_vector, list_to_vector_prim), List(symbol_list_to_string, list_to_string_prim), List(symbol_list_ref, list_ref_prim), List(symbol_load, load_prim), List(symbol_make_set, make_set_prim), List(symbol_make_vector, make_vector_prim), List(symbol_Map, map_prim), List(symbol_member, member_prim), List(symbol_memq, memq_prim), List(symbol_memv, memv_prim), List(symbol_newline, newline_prim), List(symbol_not, not_prim), List(symbol_null_q, null_q_prim), List(symbol_number_to_string, number_to_string_prim), List(symbol_number_q, number_q_prim), List(symbol_pair_q, pair_q_prim), List(symbol_parse, parse_prim), List(symbol_parse_string, parse_string_prim), List(symbol_print, print_prim), List(symbol_printf, printf_primitive), List(symbol_Range, range_prim), List(symbol_read_string, read_string_prim), List(symbol_require, require_prim), List(symbol_reverse, reverse_prim), List(symbol_set_car_b, set_car_b_prim), List(symbol_set_cdr_b, set_cdr_b_prim), List(symbol_snoc, snoc_prim), List(symbol_rac, rac_prim), List(symbol_rdc, rdc_prim), List(symbol_sqrt, sqrt_prim), List(symbol_odd_q, odd_q_prim), List(symbol_even_q, even_q_prim), List(symbol_quotient, quotient_prim), List(symbol_remainder, remainder_prim), List(symbol_string, string_prim), List(symbol_string_length, string_length_prim), List(symbol_string_ref, string_ref_prim), List(symbol_string_q, string_q_prim), List(symbol_string_to_number, string_to_number_prim), List(symbol_string_is__q, string_is__q_prim), List(symbol_substring, substring_prim), List(symbol_symbol_q, symbol_q_prim), List(symbol_unparse, unparse_prim), List(symbol_unparse_procedure, unparse_procedure_prim), List(symbol_using, using_primitive), List(symbol_vector, vector_prim), List(symbol_vector_ref, vector_ref_prim), List(symbol_vector_set_b, vector_set_b_prim), List(symbol_void, void_prim), List(symbol_zero_q, zero_q_prim), List(symbol_current_directory, current_directory_prim), List(symbol_cd, current_directory_prim), List(symbol_round, round_prim))
     return make_initial_env_extended(Map(car, primitives), Map(cadr, primitives))
 
 def make_external_proc(external_function_object):
@@ -6777,7 +6865,7 @@ set_cdr_b_prim = make_proc(b_proc_73_d)
 import_prim = make_proc(b_proc_74_d)
 get_stack_trace_prim = make_proc(b_proc_75_d)
 get_prim = make_proc(b_proc_76_d)
-callslashcc_prim = make_proc(b_proc_78_d)
+call_cc_prim = make_proc(b_proc_78_d)
 abort_prim = make_proc(b_proc_79_d)
 require_prim = make_proc(b_proc_80_d)
 cut_prim = make_proc(b_proc_81_d)
@@ -6812,4 +6900,7 @@ def run(setup, *args):
 
 
 if __name__ == '__main__':
+    print('Calico Scheme, version 3.0.0')
+    print('----------------------------')
+    print('Use (exit) to exit')
     start_rm()

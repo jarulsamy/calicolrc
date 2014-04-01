@@ -61,7 +61,6 @@
 (define-native dlr-lookup-components (lambda (x y) #f))
 (define-native set-global-value! (lambda (var x) #f))
 (define-native set-global-docstring! (lambda (var x) #f))
-(define-native printf-prim printf)
 (define-native using-prim (lambda ignore #f))
 (define-native iterator? (lambda ignore #f))
 (define-native get_type (lambda (x) 'unknown))
@@ -1732,10 +1731,10 @@
        (runtime-error "incorrect number of arguments to not" info handler fail))
       (else (k2 (not (car args)) fail)))))
 
-;; printf (not defined in scheme)
+;; printf 
 (define printf-primitive
   (lambda-proc (args env2 info handler fail k2)
-    (apply printf-prim args)
+    (apply printf args)
     (k2 void-value fail)))
 
 ;; vector

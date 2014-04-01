@@ -82,6 +82,8 @@ class Translator(object):
             return "minus"
         elif name == "*":
             return "multiply"
+        elif name == "/":
+            return "divide"
         elif name == "+":
             return "plus"
         elif name.startswith('"'):
@@ -91,7 +93,7 @@ class Translator(object):
         elif name.startswith("<") and name.endswith(">"):
             name = "b_" + name[1:-1] + "_d"
         for pattern in [("->", "_to_"), (">", "to_"), ("<", "LessThan"), ("*", "_star"),
-                        ("=", "_is_"), ("-", "_"), ("?", "_q"), ("!", "_b"), ("/", "slash"),
+                        ("=", "_is_"), ("-", "_"), ("?", "_q"), ("!", "_b"), ("/", "_"),
                         (".", "dot"), ("+", "plus"), ("%" "percent"), ("^", "_hat")]:
             name = name.replace(pattern[0], pattern[1])
         return name
@@ -405,7 +407,10 @@ class PythonTranslator(Translator):
             self.process_statement(statement, [], 0)
         self.Print(0, "")
         self.Print(0, "if __name__ == '__main__':")
-        self.Print(0, "    start_rm()")
+        self.Print(4, "print('Calico Scheme, version 3.0.0')")
+        self.Print(4, "print('----------------------------')")
+        self.Print(4, "print('Use (exit) to exit')")
+        self.Print(4, "start_rm()")
 
 class CSharpTranslator(Translator):
     def preamble(self):

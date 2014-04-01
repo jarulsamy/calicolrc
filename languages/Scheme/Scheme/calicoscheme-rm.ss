@@ -3370,7 +3370,7 @@
 
 (define <proc-96>
   (lambda ()
-    (apply printf-prim args_reg)
+    (apply printf args_reg)
     (set! value2_reg fail_reg)
     (set! value1_reg void-value)
     (set! k_reg k2_reg)
@@ -7490,8 +7490,6 @@
 (define-native set-global-value! (lambda (var x) #f))
 
 (define-native set-global-docstring! (lambda (var x) #f))
-
-(define-native printf-prim printf)
 
 (define-native using-prim (lambda ignore #f))
 

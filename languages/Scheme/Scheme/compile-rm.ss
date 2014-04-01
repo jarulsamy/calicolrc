@@ -1,5 +1,5 @@
 (load "rm-transformer.ss")
-(delete-file "pjscheme-rm.ss")
+(delete-file "calicoscheme-rm.ss")
 (compile-level-output)
-(rm-transform-file "pjscheme-ds.ss" "pjscheme-rm.ss")
+(rm-transform-file "calicoscheme-ds.ss" "calicoscheme-rm.ss")
 (exit)
