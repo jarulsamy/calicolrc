@@ -2663,7 +2663,7 @@
 (define-native dlr-lookup-components (lambda (x y) #f))
 (define-native set-global-value! (lambda (var x) #f))
 (define-native set-global-docstring! (lambda (var x) #f))
-(define-native using-prim (lambda ignore #f))
+(define-native using (lambda ignore #f))
 (define-native iterator? (lambda ignore #f))
 (define-native get_type (lambda (x) 'unknown))
 
@@ -4321,9 +4321,9 @@
     (k2 env2 fail)))
 
 ;; using (not defined in scheme)
-(define using-primitive
+(define using-prim
   (lambda-proc (args env2 info handler fail k2)
-    (k2 (using-prim args env2) fail)))
+    (k2 (using args env2) fail)))
 
 ;; not
 (define not-prim
@@ -4334,7 +4334,7 @@
       (else (k2 (not (car args)) fail)))))
 
 ;; printf 
-(define printf-primitive
+(define printf-prim
   (lambda-proc (args env2 info handler fail k2)
     (apply printf args)
     (k2 void-value fail)))
@@ -4476,7 +4476,7 @@
 	    (list 'parse parse-prim)
 	    (list 'parse-string parse-string-prim)
 	    (list 'print print-prim)
-	    (list 'printf printf-primitive)
+	    (list 'printf printf-prim)
 	    (list 'range range-prim)
 	    (list 'read-string read-string-prim)
 	    (list 'require require-prim)
@@ -4501,7 +4501,7 @@
 	    (list 'symbol? symbol?-prim)
 	    (list 'unparse unparse-prim)    ;; unparse should be in CPS
 	    (list 'unparse-procedure unparse-procedure-prim)  ;; unparse should be in CPS
-	    (list 'using using-primitive)
+	    (list 'using using-prim)
 	    (list 'vector vector-prim)
 	    (list 'vector-ref vector-ref-prim)
 	    (list 'vector-set! vector-set!-prim)

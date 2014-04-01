@@ -3352,7 +3352,7 @@
 (define <proc-94>
   (lambda ()
     (set! value2_reg fail_reg)
-    (set! value1_reg (using-prim args_reg env2_reg))
+    (set! value1_reg (using args_reg env2_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
@@ -7087,7 +7087,7 @@
          (list 'number? number?-prim) (list 'pair? pair?-prim)
          (list 'parse parse-prim)
          (list 'parse-string parse-string-prim)
-         (list 'print print-prim) (list 'printf printf-primitive)
+         (list 'print print-prim) (list 'printf printf-prim)
          (list 'range range-prim)
          (list 'read-string read-string-prim)
          (list 'require require-prim) (list 'reverse reverse-prim)
@@ -7105,7 +7105,7 @@
          (list 'substring substring-prim)
          (list 'symbol? symbol?-prim) (list 'unparse unparse-prim)
          (list 'unparse-procedure unparse-procedure-prim)
-         (list 'using using-primitive) (list 'vector vector-prim)
+         (list 'using using-prim) (list 'vector vector-prim)
          (list 'vector-ref vector-ref-prim)
          (list 'vector-set! vector-set!-prim) (list 'void void-prim)
          (list 'zero? zero?-prim)
@@ -7491,7 +7491,7 @@
 
 (define-native set-global-docstring! (lambda (var x) #f))
 
-(define-native using-prim (lambda ignore #f))
+(define-native using (lambda ignore #f))
 
 (define-native iterator? (lambda ignore #f))
 
@@ -7770,11 +7770,11 @@
 
 (define current-environment-prim (make-proc <proc-93>))
 
-(define using-primitive (make-proc <proc-94>))
+(define using-prim (make-proc <proc-94>))
 
 (define not-prim (make-proc <proc-95>))
 
-(define printf-primitive (make-proc <proc-96>))
+(define printf-prim (make-proc <proc-96>))
 
 (define vector-prim (make-proc <proc-97>))
 

@@ -665,7 +665,7 @@ def vector_set_b(vec, pos, value):
 
 ### External env interface:
 
-def using_prim(libraries, environment):
+def using(libraries, environment):
     retval = symbol_emptylist
     for library in libraries:
         lib = __import__(library)
