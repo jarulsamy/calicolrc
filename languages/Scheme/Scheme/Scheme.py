@@ -211,6 +211,9 @@ def list_ref(lyst, pos):
         pos = pos - 1
     return current.car
 
+def vector_length(vec):
+    return len(vec)
+
 ### Native make- functions:
 
 def make_proc(*args):
@@ -319,12 +322,10 @@ def true_q(item):
 
 def list_q(item):
     ## return proper_list?
-    if isinstance(item, cons):
-        current = item
-        while isinstance(current, cons):
-            current = current.cdr
-        return current is symbol_emptylist
-    return False
+    current = item
+    while isinstance(current, cons):
+        current = current.cdr
+    return current is symbol_emptylist
 
 def procedure_q(item):
     return pair_q(item) and (car(item) is symbol_procedure)
@@ -339,10 +340,15 @@ def pair_q(item):
     return isinstance(item, cons)
 
 def iterator_q(item):
-    return not list_q(item)
+    return False
+    # FIXME:
+    #return not list_q(item)
 
 def get_iterator(generator):
     return iter(generator)
+
+def get_type(obj):
+    return type(obj)
 
 ### Math and applications:
 
@@ -495,6 +501,7 @@ def tagged_list_hat(keyword, op, length):
 
 def error(function, formatting, *args):
     sys.stderr.write(format(formatting, *args))
+    raise Exception(format(formatting, *args))
 
 def display(item):
     print(item, end="")
