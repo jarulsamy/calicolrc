@@ -1,9 +1,18 @@
 from __future__ import division, print_function
 
 class Translator(object):
-    def __init__(self):
+    def __init__(self, flags=None):
         self.program = []
-        self.symbols = ["()"]
+        self.symbols = self.get_initial_symbols()
+        self.options = {}
+        ## --noprimitives
+        if flags:
+            for flag in flags:
+                if flag.startswith("--"):
+                    self.options[flag[2:]] = True
+
+    def get_initial_symbols(self):
+        return ["()"]
 
     def Print(self, indent, *args, **kwargs):
         kwargs["file"] = self.fp
@@ -401,6 +410,8 @@ class PythonTranslator(Translator):
         self.fp = open(filename, "w")
         self.preamble()
         for symbol in self.symbols:
+            if self.options.get("noprimitives", False) and symbol.endswith("-prim"):
+                continue
             self.Print(0, "%s = make_symbol(\"%s\")" % (self.make_symbol_name(symbol), symbol))
         self.Print(0, "")
         for statement in self.program:
@@ -596,12 +607,12 @@ public class PJScheme:Scheme
                 args = ", ".join(map(self.fix_name, expr[2][1]))
             else:
                 args = "params object [] %s" % self.fix_name(expr[2][1]) # var args
-                convert_args = "%s = vList(%s);" % (self.fix_name(expr[2][1]), 
+                convert_args = "%s = sList(%s);" % (self.fix_name(expr[2][1]), 
                                                    self.fix_name(expr[2][1]))
         if ", dot, " in args:
             args = args.replace(", dot, ", ", params object [] ") # var args on end
             var_arg = args.rsplit("[] ", 1)[1]
-            convert_args = "%s = vList(%s);" % (var_arg, var_arg)
+            convert_args = "%s = sList(%s);" % (var_arg, var_arg)
         self.Print(indent, "new public static %s %s(%s) {" % (return_type, function_name, self.make_arg_types(args)))
         if convert_args:
             self.Print(indent + 4, convert_args)
@@ -717,6 +728,11 @@ public class PJScheme:Scheme
             self.Print(indent, "}")
 
     def process_statement(self, expr, locals, indent):
+        if (self.options.get("noprimitives", False) and 
+            isinstance(expr, list) and len(expr) > 1 and 
+            isinstance(expr[1], str) and 
+            (expr[1].endswith("-prim") or expr[1] == "make-toplevel-env")):
+            return
         if self.function_q(expr):
             # handles all define/*/+ functions
             if not self.get_define_name(expr) in self.to_ignore():
@@ -751,11 +767,19 @@ public class PJScheme:Scheme
         self.fp = open(filename, "w")
         self.preamble()
         for symbol in self.symbols:
+            if self.options.get("noprimitives", False) and symbol.endswith("-prim"):
+                continue
             self.Print(indent + 4, "public static object %s = make_symbol(\"%s\");" % (self.make_symbol_name(symbol), symbol))
         self.Print(indent + 4, "")
         for statement in self.program:
             self.process_statement(statement, [], indent + 4)
-        self.Print(indent + 4, "")
+        if self.options.get("noprimitives", False):
+            self.Print(indent + 4, "new public static object make_toplevel_env() {")
+            self.Print(indent + 8, "object variables = symbol_emptylist;")
+            self.Print(indent + 8, "object values = symbol_emptylist;")
+            self.Print(indent + 8, "return make_initial_env_extended(variables, values);")
+            self.Print(indent + 4, "}")
+            self.Print(indent + 4, "")
         self.Print(indent + 4, "public static void Main() {")
         self.Print(indent + 8, "start_rm();")
         self.Print(indent + 4, "}")
@@ -772,7 +796,7 @@ public class PJScheme:Scheme
 
     def fix_name(self, name):
         if (name == "list"):
-            return "vList";
+            return "sList";
         elif (name == "string"):
             return "string_";
         elif (name == "operator"):
@@ -783,8 +807,12 @@ public class PJScheme:Scheme
             return "char_";
         elif (name == "eq?"):
             return "Eq";
+        elif (name == "using"):
+            return "using_";
         elif (name == "equal?"):
             return "Equal";
+        elif name == "map":
+            return "map"
         else:
             return super(CSharpTranslator, self).fix_name(name)
 
@@ -798,12 +826,16 @@ public class PJScheme:Scheme
         else:
             return super(CSharpTranslator, self).replace_char(name)
 
+    def get_initial_symbols(self):
+        return ["()", "<extension>", "method", "field", "constructor", 
+                "property", "done", "module"]
+
 if __name__ == "__main__":
     ## infile outfile
     import sys
     if sys.argv[2].rsplit(".")[1] == "cs":
-        pt = CSharpTranslator()
+        translator = CSharpTranslator(sys.argv)
     elif sys.argv[2].rsplit(".")[1] == "py":
-        pt = PythonTranslator()
-    pt.parse_file(sys.argv[1])
-    pt.translate(sys.argv[2])
+        translator = PythonTranslator(sys.argv)
+    translator.parse_file(sys.argv[1])
+    translator.translate(sys.argv[2])

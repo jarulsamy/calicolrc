@@ -13,8 +13,8 @@ calicoscheme.py: calicoscheme-rm.ss translate_rm.py Scheme.py
 #Scheme.dll: Scheme.cs Makefile
 #	$(MCS) -debug Scheme.cs -target:library -lib:../../../bin -r:Microsoft.Scripting -r:IronPython.dll -r:Microsoft.Dynamic -r:Microsoft.VisualBasic.dll -r:Microsoft.Scripting.Core -out:Scheme.dll
 
-calicoscheme.cs: calicoscheme-ds.ss
-	python translate_rm.py "calicoscheme-rm.ss" "calicoscheme.cs"
+calicoscheme.cs: calicoscheme-ds.ss translate_rm.py
+	python translate_rm.py "calicoscheme-rm.ss" "calicoscheme.cs" --noprimitives
 
 calicoscheme-ds.ss: reader-cps.ss environments-cps.ss parser-cps.ss \
 		interpreter-cps.ss unifier-cps.ss ds-transformer.ss
