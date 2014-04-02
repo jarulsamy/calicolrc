@@ -32,7 +32,7 @@ import os
 ## Global symbols:
 
 # Set to a dictionary-like object for global-shared namespace:
-DLR_ENV = globals()
+DLR_ENV = {key:getattr(__builtins__, key) for key in dir(__builtins__)}
 
 class Symbol(object):
     def __init__(self, name):
@@ -675,7 +675,7 @@ def using(libraries, environment):
     return reverse(retval)
 
 def dlr_proc_q(item):
-    return isinstance(item, (types.BuiltinFunctionType, types.FunctionType))
+    return callable(item)
 
 def dlr_env_contains(item):
     return item.name in DLR_ENV
