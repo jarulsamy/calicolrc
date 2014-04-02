@@ -184,6 +184,13 @@ public class Scheme {
     public delegate object Procedure10(object a0, object a1, object a2, object a3, object a4, object a5, object a6, object a7, object a8, object a9);
 
     public delegate object ProcedureN(params object [] args);
+    public delegate void Procedure1NVoid(object a0, params object [] args);
+
+    public static object make_sList(object [] args) {
+	return null;
+    }
+
+    public static Function pc_halt_signal = (Function) null;
 
     public static object sList(params object [] args) {
 	// make Scheme cons based list from multiple args
@@ -195,6 +202,10 @@ public class Scheme {
 	    i++;
 	}
 	return retval;
+    }
+
+    public static object box(object item) {
+	return sList(item);
     }
 
   public static object symbol(object symbol) {
@@ -367,9 +378,9 @@ public class Scheme {
   public static Proc EqualSign_proc = new Proc("=", (Procedure1Bool) EqualSign, -1, 2);
   public static Proc Equal_proc = new Proc("equal?", (Procedure1Bool) Equal, -1, 2);
   public static Proc Eqv_proc = new Proc("eqv?", (Procedure1Bool) Eqv, -1, 2);
-  public static Proc GreaterOrEqual_proc = new Proc(">=", (Procedure1Bool) GreaterThanOrEqual, -1, 2);
   public static Proc GreaterThan_proc = new Proc(">", (Procedure1Bool) GreaterThan, -1, 2);
-  public static Proc LessThan_is__proc = new Proc("<=", (Procedure1Bool) LessThanOrEqual, -1, 2);
+  public static Proc GreaterThanEqual_proc = new Proc(">=", (Procedure1Bool) GreaterThanEqual, -1, 2);
+  public static Proc LessThanEqual_proc = new Proc("<=", (Procedure1Bool) LessThanOrEqual, -1, 2);
   public static Proc LessThan_proc = new Proc("<", (Procedure1Bool) LessThan, -1, 2);
   public static Proc Multiply_proc = new Proc("*", (Procedure1) Multiply, -1, 1);
   public static Proc Subtract_proc = new Proc("-", (Procedure1) Subtract, -1, 1);
@@ -407,7 +418,7 @@ public class Scheme {
   public static Proc list_to_string_proc = new Proc("list->string", (Procedure1) list_to_string, 1, 1);
   public static Proc list_to_vector_proc = new Proc("list->vector", (Procedure1) list_to_vector, 1, 1);
   public static Proc make_binding_proc = new Proc("make-binding",(Procedure1)PJScheme.make_binding, 1, 1);
-  public static Proc make_external_proc_proc = new Proc("make-external-proc", (Procedure1) make_external_proc, 1, 1);
+  public static Proc make_external_proc_proc = new Proc("make-external-proc", (Procedure1) PJScheme.make_external_proc, 1, 1);
   public static Proc make_vector_proc = new Proc("make-vector", (Procedure1) make_vector, 1, 1);
   public static Proc make_string_proc = new Proc("make-string", (Procedure1) make_string, -1, 1);
   public static Proc memq_proc = new Proc("memq", (Procedure2) memq, 2, 1);
@@ -416,9 +427,9 @@ public class Scheme {
   public static Proc number_q_proc = new Proc("number?", (Procedure1Bool) number_q, 1, 2);
   public static Proc pair_q_proc = new Proc("pair?", (Procedure1Bool) pair_q, 1, 2);
   public static Proc pretty_print_proc = new Proc("pretty-print", (Procedure1Void) pretty_print, -1, 0);
-  public static Proc printf_prim_proc = new Proc("printf",(Procedure1)printf_prim, -1, 1);
+  public static Proc printf_proc = new Proc("printf",(Procedure1NVoid)printf, -1, 1);
   public static Proc quotient_proc = new Proc("quotient", (Procedure2) quotient, 2, 1);
-  public static Proc range_proc = new Proc("range", (Procedure1) range, -1, 1);
+  public static Proc Range_proc = new Proc("range", (Procedure1) range, -1, 1);
   public static Proc remainder_proc = new Proc("modulo", (Procedure2) modulo, 2, 1);
   public static Proc reverse_proc = new Proc("reverse", (Procedure1) reverse, 1, 1);
   public static Proc safe_print_proc = new Proc("safe-print", (Procedure1Void)safe_print, 1, 0);
@@ -439,6 +450,12 @@ public class Scheme {
   public static Proc vector_native_proc = new Proc("vector", (Procedure1) vector_native, -1, 1);
   public static Proc vector_proc = new Proc("vector", (ProcedureN) vector, -1, 1);
   public static Proc vector_ref_proc = new Proc("vector-ref", (Procedure2) vector_ref, 2, 1);
+
+
+  public static Proc snoc_proc = new Proc("snoc", (Procedure2) PJScheme.snoc, 2, 1);
+  public static Proc rac_proc = new Proc("rac", (Procedure1) PJScheme.rac, 1, 1);
+  public static Proc rdc_proc = new Proc("rdc", (Procedure1) PJScheme.rdc, 1, 1);
+
 
   public static object void_b_value_d = make_symbol("<void>");
 
@@ -474,7 +491,6 @@ public class Scheme {
   }
 
   public static Func<object,bool> module_q = tagged_list(PJScheme.symbol_module, (Predicate2)GreaterOrEqual, 1);
-  public static Func<object,bool> environment_q = tagged_list(PJScheme.symbol_environment, (Predicate2)GreaterOrEqual, 1);
 
   public static object get_current_time() {
 	DateTime baseTime = new DateTime(1970, 1, 1, 8, 0, 0);
@@ -572,16 +588,12 @@ public class Scheme {
       }
       /// -------------------
       names = PJScheme.append(names, map(car_proc, primitives));
-      procs = PJScheme.append(procs, map(make_external_proc_proc, map(cadr_proc, primitives)));
+      procs = PJScheme.append(procs, map(PJScheme.make_external_proc_proc, map(cadr_proc, primitives)));
       return PJScheme.make_initial_environment(names, procs);
   }
   
   public static void reset_toplevel_env() {
       PJScheme.initialize_globals();
-  }
-    
-  public static object make_external_proc(object val) {
-      return PJScheme.make_external_proc(val);
   }
     
   public static object debug(object args) {
@@ -783,13 +795,6 @@ public class Scheme {
 	throw new Exception("list-head takes a list and a pos");
   }
 
-  public static object read_line(object prompt) {
-	//return Console.ReadLine();
-	//string s;
-	//s = lineEditor.Edit(prompt.ToString(), "");
-	return "";
-  }
-
   public static bool file_exists_q(object path_filename) {
 	return File.Exists(path_filename.ToString());
   }
@@ -817,6 +822,13 @@ public class Scheme {
 	}
   }
 
+    public static Function ApplyPlus(object what, object args) {
+	// what is "cont", "cont2", "macro"
+	// first arg is id
+	// rest of args are arguments
+	return (Function) null;
+    }
+
     public static object apply(object proc, object args) {
 	if (proc is Proc)
 	    return ((Proc)proc).Call(args);
@@ -835,47 +847,6 @@ public class Scheme {
 	  else
 		throw new Exception(string.Format("invalid procedure: {0}", proc));
   }
-
-  public static void apply_handler () {
-	// will be replaced
-  }
-
-	public static object map_hat (object f_hat, object asexp)
-	{
-		// (lambda (f^ asexp)
-		//   (cond
-		//     ((null?^ asexp) (list atom-tag '() 'none))
-		//     (else (cons^ (f^ (car^ asexp)) (map^ f^ (cdr^ asexp)) 'none)))))
-		if ((bool)PJScheme.null_q_hat(asexp))
-		    return list(PJScheme.atom_tag, PJScheme.symbol_emptylist, PJScheme.symbol_none);
-		else
-			return PJScheme.cons_hat(apply(f_hat, list(PJScheme.car_hat (asexp))),
-			                         map_hat (f_hat, PJScheme.cdr_hat (asexp)),
-			                         PJScheme.symbol_none);
-	}
-	
-	/*
-		object retval = symbol_emptylist;
-		object tail = retval;
-		object current = asexp;
-		while (!(bool)PJScheme.null_q_hat(current)) {
-			object result;
-			if ((bool)PJScheme.list_q_hat (PJScheme.car_hat (current)))
-				result = apply (f_hat, list (PJScheme.car_hat (current)));
-			else
-				result = apply (f_hat, PJScheme.car_hat (current));
-			if ((bool)PJScheme.null_q_hat (tail)) {
-				retval = list (PJScheme.atom_tag, result, symbol ("none")); // start of list
-				tail = retval;
-			} else { // pair
-				set_cdr_b (tail, PJScheme.cons_hat (result, symbol_emptylist, symbol ("none")));
-				tail = PJScheme.cdr_hat (tail);
-			}
-			current = PJScheme.cdr_hat (current);
-		}
-		return retval;
-	}
-	*/
 
   public static object filter(object proc, object args) {
 	object retval = PJScheme.symbol_emptylist;
@@ -952,17 +923,17 @@ public class Scheme {
 	   (symbol?^ (car^ asexp))
 	   (eq?^ (car^ asexp) keyword)))))
 	 */
-	public static Func<object,bool> tagged_list_hat(object test_string, object pred, object value) {
+    public static Func<object,bool> tagged_list_hat(object tag_symbol, object pred, object value) {
 	return (object asexp) => {
-	  return ((bool)pair_q(asexp) &&
-		      ((bool)PJScheme.list_q_hat(asexp)) && 
-		      ((bool)((Predicate2)pred)(PJScheme.length_hat(asexp), value)) &&
-			  ((bool)(PJScheme.symbol_q_hat(PJScheme.car_hat(asexp)))) &&
-			  ((bool)(PJScheme.eq_q_hat(PJScheme.car_hat(asexp), string_to_symbol(test_string))))
-	         );
+	    return ((bool)pair_q(asexp) &&
+		    ((bool)PJScheme.list_q_hat(asexp)) && 
+		    ((bool)((Predicate2)pred)(PJScheme.length_hat(asexp), value)) &&
+		    ((bool)(PJScheme.symbol_q_hat(PJScheme.car_hat(asexp)))) &&
+		    ((bool)(PJScheme.eq_q_hat(PJScheme.car_hat(asexp), tag_symbol)))
+		    );
 		//printf("is this a {0}? ({1} ...) compare {2} => {3}\n", test_string, car(lyst), value, retval);
 	};
-  }
+    }
 	
   public static Func<object,bool> tagged_list(object test_string, object pred, object value) {
 		return (object lyst) => {
@@ -1290,7 +1261,7 @@ public class Scheme {
       foreach (string name in _dlr_runtime.Operations.GetMemberNames(obj)) {
 	  retval = new Cons(name, retval);
       }
-      return sort(make_external_proc(stringLessThan_q_proc), retval);
+      return sort(PJScheme.make_external_proc(stringLessThan_q_proc), retval);
   }
 
     // FIXME: can't get Myro.robot.name after (Myro.init "sim")
@@ -1992,8 +1963,53 @@ public class Scheme {
 	return (LessThan(car(obj), cadr(obj)) || Equal(car(obj), cadr(obj)));
   }
 
-  public static bool GreaterThanOrEqual(object obj) {
+  public static bool GreaterThanEqual(object obj) {
 	return (GreaterThan(car(obj), cadr(obj)) || Equal(car(obj), cadr(obj)));
+  }
+
+  public static bool GreaterThanEqual(object obj1, object obj2) {
+	if (obj1 is Rational) {
+	  if (obj2 is Rational) {
+		return (((Rational)obj1) >= ((Rational)obj2));
+	  } else if (obj2 is int) {
+		return (((Rational)obj1) >= ((int)obj2));
+	  } else if (obj2 is double) {
+		return (((double)((Rational)obj1)) >= ((double)obj2));
+	  }
+	} else if (obj2 is Rational) {
+	  if (obj1 is Rational) {
+		return (((Rational)obj1) >= ((Rational)obj2));
+	  } else if (obj1 is int) {
+		return (((Rational)obj2) >= ((int)obj1));
+	  } else if (obj1 is double) {
+		return (((double)((Rational)obj2)) >= ((double)obj1));
+	  }
+	} else {
+	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
+        try {
+          return (ObjectType.ObjTst(obj1, obj2, false) >= 0);
+        } catch {
+          // continue
+        }
+      }
+      BigInteger? b1 = null;
+      BigInteger? b2 = null;
+      if (obj1 is int) {
+        b1 = makeBigInteger((int) obj1);
+      } else if (obj1 is BigInteger) {
+        b1 = (BigInteger)obj1;
+      } else
+        throw new Exception(string.Format("can't convert {0} to bigint", obj1.GetType()));
+      if (obj2 is int) {
+        b2 = makeBigInteger((int) obj2);
+      } else if (obj2 is BigInteger) {
+        b2 = (BigInteger)obj2;
+      } else
+        throw new Exception(string.Format("can't convert {0} to bigint", obj2.GetType()));
+      return b1 >= b2;
+	}
+	throw new Exception(String.Format("unable to compare {0} and {1}", 
+			obj1.GetType().ToString(), obj2.GetType().ToString()));
   }
 
   public static bool GreaterThan(object args) {
@@ -2643,13 +2659,6 @@ public class Scheme {
 	return result;
   }
 
-  public static object rdc(object lyst) {
-	if (null_q(cdr(lyst)))
-	  return PJScheme.symbol_emptylist;
-	else
-	  return new Cons(car(lyst), rdc(cdr(lyst)));
-  }
-	
   public static void set_cdr_b(object obj) {
 	set_cdr_b(car(obj), cadr(obj));
   }
@@ -2838,7 +2847,7 @@ public class Scheme {
 
   // FIXME: need to cps/registerize this to avoid reliance on C-sharp's stack
   public static object make_safe(object x) {
-    if (procedure_object_q(x))
+    if (PJScheme.procedure_object_q(x))
       return (PJScheme.symbol_b_procedure_d);
     else if (environment_object_q(x))
       return (PJScheme.symbol_b_environment_d);
@@ -2902,10 +2911,6 @@ public class Scheme {
     return ((! pair_q(x)) && (! (null_q(x))));
   }
 
-  public static bool procedure_object_q(object x) {
-    return (procedure_q(x) || (pair_q(x) && Eq(car(x), PJScheme.symbol_procedure)));
-  }
-
   public static bool environment_object_q(object x) {
     return (pair_q(x) && Eq(car(x), PJScheme.symbol_environment));
   }
@@ -2965,21 +2970,6 @@ public class Scheme {
 	string text = fp.ReadToEnd();
     fp.Close();
     return text;
-  }
-
-  //--------------------------------------------------------------------------------------------
-  // support for annotated s-expressions
-
-  public static bool aatom_q(object x) {
-    return (pair_q(x) && Eq(car(x), PJScheme.atom_tag));
-  }
-
-  public static bool apair_q(object x) {
-    return (pair_q(x) && Eq(car(x), PJScheme.pair_tag));
-  }
-
-  public static bool annotated_q(object x) {
-    return (pair_q(x) && (Eq(car(x), PJScheme.atom_tag) || Eq(car(x), PJScheme.pair_tag)));
   }
 
   //--------------------------------------------------------------------------------------------
@@ -3113,7 +3103,7 @@ public class Scheme {
 	  return "#<procedure>";
 	else if (module_q(this)) 
 	  return String.Format("#<module {0}>", this.car);
-	else if (environment_q(this)) 
+	else if (PJScheme.environment_q(this)) 
 	  return String.Format("#<environment>");
 	else if (this.car == PJScheme.symbol_quote &&
 		(this.cdr is Cons) &&

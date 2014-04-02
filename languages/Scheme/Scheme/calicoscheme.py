@@ -1188,7 +1188,7 @@ temp_3 = symbol_undefined
 temp_4 = symbol_undefined
 temp_1 = symbol_undefined
 def apply_cont():
-    return Apply(cadr(k_reg), cddr(k_reg))
+    Apply(cadr(k_reg), cddr(k_reg))
 
 def b_cont_1_d(chars, fail, k):
     globals()['value3_reg'] = fail
@@ -1254,7 +1254,7 @@ def b_cont_10_d(src, start, tokens, handler, fail, k):
 
 def b_cont_11_d():
     globals()['final_reg'] = value_reg
-    globals()['pc'] = False
+    globals()['pc'] = pc_halt_signal
 
 def b_cont_12_d(adatum, senv, info, handler, fail, k):
     formals_list = symbol_undefined
@@ -1594,7 +1594,7 @@ def b_cont_51_d(apair1, apair2, pair1, pair2, k):
         globals()['pc'] = instantiate_hat
 
 def apply_cont2():
-    return Apply(cadr(k_reg), cddr(k_reg))
+    Apply(cadr(k_reg), cddr(k_reg))
 
 def b_cont2_1_d(token, k):
     globals()['value1_reg'] = cons(token, value1_reg)
@@ -1603,7 +1603,7 @@ def b_cont2_1_d(token, k):
 
 def b_cont2_2_d():
     globals()['final_reg'] = value1_reg
-    globals()['pc'] = False
+    globals()['pc'] = pc_halt_signal
 
 def b_cont2_3_d(k):
     globals()['value1_reg'] = binding_value(value1_reg)
@@ -1931,7 +1931,7 @@ def b_cont2_48_d(fail, k):
 def b_cont2_49_d():
     globals()['_starlast_fail_star'] = value2_reg
     globals()['final_reg'] = value1_reg
-    globals()['pc'] = False
+    globals()['pc'] = pc_halt_signal
 
 def b_cont2_50_d():
     globals()['k_reg'] = REP_k
@@ -1943,7 +1943,7 @@ def b_cont2_50_d():
 
 def b_cont2_51_d():
     globals()['final_reg'] = True
-    globals()['pc'] = False
+    globals()['pc'] = pc_halt_signal
 
 def b_cont2_52_d():
     globals()['k_reg'] = make_cont2(b_cont2_51_d)
@@ -2396,7 +2396,7 @@ def b_cont2_103_d(s2, k2):
     globals()['pc'] = instantiate_hat
 
 def apply_cont3():
-    return Apply(cadr(k_reg), cddr(k_reg))
+    Apply(cadr(k_reg), cddr(k_reg))
 
 def b_cont3_1_d(src, handler, k):
     if token_type_q(value1_reg, symbol_end_marker):
@@ -2414,7 +2414,7 @@ def b_cont3_1_d(src, handler, k):
 
 def b_cont3_2_d():
     globals()['final_reg'] = value1_reg
-    globals()['pc'] = False
+    globals()['pc'] = pc_halt_signal
 
 def b_cont3_3_d(k):
     globals()['value1_reg'] = get_external_member(value1_reg, value2_reg)
@@ -2434,7 +2434,7 @@ def b_cont3_4_d(rhs_value, k):
     globals()['pc'] = apply_cont2
 
 def apply_cont4():
-    return Apply(cadr(k_reg), cddr(k_reg))
+    Apply(cadr(k_reg), cddr(k_reg))
 
 def b_cont4_1_d(src, start, k):
     globals()['k_reg'] = make_cont(b_cont_8_d, value2_reg, value3_reg, value4_reg, k)
@@ -2496,7 +2496,7 @@ def b_cont4_7_d(expected_terminator, src, handler, k):
 
 def b_cont4_8_d():
     globals()['final_reg'] = value1_reg
-    globals()['pc'] = False
+    globals()['pc'] = pc_halt_signal
 
 def b_cont4_9_d(senv, src, handler, k):
     globals()['k_reg'] = make_cont2(b_cont2_37_d, senv, src, value3_reg, handler, k)
@@ -2553,11 +2553,11 @@ def b_cont4_13_d(src, env2, handler, k):
     globals()['pc'] = aparse
 
 def apply_fail():
-    return Apply(cadr(fail_reg), cddr(fail_reg))
+    Apply(cadr(fail_reg), cddr(fail_reg))
 
 def b_fail_1_d():
     globals()['final_reg'] = "no more choices"
-    globals()['pc'] = False
+    globals()['pc'] = pc_halt_signal
 
 def b_fail_2_d(binding, old_value, fail):
     set_binding_value_b(binding, old_value)
@@ -2583,27 +2583,27 @@ def b_fail_5_d(exps, env, handler, fail, k):
     globals()['pc'] = eval_choices
 
 def apply_handler():
-    return Apply(cadr(handler_reg), cddr(handler_reg))
+    Apply(cadr(handler_reg), cddr(handler_reg))
 
 def b_handler_1_d():
     globals()['final_reg'] = List(symbol_exception, exception_reg)
-    globals()['pc'] = False
+    globals()['pc'] = pc_halt_signal
 
 def apply_handler2():
-    return Apply(cadr(handler_reg), cddr(handler_reg))
+    Apply(cadr(handler_reg), cddr(handler_reg))
 
 def b_handler2_1_d():
     globals()['final_reg'] = List(symbol_exception, exception_reg)
-    globals()['pc'] = False
+    globals()['pc'] = pc_halt_signal
 
 def b_handler2_2_d():
     globals()['_starlast_fail_star'] = fail_reg
     globals()['final_reg'] = List(symbol_exception, exception_reg)
-    globals()['pc'] = False
+    globals()['pc'] = pc_halt_signal
 
 def b_handler2_3_d():
     globals()['final_reg'] = False
-    globals()['pc'] = False
+    globals()['pc'] = pc_halt_signal
 
 def b_handler2_4_d(cexps, cvar, env, handler, k):
     new_env = symbol_undefined
@@ -2633,7 +2633,7 @@ def b_handler2_6_d(cexps, cvar, fexps, env, handler, k):
     globals()['pc'] = eval_sequence
 
 def apply_proc():
-    return Apply(cadr(proc_reg), cddr(proc_reg))
+    Apply(cadr(proc_reg), cddr(proc_reg))
 
 def b_proc_1_d(bodies, formals, env):
     if Equal(length(args_reg), length(formals)):
@@ -2697,7 +2697,7 @@ def b_proc_6_d():
 
 def b_proc_7_d():
     globals()['final_reg'] = end_of_session
-    globals()['pc'] = False
+    globals()['pc'] = pc_halt_signal
 
 def b_proc_8_d():
     if length_one_q(args_reg):
@@ -3705,7 +3705,7 @@ def b_proc_105_d(external_function_object):
     globals()['pc'] = apply_cont2
 
 def apply_macro():
-    return Apply(cadr(macro_reg), cddr(macro_reg))
+    Apply(cadr(macro_reg), cddr(macro_reg))
 
 def b_macro_1_d():
     if symbol_q_hat(cadr_hat(datum_reg)):
@@ -5782,7 +5782,7 @@ def read_eval_print_loop_rm():
         newline()
     if end_of_session_q(result):
         globals()['final_reg'] = symbol_goodbye
-        globals()['pc'] = False
+        globals()['pc'] = pc_halt_signal
     else:
         return read_eval_print_loop_rm()
 
@@ -6893,6 +6893,7 @@ list_ref_prim = make_proc(b_proc_102_d)
 current_directory_prim = make_proc(b_proc_103_d)
 round_prim = make_proc(b_proc_104_d)
 toplevel_env = make_toplevel_env()
+pc_halt_signal = False
 def run(setup, *args):
     args = List(*args)
     Apply(setup, args)

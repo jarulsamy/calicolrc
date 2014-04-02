@@ -231,6 +231,9 @@
 			(begin (pc) (trampoline))
 			final_reg)))
 	       output-port)
+	     (pretty-print
+	       '(define pc-halt-signal #f)
+	       output-port)
 	     (newline output-port)
 	     (pretty-print
 	       '(define run (lambda (setup . args) (apply setup args) (return* (trampoline))))
@@ -373,7 +376,7 @@
 		     (let-bodies (cddr let-exp)))
 		`(define ,name (lambda ,let-vars ,@(consolidate (map transform let-bodies))))))
 	    (apply+ args
-	      `(apply ,(car args) ,(rac args)))
+	      `(apply+ ,(car args) ,(rac args)))
 ;;	    (define+ (name body)
 ;;	      (let* ((formals (cadr body))
 ;;		     (let-exp (caddr body))
@@ -444,7 +447,7 @@
 		   ,@(transform-record-case-clauses clauses))
 		(transform `(record-case ,exp ,@clauses))))
 	    (halt* (value)
-	      `(begin (set! final_reg ,(transform value)) (set! pc #f)))
+	      `(begin (set! final_reg ,(transform value)) (set! pc pc-halt-signal)))
 	    (else (cond
 		    ((memq (car code) syntactic-keywords)
 		     (error-in-source code "I don't know how to process the above code."))
@@ -730,4 +733,4 @@
     (if (null? (cdr exps))
       (list (returnize (car exps)))
       (cons (car exps) (returnize-last (cdr exps))))))
- 
+

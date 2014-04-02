@@ -10,6 +10,10 @@ class Translator(object):
             for flag in flags:
                 if flag.startswith("--"):
                     self.options[flag[2:]] = True
+        self.initialize()
+
+    def initialize(self):
+        pass
 
     def get_initial_symbols(self):
         return ["()"]
@@ -20,7 +24,8 @@ class Translator(object):
         print(*args, **kwargs)
 
     def to_ignore(self):
-        # FIXME: get rid of these by marking them as native:
+        # FIXME: get rid of these by marking them as native,
+        # or move to overrides
         return [
             "void-value", "restart-rm", "raw-read-line", "trampoline",
             "read-content", 
@@ -35,7 +40,10 @@ class Translator(object):
             "init-handler", "init-handler2", "init-fail",
             "make-cont", "make-cont2", "make-cont3", "make-cont4", "make-macro", "make-proc",
             "make-fail", "make-handler", "make-handler2"
-        ]
+        ] + self.overrides()
+
+    def overrides(self):
+        return ["length-one?", "length-two?", "length-at-least?", "all-numeric?"]
 
     def parse(self, text):
         self.program = self.parser(self.lexer(text))
@@ -70,6 +78,8 @@ class Translator(object):
         elif name == "list":
             return "List"
         elif name == "apply":
+            return "Apply"
+        elif name == "apply+":
             return "Apply"
         elif name == "range":
             return "Range"
@@ -436,13 +446,14 @@ class CSharpTranslator(Translator):
 
 #pragma warning disable 109
 using System;
+using System.Reflection;
 
 public class PJScheme:Scheme
 {
 
   static object void_value = null;
 
-  new public static object trampoline () {
+  public static object trampoline () {
 	while (pc != null) {
             try {
 	        pc ();
@@ -549,7 +560,7 @@ public class PJScheme:Scheme
    }
 
    public static object repeat(object item, object times) {
-      object retval = EmptyList;
+      object retval = symbol_emptylist;
       for (int i=0; i < ((int)times); i++) {
           retval = cons(item, retval);
       }
@@ -561,7 +572,7 @@ public class PJScheme:Scheme
 	    value = car(value);
 	    _staruse_lexical_address_star = true_q(value);
 	}
-	return _staruse_lexical_address_star;
+	return (bool) _staruse_lexical_address_star;
    }
 
    // *tracing-on?*
@@ -606,14 +617,15 @@ public class PJScheme:Scheme
             if isinstance(expr[2][1], list):
                 args = ", ".join(map(self.fix_name, expr[2][1]))
             else:
-                args = "params object [] %s" % self.fix_name(expr[2][1]) # var args
-                convert_args = "%s = sList(%s);" % (self.fix_name(expr[2][1]), 
-                                                   self.fix_name(expr[2][1]))
+                args = "params object [] t_%s" % self.fix_name(expr[2][1]) # var args
+                convert_args = "object %s = sList(t_%s);" % (self.fix_name(expr[2][1]), 
+                                                             self.fix_name(expr[2][1]))
         if ", dot, " in args:
-            args = args.replace(", dot, ", ", params object [] ") # var args on end
+            args = args.replace(", dot, ", ", params object [] t_") # var args on end
+            original_arg = args.rsplit("[] t_", 1)[1]
             var_arg = args.rsplit("[] ", 1)[1]
-            convert_args = "%s = sList(%s);" % (var_arg, var_arg)
-        self.Print(indent, "new public static %s %s(%s) {" % (return_type, function_name, self.make_arg_types(args)))
+            convert_args = "object %s = sList(%s);" % (original_arg, var_arg)
+        self.Print(indent, "public static %s %s(%s) {" % (return_type, function_name, self.make_arg_types(args)))
         if convert_args:
             self.Print(indent + 4, convert_args)
         body = expr[2][2:]
@@ -639,15 +651,15 @@ public class PJScheme:Scheme
         retval = "(%s)" % self.process_app(expr[1])
         for e in expr[2:]:
             retval += " %s (%s)" % (op, self.process_app(e))
-        return retval
+        return "(%s)" % retval
 
     def process_app(self, expr):
         if isinstance(expr, list):
-            if expr[0] in ['+', '-', '*']:
-                return self.process_infix_op(expr, expr[0])
+            #if expr[0] in ['+', '-', '*']:
+            #    return self.process_infix_op(expr, expr[0])
             #elif expr[0] == "eq?":
             #    return self.process_infix_op(expr, "is")
-            elif expr[0] == "and":
+            if expr[0] == "and":
                 return self.process_infix_op(expr, "&&")
             elif expr[0] == "or":
                 return self.process_infix_op(expr, "||")
@@ -659,13 +671,44 @@ public class PJScheme:Scheme
             else:
                 ## function call:
                 if expr[0] == "not":
-                    return "%s true_q(%s)" % ("!",
+                    return "(%s true_q(%s))" % ("!",
                                               ", ".join([self.process_app(e) for e in expr[1:]]))
                 else:
+                    # Handle make_cont(function, ...) -> make_cont(id, "cont", ...)
+                    if expr[0].startswith("make-"):
+                        make_, what = expr[0].split("-", 1)
+                        if what in self.methods:
+                            id = expr[1].split("-", 1)[1][:-1] # <cont-3>
+                            self.methods[what]["count"] = max(self.methods[what]["count"], int(id)) + 1
+                            return "%s(%s)" % (self.fix_name(expr[0]),
+                                               ", ".join([self.process_app(e) for e in (['"%s"' % what, id] + expr[2:])]))
                     return "%s(%s)" % (self.fix_name(expr[0]),
                                        ", ".join([self.process_app(e) for e in expr[1:]]))
         else:
-            return self.fix_name(expr)
+            return self.fix_function_name_as_argument(expr)
+
+    def fix_function_name_as_argument(self, name):
+        if name.startswith('"'):
+            return name
+        elif name.startswith("#\\"):
+            return self.fix_name(name)
+        elif name == "string":
+            return "make_string_proc"
+        # the names of cps functions:
+        elif name in ["equal-objects?", "equal-vectors?", "occurs?", "quote?^"]:
+            return self.fix_name(name)
+        # the name of C# functions, which need a delegate:
+        elif (name in ["=", ">=", "car", "cdr", "string-length", "+", "string-ref", "sqrt",
+                       "/", "remainder", "string", "quotient", "char->integer", "integer->char",
+                       "cons", "cadr", "caddr", "-", "*", "%", "<", ">", "<=", "abs", "memq",
+                       "range", "snoc", "rac", "rdc", "set-car!", "set-cdr!", "reverse", 
+                       "string->number", "list->vector", "list->string", "format", "printf",
+                       "vector-native", "vector-ref", "make-vector", "list-ref", "setup", 
+                       "safe-print", "modulo"] or 
+            "?" in name):
+            return self.fix_name(name) + "_proc"
+        else:
+            return self.fix_name(name)
 
     def process_while(self, expr, locals, indent):
         # (while test body...)
@@ -713,7 +756,12 @@ public class PJScheme:Scheme
 
     def process_definition(self, expr, locals, indent):
         # global
-        self.Print(indent, "public static object %s = %s;" % (self.fix_name(expr[1]), self.process_app(expr[2])))
+        if expr[1] == "pc":
+            self.Print(indent, "public static Function %s = (Function) %s;" % (self.fix_name(expr[1]), self.process_app(expr[2])))
+        elif "?^" in expr[1]:
+            self.Print(indent, "public static Func<object,bool> %s = %s;" % (self.fix_name(expr[1]), self.process_app(expr[2])))
+        else:
+            self.Print(indent, "public static object %s = %s;" % (self.fix_name(expr[1]), self.process_app(expr[2])))
 
     def process_cond(self, expr, locals, indent):
         ## (cond (test result) ...)
@@ -773,8 +821,9 @@ public class PJScheme:Scheme
         self.Print(indent + 4, "")
         for statement in self.program:
             self.process_statement(statement, [], indent + 4)
+        self.generate_extras(indent + 4)
         if self.options.get("noprimitives", False):
-            self.Print(indent + 4, "new public static object make_toplevel_env() {")
+            self.Print(indent + 4, "public static object make_toplevel_env() {")
             self.Print(indent + 8, "object variables = symbol_emptylist;")
             self.Print(indent + 8, "object values = symbol_emptylist;")
             self.Print(indent + 8, "return make_initial_env_extended(variables, values);")
@@ -808,11 +857,23 @@ public class PJScheme:Scheme
         elif (name == "eq?"):
             return "Eq";
         elif (name == "using"):
-            return "using_";
+            return "using_prim";
         elif (name == "equal?"):
             return "Equal";
         elif name == "map":
             return "map"
+        elif name == "apply":
+            return "apply"
+        elif name == "apply+":
+            return "ApplyPlus"
+        elif name == "+":
+            return "Add"
+        elif name == "-":
+            return "Subtract"
+        elif name == "*":
+            return "Multiply"
+        elif name == "/":
+            return "Divide"
         else:
             return super(CSharpTranslator, self).fix_name(name)
 
@@ -826,9 +887,76 @@ public class PJScheme:Scheme
         else:
             return super(CSharpTranslator, self).replace_char(name)
 
+    def initialize(self):
+        self.methods = {
+            "cont": {
+                "tag": "continuation",
+                "count": 0,
+            }, 
+            "cont2": {
+                "tag": "continuation2",
+                "count": 0,
+            }, 
+            "cont3": {
+                "tag": "continuation3",
+                "count": 0,
+            }, 
+            "cont4": {
+                "tag": "continuation4",
+                "count": 0,
+            }, 
+            "macro": {
+                "tag": "macro-transformer",
+                "count": 0,
+            },
+            "fail": {
+                "tag": "fail-continuation",
+                "count": 0,
+            }, 
+            "handler": {
+                "tag": "handler",
+                "count": 0,
+            }, 
+            "handler2": {
+                "tag": "handler2",
+                "count": 0,
+            }, 
+            "proc": {
+                "tag": "procedure",
+                "count": 0,
+            }
+        }
+
     def get_initial_symbols(self):
         return ["()", "<extension>", "method", "field", "constructor", 
                 "property", "done", "module"]
+
+    def generate_extras(self, indent):
+        for mi in self.methods:
+            self.Print(indent, "public static MethodInfo[] mi_%s;" % mi)
+        self.Print(indent, "")
+        self.Print(indent, "public static void initialize_method_info() {")
+        for mi in self.methods:
+            self.Print(indent + 4, "mi_%s = new MethodInfo[%s];" % (mi, self.methods[mi]["count"]))
+        self.Print(indent + 4, "")
+        for mi in self.methods:
+            self.Print(indent + 4,  "for (int i = 1; i < %s; i++) {" % self.methods[mi]["count"]) 
+            self.Print(indent + 8,  "mi_%s[i] = typeof(PJScheme).GetMethod(String.Format(\"b_%s_{0}_d\", i));" % (mi, mi))
+            self.Print(indent + 8,  "if (mi_%s[i] == null) {" % mi)
+            self.Print(indent + 12, "throw new Exception(String.Format(\"Undefined mi: mi_%s[{0}]\", i));" % mi)
+	    self.Print(indent + 8,  "}")
+            self.Print(indent + 4,  "}")
+            self.Print(indent + 4, "")
+        self.Print(indent,  "}")
+        self.Print(indent,  "")
+        for mi in self.methods:
+            self.Print(indent + 0,  "public static object make_%s (string what, int id, params object[] args) {" % mi)
+            self.Print(indent + 4,  "return sList(make_symbol(\"%s\"), what, id, args);" % self.methods[mi]["tag"])
+            self.Print(indent + 0,  "}")
+            self.Print(indent + 0,  "")
+
+    def overrides(self):
+        return ["pc-halt-signal"]
 
 if __name__ == "__main__":
     ## infile outfile

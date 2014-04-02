@@ -3229,22 +3229,22 @@
 ;;----------------------------------------------------------------------------
 ;; Primitives
 
-(define-native length-one?
+(define length-one?
   (lambda (ls)
     (and (not (null? ls)) (null? (cdr ls)))))
 
-(define-native length-two?
+(define length-two?
   (lambda (ls)
     (and (not (null? ls)) (not (null? (cdr ls))) (null? (cddr ls)))))
 
-(define-native length-at-least?
+(define length-at-least?
   (lambda (n ls)
     (cond
       ((< n 1) #t)
       ((or (null? ls) (not (pair? ls))) #f)
       (else (length-at-least? (- n 1) (cdr ls))))))
 
-(define-native all-numeric?
+(define all-numeric?
   (lambda (ls)
     (or (null? ls)
 	(and (number? (car ls))

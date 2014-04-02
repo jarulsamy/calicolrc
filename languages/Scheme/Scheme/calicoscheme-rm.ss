@@ -157,7 +157,7 @@
 
 (define*
   apply-cont
-  (lambda () (return* (apply (cadr k_reg) (cddr k_reg)))))
+  (lambda () (apply+ (cadr k_reg) (cddr k_reg))))
 
 (define <cont-1>
   (lambda (chars fail k)
@@ -232,7 +232,9 @@
     (set! pc read-sexp)))
 
 (define <cont-11>
-  (lambda () (set! final_reg value_reg) (set! pc #f)))
+  (lambda ()
+    (set! final_reg value_reg)
+    (set! pc pc-halt-signal)))
 
 (define <cont-12>
   (lambda (adatum senv info handler fail k)
@@ -749,7 +751,7 @@
 
 (define*
   apply-cont2
-  (lambda () (return* (apply (cadr k_reg) (cddr k_reg)))))
+  (lambda () (apply+ (cadr k_reg) (cddr k_reg))))
 
 (define <cont2-1>
   (lambda (token k)
@@ -758,7 +760,9 @@
     (set! pc apply-cont2)))
 
 (define <cont2-2>
-  (lambda () (set! final_reg value1_reg) (set! pc #f)))
+  (lambda ()
+    (set! final_reg value1_reg)
+    (set! pc pc-halt-signal)))
 
 (define <cont2-3>
   (lambda (k)
@@ -1347,7 +1351,7 @@
   (lambda ()
     (set! *last-fail* value2_reg)
     (set! final_reg value1_reg)
-    (set! pc #f)))
+    (set! pc pc-halt-signal)))
 
 (define <cont2-50>
   (lambda ()
@@ -1359,7 +1363,7 @@
     (set! pc m)))
 
 (define <cont2-51>
-  (lambda () (set! final_reg #t) (set! pc #f)))
+  (lambda () (set! final_reg #t) (set! pc pc-halt-signal)))
 
 (define <cont2-52>
   (lambda ()
@@ -1879,7 +1883,7 @@
 
 (define*
   apply-cont3
-  (lambda () (return* (apply (cadr k_reg) (cddr k_reg)))))
+  (lambda () (apply+ (cadr k_reg) (cddr k_reg))))
 
 (define <cont3-1>
   (lambda (src handler k)
@@ -1898,7 +1902,9 @@
           (set! pc scan-input-loop)))))
 
 (define <cont3-2>
-  (lambda () (set! final_reg value1_reg) (set! pc #f)))
+  (lambda ()
+    (set! final_reg value1_reg)
+    (set! pc pc-halt-signal)))
 
 (define <cont3-3>
   (lambda (k)
@@ -1927,7 +1933,7 @@
 
 (define*
   apply-cont4
-  (lambda () (return* (apply (cadr k_reg) (cddr k_reg)))))
+  (lambda () (apply+ (cadr k_reg) (cddr k_reg))))
 
 (define <cont4-1>
   (lambda (src start k)
@@ -2001,7 +2007,9 @@
           (set! pc read-sexp-sequence)))))
 
 (define <cont4-8>
-  (lambda () (set! final_reg value1_reg) (set! pc #f)))
+  (lambda ()
+    (set! final_reg value1_reg)
+    (set! pc pc-halt-signal)))
 
 (define <cont4-9>
   (lambda (senv src handler k)
@@ -2071,11 +2079,12 @@
 
 (define*
   apply-fail
-  (lambda ()
-    (return* (apply (cadr fail_reg) (cddr fail_reg)))))
+  (lambda () (apply+ (cadr fail_reg) (cddr fail_reg))))
 
 (define <fail-1>
-  (lambda () (set! final_reg "no more choices") (set! pc #f)))
+  (lambda ()
+    (set! final_reg "no more choices")
+    (set! pc pc-halt-signal)))
 
 (define <fail-2>
   (lambda (binding old-value fail)
@@ -2109,35 +2118,33 @@
 
 (define*
   apply-handler
-  (lambda ()
-    (return* (apply (cadr handler_reg) (cddr handler_reg)))))
+  (lambda () (apply+ (cadr handler_reg) (cddr handler_reg))))
 
 (define <handler-1>
   (lambda ()
     (set! final_reg (list 'exception exception_reg))
-    (set! pc #f)))
+    (set! pc pc-halt-signal)))
 
 (define make-handler2
   (lambda args (return* (cons 'handler2 args))))
 
 (define*
   apply-handler2
-  (lambda ()
-    (return* (apply (cadr handler_reg) (cddr handler_reg)))))
+  (lambda () (apply+ (cadr handler_reg) (cddr handler_reg))))
 
 (define <handler2-1>
   (lambda ()
     (set! final_reg (list 'exception exception_reg))
-    (set! pc #f)))
+    (set! pc pc-halt-signal)))
 
 (define <handler2-2>
   (lambda ()
     (set! *last-fail* fail_reg)
     (set! final_reg (list 'exception exception_reg))
-    (set! pc #f)))
+    (set! pc pc-halt-signal)))
 
 (define <handler2-3>
-  (lambda () (set! final_reg #f) (set! pc #f)))
+  (lambda () (set! final_reg #f) (set! pc pc-halt-signal)))
 
 (define <handler2-4>
   (lambda (cexps cvar env handler k)
@@ -2174,8 +2181,7 @@
 
 (define*
   apply-proc
-  (lambda ()
-    (return* (apply (cadr proc_reg) (cddr proc_reg)))))
+  (lambda () (apply+ (cadr proc_reg) (cddr proc_reg))))
 
 (define <proc-1>
   (lambda (bodies formals env)
@@ -2266,7 +2272,9 @@
     (set! pc apply-cont2)))
 
 (define <proc-7>
-  (lambda () (set! final_reg end-of-session) (set! pc #f)))
+  (lambda ()
+    (set! final_reg end-of-session)
+    (set! pc pc-halt-signal)))
 
 (define <proc-8>
   (lambda ()
@@ -3481,8 +3489,7 @@
 
 (define*
   apply-macro
-  (lambda ()
-    (return* (apply (cadr macro_reg) (cddr macro_reg)))))
+  (lambda () (apply+ (cadr macro_reg) (cddr macro_reg))))
 
 (define <macro-1>
   (lambda ()
@@ -6046,7 +6053,7 @@
         (if (not (void? result)) (safe-print result))
         (if *need-newline* (newline))
         (if (end-of-session? result)
-            (begin (set! final_reg 'goodbye) (set! pc #f))
+            (begin (set! final_reg 'goodbye) (set! pc pc-halt-signal))
             (return* (read-eval-print-loop-rm)))))))
 
 (define execute-string-rm
@@ -6555,6 +6562,31 @@
       (return*
         (make-proc <proc-4> bodies name trace-depth formals runt
           env)))))
+
+(define length-one?
+  (lambda (ls)
+    (return* (and (not (null? ls)) (null? (cdr ls))))))
+
+(define length-two?
+  (lambda (ls)
+    (return*
+      (and (not (null? ls))
+           (not (null? (cdr ls)))
+           (null? (cddr ls))))))
+
+(define length-at-least?
+  (lambda (n ls)
+    (if (< n 1)
+        (return* #t)
+        (if (or (null? ls) (not (pair? ls)))
+            (return* #f)
+            (return* (length-at-least? (- n 1) (cdr ls)))))))
+
+(define all-numeric?
+  (lambda (ls)
+    (return*
+      (or (null? ls)
+          (and (number? (car ls)) (all-numeric? (cdr ls)))))))
 
 (define all-char?
   (lambda (ls)
@@ -7545,32 +7577,6 @@
                            (filter continuation-object? (cddr k))))
                     '<???>))))))
 
-(define-native
-  length-one?
-  (lambda (ls) (and (not (null? ls)) (null? (cdr ls)))))
-
-(define-native
-  length-two?
-  (lambda (ls)
-    (and (not (null? ls))
-         (not (null? (cdr ls)))
-         (null? (cddr ls)))))
-
-(define-native
-  length-at-least?
-  (lambda (n ls)
-    (if (< n 1)
-        #t
-        (if (or (null? ls) (not (pair? ls)))
-            #f
-            (length-at-least? (- n 1) (cdr ls))))))
-
-(define-native
-  all-numeric?
-  (lambda (ls)
-    (or (null? ls)
-        (and (number? (car ls)) (all-numeric? (cdr ls))))))
-
 (define void-prim (make-proc <proc-5>))
 
 (define void-value '<void>)
@@ -7806,6 +7812,7 @@
 ;; the trampoline
 (define trampoline
   (lambda () (if pc (begin (pc) (trampoline)) final_reg)))
+(define pc-halt-signal #f)
 
 (define run
   (lambda (setup . args)
