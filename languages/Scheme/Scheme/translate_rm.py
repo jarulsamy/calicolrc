@@ -693,6 +693,8 @@ public class PJScheme:Scheme
     def fix_function_name_as_argument(self, name):
         if name.startswith('"'):
             return name
+        elif name.endswith("-prim"):
+            return self.fix_name(name)
         elif name.startswith("#\\"):
             return self.fix_name(name)
         elif name == "string":
@@ -865,13 +867,15 @@ public class PJScheme:Scheme
         elif (name == "eq?"):
             return "Eq";
         elif (name == "using"):
-            return "using_prim";
+            return "using_native";
         elif (name == "equal?"):
             return "Equal";
         elif name == "map":
             return "map"
         elif name == "apply":
             return "apply"
+        elif name == "apply*":
+            return "dlr_apply"
         elif name == "apply+":
             return "ApplyPlus"
         elif name == "+":
@@ -964,7 +968,7 @@ public class PJScheme:Scheme
             self.Print(indent + 0,  "")
 
     def overrides(self):
-        return ["pc-halt-signal", "map^", "set-use-stack-trace"]
+        return ["pc-halt-signal", "map^", "set-use-stack-trace", "run"]
 
 if __name__ == "__main__":
     ## infile outfile

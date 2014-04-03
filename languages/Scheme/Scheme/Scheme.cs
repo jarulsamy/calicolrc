@@ -186,10 +186,6 @@ public class Scheme {
     public delegate object ProcedureN(params object [] args);
     public delegate void Procedure1NVoid(object a0, params object [] args);
 
-    public static object make_sList(object [] args) {
-	return null;
-    }
-
     public static Function pc_halt_signal = (Function) null;
 
     public static object sList(params object [] args) {
@@ -382,6 +378,7 @@ public class Scheme {
   public static Proc GreaterThanEqual_proc = new Proc(">=", (Procedure1Bool) GreaterThanEqual, -1, 2);
   public static Proc LessThanEqual_proc = new Proc("<=", (Procedure1Bool) LessThanOrEqual, -1, 2);
   public static Proc LessThan_proc = new Proc("<", (Procedure1Bool) LessThan, -1, 2);
+  public static Proc symbolLessThan_q_proc = new Proc("symbol<?", (Procedure2Bool) PJScheme.symbolLessThan_q, 2, 2);
   public static Proc Multiply_proc = new Proc("*", (Procedure1) Multiply, -1, 1);
   public static Proc Subtract_proc = new Proc("-", (Procedure1) Subtract, -1, 1);
   public static Proc abs_proc = new Proc("abs", (Procedure1) abs, -1, 1);
@@ -412,7 +409,7 @@ public class Scheme {
   public static Proc display_proc = new Proc("display", (Procedure1Void) display, 1, 0);
   public static Proc dlr_env_contains_proc = new Proc("dlr-env-contains",(Procedure1Bool)dlr_env_contains, 1, 2);
   public static Proc dlr_env_lookup_proc = new Proc("dlr-env-lookup",(Procedure1)dlr_env_lookup, 1, 1);
-  public static Proc format_proc = new Proc("format", (Procedure1) format_prim, -1, 1);
+  public static Proc format_proc = new Proc("format", (Procedure1) format, -1, 1);
   public static Proc format_stack_trace_proc = new Proc("format-stack-trace", (Procedure1) PJScheme.format_stack_trace, 1, 1);
   public static Proc list_ref_proc = new Proc("list-ref", (Procedure2) list_ref, 2, 1);
   public static Proc list_to_string_proc = new Proc("list->string", (Procedure1) list_to_string, 1, 1);
@@ -821,17 +818,6 @@ public class Scheme {
 	  current1 = cdr(current1);
 	}
   }
-
-    public static Function ApplyPlus(object what, object args) {
-	// what is "cont", "cont2", "macro"
-	// first arg is id
-	// rest of args are arguments
-	return (Function) null;
-    }
-
-    public static object apply_star(object external_function_object, object args) {
-	return null;
-    }
 
     public static object apply(object proc, object args) {
 	if (proc is Proc)
@@ -1261,10 +1247,6 @@ public class Scheme {
     return retval;
   }
 
-  public static object set_external_member_b(object obj, object components, object value) {
-      return null;
-  }
-
   public static object get_external_member(object obj, object parts_list) {
       return dlr_lookup_components(obj, cdr(parts_list));
   }
@@ -1362,7 +1344,7 @@ public class Scheme {
 	throw new Exception(String.Format("no such external type '{0}'", type));
   }
 
-  public static object using_prim(object args, object env) {
+  public static object using_native(object args, object env) {
       // Works with Python Types
       // implements "using"
       Assembly assembly = null;
@@ -1538,7 +1520,7 @@ public class Scheme {
       return retobj;
   }
 
-  public static object printf_prim(object args) {
+  public static object printf_native(object args) {
 	int len = ((int) length(args)) - 1;
 	// FIXME: surely there is a better way?:
 	if (len == 0)
@@ -1666,14 +1648,14 @@ public class Scheme {
   }
 
   public static MethodInfo get_method(object obj, string method_name) {
-	Type t = obj.GetType();
-    MethodInfo[] mi = t.GetMethods();
-    foreach(MethodInfo m in mi) {
+      Type t = obj.GetType();
+      MethodInfo[] mi = t.GetMethods();
+      foreach(MethodInfo m in mi) {
 	  if (m.Name == method_name) {
-		return m;
+	      return m;
 	  }
-	}
-	return null;
+      }
+      return null;
   }
 
   public static string format(object msg, params object[] rest) {
@@ -2758,7 +2740,7 @@ public class Scheme {
 		return retval;
 	}
 
-  public static string format_prim(object obj) {
+  public static string format(object obj) {
 	return format(car(obj), list_to_array(obj, 1));
   }
 	
@@ -2862,7 +2844,7 @@ public class Scheme {
   public static object make_safe(object x) {
     if (PJScheme.procedure_object_q(x))
       return (PJScheme.symbol_b_procedure_d);
-    else if (environment_object_q(x))
+    else if (PJScheme.environment_object_q(x))
       return (PJScheme.symbol_b_environment_d);
     else if (pair_q(x))
       return (new Cons(make_safe(car(x)), make_safe(cdr(x))));
@@ -2922,10 +2904,6 @@ public class Scheme {
 
   public static bool atom_q(object x) {
     return ((! pair_q(x)) && (! (null_q(x))));
-  }
-
-  public static bool environment_object_q(object x) {
-    return (pair_q(x) && Eq(car(x), PJScheme.symbol_environment));
   }
 
   public static bool isTokenType(List<object> token, string tokenType) {
@@ -3412,10 +3390,6 @@ public class Scheme {
 	}
   }
 
-  public static void set_global_docstring_b(object var, object value) {
-      // FIXME: how to set docstring?
-  }
-
   public static double currentTime () {
       System.TimeSpan t = System.DateTime.UtcNow - new System.DateTime (1970, 1, 1);
       return t.TotalSeconds;
@@ -3477,17 +3451,6 @@ public class Scheme {
 	  return;
       }
       int start_line = (int)PJScheme.get_start_line(info);
-
-		/* force CLI output
-      string filename = PJScheme.get_srcfile(info).ToString();
-      int start_col = (int)PJScheme.get_start_char(info);
-      int end_line = (int)PJScheme.get_end_line(info);
-      int end_col = (int)PJScheme.get_end_char(info);
-	  printf("[~s] at line ~s, column ~s~%", filename, start_line, start_col);
-      printf("~s~%", PJScheme.aunparse(exp));
-	  return;			
-	}
-		 */
  	  if (_dlr_env != null) {
 	  calico = (Calico.MainWindow)_dlr_env.GetVariable("calico");
 	  if (calico != null) {
@@ -3599,26 +3562,6 @@ public class Scheme {
       }
   }
 
-    //  public static object search_frame(object frame, object variable) {
-    //      if (PJScheme.empty_frame_q(frame)) {
-    //	  return false;
-    //      } else {
-    //	  if (frame is Vector) {
-    //	      Vector v = (Vector)frame;
-    //	      for (int i = 0; i < (int)v.length(); i++) {
-    //		  if (Eq(PJScheme.binding_variable(v.get(i)), variable)) {
-    //		      return v.get(i);
-    //		  }
-    //	      }
-    //	  } else {
-    //	      throw new Exception("frame is not a vector");
-    //	  }
-    //      }
-    //      return false;
-    //  }
-
-
-  // is this correct?
   public static object search_frame(object frame, object variable) {
       if (frame is Cons) {
           Vector bindings = (Vector) car(frame);
@@ -3640,6 +3583,60 @@ public class Scheme {
     public static void set_use_stack_trace(bool value) {
         PJScheme._staruse_stack_trace_star = value;
     }
-    
 
+    public static string raw_read_line(string prompt) {
+	// FIXME: 
+	return "1";
+    }    
+
+    public static string raw_input() {
+	// FIXME:
+	return "1";
+    }    
+
+    public static Function ApplyPlus(object what, object slist) {
+	// what is "cont", "cont2", "macro"
+	// first arg is id
+	// rest of args are arguments
+	string kind = (string) what;
+	int id = (int)car(slist);
+	object[] args = (object [])cadr(slist);
+	//Console.WriteLine("apply_native: <{0}-{1}>", kind, id);
+	//Console.WriteLine("args: " + repr(args));
+	//object [] args = list_to_array(lyst);
+	if (kind == "cont") {
+	    //Console.WriteLine("Executing cont[{0}]...", id);
+	    PJScheme.mi_cont[id].Invoke(PJScheme.mi_cont[id], args);
+	    //Console.WriteLine("done!");
+	} else if (kind == "cont2") {
+	    PJScheme.mi_cont2[id].Invoke(PJScheme.mi_cont2[id], args);
+	} else if (kind == "cont3") {
+	    PJScheme.mi_cont3[id].Invoke(PJScheme.mi_cont3[id], args);
+	} else if (kind == "cont4") {
+	    PJScheme.mi_cont4[id].Invoke(PJScheme.mi_cont4[id], args);
+	} else if (kind == "macro") {
+	    PJScheme.mi_macro[id].Invoke(PJScheme.mi_macro[id], args);
+	} else if (kind == "fail") {
+	    PJScheme.mi_fail[id].Invoke(PJScheme.mi_fail[id], args);
+	} else if (kind == "handler") {
+	    PJScheme.mi_handler[id].Invoke(PJScheme.mi_handler[id], args);
+	} else if (kind == "handler2") {
+	    PJScheme.mi_handler2[id].Invoke(PJScheme.mi_handler2[id], args);
+	} else if (kind == "proc") {
+	    PJScheme.mi_proc[id].Invoke(PJScheme.mi_proc[id], args);
+	} else {
+	    throw new Exception("invalid kind: " + kind);
+	}
+	
+	return (Function) null;
+    }
+
+    public static object set_external_member_b(object obj, object components, object value) {
+	// FIXME: 
+	return null;
+    }
+
+    public static void set_global_docstring_b(object var, object value) {
+	// FIXME: how to set docstring?
+    }
 }

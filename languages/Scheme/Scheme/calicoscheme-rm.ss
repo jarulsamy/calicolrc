@@ -6037,12 +6037,12 @@
   (lambda ()
     (set! toplevel-env (make-toplevel-env))
     (set! macro-env (make-macro-env^))
-    (return* (read-eval-print-loop-rm))))
+    (read-eval-print-loop-rm)))
 
 (define restart-rm
   (lambda ()
     (printf "Restarting...\n")
-    (return* (read-eval-print-loop-rm))))
+    (read-eval-print-loop-rm)))
 
 (define read-eval-print-loop-rm
   (lambda ()
@@ -6054,7 +6054,7 @@
         (if *need-newline* (newline))
         (if (end-of-session? result)
             (begin (set! final_reg 'goodbye) (set! pc pc-halt-signal))
-            (return* (read-eval-print-loop-rm)))))))
+            (read-eval-print-loop-rm))))))
 
 (define execute-string-rm
   (lambda (input) (return* (execute-rm input 'stdin))))

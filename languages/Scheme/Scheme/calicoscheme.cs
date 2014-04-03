@@ -385,7 +385,7 @@ public class PJScheme:Scheme
     public static object symbol_symbol_q = make_symbol("symbol?");
     public static object symbol_unparse = make_symbol("unparse");
     public static object symbol_unparse_procedure = make_symbol("unparse-procedure");
-    public static object symbol_using_prim = make_symbol("using");
+    public static object symbol_using_native = make_symbol("using");
     public static object symbol_vector = make_symbol("vector");
     public static object symbol_vector_ref = make_symbol("vector-ref");
     public static object symbol_vector_set_b = make_symbol("vector-set!");
@@ -3446,7 +3446,7 @@ public class PJScheme:Scheme
     
     public static void b_proc_94_d() {
         value2_reg = fail_reg;
-        value1_reg = using_prim(args_reg, env2_reg);
+        value1_reg = using_native(args_reg, env2_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
@@ -3563,7 +3563,7 @@ public class PJScheme:Scheme
     
     public static void b_proc_105_d(object external_function_object) {
         value2_reg = fail_reg;
-        value1_reg = apply_star(external_function_object, args_reg);
+        value1_reg = dlr_apply(external_function_object, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
@@ -7087,6 +7087,12 @@ public class PJScheme:Scheme
         }
     }
     
+    public static object make_toplevel_env() {
+        object primitives = symbol_undefined;
+        primitives = sList(sList(symbol_Multiply, times_prim), sList(symbol_Add, plus_prim), sList(symbol_Subtract, minus_prim), sList(symbol_Divide, divide_prim), sList(symbol_p, modulo_prim), sList(symbol_LessThan, lt_prim), sList(symbol_LessThanEqual, lt_or_eq_prim), sList(symbol_Equal, equal_sign_prim), sList(symbol_GreaterThan, gt_prim), sList(symbol_GreaterThanEqual, gt_or_eq_prim), sList(symbol_abort, abort_prim), sList(symbol_abs, abs_prim), sList(symbol_append, append_prim), sList(symbol_apply, apply_prim), sList(symbol_assv, assv_prim), sList(symbol_boolean_q, boolean_q_prim), sList(symbol_caddr, caddr_prim), sList(symbol_cadr, cadr_prim), sList(symbol_call_with_current_continuation, call_cc_prim), sList(symbol_call_cc, call_cc_prim), sList(symbol_car, car_prim), sList(symbol_cdr, cdr_prim), sList(symbol_char_q, char_q_prim), sList(symbol_char_is__q, char_is__q_prim), sList(symbol_char_whitespace_q, char_whitespace_q_prim), sList(symbol_char_alphabetic_q, char_alphabetic_q_prim), sList(symbol_char_numeric_q, char_numeric_q_prim), sList(symbol_char_to_integer, char_to_integer_prim), sList(symbol_cons, cons_prim), sList(symbol_current_time, current_time_prim), sList(symbol_cut, cut_prim), sList(symbol_dir, dir_prim), sList(symbol_display, display_prim), sList(symbol_current_environment, current_environment_prim), sList(symbol_eq_q, eq_q_prim), sList(symbol_equal_q, equal_q_prim), sList(symbol_error, error_prim), sList(symbol_eval, eval_prim), sList(symbol_eval_ast, eval_ast_prim), sList(symbol_exit, exit_prim), sList(symbol_for_each, for_each_prim), sList(symbol_format, format_prim), sList(symbol_get, get_prim), sList(symbol_get_stack_trace, get_stack_trace_prim), sList(symbol_import, import_prim), sList(symbol_integer_to_char, integer_to_char_prim), sList(symbol_length, length_prim), sList(symbol_sList, list_prim), sList(symbol_list_to_vector, list_to_vector_prim), sList(symbol_list_to_string, list_to_string_prim), sList(symbol_list_ref, list_ref_prim), sList(symbol_load, load_prim), sList(symbol_make_set, make_set_prim), sList(symbol_make_vector, make_vector_prim), sList(symbol_map, map_prim), sList(symbol_member, member_prim), sList(symbol_memq, memq_prim), sList(symbol_memv, memv_prim), sList(symbol_newline, newline_prim), sList(symbol_not, not_prim), sList(symbol_null_q, null_q_prim), sList(symbol_number_to_string, number_to_string_prim), sList(symbol_number_q, number_q_prim), sList(symbol_pair_q, pair_q_prim), sList(symbol_parse, parse_prim), sList(symbol_parse_string, parse_string_prim), sList(symbol_print, print_prim), sList(symbol_printf, printf_prim), sList(symbol_Range, range_prim), sList(symbol_read_string, read_string_prim), sList(symbol_require, require_prim), sList(symbol_reverse, reverse_prim), sList(symbol_set_car_b, set_car_b_prim), sList(symbol_set_cdr_b, set_cdr_b_prim), sList(symbol_snoc, snoc_prim), sList(symbol_rac, rac_prim), sList(symbol_rdc, rdc_prim), sList(symbol_sqrt, sqrt_prim), sList(symbol_odd_q, odd_q_prim), sList(symbol_even_q, even_q_prim), sList(symbol_quotient, quotient_prim), sList(symbol_remainder, remainder_prim), sList(symbol_make_string, string_prim), sList(symbol_string_length, string_length_prim), sList(symbol_string_ref, string_ref_prim), sList(symbol_string_q, string_q_prim), sList(symbol_string_to_number, string_to_number_prim), sList(symbol_string_is__q, string_is__q_prim), sList(symbol_substring, substring_prim), sList(symbol_symbol_q, symbol_q_prim), sList(symbol_unparse, unparse_prim), sList(symbol_unparse_procedure, unparse_procedure_prim), sList(symbol_using_native, using_prim), sList(symbol_vector, vector_prim), sList(symbol_vector_ref, vector_ref_prim), sList(symbol_vector_set_b, vector_set_b_prim), sList(symbol_void, void_prim), sList(symbol_zero_q, zero_q_prim), sList(symbol_current_directory, current_directory_prim), sList(symbol_cd, current_directory_prim), sList(symbol_round, round_prim));
+        return make_initial_env_extended(map(car_proc, primitives), map(cadr_proc, primitives));
+    }
+    
     public static object make_external_proc(object external_function_object) {
         return make_proc("proc", 105, external_function_object);
     }
@@ -7299,9 +7305,108 @@ public class PJScheme:Scheme
     public static bool _startracing_on_q_star = false;
     public static object _starstack_trace_star = sList(symbol_emptylist);
     public static bool _staruse_stack_trace_star = true;
+    public static object void_prim = make_proc("proc", 5);
+    public static object zero_q_prim = make_proc("proc", 6);
+    public static object exit_prim = make_proc("proc", 7);
     public static object end_of_session = sList(symbol_exiting, symbol_the, symbol_interpreter);
+    public static object eval_prim = make_proc("proc", 8);
+    public static object eval_ast_prim = make_proc("proc", 9);
+    public static object parse_prim = make_proc("proc", 10);
+    public static object string_length_prim = make_proc("proc", 11);
+    public static object string_ref_prim = make_proc("proc", 12);
+    public static object unparse_prim = make_proc("proc", 13);
+    public static object unparse_procedure_prim = make_proc("proc", 14);
+    public static object parse_string_prim = make_proc("proc", 15);
+    public static object read_string_prim = make_proc("proc", 16);
+    public static object apply_prim = make_proc("proc", 17);
+    public static object sqrt_prim = make_proc("proc", 18);
+    public static object odd_q_prim = make_proc("proc", 19);
+    public static object even_q_prim = make_proc("proc", 20);
+    public static object quotient_prim = make_proc("proc", 21);
+    public static object remainder_prim = make_proc("proc", 22);
+    public static object print_prim = make_proc("proc", 23);
+    public static object string_prim = make_proc("proc", 24);
+    public static object substring_prim = make_proc("proc", 25);
+    public static object number_to_string_prim = make_proc("proc", 26);
+    public static object assv_prim = make_proc("proc", 27);
+    public static object memv_prim = make_proc("proc", 28);
+    public static object display_prim = make_proc("proc", 29);
+    public static object newline_prim = make_proc("proc", 30);
     public static bool _starneed_newline_star = false;
+    public static object load_prim = make_proc("proc", 31);
     public static object load_stack = symbol_emptylist;
+    public static object length_prim = make_proc("proc", 32);
+    public static object symbol_q_prim = make_proc("proc", 33);
+    public static object number_q_prim = make_proc("proc", 34);
+    public static object boolean_q_prim = make_proc("proc", 35);
+    public static object string_q_prim = make_proc("proc", 36);
+    public static object char_q_prim = make_proc("proc", 37);
+    public static object char_is__q_prim = make_proc("proc", 38);
+    public static object char_whitespace_q_prim = make_proc("proc", 39);
+    public static object char_to_integer_prim = make_proc("proc", 40);
+    public static object integer_to_char_prim = make_proc("proc", 41);
+    public static object char_alphabetic_q_prim = make_proc("proc", 42);
+    public static object char_numeric_q_prim = make_proc("proc", 43);
+    public static object null_q_prim = make_proc("proc", 44);
+    public static object pair_q_prim = make_proc("proc", 45);
+    public static object cons_prim = make_proc("proc", 46);
+    public static object car_prim = make_proc("proc", 47);
+    public static object cdr_prim = make_proc("proc", 48);
+    public static object cadr_prim = make_proc("proc", 49);
+    public static object caddr_prim = make_proc("proc", 50);
+    public static object list_prim = make_proc("proc", 51);
+    public static object make_set_prim = make_proc("proc", 52);
+    public static object plus_prim = make_proc("proc", 53);
+    public static object minus_prim = make_proc("proc", 54);
+    public static object times_prim = make_proc("proc", 55);
+    public static object divide_prim = make_proc("proc", 56);
+    public static object modulo_prim = make_proc("proc", 57);
+    public static object lt_prim = make_proc("proc", 58);
+    public static object gt_prim = make_proc("proc", 59);
+    public static object lt_or_eq_prim = make_proc("proc", 60);
+    public static object gt_or_eq_prim = make_proc("proc", 61);
+    public static object equal_sign_prim = make_proc("proc", 62);
+    public static object abs_prim = make_proc("proc", 63);
+    public static object equal_q_prim = make_proc("proc", 64);
+    public static object eq_q_prim = make_proc("proc", 65);
+    public static object memq_prim = make_proc("proc", 66);
+    public static object member_prim = make_proc("proc", 67);
+    public static object range_prim = make_proc("proc", 68);
+    public static object snoc_prim = make_proc("proc", 69);
+    public static object rac_prim = make_proc("proc", 70);
+    public static object rdc_prim = make_proc("proc", 71);
+    public static object set_car_b_prim = make_proc("proc", 72);
+    public static object set_cdr_b_prim = make_proc("proc", 73);
+    public static object import_prim = make_proc("proc", 74);
+    public static object get_stack_trace_prim = make_proc("proc", 75);
+    public static object get_prim = make_proc("proc", 76);
+    public static object call_cc_prim = make_proc("proc", 78);
+    public static object abort_prim = make_proc("proc", 79);
+    public static object require_prim = make_proc("proc", 80);
+    public static object cut_prim = make_proc("proc", 81);
+    public static object reverse_prim = make_proc("proc", 82);
+    public static object append_prim = make_proc("proc", 83);
+    public static object string_to_number_prim = make_proc("proc", 84);
+    public static object string_is__q_prim = make_proc("proc", 85);
+    public static object list_to_vector_prim = make_proc("proc", 86);
+    public static object list_to_string_prim = make_proc("proc", 87);
+    public static object dir_prim = make_proc("proc", 88);
+    public static object current_time_prim = make_proc("proc", 89);
+    public static object map_prim = make_proc("proc", 90);
+    public static object for_each_prim = make_proc("proc", 91);
+    public static object format_prim = make_proc("proc", 92);
+    public static object current_environment_prim = make_proc("proc", 93);
+    public static object using_prim = make_proc("proc", 94);
+    public static object not_prim = make_proc("proc", 95);
+    public static object printf_prim = make_proc("proc", 96);
+    public static object vector_prim = make_proc("proc", 97);
+    public static object vector_set_b_prim = make_proc("proc", 98);
+    public static object vector_ref_prim = make_proc("proc", 99);
+    public static object make_vector_prim = make_proc("proc", 100);
+    public static object error_prim = make_proc("proc", 101);
+    public static object list_ref_prim = make_proc("proc", 102);
+    public static object current_directory_prim = make_proc("proc", 103);
+    public static object round_prim = make_proc("proc", 104);
     public static object toplevel_env = make_toplevel_env();
     public static MethodInfo[] mi_cont4;
     public static MethodInfo[] mi_handler;
@@ -7322,7 +7427,7 @@ public class PJScheme:Scheme
         mi_cont2 = new MethodInfo[206];
         mi_fail = new MethodInfo[8];
         mi_macro = new MethodInfo[12];
-        mi_proc = new MethodInfo[106];
+        mi_proc = new MethodInfo[205];
         
         for (int i = 1; i < 24; i++) {
             mi_cont4[i] = typeof(PJScheme).GetMethod(String.Format("b_cont4_{0}_d", i));
@@ -7380,7 +7485,7 @@ public class PJScheme:Scheme
             }
         }
         
-        for (int i = 1; i < 106; i++) {
+        for (int i = 1; i < 205; i++) {
             mi_proc[i] = typeof(PJScheme).GetMethod(String.Format("b_proc_{0}_d", i));
             if (mi_proc[i] == null) {
                 throw new Exception(String.Format("Undefined mi: mi_proc[{0}]", i));
@@ -7423,12 +7528,6 @@ public class PJScheme:Scheme
     
     public static object make_proc (string what, int id, params object[] args) {
         return sList(make_symbol("procedure"), what, id, args);
-    }
-    
-    public static object make_toplevel_env() {
-        object variables = symbol_emptylist;
-        object values = symbol_emptylist;
-        return make_initial_env_extended(variables, values);
     }
     
     public static void Main() {
