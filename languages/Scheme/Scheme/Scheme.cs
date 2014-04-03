@@ -829,6 +829,10 @@ public class Scheme {
 	return (Function) null;
     }
 
+    public static object apply_star(object external_function_object, object args) {
+	return null;
+    }
+
     public static object apply(object proc, object args) {
 	if (proc is Proc)
 	    return ((Proc)proc).Call(args);
@@ -871,6 +875,15 @@ public class Scheme {
 	}
 	return retval;
   }
+
+    public static object map_hat (object f_hat, object asexp) {
+	if ((bool)PJScheme.null_q_hat(asexp))
+	    return list(PJScheme.atom_tag, PJScheme.symbol_emptylist, PJScheme.symbol_none);
+	else
+	    return PJScheme.cons_hat(apply(f_hat, list(PJScheme.car_hat (asexp))),
+				     map_hat (f_hat, PJScheme.cdr_hat (asexp)),
+				     PJScheme.symbol_none);
+    }
 
   public static object map(object proc, object args) {
 	object retval = PJScheme.symbol_emptylist;
@@ -3623,5 +3636,10 @@ public class Scheme {
           throw new Exception("invalid frame");
       }
   }
+
+    public static void set_use_stack_trace(bool value) {
+        PJScheme._staruse_stack_trace_star = value;
+    }
+    
 
 }

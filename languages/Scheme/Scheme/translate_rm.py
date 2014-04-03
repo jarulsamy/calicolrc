@@ -648,9 +648,9 @@ public class PJScheme:Scheme
         return retval
 
     def process_infix_op(self, expr, op):
-        retval = "(%s)" % self.process_app(expr[1])
+        retval = "true_q(%s)" % self.process_app(expr[1])
         for e in expr[2:]:
-            retval += " %s (%s)" % (op, self.process_app(e))
+            retval += " %s true_q(%s)" % (op, self.process_app(e))
         return "(%s)" % retval
 
     def process_app(self, expr):
@@ -671,8 +671,11 @@ public class PJScheme:Scheme
             else:
                 ## function call:
                 if expr[0] == "not":
-                    return "(%s true_q(%s))" % ("!",
-                                              ", ".join([self.process_app(e) for e in expr[1:]]))
+                    return "(! true_q(%s))" % ", ".join([self.process_app(e) for e in expr[1:]])
+                elif expr[0] == "error":
+                    exception_msg = "\"%s: \" + String.Format(%s, %s)" % (
+                        expr[1], expr[2], ", ".join([self.process_app(e) for e in expr[3:]]))
+                    return "throw new Exception(%s);" % exception_msg
                 else:
                     # Handle make_cont(function, ...) -> make_cont(id, "cont", ...)
                     if expr[0].startswith("make-"):
@@ -694,17 +697,20 @@ public class PJScheme:Scheme
             return self.fix_name(name)
         elif name == "string":
             return "make_string_proc"
+        elif name.endswith("*") and name != "*":
+            return self.fix_name(name)
         # the names of cps functions:
         elif name in ["equal-objects?", "equal-vectors?", "occurs?", "quote?^"]:
             return self.fix_name(name)
         # the name of C# functions, which need a delegate:
         elif (name in ["=", ">=", "car", "cdr", "string-length", "+", "string-ref", "sqrt",
-                       "/", "remainder", "string", "quotient", "char->integer", "integer->char",
+                       "/", "remainder", "quotient", "char->integer", "integer->char",
                        "cons", "cadr", "caddr", "-", "*", "%", "<", ">", "<=", "abs", "memq",
                        "range", "snoc", "rac", "rdc", "set-car!", "set-cdr!", "reverse", 
                        "string->number", "list->vector", "list->string", "format", "printf",
                        "vector-native", "vector-ref", "make-vector", "list-ref", "setup", 
-                       "safe-print", "modulo"] or 
+                       "safe-print", "modulo", "vector_native", "car^", "cadr^", "string->symbol",
+                       "make-binding", "aunparse", "format-stack-trace", "get-variables-from-frame"] or 
             "?" in name):
             return self.fix_name(name) + "_proc"
         else:
@@ -760,6 +766,8 @@ public class PJScheme:Scheme
             self.Print(indent, "public static Function %s = (Function) %s;" % (self.fix_name(expr[1]), self.process_app(expr[2])))
         elif "?^" in expr[1]:
             self.Print(indent, "public static Func<object,bool> %s = %s;" % (self.fix_name(expr[1]), self.process_app(expr[2])))
+        elif expr[2] in ["#t", "#f"]:
+            self.Print(indent, "public static bool %s = %s;" % (self.fix_name(expr[1]), self.process_app(expr[2])))
         else:
             self.Print(indent, "public static object %s = %s;" % (self.fix_name(expr[1]), self.process_app(expr[2])))
 
@@ -847,7 +855,7 @@ public class PJScheme:Scheme
         if (name == "list"):
             return "sList";
         elif (name == "string"):
-            return "string_";
+            return "make_string";
         elif (name == "operator"):
             return "operator_";
         elif (name == "bool"):
@@ -956,7 +964,7 @@ public class PJScheme:Scheme
             self.Print(indent + 0,  "")
 
     def overrides(self):
-        return ["pc-halt-signal"]
+        return ["pc-halt-signal", "map^", "set-use-stack-trace"]
 
 if __name__ == "__main__":
     ## infile outfile

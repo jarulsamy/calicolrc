@@ -4870,11 +4870,11 @@
   (lambda (binding) (return* (cdr binding))))
 
 (define set-binding-value!
-  (lambda (binding value) (return* (set-car! binding value))))
+  (lambda (binding value) (set-car! binding value)))
 
 (define set-binding-docstring!
   (lambda (binding docstring)
-    (return* (set-cdr! binding docstring))))
+    (set-cdr! binding docstring)))
 
 (define make-frame
   (lambda (variables values)
@@ -4921,7 +4921,7 @@
 
 (define set-first-frame!
   (lambda (env new-frame)
-    (return* (set-car! (cdr env) new-frame))))
+    (set-car! (cdr env) new-frame)))
 
 (define extend
   (lambda (env variables values)
@@ -6132,24 +6132,22 @@
   (lambda (value) (set! *use-stack-trace* value)))
 
 (define initialize-stack-trace
-  (lambda () (return* (set-car! *stack-trace* '()))))
+  (lambda () (set-car! *stack-trace* '())))
 
 (define initialize-execute
   (lambda ()
     (set! _closure_depth 0)
     (set! _trace_pause #f)
-    (return* (initialize-stack-trace))))
+    (initialize-stack-trace)))
 
 (define push-stack-trace
   (lambda (exp)
-    (return*
-      (set-car! *stack-trace* (cons exp (car *stack-trace*))))))
+      (set-car! *stack-trace* (cons exp (car *stack-trace*)))))
 
 (define pop-stack-trace
   (lambda (exp)
     (if (not (null? (car *stack-trace*)))
-        (return*
-          (set-car! *stack-trace* (cdr (car *stack-trace*)))))))
+          (set-car! *stack-trace* (cdr (car *stack-trace*))))))
 
 (define*
   m
