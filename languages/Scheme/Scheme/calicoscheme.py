@@ -335,7 +335,7 @@ def pair_q(item):
     return isinstance(item, cons)
 
 def number_q(item):
-    return isinstance(item, (int, long, float, Fraction))
+    return isinstance(item, (int, long, float, Fraction, fractions.Fraction))
 
 def null_q(item):
     return item is symbol_emptylist
