@@ -673,7 +673,7 @@ public class PJScheme:Scheme
                 if expr[0] == "not":
                     return "(! true_q(%s))" % ", ".join([self.process_app(e) for e in expr[1:]])
                 elif expr[0] == "error":
-                    exception_msg = "\"%s: \" + String.Format(%s, %s)" % (
+                    exception_msg = "\"%s: \" + format(%s, %s)" % (
                         expr[1], expr[2], ", ".join([self.process_app(e) for e in expr[3:]]))
                     return "throw new Exception(%s);" % exception_msg
                 else:
@@ -839,9 +839,6 @@ public class PJScheme:Scheme
             self.Print(indent + 8, "return make_initial_env_extended(variables, values);")
             self.Print(indent + 4, "}")
             self.Print(indent + 4, "")
-        self.Print(indent + 4, "public static void Main() {")
-        self.Print(indent + 8, "start_rm();")
-        self.Print(indent + 4, "}")
         self.Print(indent, "}")
 
     def fix_symbol_name(self, name):

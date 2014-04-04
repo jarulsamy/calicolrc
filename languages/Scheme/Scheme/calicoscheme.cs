@@ -3910,7 +3910,7 @@ public class PJScheme:Scheme
                             token_type_reg = token_type;
                             pc = convert_buffer_to_token;
                         } else {
-                            throw new Exception("symbol_apply_action: " + String.Format("invalid action: ~a", action_reg));;
+                            throw new Exception("symbol_apply_action: " + format("invalid action: ~a", action_reg));;
                         }
                     }
                 }
@@ -4511,7 +4511,7 @@ public class PJScheme:Scheme
                                                                                                 }
                                                                                             }
                                                                                         } else {
-                                                                                            throw new Exception("symbol_apply_state: " + String.Format("invalid state: ~a", state));;
+                                                                                            throw new Exception("symbol_apply_state: " + format("invalid state: ~a", state));;
                                                                                         }
                                                                                     }
                                                                                 }
@@ -6051,7 +6051,7 @@ public class PJScheme:Scheme
                                                                                             exps = list_ref(aexp, 1);
                                                                                             return append(sList(symbol_choose), map(aunparse_proc, exps));
                                                                                         } else {
-                                                                                            throw new Exception("symbol_aunparse: " + String.Format("bad abstract syntax: ~s", aexp));;
+                                                                                            throw new Exception("symbol_aunparse: " + format("bad abstract syntax: ~s", aexp));;
                                                                                         }
                                                                                     }
                                                                                 }
@@ -6450,7 +6450,7 @@ public class PJScheme:Scheme
                                                                                                     exps_reg = operands;
                                                                                                     pc = m_star;
                                                                                                 } else {
-                                                                                                    throw new Exception("symbol_m: " + String.Format("bad abstract syntax: '~s'", exp_reg));;
+                                                                                                    throw new Exception("symbol_m: " + format("bad abstract syntax: '~s'", exp_reg));;
                                                                                                 }
                                                                                             }
                                                                                         }
@@ -6946,7 +6946,7 @@ public class PJScheme:Scheme
                     if (true_q(string_q(car(arg_list)))) {
                         return cons(string_to_list(car(arg_list)), listify(cdr(arg_list)));
                     } else {
-                        throw new Exception("symbol_map: " + String.Format("cannot use object type '~a' in map", get_type(car(arg_list))));;
+                        throw new Exception("symbol_map: " + format("cannot use object type '~a' in map", get_type(car(arg_list))));;
                     }
                 }
             }
@@ -7194,7 +7194,7 @@ public class PJScheme:Scheme
                     pattern_reg = car(pattern_reg);
                     pc = instantiate_hat;
                 } else {
-                    throw new Exception("symbol_instantiate_hat: " + String.Format("bad pattern: ~a", pattern_reg));;
+                    throw new Exception("symbol_instantiate_hat: " + format("bad pattern: ~a", pattern_reg));;
                 }
             }
         }
@@ -7242,7 +7242,7 @@ public class PJScheme:Scheme
                     s_reg = s1;
                     pc = apply_sub_hat;
                 } else {
-                    throw new Exception("symbol_apply_sub_hat: " + String.Format("bad substitution: ~a", s_reg));;
+                    throw new Exception("symbol_apply_sub_hat: " + format("bad substitution: ~a", s_reg));;
                 }
             }
         }
@@ -7530,7 +7530,4 @@ public class PJScheme:Scheme
         return sList(make_symbol("procedure"), what, id, args);
     }
     
-    public static void Main() {
-        start_rm();
-    }
 }

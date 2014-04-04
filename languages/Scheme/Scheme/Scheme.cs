@@ -454,8 +454,6 @@ public class Scheme {
   public static Proc rdc_proc = new Proc("rdc", (Procedure1) PJScheme.rdc, 1, 1);
 
 
-  public static object void_b_value_d = make_symbol("<void>");
-
 
     //  public static Proc binding_variable_proc = new Proc("binding_variable", 
     //							(Procedure1) PJScheme.binding_variable,
@@ -3258,9 +3256,12 @@ public class Scheme {
 	//PJScheme.execute_string_rm("(define fact2 (lambda fact2 (n) (if (= n 1) 1 (* (fact2 (- n 1)) n))))");
 	//printf ("  (fact2 5): {0}\n",
 	//		PJScheme.execute_string_rm("(fact2 5)"));
-	PJScheme.execute_string_rm("(define fact (lambda (n) (if (= n 1) 1 (* n (fact (- n 1))))))");
-	printf ("  (fact 1000): {0}\n",
-			PJScheme.execute_string_rm("(fact 1000)"));
+
+      Console.WriteLine("Ok");
+
+      //PJScheme.execute_string_rm("(define fact (lambda (n) (if (= n 1) 1 (* n (fact (- n 1))))))");
+      //printf ("  (fact 1000): {0}\n",
+      //		PJScheme.execute_string_rm("(fact 1000)"));
 	//printf ("  (1): {0}\n",
 		//PJScheme.execute_string_rm("(1)"));
 	// ----------------------------------

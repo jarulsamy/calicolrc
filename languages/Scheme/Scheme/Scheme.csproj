@@ -15,7 +15,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..</OutputPath>
+    <OutputPath>.</OutputPath>
     <DefineConstants>DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -26,7 +26,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>none</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..</OutputPath>
+    <OutputPath>.</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
@@ -35,14 +35,11 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="Scheme.cs" />
-    <Compile Include="pjscheme.cs" />
     <Compile Include="ObjectType.cs" />
     <Compile Include="Rational.cs" />
+    <Compile Include="calicoscheme.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="IronPython, Version=3.0.0.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
-      <HintPath>..\..\..\bin\IronPython.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Scripting.Core, Version=1.1.0.30, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
       <HintPath>..\..\..\bin\Microsoft.Scripting.Core.dll</HintPath>
     </Reference>
@@ -59,5 +56,10 @@
     <Reference Include="Calico">
       <HintPath>..\..\..\bin\Calico.exe</HintPath>
     </Reference>
+    <Reference Include="IronPython, Version=2.9.0.0, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
+      <HintPath>..\..\..\bin\IronPython.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 </Project>
