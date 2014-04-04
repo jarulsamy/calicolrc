@@ -127,7 +127,7 @@
     (let ((stack (cadddr (cddr (cadr exc))))
 	  (message (cadr (cadr exc)))
 	  (error-type (car (cadr exc))))
-      (printf "Traceback (most recent call last):~%")
+      (printf "~%Traceback (most recent call last):~%")
       (while (not (null? stack))
 	     (display (format-exception-line (car stack)))
 	     (set! stack (cdr stack)))
@@ -1824,6 +1824,14 @@
       (else
        (runtime-error "round requires exactly one number" info handler fail)))))
 
+(define set-use-stack-trace!-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((and (length-one? args) (boolean? (car args)))
+       (k2 (set-use-stack-trace (car args)) fail))
+      (else
+       (runtime-error "set-stack-trace! requires exactly one boolean" info handler fail)))))
+
 ;; Add new procedures above here!
 ;; Then, add NAME to env
 ;; Then, add NAME_proc to Scheme.cs (if you use map or apply on it internally)
@@ -1925,6 +1933,7 @@
 	    (list 'unparse unparse-prim)    ;; unparse should be in CPS
 	    (list 'unparse-procedure unparse-procedure-prim)  ;; unparse should be in CPS
 	    (list 'using using-prim)
+	    (list 'set-use-stack-trace! set-use-stack-trace!-prim)
 	    (list 'vector vector-prim)
 	    (list 'vector-ref vector-ref-prim)
 	    (list 'vector-set! vector-set!-prim)

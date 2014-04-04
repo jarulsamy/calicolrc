@@ -560,10 +560,10 @@ def trampoline():
         try:
             pc()
         except KeyboardInterrupt:
-            exception_reg = "Keyboard interrupt"
+            exception_reg = make_exception("KeyboardInterrupt", "Keyboard interrupt", symbol_none, symbol_none, symbol_none)
             pc = apply_handler2            
         except Exception, e:
-            exception_reg = e.message
+            exception_reg = make_exception("UnhandledException", e.message, symbol_none, symbol_none, symbol_none)
             pc = apply_handler2
     return final_reg
 

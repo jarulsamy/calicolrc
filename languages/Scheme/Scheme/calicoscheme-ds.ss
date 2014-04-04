@@ -3340,6 +3340,20 @@
 (define+
   <proc-105>
   (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((and (length-one? args) (boolean? (car args)))
+         (apply-cont2 k2 (set-use-stack-trace (car args)) fail))
+        (else
+         (runtime-error
+           "set-stack-trace! requires exactly one boolean"
+           info
+           handler
+           fail))))))
+
+(define+
+  <proc-106>
+  (lambda (args env2 info handler fail k2 fields)
     (let ((external-function-object (car fields)))
       (apply-cont2
         k2
@@ -5134,11 +5148,40 @@
   (lambda ()
     (let ((input (raw-read-line "==> ")))
       (let ((result (execute input 'stdin)))
-        (if (not (void? result)) (safe-print result))
+        (if (not (void? result))
+            (if (exception? result)
+                (handle-exception result)
+                (safe-print result)))
         (if *need-newline* (newline))
         (if (end-of-session? result)
             (halt* 'goodbye)
             (read-eval-print-loop))))))
+
+(define handle-exception
+  (lambda (exc)
+    (let ((stack (cadddr (cddr (cadr exc))))
+          (message (cadr (cadr exc)))
+          (error-type (car (cadr exc))))
+      (printf "~%Traceback (most recent call last):~%")
+      (while
+        (not (null? stack))
+        (display (format-exception-line (car stack)))
+        (set! stack (cdr stack)))
+      (printf "~a: ~a~%" error-type message))))
+
+(define format-exception-line
+  (lambda (line)
+    (let ((filename (car line))
+          (line-number (cadr line))
+          (column-number (caddr line)))
+      (if (= (length line) 3)
+          (format
+            "  File \"~a\", line ~a, col ~a~%"
+            filename
+            line-number
+            column-number)
+          (format "  File \"~a\", line ~a, col ~a, in ~a~%" filename
+            line-number column-number (cadddr line))))))
 
 (define execute-string
   (lambda (input) (execute input 'stdin)))
@@ -5190,7 +5233,10 @@
   (lambda ()
     (let ((input (raw-read-line "==> ")))
       (let ((result (execute-rm input 'stdin)))
-        (if (not (void? result)) (safe-print result))
+        (if (not (void? result))
+            (if (exception? result)
+                (handle-exception result)
+                (safe-print result)))
         (if *need-newline* (newline))
         (if (end-of-session? result)
             (halt* 'goodbye)
@@ -5421,11 +5467,12 @@
           (make-exception "RunTimeError" msg 'none 'none 'none)
           fail)
         (let ((src (get-srcfile info))
-              (line (get-start-line info))
-              (char (get-start-char info)))
+              (line_number (get-start-line info))
+              (char_number (get-start-char info)))
           (apply-handler2
             handler
-            (make-exception "RunTimeError" msg src line char)
+            (make-exception "RunTimeError" msg src line_number
+              char_number)
             fail)))))
 
 (define*
@@ -5934,7 +5981,11 @@
                        (list 'symbol? symbol?-prim)
                        (list 'unparse unparse-prim)
                        (list 'unparse-procedure unparse-procedure-prim)
-                       (list 'using using-prim) (list 'vector vector-prim)
+                       (list 'using using-prim)
+                       (list
+                         'set-use-stack-trace!
+                         set-use-stack-trace!-prim)
+                       (list 'vector vector-prim)
                        (list 'vector-ref vector-ref-prim)
                        (list 'vector-set! vector-set!-prim)
                        (list 'void void-prim) (list 'zero? zero?-prim)
@@ -5947,7 +5998,7 @@
 
 (define make-external-proc
   (lambda (external-function-object)
-    (make-proc <proc-105> external-function-object)))
+    (make-proc <proc-106> external-function-object)))
 
 (define pattern?
   (lambda (x)
@@ -6517,6 +6568,8 @@
 (define current-directory-prim (make-proc <proc-103>))
 
 (define round-prim (make-proc <proc-104>))
+
+(define set-use-stack-trace!-prim (make-proc <proc-105>))
 
 (define-native
   make-initial-env-extended

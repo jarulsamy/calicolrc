@@ -2714,12 +2714,35 @@
       ;; execute gets redefined as execute-rm when no-csharp-support.ss is loaded
       (let ((result (execute input 'stdin)))
 	(if (not (void? result))
-	    (safe-print result))
+	    (if (exception? result)
+		(handle-exception result)
+		(safe-print result)))
 	(if *need-newline*
 	  (newline))
 	(if (end-of-session? result)
 	  (halt* 'goodbye)
 	  (read-eval-print-loop))))))
+
+(define handle-exception
+  (lambda (exc)
+    ;; (exception ("ReadError" "cannot represent 1/0" stdin 1 1 ()))
+    (let ((stack (cadddr (cddr (cadr exc))))
+	  (message (cadr (cadr exc)))
+	  (error-type (car (cadr exc))))
+      (printf "~%Traceback (most recent call last):~%")
+      (while (not (null? stack))
+	     (display (format-exception-line (car stack)))
+	     (set! stack (cdr stack)))
+      (printf "~a: ~a~%" error-type message))))
+
+(define format-exception-line
+  (lambda (line)
+    (let ((filename (car line))
+	  (line-number (cadr line))
+	  (column-number (caddr line)))
+      (if (= (length line) 3)
+	  (format "  File \"~a\", line ~a, col ~a~%" filename line-number column-number)
+	  (format "  File \"~a\", line ~a, col ~a, in ~a~%" filename line-number column-number (cadddr line))))))
 
 (define execute-string
   (lambda (input)
@@ -2782,7 +2805,9 @@
       ;; execute gets redefined as execute-rm when no-csharp-support.ss is loaded
       (let ((result (execute-rm input 'stdin)))
 	(if (not (void? result))
-	    (safe-print result))
+	    (if (exception? result)
+		(handle-exception result)
+		(safe-print result)))
 	(if *need-newline*
 	  (newline))
 	(if (end-of-session? result)
@@ -3089,9 +3114,9 @@
     (if (eq? info 'none)
       (handler (make-exception "RunTimeError" msg 'none 'none 'none) fail)
       (let ((src (get-srcfile info))
-	    (line (get-start-line info))
-	    (char (get-start-char info)))
-	(handler (make-exception "RunTimeError" msg src line char) fail)))))
+	    (line_number (get-start-line info))
+	    (char_number (get-start-char info)))
+	(handler (make-exception "RunTimeError" msg src line_number char_number) fail)))))
 
 (define* m*
   (lambda (exps env handler fail k)
@@ -4401,6 +4426,14 @@
       (else
        (runtime-error "round requires exactly one number" info handler fail)))))
 
+(define set-use-stack-trace!-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((and (length-one? args) (boolean? (car args)))
+       (k2 (set-use-stack-trace (car args)) fail))
+      (else
+       (runtime-error "set-stack-trace! requires exactly one boolean" info handler fail)))))
+
 ;; Add new procedures above here!
 ;; Then, add NAME to env
 ;; Then, add NAME_proc to Scheme.cs (if you use map or apply on it internally)
@@ -4502,6 +4535,7 @@
 	    (list 'unparse unparse-prim)    ;; unparse should be in CPS
 	    (list 'unparse-procedure unparse-procedure-prim)  ;; unparse should be in CPS
 	    (list 'using using-prim)
+	    (list 'set-use-stack-trace! set-use-stack-trace!-prim)
 	    (list 'vector vector-prim)
 	    (list 'vector-ref vector-ref-prim)
 	    (list 'vector-set! vector-set!-prim)

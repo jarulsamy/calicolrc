@@ -3478,6 +3478,19 @@
           (set! pc runtime-error)))))
 
 (define <proc-105>
+  (lambda ()
+    (if (and (length-one? args_reg) (boolean? (car args_reg)))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (set-use-stack-trace (car args_reg)))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2))
+        (begin
+          (set! msg_reg
+            "set-stack-trace! requires exactly one boolean")
+          (set! pc runtime-error)))))
+
+(define <proc-106>
   (lambda (external-function-object)
     (set! value2_reg fail_reg)
     (set! value1_reg (apply* external-function-object args_reg))
@@ -4870,11 +4883,11 @@
   (lambda (binding) (return* (cdr binding))))
 
 (define set-binding-value!
-  (lambda (binding value) (set-car! binding value)))
+  (lambda (binding value) (return* (set-car! binding value))))
 
 (define set-binding-docstring!
   (lambda (binding docstring)
-    (set-cdr! binding docstring)))
+    (return* (set-cdr! binding docstring))))
 
 (define make-frame
   (lambda (variables values)
@@ -4921,7 +4934,7 @@
 
 (define set-first-frame!
   (lambda (env new-frame)
-    (set-car! (cdr env) new-frame)))
+    (return* (set-car! (cdr env) new-frame))))
 
 (define extend
   (lambda (env variables values)
@@ -6033,16 +6046,50 @@
                 (loop (read))))))
       (return* (loop (read))))))
 
+(define handle-exception
+  (lambda (exc)
+    (let ((stack 'undefined)
+          (message 'undefined)
+          (error-type 'undefined))
+      (set! error-type (car (cadr exc)))
+      (set! message (cadr (cadr exc)))
+      (set! stack (cadddr (cddr (cadr exc))))
+      (printf "~%Traceback (most recent call last):~%")
+      (while
+        (not (null? stack))
+        (display (format-exception-line (car stack)))
+        (set! stack (cdr stack)))
+      (printf "~a: ~a~%" error-type message))))
+
+(define format-exception-line
+  (lambda (line)
+    (let ((filename 'undefined)
+          (line-number 'undefined)
+          (column-number 'undefined))
+      (set! column-number (caddr line))
+      (set! line-number (cadr line))
+      (set! filename (car line))
+      (if (= (length line) 3)
+          (return*
+            (format
+              "  File \"~a\", line ~a, col ~a~%"
+              filename
+              line-number
+              column-number))
+          (return*
+            (format "  File \"~a\", line ~a, col ~a, in ~a~%" filename
+              line-number column-number (cadddr line)))))))
+
 (define start-rm
   (lambda ()
     (set! toplevel-env (make-toplevel-env))
     (set! macro-env (make-macro-env^))
-    (read-eval-print-loop-rm)))
+    (return* (read-eval-print-loop-rm))))
 
 (define restart-rm
   (lambda ()
     (printf "Restarting...\n")
-    (read-eval-print-loop-rm)))
+    (return* (read-eval-print-loop-rm))))
 
 (define read-eval-print-loop-rm
   (lambda ()
@@ -6050,11 +6097,14 @@
       (set! input (raw-read-line "==> "))
       (let ((result 'undefined))
         (set! result (execute-rm input 'stdin))
-        (if (not (void? result)) (safe-print result))
+        (if (not (void? result))
+            (if (exception? result)
+                (handle-exception result)
+                (safe-print result)))
         (if *need-newline* (newline))
         (if (end-of-session? result)
             (begin (set! final_reg 'goodbye) (set! pc pc-halt-signal))
-            (read-eval-print-loop-rm))))))
+            (return* (read-eval-print-loop-rm)))))))
 
 (define execute-string-rm
   (lambda (input) (return* (execute-rm input 'stdin))))
@@ -6132,22 +6182,24 @@
   (lambda (value) (set! *use-stack-trace* value)))
 
 (define initialize-stack-trace
-  (lambda () (set-car! *stack-trace* '())))
+  (lambda () (return* (set-car! *stack-trace* '()))))
 
 (define initialize-execute
   (lambda ()
     (set! _closure_depth 0)
     (set! _trace_pause #f)
-    (initialize-stack-trace)))
+    (return* (initialize-stack-trace))))
 
 (define push-stack-trace
   (lambda (exp)
-      (set-car! *stack-trace* (cons exp (car *stack-trace*)))))
+    (return*
+      (set-car! *stack-trace* (cons exp (car *stack-trace*))))))
 
 (define pop-stack-trace
   (lambda (exp)
     (if (not (null? (car *stack-trace*)))
-          (set-car! *stack-trace* (cdr (car *stack-trace*))))))
+        (return*
+          (set-car! *stack-trace* (cdr (car *stack-trace*)))))))
 
 (define*
   m
@@ -6456,12 +6508,15 @@
           (set! exception_reg
             (make-exception "RunTimeError" msg_reg 'none 'none 'none))
           (set! pc apply-handler2))
-        (let ((src 'undefined) (line 'undefined) (char 'undefined))
-          (set! char (get-start-char info_reg))
-          (set! line (get-start-line info_reg))
+        (let ((src 'undefined)
+              (line_number 'undefined)
+              (char_number 'undefined))
+          (set! char_number (get-start-char info_reg))
+          (set! line_number (get-start-line info_reg))
           (set! src (get-srcfile info_reg))
           (set! exception_reg
-            (make-exception "RunTimeError" msg_reg src line char))
+            (make-exception "RunTimeError" msg_reg src line_number
+              char_number))
           (set! pc apply-handler2)))))
 
 (define*
@@ -7135,7 +7190,9 @@
          (list 'substring substring-prim)
          (list 'symbol? symbol?-prim) (list 'unparse unparse-prim)
          (list 'unparse-procedure unparse-procedure-prim)
-         (list 'using using-prim) (list 'vector vector-prim)
+         (list 'using using-prim)
+         (list 'set-use-stack-trace! set-use-stack-trace!-prim)
+         (list 'vector vector-prim)
          (list 'vector-ref vector-ref-prim)
          (list 'vector-set! vector-set!-prim) (list 'void void-prim)
          (list 'zero? zero?-prim)
@@ -7148,7 +7205,7 @@
 
 (define make-external-proc
   (lambda (external-function-object)
-    (return* (make-proc <proc-105> external-function-object))))
+    (return* (make-proc <proc-106> external-function-object))))
 
 (define pattern?
   (lambda (x)
@@ -7799,6 +7856,8 @@
 (define current-directory-prim (make-proc <proc-103>))
 
 (define round-prim (make-proc <proc-104>))
+
+(define set-use-stack-trace!-prim (make-proc <proc-105>))
 
 (define-native
   make-initial-env-extended
