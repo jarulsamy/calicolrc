@@ -112,12 +112,35 @@
       ;; execute gets redefined as execute-rm when no-csharp-support.ss is loaded
       (let ((result (execute input 'stdin)))
 	(if (not (void? result))
-	    (safe-print result))
+	    (if (exception? result)
+		(handle-exception result)
+		(safe-print result)))
 	(if *need-newline*
 	  (newline))
 	(if (end-of-session? result)
 	  (halt* 'goodbye)
 	  (read-eval-print-loop))))))
+
+(define handle-exception
+  (lambda (exc)
+    ;; (exception ("ReadError" "cannot represent 1/0" stdin 1 1 ()))
+    (let ((stack (cadddr (cddr (cadr exc))))
+	  (message (cadr (cadr exc)))
+	  (error-type (car (cadr exc))))
+      (printf "Traceback (most recent call last):~%")
+      (while (not (null? stack))
+	     (display (format-exception-line (car stack)))
+	     (set! stack (cdr stack)))
+      (printf "~a: ~a~%" error-type message))))
+
+(define format-exception-line
+  (lambda (line)
+    (let ((filename (car line))
+	  (line-number (cadr line))
+	  (column-number (caddr line)))
+      (if (= (length line) 3)
+	  (format "  File \"~a\", line ~a, col ~a~%" filename line-number column-number)
+	  (format "  File \"~a\", line ~a, col ~a, in ~a~%" filename line-number column-number (cadddr line))))))
 
 (define execute-string
   (lambda (input)
@@ -180,7 +203,9 @@
       ;; execute gets redefined as execute-rm when no-csharp-support.ss is loaded
       (let ((result (execute-rm input 'stdin)))
 	(if (not (void? result))
-	    (safe-print result))
+	    (if (exception? result)
+		(handle-exception result)
+		(safe-print result)))
 	(if *need-newline*
 	  (newline))
 	(if (end-of-session? result)
@@ -487,9 +512,9 @@
     (if (eq? info 'none)
       (handler (make-exception "RunTimeError" msg 'none 'none 'none) fail)
       (let ((src (get-srcfile info))
-	    (line (get-start-line info))
-	    (char (get-start-char info)))
-	(handler (make-exception "RunTimeError" msg src line char) fail)))))
+	    (line_number (get-start-line info))
+	    (char_number (get-start-char info)))
+	(handler (make-exception "RunTimeError" msg src line_number char_number) fail)))))
 
 (define* m*
   (lambda (exps env handler fail k)

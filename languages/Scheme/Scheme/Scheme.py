@@ -482,7 +482,10 @@ def string_to_decimal(s):
     return float(s)
 
 def string_to_rational(s):
-    return Fraction(s)
+    try:
+        return Fraction(s)
+    except:
+        return False
 
 def string_split(string, delim):
     return List(*string.split(delim))
@@ -493,7 +496,7 @@ def symbol_to_string(symbol):
 def member(item, lyst):
     current = lyst
     while isinstance(current, cons):
-        if item == lyst:
+        if item == current.car:
             return True
         current = current.cdr
     return False
@@ -552,12 +555,16 @@ def newline():
     print()
 
 def trampoline():
+    global pc, exception_reg
     while pc:
-        pc()
-        #if end_of_session_q(final_reg):
-        #    break
-        #elif exception_q(final_reg):
-        #    break
+        try:
+            pc()
+        except KeyboardInterrupt:
+            exception_reg = "Keyboard interrupt"
+            pc = apply_handler2            
+        except Exception, e:
+            exception_reg = e.message
+            pc = apply_handler2
     return final_reg
 
 def box(item):
@@ -566,7 +573,7 @@ def box(item):
 def raw_read_line(prompt):
     try:
         return raw_input(prompt)
-    except EOFError:
+    except:
         return ""
 
 def format(formatting, *lyst):

@@ -142,7 +142,12 @@ class Translator(object):
                     state = None
                 # else, ignore
             elif state == "in-string":
-                if c == '"':
+                if c == '\\':
+                    current += c
+                    i += 1
+                    c = text[i]
+                    current += c
+                elif c == '"':
                     state = None
                     current += c
                     retval.append(current)
@@ -323,9 +328,15 @@ class PythonTranslator(Translator):
                                                self.process_app(expr[1]),
                                                self.process_app(expr[3]))
             else:
-                ## function call:
-                return "%s(%s)" % (self.fix_name(expr[0]),
-                                   ", ".join([self.process_app(e) for e in expr[1:]]))
+                if expr[0] == "error":
+                    # (error 'tag "msg ~a" args...)
+                    exception_message = "\"%s: \" + format(%s, *[%s])" % (
+                        expr[1], expr[2], ", ".join([self.process_app(e) for e in expr[3:]]))
+                    return "raise Exception(%s)" % exception_message
+                else:
+                    ## function call:
+                    return "%s(%s)" % (self.fix_name(expr[0]),
+                                       ", ".join([self.process_app(e) for e in expr[1:]]))
         else:
             return self.fix_name(expr)
 

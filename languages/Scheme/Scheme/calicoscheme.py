@@ -490,7 +490,10 @@ def string_to_decimal(s):
     return float(s)
 
 def string_to_rational(s):
-    return Fraction(s)
+    try:
+        return Fraction(s)
+    except:
+        return False
 
 def string_split(string, delim):
     return List(*string.split(delim))
@@ -501,7 +504,7 @@ def symbol_to_string(symbol):
 def member(item, lyst):
     current = lyst
     while isinstance(current, cons):
-        if item == lyst:
+        if item == current.car:
             return True
         current = current.cdr
     return False
@@ -560,12 +563,16 @@ def newline():
     print()
 
 def trampoline():
+    global pc, exception_reg
     while pc:
-        pc()
-        #if end_of_session_q(final_reg):
-        #    break
-        #elif exception_q(final_reg):
-        #    break
+        try:
+            pc()
+        except KeyboardInterrupt:
+            exception_reg = "Keyboard interrupt"
+            pc = apply_handler2            
+        except Exception, e:
+            exception_reg = e.message
+            pc = apply_handler2
     return final_reg
 
 def box(item):
@@ -574,7 +581,7 @@ def box(item):
 def raw_read_line(prompt):
     try:
         return raw_input(prompt)
-    except EOFError:
+    except:
         return ""
 
 def format(formatting, *lyst):
@@ -4005,7 +4012,7 @@ def apply_action():
                         globals()['token_type_reg'] = token_type
                         globals()['pc'] = convert_buffer_to_token
                     else:
-                        error(symbol_apply_action, "invalid action: ~a", action_reg)
+                        raise Exception("symbol_apply_action: " + format("invalid action: ~a", *[action_reg]))
 
 def scan_error():
     globals()['exception_reg'] = make_exception("ScanError", msg_reg, src_reg, line_reg, char_reg)
@@ -4481,7 +4488,7 @@ def apply_state(state, c):
                                                                                                 else:
                                                                                                     return symbol_error
                                                                                     else:
-                                                                                        error(symbol_apply_state, "invalid state: ~a", state)
+                                                                                        raise Exception("symbol_apply_state: " + format("invalid state: ~a", *[state]))
 
 def aatom_q(x):
     return (pair_q(x)) and ((car(x)) is (atom_tag))
@@ -5755,7 +5762,7 @@ def aunparse(aexp):
                                                                                         exps = list_ref(aexp, 1)
                                                                                         return append(List(symbol_choose), Map(aunparse, exps))
                                                                                     else:
-                                                                                        error(symbol_aunparse, "bad abstract syntax: ~s", aexp)
+                                                                                        raise Exception("symbol_aunparse: " + format("bad abstract syntax: ~s", *[aexp]))
 
 def exception_q(x):
     return (pair_q(x)) and ((car(x)) is (symbol_exception))
@@ -5765,6 +5772,31 @@ def read_line(prompt):
     input_ = symbol_undefined
     input_ = raw_input()
     return format("~s", input_)
+
+def handle_exception(exc):
+    stack = symbol_undefined
+    message = symbol_undefined
+    error_type = symbol_undefined
+    error_type = car(cadr(exc))
+    message = cadr(cadr(exc))
+    stack = cadddr(cddr(cadr(exc)))
+    printf("Traceback (most recent call last):~%")
+    while not(null_q(stack)):
+        display(format_exception_line(car(stack)))
+        stack = cdr(stack)
+    printf("~a: ~a~%", error_type, message)
+
+def format_exception_line(line):
+    filename = symbol_undefined
+    line_number = symbol_undefined
+    column_number = symbol_undefined
+    column_number = caddr(line)
+    line_number = cadr(line)
+    filename = car(line)
+    if Equal(length(line), 3):
+        return format("  File \"~a\", line ~a, col ~a~%", filename, line_number, column_number)
+    else:
+        return format("  File \"~a\", line ~a, col ~a, in ~a~%", filename, line_number, column_number, cadddr(line))
 
 def start_rm():
     globals()['toplevel_env'] = make_toplevel_env()
@@ -5777,7 +5809,10 @@ def read_eval_print_loop_rm():
     result = symbol_undefined
     result = execute_rm(input_, symbol_stdin)
     if not(void_q(result)):
-        safe_print(result)
+        if exception_q(result):
+            handle_exception(result)
+        else:
+            safe_print(result)
     if _starneed_newline_star:
         newline()
     if end_of_session_q(result):
@@ -6110,7 +6145,7 @@ def m():
                                                                                                 globals()['exps_reg'] = operands
                                                                                                 globals()['pc'] = m_star
                                                                                             else:
-                                                                                                error(symbol_m, "bad abstract syntax: '~s'", exp_reg)
+                                                                                                raise Exception("symbol_m: " + format("bad abstract syntax: '~s'", *[exp_reg]))
 
 def make_exception(exception, message, source, line, column):
     return List(exception, message, source, line, column, make_stack_trace())
@@ -6177,12 +6212,12 @@ def runtime_error():
         globals()['pc'] = apply_handler2
     else:
         src = symbol_undefined
-        line = symbol_undefined
-        char = symbol_undefined
-        char = get_start_char(info_reg)
-        line = get_start_line(info_reg)
+        line_number = symbol_undefined
+        char_number = symbol_undefined
+        char_number = get_start_char(info_reg)
+        line_number = get_start_line(info_reg)
         src = get_srcfile(info_reg)
-        globals()['exception_reg'] = make_exception("RunTimeError", msg_reg, src, line, char)
+        globals()['exception_reg'] = make_exception("RunTimeError", msg_reg, src, line_number, char_number)
         globals()['pc'] = apply_handler2
 
 def m_star():
@@ -6480,7 +6515,7 @@ def listify(arg_list):
                 if string_q(car(arg_list)):
                     return cons(string_to_list(car(arg_list)), listify(cdr(arg_list)))
                 else:
-                    error(symbol_Map, "cannot use object type '~a' in map", get_type(car(arg_list)))
+                    raise Exception("symbol_Map: " + format("cannot use object type '~a' in map", *[get_type(car(arg_list))]))
 
 def iterate():
     iterator = symbol_undefined
@@ -6689,7 +6724,7 @@ def instantiate_hat():
                 globals()['pattern_reg'] = car(pattern_reg)
                 globals()['pc'] = instantiate_hat
             else:
-                error(symbol_instantiate_hat, "bad pattern: ~a", pattern_reg)
+                raise Exception("symbol_instantiate_hat: " + format("bad pattern: ~a", *[pattern_reg]))
 
 def make_sub(*args):
     args = List(*args)
@@ -6731,7 +6766,7 @@ def apply_sub_hat():
                 globals()['s_reg'] = s1
                 globals()['pc'] = apply_sub_hat
             else:
-                error(symbol_apply_sub_hat, "bad substitution: ~a", s_reg)
+                raise Exception("symbol_apply_sub_hat: " + format("bad substitution: ~a", *[s_reg]))
 
 chars_to_scan = symbol_undefined
 scan_line = symbol_undefined
