@@ -35,7 +35,7 @@ class Translator(object):
             "read-eval-print-loop", "unparse", "unparse-exps", "qq-expand-cps_",
             "qq-expand-list-cps_", 
             ## defined in Scheme.cs:
-            "true?", "safe-print", "make-safe",
+            "true?", 
             "init-cont", "init-cont2", "init-cont3", "init-cont4",
             "init-handler", "init-handler2", "init-fail",
             "make-cont", "make-cont2", "make-cont3", "make-cont4", "make-macro", "make-proc",
@@ -43,7 +43,7 @@ class Translator(object):
         ] + self.overrides()
 
     def overrides(self):
-        return ["length-one?", "length-two?", "length-at-least?", "all-numeric?", "pair?"]
+        return ["length-one?", "length-two?", "length-at-least?", "all-numeric?", "pair?", "make-safe"]
 
     def parse(self, text):
         self.program = self.parser(self.lexer(text))

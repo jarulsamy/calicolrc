@@ -294,21 +294,21 @@
       (handle-debug-info exp v)
       (k v fail))))
 
-(define-native highlight-expression
+(define highlight-expression
   (lambda (exp)
     ;; call: (function 1 2 3) 
     ;;          ["filename.ss" at line 13 column 4]
     (printf "call: ~s~%" (aunparse exp))
     (let ((info (rac exp)))
       (if (not (eq? info 'none))
-	  (printf "['~a' at line ~a column ~a]~%"
+	  (printf "['~a', line ~a, col ~a]~%"
 		  (get-srcfile info)
 		  (get-start-line info)
 		  (get-start-char info))))))
 
-(define-native handle-debug-info
+(define handle-debug-info
   (lambda (exp result)
-    (printf "~s evaluates to ~a~%" (aunparse exp) result)))
+    (printf "~s => ~a~%" (aunparse exp) (make-safe result))))
 
 (define *stack-trace* '(()))
 
@@ -320,7 +320,7 @@
 
 (define set-use-stack-trace
   (lambda (value)
-    (set! *use-stack-trace* value)))
+    (set! *use-stack-trace* (true? value))))
 
 (define initialize-stack-trace
   (lambda ()
@@ -2110,15 +2110,29 @@
       (else
        (runtime-error "round requires exactly one number" info handler fail)))))
 
-(define set-use-stack-trace!-prim
+(define use-stack-trace-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
       ((and (length-one? args) (boolean? (car args)))
        (begin
 	 (set-use-stack-trace (car args))
 	 (k2 void-value fail)))
+      ((null? args)
+       (k2 *use-stack-trace* fail))
       (else
-       (runtime-error "set-stack-trace! requires exactly one boolean" info handler fail)))))
+       (runtime-error "use-stack-trace requires exactly one boolean or nothing" info handler fail)))))
+
+(define use-tracing-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((and (length-one? args) (boolean? (car args)))
+       (begin
+	 (set! *tracing-on?* (true? (car args)))
+	 (k2 void-value fail)))
+      ((null? args)
+       (k2 *tracing-on?* fail))
+      (else
+       (runtime-error "use-tracing requires exactly one boolean or nothing" info handler fail)))))
 
 (define eqv?-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -2410,7 +2424,7 @@
 	    (list 'unparse unparse-prim)    ;; unparse should be in CPS
 	    (list 'unparse-procedure unparse-procedure-prim)  ;; unparse should be in CPS
 	    (list 'using using-prim)
-	    (list 'set-use-stack-trace! set-use-stack-trace!-prim)
+	    (list 'use-stack-trace use-stack-trace-prim)
 	    (list 'vector vector-prim)
 	    (list 'vector-ref vector-ref-prim)
 	    (list 'vector-set! vector-set!-prim)
@@ -2447,6 +2461,7 @@
  	    (list 'symbol symbol-prim)
  	    (list 'typeof typeof-prim)
  	    (list 'use-lexical-address use-lexical-address-prim)
+	    (list 'use-tracing use-tracing-prim)
 	    )))
       (make-initial-env-extended (map car primitives) (map cadr primitives)))))
 

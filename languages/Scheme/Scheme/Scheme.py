@@ -109,7 +109,7 @@ class cons(object):
             retval += repr(current.car)
             current = current.cdr
         if current != symbol_emptylist:
-            retval += " . " + safe_repr(current)
+            retval += " . " + make_safe(current)
         return "(%s)" % retval
 
     def __iter__(self):
@@ -584,7 +584,7 @@ def string(*chars):
     return retval
 
 def string_split(string, delim):
-    return List(*string.split(delim))
+    return List(*string.split(str(delim)))
 
 def member(item, lyst):
     current = lyst
@@ -674,7 +674,7 @@ def format(formatting, *lyst):
         elif formatting[i] == "~":
             if formatting[i+1] == 's' and count < len(args):
                 i += 1
-                retval += safe_repr(args[count])
+                retval += make_safe(args[count])
                 count += 1
             elif formatting[i+1] == 'a' and count < len(args):
                 i += 1
@@ -690,10 +690,10 @@ def format(formatting, *lyst):
         i += 1
     return retval
 
-def safe_print(item):
-    print(safe_repr(item))
+def pretty_print(thing):
+    print(thing)
 
-def safe_repr(item):
+def make_safe(item):
     if procedure_q(item):
         return "<procedure>"
     elif environment_q(item):
@@ -853,9 +853,6 @@ def set_global_docstring_b(variable, docstring):
 def get_external_members(obj):
     return List(*[make_symbol(x) for x in  dir(obj)])
 
-def handle_debug_info(expr, value):
-    print(expr, value)
-
 def callback0(value):
     return value
 
@@ -872,9 +869,6 @@ def set_external_member_b(obj, components, value):
 
 def apply_star(external_function, args):
     return external_function(*args)
-
-def highlight_expression(expr):
-    pass
 
 def next_item(iter_item):
     return next(iter_item)
