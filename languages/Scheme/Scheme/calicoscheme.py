@@ -669,6 +669,8 @@ def box(item):
 def raw_read_line(prompt):
     try:
         return raw_input(prompt)
+    except EOFError:
+        return "(exit)"
     except:
         return ""
 
@@ -1359,7 +1361,7 @@ temp_3 = symbol_undefined
 temp_4 = symbol_undefined
 temp_1 = symbol_undefined
 def apply_cont():
-    Apply(cadr(k_reg), cddr(k_reg))
+    return Apply(cadr(k_reg), cddr(k_reg))
 
 def b_cont_1_d(chars, fail, k):
     globals()['value3_reg'] = fail
@@ -1765,7 +1767,7 @@ def b_cont_51_d(apair1, apair2, pair1, pair2, k):
         globals()['pc'] = instantiate_hat
 
 def apply_cont2():
-    Apply(cadr(k_reg), cddr(k_reg))
+    return Apply(cadr(k_reg), cddr(k_reg))
 
 def b_cont2_1_d(token, k):
     globals()['value1_reg'] = cons(token, value1_reg)
@@ -2567,7 +2569,7 @@ def b_cont2_103_d(s2, k2):
     globals()['pc'] = instantiate_hat
 
 def apply_cont3():
-    Apply(cadr(k_reg), cddr(k_reg))
+    return Apply(cadr(k_reg), cddr(k_reg))
 
 def b_cont3_1_d(src, handler, k):
     if token_type_q(value1_reg, symbol_end_marker):
@@ -2605,7 +2607,7 @@ def b_cont3_4_d(rhs_value, k):
     globals()['pc'] = apply_cont2
 
 def apply_cont4():
-    Apply(cadr(k_reg), cddr(k_reg))
+    return Apply(cadr(k_reg), cddr(k_reg))
 
 def b_cont4_1_d(src, start, k):
     globals()['k_reg'] = make_cont(b_cont_8_d, value2_reg, value3_reg, value4_reg, k)
@@ -2724,7 +2726,7 @@ def b_cont4_13_d(src, env2, handler, k):
     globals()['pc'] = aparse
 
 def apply_fail():
-    Apply(cadr(fail_reg), cddr(fail_reg))
+    return Apply(cadr(fail_reg), cddr(fail_reg))
 
 def b_fail_1_d():
     globals()['final_reg'] = "no more choices"
@@ -2754,14 +2756,14 @@ def b_fail_5_d(exps, env, handler, fail, k):
     globals()['pc'] = eval_choices
 
 def apply_handler():
-    Apply(cadr(handler_reg), cddr(handler_reg))
+    return Apply(cadr(handler_reg), cddr(handler_reg))
 
 def b_handler_1_d():
     globals()['final_reg'] = List(symbol_exception, exception_reg)
     globals()['pc'] = pc_halt_signal
 
 def apply_handler2():
-    Apply(cadr(handler_reg), cddr(handler_reg))
+    return Apply(cadr(handler_reg), cddr(handler_reg))
 
 def b_handler2_1_d():
     globals()['final_reg'] = List(symbol_exception, exception_reg)
@@ -2804,7 +2806,7 @@ def b_handler2_6_d(cexps, cvar, fexps, env, handler, k):
     globals()['pc'] = eval_sequence
 
 def apply_proc():
-    Apply(cadr(proc_reg), cddr(proc_reg))
+    return Apply(cadr(proc_reg), cddr(proc_reg))
 
 def b_proc_1_d(bodies, formals, env):
     if Equal(length(args_reg), length(formals)):
@@ -4392,7 +4394,7 @@ def b_proc_144_d(external_function_object):
     globals()['pc'] = apply_cont2
 
 def apply_macro():
-    Apply(cadr(macro_reg), cddr(macro_reg))
+    return Apply(cadr(macro_reg), cddr(macro_reg))
 
 def b_macro_1_d():
     if symbol_q_hat(cadr_hat(datum_reg)):

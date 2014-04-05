@@ -661,6 +661,8 @@ def box(item):
 def raw_read_line(prompt):
     try:
         return raw_input(prompt)
+    except EOFError:
+        return "(exit)"
     except:
         return ""
 

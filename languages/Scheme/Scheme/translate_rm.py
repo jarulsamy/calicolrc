@@ -79,7 +79,7 @@ class Translator(object):
             return "List"
         elif name == "apply":
             return "Apply"
-        elif name == "apply+":
+        elif name == "apply$":
             return "Apply"
         elif name == "range":
             return "Range"

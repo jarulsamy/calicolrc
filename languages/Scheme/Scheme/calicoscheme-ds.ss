@@ -5813,15 +5813,7 @@
     (let ((input (read))) (format "~s" input))))
 
 (define raw-read-line
-  (lambda (prompt)
-    (printf prompt)
-    (let loop ((input (read)))
-      (if (string? input)
-          input
-          (begin
-            (printf
-              "Error: input must be enclosed in quotation marks.\n==> ")
-            (loop (read)))))))
+  (lambda (prompt) (printf prompt) (format "~s" (read))))
 
 (define start
   (lambda ()

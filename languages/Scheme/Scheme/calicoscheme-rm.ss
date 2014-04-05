@@ -157,7 +157,7 @@
 
 (define*
   apply-cont
-  (lambda () (apply+ (cadr k_reg) (cddr k_reg))))
+  (lambda () (return* (apply$ (cadr k_reg) (cddr k_reg)))))
 
 (define <cont-1>
   (lambda (chars fail k)
@@ -751,7 +751,7 @@
 
 (define*
   apply-cont2
-  (lambda () (apply+ (cadr k_reg) (cddr k_reg))))
+  (lambda () (return* (apply$ (cadr k_reg) (cddr k_reg)))))
 
 (define <cont2-1>
   (lambda (token k)
@@ -1883,7 +1883,7 @@
 
 (define*
   apply-cont3
-  (lambda () (apply+ (cadr k_reg) (cddr k_reg))))
+  (lambda () (return* (apply$ (cadr k_reg) (cddr k_reg)))))
 
 (define <cont3-1>
   (lambda (src handler k)
@@ -1933,7 +1933,7 @@
 
 (define*
   apply-cont4
-  (lambda () (apply+ (cadr k_reg) (cddr k_reg))))
+  (lambda () (return* (apply$ (cadr k_reg) (cddr k_reg)))))
 
 (define <cont4-1>
   (lambda (src start k)
@@ -2079,7 +2079,8 @@
 
 (define*
   apply-fail
-  (lambda () (apply+ (cadr fail_reg) (cddr fail_reg))))
+  (lambda ()
+    (return* (apply$ (cadr fail_reg) (cddr fail_reg)))))
 
 (define <fail-1>
   (lambda ()
@@ -2118,7 +2119,8 @@
 
 (define*
   apply-handler
-  (lambda () (apply+ (cadr handler_reg) (cddr handler_reg))))
+  (lambda ()
+    (return* (apply$ (cadr handler_reg) (cddr handler_reg)))))
 
 (define <handler-1>
   (lambda ()
@@ -2130,7 +2132,8 @@
 
 (define*
   apply-handler2
-  (lambda () (apply+ (cadr handler_reg) (cddr handler_reg))))
+  (lambda ()
+    (return* (apply$ (cadr handler_reg) (cddr handler_reg)))))
 
 (define <handler2-1>
   (lambda ()
@@ -2181,7 +2184,8 @@
 
 (define*
   apply-proc
-  (lambda () (apply+ (cadr proc_reg) (cddr proc_reg))))
+  (lambda ()
+    (return* (apply$ (cadr proc_reg) (cddr proc_reg)))))
 
 (define <proc-1>
   (lambda (bodies formals env)
@@ -4129,7 +4133,8 @@
 
 (define*
   apply-macro
-  (lambda () (apply+ (cadr macro_reg) (cddr macro_reg))))
+  (lambda ()
+    (return* (apply$ (cadr macro_reg) (cddr macro_reg)))))
 
 (define <macro-1>
   (lambda ()
@@ -6662,16 +6667,7 @@
 (define raw-read-line
   (lambda (prompt)
     (printf prompt)
-    (let ((loop 'undefined))
-      (set! loop
-        (lambda (input)
-          (if (string? input)
-              input
-              (begin
-                (printf
-                  "Error: input must be enclosed in quotation marks.\n==> ")
-                (loop (read))))))
-      (return* (loop (read))))))
+    (return* (format "~s" (read)))))
 
 (define handle-exception
   (lambda (exc)

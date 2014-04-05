@@ -2685,12 +2685,7 @@
 (define raw-read-line
   (lambda (prompt)
     (printf prompt)
-    (let loop ((input (read)))
-      (if (string? input)
-	input
-	(begin
-	  (printf "Error: input must be enclosed in quotation marks.\n==> ")
-	  (loop (read)))))))
+    (format "~s" (read))))
 
 ;;----------------------------------------------------------------------------
 ;; used only by scheme CPS and DS code

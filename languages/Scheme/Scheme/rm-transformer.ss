@@ -376,7 +376,7 @@
 		     (let-bodies (cddr let-exp)))
 		`(define ,name (lambda ,let-vars ,@(consolidate (map transform let-bodies))))))
 	    (apply+ args
-	      `(apply+ ,(car args) ,(rac args)))
+	      `(apply$ ,(car args) ,(rac args)))
 ;;	    (define+ (name body)
 ;;	      (let* ((formals (cadr body))
 ;;		     (let-exp (caddr body))
