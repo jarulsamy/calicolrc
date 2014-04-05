@@ -43,7 +43,7 @@ class Translator(object):
         ] + self.overrides()
 
     def overrides(self):
-        return ["length-one?", "length-two?", "length-at-least?", "all-numeric?"]
+        return ["length-one?", "length-two?", "length-at-least?", "all-numeric?", "pair?"]
 
     def parse(self, text):
         self.program = self.parser(self.lexer(text))
@@ -370,7 +370,7 @@ class PythonTranslator(Translator):
         return expr[1]
 
     def check_global(self, name, locals):
-        if name.startswith("temp_") or name in locals:
+        if name in locals:
             return self.fix_name(name)
         else:
             return "globals()['%s']" % self.fix_name(name)
@@ -763,8 +763,7 @@ public class PJScheme:Scheme
         return expr[1]
 
     def check_global(self, name, locals):
-        #if name.startswith("temp_") or name in locals:
-            return self.fix_name(name)
+        return self.fix_name(name)
 
     def process_assignment(self, expr, locals, indent):
         self.Print(indent, "%s = %s;" % (self.check_global(expr[1], locals), 

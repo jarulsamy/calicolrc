@@ -2008,7 +2008,8 @@
 ;; vector-set!
 (define vector-set!-prim
   (lambda-proc (args env2 info handler fail k2)
-    (k2 (vector-set! (car args) (cadr args) (caddr args)) fail)))
+    (vector-set! (car args) (cadr args) (caddr args))
+    (k2 void-value fail)))
 
 ;; vector-ref
 (define vector-ref-prim
@@ -2062,7 +2063,9 @@
   (lambda-proc (args env2 info handler fail k2)
     (cond
       ((and (length-one? args) (boolean? (car args)))
-       (k2 (set-use-stack-trace (car args)) fail))
+       (begin
+	 (set-use-stack-trace (car args))
+	 (k2 void-value fail)))
       (else
        (runtime-error "set-stack-trace! requires exactly one boolean" info handler fail)))))
 

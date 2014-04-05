@@ -2643,14 +2643,14 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_31_d() {
-        if (true_q((! true_q(length_one_q(args_reg))))) {
+        if (true_q((! true_q(length_at_least_q(1, args_reg))))) {
             msg_reg = "incorrect number of arguments to load";
             pc = runtime_error;
         } else {
             k_reg = k2_reg;
             env2_reg = toplevel_env;
-            filename_reg = car(args_reg);
-            pc = load_file;
+            filenames_reg = args_reg;
+            pc = load_files;
         }
     }
     
@@ -3948,8 +3948,9 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_124_d() {
+        vector_set_b(car(args_reg), cadr(args_reg), caddr(args_reg));
         value2_reg = fail_reg;
-        value1_reg = vector_set_b(car(args_reg), cadr(args_reg), caddr(args_reg));
+        value1_reg = void_value;
         k_reg = k2_reg;
         pc = apply_cont2;
     }
@@ -4032,8 +4033,9 @@ public class PJScheme:Scheme
     
     public static void b_proc_131_d() {
         if (true_q((true_q(length_one_q(args_reg)) && true_q(boolean_q(car(args_reg)))))) {
+            set_use_stack_trace(car(args_reg));
             value2_reg = fail_reg;
-            value1_reg = set_use_stack_trace(car(args_reg));
+            value1_reg = void_value;
             k_reg = k2_reg;
             pc = apply_cont2;
         } else {

@@ -3750,10 +3750,8 @@
   <proc-124>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
-      (apply-cont2
-        k2
-        (vector-set! (car args) (cadr args) (caddr args))
-        fail))))
+      (vector-set! (car args) (cadr args) (caddr args))
+      (apply-cont2 k2 void-value fail))))
 
 (define+
   <proc-125>
@@ -3837,7 +3835,9 @@
     (let ()
       (cond
         ((and (length-one? args) (boolean? (car args)))
-         (apply-cont2 k2 (set-use-stack-trace (car args)) fail))
+         (begin
+           (set-use-stack-trace (car args))
+           (apply-cont2 k2 void-value fail)))
         (else
          (runtime-error
            "set-stack-trace! requires exactly one boolean"

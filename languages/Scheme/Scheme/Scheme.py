@@ -341,12 +341,6 @@ def all_numeric_q(ls):
             return False
     return True
 
-def all_char_q(ls):
-    for item in ls:
-        if not char_q(item):
-            return False
-    return True
-
 ### Questions:
 
 def even_q(n):
@@ -379,9 +373,6 @@ def char_numeric_q(c):
 
 def char_is__q(c1, c2):
     return c1 == c2
-
-def pair_q(item):
-    return isinstance(item, cons)
 
 def number_q(item):
     return isinstance(item, (int, long, float, Fraction, fractions.Fraction))
@@ -481,7 +472,6 @@ def GreaterThan(a, b):
     return a > b
 
 def memq(item, lyst):
-    retval = symbol_emptylist
     current = lyst
     while isinstance(current, cons):
         if current.car == item:
@@ -599,7 +589,7 @@ def tagged_list_hat(keyword, op, length):
 ### Misc:
 
 def error(function, message):
-    raise Exception("Exception in {0}: {1}" % (function, message))
+    raise Exception("Exception in %s: %s" % (function, message))
 
 def display(item):
     print(item, end="")
@@ -679,7 +669,7 @@ def search_frame(frame, variable):
         i = 0
         while not null_q(variables):
             if eq_q(car(variables), variable):
-                return bindings[i];
+                return bindings[i]
             variables = cdr(variables)
             i += 1
         return False
@@ -710,10 +700,10 @@ def assv(x, ls):
         ls = ls.cdr
     return False
 
-def memv(x, ls):
+def memv(item, ls):
     current = ls
     while isinstance(current, cons):
-        if (item1 == current.car):
+        if (item == current.car):
             return current
         current = current.cdr
     return False
@@ -789,18 +779,31 @@ def set_global_docstring_b(variable, docstring):
 def get_external_members(obj):
     return List(*[make_symbol(x) for x in  dir(obj)])
 
-#########################################
-# Calico External functions not used here
-#########################################
-# apply_star # external apply
-# callback0
-# callback1
-# callback2
-# handle_debug_info
-# highlight_expression
-# next_item
-# set_external_member_b
-#########################################
+def handle_debug_info(expr, value):
+    print(expr, value)
+
+def callback0(value):
+    return value
+
+def callback1(value):
+    return value
+
+def callback2(value):
+    return value
+
+def set_external_member_b(obj, components, value):
+    for component in components[:-1]:
+        obj = getattr(obj, component)
+    setattr(obj, components[-1], value)
+
+def apply_star(external_function, args):
+    return external_function(*args)
+
+def highlight_expression(expr):
+    pass
+
+def next_item(iter_item):
+    return next(iter_item)
 
 # end of Scheme.py
 #############################################################

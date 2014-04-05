@@ -3835,12 +3835,12 @@
 
 (define <proc-124>
   (lambda ()
+    (vector-set!
+      (car args_reg)
+      (cadr args_reg)
+      (caddr args_reg))
     (set! value2_reg fail_reg)
-    (set! value1_reg
-      (vector-set!
-        (car args_reg)
-        (cadr args_reg)
-        (caddr args_reg)))
+    (set! value1_reg void-value)
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
@@ -3923,8 +3923,9 @@
   (lambda ()
     (if (and (length-one? args_reg) (boolean? (car args_reg)))
         (begin
+          (set-use-stack-trace (car args_reg))
           (set! value2_reg fail_reg)
-          (set! value1_reg (set-use-stack-trace (car args_reg)))
+          (set! value1_reg void-value)
           (set! k_reg k2_reg)
           (set! pc apply-cont2))
         (begin
