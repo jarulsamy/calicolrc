@@ -12,6 +12,8 @@ import time
 import sys
 import os
 
+DEBUG = False
+
 #############################################################
 # Python implementation notes:
 #
@@ -33,6 +35,18 @@ import os
 
 # Set to a dictionary-like object for global-shared namespace:
 DLR_ENV = {key:getattr(__builtins__, key) for key in dir(__builtins__)}
+
+class Char(object):
+    def __init__(self, c):
+        self.char = c
+    def __eq__(self, other):
+        return isinstance(other, Char) and self.char == other.char
+    def __lt__(self, other):
+        return isinstance(other, Char) and self.char < other.char
+    def __gt__(self, other):
+        return isinstance(other, Char) and self.char > other.char
+    def __str__(self):
+        return "#\\%s" % self.char
 
 class Symbol(object):
     def __init__(self, name):
@@ -357,20 +371,20 @@ def equal_q(o1, o2):
     return o1 == o2
 
 def char_q(item):
-    return isinstance(item, str) and len(item) == 1
+    return isinstance(item, Char)
 
 def string_q(item):
     return isinstance(item, str)
 
 def char_whitespace_q(c):
-    return c in [' ', '\t', '\n', '\r']
+    return c.char in [' ', '\t', '\n', '\r']
 
 def char_alphabetic_q(c):
-    return (('A' <= c <= 'Z') or 
-            ('a' <= c <= 'z'))
+    return (('A' <= c.char <= 'Z') or 
+            ('a' <= c.char <= 'z'))
 
 def char_numeric_q(c):
-    return '0' <= c <= '9'
+    return '0' <= c.char <= '9'
 
 def char_is__q(c1, c2):
     return c1 == c2
@@ -485,10 +499,10 @@ def memq(item, lyst):
 ### Converters:
 
 def char_to_integer(c):
-    return ord(c)
+    return ord(c.char)
 
 def integer_to_char(i):
-    return chr(i)
+    return Char(chr(i))
 
 def number_to_string(number):
     return str(number)
@@ -500,10 +514,11 @@ def string_to_symbol(string):
     return make_symbol(string)
 
 def list_to_string(lyst):
+    # only on list of chars
     retval = ""
     current = lyst
     while isinstance(current, cons):
-        retval += str(current.car)
+        retval += current.car.char
         current = current.cdr
     return retval
 
@@ -518,7 +533,7 @@ def vector_ref(vector, position):
     return vector[position]
 
 def char_to_string(c):
-    return c
+    return c.char
 
 def string_to_list(st):
     return List(*[c for c in st])
@@ -538,10 +553,16 @@ def string_append(s1, s2):
     return str(s1) + str(s2)
 
 def string_ref(string, pos):
-    return string[pos]
+    return Char(string[pos])
 
-def string(s):
-    return str(s)
+def string(*s):
+    retval = ""
+    for c in s:
+        if isinstance(c, Char):
+            retval += c.char
+        else:
+            raise Exception("invalid argument to string: '%s' is not a character" % c)
+    return retval
 
 def string_to_decimal(s):
     return float(s)
@@ -617,15 +638,19 @@ def newline():
 
 def trampoline():
     global pc, exception_reg
-    while pc:
-        try:
+    if DEBUG:
+        while pc:
             pc()
-        except KeyboardInterrupt:
-            exception_reg = make_exception("KeyboardInterrupt", "Keyboard interrupt", symbol_none, symbol_none, symbol_none)
-            pc = apply_handler2            
-        except Exception, e:
-            exception_reg = make_exception("UnhandledException", e.message, symbol_none, symbol_none, symbol_none)
-            pc = apply_handler2
+    else:
+        while pc:
+            try:
+                pc()
+            except KeyboardInterrupt:
+                exception_reg = make_exception("KeyboardInterrupt", "Keyboard interrupt", symbol_none, symbol_none, symbol_none)
+                pc = apply_handler2            
+            except Exception, e:
+                exception_reg = make_exception("UnhandledException", e.message, symbol_none, symbol_none, symbol_none)
+                pc = apply_handler2
     return final_reg
 
 def box(item):
