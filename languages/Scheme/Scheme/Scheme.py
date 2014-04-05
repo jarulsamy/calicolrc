@@ -540,14 +540,25 @@ def char_to_string(c):
 def string_to_list(st):
     return List(*[Char(c) for c in st])
 
-def string_to_symbol(s):
-    return make_symbol(s)
+def symbol_to_string(symbol):
+    return symbol.name
 
-def symbol_to_string(s):
-    return s.name
+def string_to_decimal(s):
+    return float(s)
 
-def vector_to_list(v):
-    return List(*v)
+def string_to_rational(s):
+    try:
+        return Fraction(s)
+    except:
+        return False
+
+def string_to_number(s):
+    if "/" in s:
+        return string_to_rational(s)
+    elif "." in s:
+        return string_to_decimal(s)
+    else:
+        return string_to_integer(s)
 
 ### Strings:
 
@@ -566,20 +577,8 @@ def string(*chars):
             raise Exception("invalid argument to string: '%s' is not a character" % c)
     return retval
 
-def string_to_decimal(s):
-    return float(s)
-
-def string_to_rational(s):
-    try:
-        return Fraction(s)
-    except:
-        return False
-
 def string_split(string, delim):
     return List(*string.split(delim))
-
-def symbol_to_string(symbol):
-    return symbol.name
 
 def member(item, lyst):
     current = lyst
@@ -594,14 +593,6 @@ def string_is__q(s1, s2):
 
 def string_length(s):
     return len(s)
-
-def string_to_number(s):
-    if "/" in s:
-        return string_to_rational(s)
-    elif "." in s:
-        return string_to_decimal(s)
-    else:
-        return string_to_integer(s)
 
 def stringLessThan_q(s1, s2):
     return s1 < s2
@@ -784,7 +775,18 @@ def iter_q(item):
     # has no such items.
     return False
 
+def assq(x, ls):
+    if null_q(ls):
+        return False
+    elif eq_q(x, caar(ls)):
+        return car(ls)
+    else:
+        return assq(x, cdr(ls))
+
 ### External env interface:
+
+def apply_with_keywords(*args):
+    pass
 
 def using(libraries, environment):
     retval = symbol_emptylist

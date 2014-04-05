@@ -4044,6 +4044,201 @@
 (define+
   <proc-144>
   (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to float"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply float args) fail))))))
+
+(define+
+  <proc-145>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-two? args))
+         (runtime-error
+           "incorrect number of arguments to format"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply format args) fail))))))
+
+(define+
+  <proc-146>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (null? args))
+         (runtime-error
+           "incorrect number of arguments to globals"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply globals args) fail))))))
+
+(define+
+  <proc-147>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to int"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply int args) fail))))))
+
+(define+
+  <proc-148>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-at-least? 1 args))
+         (runtime-error
+           "incorrect number of arguments to apply-with-keywords"
+           info
+           handler
+           fail))
+        (else
+         (apply-cont2 k2 (apply apply-with-keywords args) fail))))))
+
+(define+
+  <proc-149>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-two? args))
+         (runtime-error
+           "incorrect number of arguments to assq"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply assq args) fail))))))
+
+(define+
+  <proc-150>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond (else (apply-cont2 k2 (apply dict args) fail))))))
+
+(define+
+  <proc-151>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-two? args))
+         (runtime-error
+           "incorrect number of arguments to property"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply property args) fail))))))
+
+(define+
+  <proc-152>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-two? args))
+         (runtime-error
+           "incorrect number of arguments to rational"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply / args) fail))))))
+
+(define+
+  <proc-153>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (null? args))
+         (runtime-error
+           "incorrect number of arguments to reset-toplevel-env"
+           info
+           handler
+           fail))
+        (else
+         (apply-cont2 k2 (apply reset-toplevel-env args) fail))))))
+
+(define+
+  <proc-154>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-two? args))
+         (runtime-error
+           "incorrect number of arguments to sort"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply sort args) fail))))))
+
+(define+
+  <proc-155>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-two? args))
+         (runtime-error
+           "incorrect number of arguments to string-append"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply string-append args) fail))))))
+
+(define+
+  <proc-156>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to string-split"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply string-split args) fail))))))
+
+(define+
+  <proc-157>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to symbol"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply make-symbol args) fail))))))
+
+(define+
+  <proc-158>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to typeof"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply type args) fail))))))
+
+(define+
+  <proc-159>
+  (lambda (args env2 info handler fail k2 fields)
+    (let () (cond (k2 (apply use-lexical-address args) fail)))))
+
+(define+
+  <proc-160>
+  (lambda (args env2 info handler fail k2 fields)
     (let ((external-function-object (car fields)))
       (apply-cont2
         k2
@@ -6592,6 +6787,12 @@
                     (make-cont2 <cont2-98> arg-list proc env handler
                       k))))))))
 
+(define use-lexical-address
+  (lambda args
+    (cond
+      ((null? args) *use-lexical-address*)
+      (else (set! *use-lexical-address* (true? (car args)))))))
+
 (define make-toplevel-env
   (lambda ()
     (let ((primitives (list (list '* times-prim) (list '+ plus-prim)
@@ -6699,14 +6900,34 @@
                        (list 'atom? atom?-prim) (list 'iter? iter?-prim)
                        (list 'list? list?-prim)
                        (list 'procedure? procedure?-prim)
-                       (list 'string<? string<?-prim))))
+                       (list 'string<? string<?-prim)
+                       (list 'float float-prim) (list 'format format-prim)
+                       (list 'globals globals-prim) (list 'int int-prim)
+                       (list 'apply-with-keywords apply-with-keywords-prim)
+                       (list 'assq assq-prim) (list 'dict dict-prim)
+                       (list 'property property-prim)
+                       (list 'rational rational-prim)
+                       (list 'reset-toplevel-env reset-toplevel-env-prim)
+                       (list 'sort sort-prim)
+                       (list 'string-append string-append-prim)
+                       (list 'string-split string-split-prim)
+                       (list 'symbol symbol-prim)
+                       (list 'typeof typeof-prim)
+                       (list
+                         'use-lexical-address
+                         use-lexical-address-prim))))
       (make-initial-env-extended
         (map car primitives)
         (map cadr primitives)))))
 
+(define reset-toplevel-env
+  (lambda ()
+    (set! toplevel-env (make-toplevel-env))
+    void-value))
+
 (define make-external-proc
   (lambda (external-function-object)
-    (make-proc <proc-144> external-function-object)))
+    (make-proc <proc-160> external-function-object)))
 
 (define pattern?
   (lambda (x)
@@ -7354,6 +7575,38 @@
 (define procedure?-prim (make-proc <proc-142>))
 
 (define string<?-prim (make-proc <proc-143>))
+
+(define float-prim (make-proc <proc-144>))
+
+(define format-prim (make-proc <proc-145>))
+
+(define globals-prim (make-proc <proc-146>))
+
+(define int-prim (make-proc <proc-147>))
+
+(define apply-with-keywords-prim (make-proc <proc-148>))
+
+(define assq-prim (make-proc <proc-149>))
+
+(define dict-prim (make-proc <proc-150>))
+
+(define property-prim (make-proc <proc-151>))
+
+(define rational-prim (make-proc <proc-152>))
+
+(define reset-toplevel-env-prim (make-proc <proc-153>))
+
+(define sort-prim (make-proc <proc-154>))
+
+(define string-append-prim (make-proc <proc-155>))
+
+(define string-split-prim (make-proc <proc-156>))
+
+(define symbol-prim (make-proc <proc-157>))
+
+(define typeof-prim (make-proc <proc-158>))
+
+(define use-lexical-address-prim (make-proc <proc-159>))
 
 (define-native
   make-initial-env-extended

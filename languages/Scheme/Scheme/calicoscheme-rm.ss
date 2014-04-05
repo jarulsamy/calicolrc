@@ -4122,6 +4122,192 @@
           (set! pc apply-cont2)))))
 
 (define <proc-144>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to float")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply float args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-145>
+  (lambda ()
+    (if (not (length-two? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to format")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply format args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-146>
+  (lambda ()
+    (if (not (null? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to globals")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply globals args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-147>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to int")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply int args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-148>
+  (lambda ()
+    (if (not (length-at-least? 1 args_reg))
+        (begin
+          (set! msg_reg
+            "incorrect number of arguments to apply-with-keywords")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply apply-with-keywords args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-149>
+  (lambda ()
+    (if (not (length-two? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to assq")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply assq args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-150>
+  (lambda ()
+    (set! value2_reg fail_reg)
+    (set! value1_reg (apply dict args_reg))
+    (set! k_reg k2_reg)
+    (set! pc apply-cont2)))
+
+(define <proc-151>
+  (lambda ()
+    (if (not (length-two? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to property")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply property args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-152>
+  (lambda ()
+    (if (not (length-two? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to rational")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply / args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-153>
+  (lambda ()
+    (if (not (null? args_reg))
+        (begin
+          (set! msg_reg
+            "incorrect number of arguments to reset-toplevel-env")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply reset-toplevel-env args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-154>
+  (lambda ()
+    (if (not (length-two? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to sort")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply sort args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-155>
+  (lambda ()
+    (if (not (length-two? args_reg))
+        (begin
+          (set! msg_reg
+            "incorrect number of arguments to string-append")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply string-append args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-156>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg
+            "incorrect number of arguments to string-split")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply string-split args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-157>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to symbol")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply make-symbol args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-158>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to typeof")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply type args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-159>
+  (lambda ()
+    (if k2_reg
+        (begin
+          (apply use-lexical-address args_reg)
+          (return* fail_reg)))))
+
+(define <proc-160>
   (lambda (external-function-object)
     (set! value2_reg fail_reg)
     (set! value1_reg (apply* external-function-object args_reg))
@@ -7749,6 +7935,12 @@
                     (set! args_reg (map car arg-list))
                     (set! pc apply-proc))))))))
 
+(define use-lexical-address
+  (lambda args
+    (if (null? args)
+        (return* *use-lexical-address*)
+        (set! *use-lexical-address* (true? (car args))))))
+
 (define make-toplevel-env
   (lambda ()
     (let ((primitives 'undefined))
@@ -7842,15 +8034,32 @@
          (list 'eqv? eqv?-prim) (list 'vector? vector?-prim)
          (list 'atom? atom?-prim) (list 'iter? iter?-prim)
          (list 'list? list?-prim) (list 'procedure? procedure?-prim)
-         (list 'string<? string<?-prim)))
+         (list 'string<? string<?-prim) (list 'float float-prim)
+         (list 'format format-prim) (list 'globals globals-prim)
+         (list 'int int-prim)
+         (list 'apply-with-keywords apply-with-keywords-prim)
+         (list 'assq assq-prim) (list 'dict dict-prim)
+         (list 'property property-prim)
+         (list 'rational rational-prim)
+         (list 'reset-toplevel-env reset-toplevel-env-prim)
+         (list 'sort sort-prim)
+         (list 'string-append string-append-prim)
+         (list 'string-split string-split-prim)
+         (list 'symbol symbol-prim) (list 'typeof typeof-prim)
+         (list 'use-lexical-address use-lexical-address-prim)))
       (return*
         (make-initial-env-extended
           (map car primitives)
           (map cadr primitives))))))
 
+(define reset-toplevel-env
+  (lambda ()
+    (set! toplevel-env (make-toplevel-env))
+    (return* void-value)))
+
 (define make-external-proc
   (lambda (external-function-object)
-    (return* (make-proc <proc-144> external-function-object))))
+    (return* (make-proc <proc-160> external-function-object))))
 
 (define pattern?
   (lambda (x)
@@ -8579,6 +8788,38 @@
 (define procedure?-prim (make-proc <proc-142>))
 
 (define string<?-prim (make-proc <proc-143>))
+
+(define float-prim (make-proc <proc-144>))
+
+(define format-prim (make-proc <proc-145>))
+
+(define globals-prim (make-proc <proc-146>))
+
+(define int-prim (make-proc <proc-147>))
+
+(define apply-with-keywords-prim (make-proc <proc-148>))
+
+(define assq-prim (make-proc <proc-149>))
+
+(define dict-prim (make-proc <proc-150>))
+
+(define property-prim (make-proc <proc-151>))
+
+(define rational-prim (make-proc <proc-152>))
+
+(define reset-toplevel-env-prim (make-proc <proc-153>))
+
+(define sort-prim (make-proc <proc-154>))
+
+(define string-append-prim (make-proc <proc-155>))
+
+(define string-split-prim (make-proc <proc-156>))
+
+(define symbol-prim (make-proc <proc-157>))
+
+(define typeof-prim (make-proc <proc-158>))
+
+(define use-lexical-address-prim (make-proc <proc-159>))
 
 (define-native
   make-initial-env-extended

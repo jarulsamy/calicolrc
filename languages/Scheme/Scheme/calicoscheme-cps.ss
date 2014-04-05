@@ -4763,6 +4763,120 @@
       (runtime-error "incorrect number of arguments to string<?" info handler fail))
      (else (k2 (apply string<? args) fail)))))
 
+(define float-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to float" info handler fail))
+      (else (k2 (apply float args) fail)))))
+
+(define format-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to format" info handler fail))
+      (else (k2 (apply format args) fail)))))
+
+(define globals-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (null? args))
+       (runtime-error "incorrect number of arguments to globals" info handler fail))
+      (else (k2 (apply globals args) fail)))))
+
+(define int-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to int" info handler fail))
+      (else (k2 (apply int args) fail)))))
+
+(define apply-with-keywords-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-at-least? 1 args))
+       (runtime-error "incorrect number of arguments to apply-with-keywords" info handler fail))
+      (else (k2 (apply apply-with-keywords args) fail)))))
+
+(define assq-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to assq" info handler fail))
+      (else (k2 (apply assq args) fail)))))
+
+(define dict-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      (else (k2 (apply dict args) fail)))))
+
+(define property-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to property" info handler fail))
+      (else (k2 (apply property args) fail)))))
+
+(define rational-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to rational" info handler fail))
+      (else (k2 (apply / args) fail)))))
+
+(define reset-toplevel-env-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (null? args))
+       (runtime-error "incorrect number of arguments to reset-toplevel-env" info handler fail))
+      (else (k2 (apply reset-toplevel-env args) fail)))))
+
+(define sort-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to sort" info handler fail))
+      (else (k2 (apply sort args) fail)))))
+
+(define string-append-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to string-append" info handler fail))
+      (else (k2 (apply string-append args) fail)))))
+
+(define string-split-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to string-split" info handler fail))
+      (else (k2 (apply string-split args) fail)))))
+
+(define symbol-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to symbol" info handler fail))
+      (else (k2 (apply make-symbol args) fail)))))
+
+(define typeof-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to typeof" info handler fail))
+      (else (k2 (apply type args) fail)))))
+ 
+(define use-lexical-address-prim
+  (lambda-proc (args env2 info handler fail k2)
+   (cond
+     (k2 (apply use-lexical-address args) fail))))
+
+(define use-lexical-address
+  (lambda args
+    (cond 
+     ((null? args) *use-lexical-address*)
+     (else (set! *use-lexical-address* (true? (car args)))))))
+
 ;; -----------------------------------------------------
 ;; To add a new primitive:
 ;; -----------------------------------------------------
@@ -4918,6 +5032,22 @@
 	    (list 'list? list?-prim)
 	    (list 'procedure? procedure?-prim)
 	    (list 'string<? string<?-prim)
+ 	    (list 'float float-prim)
+ 	    (list 'format format-prim)
+ 	    (list 'globals globals-prim)
+ 	    (list 'int int-prim)
+ 	    (list 'apply-with-keywords apply-with-keywords-prim)
+ 	    (list 'assq assq-prim)
+ 	    (list 'dict dict-prim)
+ 	    (list 'property property-prim)
+ 	    (list 'rational rational-prim)
+ 	    (list 'reset-toplevel-env reset-toplevel-env-prim)
+ 	    (list 'sort sort-prim)
+ 	    (list 'string-append string-append-prim)
+ 	    (list 'string-split string-split-prim)
+ 	    (list 'symbol symbol-prim)
+ 	    (list 'typeof typeof-prim)
+ 	    (list 'use-lexical-address use-lexical-address-prim)
 	    )))
       (make-initial-env-extended (map car primitives) (map cadr primitives)))))
 
@@ -4925,6 +5055,11 @@
 (define-native make-initial-env-extended
   (lambda (names procs)
     (make-initial-environment names procs)))
+
+(define reset-toplevel-env
+  (lambda ()
+    (set! toplevel-env (make-toplevel-env))
+    void-value))
 
 (define toplevel-env (make-toplevel-env))
 
