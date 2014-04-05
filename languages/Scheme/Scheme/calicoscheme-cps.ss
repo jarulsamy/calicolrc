@@ -4371,7 +4371,7 @@
      (else (k2 (apply string=? args) fail)))))
 
 ;; list->vector
-(define list-to-vector-prim
+(define list->vector-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
       ((not (length-one? args))
@@ -4391,6 +4391,54 @@
       ((not (all-char? (car args)))
        (runtime-error (format "list->string called on non-char list ~s" (car args)) info handler fail))
       (else (k2 (apply list->string args) fail)))))
+
+(define char->string-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to char->string" info handler fail))
+      ((not (char? (car args)))
+       (runtime-error (format "char->string called on non-char item ~s" (car args)) info handler fail))
+      (else (k2 (apply char->string args) fail)))))
+
+
+(define string->list-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to string->list" info handler fail))
+      ((not (string? (car args)))
+       (runtime-error (format "string->list called on non-string item ~s" (car args)) info handler fail))
+      (else (k2 (apply string->list args) fail)))))
+
+
+(define string->symbol-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to string->symbol" info handler fail))
+      ((not (string? (car args)))
+       (runtime-error (format "string->symbol called on non-string item ~s" (car args)) info handler fail))
+      (else (k2 (apply string->symbol args) fail)))))
+
+
+(define symbol->string-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to symbol->string" info handler fail))
+      ((not (symbol? (car args)))
+       (runtime-error (format "symbol->string called on non-symbol item ~s" (car args)) info handler fail))
+      (else (k2 (apply symbol->string args) fail)))))
+
+(define vector->list-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to vector->list" info handler fail))
+      ((not (vector? (car args)))
+       (runtime-error (format "vector->list called on incorrect vector structure ~s" (car args)) info handler fail))
+      (else (k2 (apply vector->list args) fail)))))
 
 ;; dir
 (define dir-prim
@@ -4760,7 +4808,7 @@
 	    (list 'integer->char integer->char-prim)
 	    (list 'length length-prim)
 	    (list 'list list-prim)
-	    (list 'list->vector list-to-vector-prim)
+	    (list 'list->vector list->vector-prim)
 	    (list 'list->string list->string-prim)
 	    (list 'list-ref list-ref-prim)
 	    (list 'load load-prim)
@@ -4814,6 +4862,11 @@
 	    (list 'current-directory current-directory-prim)
 	    (list 'cd current-directory-prim)
 	    (list 'round round-prim)
+	    (list 'char->string char->string-prim)
+	    (list 'string->list string->list-prim)
+	    (list 'string->symbol string->symbol-prim)
+	    (list 'symbol->string symbol->string-prim)
+	    (list 'vector->list vector->list-prim)
 	    )))
       (make-initial-env-extended (map car primitives) (map cadr primitives)))))
 

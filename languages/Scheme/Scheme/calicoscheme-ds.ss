@@ -3676,30 +3676,135 @@
   <proc-114>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
-      (make-set (directory args env2) env2 info handler fail
-        k2))))
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to char->string"
+           info
+           handler
+           fail))
+        ((not (char? (car args)))
+         (runtime-error
+           (format
+             "char->string called on non-char item ~s"
+             (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply char->string args) fail))))))
 
 (define+
   <proc-115>
   (lambda (args env2 info handler fail k2 fields)
-    (let () (apply-cont2 k2 (get-current-time) fail))))
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to string->list"
+           info
+           handler
+           fail))
+        ((not (string? (car args)))
+         (runtime-error
+           (format
+             "string->list called on non-string item ~s"
+             (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply string->list args) fail))))))
 
 (define+
   <proc-116>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to string->symbol"
+           info
+           handler
+           fail))
+        ((not (string? (car args)))
+         (runtime-error
+           (format
+             "string->symbol called on non-string item ~s"
+             (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply string->symbol args) fail))))))
+
+(define+
+  <proc-117>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to symbol->string"
+           info
+           handler
+           fail))
+        ((not (symbol? (car args)))
+         (runtime-error
+           (format
+             "symbol->string called on non-symbol item ~s"
+             (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply symbol->string args) fail))))))
+
+(define+
+  <proc-118>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to vector->list"
+           info
+           handler
+           fail))
+        ((not (vector? (car args)))
+         (runtime-error
+           (format
+             "vector->list called on incorrect vector structure ~s"
+             (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply vector->list args) fail))))))
+
+(define+
+  <proc-119>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (make-set (directory args env2) env2 info handler fail
+        k2))))
+
+(define+
+  <proc-120>
+  (lambda (args env2 info handler fail k2 fields)
+    (let () (apply-cont2 k2 (get-current-time) fail))))
+
+(define+
+  <proc-121>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (map-primitive (car args) (cdr args) env2 handler fail
         k2))))
 
 (define+
-  <proc-117>
+  <proc-122>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (for-each-primitive (car args) (cdr args) env2 handler fail
         k2))))
 
 (define+
-  <proc-118>
+  <proc-123>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3712,17 +3817,17 @@
         (else (apply-cont2 k2 (apply format args) fail))))))
 
 (define+
-  <proc-119>
+  <proc-124>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 env2 fail))))
 
 (define+
-  <proc-120>
+  <proc-125>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (using args env2) fail))))
 
 (define+
-  <proc-121>
+  <proc-126>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3735,36 +3840,36 @@
         (else (apply-cont2 k2 (not (true? (car args))) fail))))))
 
 (define+
-  <proc-122>
+  <proc-127>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (apply printf args)
       (apply-cont2 k2 void-value fail))))
 
 (define+
-  <proc-123>
+  <proc-128>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (apply vector_native args) fail))))
 
 (define+
-  <proc-124>
+  <proc-129>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (vector-set! (car args) (cadr args) (caddr args))
       (apply-cont2 k2 void-value fail))))
 
 (define+
-  <proc-125>
+  <proc-130>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (apply vector-ref args) fail))))
 
 (define+
-  <proc-126>
+  <proc-131>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (apply make-vector args) fail))))
 
 (define+
-  <proc-127>
+  <proc-132>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3782,7 +3887,7 @@
            (runtime-error message info handler fail)))))))
 
 (define+
-  <proc-128>
+  <proc-133>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3795,7 +3900,7 @@
         (else (apply-cont2 k2 (apply list-ref args) fail))))))
 
 (define+
-  <proc-129>
+  <proc-134>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3816,7 +3921,7 @@
            fail))))))
 
 (define+
-  <proc-130>
+  <proc-135>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3830,7 +3935,7 @@
            fail))))))
 
 (define+
-  <proc-131>
+  <proc-136>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3846,7 +3951,7 @@
            fail))))))
 
 (define+
-  <proc-132>
+  <proc-137>
   (lambda (args env2 info handler fail k2 fields)
     (let ((external-function-object (car fields)))
       (apply-cont2
@@ -6455,7 +6560,7 @@
                        (list 'import import-prim)
                        (list 'integer->char integer->char-prim)
                        (list 'length length-prim) (list 'list list-prim)
-                       (list 'list->vector list-to-vector-prim)
+                       (list 'list->vector list->vector-prim)
                        (list 'list->string list->string-prim)
                        (list 'list-ref list-ref-prim)
                        (list 'load load-prim)
@@ -6501,14 +6606,19 @@
                        (list 'void void-prim) (list 'zero? zero?-prim)
                        (list 'current-directory current-directory-prim)
                        (list 'cd current-directory-prim)
-                       (list 'round round-prim))))
+                       (list 'round round-prim)
+                       (list 'char->string char->string-prim)
+                       (list 'string->list string->list-prim)
+                       (list 'string->symbol string->symbol-prim)
+                       (list 'symbol->string symbol->string-prim)
+                       (list 'vector->list vector->list-prim))))
       (make-initial-env-extended
         (map car primitives)
         (map cadr primitives)))))
 
 (define make-external-proc
   (lambda (external-function-object)
-    (make-proc <proc-132> external-function-object)))
+    (make-proc <proc-137> external-function-object)))
 
 (define pattern?
   (lambda (x)
@@ -7089,49 +7199,59 @@
 
 (define string=?-prim (make-proc <proc-111>))
 
-(define list-to-vector-prim (make-proc <proc-112>))
+(define list->vector-prim (make-proc <proc-112>))
 
 (define list->string-prim (make-proc <proc-113>))
 
-(define dir-prim (make-proc <proc-114>))
+(define char->string-prim (make-proc <proc-114>))
 
-(define current-time-prim (make-proc <proc-115>))
+(define string->list-prim (make-proc <proc-115>))
 
-(define map-prim (make-proc <proc-116>))
+(define string->symbol-prim (make-proc <proc-116>))
 
-(define for-each-prim (make-proc <proc-117>))
+(define symbol->string-prim (make-proc <proc-117>))
 
-(define format-prim (make-proc <proc-118>))
+(define vector->list-prim (make-proc <proc-118>))
 
-(define current-environment-prim (make-proc <proc-119>))
+(define dir-prim (make-proc <proc-119>))
 
-(define using-prim (make-proc <proc-120>))
+(define current-time-prim (make-proc <proc-120>))
 
-(define not-prim (make-proc <proc-121>))
+(define map-prim (make-proc <proc-121>))
 
-(define printf-prim (make-proc <proc-122>))
+(define for-each-prim (make-proc <proc-122>))
 
-(define vector-prim (make-proc <proc-123>))
+(define format-prim (make-proc <proc-123>))
+
+(define current-environment-prim (make-proc <proc-124>))
+
+(define using-prim (make-proc <proc-125>))
+
+(define not-prim (make-proc <proc-126>))
+
+(define printf-prim (make-proc <proc-127>))
+
+(define vector-prim (make-proc <proc-128>))
 
 (define-native
   vector_native
   (lambda args (apply vector args)))
 
-(define vector-set!-prim (make-proc <proc-124>))
+(define vector-set!-prim (make-proc <proc-129>))
 
-(define vector-ref-prim (make-proc <proc-125>))
+(define vector-ref-prim (make-proc <proc-130>))
 
-(define make-vector-prim (make-proc <proc-126>))
+(define make-vector-prim (make-proc <proc-131>))
 
-(define error-prim (make-proc <proc-127>))
+(define error-prim (make-proc <proc-132>))
 
-(define list-ref-prim (make-proc <proc-128>))
+(define list-ref-prim (make-proc <proc-133>))
 
-(define current-directory-prim (make-proc <proc-129>))
+(define current-directory-prim (make-proc <proc-134>))
 
-(define round-prim (make-proc <proc-130>))
+(define round-prim (make-proc <proc-135>))
 
-(define set-use-stack-trace!-prim (make-proc <proc-131>))
+(define set-use-stack-trace!-prim (make-proc <proc-136>))
 
 (define-native
   make-initial-env-extended

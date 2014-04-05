@@ -3754,17 +3754,117 @@
 
 (define <proc-114>
   (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg
+            "incorrect number of arguments to char->string")
+          (set! pc runtime-error))
+        (if (not (char? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format
+                  "char->string called on non-char item ~s"
+                  (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply char->string args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-115>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg
+            "incorrect number of arguments to string->list")
+          (set! pc runtime-error))
+        (if (not (string? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format
+                  "string->list called on non-string item ~s"
+                  (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply string->list args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-116>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg
+            "incorrect number of arguments to string->symbol")
+          (set! pc runtime-error))
+        (if (not (string? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format
+                  "string->symbol called on non-string item ~s"
+                  (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply string->symbol args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-117>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg
+            "incorrect number of arguments to symbol->string")
+          (set! pc runtime-error))
+        (if (not (symbol? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format
+                  "symbol->string called on non-symbol item ~s"
+                  (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply symbol->string args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-118>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg
+            "incorrect number of arguments to vector->list")
+          (set! pc runtime-error))
+        (if (not (vector? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format
+                  "vector->list called on incorrect vector structure ~s"
+                  (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply vector->list args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-119>
+  (lambda ()
     (set! lst_reg (directory args_reg env2_reg))
     (set! pc make-set)))
 
-(define <proc-115>
+(define <proc-120>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (get-current-time))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-116>
+(define <proc-121>
   (lambda ()
     (set! k_reg k2_reg)
     (set! env_reg env2_reg)
@@ -3772,7 +3872,7 @@
     (set! args_reg (cdr args_reg))
     (set! pc map-primitive)))
 
-(define <proc-117>
+(define <proc-122>
   (lambda ()
     (set! k_reg k2_reg)
     (set! env_reg env2_reg)
@@ -3780,7 +3880,7 @@
     (set! proc_reg (car args_reg))
     (set! pc for-each-primitive)))
 
-(define <proc-118>
+(define <proc-123>
   (lambda ()
     (if (< (length args_reg) 1)
         (begin
@@ -3792,21 +3892,21 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-119>
+(define <proc-124>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg env2_reg)
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-120>
+(define <proc-125>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (using args_reg env2_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-121>
+(define <proc-126>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -3818,7 +3918,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-122>
+(define <proc-127>
   (lambda ()
     (apply printf args_reg)
     (set! value2_reg fail_reg)
@@ -3826,14 +3926,14 @@
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-123>
+(define <proc-128>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (apply vector_native args_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-124>
+(define <proc-129>
   (lambda ()
     (vector-set!
       (car args_reg)
@@ -3844,21 +3944,21 @@
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-125>
+(define <proc-130>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (apply vector-ref args_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-126>
+(define <proc-131>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (apply make-vector args_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-127>
+(define <proc-132>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -3872,7 +3972,7 @@
           (set! msg_reg message)
           (set! pc runtime-error)))))
 
-(define <proc-128>
+(define <proc-133>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -3884,7 +3984,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-129>
+(define <proc-134>
   (lambda ()
     (if (null? args_reg)
         (begin
@@ -3907,7 +4007,7 @@
                 "incorrect number of arguments to current-directory")
               (set! pc runtime-error))))))
 
-(define <proc-130>
+(define <proc-135>
   (lambda ()
     (if (and (length-one? args_reg) (number? (car args_reg)))
         (begin
@@ -3919,7 +4019,7 @@
           (set! msg_reg "round requires exactly one number")
           (set! pc runtime-error)))))
 
-(define <proc-131>
+(define <proc-136>
   (lambda ()
     (if (and (length-one? args_reg) (boolean? (car args_reg)))
         (begin
@@ -3933,7 +4033,7 @@
             "set-stack-trace! requires exactly one boolean")
           (set! pc runtime-error)))))
 
-(define <proc-132>
+(define <proc-137>
   (lambda (external-function-object)
     (set! value2_reg fail_reg)
     (set! value1_reg (apply* external-function-object args_reg))
@@ -7616,7 +7716,7 @@
          (list 'import import-prim)
          (list 'integer->char integer->char-prim)
          (list 'length length-prim) (list 'list list-prim)
-         (list 'list->vector list-to-vector-prim)
+         (list 'list->vector list->vector-prim)
          (list 'list->string list->string-prim)
          (list 'list-ref list-ref-prim) (list 'load load-prim)
          (list 'make-set make-set-prim)
@@ -7653,7 +7753,12 @@
          (list 'vector-set! vector-set!-prim) (list 'void void-prim)
          (list 'zero? zero?-prim)
          (list 'current-directory current-directory-prim)
-         (list 'cd current-directory-prim) (list 'round round-prim)))
+         (list 'cd current-directory-prim) (list 'round round-prim)
+         (list 'char->string char->string-prim)
+         (list 'string->list string->list-prim)
+         (list 'string->symbol string->symbol-prim)
+         (list 'symbol->string symbol->string-prim)
+         (list 'vector->list vector->list-prim)))
       (return*
         (make-initial-env-extended
           (map car primitives)
@@ -7661,7 +7766,7 @@
 
 (define make-external-proc
   (lambda (external-function-object)
-    (return* (make-proc <proc-132> external-function-object))))
+    (return* (make-proc <proc-137> external-function-object))))
 
 (define pattern?
   (lambda (x)
@@ -8323,49 +8428,59 @@
 
 (define string=?-prim (make-proc <proc-111>))
 
-(define list-to-vector-prim (make-proc <proc-112>))
+(define list->vector-prim (make-proc <proc-112>))
 
 (define list->string-prim (make-proc <proc-113>))
 
-(define dir-prim (make-proc <proc-114>))
+(define char->string-prim (make-proc <proc-114>))
 
-(define current-time-prim (make-proc <proc-115>))
+(define string->list-prim (make-proc <proc-115>))
 
-(define map-prim (make-proc <proc-116>))
+(define string->symbol-prim (make-proc <proc-116>))
 
-(define for-each-prim (make-proc <proc-117>))
+(define symbol->string-prim (make-proc <proc-117>))
 
-(define format-prim (make-proc <proc-118>))
+(define vector->list-prim (make-proc <proc-118>))
 
-(define current-environment-prim (make-proc <proc-119>))
+(define dir-prim (make-proc <proc-119>))
 
-(define using-prim (make-proc <proc-120>))
+(define current-time-prim (make-proc <proc-120>))
 
-(define not-prim (make-proc <proc-121>))
+(define map-prim (make-proc <proc-121>))
 
-(define printf-prim (make-proc <proc-122>))
+(define for-each-prim (make-proc <proc-122>))
 
-(define vector-prim (make-proc <proc-123>))
+(define format-prim (make-proc <proc-123>))
+
+(define current-environment-prim (make-proc <proc-124>))
+
+(define using-prim (make-proc <proc-125>))
+
+(define not-prim (make-proc <proc-126>))
+
+(define printf-prim (make-proc <proc-127>))
+
+(define vector-prim (make-proc <proc-128>))
 
 (define-native
   vector_native
   (lambda args (apply vector args)))
 
-(define vector-set!-prim (make-proc <proc-124>))
+(define vector-set!-prim (make-proc <proc-129>))
 
-(define vector-ref-prim (make-proc <proc-125>))
+(define vector-ref-prim (make-proc <proc-130>))
 
-(define make-vector-prim (make-proc <proc-126>))
+(define make-vector-prim (make-proc <proc-131>))
 
-(define error-prim (make-proc <proc-127>))
+(define error-prim (make-proc <proc-132>))
 
-(define list-ref-prim (make-proc <proc-128>))
+(define list-ref-prim (make-proc <proc-133>))
 
-(define current-directory-prim (make-proc <proc-129>))
+(define current-directory-prim (make-proc <proc-134>))
 
-(define round-prim (make-proc <proc-130>))
+(define round-prim (make-proc <proc-135>))
 
-(define set-use-stack-trace!-prim (make-proc <proc-131>))
+(define set-use-stack-trace!-prim (make-proc <proc-136>))
 
 (define-native
   make-initial-env-extended

@@ -152,6 +152,7 @@ def for_each(f, lyst):
         raise Exception("not a proper list")
 
 def sort(f, lyst):
+    # FIXME: sort the list based on f
     return List(*sorted(lyst))
 
 def append(*objs):
@@ -409,11 +410,13 @@ def pair_q(item):
     return isinstance(item, cons)
 
 def iterator_q(item):
+    # return true if an iter that implementation doesn't
+    # know how to handle. Python knows how to handle all
+    # of the iters, so this just returns false.
     return False
-    # FIXME:
-    #return not list_q(item)
 
 def get_iterator(generator):
+    # Not used in Python version
     return iter(generator)
 
 def get_type(obj):
@@ -514,6 +517,21 @@ def vector_to_list(vector):
 def vector_ref(vector, position):
     return vector[position]
 
+def char_to_string(c):
+    return c
+
+def string_to_list(st):
+    return List(*[c for c in st])
+
+def string_to_symbol(s):
+    return make_symbol(s)
+
+def symbol_to_string(s):
+    return s.name
+
+def vector_to_list(v):
+    return List(*v)
+
 ### Strings:
 
 def string_append(s1, s2):
@@ -561,9 +579,6 @@ def string_to_number(s):
         return string_to_decimal(s)
     else:
         return string_to_integer(s)
-
-def string_to_list(s):
-    return List(*s.split())
 
 def stringLessThan_q(s1, s2):
     return s1 < s2
