@@ -4234,7 +4234,8 @@
 (define+
   <proc-159>
   (lambda (args env2 info handler fail k2 fields)
-    (let () (cond (k2 (apply use-lexical-address args) fail)))))
+    (let ()
+      (apply-cont2 k2 (apply use-lexical-address args) fail))))
 
 (define+
   <proc-160>
@@ -6002,6 +6003,15 @@
 (define exception?
   (lambda (x) (and (pair? x) (eq? (car x) 'exception))))
 
+(define use-lexical-address
+  (lambda args
+    (cond
+      ((null? args) *use-lexical-address*)
+      (else
+       (begin
+         (set! *use-lexical-address* (true? (car args)))
+         void-value)))))
+
 (define read-line
   (lambda (prompt)
     (printf prompt)
@@ -6786,12 +6796,6 @@
                     fail
                     (make-cont2 <cont2-98> arg-list proc env handler
                       k))))))))
-
-(define use-lexical-address
-  (lambda args
-    (cond
-      ((null? args) *use-lexical-address*)
-      (else (set! *use-lexical-address* (true? (car args)))))))
 
 (define make-toplevel-env
   (lambda ()

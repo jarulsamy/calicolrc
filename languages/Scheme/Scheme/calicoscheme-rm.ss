@@ -4302,10 +4302,10 @@
 
 (define <proc-159>
   (lambda ()
-    (if k2_reg
-        (begin
-          (apply use-lexical-address args_reg)
-          (return* fail_reg)))))
+    (set! value2_reg fail_reg)
+    (set! value1_reg (apply use-lexical-address args_reg))
+    (set! k_reg k2_reg)
+    (set! pc apply-cont2)))
 
 (define <proc-160>
   (lambda (external-function-object)
@@ -6843,6 +6843,14 @@
   (lambda (x)
     (return* (and (pair? x) (eq? (car x) 'exception)))))
 
+(define use-lexical-address
+  (lambda args
+    (if (null? args)
+        (return* *use-lexical-address*)
+        (begin
+          (set! *use-lexical-address* (true? (car args)))
+          (return* void-value)))))
+
 (define read-line
   (lambda (prompt)
     (printf prompt)
@@ -7934,12 +7942,6 @@
                     (set! env2_reg env_reg)
                     (set! args_reg (map car arg-list))
                     (set! pc apply-proc))))))))
-
-(define use-lexical-address
-  (lambda args
-    (if (null? args)
-        (return* *use-lexical-address*)
-        (set! *use-lexical-address* (true? (car args))))))
 
 (define make-toplevel-env
   (lambda ()

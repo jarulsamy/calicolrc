@@ -203,25 +203,25 @@ class Translator(object):
         elif name == "#f":
             return "False"
         elif name == "#\\newline":
-            return "Char('\\n')"
+            return "make_char('\\n')"
         elif name == "#\\nul":
-            return "Char('\\0')"
+            return "make_char('\\0')"
         elif name == "#\\return":
-            return "Char('\\r')"
+            return "make_char('\\r')"
         elif name == "#\\space":
-            return "Char(' ')"
+            return "make_char(' ')"
         elif name == "#\\tab":
-            return "Char('\\t')"
+            return "make_char('\\t')"
         elif name == "#\\backspace":
-            return "Char('\\b')"
+            return "make_char('\\b')"
         elif name == "#\\page":
-            return "Char(u\"\\u000C\")"
+            return "make_char(u\"\\u000C\")"
         elif name == "#\\'":
-            return "Char(\"'\")"
+            return "make_char(\"'\")"
         elif name == "#\\\\":
-            return "Char('\\\\')"
+            return "make_char('\\\\')"
         elif len(name) == 3:
-            return "Char('%s')" % name[2]
+            return "make_char('%s')" % name[2]
         else:
             raise Exception("unknown char: " + name)
 

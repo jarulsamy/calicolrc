@@ -72,12 +72,18 @@ class Symbol(object):
         # So that EmptyList will be treated as []
         raise StopIteration
 
-symbols = {}
+SYMBOLS = {}
+CHARS = {}
 
 def make_symbol(string):
-    if not (string in symbols):
-        symbols[string] = Symbol(string)
-    return symbols[string]
+    if not (string in SYMBOLS):
+        SYMBOLS[string] = Symbol(string)
+    return SYMBOLS[string]
+
+def make_char(c):
+    if not (c in CHARS):
+        CHARS[c] = Char(c)
+    return CHARS[c]
 
 void_value = make_symbol("<void>")
 
@@ -504,7 +510,7 @@ def char_to_integer(c):
     return ord(c.char)
 
 def integer_to_char(i):
-    return Char(chr(i))
+    return make_char(chr(i))
 
 def number_to_string(number):
     return str(number)
@@ -538,7 +544,7 @@ def char_to_string(c):
     return c.char
 
 def string_to_list(st):
-    return List(*[Char(c) for c in st])
+    return List(*[make_char(c) for c in st])
 
 def symbol_to_string(symbol):
     return symbol.name
@@ -566,7 +572,7 @@ def string_append(s1, s2):
     return str(s1) + str(s2)
 
 def string_ref(string, pos):
-    return Char(string[pos])
+    return make_char(string[pos])
 
 def string(*chars):
     retval = ""
@@ -771,17 +777,16 @@ def atom_q(item):
     return number_q(item) or symbol_q(item) or string_q(item)
 
 def iter_q(item):
-    # If a item is externally iterable. Scheme in Python
+    # If an item is externally iterable. Scheme in Python
     # has no such items.
     return False
 
 def assq(x, ls):
-    if null_q(ls):
-        return False
-    elif eq_q(x, caar(ls)):
-        return car(ls)
-    else:
-        return assq(x, cdr(ls))
+    while not null_q(ls):
+        if eq_q(x, caar(ls)):
+            return car(ls)
+        ls = cdr(ls)
+    return False
 
 ### External env interface:
 

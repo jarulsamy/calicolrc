@@ -4287,7 +4287,7 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_148_d() {
-        if (true_q((! true_q(length_two_q(args_reg))))) {
+        if (true_q((! true_q(length_at_least_q(1, args_reg))))) {
             msg_reg = "incorrect number of arguments to apply-with-keywords";
             pc = runtime_error;
         } else {
@@ -4311,15 +4311,10 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_150_d() {
-        if (true_q((! true_q(length_one_q(args_reg))))) {
-            msg_reg = "incorrect number of arguments to dict";
-            pc = runtime_error;
-        } else {
-            value2_reg = fail_reg;
-            value1_reg = apply(dict, args_reg);
-            k_reg = k2_reg;
-            pc = apply_cont2;
-        }
+        value2_reg = fail_reg;
+        value1_reg = apply(dict, args_reg);
+        k_reg = k2_reg;
+        pc = apply_cont2;
     }
     
     public static void b_proc_151_d() {
@@ -4335,12 +4330,12 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_152_d() {
-        if (true_q((! true_q(length_one_q(args_reg))))) {
+        if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to rational";
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = apply(rational, args_reg);
+            value1_reg = apply(Divide_proc, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }
@@ -4400,7 +4395,7 @@ public class PJScheme:Scheme
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = apply(symbol, args_reg);
+            value1_reg = apply(make_symbol, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }
@@ -4412,32 +4407,20 @@ public class PJScheme:Scheme
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = apply(symbol, args_reg);
+            value1_reg = apply(type, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }
     }
     
     public static void b_proc_159_d() {
-        if (true_q((! true_q(length_one_q(args_reg))))) {
-            msg_reg = "incorrect number of arguments to typeof";
-            pc = runtime_error;
-        } else {
-            value2_reg = fail_reg;
-            value1_reg = apply(typeof, args_reg);
-            k_reg = k2_reg;
-            pc = apply_cont2;
-        }
+        value2_reg = fail_reg;
+        value1_reg = apply(use_lexical_address, args_reg);
+        k_reg = k2_reg;
+        pc = apply_cont2;
     }
     
-    public static object b_proc_160_d() {
-        if (true_q(k2_reg)) {
-            apply(use_lexical_address, args_reg);
-            return fail_reg;
-        }
-    }
-    
-    public static void b_proc_161_d(object external_function_object) {
+    public static void b_proc_160_d(object external_function_object) {
         value2_reg = fail_reg;
         value1_reg = dlr_apply(external_function_object, args_reg);
         k_reg = k2_reg;
@@ -4706,7 +4689,7 @@ public class PJScheme:Scheme
         last_scan_line = scan_line;
         last_scan_char = scan_char;
         last_scan_position = scan_position;
-        if (true_q(char_is__q(next_avail(chars), Char('\n')))) {
+        if (true_q(char_is__q(next_avail(chars), make_char('\n')))) {
             scan_line = Add(1, scan_line);
             scan_char = 1;
         } else {
@@ -4723,7 +4706,7 @@ public class PJScheme:Scheme
     
     public static void scan_input() {
         initialize_scan_counters();
-        chars_to_scan = string_append(input_reg, make_string(Char('\0')));
+        chars_to_scan = string_append(input_reg, make_string(make_char('\0')));
         chars_reg = 0;
         pc = scan_input_loop;
     }
@@ -4802,7 +4785,7 @@ public class PJScheme:Scheme
     public static void unexpected_char_error() {
         object c = symbol_undefined;
         c = next_avail(chars_reg);
-        if (true_q(char_is__q(c, Char('\0')))) {
+        if (true_q(char_is__q(c, make_char('\0')))) {
             char_reg = scan_char;
             line_reg = scan_line;
             msg_reg = "unexpected end of input";
@@ -4839,7 +4822,7 @@ public class PJScheme:Scheme
                             pc = apply_cont;
                         } else {
                             if (true_q(Eq(token_type_reg, symbol_boolean))) {
-                                value_reg = make_token2(symbol_boolean, (true_q(char_is__q(car(buffer), Char('t'))) || true_q(char_is__q(car(buffer), Char('T')))));
+                                value_reg = make_token2(symbol_boolean, (true_q(char_is__q(car(buffer), make_char('t'))) || true_q(char_is__q(car(buffer), make_char('T')))));
                                 pc = apply_cont;
                             } else {
                                 if (true_q(Eq(token_type_reg, symbol_character))) {
@@ -4850,31 +4833,31 @@ public class PJScheme:Scheme
                                         object name = symbol_undefined;
                                         name = list_to_string(buffer);
                                         if (true_q(string_is__q(name, "nul"))) {
-                                            value_reg = make_token2(symbol_character, Char('\0'));
+                                            value_reg = make_token2(symbol_character, make_char('\0'));
                                             pc = apply_cont;
                                         } else {
                                             if (true_q(string_is__q(name, "space"))) {
-                                                value_reg = make_token2(symbol_character, Char(' '));
+                                                value_reg = make_token2(symbol_character, make_char(' '));
                                                 pc = apply_cont;
                                             } else {
                                                 if (true_q(string_is__q(name, "tab"))) {
-                                                    value_reg = make_token2(symbol_character, Char('\t'));
+                                                    value_reg = make_token2(symbol_character, make_char('\t'));
                                                     pc = apply_cont;
                                                 } else {
                                                     if (true_q(string_is__q(name, "newline"))) {
-                                                        value_reg = make_token2(symbol_character, Char('\n'));
+                                                        value_reg = make_token2(symbol_character, make_char('\n'));
                                                         pc = apply_cont;
                                                     } else {
                                                         if (true_q(string_is__q(name, "linefeed"))) {
-                                                            value_reg = make_token2(symbol_character, Char('\n'));
+                                                            value_reg = make_token2(symbol_character, make_char('\n'));
                                                             pc = apply_cont;
                                                         } else {
                                                             if (true_q(string_is__q(name, "backspace"))) {
-                                                                value_reg = make_token2(symbol_character, Char('\b'));
+                                                                value_reg = make_token2(symbol_character, make_char('\b'));
                                                                 pc = apply_cont;
                                                             } else {
                                                                 if (true_q(string_is__q(name, "return"))) {
-                                                                    value_reg = make_token2(symbol_character, Char('\r'));
+                                                                    value_reg = make_token2(symbol_character, make_char('\r'));
                                                                     pc = apply_cont;
                                                                 } else {
                                                                     if (true_q(string_is__q(name, "page"))) {
@@ -5004,15 +4987,15 @@ public class PJScheme:Scheme
     }
     
     public static bool char_delimiter_q(object c) {
-        return (true_q(char_whitespace_q(c)) || true_q(char_is__q(c, Char("'"))) || true_q(char_is__q(c, Char('('))) || true_q(char_is__q(c, Char('['))) || true_q(char_is__q(c, Char(')'))) || true_q(char_is__q(c, Char(']'))) || true_q(char_is__q(c, Char('"'))) || true_q(char_is__q(c, Char(';'))) || true_q(char_is__q(c, Char('#'))) || true_q(char_is__q(c, Char('\0'))));
+        return (true_q(char_whitespace_q(c)) || true_q(char_is__q(c, make_char("'"))) || true_q(char_is__q(c, make_char('('))) || true_q(char_is__q(c, make_char('['))) || true_q(char_is__q(c, make_char(')'))) || true_q(char_is__q(c, make_char(']'))) || true_q(char_is__q(c, make_char('"'))) || true_q(char_is__q(c, make_char(';'))) || true_q(char_is__q(c, make_char('#'))) || true_q(char_is__q(c, make_char('\0'))));
     }
     
     public static bool char_initial_q(object c) {
-        return (true_q(char_alphabetic_q(c)) || true_q(char_is__q(c, Char('!'))) || true_q(char_is__q(c, Char('$'))) || true_q(char_is__q(c, Char('%'))) || true_q(char_is__q(c, Char('&'))) || true_q(char_is__q(c, Char('*'))) || true_q(char_is__q(c, Char('/'))) || true_q(char_is__q(c, Char(':'))) || true_q(char_is__q(c, Char('<'))) || true_q(char_is__q(c, Char('='))) || true_q(char_is__q(c, Char('>'))) || true_q(char_is__q(c, Char('?'))) || true_q(char_is__q(c, Char('^'))) || true_q(char_is__q(c, Char('_'))) || true_q(char_is__q(c, Char('~'))));
+        return (true_q(char_alphabetic_q(c)) || true_q(char_is__q(c, make_char('!'))) || true_q(char_is__q(c, make_char('$'))) || true_q(char_is__q(c, make_char('%'))) || true_q(char_is__q(c, make_char('&'))) || true_q(char_is__q(c, make_char('*'))) || true_q(char_is__q(c, make_char('/'))) || true_q(char_is__q(c, make_char(':'))) || true_q(char_is__q(c, make_char('<'))) || true_q(char_is__q(c, make_char('='))) || true_q(char_is__q(c, make_char('>'))) || true_q(char_is__q(c, make_char('?'))) || true_q(char_is__q(c, make_char('^'))) || true_q(char_is__q(c, make_char('_'))) || true_q(char_is__q(c, make_char('~'))));
     }
     
     public static bool char_special_subsequent_q(object c) {
-        return (true_q(char_is__q(c, Char('+'))) || true_q(char_is__q(c, Char('-'))) || true_q(char_is__q(c, Char('@'))) || true_q(char_is__q(c, Char('.'))));
+        return (true_q(char_is__q(c, make_char('+'))) || true_q(char_is__q(c, make_char('-'))) || true_q(char_is__q(c, make_char('@'))) || true_q(char_is__q(c, make_char('.'))));
     }
     
     public static bool char_subsequent_q(object c) {
@@ -5020,11 +5003,11 @@ public class PJScheme:Scheme
     }
     
     public static bool char_sign_q(object c) {
-        return (true_q(char_is__q(c, Char('+'))) || true_q(char_is__q(c, Char('-'))));
+        return (true_q(char_is__q(c, make_char('+'))) || true_q(char_is__q(c, make_char('-'))));
     }
     
     public static bool char_boolean_q(object c) {
-        return (true_q(char_is__q(c, Char('t'))) || true_q(char_is__q(c, Char('T'))) || true_q(char_is__q(c, Char('f'))) || true_q(char_is__q(c, Char('F'))));
+        return (true_q(char_is__q(c, make_char('t'))) || true_q(char_is__q(c, make_char('T'))) || true_q(char_is__q(c, make_char('f'))) || true_q(char_is__q(c, make_char('F'))));
     }
     
     public static object apply_state(object state, object c) {
@@ -5032,10 +5015,10 @@ public class PJScheme:Scheme
             if (true_q(char_whitespace_q(c))) {
                 return sList(symbol_drop, sList(symbol_goto, symbol_start_state));
             } else {
-                if (true_q(char_is__q(c, Char(';')))) {
+                if (true_q(char_is__q(c, make_char(';')))) {
                     return sList(symbol_drop, sList(symbol_goto, symbol_comment_state));
                 } else {
-                    if (true_q(char_is__q(c, Char('\0')))) {
+                    if (true_q(char_is__q(c, make_char('\0')))) {
                         return sList(symbol_drop, sList(symbol_emit, symbol_end_marker));
                     } else {
                         return sList(symbol_goto, symbol_token_start_state);
@@ -5044,31 +5027,31 @@ public class PJScheme:Scheme
             }
         } else {
             if (true_q(Eq(state, symbol_token_start_state))) {
-                if (true_q(char_is__q(c, Char('(')))) {
+                if (true_q(char_is__q(c, make_char('(')))) {
                     return sList(symbol_drop, sList(symbol_emit, symbol_lparen));
                 } else {
-                    if (true_q(char_is__q(c, Char('[')))) {
+                    if (true_q(char_is__q(c, make_char('[')))) {
                         return sList(symbol_drop, sList(symbol_emit, symbol_lbracket));
                     } else {
-                        if (true_q(char_is__q(c, Char(')')))) {
+                        if (true_q(char_is__q(c, make_char(')')))) {
                             return sList(symbol_drop, sList(symbol_emit, symbol_rparen));
                         } else {
-                            if (true_q(char_is__q(c, Char(']')))) {
+                            if (true_q(char_is__q(c, make_char(']')))) {
                                 return sList(symbol_drop, sList(symbol_emit, symbol_rbracket));
                             } else {
-                                if (true_q(char_is__q(c, Char("'")))) {
+                                if (true_q(char_is__q(c, make_char("'")))) {
                                     return sList(symbol_drop, sList(symbol_emit, symbol_apostrophe));
                                 } else {
-                                    if (true_q(char_is__q(c, Char('`')))) {
+                                    if (true_q(char_is__q(c, make_char('`')))) {
                                         return sList(symbol_drop, sList(symbol_emit, symbol_backquote));
                                     } else {
-                                        if (true_q(char_is__q(c, Char(',')))) {
+                                        if (true_q(char_is__q(c, make_char(',')))) {
                                             return sList(symbol_drop, sList(symbol_goto, symbol_comma_state));
                                         } else {
-                                            if (true_q(char_is__q(c, Char('#')))) {
+                                            if (true_q(char_is__q(c, make_char('#')))) {
                                                 return sList(symbol_drop, sList(symbol_goto, symbol_hash_prefix_state));
                                             } else {
-                                                if (true_q(char_is__q(c, Char('"')))) {
+                                                if (true_q(char_is__q(c, make_char('"')))) {
                                                     return sList(symbol_drop, sList(symbol_goto, symbol_string_state));
                                                 } else {
                                                     if (true_q(char_initial_q(c))) {
@@ -5077,7 +5060,7 @@ public class PJScheme:Scheme
                                                         if (true_q(char_sign_q(c))) {
                                                             return sList(symbol_shift, sList(symbol_goto, symbol_signed_state));
                                                         } else {
-                                                            if (true_q(char_is__q(c, Char('.')))) {
+                                                            if (true_q(char_is__q(c, make_char('.')))) {
                                                                 return sList(symbol_shift, sList(symbol_goto, symbol_decimal_point_state));
                                                             } else {
                                                                 if (true_q(char_numeric_q(c))) {
@@ -5099,10 +5082,10 @@ public class PJScheme:Scheme
                 }
             } else {
                 if (true_q(Eq(state, symbol_comment_state))) {
-                    if (true_q(char_is__q(c, Char('\n')))) {
+                    if (true_q(char_is__q(c, make_char('\n')))) {
                         return sList(symbol_drop, sList(symbol_goto, symbol_start_state));
                     } else {
-                        if (true_q(char_is__q(c, Char('\0')))) {
+                        if (true_q(char_is__q(c, make_char('\0')))) {
                             return sList(symbol_drop, sList(symbol_emit, symbol_end_marker));
                         } else {
                             return sList(symbol_drop, sList(symbol_goto, symbol_comment_state));
@@ -5110,7 +5093,7 @@ public class PJScheme:Scheme
                     }
                 } else {
                     if (true_q(Eq(state, symbol_comma_state))) {
-                        if (true_q(char_is__q(c, Char('@')))) {
+                        if (true_q(char_is__q(c, make_char('@')))) {
                             return sList(symbol_drop, sList(symbol_emit, symbol_comma_at));
                         } else {
                             return sList(symbol_emit, symbol_comma);
@@ -5120,10 +5103,10 @@ public class PJScheme:Scheme
                             if (true_q(char_boolean_q(c))) {
                                 return sList(symbol_shift, sList(symbol_emit, symbol_boolean));
                             } else {
-                                if (true_q(char_is__q(c, Char('\\')))) {
+                                if (true_q(char_is__q(c, make_char('\\')))) {
                                     return sList(symbol_drop, sList(symbol_goto, symbol_character_state));
                                 } else {
-                                    if (true_q(char_is__q(c, Char('(')))) {
+                                    if (true_q(char_is__q(c, make_char('(')))) {
                                         return sList(symbol_drop, sList(symbol_emit, symbol_lvector));
                                     } else {
                                         return symbol_error;
@@ -5135,7 +5118,7 @@ public class PJScheme:Scheme
                                 if (true_q(char_alphabetic_q(c))) {
                                     return sList(symbol_shift, sList(symbol_goto, symbol_alphabetic_character_state));
                                 } else {
-                                    if (true_q((! true_q(char_is__q(c, Char('\0')))))) {
+                                    if (true_q((! true_q(char_is__q(c, make_char('\0')))))) {
                                         return sList(symbol_shift, sList(symbol_emit, symbol_character));
                                     } else {
                                         return symbol_error;
@@ -5157,13 +5140,13 @@ public class PJScheme:Scheme
                                         }
                                     } else {
                                         if (true_q(Eq(state, symbol_string_state))) {
-                                            if (true_q(char_is__q(c, Char('"')))) {
+                                            if (true_q(char_is__q(c, make_char('"')))) {
                                                 return sList(symbol_drop, sList(symbol_emit, symbol_make_string));
                                             } else {
-                                                if (true_q(char_is__q(c, Char('\\')))) {
+                                                if (true_q(char_is__q(c, make_char('\\')))) {
                                                     return sList(symbol_drop, sList(symbol_goto, symbol_string_escape_state));
                                                 } else {
-                                                    if (true_q((! true_q(char_is__q(c, Char('\0')))))) {
+                                                    if (true_q((! true_q(char_is__q(c, make_char('\0')))))) {
                                                         return sList(symbol_shift, sList(symbol_goto, symbol_string_state));
                                                     } else {
                                                         return symbol_error;
@@ -5172,26 +5155,26 @@ public class PJScheme:Scheme
                                             }
                                         } else {
                                             if (true_q(Eq(state, symbol_string_escape_state))) {
-                                                if (true_q(char_is__q(c, Char('"')))) {
+                                                if (true_q(char_is__q(c, make_char('"')))) {
                                                     return sList(symbol_shift, sList(symbol_goto, symbol_string_state));
                                                 } else {
-                                                    if (true_q(char_is__q(c, Char('\\')))) {
+                                                    if (true_q(char_is__q(c, make_char('\\')))) {
                                                         return sList(symbol_shift, sList(symbol_goto, symbol_string_state));
                                                     } else {
-                                                        if (true_q(char_is__q(c, Char('b')))) {
-                                                            return sList(symbol_replace, Char('\b'), sList(symbol_goto, symbol_string_state));
+                                                        if (true_q(char_is__q(c, make_char('b')))) {
+                                                            return sList(symbol_replace, make_char('\b'), sList(symbol_goto, symbol_string_state));
                                                         } else {
-                                                            if (true_q(char_is__q(c, Char('f')))) {
+                                                            if (true_q(char_is__q(c, make_char('f')))) {
                                                                 return sList(symbol_replace, '\f', sList(symbol_goto, symbol_string_state));
                                                             } else {
-                                                                if (true_q(char_is__q(c, Char('n')))) {
-                                                                    return sList(symbol_replace, Char('\n'), sList(symbol_goto, symbol_string_state));
+                                                                if (true_q(char_is__q(c, make_char('n')))) {
+                                                                    return sList(symbol_replace, make_char('\n'), sList(symbol_goto, symbol_string_state));
                                                                 } else {
-                                                                    if (true_q(char_is__q(c, Char('t')))) {
-                                                                        return sList(symbol_replace, Char('\t'), sList(symbol_goto, symbol_string_state));
+                                                                    if (true_q(char_is__q(c, make_char('t')))) {
+                                                                        return sList(symbol_replace, make_char('\t'), sList(symbol_goto, symbol_string_state));
                                                                     } else {
-                                                                        if (true_q(char_is__q(c, Char('r')))) {
-                                                                            return sList(symbol_replace, Char('\r'), sList(symbol_goto, symbol_string_state));
+                                                                        if (true_q(char_is__q(c, make_char('r')))) {
+                                                                            return sList(symbol_replace, make_char('\r'), sList(symbol_goto, symbol_string_state));
                                                                         } else {
                                                                             return symbol_error;
                                                                         }
@@ -5217,7 +5200,7 @@ public class PJScheme:Scheme
                                                         if (true_q(char_numeric_q(c))) {
                                                             return sList(symbol_shift, sList(symbol_goto, symbol_whole_number_state));
                                                         } else {
-                                                            if (true_q(char_is__q(c, Char('.')))) {
+                                                            if (true_q(char_is__q(c, make_char('.')))) {
                                                                 return sList(symbol_shift, sList(symbol_goto, symbol_signed_decimal_point_state));
                                                             } else {
                                                                 if (true_q(char_delimiter_q(c))) {
@@ -5266,13 +5249,13 @@ public class PJScheme:Scheme
                                                                     if (true_q(char_numeric_q(c))) {
                                                                         return sList(symbol_shift, sList(symbol_goto, symbol_whole_number_state));
                                                                     } else {
-                                                                        if (true_q(char_is__q(c, Char('.')))) {
+                                                                        if (true_q(char_is__q(c, make_char('.')))) {
                                                                             return sList(symbol_shift, sList(symbol_goto, symbol_fractional_number_state));
                                                                         } else {
-                                                                            if (true_q(char_is__q(c, Char('/')))) {
+                                                                            if (true_q(char_is__q(c, make_char('/')))) {
                                                                                 return sList(symbol_shift, sList(symbol_goto, symbol_rational_number_state));
                                                                             } else {
-                                                                                if (true_q((true_q(char_is__q(c, Char('e'))) || true_q(char_is__q(c, Char('E')))))) {
+                                                                                if (true_q((true_q(char_is__q(c, make_char('e'))) || true_q(char_is__q(c, make_char('E')))))) {
                                                                                     return sList(symbol_shift, sList(symbol_goto, symbol_suffix_state));
                                                                                 } else {
                                                                                     if (true_q(char_delimiter_q(c))) {
@@ -5293,7 +5276,7 @@ public class PJScheme:Scheme
                                                                         if (true_q(char_numeric_q(c))) {
                                                                             return sList(symbol_shift, sList(symbol_goto, symbol_fractional_number_state));
                                                                         } else {
-                                                                            if (true_q((true_q(char_is__q(c, Char('e'))) || true_q(char_is__q(c, Char('E')))))) {
+                                                                            if (true_q((true_q(char_is__q(c, make_char('e'))) || true_q(char_is__q(c, make_char('E')))))) {
                                                                                 return sList(symbol_shift, sList(symbol_goto, symbol_suffix_state));
                                                                             } else {
                                                                                 if (true_q(char_delimiter_q(c))) {
@@ -6105,7 +6088,7 @@ public class PJScheme:Scheme
     
     public static object split_variable(object var) {
         object strings = symbol_undefined;
-        strings = string_split(symbol_to_string(var), Char('.'));
+        strings = string_split(symbol_to_string(var), make_char('.'));
         if (true_q(member("", strings))) {
             return symbol_emptylist;
         } else {
@@ -6953,6 +6936,16 @@ public class PJScheme:Scheme
     
     public static bool exception_q(object x) {
         return (true_q(pair_q(x)) && true_q(Eq(car(x), symbol_exception)));
+    }
+    
+    public static object use_lexical_address(params object [] t_args) {
+        object args = sList(t_args);
+        if (true_q(null_q(args))) {
+            return _staruse_lexical_address_star;
+        } else {
+            _staruse_lexical_address_star = true_q(car(args));
+            return void_value;
+        }
     }
     
     public static object read_line(object prompt) {
@@ -8002,8 +7995,13 @@ public class PJScheme:Scheme
         return make_initial_env_extended(map(car_proc, primitives), map(cadr_proc, primitives));
     }
     
+    public static object reset_toplevel_env() {
+        toplevel_env = make_toplevel_env();
+        return void_value;
+    }
+    
     public static object make_external_proc(object external_function_object) {
-        return make_proc("proc", 161, external_function_object);
+        return make_proc("proc", 160, external_function_object);
     }
     
     public static bool pattern_q(object x) {
@@ -8370,8 +8368,7 @@ public class PJScheme:Scheme
     public static object string_split_prim = make_proc("proc", 156);
     public static object symbol_prim = make_proc("proc", 157);
     public static object typeof_prim = make_proc("proc", 158);
-    public static object typeof_prim = make_proc("proc", 159);
-    public static object use_lexical_address_prim = make_proc("proc", 160);
+    public static object use_lexical_address_prim = make_proc("proc", 159);
     public static object toplevel_env = make_toplevel_env();
     public static MethodInfo[] mi_cont4;
     public static MethodInfo[] mi_handler;
@@ -8392,7 +8389,7 @@ public class PJScheme:Scheme
         mi_cont2 = new MethodInfo[206];
         mi_fail = new MethodInfo[8];
         mi_macro = new MethodInfo[12];
-        mi_proc = new MethodInfo[317];
+        mi_proc = new MethodInfo[315];
         
         for (int i = 1; i < 24; i++) {
             mi_cont4[i] = typeof(PJScheme).GetMethod(String.Format("b_cont4_{0}_d", i));
@@ -8450,7 +8447,7 @@ public class PJScheme:Scheme
             }
         }
         
-        for (int i = 1; i < 317; i++) {
+        for (int i = 1; i < 315; i++) {
             mi_proc[i] = typeof(PJScheme).GetMethod(String.Format("b_proc_{0}_d", i));
             if (mi_proc[i] == null) {
                 throw new Exception(String.Format("Undefined mi: mi_proc[{0}]", i));

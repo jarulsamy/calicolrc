@@ -80,12 +80,18 @@ class Symbol(object):
         # So that EmptyList will be treated as []
         raise StopIteration
 
-symbols = {}
+SYMBOLS = {}
+CHARS = {}
 
 def make_symbol(string):
-    if not (string in symbols):
-        symbols[string] = Symbol(string)
-    return symbols[string]
+    if not (string in SYMBOLS):
+        SYMBOLS[string] = Symbol(string)
+    return SYMBOLS[string]
+
+def make_char(c):
+    if not (c in CHARS):
+        CHARS[c] = Char(c)
+    return CHARS[c]
 
 void_value = make_symbol("<void>")
 
@@ -512,7 +518,7 @@ def char_to_integer(c):
     return ord(c.char)
 
 def integer_to_char(i):
-    return Char(chr(i))
+    return make_char(chr(i))
 
 def number_to_string(number):
     return str(number)
@@ -546,7 +552,7 @@ def char_to_string(c):
     return c.char
 
 def string_to_list(st):
-    return List(*[Char(c) for c in st])
+    return List(*[make_char(c) for c in st])
 
 def symbol_to_string(symbol):
     return symbol.name
@@ -574,7 +580,7 @@ def string_append(s1, s2):
     return str(s1) + str(s2)
 
 def string_ref(string, pos):
-    return Char(string[pos])
+    return make_char(string[pos])
 
 def string(*chars):
     retval = ""
@@ -779,17 +785,16 @@ def atom_q(item):
     return number_q(item) or symbol_q(item) or string_q(item)
 
 def iter_q(item):
-    # If a item is externally iterable. Scheme in Python
+    # If an item is externally iterable. Scheme in Python
     # has no such items.
     return False
 
 def assq(x, ls):
-    if null_q(ls):
-        return False
-    elif eq_q(x, caar(ls)):
-        return car(ls)
-    else:
-        return assq(x, cdr(ls))
+    while not null_q(ls):
+        if eq_q(x, caar(ls)):
+            return car(ls)
+        ls = cdr(ls)
+    return False
 
 ### External env interface:
 
@@ -4550,9 +4555,10 @@ def b_proc_158_d():
         globals()['pc'] = apply_cont2
 
 def b_proc_159_d():
-    if k2_reg:
-        Apply(use_lexical_address, args_reg)
-        return fail_reg
+    globals()['value2_reg'] = fail_reg
+    globals()['value1_reg'] = Apply(use_lexical_address, args_reg)
+    globals()['k_reg'] = k2_reg
+    globals()['pc'] = apply_cont2
 
 def b_proc_160_d(external_function_object):
     globals()['value2_reg'] = fail_reg
@@ -4788,7 +4794,7 @@ def increment_scan_counters(chars):
     globals()['last_scan_line'] = scan_line
     globals()['last_scan_char'] = scan_char
     globals()['last_scan_position'] = scan_position
-    if char_is__q(next_avail(chars), Char('\n')):
+    if char_is__q(next_avail(chars), make_char('\n')):
         globals()['scan_line'] = (1) + (scan_line)
         globals()['scan_char'] = 1
     else:
@@ -4802,7 +4808,7 @@ def mark_token_start():
 
 def scan_input():
     initialize_scan_counters()
-    globals()['chars_to_scan'] = string_append(input_reg, string(Char('\0')))
+    globals()['chars_to_scan'] = string_append(input_reg, string(make_char('\0')))
     globals()['chars_reg'] = 0
     globals()['pc'] = scan_input_loop
 
@@ -4870,7 +4876,7 @@ def scan_error():
 def unexpected_char_error():
     c = symbol_undefined
     c = next_avail(chars_reg)
-    if char_is__q(c, Char('\0')):
+    if char_is__q(c, make_char('\0')):
         globals()['char_reg'] = scan_char
         globals()['line_reg'] = scan_line
         globals()['msg_reg'] = "unexpected end of input"
@@ -4905,7 +4911,7 @@ def convert_buffer_to_token():
                         globals()['pc'] = apply_cont
                     else:
                         if (token_type_reg) is (symbol_boolean):
-                            globals()['value_reg'] = make_token2(symbol_boolean, (char_is__q(car(buffer), Char('t'))) or (char_is__q(car(buffer), Char('T'))))
+                            globals()['value_reg'] = make_token2(symbol_boolean, (char_is__q(car(buffer), make_char('t'))) or (char_is__q(car(buffer), make_char('T'))))
                             globals()['pc'] = apply_cont
                         else:
                             if (token_type_reg) is (symbol_character):
@@ -4916,35 +4922,35 @@ def convert_buffer_to_token():
                                     name = symbol_undefined
                                     name = list_to_string(buffer)
                                     if string_is__q(name, "nul"):
-                                        globals()['value_reg'] = make_token2(symbol_character, Char('\0'))
+                                        globals()['value_reg'] = make_token2(symbol_character, make_char('\0'))
                                         globals()['pc'] = apply_cont
                                     else:
                                         if string_is__q(name, "space"):
-                                            globals()['value_reg'] = make_token2(symbol_character, Char(' '))
+                                            globals()['value_reg'] = make_token2(symbol_character, make_char(' '))
                                             globals()['pc'] = apply_cont
                                         else:
                                             if string_is__q(name, "tab"):
-                                                globals()['value_reg'] = make_token2(symbol_character, Char('\t'))
+                                                globals()['value_reg'] = make_token2(symbol_character, make_char('\t'))
                                                 globals()['pc'] = apply_cont
                                             else:
                                                 if string_is__q(name, "newline"):
-                                                    globals()['value_reg'] = make_token2(symbol_character, Char('\n'))
+                                                    globals()['value_reg'] = make_token2(symbol_character, make_char('\n'))
                                                     globals()['pc'] = apply_cont
                                                 else:
                                                     if string_is__q(name, "linefeed"):
-                                                        globals()['value_reg'] = make_token2(symbol_character, Char('\n'))
+                                                        globals()['value_reg'] = make_token2(symbol_character, make_char('\n'))
                                                         globals()['pc'] = apply_cont
                                                     else:
                                                         if string_is__q(name, "backspace"):
-                                                            globals()['value_reg'] = make_token2(symbol_character, Char('\b'))
+                                                            globals()['value_reg'] = make_token2(symbol_character, make_char('\b'))
                                                             globals()['pc'] = apply_cont
                                                         else:
                                                             if string_is__q(name, "return"):
-                                                                globals()['value_reg'] = make_token2(symbol_character, Char('\r'))
+                                                                globals()['value_reg'] = make_token2(symbol_character, make_char('\r'))
                                                                 globals()['pc'] = apply_cont
                                                             else:
                                                                 if string_is__q(name, "page"):
-                                                                    globals()['value_reg'] = make_token2(symbol_character, Char(u"\u000C"))
+                                                                    globals()['value_reg'] = make_token2(symbol_character, make_char(u"\u000C"))
                                                                     globals()['pc'] = apply_cont
                                                                 else:
                                                                     globals()['char_reg'] = token_start_char
@@ -5034,62 +5040,62 @@ def snoc(x, ls):
         return front
 
 def char_delimiter_q(c):
-    return (char_whitespace_q(c)) or (char_is__q(c, Char("'"))) or (char_is__q(c, Char('('))) or (char_is__q(c, Char('['))) or (char_is__q(c, Char(')'))) or (char_is__q(c, Char(']'))) or (char_is__q(c, Char('"'))) or (char_is__q(c, Char(';'))) or (char_is__q(c, Char('#'))) or (char_is__q(c, Char('\0')))
+    return (char_whitespace_q(c)) or (char_is__q(c, make_char("'"))) or (char_is__q(c, make_char('('))) or (char_is__q(c, make_char('['))) or (char_is__q(c, make_char(')'))) or (char_is__q(c, make_char(']'))) or (char_is__q(c, make_char('"'))) or (char_is__q(c, make_char(';'))) or (char_is__q(c, make_char('#'))) or (char_is__q(c, make_char('\0')))
 
 def char_initial_q(c):
-    return (char_alphabetic_q(c)) or (char_is__q(c, Char('!'))) or (char_is__q(c, Char('$'))) or (char_is__q(c, Char('%'))) or (char_is__q(c, Char('&'))) or (char_is__q(c, Char('*'))) or (char_is__q(c, Char('/'))) or (char_is__q(c, Char(':'))) or (char_is__q(c, Char('<'))) or (char_is__q(c, Char('='))) or (char_is__q(c, Char('>'))) or (char_is__q(c, Char('?'))) or (char_is__q(c, Char('^'))) or (char_is__q(c, Char('_'))) or (char_is__q(c, Char('~')))
+    return (char_alphabetic_q(c)) or (char_is__q(c, make_char('!'))) or (char_is__q(c, make_char('$'))) or (char_is__q(c, make_char('%'))) or (char_is__q(c, make_char('&'))) or (char_is__q(c, make_char('*'))) or (char_is__q(c, make_char('/'))) or (char_is__q(c, make_char(':'))) or (char_is__q(c, make_char('<'))) or (char_is__q(c, make_char('='))) or (char_is__q(c, make_char('>'))) or (char_is__q(c, make_char('?'))) or (char_is__q(c, make_char('^'))) or (char_is__q(c, make_char('_'))) or (char_is__q(c, make_char('~')))
 
 def char_special_subsequent_q(c):
-    return (char_is__q(c, Char('+'))) or (char_is__q(c, Char('-'))) or (char_is__q(c, Char('@'))) or (char_is__q(c, Char('.')))
+    return (char_is__q(c, make_char('+'))) or (char_is__q(c, make_char('-'))) or (char_is__q(c, make_char('@'))) or (char_is__q(c, make_char('.')))
 
 def char_subsequent_q(c):
     return (char_initial_q(c)) or (char_numeric_q(c)) or (char_special_subsequent_q(c))
 
 def char_sign_q(c):
-    return (char_is__q(c, Char('+'))) or (char_is__q(c, Char('-')))
+    return (char_is__q(c, make_char('+'))) or (char_is__q(c, make_char('-')))
 
 def char_boolean_q(c):
-    return (char_is__q(c, Char('t'))) or (char_is__q(c, Char('T'))) or (char_is__q(c, Char('f'))) or (char_is__q(c, Char('F')))
+    return (char_is__q(c, make_char('t'))) or (char_is__q(c, make_char('T'))) or (char_is__q(c, make_char('f'))) or (char_is__q(c, make_char('F')))
 
 def apply_state(state, c):
     if (state) is (symbol_start_state):
         if char_whitespace_q(c):
             return List(symbol_drop, List(symbol_goto, symbol_start_state))
         else:
-            if char_is__q(c, Char(';')):
+            if char_is__q(c, make_char(';')):
                 return List(symbol_drop, List(symbol_goto, symbol_comment_state))
             else:
-                if char_is__q(c, Char('\0')):
+                if char_is__q(c, make_char('\0')):
                     return List(symbol_drop, List(symbol_emit, symbol_end_marker))
                 else:
                     return List(symbol_goto, symbol_token_start_state)
     else:
         if (state) is (symbol_token_start_state):
-            if char_is__q(c, Char('(')):
+            if char_is__q(c, make_char('(')):
                 return List(symbol_drop, List(symbol_emit, symbol_lparen))
             else:
-                if char_is__q(c, Char('[')):
+                if char_is__q(c, make_char('[')):
                     return List(symbol_drop, List(symbol_emit, symbol_lbracket))
                 else:
-                    if char_is__q(c, Char(')')):
+                    if char_is__q(c, make_char(')')):
                         return List(symbol_drop, List(symbol_emit, symbol_rparen))
                     else:
-                        if char_is__q(c, Char(']')):
+                        if char_is__q(c, make_char(']')):
                             return List(symbol_drop, List(symbol_emit, symbol_rbracket))
                         else:
-                            if char_is__q(c, Char("'")):
+                            if char_is__q(c, make_char("'")):
                                 return List(symbol_drop, List(symbol_emit, symbol_apostrophe))
                             else:
-                                if char_is__q(c, Char('`')):
+                                if char_is__q(c, make_char('`')):
                                     return List(symbol_drop, List(symbol_emit, symbol_backquote))
                                 else:
-                                    if char_is__q(c, Char(',')):
+                                    if char_is__q(c, make_char(',')):
                                         return List(symbol_drop, List(symbol_goto, symbol_comma_state))
                                     else:
-                                        if char_is__q(c, Char('#')):
+                                        if char_is__q(c, make_char('#')):
                                             return List(symbol_drop, List(symbol_goto, symbol_hash_prefix_state))
                                         else:
-                                            if char_is__q(c, Char('"')):
+                                            if char_is__q(c, make_char('"')):
                                                 return List(symbol_drop, List(symbol_goto, symbol_string_state))
                                             else:
                                                 if char_initial_q(c):
@@ -5098,7 +5104,7 @@ def apply_state(state, c):
                                                     if char_sign_q(c):
                                                         return List(symbol_shift, List(symbol_goto, symbol_signed_state))
                                                     else:
-                                                        if char_is__q(c, Char('.')):
+                                                        if char_is__q(c, make_char('.')):
                                                             return List(symbol_shift, List(symbol_goto, symbol_decimal_point_state))
                                                         else:
                                                             if char_numeric_q(c):
@@ -5107,16 +5113,16 @@ def apply_state(state, c):
                                                                 return symbol_error
         else:
             if (state) is (symbol_comment_state):
-                if char_is__q(c, Char('\n')):
+                if char_is__q(c, make_char('\n')):
                     return List(symbol_drop, List(symbol_goto, symbol_start_state))
                 else:
-                    if char_is__q(c, Char('\0')):
+                    if char_is__q(c, make_char('\0')):
                         return List(symbol_drop, List(symbol_emit, symbol_end_marker))
                     else:
                         return List(symbol_drop, List(symbol_goto, symbol_comment_state))
             else:
                 if (state) is (symbol_comma_state):
-                    if char_is__q(c, Char('@')):
+                    if char_is__q(c, make_char('@')):
                         return List(symbol_drop, List(symbol_emit, symbol_comma_at))
                     else:
                         return List(symbol_emit, symbol_comma)
@@ -5125,10 +5131,10 @@ def apply_state(state, c):
                         if char_boolean_q(c):
                             return List(symbol_shift, List(symbol_emit, symbol_boolean))
                         else:
-                            if char_is__q(c, Char('\\')):
+                            if char_is__q(c, make_char('\\')):
                                 return List(symbol_drop, List(symbol_goto, symbol_character_state))
                             else:
-                                if char_is__q(c, Char('(')):
+                                if char_is__q(c, make_char('(')):
                                     return List(symbol_drop, List(symbol_emit, symbol_lvector))
                                 else:
                                     return symbol_error
@@ -5137,7 +5143,7 @@ def apply_state(state, c):
                             if char_alphabetic_q(c):
                                 return List(symbol_shift, List(symbol_goto, symbol_alphabetic_character_state))
                             else:
-                                if not(char_is__q(c, Char('\0'))):
+                                if not(char_is__q(c, make_char('\0'))):
                                     return List(symbol_shift, List(symbol_emit, symbol_character))
                                 else:
                                     return symbol_error
@@ -5155,38 +5161,38 @@ def apply_state(state, c):
                                         return List(symbol_shift, List(symbol_goto, symbol_named_character_state))
                                 else:
                                     if (state) is (symbol_string_state):
-                                        if char_is__q(c, Char('"')):
+                                        if char_is__q(c, make_char('"')):
                                             return List(symbol_drop, List(symbol_emit, symbol_string))
                                         else:
-                                            if char_is__q(c, Char('\\')):
+                                            if char_is__q(c, make_char('\\')):
                                                 return List(symbol_drop, List(symbol_goto, symbol_string_escape_state))
                                             else:
-                                                if not(char_is__q(c, Char('\0'))):
+                                                if not(char_is__q(c, make_char('\0'))):
                                                     return List(symbol_shift, List(symbol_goto, symbol_string_state))
                                                 else:
                                                     return symbol_error
                                     else:
                                         if (state) is (symbol_string_escape_state):
-                                            if char_is__q(c, Char('"')):
+                                            if char_is__q(c, make_char('"')):
                                                 return List(symbol_shift, List(symbol_goto, symbol_string_state))
                                             else:
-                                                if char_is__q(c, Char('\\')):
+                                                if char_is__q(c, make_char('\\')):
                                                     return List(symbol_shift, List(symbol_goto, symbol_string_state))
                                                 else:
-                                                    if char_is__q(c, Char('b')):
-                                                        return List(symbol_replace, Char('\b'), List(symbol_goto, symbol_string_state))
+                                                    if char_is__q(c, make_char('b')):
+                                                        return List(symbol_replace, make_char('\b'), List(symbol_goto, symbol_string_state))
                                                     else:
-                                                        if char_is__q(c, Char('f')):
-                                                            return List(symbol_replace, Char(u"\u000C"), List(symbol_goto, symbol_string_state))
+                                                        if char_is__q(c, make_char('f')):
+                                                            return List(symbol_replace, make_char(u"\u000C"), List(symbol_goto, symbol_string_state))
                                                         else:
-                                                            if char_is__q(c, Char('n')):
-                                                                return List(symbol_replace, Char('\n'), List(symbol_goto, symbol_string_state))
+                                                            if char_is__q(c, make_char('n')):
+                                                                return List(symbol_replace, make_char('\n'), List(symbol_goto, symbol_string_state))
                                                             else:
-                                                                if char_is__q(c, Char('t')):
-                                                                    return List(symbol_replace, Char('\t'), List(symbol_goto, symbol_string_state))
+                                                                if char_is__q(c, make_char('t')):
+                                                                    return List(symbol_replace, make_char('\t'), List(symbol_goto, symbol_string_state))
                                                                 else:
-                                                                    if char_is__q(c, Char('r')):
-                                                                        return List(symbol_replace, Char('\r'), List(symbol_goto, symbol_string_state))
+                                                                    if char_is__q(c, make_char('r')):
+                                                                        return List(symbol_replace, make_char('\r'), List(symbol_goto, symbol_string_state))
                                                                     else:
                                                                         return symbol_error
                                         else:
@@ -5203,7 +5209,7 @@ def apply_state(state, c):
                                                     if char_numeric_q(c):
                                                         return List(symbol_shift, List(symbol_goto, symbol_whole_number_state))
                                                     else:
-                                                        if char_is__q(c, Char('.')):
+                                                        if char_is__q(c, make_char('.')):
                                                             return List(symbol_shift, List(symbol_goto, symbol_signed_decimal_point_state))
                                                         else:
                                                             if char_delimiter_q(c):
@@ -5242,13 +5248,13 @@ def apply_state(state, c):
                                                                 if char_numeric_q(c):
                                                                     return List(symbol_shift, List(symbol_goto, symbol_whole_number_state))
                                                                 else:
-                                                                    if char_is__q(c, Char('.')):
+                                                                    if char_is__q(c, make_char('.')):
                                                                         return List(symbol_shift, List(symbol_goto, symbol_fractional_number_state))
                                                                     else:
-                                                                        if char_is__q(c, Char('/')):
+                                                                        if char_is__q(c, make_char('/')):
                                                                             return List(symbol_shift, List(symbol_goto, symbol_rational_number_state))
                                                                         else:
-                                                                            if (char_is__q(c, Char('e'))) or (char_is__q(c, Char('E'))):
+                                                                            if (char_is__q(c, make_char('e'))) or (char_is__q(c, make_char('E'))):
                                                                                 return List(symbol_shift, List(symbol_goto, symbol_suffix_state))
                                                                             else:
                                                                                 if char_delimiter_q(c):
@@ -5263,7 +5269,7 @@ def apply_state(state, c):
                                                                     if char_numeric_q(c):
                                                                         return List(symbol_shift, List(symbol_goto, symbol_fractional_number_state))
                                                                     else:
-                                                                        if (char_is__q(c, Char('e'))) or (char_is__q(c, Char('E'))):
+                                                                        if (char_is__q(c, make_char('e'))) or (char_is__q(c, make_char('E'))):
                                                                             return List(symbol_shift, List(symbol_goto, symbol_suffix_state))
                                                                         else:
                                                                             if char_delimiter_q(c):
@@ -5911,7 +5917,7 @@ def lookup_binding_in_first_frame():
 
 def split_variable(var):
     strings = symbol_undefined
-    strings = string_split(symbol_to_string(var), Char('.'))
+    strings = string_split(symbol_to_string(var), make_char('.'))
     if member("", strings):
         return symbol_emptylist
     else:
@@ -6615,6 +6621,14 @@ def aunparse(aexp):
 
 def exception_q(x):
     return (pair_q(x)) and ((car(x)) is (symbol_exception))
+
+def use_lexical_address(*args):
+    args = List(*args)
+    if null_q(args):
+        return _staruse_lexical_address_star
+    else:
+        globals()['_staruse_lexical_address_star'] = true_q(car(args))
+        return void_value
 
 def read_line(prompt):
     printf(prompt)
@@ -7480,13 +7494,6 @@ def for_each_primitive():
                 globals()['env2_reg'] = env_reg
                 globals()['args_reg'] = Map(car, arg_list)
                 globals()['pc'] = apply_proc
-
-def use_lexical_address(*args):
-    args = List(*args)
-    if null_q(args):
-        return _staruse_lexical_address_star
-    else:
-        globals()['_staruse_lexical_address_star'] = true_q(car(args))
 
 def make_toplevel_env():
     primitives = symbol_undefined

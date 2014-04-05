@@ -65,6 +65,14 @@
 (define-native iterator? (lambda ignore #f))
 (define-native get_type (lambda (x) 'unknown))
 
+(define use-lexical-address
+  (lambda args
+    (cond 
+     ((null? args) *use-lexical-address*)
+     (else 
+      (begin (set! *use-lexical-address* (true? (car args)))
+	     void-value)))))
+
 (define read-line
   (lambda (prompt)
     (printf prompt)
@@ -2266,14 +2274,7 @@
  
 (define use-lexical-address-prim
   (lambda-proc (args env2 info handler fail k2)
-   (cond
-     (k2 (apply use-lexical-address args) fail))))
-
-(define use-lexical-address
-  (lambda args
-    (cond 
-     ((null? args) *use-lexical-address*)
-     (else (set! *use-lexical-address* (true? (car args)))))))
+      (k2 (apply use-lexical-address args) fail)))
 
 ;; -----------------------------------------------------
 ;; To add a new primitive:
