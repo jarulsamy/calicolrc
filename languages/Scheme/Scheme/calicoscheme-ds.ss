@@ -2358,13 +2358,13 @@
   <proc-31>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
-      (if (not (length-one? args))
+      (if (not (length-at-least? 1 args))
           (runtime-error
             "incorrect number of arguments to load"
             info
             handler
             fail)
-          (load-file (car args) toplevel-env info handler fail k2)))))
+          (load-files args toplevel-env info handler fail k2)))))
 
 (define+
   <proc-32>
@@ -2653,10 +2653,504 @@
 (define+
   <proc-51>
   (lambda (args env2 info handler fail k2 fields)
-    (let () (apply-cont2 k2 args fail))))
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to caaaar"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "caaaar called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply caaaar args) fail))))))
 
 (define+
   <proc-52>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to caaadr"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "caaadr called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply caaadr args) fail))))))
+
+(define+
+  <proc-53>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to caaar"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "caaar called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply caaar args) fail))))))
+
+(define+
+  <proc-54>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to caadar"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "caadar called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply caadar args) fail))))))
+
+(define+
+  <proc-55>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to caaddr"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "caaddr called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply caaddr args) fail))))))
+
+(define+
+  <proc-56>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to caadr"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "caadr called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply caadr args) fail))))))
+
+(define+
+  <proc-57>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to caar"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "caar called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply caar args) fail))))))
+
+(define+
+  <proc-58>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cadaar"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cadaar called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cadaar args) fail))))))
+
+(define+
+  <proc-59>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cadadr"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cadadr called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cadadr args) fail))))))
+
+(define+
+  <proc-60>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cadar"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cadar called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cadar args) fail))))))
+
+(define+
+  <proc-61>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to caddar"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "caddar called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply caddar args) fail))))))
+
+(define+
+  <proc-62>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cadddr"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cadddr called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cadddr args) fail))))))
+
+(define+
+  <proc-63>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cdaaar"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cdaaar called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cdaaar args) fail))))))
+
+(define+
+  <proc-64>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cdaadr"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cdaadr called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cdaadr args) fail))))))
+
+(define+
+  <proc-65>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cdaar"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cdaar called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cdaar args) fail))))))
+
+(define+
+  <proc-66>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cdadar"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cdadar called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cdadar args) fail))))))
+
+(define+
+  <proc-67>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cdaddr"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cdaddr called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cdaddr args) fail))))))
+
+(define+
+  <proc-68>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cdadr"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cdadr called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cdadr args) fail))))))
+
+(define+
+  <proc-69>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cdar"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cdar called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cdar args) fail))))))
+
+(define+
+  <proc-70>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cddaar"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cddaar called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cddaar args) fail))))))
+
+(define+
+  <proc-71>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cddadr"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cddadr called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cddadr args) fail))))))
+
+(define+
+  <proc-72>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cddar"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cddar called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cddar args) fail))))))
+
+(define+
+  <proc-73>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cdddar"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cdddar called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cdddar args) fail))))))
+
+(define+
+  <proc-74>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cddddr"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cddddr called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cddddr args) fail))))))
+
+(define+
+  <proc-75>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cdddr"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cdddr called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cdddr args) fail))))))
+
+(define+
+  <proc-76>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to cddr"
+           info
+           handler
+           fail))
+        ((not (pair? (car args)))
+         (runtime-error
+           (format "cddr called on non-pair ~s" (car args))
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply cddr args) fail))))))
+
+(define+
+  <proc-77>
+  (lambda (args env2 info handler fail k2 fields)
+    (let () (apply-cont2 k2 args fail))))
+
+(define+
+  <proc-78>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -2669,7 +3163,7 @@
         (else (make-set (car args) env2 info handler fail k2))))))
 
 (define+
-  <proc-53>
+  <proc-79>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (if (not (all-numeric? args))
@@ -2681,7 +3175,7 @@
           (apply-cont2 k2 (apply + args) fail)))))
 
 (define+
-  <proc-54>
+  <proc-80>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -2700,7 +3194,7 @@
         (else (apply-cont2 k2 (apply - args) fail))))))
 
 (define+
-  <proc-55>
+  <proc-81>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (if (not (all-numeric? args))
@@ -2712,7 +3206,7 @@
           (apply-cont2 k2 (apply * args) fail)))))
 
 (define+
-  <proc-56>
+  <proc-82>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -2733,7 +3227,7 @@
         (else (apply-cont2 k2 (apply / args) fail))))))
 
 (define+
-  <proc-57>
+  <proc-83>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -2754,7 +3248,7 @@
         (else (apply-cont2 k2 (apply modulo args) fail))))))
 
 (define+
-  <proc-58>
+  <proc-84>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -2773,7 +3267,7 @@
         (else (apply-cont2 k2 (apply < args) fail))))))
 
 (define+
-  <proc-59>
+  <proc-85>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -2792,7 +3286,7 @@
         (else (apply-cont2 k2 (apply > args) fail))))))
 
 (define+
-  <proc-60>
+  <proc-86>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -2811,7 +3305,7 @@
         (else (apply-cont2 k2 (apply <= args) fail))))))
 
 (define+
-  <proc-61>
+  <proc-87>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -2830,7 +3324,7 @@
         (else (apply-cont2 k2 (apply >= args) fail))))))
 
 (define+
-  <proc-62>
+  <proc-88>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -2849,7 +3343,7 @@
         (else (apply-cont2 k2 (apply = args) fail))))))
 
 (define+
-  <proc-63>
+  <proc-89>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -2868,7 +3362,7 @@
         (else (apply-cont2 k2 (apply abs args) fail))))))
 
 (define+
-  <proc-64>
+  <proc-90>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (if (not (length-two? args))
@@ -2883,7 +3377,7 @@
             (make-cont <cont-44> fail k2))))))
 
 (define+
-  <proc-65>
+  <proc-91>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -2896,7 +3390,7 @@
         (else (apply-cont2 k2 (apply eq? args) fail))))))
 
 (define+
-  <proc-66>
+  <proc-92>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -2909,7 +3403,7 @@
         (else (apply-cont2 k2 (apply memq args) fail))))))
 
 (define+
-  <proc-67>
+  <proc-93>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (if (not (length-two? args))
@@ -2922,7 +3416,7 @@
             fail k2)))))
 
 (define+
-  <proc-68>
+  <proc-94>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -2941,22 +3435,22 @@
         (else (apply-cont2 k2 (apply range args) fail))))))
 
 (define+
-  <proc-69>
+  <proc-95>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (apply snoc args) fail))))
 
 (define+
-  <proc-70>
+  <proc-96>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (apply rac args) fail))))
 
 (define+
-  <proc-71>
+  <proc-97>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (apply rdc args) fail))))
 
 (define+
-  <proc-72>
+  <proc-98>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -2975,7 +3469,7 @@
         (else (apply-cont2 k2 (apply set-car! args) fail))))))
 
 (define+
-  <proc-73>
+  <proc-99>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -2994,7 +3488,7 @@
         (else (apply-cont2 k2 (apply set-cdr! args) fail))))))
 
 (define+
-  <proc-74>
+  <proc-100>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (let ((filename (car args)))
@@ -3005,22 +3499,22 @@
                 (make-cont2 <cont2-86> filename handler k2))))))))
 
 (define+
-  <proc-75>
+  <proc-101>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (car *stack-trace*) fail))))
 
 (define+
-  <proc-76>
+  <proc-102>
   (lambda (args env2 info handler fail k2 fields)
     (let () (get-primitive args env2 info handler fail k2))))
 
 (define+
-  <proc-77>
+  <proc-103>
   (lambda (args env2 info handler fail k2 fields)
     (let ((k (car fields))) (apply-cont2 k (car args) fail))))
 
 (define+
-  <proc-78>
+  <proc-104>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (if (not (length-one? args))
@@ -3036,14 +3530,14 @@
                   info
                   handler
                   fail)
-                (let ((fake-k (make-proc <proc-77> k2)))
+                (let ((fake-k (make-proc <proc-103> k2)))
                   (if (dlr-proc? proc)
                       (apply-cont2 k2 (dlr-apply proc (list fake-k)) fail)
                       (apply-proc proc (list fake-k) env2 info handler fail
                         k2)))))))))
 
 (define+
-  <proc-79>
+  <proc-105>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (if (null? args)
@@ -3051,7 +3545,7 @@
           (apply-cont2 REP-k (car args) fail)))))
 
 (define+
-  <proc-80>
+  <proc-106>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3065,7 +3559,7 @@
         (else (apply-fail fail))))))
 
 (define+
-  <proc-81>
+  <proc-107>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (if (not (null? args))
@@ -3077,7 +3571,7 @@
           (apply-cont2 k2 'ok REP-fail)))))
 
 (define+
-  <proc-82>
+  <proc-108>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3098,12 +3592,12 @@
         (else (apply-cont2 k2 (apply reverse args) fail))))))
 
 (define+
-  <proc-83>
+  <proc-109>
   (lambda (args env2 info handler fail k2 fields)
     (let () (append-all args info handler fail k2))))
 
 (define+
-  <proc-84>
+  <proc-110>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3116,7 +3610,7 @@
         (else (apply-cont2 k2 (apply string->number args) fail))))))
 
 (define+
-  <proc-85>
+  <proc-111>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3129,7 +3623,7 @@
         (else (apply-cont2 k2 (apply string=? args) fail))))))
 
 (define+
-  <proc-86>
+  <proc-112>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3150,7 +3644,7 @@
         (else (apply-cont2 k2 (apply list->vector args) fail))))))
 
 (define+
-  <proc-87>
+  <proc-113>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3179,33 +3673,33 @@
         (else (apply-cont2 k2 (apply list->string args) fail))))))
 
 (define+
-  <proc-88>
+  <proc-114>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (make-set (directory args env2) env2 info handler fail
         k2))))
 
 (define+
-  <proc-89>
+  <proc-115>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (get-current-time) fail))))
 
 (define+
-  <proc-90>
+  <proc-116>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (map-primitive (car args) (cdr args) env2 handler fail
         k2))))
 
 (define+
-  <proc-91>
+  <proc-117>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (for-each-primitive (car args) (cdr args) env2 handler fail
         k2))))
 
 (define+
-  <proc-92>
+  <proc-118>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3218,17 +3712,17 @@
         (else (apply-cont2 k2 (apply format args) fail))))))
 
 (define+
-  <proc-93>
+  <proc-119>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 env2 fail))))
 
 (define+
-  <proc-94>
+  <proc-120>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (using args env2) fail))))
 
 (define+
-  <proc-95>
+  <proc-121>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3241,19 +3735,19 @@
         (else (apply-cont2 k2 (not (true? (car args))) fail))))))
 
 (define+
-  <proc-96>
+  <proc-122>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (apply printf args)
       (apply-cont2 k2 void-value fail))))
 
 (define+
-  <proc-97>
+  <proc-123>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (apply vector_native args) fail))))
 
 (define+
-  <proc-98>
+  <proc-124>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (apply-cont2
@@ -3262,17 +3756,17 @@
         fail))))
 
 (define+
-  <proc-99>
+  <proc-125>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (apply vector-ref args) fail))))
 
 (define+
-  <proc-100>
+  <proc-126>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (apply make-vector args) fail))))
 
 (define+
-  <proc-101>
+  <proc-127>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3290,7 +3784,7 @@
            (runtime-error message info handler fail)))))))
 
 (define+
-  <proc-102>
+  <proc-128>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3303,7 +3797,7 @@
         (else (apply-cont2 k2 (apply list-ref args) fail))))))
 
 (define+
-  <proc-103>
+  <proc-129>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3324,7 +3818,7 @@
            fail))))))
 
 (define+
-  <proc-104>
+  <proc-130>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3338,7 +3832,7 @@
            fail))))))
 
 (define+
-  <proc-105>
+  <proc-131>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3352,7 +3846,7 @@
            fail))))))
 
 (define+
-  <proc-106>
+  <proc-132>
   (lambda (args env2 info handler fail k2 fields)
     (let ((external-function-object (car fields)))
       (apply-cont2
@@ -5924,7 +6418,23 @@
                        (list 'caddr caddr-prim) (list 'cadr cadr-prim)
                        (list 'call-with-current-continuation call/cc-prim)
                        (list 'call/cc call/cc-prim) (list 'car car-prim)
-                       (list 'cdr cdr-prim) (list 'char? char?-prim)
+                       (list 'cdr cdr-prim) (list 'caaaar caaaar-prim)
+                       (list 'caaadr caaadr-prim) (list 'caaar caaar-prim)
+                       (list 'caadar caadar-prim)
+                       (list 'caaddr caaddr-prim) (list 'caadr caadr-prim)
+                       (list 'caar caar-prim) (list 'cadaar cadaar-prim)
+                       (list 'cadadr cadadr-prim) (list 'cadar cadar-prim)
+                       (list 'caddar caddar-prim)
+                       (list 'cadddr cadddr-prim)
+                       (list 'cdaaar cdaaar-prim)
+                       (list 'cdaadr cdaadr-prim) (list 'cdaar cdaar-prim)
+                       (list 'cdadar cdadar-prim)
+                       (list 'cdaddr cdaddr-prim) (list 'cdadr cdadr-prim)
+                       (list 'cdar cdar-prim) (list 'cddaar cddaar-prim)
+                       (list 'cddadr cddadr-prim) (list 'cddar cddar-prim)
+                       (list 'cdddar cdddar-prim)
+                       (list 'cddddr cddddr-prim) (list 'cdddr cdddr-prim)
+                       (list 'cddr cddr-prim) (list 'char? char?-prim)
                        (list 'char=? char=?-prim)
                        (list 'char-whitespace? char-whitespace?-prim)
                        (list 'char-alphabetic? char-alphabetic?-prim)
@@ -5998,7 +6508,7 @@
 
 (define make-external-proc
   (lambda (external-function-object)
-    (make-proc <proc-106> external-function-object)))
+    (make-proc <proc-132> external-function-object)))
 
 (define pattern?
   (lambda (x)
@@ -6447,47 +6957,99 @@
 
 (define caddr-prim (make-proc <proc-50>))
 
-(define list-prim (make-proc <proc-51>))
+(define caaaar-prim (make-proc <proc-51>))
 
-(define make-set-prim (make-proc <proc-52>))
+(define caaadr-prim (make-proc <proc-52>))
 
-(define plus-prim (make-proc <proc-53>))
+(define caaar-prim (make-proc <proc-53>))
 
-(define minus-prim (make-proc <proc-54>))
+(define caadar-prim (make-proc <proc-54>))
 
-(define times-prim (make-proc <proc-55>))
+(define caaddr-prim (make-proc <proc-55>))
 
-(define divide-prim (make-proc <proc-56>))
+(define caadr-prim (make-proc <proc-56>))
 
-(define modulo-prim (make-proc <proc-57>))
+(define caar-prim (make-proc <proc-57>))
 
-(define lt-prim (make-proc <proc-58>))
+(define cadaar-prim (make-proc <proc-58>))
 
-(define gt-prim (make-proc <proc-59>))
+(define cadadr-prim (make-proc <proc-59>))
 
-(define lt-or-eq-prim (make-proc <proc-60>))
+(define cadar-prim (make-proc <proc-60>))
 
-(define gt-or-eq-prim (make-proc <proc-61>))
+(define caddar-prim (make-proc <proc-61>))
 
-(define equal-sign-prim (make-proc <proc-62>))
+(define cadddr-prim (make-proc <proc-62>))
 
-(define abs-prim (make-proc <proc-63>))
+(define cdaaar-prim (make-proc <proc-63>))
 
-(define equal?-prim (make-proc <proc-64>))
+(define cdaadr-prim (make-proc <proc-64>))
 
-(define eq?-prim (make-proc <proc-65>))
+(define cdaar-prim (make-proc <proc-65>))
 
-(define memq-prim (make-proc <proc-66>))
+(define cdadar-prim (make-proc <proc-66>))
 
-(define member-prim (make-proc <proc-67>))
+(define cdaddr-prim (make-proc <proc-67>))
 
-(define range-prim (make-proc <proc-68>))
+(define cdadr-prim (make-proc <proc-68>))
 
-(define snoc-prim (make-proc <proc-69>))
+(define cdar-prim (make-proc <proc-69>))
 
-(define rac-prim (make-proc <proc-70>))
+(define cddaar-prim (make-proc <proc-70>))
 
-(define rdc-prim (make-proc <proc-71>))
+(define cddadr-prim (make-proc <proc-71>))
+
+(define cddar-prim (make-proc <proc-72>))
+
+(define cdddar-prim (make-proc <proc-73>))
+
+(define cddddr-prim (make-proc <proc-74>))
+
+(define cdddr-prim (make-proc <proc-75>))
+
+(define cddr-prim (make-proc <proc-76>))
+
+(define list-prim (make-proc <proc-77>))
+
+(define make-set-prim (make-proc <proc-78>))
+
+(define plus-prim (make-proc <proc-79>))
+
+(define minus-prim (make-proc <proc-80>))
+
+(define times-prim (make-proc <proc-81>))
+
+(define divide-prim (make-proc <proc-82>))
+
+(define modulo-prim (make-proc <proc-83>))
+
+(define lt-prim (make-proc <proc-84>))
+
+(define gt-prim (make-proc <proc-85>))
+
+(define lt-or-eq-prim (make-proc <proc-86>))
+
+(define gt-or-eq-prim (make-proc <proc-87>))
+
+(define equal-sign-prim (make-proc <proc-88>))
+
+(define abs-prim (make-proc <proc-89>))
+
+(define equal?-prim (make-proc <proc-90>))
+
+(define eq?-prim (make-proc <proc-91>))
+
+(define memq-prim (make-proc <proc-92>))
+
+(define member-prim (make-proc <proc-93>))
+
+(define range-prim (make-proc <proc-94>))
+
+(define snoc-prim (make-proc <proc-95>))
+
+(define rac-prim (make-proc <proc-96>))
+
+(define rdc-prim (make-proc <proc-97>))
 
 (define-native
   range
@@ -6501,75 +7063,75 @@
         ((null? (cddr args)) (range (car args) (cadr args) 1 '()))
         (else (range (car args) (cadr args) (caddr args) '()))))))
 
-(define set-car!-prim (make-proc <proc-72>))
+(define set-car!-prim (make-proc <proc-98>))
 
-(define set-cdr!-prim (make-proc <proc-73>))
+(define set-cdr!-prim (make-proc <proc-99>))
 
-(define import-prim (make-proc <proc-74>))
+(define import-prim (make-proc <proc-100>))
 
-(define get-stack-trace-prim (make-proc <proc-75>))
+(define get-stack-trace-prim (make-proc <proc-101>))
 
-(define get-prim (make-proc <proc-76>))
+(define get-prim (make-proc <proc-102>))
 
-(define call/cc-prim (make-proc <proc-78>))
+(define call/cc-prim (make-proc <proc-104>))
 
-(define abort-prim (make-proc <proc-79>))
+(define abort-prim (make-proc <proc-105>))
 
-(define require-prim (make-proc <proc-80>))
+(define require-prim (make-proc <proc-106>))
 
-(define cut-prim (make-proc <proc-81>))
+(define cut-prim (make-proc <proc-107>))
 
-(define reverse-prim (make-proc <proc-82>))
+(define reverse-prim (make-proc <proc-108>))
 
-(define append-prim (make-proc <proc-83>))
+(define append-prim (make-proc <proc-109>))
 
-(define string->number-prim (make-proc <proc-84>))
+(define string->number-prim (make-proc <proc-110>))
 
-(define string=?-prim (make-proc <proc-85>))
+(define string=?-prim (make-proc <proc-111>))
 
-(define list-to-vector-prim (make-proc <proc-86>))
+(define list-to-vector-prim (make-proc <proc-112>))
 
-(define list->string-prim (make-proc <proc-87>))
+(define list->string-prim (make-proc <proc-113>))
 
-(define dir-prim (make-proc <proc-88>))
+(define dir-prim (make-proc <proc-114>))
 
-(define current-time-prim (make-proc <proc-89>))
+(define current-time-prim (make-proc <proc-115>))
 
-(define map-prim (make-proc <proc-90>))
+(define map-prim (make-proc <proc-116>))
 
-(define for-each-prim (make-proc <proc-91>))
+(define for-each-prim (make-proc <proc-117>))
 
-(define format-prim (make-proc <proc-92>))
+(define format-prim (make-proc <proc-118>))
 
-(define current-environment-prim (make-proc <proc-93>))
+(define current-environment-prim (make-proc <proc-119>))
 
-(define using-prim (make-proc <proc-94>))
+(define using-prim (make-proc <proc-120>))
 
-(define not-prim (make-proc <proc-95>))
+(define not-prim (make-proc <proc-121>))
 
-(define printf-prim (make-proc <proc-96>))
+(define printf-prim (make-proc <proc-122>))
 
-(define vector-prim (make-proc <proc-97>))
+(define vector-prim (make-proc <proc-123>))
 
 (define-native
   vector_native
   (lambda args (apply vector args)))
 
-(define vector-set!-prim (make-proc <proc-98>))
+(define vector-set!-prim (make-proc <proc-124>))
 
-(define vector-ref-prim (make-proc <proc-99>))
+(define vector-ref-prim (make-proc <proc-125>))
 
-(define make-vector-prim (make-proc <proc-100>))
+(define make-vector-prim (make-proc <proc-126>))
 
-(define error-prim (make-proc <proc-101>))
+(define error-prim (make-proc <proc-127>))
 
-(define list-ref-prim (make-proc <proc-102>))
+(define list-ref-prim (make-proc <proc-128>))
 
-(define current-directory-prim (make-proc <proc-103>))
+(define current-directory-prim (make-proc <proc-129>))
 
-(define round-prim (make-proc <proc-104>))
+(define round-prim (make-proc <proc-130>))
 
-(define set-use-stack-trace!-prim (make-proc <proc-105>))
+(define set-use-stack-trace!-prim (make-proc <proc-131>))
 
 (define-native
   make-initial-env-extended

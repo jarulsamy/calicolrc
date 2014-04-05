@@ -326,6 +326,32 @@ public class PJScheme:Scheme
     public static object symbol_cadr = make_symbol("cadr");
     public static object symbol_call_with_current_continuation = make_symbol("call-with-current-continuation");
     public static object symbol_call_cc = make_symbol("call/cc");
+    public static object symbol_caaaar = make_symbol("caaaar");
+    public static object symbol_caaadr = make_symbol("caaadr");
+    public static object symbol_caaar = make_symbol("caaar");
+    public static object symbol_caadar = make_symbol("caadar");
+    public static object symbol_caaddr = make_symbol("caaddr");
+    public static object symbol_caadr = make_symbol("caadr");
+    public static object symbol_caar = make_symbol("caar");
+    public static object symbol_cadaar = make_symbol("cadaar");
+    public static object symbol_cadadr = make_symbol("cadadr");
+    public static object symbol_cadar = make_symbol("cadar");
+    public static object symbol_caddar = make_symbol("caddar");
+    public static object symbol_cadddr = make_symbol("cadddr");
+    public static object symbol_cdaaar = make_symbol("cdaaar");
+    public static object symbol_cdaadr = make_symbol("cdaadr");
+    public static object symbol_cdaar = make_symbol("cdaar");
+    public static object symbol_cdadar = make_symbol("cdadar");
+    public static object symbol_cdaddr = make_symbol("cdaddr");
+    public static object symbol_cdadr = make_symbol("cdadr");
+    public static object symbol_cdar = make_symbol("cdar");
+    public static object symbol_cddaar = make_symbol("cddaar");
+    public static object symbol_cddadr = make_symbol("cddadr");
+    public static object symbol_cddar = make_symbol("cddar");
+    public static object symbol_cdddar = make_symbol("cdddar");
+    public static object symbol_cddddr = make_symbol("cddddr");
+    public static object symbol_cdddr = make_symbol("cdddr");
+    public static object symbol_cddr = make_symbol("cddr");
     public static object symbol_char_q = make_symbol("char?");
     public static object symbol_char_is__q = make_symbol("char=?");
     public static object symbol_char_whitespace_q = make_symbol("char-whitespace?");
@@ -386,6 +412,7 @@ public class PJScheme:Scheme
     public static object symbol_unparse = make_symbol("unparse");
     public static object symbol_unparse_procedure = make_symbol("unparse-procedure");
     public static object symbol_using_native = make_symbol("using");
+    public static object symbol_set_use_stack_trace_b = make_symbol("set-use-stack-trace!");
     public static object symbol_vector = make_symbol("vector");
     public static object symbol_vector_ref = make_symbol("vector-ref");
     public static object symbol_vector_set_b = make_symbol("vector-set!");
@@ -2881,13 +2908,455 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_51_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to caaaar";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("caaaar called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(caaaar, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_52_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to caaadr";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("caaadr called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(caaadr, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_53_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to caaar";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("caaar called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(caaar, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_54_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to caadar";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("caadar called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(caadar, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_55_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to caaddr";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("caaddr called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(caaddr, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_56_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to caadr";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("caadr called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(caadr, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_57_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to caar";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("caar called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(caar, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_58_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cadaar";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cadaar called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cadaar, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_59_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cadadr";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cadadr called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cadadr, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_60_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cadar";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cadar called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cadar, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_61_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to caddar";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("caddar called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(caddar, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_62_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cadddr";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cadddr called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cadddr, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_63_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cdaaar";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cdaaar called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cdaaar, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_64_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cdaadr";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cdaadr called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cdaadr, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_65_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cdaar";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cdaar called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cdaar, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_66_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cdadar";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cdadar called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cdadar, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_67_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cdaddr";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cdaddr called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cdaddr, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_68_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cdadr";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cdadr called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cdadr, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_69_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cdar";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cdar called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cdar, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_70_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cddaar";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cddaar called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cddaar, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_71_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cddadr";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cddadr called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cddadr, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_72_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cddar";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cddar called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cddar, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_73_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cdddar";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cdddar called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cdddar, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_74_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cddddr";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cddddr called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cddddr, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_75_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cdddr";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cdddr called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cdddr, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_76_d() {
+        if (true_q((! true_q(length_one_q(args_reg))))) {
+            msg_reg = "incorrect number of arguments to cddr";
+            pc = runtime_error;
+        } else {
+            if (true_q((! true_q(pair_q(car(args_reg)))))) {
+                msg_reg = format("cddr called on non-pair ~s", car(args_reg));
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(cddr, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
+        }
+    }
+    
+    public static void b_proc_77_d() {
         value2_reg = fail_reg;
         value1_reg = args_reg;
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_52_d() {
+    public static void b_proc_78_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to set";
             pc = runtime_error;
@@ -2897,7 +3366,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_53_d() {
+    public static void b_proc_79_d() {
         if (true_q((! true_q(all_numeric_q(args_reg))))) {
             msg_reg = "+ called on non-numeric argument(s)";
             pc = runtime_error;
@@ -2909,7 +3378,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_54_d() {
+    public static void b_proc_80_d() {
         if (true_q(null_q(args_reg))) {
             msg_reg = "incorrect number of arguments to -";
             pc = runtime_error;
@@ -2926,7 +3395,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_55_d() {
+    public static void b_proc_81_d() {
         if (true_q((! true_q(all_numeric_q(args_reg))))) {
             msg_reg = "* called on non-numeric argument(s)";
             pc = runtime_error;
@@ -2938,7 +3407,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_56_d() {
+    public static void b_proc_82_d() {
         if (true_q(null_q(args_reg))) {
             msg_reg = "incorrect number of arguments to /";
             pc = runtime_error;
@@ -2960,7 +3429,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_57_d() {
+    public static void b_proc_83_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to %";
             pc = runtime_error;
@@ -2982,7 +3451,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_58_d() {
+    public static void b_proc_84_d() {
         if (true_q((! true_q(length_at_least_q(2, args_reg))))) {
             msg_reg = "incorrect number of arguments to <";
             pc = runtime_error;
@@ -2999,7 +3468,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_59_d() {
+    public static void b_proc_85_d() {
         if (true_q((! true_q(length_at_least_q(2, args_reg))))) {
             msg_reg = "incorrect number of arguments to >";
             pc = runtime_error;
@@ -3016,7 +3485,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_60_d() {
+    public static void b_proc_86_d() {
         if (true_q((! true_q(length_at_least_q(2, args_reg))))) {
             msg_reg = "incorrect number of arguments to <=";
             pc = runtime_error;
@@ -3033,7 +3502,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_61_d() {
+    public static void b_proc_87_d() {
         if (true_q((! true_q(length_at_least_q(2, args_reg))))) {
             msg_reg = "incorrect number of arguments to >=";
             pc = runtime_error;
@@ -3050,7 +3519,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_62_d() {
+    public static void b_proc_88_d() {
         if (true_q((! true_q(length_at_least_q(2, args_reg))))) {
             msg_reg = "incorrect number of arguments to =";
             pc = runtime_error;
@@ -3067,7 +3536,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_63_d() {
+    public static void b_proc_89_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to abs";
             pc = runtime_error;
@@ -3084,7 +3553,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_64_d() {
+    public static void b_proc_90_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to equal?";
             pc = runtime_error;
@@ -3096,7 +3565,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_65_d() {
+    public static void b_proc_91_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to eq?";
             pc = runtime_error;
@@ -3108,7 +3577,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_66_d() {
+    public static void b_proc_92_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to memq";
             pc = runtime_error;
@@ -3120,7 +3589,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_67_d() {
+    public static void b_proc_93_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to member";
             pc = runtime_error;
@@ -3133,7 +3602,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_68_d() {
+    public static void b_proc_94_d() {
         if (true_q((true_q(null_q(args_reg)) || true_q(length_at_least_q(4, args_reg))))) {
             msg_reg = "incorrect number of arguments to range";
             pc = runtime_error;
@@ -3150,28 +3619,28 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_69_d() {
+    public static void b_proc_95_d() {
         value2_reg = fail_reg;
         value1_reg = apply(snoc_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_70_d() {
+    public static void b_proc_96_d() {
         value2_reg = fail_reg;
         value1_reg = apply(rac_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_71_d() {
+    public static void b_proc_97_d() {
         value2_reg = fail_reg;
         value1_reg = apply(rdc_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_72_d() {
+    public static void b_proc_98_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to set-car!";
             pc = runtime_error;
@@ -3188,7 +3657,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_73_d() {
+    public static void b_proc_99_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to set-cdr!";
             pc = runtime_error;
@@ -3205,7 +3674,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_74_d() {
+    public static void b_proc_100_d() {
         object filename = symbol_undefined;
         filename = car(args_reg);
         if (true_q(null_q(cdr(args_reg)))) {
@@ -3223,27 +3692,27 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_75_d() {
+    public static void b_proc_101_d() {
         value2_reg = fail_reg;
         value1_reg = car(_starstack_trace_star);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_76_d() {
+    public static void b_proc_102_d() {
         k_reg = k2_reg;
         env_reg = env2_reg;
         pc = get_primitive;
     }
     
-    public static void b_proc_77_d(object k) {
+    public static void b_proc_103_d(object k) {
         value2_reg = fail_reg;
         value1_reg = car(args_reg);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_proc_78_d() {
+    public static void b_proc_104_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to call/cc";
             pc = runtime_error;
@@ -3255,7 +3724,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 object fake_k = symbol_undefined;
-                fake_k = make_proc("proc", 77, k2_reg);
+                fake_k = make_proc("proc", 103, k2_reg);
                 if (true_q(dlr_proc_q(proc))) {
                     value2_reg = fail_reg;
                     value1_reg = dlr_apply(proc, sList(fake_k));
@@ -3270,7 +3739,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_79_d() {
+    public static void b_proc_105_d() {
         if (true_q(null_q(args_reg))) {
             value2_reg = fail_reg;
             value1_reg = void_value;
@@ -3284,7 +3753,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_80_d() {
+    public static void b_proc_106_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to require";
             pc = runtime_error;
@@ -3300,7 +3769,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_81_d() {
+    public static void b_proc_107_d() {
         if (true_q((! true_q(null_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to cut";
             pc = runtime_error;
@@ -3312,7 +3781,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_82_d() {
+    public static void b_proc_108_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to reverse";
             pc = runtime_error;
@@ -3329,12 +3798,12 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_83_d() {
+    public static void b_proc_109_d() {
         lists_reg = args_reg;
         pc = append_all;
     }
     
-    public static void b_proc_84_d() {
+    public static void b_proc_110_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to string->number";
             pc = runtime_error;
@@ -3346,7 +3815,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_85_d() {
+    public static void b_proc_111_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to string=?";
             pc = runtime_error;
@@ -3358,7 +3827,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_86_d() {
+    public static void b_proc_112_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to list->vector";
             pc = runtime_error;
@@ -3375,7 +3844,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_87_d() {
+    public static void b_proc_113_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to list->string";
             pc = runtime_error;
@@ -3397,19 +3866,19 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_88_d() {
+    public static void b_proc_114_d() {
         lst_reg = directory(args_reg, env2_reg);
         pc = make_set;
     }
     
-    public static void b_proc_89_d() {
+    public static void b_proc_115_d() {
         value2_reg = fail_reg;
         value1_reg = get_current_time();
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_90_d() {
+    public static void b_proc_116_d() {
         k_reg = k2_reg;
         env_reg = env2_reg;
         proc_reg = car(args_reg);
@@ -3417,7 +3886,7 @@ public class PJScheme:Scheme
         pc = map_primitive;
     }
     
-    public static void b_proc_91_d() {
+    public static void b_proc_117_d() {
         k_reg = k2_reg;
         env_reg = env2_reg;
         lists_reg = cdr(args_reg);
@@ -3425,7 +3894,7 @@ public class PJScheme:Scheme
         pc = for_each_primitive;
     }
     
-    public static void b_proc_92_d() {
+    public static void b_proc_118_d() {
         if (true_q(LessThan(length(args_reg), 1))) {
             msg_reg = "incorrect number of arguments to format";
             pc = runtime_error;
@@ -3437,33 +3906,33 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_93_d() {
+    public static void b_proc_119_d() {
         value2_reg = fail_reg;
         value1_reg = env2_reg;
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_94_d() {
+    public static void b_proc_120_d() {
         value2_reg = fail_reg;
         value1_reg = using_native(args_reg, env2_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_95_d() {
+    public static void b_proc_121_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to not";
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = (! true_q(car(args_reg)));
+            value1_reg = (! true_q(true_q(car(args_reg))));
             k_reg = k2_reg;
             pc = apply_cont2;
         }
     }
     
-    public static void b_proc_96_d() {
+    public static void b_proc_122_d() {
         apply(printf_proc, args_reg);
         value2_reg = fail_reg;
         value1_reg = void_value;
@@ -3471,35 +3940,35 @@ public class PJScheme:Scheme
         pc = apply_cont2;
     }
     
-    public static void b_proc_97_d() {
+    public static void b_proc_123_d() {
         value2_reg = fail_reg;
         value1_reg = apply(vector_native_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_98_d() {
+    public static void b_proc_124_d() {
         value2_reg = fail_reg;
         value1_reg = vector_set_b(car(args_reg), cadr(args_reg), caddr(args_reg));
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_99_d() {
+    public static void b_proc_125_d() {
         value2_reg = fail_reg;
         value1_reg = apply(vector_ref_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_100_d() {
+    public static void b_proc_126_d() {
         value2_reg = fail_reg;
         value1_reg = apply(make_vector_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_101_d() {
+    public static void b_proc_127_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to 'error' (should be 2)";
             pc = runtime_error;
@@ -3513,7 +3982,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_102_d() {
+    public static void b_proc_128_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to list-ref";
             pc = runtime_error;
@@ -3525,7 +3994,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_103_d() {
+    public static void b_proc_129_d() {
         if (true_q(null_q(args_reg))) {
             value2_reg = fail_reg;
             value1_reg = current_directory();
@@ -3549,7 +4018,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_104_d() {
+    public static void b_proc_130_d() {
         if (true_q((true_q(length_one_q(args_reg)) && true_q(number_q(car(args_reg)))))) {
             value2_reg = fail_reg;
             value1_reg = round(car(args_reg));
@@ -3561,7 +4030,19 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_105_d(object external_function_object) {
+    public static void b_proc_131_d() {
+        if (true_q((true_q(length_one_q(args_reg)) && true_q(boolean_q(car(args_reg)))))) {
+            value2_reg = fail_reg;
+            value1_reg = set_use_stack_trace(car(args_reg));
+            k_reg = k2_reg;
+            pc = apply_cont2;
+        } else {
+            msg_reg = "set-stack-trace! requires exactly one boolean";
+            pc = runtime_error;
+        }
+    }
+    
+    public static void b_proc_132_d(object external_function_object) {
         value2_reg = fail_reg;
         value1_reg = dlr_apply(external_function_object, args_reg);
         k_reg = k2_reg;
@@ -5006,12 +5487,12 @@ public class PJScheme:Scheme
         return cdr(binding);
     }
     
-    public static void set_binding_value_b(object binding, object value) {
-        set_car_b(binding, value);
+    public static object set_binding_value_b(object binding, object value) {
+        return set_car_b(binding, value);
     }
     
-    public static void set_binding_docstring_b(object binding, object docstring) {
-        set_cdr_b(binding, docstring);
+    public static object set_binding_docstring_b(object binding, object docstring) {
+        return set_cdr_b(binding, docstring);
     }
     
     public static object make_frame(object variables, object values) {
@@ -5062,8 +5543,8 @@ public class PJScheme:Scheme
         return sList(list_to_vector(append(bindings, sList(new_binding))), append(vars, sList(new_var)));
     }
     
-    public static void set_first_frame_b(object env, object new_frame) {
-        set_car_b(cdr(env), new_frame);
+    public static object set_first_frame_b(object env, object new_frame) {
+        return set_car_b(cdr(env), new_frame);
     }
     
     public static object extend(object env, object variables, object values) {
@@ -6086,19 +6567,52 @@ public class PJScheme:Scheme
         return format("~s", input_);
     }
     
-    public static void start_rm() {
-        toplevel_env = make_toplevel_env();
-        macro_env = make_macro_env_hat();
-        read_eval_print_loop_rm();
+    public static void handle_exception(object exc) {
+        object stack = symbol_undefined;
+        object message = symbol_undefined;
+        object error_type = symbol_undefined;
+        error_type = car(cadr(exc));
+        message = cadr(cadr(exc));
+        stack = cadddr(cddr(cadr(exc)));
+        printf("~%Traceback (most recent call last):~%");
+        while (true_q((! true_q(null_q(stack))))) {
+            display(format_exception_line(car(stack)));
+            stack = cdr(stack);
+        }
+        printf("~a: ~a~%", error_type, message);
     }
     
-    public static void read_eval_print_loop_rm() {
+    public static object format_exception_line(object line) {
+        object filename = symbol_undefined;
+        object line_number = symbol_undefined;
+        object column_number = symbol_undefined;
+        column_number = caddr(line);
+        line_number = cadr(line);
+        filename = car(line);
+        if (true_q(Equal(length(line), 3))) {
+            return format("  File \"~a\", line ~a, col ~a~%", filename, line_number, column_number);
+        } else {
+            return format("  File \"~a\", line ~a, col ~a, in ~a~%", filename, line_number, column_number, cadddr(line));
+        }
+    }
+    
+    public static object start_rm() {
+        toplevel_env = make_toplevel_env();
+        macro_env = make_macro_env_hat();
+        return read_eval_print_loop_rm();
+    }
+    
+    public static object read_eval_print_loop_rm() {
         object input_ = symbol_undefined;
         input_ = raw_read_line("==> ");
         object result = symbol_undefined;
         result = execute_rm(input_, symbol_stdin);
         if (true_q((! true_q(void_q(result))))) {
-            safe_print(result);
+            if (true_q(exception_q(result))) {
+                handle_exception(result);
+            } else {
+                safe_print(result);
+            }
         }
         if (true_q(_starneed_newline_star)) {
             newline();
@@ -6107,7 +6621,7 @@ public class PJScheme:Scheme
             final_reg = symbol_goodbye;
             pc = pc_halt_signal;
         } else {
-            read_eval_print_loop_rm();
+            return read_eval_print_loop_rm();
         }
     }
     
@@ -6189,23 +6703,23 @@ public class PJScheme:Scheme
         return _staruse_stack_trace_star;
     }
     
-    public static void initialize_stack_trace() {
-        set_car_b(_starstack_trace_star, symbol_emptylist);
+    public static object initialize_stack_trace() {
+        return set_car_b(_starstack_trace_star, symbol_emptylist);
     }
     
-    public static void initialize_execute() {
+    public static object initialize_execute() {
         _closure_depth = 0;
         _trace_pause = false;
-        initialize_stack_trace();
+        return initialize_stack_trace();
     }
     
-    public static void push_stack_trace(object exp) {
-        set_car_b(_starstack_trace_star, cons(exp, car(_starstack_trace_star)));
+    public static object push_stack_trace(object exp) {
+        return set_car_b(_starstack_trace_star, cons(exp, car(_starstack_trace_star)));
     }
     
-    public static void pop_stack_trace(object exp) {
+    public static object pop_stack_trace(object exp) {
         if (true_q((! true_q(null_q(car(_starstack_trace_star)))))) {
-            set_car_b(_starstack_trace_star, cdr(car(_starstack_trace_star)));
+            return set_car_b(_starstack_trace_star, cdr(car(_starstack_trace_star)));
         }
     }
     
@@ -6554,12 +7068,12 @@ public class PJScheme:Scheme
             pc = apply_handler2;
         } else {
             object src = symbol_undefined;
-            object line = symbol_undefined;
-            object char_ = symbol_undefined;
-            char_ = get_start_char(info_reg);
-            line = get_start_line(info_reg);
+            object line_number = symbol_undefined;
+            object char_number = symbol_undefined;
+            char_number = get_start_char(info_reg);
+            line_number = get_start_line(info_reg);
             src = get_srcfile(info_reg);
-            exception_reg = make_exception("RunTimeError", msg_reg, src, line, char_);
+            exception_reg = make_exception("RunTimeError", msg_reg, src, line_number, char_number);
             pc = apply_handler2;
         }
     }
@@ -7089,12 +7603,12 @@ public class PJScheme:Scheme
     
     public static object make_toplevel_env() {
         object primitives = symbol_undefined;
-        primitives = sList(sList(symbol_Multiply, times_prim), sList(symbol_Add, plus_prim), sList(symbol_Subtract, minus_prim), sList(symbol_Divide, divide_prim), sList(symbol_p, modulo_prim), sList(symbol_LessThan, lt_prim), sList(symbol_LessThanEqual, lt_or_eq_prim), sList(symbol_Equal, equal_sign_prim), sList(symbol_GreaterThan, gt_prim), sList(symbol_GreaterThanEqual, gt_or_eq_prim), sList(symbol_abort, abort_prim), sList(symbol_abs, abs_prim), sList(symbol_append, append_prim), sList(symbol_apply, apply_prim), sList(symbol_assv, assv_prim), sList(symbol_boolean_q, boolean_q_prim), sList(symbol_caddr, caddr_prim), sList(symbol_cadr, cadr_prim), sList(symbol_call_with_current_continuation, call_cc_prim), sList(symbol_call_cc, call_cc_prim), sList(symbol_car, car_prim), sList(symbol_cdr, cdr_prim), sList(symbol_char_q, char_q_prim), sList(symbol_char_is__q, char_is__q_prim), sList(symbol_char_whitespace_q, char_whitespace_q_prim), sList(symbol_char_alphabetic_q, char_alphabetic_q_prim), sList(symbol_char_numeric_q, char_numeric_q_prim), sList(symbol_char_to_integer, char_to_integer_prim), sList(symbol_cons, cons_prim), sList(symbol_current_time, current_time_prim), sList(symbol_cut, cut_prim), sList(symbol_dir, dir_prim), sList(symbol_display, display_prim), sList(symbol_current_environment, current_environment_prim), sList(symbol_eq_q, eq_q_prim), sList(symbol_equal_q, equal_q_prim), sList(symbol_error, error_prim), sList(symbol_eval, eval_prim), sList(symbol_eval_ast, eval_ast_prim), sList(symbol_exit, exit_prim), sList(symbol_for_each, for_each_prim), sList(symbol_format, format_prim), sList(symbol_get, get_prim), sList(symbol_get_stack_trace, get_stack_trace_prim), sList(symbol_import, import_prim), sList(symbol_integer_to_char, integer_to_char_prim), sList(symbol_length, length_prim), sList(symbol_sList, list_prim), sList(symbol_list_to_vector, list_to_vector_prim), sList(symbol_list_to_string, list_to_string_prim), sList(symbol_list_ref, list_ref_prim), sList(symbol_load, load_prim), sList(symbol_make_set, make_set_prim), sList(symbol_make_vector, make_vector_prim), sList(symbol_map, map_prim), sList(symbol_member, member_prim), sList(symbol_memq, memq_prim), sList(symbol_memv, memv_prim), sList(symbol_newline, newline_prim), sList(symbol_not, not_prim), sList(symbol_null_q, null_q_prim), sList(symbol_number_to_string, number_to_string_prim), sList(symbol_number_q, number_q_prim), sList(symbol_pair_q, pair_q_prim), sList(symbol_parse, parse_prim), sList(symbol_parse_string, parse_string_prim), sList(symbol_print, print_prim), sList(symbol_printf, printf_prim), sList(symbol_Range, range_prim), sList(symbol_read_string, read_string_prim), sList(symbol_require, require_prim), sList(symbol_reverse, reverse_prim), sList(symbol_set_car_b, set_car_b_prim), sList(symbol_set_cdr_b, set_cdr_b_prim), sList(symbol_snoc, snoc_prim), sList(symbol_rac, rac_prim), sList(symbol_rdc, rdc_prim), sList(symbol_sqrt, sqrt_prim), sList(symbol_odd_q, odd_q_prim), sList(symbol_even_q, even_q_prim), sList(symbol_quotient, quotient_prim), sList(symbol_remainder, remainder_prim), sList(symbol_make_string, string_prim), sList(symbol_string_length, string_length_prim), sList(symbol_string_ref, string_ref_prim), sList(symbol_string_q, string_q_prim), sList(symbol_string_to_number, string_to_number_prim), sList(symbol_string_is__q, string_is__q_prim), sList(symbol_substring, substring_prim), sList(symbol_symbol_q, symbol_q_prim), sList(symbol_unparse, unparse_prim), sList(symbol_unparse_procedure, unparse_procedure_prim), sList(symbol_using_native, using_prim), sList(symbol_vector, vector_prim), sList(symbol_vector_ref, vector_ref_prim), sList(symbol_vector_set_b, vector_set_b_prim), sList(symbol_void, void_prim), sList(symbol_zero_q, zero_q_prim), sList(symbol_current_directory, current_directory_prim), sList(symbol_cd, current_directory_prim), sList(symbol_round, round_prim));
+        primitives = sList(sList(symbol_Multiply, times_prim), sList(symbol_Add, plus_prim), sList(symbol_Subtract, minus_prim), sList(symbol_Divide, divide_prim), sList(symbol_p, modulo_prim), sList(symbol_LessThan, lt_prim), sList(symbol_LessThanEqual, lt_or_eq_prim), sList(symbol_Equal, equal_sign_prim), sList(symbol_GreaterThan, gt_prim), sList(symbol_GreaterThanEqual, gt_or_eq_prim), sList(symbol_abort, abort_prim), sList(symbol_abs, abs_prim), sList(symbol_append, append_prim), sList(symbol_apply, apply_prim), sList(symbol_assv, assv_prim), sList(symbol_boolean_q, boolean_q_prim), sList(symbol_caddr, caddr_prim), sList(symbol_cadr, cadr_prim), sList(symbol_call_with_current_continuation, call_cc_prim), sList(symbol_call_cc, call_cc_prim), sList(symbol_car, car_prim), sList(symbol_cdr, cdr_prim), sList(symbol_caaaar, caaaar_prim), sList(symbol_caaadr, caaadr_prim), sList(symbol_caaar, caaar_prim), sList(symbol_caadar, caadar_prim), sList(symbol_caaddr, caaddr_prim), sList(symbol_caadr, caadr_prim), sList(symbol_caar, caar_prim), sList(symbol_cadaar, cadaar_prim), sList(symbol_cadadr, cadadr_prim), sList(symbol_cadar, cadar_prim), sList(symbol_caddar, caddar_prim), sList(symbol_cadddr, cadddr_prim), sList(symbol_cdaaar, cdaaar_prim), sList(symbol_cdaadr, cdaadr_prim), sList(symbol_cdaar, cdaar_prim), sList(symbol_cdadar, cdadar_prim), sList(symbol_cdaddr, cdaddr_prim), sList(symbol_cdadr, cdadr_prim), sList(symbol_cdar, cdar_prim), sList(symbol_cddaar, cddaar_prim), sList(symbol_cddadr, cddadr_prim), sList(symbol_cddar, cddar_prim), sList(symbol_cdddar, cdddar_prim), sList(symbol_cddddr, cddddr_prim), sList(symbol_cdddr, cdddr_prim), sList(symbol_cddr, cddr_prim), sList(symbol_char_q, char_q_prim), sList(symbol_char_is__q, char_is__q_prim), sList(symbol_char_whitespace_q, char_whitespace_q_prim), sList(symbol_char_alphabetic_q, char_alphabetic_q_prim), sList(symbol_char_numeric_q, char_numeric_q_prim), sList(symbol_char_to_integer, char_to_integer_prim), sList(symbol_cons, cons_prim), sList(symbol_current_time, current_time_prim), sList(symbol_cut, cut_prim), sList(symbol_dir, dir_prim), sList(symbol_display, display_prim), sList(symbol_current_environment, current_environment_prim), sList(symbol_eq_q, eq_q_prim), sList(symbol_equal_q, equal_q_prim), sList(symbol_error, error_prim), sList(symbol_eval, eval_prim), sList(symbol_eval_ast, eval_ast_prim), sList(symbol_exit, exit_prim), sList(symbol_for_each, for_each_prim), sList(symbol_format, format_prim), sList(symbol_get, get_prim), sList(symbol_get_stack_trace, get_stack_trace_prim), sList(symbol_import, import_prim), sList(symbol_integer_to_char, integer_to_char_prim), sList(symbol_length, length_prim), sList(symbol_sList, list_prim), sList(symbol_list_to_vector, list_to_vector_prim), sList(symbol_list_to_string, list_to_string_prim), sList(symbol_list_ref, list_ref_prim), sList(symbol_load, load_prim), sList(symbol_make_set, make_set_prim), sList(symbol_make_vector, make_vector_prim), sList(symbol_map, map_prim), sList(symbol_member, member_prim), sList(symbol_memq, memq_prim), sList(symbol_memv, memv_prim), sList(symbol_newline, newline_prim), sList(symbol_not, not_prim), sList(symbol_null_q, null_q_prim), sList(symbol_number_to_string, number_to_string_prim), sList(symbol_number_q, number_q_prim), sList(symbol_pair_q, pair_q_prim), sList(symbol_parse, parse_prim), sList(symbol_parse_string, parse_string_prim), sList(symbol_print, print_prim), sList(symbol_printf, printf_prim), sList(symbol_Range, range_prim), sList(symbol_read_string, read_string_prim), sList(symbol_require, require_prim), sList(symbol_reverse, reverse_prim), sList(symbol_set_car_b, set_car_b_prim), sList(symbol_set_cdr_b, set_cdr_b_prim), sList(symbol_snoc, snoc_prim), sList(symbol_rac, rac_prim), sList(symbol_rdc, rdc_prim), sList(symbol_sqrt, sqrt_prim), sList(symbol_odd_q, odd_q_prim), sList(symbol_even_q, even_q_prim), sList(symbol_quotient, quotient_prim), sList(symbol_remainder, remainder_prim), sList(symbol_make_string, string_prim), sList(symbol_string_length, string_length_prim), sList(symbol_string_ref, string_ref_prim), sList(symbol_string_q, string_q_prim), sList(symbol_string_to_number, string_to_number_prim), sList(symbol_string_is__q, string_is__q_prim), sList(symbol_substring, substring_prim), sList(symbol_symbol_q, symbol_q_prim), sList(symbol_unparse, unparse_prim), sList(symbol_unparse_procedure, unparse_procedure_prim), sList(symbol_using_native, using_prim), sList(symbol_set_use_stack_trace_b, set_use_stack_trace_b_prim), sList(symbol_vector, vector_prim), sList(symbol_vector_ref, vector_ref_prim), sList(symbol_vector_set_b, vector_set_b_prim), sList(symbol_void, void_prim), sList(symbol_zero_q, zero_q_prim), sList(symbol_current_directory, current_directory_prim), sList(symbol_cd, current_directory_prim), sList(symbol_round, round_prim));
         return make_initial_env_extended(map(car_proc, primitives), map(cadr_proc, primitives));
     }
     
     public static object make_external_proc(object external_function_object) {
-        return make_proc("proc", 105, external_function_object);
+        return make_proc("proc", 132, external_function_object);
     }
     
     public static bool pattern_q(object x) {
@@ -7354,59 +7868,86 @@ public class PJScheme:Scheme
     public static object cdr_prim = make_proc("proc", 48);
     public static object cadr_prim = make_proc("proc", 49);
     public static object caddr_prim = make_proc("proc", 50);
-    public static object list_prim = make_proc("proc", 51);
-    public static object make_set_prim = make_proc("proc", 52);
-    public static object plus_prim = make_proc("proc", 53);
-    public static object minus_prim = make_proc("proc", 54);
-    public static object times_prim = make_proc("proc", 55);
-    public static object divide_prim = make_proc("proc", 56);
-    public static object modulo_prim = make_proc("proc", 57);
-    public static object lt_prim = make_proc("proc", 58);
-    public static object gt_prim = make_proc("proc", 59);
-    public static object lt_or_eq_prim = make_proc("proc", 60);
-    public static object gt_or_eq_prim = make_proc("proc", 61);
-    public static object equal_sign_prim = make_proc("proc", 62);
-    public static object abs_prim = make_proc("proc", 63);
-    public static object equal_q_prim = make_proc("proc", 64);
-    public static object eq_q_prim = make_proc("proc", 65);
-    public static object memq_prim = make_proc("proc", 66);
-    public static object member_prim = make_proc("proc", 67);
-    public static object range_prim = make_proc("proc", 68);
-    public static object snoc_prim = make_proc("proc", 69);
-    public static object rac_prim = make_proc("proc", 70);
-    public static object rdc_prim = make_proc("proc", 71);
-    public static object set_car_b_prim = make_proc("proc", 72);
-    public static object set_cdr_b_prim = make_proc("proc", 73);
-    public static object import_prim = make_proc("proc", 74);
-    public static object get_stack_trace_prim = make_proc("proc", 75);
-    public static object get_prim = make_proc("proc", 76);
-    public static object call_cc_prim = make_proc("proc", 78);
-    public static object abort_prim = make_proc("proc", 79);
-    public static object require_prim = make_proc("proc", 80);
-    public static object cut_prim = make_proc("proc", 81);
-    public static object reverse_prim = make_proc("proc", 82);
-    public static object append_prim = make_proc("proc", 83);
-    public static object string_to_number_prim = make_proc("proc", 84);
-    public static object string_is__q_prim = make_proc("proc", 85);
-    public static object list_to_vector_prim = make_proc("proc", 86);
-    public static object list_to_string_prim = make_proc("proc", 87);
-    public static object dir_prim = make_proc("proc", 88);
-    public static object current_time_prim = make_proc("proc", 89);
-    public static object map_prim = make_proc("proc", 90);
-    public static object for_each_prim = make_proc("proc", 91);
-    public static object format_prim = make_proc("proc", 92);
-    public static object current_environment_prim = make_proc("proc", 93);
-    public static object using_prim = make_proc("proc", 94);
-    public static object not_prim = make_proc("proc", 95);
-    public static object printf_prim = make_proc("proc", 96);
-    public static object vector_prim = make_proc("proc", 97);
-    public static object vector_set_b_prim = make_proc("proc", 98);
-    public static object vector_ref_prim = make_proc("proc", 99);
-    public static object make_vector_prim = make_proc("proc", 100);
-    public static object error_prim = make_proc("proc", 101);
-    public static object list_ref_prim = make_proc("proc", 102);
-    public static object current_directory_prim = make_proc("proc", 103);
-    public static object round_prim = make_proc("proc", 104);
+    public static object caaaar_prim = make_proc("proc", 51);
+    public static object caaadr_prim = make_proc("proc", 52);
+    public static object caaar_prim = make_proc("proc", 53);
+    public static object caadar_prim = make_proc("proc", 54);
+    public static object caaddr_prim = make_proc("proc", 55);
+    public static object caadr_prim = make_proc("proc", 56);
+    public static object caar_prim = make_proc("proc", 57);
+    public static object cadaar_prim = make_proc("proc", 58);
+    public static object cadadr_prim = make_proc("proc", 59);
+    public static object cadar_prim = make_proc("proc", 60);
+    public static object caddar_prim = make_proc("proc", 61);
+    public static object cadddr_prim = make_proc("proc", 62);
+    public static object cdaaar_prim = make_proc("proc", 63);
+    public static object cdaadr_prim = make_proc("proc", 64);
+    public static object cdaar_prim = make_proc("proc", 65);
+    public static object cdadar_prim = make_proc("proc", 66);
+    public static object cdaddr_prim = make_proc("proc", 67);
+    public static object cdadr_prim = make_proc("proc", 68);
+    public static object cdar_prim = make_proc("proc", 69);
+    public static object cddaar_prim = make_proc("proc", 70);
+    public static object cddadr_prim = make_proc("proc", 71);
+    public static object cddar_prim = make_proc("proc", 72);
+    public static object cdddar_prim = make_proc("proc", 73);
+    public static object cddddr_prim = make_proc("proc", 74);
+    public static object cdddr_prim = make_proc("proc", 75);
+    public static object cddr_prim = make_proc("proc", 76);
+    public static object list_prim = make_proc("proc", 77);
+    public static object make_set_prim = make_proc("proc", 78);
+    public static object plus_prim = make_proc("proc", 79);
+    public static object minus_prim = make_proc("proc", 80);
+    public static object times_prim = make_proc("proc", 81);
+    public static object divide_prim = make_proc("proc", 82);
+    public static object modulo_prim = make_proc("proc", 83);
+    public static object lt_prim = make_proc("proc", 84);
+    public static object gt_prim = make_proc("proc", 85);
+    public static object lt_or_eq_prim = make_proc("proc", 86);
+    public static object gt_or_eq_prim = make_proc("proc", 87);
+    public static object equal_sign_prim = make_proc("proc", 88);
+    public static object abs_prim = make_proc("proc", 89);
+    public static object equal_q_prim = make_proc("proc", 90);
+    public static object eq_q_prim = make_proc("proc", 91);
+    public static object memq_prim = make_proc("proc", 92);
+    public static object member_prim = make_proc("proc", 93);
+    public static object range_prim = make_proc("proc", 94);
+    public static object snoc_prim = make_proc("proc", 95);
+    public static object rac_prim = make_proc("proc", 96);
+    public static object rdc_prim = make_proc("proc", 97);
+    public static object set_car_b_prim = make_proc("proc", 98);
+    public static object set_cdr_b_prim = make_proc("proc", 99);
+    public static object import_prim = make_proc("proc", 100);
+    public static object get_stack_trace_prim = make_proc("proc", 101);
+    public static object get_prim = make_proc("proc", 102);
+    public static object call_cc_prim = make_proc("proc", 104);
+    public static object abort_prim = make_proc("proc", 105);
+    public static object require_prim = make_proc("proc", 106);
+    public static object cut_prim = make_proc("proc", 107);
+    public static object reverse_prim = make_proc("proc", 108);
+    public static object append_prim = make_proc("proc", 109);
+    public static object string_to_number_prim = make_proc("proc", 110);
+    public static object string_is__q_prim = make_proc("proc", 111);
+    public static object list_to_vector_prim = make_proc("proc", 112);
+    public static object list_to_string_prim = make_proc("proc", 113);
+    public static object dir_prim = make_proc("proc", 114);
+    public static object current_time_prim = make_proc("proc", 115);
+    public static object map_prim = make_proc("proc", 116);
+    public static object for_each_prim = make_proc("proc", 117);
+    public static object format_prim = make_proc("proc", 118);
+    public static object current_environment_prim = make_proc("proc", 119);
+    public static object using_prim = make_proc("proc", 120);
+    public static object not_prim = make_proc("proc", 121);
+    public static object printf_prim = make_proc("proc", 122);
+    public static object vector_prim = make_proc("proc", 123);
+    public static object vector_set_b_prim = make_proc("proc", 124);
+    public static object vector_ref_prim = make_proc("proc", 125);
+    public static object make_vector_prim = make_proc("proc", 126);
+    public static object error_prim = make_proc("proc", 127);
+    public static object list_ref_prim = make_proc("proc", 128);
+    public static object current_directory_prim = make_proc("proc", 129);
+    public static object round_prim = make_proc("proc", 130);
+    public static object set_use_stack_trace_b_prim = make_proc("proc", 131);
     public static object toplevel_env = make_toplevel_env();
     public static MethodInfo[] mi_cont4;
     public static MethodInfo[] mi_handler;
@@ -7427,7 +7968,7 @@ public class PJScheme:Scheme
         mi_cont2 = new MethodInfo[206];
         mi_fail = new MethodInfo[8];
         mi_macro = new MethodInfo[12];
-        mi_proc = new MethodInfo[205];
+        mi_proc = new MethodInfo[259];
         
         for (int i = 1; i < 24; i++) {
             mi_cont4[i] = typeof(PJScheme).GetMethod(String.Format("b_cont4_{0}_d", i));
@@ -7485,7 +8026,7 @@ public class PJScheme:Scheme
             }
         }
         
-        for (int i = 1; i < 205; i++) {
+        for (int i = 1; i < 259; i++) {
             mi_proc[i] = typeof(PJScheme).GetMethod(String.Format("b_proc_{0}_d", i));
             if (mi_proc[i] == null) {
                 throw new Exception(String.Format("Undefined mi: mi_proc[{0}]", i));

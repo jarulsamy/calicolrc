@@ -198,6 +198,63 @@ def cadddr(lyst):
 def cddddr(lyst):
     return lyst.cdr.cdr.cdr.cdr
 
+def caaaar(lyst):
+    return lyst.car.car.car.car
+
+def caaadr(lyst):
+    return lyst.cdr.car.car.car
+
+def caaar(lyst):
+    return lyst.car.car.car
+
+def caadar(lyst):
+    return lyst.car.cdr.car.car
+
+def caaddr(lyst):
+    return lyst.cdr.cdr.car.car
+
+def caadr(lyst):
+    return lyst.cdr.car.car
+
+def cadaar(lyst):
+    return lyst.car.cdr.car.car
+
+def cadadr(lyst):
+    return lyst.car.cdr.car.cdr
+
+def caddar(lyst):
+    return lyst.car.cdr.cdr.car
+
+def cdaaar(lyst):
+    return lyst.car.car.car.cdr
+
+def cdaadr(lyst):
+    return lyst.cdr.car.car.cdr
+
+def cdaar(lyst):
+    return lyst.car.car.car.cdr
+
+def cdadar(lyst):
+    return lyst.car.cdr.car.cdr
+
+def cdaddr(lyst):
+    return lyst.cdr.cdr.car.cdr
+
+def cdadr(lyst):
+    return lyst.car.cdr.car.cdr
+
+def cddaar(lyst):
+    return lyst.cdr.cdr.car.car
+
+def cddadr(lyst):
+    return lyst.cdr.car.cdr.cdr
+
+def cddar(lyst):
+    return lyst.car.cdr.cdr
+
+def cdddar(lyst):
+    return lyst.car.cdr.cdr.cdr
+
 def set_car_b(cell, item):
     cell.car = item
 
@@ -638,7 +695,9 @@ def file_exists_q(path):
 def get_current_time():
     return time.time()
 
-def current_directory():
+def current_directory(*path):
+    if len(path) == 1:
+        os.chdir(path[0])
     return os.getcwd()
 
 def Range(*args):

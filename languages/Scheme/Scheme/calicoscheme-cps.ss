@@ -3527,9 +3527,9 @@
 ;; load
 (define load-prim
   (lambda-proc (args env2 info handler fail k2)
-    (if (not (length-one? args))
-       (runtime-error "incorrect number of arguments to load" info handler fail)
-       (load-file (car args) toplevel-env info handler fail k2))))  ;; petite uses toplevel env
+    (if (not (length-at-least? 1 args))
+	(runtime-error "incorrect number of arguments to load" info handler fail)
+	(load-files args toplevel-env info handler fail k2))))  ;; petite uses toplevel env
 
 (define load-stack '())
 
@@ -3747,6 +3747,240 @@
       ((not (length-at-least? 3 (car args)))
        (runtime-error (format "caddr called on incorrect list structure ~s" (car args)) info handler fail))
       (else (k2 (apply caddr args) fail)))))
+
+(define caaaar-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to caaaar" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "caaaar called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply caaaar args) fail)))))
+
+(define caaadr-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to caaadr" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "caaadr called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply caaadr args) fail)))))
+
+(define caaar-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to caaar" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "caaar called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply caaar args) fail)))))
+
+(define caadar-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to caadar" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "caadar called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply caadar args) fail)))))
+
+(define caaddr-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to caaddr" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "caaddr called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply caaddr args) fail)))))
+
+(define caadr-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to caadr" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "caadr called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply caadr args) fail)))))
+
+(define caar-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to caar" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "caar called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply caar args) fail)))))
+
+(define cadaar-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cadaar" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cadaar called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cadaar args) fail)))))
+
+(define cadadr-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cadadr" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cadadr called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cadadr args) fail)))))
+
+(define cadar-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cadar" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cadar called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cadar args) fail)))))
+
+(define caddar-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to caddar" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "caddar called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply caddar args) fail)))))
+
+(define cadddr-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cadddr" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cadddr called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cadddr args) fail)))))
+
+(define cdaaar-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cdaaar" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cdaaar called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cdaaar args) fail)))))
+
+(define cdaadr-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cdaadr" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cdaadr called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cdaadr args) fail)))))
+
+(define cdaar-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cdaar" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cdaar called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cdaar args) fail)))))
+
+(define cdadar-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cdadar" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cdadar called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cdadar args) fail)))))
+
+(define cdaddr-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cdaddr" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cdaddr called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cdaddr args) fail)))))
+
+(define cdadr-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cdadr" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cdadr called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cdadr args) fail)))))
+
+(define cdar-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cdar" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cdar called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cdar args) fail)))))
+
+(define cddaar-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cddaar" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cddaar called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cddaar args) fail)))))
+
+(define cddadr-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cddadr" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cddadr called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cddadr args) fail)))))
+
+(define cddar-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cddar" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cddar called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cddar args) fail)))))
+
+(define cdddar-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cdddar" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cdddar called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cdddar args) fail)))))
+
+(define cddddr-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cddddr" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cddddr called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cddddr args) fail)))))
+
+(define cdddr-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cdddr" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cdddr called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cdddr args) fail)))))
+
+(define cddr-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (length-one? args))
+       (runtime-error "incorrect number of arguments to cddr" info handler fail))
+      ((not (pair? (car args)))
+       (runtime-error (format "cddr called on non-pair ~s" (car args)) info handler fail))
+      (else (k2 (apply cddr args) fail)))))
 
 ;; list
 (define list-prim
@@ -4434,9 +4668,16 @@
       (else
        (runtime-error "set-stack-trace! requires exactly one boolean" info handler fail)))))
 
-;; Add new procedures above here!
-;; Then, add NAME to env
-;; Then, add NAME_proc to Scheme.cs (if you use map or apply on it internally)
+;; -----------------------------------------------------
+;; To add a new primitive:
+;; -----------------------------------------------------
+;; 1. Add new NAME-prim primitive procedures above here
+;; 2. add (list 'NAME NAME-prim) to env
+;; 3. add NAME to Scheme.xx implementation
+;; 4. if you use map or apply on it internally, and the
+;;    the implementation language cannot pass functions
+;;    as arguments, then add NAME_proc to Scheme.xx 
+;; -----------------------------------------------------
 
 (define make-toplevel-env
   (lambda ()
@@ -4464,6 +4705,32 @@
 	    (list 'call/cc call/cc-prim)
 	    (list 'car car-prim)
 	    (list 'cdr cdr-prim)
+	    (list 'caaaar caaaar-prim)
+	    (list 'caaadr caaadr-prim)
+	    (list 'caaar caaar-prim)
+	    (list 'caadar caadar-prim)
+	    (list 'caaddr caaddr-prim)
+	    (list 'caadr caadr-prim)
+	    (list 'caar caar-prim)
+	    (list 'cadaar cadaar-prim)
+	    (list 'cadadr cadadr-prim)
+	    (list 'cadar cadar-prim)
+	    (list 'caddar caddar-prim)
+	    (list 'cadddr cadddr-prim)
+	    (list 'cdaaar cdaaar-prim)
+	    (list 'cdaadr cdaadr-prim)
+	    (list 'cdaar cdaar-prim)
+	    (list 'cdadar cdadar-prim)
+	    (list 'cdaddr cdaddr-prim)
+	    (list 'cdadr cdadr-prim)
+	    (list 'cdar cdar-prim)
+	    (list 'cddaar cddaar-prim)
+	    (list 'cddadr cddadr-prim)
+	    (list 'cddar cddar-prim)
+	    (list 'cdddar cdddar-prim)
+	    (list 'cddddr cddddr-prim)
+	    (list 'cdddr cdddr-prim)
+	    (list 'cddr cddr-prim)
 	    (list 'char? char?-prim)
 	    (list 'char=? char=?-prim)
 	    (list 'char-whitespace? char-whitespace?-prim)

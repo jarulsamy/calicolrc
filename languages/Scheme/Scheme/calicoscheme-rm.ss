@@ -2527,15 +2527,15 @@
 
 (define <proc-31>
   (lambda ()
-    (if (not (length-one? args_reg))
+    (if (not (length-at-least? 1 args_reg))
         (begin
           (set! msg_reg "incorrect number of arguments to load")
           (set! pc runtime-error))
         (begin
           (set! k_reg k2_reg)
           (set! env2_reg toplevel-env)
-          (set! filename_reg (car args_reg))
-          (set! pc load-file)))))
+          (set! filenames_reg args_reg)
+          (set! pc load-files)))))
 
 (define <proc-32>
   (lambda ()
@@ -2804,12 +2804,454 @@
 
 (define <proc-51>
   (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to caaaar")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "caaaar called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply caaaar args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-52>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to caaadr")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "caaadr called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply caaadr args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-53>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to caaar")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "caaar called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply caaar args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-54>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to caadar")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "caadar called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply caadar args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-55>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to caaddr")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "caaddr called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply caaddr args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-56>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to caadr")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "caadr called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply caadr args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-57>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to caar")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "caar called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply caar args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-58>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cadaar")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cadaar called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cadaar args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-59>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cadadr")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cadadr called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cadadr args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-60>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cadar")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cadar called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cadar args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-61>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to caddar")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "caddar called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply caddar args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-62>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cadddr")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cadddr called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cadddr args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-63>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cdaaar")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cdaaar called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cdaaar args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-64>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cdaadr")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cdaadr called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cdaadr args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-65>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cdaar")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cdaar called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cdaar args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-66>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cdadar")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cdadar called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cdadar args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-67>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cdaddr")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cdaddr called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cdaddr args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-68>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cdadr")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cdadr called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cdadr args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-69>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cdar")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cdar called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cdar args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-70>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cddaar")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cddaar called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cddaar args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-71>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cddadr")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cddadr called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cddadr args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-72>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cddar")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cddar called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cddar args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-73>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cdddar")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cdddar called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cdddar args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-74>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cddddr")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cddddr called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cddddr args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-75>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cdddr")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cdddr called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cdddr args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-76>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to cddr")
+          (set! pc runtime-error))
+        (if (not (pair? (car args_reg)))
+            (begin
+              (set! msg_reg
+                (format "cddr called on non-pair ~s" (car args_reg)))
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply cddr args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
+
+(define <proc-77>
+  (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg args_reg)
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-52>
+(define <proc-78>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -2817,7 +3259,7 @@
           (set! pc runtime-error))
         (begin (set! lst_reg (car args_reg)) (set! pc make-set)))))
 
-(define <proc-53>
+(define <proc-79>
   (lambda ()
     (if (not (all-numeric? args_reg))
         (begin
@@ -2829,7 +3271,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-54>
+(define <proc-80>
   (lambda ()
     (if (null? args_reg)
         (begin
@@ -2845,7 +3287,7 @@
               (set! k_reg k2_reg)
               (set! pc apply-cont2))))))
 
-(define <proc-55>
+(define <proc-81>
   (lambda ()
     (if (not (all-numeric? args_reg))
         (begin
@@ -2857,7 +3299,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-56>
+(define <proc-82>
   (lambda ()
     (if (null? args_reg)
         (begin
@@ -2877,7 +3319,7 @@
                   (set! k_reg k2_reg)
                   (set! pc apply-cont2)))))))
 
-(define <proc-57>
+(define <proc-83>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -2897,7 +3339,7 @@
                   (set! k_reg k2_reg)
                   (set! pc apply-cont2)))))))
 
-(define <proc-58>
+(define <proc-84>
   (lambda ()
     (if (not (length-at-least? 2 args_reg))
         (begin
@@ -2913,7 +3355,7 @@
               (set! k_reg k2_reg)
               (set! pc apply-cont2))))))
 
-(define <proc-59>
+(define <proc-85>
   (lambda ()
     (if (not (length-at-least? 2 args_reg))
         (begin
@@ -2929,7 +3371,7 @@
               (set! k_reg k2_reg)
               (set! pc apply-cont2))))))
 
-(define <proc-60>
+(define <proc-86>
   (lambda ()
     (if (not (length-at-least? 2 args_reg))
         (begin
@@ -2945,7 +3387,7 @@
               (set! k_reg k2_reg)
               (set! pc apply-cont2))))))
 
-(define <proc-61>
+(define <proc-87>
   (lambda ()
     (if (not (length-at-least? 2 args_reg))
         (begin
@@ -2961,7 +3403,7 @@
               (set! k_reg k2_reg)
               (set! pc apply-cont2))))))
 
-(define <proc-62>
+(define <proc-88>
   (lambda ()
     (if (not (length-at-least? 2 args_reg))
         (begin
@@ -2977,7 +3419,7 @@
               (set! k_reg k2_reg)
               (set! pc apply-cont2))))))
 
-(define <proc-63>
+(define <proc-89>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -2993,7 +3435,7 @@
               (set! k_reg k2_reg)
               (set! pc apply-cont2))))))
 
-(define <proc-64>
+(define <proc-90>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -3005,7 +3447,7 @@
           (set! x_reg (car args_reg))
           (set! pc equal-objects?)))))
 
-(define <proc-65>
+(define <proc-91>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -3017,7 +3459,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-66>
+(define <proc-92>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -3029,7 +3471,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-67>
+(define <proc-93>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -3042,7 +3484,7 @@
           (set! x_reg (car args_reg))
           (set! pc member-loop)))))
 
-(define <proc-68>
+(define <proc-94>
   (lambda ()
     (if (or (null? args_reg) (length-at-least? 4 args_reg))
         (begin
@@ -3058,28 +3500,28 @@
               (set! k_reg k2_reg)
               (set! pc apply-cont2))))))
 
-(define <proc-69>
+(define <proc-95>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (apply snoc args_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-70>
+(define <proc-96>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (apply rac args_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-71>
+(define <proc-97>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (apply rdc args_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-72>
+(define <proc-98>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -3096,7 +3538,7 @@
               (set! k_reg k2_reg)
               (set! pc apply-cont2))))))
 
-(define <proc-73>
+(define <proc-99>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -3113,7 +3555,7 @@
               (set! k_reg k2_reg)
               (set! pc apply-cont2))))))
 
-(define <proc-74>
+(define <proc-100>
   (lambda ()
     (let ((filename 'undefined))
       (set! filename (car args_reg))
@@ -3131,27 +3573,27 @@
             (set! var_reg module-name)
             (set! pc lookup-binding-in-first-frame))))))
 
-(define <proc-75>
+(define <proc-101>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (car *stack-trace*))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-76>
+(define <proc-102>
   (lambda ()
     (set! k_reg k2_reg)
     (set! env_reg env2_reg)
     (set! pc get-primitive)))
 
-(define <proc-77>
+(define <proc-103>
   (lambda (k)
     (set! value2_reg fail_reg)
     (set! value1_reg (car args_reg))
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <proc-78>
+(define <proc-104>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -3164,7 +3606,7 @@
                 (set! msg_reg "call/cc called with non-procedure")
                 (set! pc runtime-error))
               (let ((fake-k 'undefined))
-                (set! fake-k (make-proc <proc-77> k2_reg))
+                (set! fake-k (make-proc <proc-103> k2_reg))
                 (if (dlr-proc? proc)
                     (begin
                       (set! value2_reg fail_reg)
@@ -3176,7 +3618,7 @@
                       (set! proc_reg proc)
                       (set! pc apply-proc)))))))))
 
-(define <proc-79>
+(define <proc-105>
   (lambda ()
     (if (null? args_reg)
         (begin
@@ -3190,7 +3632,7 @@
           (set! k_reg REP-k)
           (set! pc apply-cont2)))))
 
-(define <proc-80>
+(define <proc-106>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -3204,7 +3646,7 @@
               (set! pc apply-cont2))
             (set! pc apply-fail)))))
 
-(define <proc-81>
+(define <proc-107>
   (lambda ()
     (if (not (null? args_reg))
         (begin
@@ -3216,7 +3658,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-82>
+(define <proc-108>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -3235,10 +3677,10 @@
               (set! k_reg k2_reg)
               (set! pc apply-cont2))))))
 
-(define <proc-83>
+(define <proc-109>
   (lambda () (set! lists_reg args_reg) (set! pc append-all)))
 
-(define <proc-84>
+(define <proc-110>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -3251,7 +3693,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-85>
+(define <proc-111>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -3263,7 +3705,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-86>
+(define <proc-112>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -3283,7 +3725,7 @@
               (set! k_reg k2_reg)
               (set! pc apply-cont2))))))
 
-(define <proc-87>
+(define <proc-113>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -3310,19 +3752,19 @@
                   (set! k_reg k2_reg)
                   (set! pc apply-cont2)))))))
 
-(define <proc-88>
+(define <proc-114>
   (lambda ()
     (set! lst_reg (directory args_reg env2_reg))
     (set! pc make-set)))
 
-(define <proc-89>
+(define <proc-115>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (get-current-time))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-90>
+(define <proc-116>
   (lambda ()
     (set! k_reg k2_reg)
     (set! env_reg env2_reg)
@@ -3330,7 +3772,7 @@
     (set! args_reg (cdr args_reg))
     (set! pc map-primitive)))
 
-(define <proc-91>
+(define <proc-117>
   (lambda ()
     (set! k_reg k2_reg)
     (set! env_reg env2_reg)
@@ -3338,7 +3780,7 @@
     (set! proc_reg (car args_reg))
     (set! pc for-each-primitive)))
 
-(define <proc-92>
+(define <proc-118>
   (lambda ()
     (if (< (length args_reg) 1)
         (begin
@@ -3350,21 +3792,21 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-93>
+(define <proc-119>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg env2_reg)
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-94>
+(define <proc-120>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (using args_reg env2_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-95>
+(define <proc-121>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -3376,7 +3818,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-96>
+(define <proc-122>
   (lambda ()
     (apply printf args_reg)
     (set! value2_reg fail_reg)
@@ -3384,14 +3826,14 @@
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-97>
+(define <proc-123>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (apply vector_native args_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-98>
+(define <proc-124>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg
@@ -3402,21 +3844,21 @@
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-99>
+(define <proc-125>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (apply vector-ref args_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-100>
+(define <proc-126>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (apply make-vector args_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-101>
+(define <proc-127>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -3430,7 +3872,7 @@
           (set! msg_reg message)
           (set! pc runtime-error)))))
 
-(define <proc-102>
+(define <proc-128>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -3442,7 +3884,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-103>
+(define <proc-129>
   (lambda ()
     (if (null? args_reg)
         (begin
@@ -3465,7 +3907,7 @@
                 "incorrect number of arguments to current-directory")
               (set! pc runtime-error))))))
 
-(define <proc-104>
+(define <proc-130>
   (lambda ()
     (if (and (length-one? args_reg) (number? (car args_reg)))
         (begin
@@ -3477,7 +3919,7 @@
           (set! msg_reg "round requires exactly one number")
           (set! pc runtime-error)))))
 
-(define <proc-105>
+(define <proc-131>
   (lambda ()
     (if (and (length-one? args_reg) (boolean? (car args_reg)))
         (begin
@@ -3490,7 +3932,7 @@
             "set-stack-trace! requires exactly one boolean")
           (set! pc runtime-error)))))
 
-(define <proc-106>
+(define <proc-132>
   (lambda (external-function-object)
     (set! value2_reg fail_reg)
     (set! value1_reg (apply* external-function-object args_reg))
@@ -7141,7 +7583,20 @@
          (list 'caddr caddr-prim) (list 'cadr cadr-prim)
          (list 'call-with-current-continuation call/cc-prim)
          (list 'call/cc call/cc-prim) (list 'car car-prim)
-         (list 'cdr cdr-prim) (list 'char? char?-prim)
+         (list 'cdr cdr-prim) (list 'caaaar caaaar-prim)
+         (list 'caaadr caaadr-prim) (list 'caaar caaar-prim)
+         (list 'caadar caadar-prim) (list 'caaddr caaddr-prim)
+         (list 'caadr caadr-prim) (list 'caar caar-prim)
+         (list 'cadaar cadaar-prim) (list 'cadadr cadadr-prim)
+         (list 'cadar cadar-prim) (list 'caddar caddar-prim)
+         (list 'cadddr cadddr-prim) (list 'cdaaar cdaaar-prim)
+         (list 'cdaadr cdaadr-prim) (list 'cdaar cdaar-prim)
+         (list 'cdadar cdadar-prim) (list 'cdaddr cdaddr-prim)
+         (list 'cdadr cdadr-prim) (list 'cdar cdar-prim)
+         (list 'cddaar cddaar-prim) (list 'cddadr cddadr-prim)
+         (list 'cddar cddar-prim) (list 'cdddar cdddar-prim)
+         (list 'cddddr cddddr-prim) (list 'cdddr cdddr-prim)
+         (list 'cddr cddr-prim) (list 'char? char?-prim)
          (list 'char=? char=?-prim)
          (list 'char-whitespace? char-whitespace?-prim)
          (list 'char-alphabetic? char-alphabetic?-prim)
@@ -7205,7 +7660,7 @@
 
 (define make-external-proc
   (lambda (external-function-object)
-    (return* (make-proc <proc-106> external-function-object))))
+    (return* (make-proc <proc-132> external-function-object))))
 
 (define pattern?
   (lambda (x)
@@ -7732,47 +8187,99 @@
 
 (define caddr-prim (make-proc <proc-50>))
 
-(define list-prim (make-proc <proc-51>))
+(define caaaar-prim (make-proc <proc-51>))
 
-(define make-set-prim (make-proc <proc-52>))
+(define caaadr-prim (make-proc <proc-52>))
 
-(define plus-prim (make-proc <proc-53>))
+(define caaar-prim (make-proc <proc-53>))
 
-(define minus-prim (make-proc <proc-54>))
+(define caadar-prim (make-proc <proc-54>))
 
-(define times-prim (make-proc <proc-55>))
+(define caaddr-prim (make-proc <proc-55>))
 
-(define divide-prim (make-proc <proc-56>))
+(define caadr-prim (make-proc <proc-56>))
 
-(define modulo-prim (make-proc <proc-57>))
+(define caar-prim (make-proc <proc-57>))
 
-(define lt-prim (make-proc <proc-58>))
+(define cadaar-prim (make-proc <proc-58>))
 
-(define gt-prim (make-proc <proc-59>))
+(define cadadr-prim (make-proc <proc-59>))
 
-(define lt-or-eq-prim (make-proc <proc-60>))
+(define cadar-prim (make-proc <proc-60>))
 
-(define gt-or-eq-prim (make-proc <proc-61>))
+(define caddar-prim (make-proc <proc-61>))
 
-(define equal-sign-prim (make-proc <proc-62>))
+(define cadddr-prim (make-proc <proc-62>))
 
-(define abs-prim (make-proc <proc-63>))
+(define cdaaar-prim (make-proc <proc-63>))
 
-(define equal?-prim (make-proc <proc-64>))
+(define cdaadr-prim (make-proc <proc-64>))
 
-(define eq?-prim (make-proc <proc-65>))
+(define cdaar-prim (make-proc <proc-65>))
 
-(define memq-prim (make-proc <proc-66>))
+(define cdadar-prim (make-proc <proc-66>))
 
-(define member-prim (make-proc <proc-67>))
+(define cdaddr-prim (make-proc <proc-67>))
 
-(define range-prim (make-proc <proc-68>))
+(define cdadr-prim (make-proc <proc-68>))
 
-(define snoc-prim (make-proc <proc-69>))
+(define cdar-prim (make-proc <proc-69>))
 
-(define rac-prim (make-proc <proc-70>))
+(define cddaar-prim (make-proc <proc-70>))
 
-(define rdc-prim (make-proc <proc-71>))
+(define cddadr-prim (make-proc <proc-71>))
+
+(define cddar-prim (make-proc <proc-72>))
+
+(define cdddar-prim (make-proc <proc-73>))
+
+(define cddddr-prim (make-proc <proc-74>))
+
+(define cdddr-prim (make-proc <proc-75>))
+
+(define cddr-prim (make-proc <proc-76>))
+
+(define list-prim (make-proc <proc-77>))
+
+(define make-set-prim (make-proc <proc-78>))
+
+(define plus-prim (make-proc <proc-79>))
+
+(define minus-prim (make-proc <proc-80>))
+
+(define times-prim (make-proc <proc-81>))
+
+(define divide-prim (make-proc <proc-82>))
+
+(define modulo-prim (make-proc <proc-83>))
+
+(define lt-prim (make-proc <proc-84>))
+
+(define gt-prim (make-proc <proc-85>))
+
+(define lt-or-eq-prim (make-proc <proc-86>))
+
+(define gt-or-eq-prim (make-proc <proc-87>))
+
+(define equal-sign-prim (make-proc <proc-88>))
+
+(define abs-prim (make-proc <proc-89>))
+
+(define equal?-prim (make-proc <proc-90>))
+
+(define eq?-prim (make-proc <proc-91>))
+
+(define memq-prim (make-proc <proc-92>))
+
+(define member-prim (make-proc <proc-93>))
+
+(define range-prim (make-proc <proc-94>))
+
+(define snoc-prim (make-proc <proc-95>))
+
+(define rac-prim (make-proc <proc-96>))
+
+(define rdc-prim (make-proc <proc-97>))
 
 (define-native
   range
@@ -7789,75 +8296,75 @@
               (range (car args) (cadr args) 1 '())
               (range (car args) (cadr args) (caddr args) '()))))))
 
-(define set-car!-prim (make-proc <proc-72>))
+(define set-car!-prim (make-proc <proc-98>))
 
-(define set-cdr!-prim (make-proc <proc-73>))
+(define set-cdr!-prim (make-proc <proc-99>))
 
-(define import-prim (make-proc <proc-74>))
+(define import-prim (make-proc <proc-100>))
 
-(define get-stack-trace-prim (make-proc <proc-75>))
+(define get-stack-trace-prim (make-proc <proc-101>))
 
-(define get-prim (make-proc <proc-76>))
+(define get-prim (make-proc <proc-102>))
 
-(define call/cc-prim (make-proc <proc-78>))
+(define call/cc-prim (make-proc <proc-104>))
 
-(define abort-prim (make-proc <proc-79>))
+(define abort-prim (make-proc <proc-105>))
 
-(define require-prim (make-proc <proc-80>))
+(define require-prim (make-proc <proc-106>))
 
-(define cut-prim (make-proc <proc-81>))
+(define cut-prim (make-proc <proc-107>))
 
-(define reverse-prim (make-proc <proc-82>))
+(define reverse-prim (make-proc <proc-108>))
 
-(define append-prim (make-proc <proc-83>))
+(define append-prim (make-proc <proc-109>))
 
-(define string->number-prim (make-proc <proc-84>))
+(define string->number-prim (make-proc <proc-110>))
 
-(define string=?-prim (make-proc <proc-85>))
+(define string=?-prim (make-proc <proc-111>))
 
-(define list-to-vector-prim (make-proc <proc-86>))
+(define list-to-vector-prim (make-proc <proc-112>))
 
-(define list->string-prim (make-proc <proc-87>))
+(define list->string-prim (make-proc <proc-113>))
 
-(define dir-prim (make-proc <proc-88>))
+(define dir-prim (make-proc <proc-114>))
 
-(define current-time-prim (make-proc <proc-89>))
+(define current-time-prim (make-proc <proc-115>))
 
-(define map-prim (make-proc <proc-90>))
+(define map-prim (make-proc <proc-116>))
 
-(define for-each-prim (make-proc <proc-91>))
+(define for-each-prim (make-proc <proc-117>))
 
-(define format-prim (make-proc <proc-92>))
+(define format-prim (make-proc <proc-118>))
 
-(define current-environment-prim (make-proc <proc-93>))
+(define current-environment-prim (make-proc <proc-119>))
 
-(define using-prim (make-proc <proc-94>))
+(define using-prim (make-proc <proc-120>))
 
-(define not-prim (make-proc <proc-95>))
+(define not-prim (make-proc <proc-121>))
 
-(define printf-prim (make-proc <proc-96>))
+(define printf-prim (make-proc <proc-122>))
 
-(define vector-prim (make-proc <proc-97>))
+(define vector-prim (make-proc <proc-123>))
 
 (define-native
   vector_native
   (lambda args (apply vector args)))
 
-(define vector-set!-prim (make-proc <proc-98>))
+(define vector-set!-prim (make-proc <proc-124>))
 
-(define vector-ref-prim (make-proc <proc-99>))
+(define vector-ref-prim (make-proc <proc-125>))
 
-(define make-vector-prim (make-proc <proc-100>))
+(define make-vector-prim (make-proc <proc-126>))
 
-(define error-prim (make-proc <proc-101>))
+(define error-prim (make-proc <proc-127>))
 
-(define list-ref-prim (make-proc <proc-102>))
+(define list-ref-prim (make-proc <proc-128>))
 
-(define current-directory-prim (make-proc <proc-103>))
+(define current-directory-prim (make-proc <proc-129>))
 
-(define round-prim (make-proc <proc-104>))
+(define round-prim (make-proc <proc-130>))
 
-(define set-use-stack-trace!-prim (make-proc <proc-105>))
+(define set-use-stack-trace!-prim (make-proc <proc-131>))
 
 (define-native
   make-initial-env-extended
