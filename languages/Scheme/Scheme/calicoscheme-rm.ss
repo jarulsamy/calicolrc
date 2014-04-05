@@ -4034,6 +4034,90 @@
           (set! pc runtime-error)))))
 
 (define <proc-137>
+  (lambda ()
+    (if (not (length-two? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to eqv?")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply eqv? args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-138>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to vector?")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply vector? args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-139>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to atom?")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply atom? args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-140>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to iter?")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply iter? args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-141>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to list?")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply vector? args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-142>
+  (lambda ()
+    (if (not (length-one? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to procedure?")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply procedure? args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-143>
+  (lambda ()
+    (if (not (length-two? args_reg))
+        (begin
+          (set! msg_reg "incorrect number of arguments to string<?")
+          (set! pc runtime-error))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply string<? args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
+
+(define <proc-144>
   (lambda (external-function-object)
     (set! value2_reg fail_reg)
     (set! value1_reg (apply* external-function-object args_reg))
@@ -7758,7 +7842,11 @@
          (list 'string->list string->list-prim)
          (list 'string->symbol string->symbol-prim)
          (list 'symbol->string symbol->string-prim)
-         (list 'vector->list vector->list-prim)))
+         (list 'vector->list vector->list-prim)
+         (list 'eqv? eqv?-prim) (list 'vector? vector?-prim)
+         (list 'atom? atom?-prim) (list 'iter? iter?-prim)
+         (list 'list? list?-prim) (list 'procedure? procedure?-prim)
+         (list 'string<? string<?-prim)))
       (return*
         (make-initial-env-extended
           (map car primitives)
@@ -7766,7 +7854,7 @@
 
 (define make-external-proc
   (lambda (external-function-object)
-    (return* (make-proc <proc-137> external-function-object))))
+    (return* (make-proc <proc-144> external-function-object))))
 
 (define pattern?
   (lambda (x)
@@ -8481,6 +8569,20 @@
 (define round-prim (make-proc <proc-135>))
 
 (define set-use-stack-trace!-prim (make-proc <proc-136>))
+
+(define eqv?-prim (make-proc <proc-137>))
+
+(define vector?-prim (make-proc <proc-138>))
+
+(define atom?-prim (make-proc <proc-139>))
+
+(define iter?-prim (make-proc <proc-140>))
+
+(define list?-prim (make-proc <proc-141>))
+
+(define procedure?-prim (make-proc <proc-142>))
+
+(define string<?-prim (make-proc <proc-143>))
 
 (define-native
   make-initial-env-extended

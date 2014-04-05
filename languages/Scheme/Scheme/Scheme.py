@@ -765,6 +765,23 @@ def vector_native(*ls):
 def vector_set_b(vec, pos, value):
     vec[pos] = value
 
+def eqv_q(a, b):
+    if number_q(a) and number_q(b):
+        # but be same type, and value
+        return type(a) == type(b) and eq_q(a, b)
+    elif char_q(a) and char_q(b):
+        return a.char == b.char
+    else:
+        return eq_q(a, b)
+
+def atom_q(item):
+    return number_q(item) or symbol_q(item) or string_q(item)
+
+def iter_q(item):
+    # If a item is externally iterable. Scheme in Python
+    # has no such items.
+    return False
+
 ### External env interface:
 
 def using(libraries, environment):

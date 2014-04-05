@@ -3953,6 +3953,97 @@
 (define+
   <proc-137>
   (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-two? args))
+         (runtime-error
+           "incorrect number of arguments to eqv?"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply eqv? args) fail))))))
+
+(define+
+  <proc-138>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to vector?"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply vector? args) fail))))))
+
+(define+
+  <proc-139>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to atom?"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply atom? args) fail))))))
+
+(define+
+  <proc-140>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to iter?"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply iter? args) fail))))))
+
+(define+
+  <proc-141>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to list?"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply vector? args) fail))))))
+
+(define+
+  <proc-142>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-one? args))
+         (runtime-error
+           "incorrect number of arguments to procedure?"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply procedure? args) fail))))))
+
+(define+
+  <proc-143>
+  (lambda (args env2 info handler fail k2 fields)
+    (let ()
+      (cond
+        ((not (length-two? args))
+         (runtime-error
+           "incorrect number of arguments to string<?"
+           info
+           handler
+           fail))
+        (else (apply-cont2 k2 (apply string<? args) fail))))))
+
+(define+
+  <proc-144>
+  (lambda (args env2 info handler fail k2 fields)
     (let ((external-function-object (car fields)))
       (apply-cont2
         k2
@@ -6611,14 +6702,19 @@
                        (list 'string->list string->list-prim)
                        (list 'string->symbol string->symbol-prim)
                        (list 'symbol->string symbol->string-prim)
-                       (list 'vector->list vector->list-prim))))
+                       (list 'vector->list vector->list-prim)
+                       (list 'eqv? eqv?-prim) (list 'vector? vector?-prim)
+                       (list 'atom? atom?-prim) (list 'iter? iter?-prim)
+                       (list 'list? list?-prim)
+                       (list 'procedure? procedure?-prim)
+                       (list 'string<? string<?-prim))))
       (make-initial-env-extended
         (map car primitives)
         (map cadr primitives)))))
 
 (define make-external-proc
   (lambda (external-function-object)
-    (make-proc <proc-137> external-function-object)))
+    (make-proc <proc-144> external-function-object)))
 
 (define pattern?
   (lambda (x)
@@ -7252,6 +7348,20 @@
 (define round-prim (make-proc <proc-135>))
 
 (define set-use-stack-trace!-prim (make-proc <proc-136>))
+
+(define eqv?-prim (make-proc <proc-137>))
+
+(define vector?-prim (make-proc <proc-138>))
+
+(define atom?-prim (make-proc <proc-139>))
+
+(define iter?-prim (make-proc <proc-140>))
+
+(define list?-prim (make-proc <proc-141>))
+
+(define procedure?-prim (make-proc <proc-142>))
+
+(define string<?-prim (make-proc <proc-143>))
 
 (define-native
   make-initial-env-extended

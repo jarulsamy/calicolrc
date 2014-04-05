@@ -4719,11 +4719,60 @@
       (else
        (runtime-error "set-stack-trace! requires exactly one boolean" info handler fail)))))
 
+(define eqv?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+     ((not (length-two? args))
+      (runtime-error "incorrect number of arguments to eqv?" info handler fail))
+     (else (k2 (apply eqv? args) fail)))))
+
+(define vector?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+     ((not (length-one? args))
+      (runtime-error "incorrect number of arguments to vector?" info handler fail))
+     (else (k2 (apply vector? args) fail)))))
+
+(define atom?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+     ((not (length-one? args))
+      (runtime-error "incorrect number of arguments to atom?" info handler fail))
+     (else (k2 (apply atom? args) fail)))))
+
+(define iter?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+     ((not (length-one? args))
+      (runtime-error "incorrect number of arguments to iter?" info handler fail))
+     (else (k2 (apply iter? args) fail)))))
+
+(define list?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+     ((not (length-one? args))
+      (runtime-error "incorrect number of arguments to list?" info handler fail))
+     (else (k2 (apply vector? args) fail)))))
+
+(define procedure?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+     ((not (length-one? args))
+      (runtime-error "incorrect number of arguments to procedure?" info handler fail))
+     (else (k2 (apply procedure? args) fail)))))
+
+(define string<?-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+     ((not (length-two? args))
+      (runtime-error "incorrect number of arguments to string<?" info handler fail))
+     (else (k2 (apply string<? args) fail)))))
+
 ;; -----------------------------------------------------
 ;; To add a new primitive:
 ;; -----------------------------------------------------
 ;; 1. Add new NAME-prim primitive procedures above here
-;; 2. add (list 'NAME NAME-prim) to env
+;; 2. add (list 'NAME NAME-prim) to toplevel-env, below
 ;; 3. add NAME to Scheme.xx implementation
 ;; 4. if you use map or apply on it internally, and the
 ;;    the implementation language cannot pass functions
@@ -4867,6 +4916,13 @@
 	    (list 'string->symbol string->symbol-prim)
 	    (list 'symbol->string symbol->string-prim)
 	    (list 'vector->list vector->list-prim)
+	    (list 'eqv? eqv?-prim)
+	    (list 'vector? vector?-prim)
+	    (list 'atom? atom?-prim)
+	    (list 'iter? iter?-prim)
+	    (list 'list? list?-prim)
+	    (list 'procedure? procedure?-prim)
+	    (list 'string<? string<?-prim)
 	    )))
       (make-initial-env-extended (map car primitives) (map cadr primitives)))))
 
