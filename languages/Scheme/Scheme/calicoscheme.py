@@ -42,19 +42,6 @@ import os
 # Set to a dictionary-like object for global-shared namespace:
 DLR_ENV = {key:getattr(__builtins__, key) for key in dir(__builtins__)}
 
-class Character(object):
-    def __init__(self, c):
-        self.char = c
-    def __repr__(self):
-        return "#\\" + self.char
-    def __eq__(self, other):
-        return ((isinstance(other, Character) and self.char == other.char)
-                (isinstance(other, str) and self.char == other))
-    def __lt__(self, other):
-        return isinstance(other, Character) and self.char < other.char
-    def __gt__(self, other):
-        return isinstance(other, Character) and self.char > other.char
-
 class Symbol(object):
     def __init__(self, name):
         self.name = name
@@ -384,17 +371,14 @@ def string_q(item):
     return isinstance(item, str)
 
 def char_whitespace_q(c):
-    return c in [Character(' '), 
-                 Character('\t'), 
-                 Character('\n'), 
-                 Character('\r')]
+    return c in [' ', '\t', '\n', '\r']
 
 def char_alphabetic_q(c):
-    return ((Character('A') <= c <= Character('Z')) or 
-            (Character('a') <= c <= Character('z')))
+    return (('A' <= c <= 'Z') or 
+            ('a' <= c <= 'z'))
 
 def char_numeric_q(c):
-    return Character('0') <= c <= Character('9')
+    return '0' <= c <= '9'
 
 def char_is__q(c1, c2):
     return c1 == c2
@@ -562,7 +546,7 @@ def string_append(s1, s2):
     return str(s1) + str(s2)
 
 def string_ref(string, pos):
-    return Character(string[pos])
+    return string[pos]
 
 def string(s):
     return str(s)
@@ -4508,7 +4492,7 @@ def increment_scan_counters(chars):
     globals()['last_scan_line'] = scan_line
     globals()['last_scan_char'] = scan_char
     globals()['last_scan_position'] = scan_position
-    if char_is__q(next_avail(chars), Character('\n')):
+    if char_is__q(next_avail(chars), '\n'):
         globals()['scan_line'] = (1) + (scan_line)
         globals()['scan_char'] = 1
     else:
@@ -4590,7 +4574,7 @@ def scan_error():
 def unexpected_char_error():
     c = symbol_undefined
     c = next_avail(chars_reg)
-    if char_is__q(c, Character('\0')):
+    if char_is__q(c, '\0'):
         globals()['char_reg'] = scan_char
         globals()['line_reg'] = scan_line
         globals()['msg_reg'] = "unexpected end of input"
@@ -4636,35 +4620,35 @@ def convert_buffer_to_token():
                                     name = symbol_undefined
                                     name = list_to_string(buffer)
                                     if string_is__q(name, "nul"):
-                                        globals()['value_reg'] = make_token2(symbol_character, Character('\0'))
+                                        globals()['value_reg'] = make_token2(symbol_character, '\0')
                                         globals()['pc'] = apply_cont
                                     else:
                                         if string_is__q(name, "space"):
-                                            globals()['value_reg'] = make_token2(symbol_character, Character(' '))
+                                            globals()['value_reg'] = make_token2(symbol_character, ' ')
                                             globals()['pc'] = apply_cont
                                         else:
                                             if string_is__q(name, "tab"):
-                                                globals()['value_reg'] = make_token2(symbol_character, Character('\t'))
+                                                globals()['value_reg'] = make_token2(symbol_character, '\t')
                                                 globals()['pc'] = apply_cont
                                             else:
                                                 if string_is__q(name, "newline"):
-                                                    globals()['value_reg'] = make_token2(symbol_character, Character('\n'))
+                                                    globals()['value_reg'] = make_token2(symbol_character, '\n')
                                                     globals()['pc'] = apply_cont
                                                 else:
                                                     if string_is__q(name, "linefeed"):
-                                                        globals()['value_reg'] = make_token2(symbol_character, Character('\n'))
+                                                        globals()['value_reg'] = make_token2(symbol_character, '\n')
                                                         globals()['pc'] = apply_cont
                                                     else:
                                                         if string_is__q(name, "backspace"):
-                                                            globals()['value_reg'] = make_token2(symbol_character, Character('\b'))
+                                                            globals()['value_reg'] = make_token2(symbol_character, '\b')
                                                             globals()['pc'] = apply_cont
                                                         else:
                                                             if string_is__q(name, "return"):
-                                                                globals()['value_reg'] = make_token2(symbol_character, Character('\r'))
+                                                                globals()['value_reg'] = make_token2(symbol_character, '\r')
                                                                 globals()['pc'] = apply_cont
                                                             else:
                                                                 if string_is__q(name, "page"):
-                                                                    globals()['value_reg'] = make_token2(symbol_character, Character(u"\u000C"))
+                                                                    globals()['value_reg'] = make_token2(symbol_character, u"\u000C")
                                                                     globals()['pc'] = apply_cont
                                                                 else:
                                                                     globals()['char_reg'] = token_start_char
