@@ -3238,7 +3238,7 @@
            info
            handler
            fail))
-        (else (apply-cont2 k2 (not (car args)) fail))))))
+        (else (apply-cont2 k2 (not (true? (car args))) fail))))))
 
 (define+
   <proc-96>

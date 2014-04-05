@@ -541,9 +541,8 @@ def tagged_list_hat(keyword, op, length):
 
 ### Misc:
 
-def error(function, formatting, *args):
-    sys.stderr.write(format(formatting, *args))
-    raise Exception(format(formatting, *args))
+def error(function, message):
+    raise Exception("Exception in {0}: {1}" % (function, message))
 
 def display(item):
     print(item, end="")
@@ -584,13 +583,12 @@ def format(formatting, *lyst):
     while i < len(formatting):
         if formatting[i] == '\\':
             i += 1
-            retval += formatting[i]
         elif formatting[i] == "~":
-            if formatting[i+1] == 's':
+            if formatting[i+1] == 's' and count < len(args):
                 i += 1
                 retval += repr(args[count])
                 count += 1
-            elif formatting[i+1] == 'a':
+            elif formatting[i+1] == 'a' and count < len(args):
                 i += 1
                 retval += str(args[count])
                 count += 1
@@ -664,8 +662,8 @@ def memv(x, ls):
 def make_vector(size):
     return [0] * size
 
-def vector_native(ls):
-    return List(ls)
+def vector_native(*ls):
+    return list(ls)
 
 def vector_set_b(vec, pos, value):
     vec[pos] = value

@@ -4356,7 +4356,7 @@
     (cond
       ((not (length-one? args))
        (runtime-error "incorrect number of arguments to not" info handler fail))
-      (else (k2 (not (car args)) fail)))))
+      (else (k2 (not (true? (car args))) fail)))))
 
 ;; printf 
 (define printf-prim

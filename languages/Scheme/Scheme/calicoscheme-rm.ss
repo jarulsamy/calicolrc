@@ -3372,7 +3372,7 @@
           (set! pc runtime-error))
         (begin
           (set! value2_reg fail_reg)
-          (set! value1_reg (not (car args_reg)))
+          (set! value1_reg (not (true? (car args_reg))))
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
