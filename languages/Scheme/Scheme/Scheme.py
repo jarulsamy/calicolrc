@@ -47,6 +47,8 @@ class Char(object):
         return isinstance(other, Char) and self.char > other.char
     def __str__(self):
         return "#\\%s" % self.char
+    def __repr__(self):
+        return "#\\%s" % self.char
 
 class Symbol(object):
     def __init__(self, name):
@@ -101,7 +103,7 @@ class cons(object):
             retval += repr(current.car)
             current = current.cdr
         if current != symbol_emptylist:
-            retval += " . " + repr(current)
+            retval += " . " + safe_repr(current)
         return "(%s)" % retval
 
     def __iter__(self):
@@ -536,7 +538,7 @@ def char_to_string(c):
     return c.char
 
 def string_to_list(st):
-    return List(*[c for c in st])
+    return List(*[Char(c) for c in st])
 
 def string_to_symbol(s):
     return make_symbol(s)
@@ -555,9 +557,9 @@ def string_append(s1, s2):
 def string_ref(string, pos):
     return Char(string[pos])
 
-def string(*s):
+def string(*chars):
     retval = ""
-    for c in s:
+    for c in chars:
         if isinstance(c, Char):
             retval += c.char
         else:
@@ -673,7 +675,7 @@ def format(formatting, *lyst):
         elif formatting[i] == "~":
             if formatting[i+1] == 's' and count < len(args):
                 i += 1
-                retval += repr(args[count])
+                retval += safe_repr(args[count])
                 count += 1
             elif formatting[i+1] == 'a' and count < len(args):
                 i += 1
@@ -690,17 +692,23 @@ def format(formatting, *lyst):
     return retval
 
 def safe_print(item):
+    print(safe_repr(item))
+
+def safe_repr(item):
     if procedure_q(item):
-        print("<procedure>")
+        return "<procedure>"
     elif environment_q(item):
-        print("<environment>")
+        return "<environment>"
+    elif string_q(item):
+        # Unlike Python, Scheme's strings must start with "
+        return '"%s"' % item.replace('"', '\\"')
     elif boolean_q(item):
         if item:
-            print("#t")
+            return "#t"
         else:
-            print("#f")
+            return "#f"
     else:
-        print(item)
+        return repr(item)
 
 def search_frame(frame, variable):
     if isinstance(frame, cons):
