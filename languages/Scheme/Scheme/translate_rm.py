@@ -865,6 +865,10 @@ public class PJScheme:Scheme
             return "sList";
         elif (name == "string"):
             return "make_string";
+        elif (name == "float"):
+            return "float_";
+        elif (name == "int"):
+            return "int_";
         elif (name == "operator"):
             return "operator_";
         elif (name == "bool"):

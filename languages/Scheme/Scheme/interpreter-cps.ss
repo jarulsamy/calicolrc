@@ -2190,13 +2190,6 @@
        (runtime-error "incorrect number of arguments to float" info handler fail))
       (else (k2 (apply float args) fail)))))
 
-(define format-prim
-  (lambda-proc (args env2 info handler fail k2)
-    (cond
-      ((not (length-two? args))
-       (runtime-error "incorrect number of arguments to format" info handler fail))
-      (else (k2 (apply format args) fail)))))
-
 (define globals-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
@@ -2446,7 +2439,6 @@
 	    (list 'procedure? procedure?-prim)
 	    (list 'string<? string<?-prim)
  	    (list 'float float-prim)
- 	    (list 'format format-prim)
  	    (list 'globals globals-prim)
  	    (list 'int int-prim)
  	    (list 'apply-with-keywords apply-with-keywords-prim)

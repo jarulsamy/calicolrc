@@ -4077,19 +4077,6 @@
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
-        ((not (length-two? args))
-         (runtime-error
-           "incorrect number of arguments to format"
-           info
-           handler
-           fail))
-        (else (apply-cont2 k2 (apply format args) fail))))))
-
-(define+
-  <proc-147>
-  (lambda (args env2 info handler fail k2 fields)
-    (let ()
-      (cond
         ((not (null? args))
          (runtime-error
            "incorrect number of arguments to globals"
@@ -4099,7 +4086,7 @@
         (else (apply-cont2 k2 (apply globals args) fail))))))
 
 (define+
-  <proc-148>
+  <proc-147>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4112,7 +4099,7 @@
         (else (apply-cont2 k2 (apply int args) fail))))))
 
 (define+
-  <proc-149>
+  <proc-148>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4126,7 +4113,7 @@
          (apply-cont2 k2 (apply apply-with-keywords args) fail))))))
 
 (define+
-  <proc-150>
+  <proc-149>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4139,13 +4126,13 @@
         (else (apply-cont2 k2 (apply assq args) fail))))))
 
 (define+
-  <proc-151>
+  <proc-150>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond (else (apply-cont2 k2 (apply dict args) fail))))))
 
 (define+
-  <proc-152>
+  <proc-151>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4158,7 +4145,7 @@
         (else (apply-cont2 k2 (apply property args) fail))))))
 
 (define+
-  <proc-153>
+  <proc-152>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4171,7 +4158,7 @@
         (else (apply-cont2 k2 (apply / args) fail))))))
 
 (define+
-  <proc-154>
+  <proc-153>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4185,7 +4172,7 @@
          (apply-cont2 k2 (apply reset-toplevel-env args) fail))))))
 
 (define+
-  <proc-155>
+  <proc-154>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4198,7 +4185,7 @@
         (else (apply-cont2 k2 (apply sort args) fail))))))
 
 (define+
-  <proc-156>
+  <proc-155>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4211,7 +4198,7 @@
         (else (apply-cont2 k2 (apply string-append args) fail))))))
 
 (define+
-  <proc-157>
+  <proc-156>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4224,7 +4211,7 @@
         (else (apply-cont2 k2 (apply string-split args) fail))))))
 
 (define+
-  <proc-158>
+  <proc-157>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4237,7 +4224,7 @@
         (else (apply-cont2 k2 (apply make-symbol args) fail))))))
 
 (define+
-  <proc-159>
+  <proc-158>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4250,13 +4237,13 @@
         (else (apply-cont2 k2 (apply type args) fail))))))
 
 (define+
-  <proc-160>
+  <proc-159>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (apply-cont2 k2 (apply use-lexical-address args) fail))))
 
 (define+
-  <proc-161>
+  <proc-160>
   (lambda (args env2 info handler fail k2 fields)
     (let ((external-function-object (car fields)))
       (apply-cont2
@@ -6936,7 +6923,7 @@
                        (list 'list? list?-prim)
                        (list 'procedure? procedure?-prim)
                        (list 'string<? string<?-prim)
-                       (list 'float float-prim) (list 'format format-prim)
+                       (list 'float float-prim)
                        (list 'globals globals-prim) (list 'int int-prim)
                        (list 'apply-with-keywords apply-with-keywords-prim)
                        (list 'assq assq-prim) (list 'dict dict-prim)
@@ -6961,7 +6948,7 @@
 
 (define make-external-proc
   (lambda (external-function-object)
-    (make-proc <proc-161> external-function-object)))
+    (make-proc <proc-160> external-function-object)))
 
 (define pattern?
   (lambda (x)
@@ -7597,35 +7584,33 @@
 
 (define float-prim (make-proc <proc-145>))
 
-(define format-prim (make-proc <proc-146>))
+(define globals-prim (make-proc <proc-146>))
 
-(define globals-prim (make-proc <proc-147>))
+(define int-prim (make-proc <proc-147>))
 
-(define int-prim (make-proc <proc-148>))
+(define apply-with-keywords-prim (make-proc <proc-148>))
 
-(define apply-with-keywords-prim (make-proc <proc-149>))
+(define assq-prim (make-proc <proc-149>))
 
-(define assq-prim (make-proc <proc-150>))
+(define dict-prim (make-proc <proc-150>))
 
-(define dict-prim (make-proc <proc-151>))
+(define property-prim (make-proc <proc-151>))
 
-(define property-prim (make-proc <proc-152>))
+(define rational-prim (make-proc <proc-152>))
 
-(define rational-prim (make-proc <proc-153>))
+(define reset-toplevel-env-prim (make-proc <proc-153>))
 
-(define reset-toplevel-env-prim (make-proc <proc-154>))
+(define sort-prim (make-proc <proc-154>))
 
-(define sort-prim (make-proc <proc-155>))
+(define string-append-prim (make-proc <proc-155>))
 
-(define string-append-prim (make-proc <proc-156>))
+(define string-split-prim (make-proc <proc-156>))
 
-(define string-split-prim (make-proc <proc-157>))
+(define symbol-prim (make-proc <proc-157>))
 
-(define symbol-prim (make-proc <proc-158>))
+(define typeof-prim (make-proc <proc-158>))
 
-(define typeof-prim (make-proc <proc-159>))
-
-(define use-lexical-address-prim (make-proc <proc-160>))
+(define use-lexical-address-prim (make-proc <proc-159>))
 
 (define-native
   make-initial-env-extended
