@@ -206,6 +206,11 @@ namespace Calico {
 			"    os.environ[\"LD_LIBRARY_PATH\"] = (\"{1}\" + \n" +
 			"        os.pathsep + \"{2}\") \n" +
 			"\n" +
+			"if \"MONO_PATH\" in os.environ:\n" +
+			"    os.environ[\"MONO_PATH\"] = \"{2}\" + os.environ[\"MONO_PATH\"] \n" +
+			"else:\n" +
+			"    os.environ[\"MONO_PATH\"] = \"{2}\" \n" +
+			"\n" +
 			"c = get_config()\n" +
 			"c.KernelManager.kernel_cmd = [\n" +
 			"      'mono', '{3}', \n", 
