@@ -15,6 +15,7 @@ all: ../Graphics.dll ../Shapes.dll
 		-r:System.Drawing \
 		-r:FarseerPhysics.dll \
 		-r:JigsawAttributes \
+		-r:Calico.exe \
 		-pkg:gtk-sharp-2.0 \
 		-pkg:gtk-dotnet-2.0 \
 		-out:../Graphics.dll
@@ -35,6 +36,7 @@ all: ../Graphics.dll ../Shapes.dll
 		-r:Mono.Cairo \
 		-r:FarseerPhysics.dll \
 		-r:JigsawAttributes \
+		-r:Calico.exe \
 		-pkg:gtk-sharp-2.0 \
 		-pkg:gtk-dotnet-2.0 \
 		-out:../Shapes.dll 

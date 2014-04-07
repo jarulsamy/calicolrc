@@ -4571,18 +4571,19 @@ public static class Graphics
 			    // Now, do what Picture(pixbuf) does:
 			    _pixbuf = pixbuf;
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
+                    //_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
 			    }
+                
 			    set_points (new Point (0, 0), 
 					new Point (_pixbuf.Width, 0),
 					new Point (_pixbuf.Width, _pixbuf.Height), 
 					new Point (0, _pixbuf.Height));			
 			    _cacheWidth = _pixbuf.Width;
 			    _cacheHeight = _pixbuf.Height;
+                if (on_mac()) swap_red_blue();
 			});
 		}
-
-
+        
 		public Picture (WindowClass window) : this(true)
 		{ 
 		    InvokeBlocking (delegate {
@@ -4596,7 +4597,7 @@ public static class Graphics
 			    // Now, do what Picture(pixbuf) does:
 			    _pixbuf = pixbuf;
 			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
+                    //_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
 			    }
 			    set_points (new Point (0, 0), 
 					new Point (_pixbuf.Width, 0),
@@ -4604,8 +4605,33 @@ public static class Graphics
 					new Point (0, _pixbuf.Height));			
 			    _cacheWidth = _pixbuf.Width;
 			    _cacheHeight = _pixbuf.Height;
+                if (on_mac()) swap_red_blue();
 			});
 		}
+        
+        // THIS IS IS A SUPER HACK
+        public bool on_mac()
+        {
+            return System.IO.Directory.Exists("/Applications");            
+        }
+
+        // THIS IS IS A SUPER HACK^2
+        public void swap_red_blue()
+        {
+            for (int x=0; x < _pixbuf.Width; x++) {
+				for (int y=0; y < _pixbuf.Height; y++) {
+
+                    byte r = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+                                              x * _pixbuf.NChannels + 0);
+                    byte b = Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+                                              x * _pixbuf.NChannels + 2);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 0, b);
+				    Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+						       x * _pixbuf.NChannels + 2, r);
+				}
+            }
+        }
 
 		public Picture (Canvas canvas) : this(true)
 		{ 
