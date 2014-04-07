@@ -1569,20 +1569,20 @@ public class PJScheme:Scheme
     }
     
     public static void b_cont2_54_d(object exp, object k) {
-        pop_stack_trace(exp);
+        pop_stack_trace_b(exp);
         k_reg = k;
         pc = apply_cont2;
     }
     
     public static void b_cont2_55_d(object args, object exp, object env, object info, object handler, object k) {
         if (true_q(_staruse_stack_trace_star)) {
-            push_stack_trace(exp);
+            push_stack_trace_b(exp);
         }
         if (true_q(dlr_proc_q(value1_reg))) {
             object result = symbol_undefined;
             result = dlr_apply(value1_reg, args);
             if (true_q(_staruse_stack_trace_star)) {
-                pop_stack_trace(exp);
+                pop_stack_trace_b(exp);
             }
             value1_reg = result;
             k_reg = k;
@@ -4144,7 +4144,7 @@ public class PJScheme:Scheme
     
     public static void b_proc_136_d() {
         if (true_q((true_q(length_one_q(args_reg)) && true_q(boolean_q(car(args_reg)))))) {
-            set_use_stack_trace(car(args_reg));
+            set_use_stack_trace_b(car(args_reg));
             value2_reg = fail_reg;
             value1_reg = void_value;
             k_reg = k2_reg;
@@ -5881,12 +5881,12 @@ public class PJScheme:Scheme
         return cdr(binding);
     }
     
-    public static object set_binding_value_b(object binding, object value) {
-        return set_car_b(binding, value);
+    public static void set_binding_value_b(object binding, object value) {
+        set_car_b(binding, value);
     }
     
-    public static object set_binding_docstring_b(object binding, object docstring) {
-        return set_cdr_b(binding, docstring);
+    public static void set_binding_docstring_b(object binding, object docstring) {
+        set_cdr_b(binding, docstring);
     }
     
     public static object make_frame(object variables, object values) {
@@ -5937,8 +5937,8 @@ public class PJScheme:Scheme
         return sList(list_to_vector(append(bindings, sList(new_binding))), append(vars, sList(new_var)));
     }
     
-    public static object set_first_frame_b(object env, object new_frame) {
-        return set_car_b(cdr(env), new_frame);
+    public static void set_first_frame_b(object env, object new_frame) {
+        set_car_b(cdr(env), new_frame);
     }
     
     public static object extend(object env, object variables, object values) {
@@ -7039,7 +7039,7 @@ public class PJScheme:Scheme
     
     public static object execute_rm(object input_, object src) {
         load_stack = symbol_emptylist;
-        initialize_execute();
+        initialize_execute_b();
         k_reg = REP_k;
         fail_reg = _starlast_fail_star;
         handler_reg = REP_handler;
@@ -7095,7 +7095,7 @@ public class PJScheme:Scheme
         toplevel_env = make_toplevel_env();
         macro_env = make_macro_env_hat();
         load_stack = symbol_emptylist;
-        initialize_execute();
+        initialize_execute_b();
         _starlast_fail_star = REP_fail;
     }
     
@@ -7120,23 +7120,27 @@ public class PJScheme:Scheme
         return _staruse_stack_trace_star;
     }
     
-    public static object initialize_stack_trace() {
-        return set_car_b(_starstack_trace_star, symbol_emptylist);
+    public static void set_use_stack_trace_b(object value) {
+        _staruse_stack_trace_star = true_q(value);
     }
     
-    public static object initialize_execute() {
+    public static void initialize_stack_trace_b() {
+        set_car_b(_starstack_trace_star, symbol_emptylist);
+    }
+    
+    public static void initialize_execute_b() {
         _closure_depth = 0;
         _trace_pause = false;
-        return initialize_stack_trace();
+        initialize_stack_trace_b();
     }
     
-    public static object push_stack_trace(object exp) {
-        return set_car_b(_starstack_trace_star, cons(exp, car(_starstack_trace_star)));
+    public static void push_stack_trace_b(object exp) {
+        set_car_b(_starstack_trace_star, cons(exp, car(_starstack_trace_star)));
     }
     
-    public static object pop_stack_trace(object exp) {
+    public static void pop_stack_trace_b(object exp) {
         if (true_q((! true_q(null_q(car(_starstack_trace_star)))))) {
-            return set_car_b(_starstack_trace_star, cdr(car(_starstack_trace_star)));
+            set_car_b(_starstack_trace_star, cdr(car(_starstack_trace_star)));
         }
     }
     

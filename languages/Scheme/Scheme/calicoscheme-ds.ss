@@ -1172,7 +1172,7 @@
   <cont2-54>
   (lambda (value1 value2 fields)
     (let ((exp (car fields)) (k (cadr fields)))
-      (pop-stack-trace exp)
+      (pop-stack-trace! exp)
       (apply-cont2 k value1 value2))))
 
 (define+
@@ -1184,11 +1184,11 @@
           (info (cadddr fields))
           (handler (list-ref fields 4))
           (k (list-ref fields 5)))
-      (if *use-stack-trace* (push-stack-trace exp))
+      (if *use-stack-trace* (push-stack-trace! exp))
       (cond
         ((dlr-proc? value1)
          (let ((result (dlr-apply value1 args)))
-           (if *use-stack-trace* (pop-stack-trace exp))
+           (if *use-stack-trace* (pop-stack-trace! exp))
            (apply-cont2 k result value2)))
         ((procedure-object? value1)
          (if *use-stack-trace*
@@ -3941,7 +3941,7 @@
       (cond
         ((and (length-one? args) (boolean? (car args)))
          (begin
-           (set-use-stack-trace (car args))
+           (set-use-stack-trace! (car args))
            (apply-cont2 k2 void-value fail)))
         ((null? args) (apply-cont2 k2 *use-stack-trace* fail))
         (else
@@ -6085,7 +6085,7 @@
 (define execute
   (lambda (input src)
     (set! load-stack '())
-    (initialize-execute)
+    (initialize-execute!)
     (let ((result (scan-input input src REP-handler *last-fail*
                     REP-k)))
       (if (exception? result)
@@ -6144,7 +6144,7 @@
 (define execute-rm
   (lambda (input src)
     (set! load-stack '())
-    (initialize-execute)
+    (initialize-execute!)
     (scan-input input src REP-handler *last-fail* REP-k)
     (let ((result (trampoline)))
       (if (exception? result)
@@ -6182,7 +6182,7 @@
     (set! toplevel-env (make-toplevel-env))
     (set! macro-env (make-macro-env^))
     (set! load-stack '())
-    (initialize-execute)
+    (initialize-execute!)
     (set! *last-fail* REP-fail)))
 
 (define make-debugging-k
@@ -6205,23 +6205,23 @@
 
 (define get-use-stack-trace (lambda () *use-stack-trace*))
 
-(define set-use-stack-trace
+(define set-use-stack-trace!
   (lambda (value) (set! *use-stack-trace* (true? value))))
 
-(define initialize-stack-trace
+(define initialize-stack-trace!
   (lambda () (set-car! *stack-trace* '())))
 
-(define initialize-execute
+(define initialize-execute!
   (lambda ()
     (set! _closure_depth 0)
     (set! _trace_pause #f)
-    (initialize-stack-trace)))
+    (initialize-stack-trace!)))
 
-(define push-stack-trace
+(define push-stack-trace!
   (lambda (exp)
     (set-car! *stack-trace* (cons exp (car *stack-trace*)))))
 
-(define pop-stack-trace
+(define pop-stack-trace!
   (lambda (exp)
     (if (not (null? (car *stack-trace*)))
         (set-car! *stack-trace* (cdr (car *stack-trace*))))))

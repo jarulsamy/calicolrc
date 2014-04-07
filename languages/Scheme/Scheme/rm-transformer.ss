@@ -724,9 +724,15 @@
 ;;	  (error (value) `(return* ,code))
 	  ((error printf pretty-print) args code)
 	  (else (cond
+		  ((ends-with-a-bang? (car code)) code)
 		  ((memq (car code) syntactic-keywords)
 		   (error-in-source code "I don't know how to process the above code."))
 		  (else `(return* ,code)))))))))
+
+(define ends-with-a-bang?
+  (lambda (symbol)
+    (let ((name (symbol->string symbol)))
+      (equal? (string-ref name (- (string-length name) 1)) #\!))))
 
 (define returnize-last
   (lambda (exps)

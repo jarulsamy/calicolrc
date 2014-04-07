@@ -156,7 +156,7 @@
 (define execute
   (lambda (input src)
     (set! load-stack '())
-    (initialize-execute)
+    (initialize-execute!)
     (let ((result (scan-input input src REP-handler *last-fail* REP-k)))
       (if (exception? result)
 	result
@@ -229,7 +229,7 @@
 (define execute-rm
   (lambda (input src)
     (set! load-stack '())
-    (initialize-execute)
+    (initialize-execute!)
     (scan-input input src REP-handler *last-fail* REP-k)
     (let ((result (trampoline)))
       (if (exception? result)
@@ -281,7 +281,7 @@
     (set! toplevel-env (make-toplevel-env))
     (set! macro-env (make-macro-env^))
     (set! load-stack '())
-    (initialize-execute)
+    (initialize-execute!)
     (set! *last-fail* REP-fail)))
 
 ;;----------------------------------------------------------------------------
@@ -318,27 +318,27 @@
   (lambda ()
     *use-stack-trace*))
 
-(define set-use-stack-trace
+(define set-use-stack-trace!
   (lambda (value)
     (set! *use-stack-trace* (true? value))))
 
-(define initialize-stack-trace
+(define initialize-stack-trace!
   (lambda ()
     (set-car! *stack-trace* '())))
 
-(define initialize-execute
+(define initialize-execute!
   (lambda () 
     (set! _closure_depth  0)
     (set! _trace_pause #f)
-    (initialize-stack-trace)))
+    (initialize-stack-trace!)))
 
-(define push-stack-trace
+(define push-stack-trace!
   (lambda (exp)
     ;;(printf "~a: ~a\n" 'push exp)
     ;; FIXME: limit size of stack!
     (set-car! *stack-trace* (cons exp (car *stack-trace*)))))
 
-(define pop-stack-trace
+(define pop-stack-trace!
   (lambda (exp)
     ;;(printf "~a: ~a\n" 'pop exp)
     (if (not (null? (car *stack-trace*)))
@@ -458,17 +458,17 @@
 	  (lambda-cont2 (args fail)
 	    (m operator env handler fail
 	      (lambda-cont2 (proc fail)
-		(if *use-stack-trace* (push-stack-trace exp))
+		(if *use-stack-trace* (push-stack-trace! exp))
 		(cond
 		  ((dlr-proc? proc) 
 		   (let ((result (dlr-apply proc args)))
-		     (if *use-stack-trace* (pop-stack-trace exp))
+		     (if *use-stack-trace* (pop-stack-trace! exp))
 		     (k result fail)))
 		  ((procedure-object? proc) 
 		   (if *use-stack-trace*
 		       (proc args env info handler fail 
 			  (lambda-cont2 (v2 fail)
-			     (pop-stack-trace exp)
+			     (pop-stack-trace! exp)
 			     (k v2 fail)))
 		       (proc args env info handler fail k)))
 		  (else (runtime-error (format "attempt to apply non-procedure '~a'" proc)
@@ -2115,7 +2115,7 @@
     (cond
       ((and (length-one? args) (boolean? (car args)))
        (begin
-	 (set-use-stack-trace (car args))
+	 (set-use-stack-trace! (car args))
 	 (k2 void-value fail)))
       ((null? args)
        (k2 *use-stack-trace* fail))

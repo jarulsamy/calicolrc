@@ -1383,17 +1383,17 @@
 
 (define <cont2-54>
   (lambda (exp k)
-    (pop-stack-trace exp)
+    (pop-stack-trace! exp)
     (set! k_reg k)
     (set! pc apply-cont2)))
 
 (define <cont2-55>
   (lambda (args exp env info handler k)
-    (if *use-stack-trace* (push-stack-trace exp))
+    (if *use-stack-trace* (push-stack-trace! exp))
     (if (dlr-proc? value1_reg)
         (let ((result 'undefined))
           (set! result (dlr-apply value1_reg args))
-          (if *use-stack-trace* (pop-stack-trace exp))
+          (if *use-stack-trace* (pop-stack-trace! exp))
           (set! value1_reg result)
           (set! k_reg k)
           (set! pc apply-cont2))
@@ -4027,7 +4027,7 @@
   (lambda ()
     (if (and (length-one? args_reg) (boolean? (car args_reg)))
         (begin
-          (set-use-stack-trace (car args_reg))
+          (set-use-stack-trace! (car args_reg))
           (set! value2_reg fail_reg)
           (set! value1_reg void-value)
           (set! k_reg k2_reg)
@@ -5715,11 +5715,10 @@
   (lambda (binding) (return* (cdr binding))))
 
 (define set-binding-value!
-  (lambda (binding value) (return* (set-car! binding value))))
+  (lambda (binding value) (set-car! binding value)))
 
 (define set-binding-docstring!
-  (lambda (binding docstring)
-    (return* (set-cdr! binding docstring))))
+  (lambda (binding docstring) (set-cdr! binding docstring)))
 
 (define make-frame
   (lambda (variables values)
@@ -5765,8 +5764,7 @@
           (append vars (list new-var)))))))
 
 (define set-first-frame!
-  (lambda (env new-frame)
-    (return* (set-car! (cdr env) new-frame))))
+  (lambda (env new-frame) (set-car! (cdr env) new-frame)))
 
 (define extend
   (lambda (env variables values)
@@ -6947,7 +6945,7 @@
 (define execute-rm
   (lambda (input src)
     (set! load-stack '())
-    (initialize-execute)
+    (initialize-execute!)
     (set! k_reg REP-k)
     (set! fail_reg *last-fail*)
     (set! handler_reg REP-handler)
@@ -7000,7 +6998,7 @@
     (set! toplevel-env (make-toplevel-env))
     (set! macro-env (make-macro-env^))
     (set! load-stack '())
-    (initialize-execute)
+    (initialize-execute!)
     (set! *last-fail* REP-fail)))
 
 (define make-debugging-k
@@ -7025,28 +7023,26 @@
 (define get-use-stack-trace
   (lambda () (return* *use-stack-trace*)))
 
-(define set-use-stack-trace
+(define set-use-stack-trace!
   (lambda (value) (set! *use-stack-trace* (true? value))))
 
-(define initialize-stack-trace
-  (lambda () (return* (set-car! *stack-trace* '()))))
+(define initialize-stack-trace!
+  (lambda () (set-car! *stack-trace* '())))
 
-(define initialize-execute
+(define initialize-execute!
   (lambda ()
     (set! _closure_depth 0)
     (set! _trace_pause #f)
-    (return* (initialize-stack-trace))))
+    (initialize-stack-trace!)))
 
-(define push-stack-trace
+(define push-stack-trace!
   (lambda (exp)
-    (return*
-      (set-car! *stack-trace* (cons exp (car *stack-trace*))))))
+    (set-car! *stack-trace* (cons exp (car *stack-trace*)))))
 
-(define pop-stack-trace
+(define pop-stack-trace!
   (lambda (exp)
     (if (not (null? (car *stack-trace*)))
-        (return*
-          (set-car! *stack-trace* (cdr (car *stack-trace*)))))))
+        (set-car! *stack-trace* (cdr (car *stack-trace*))))))
 
 (define*
   m

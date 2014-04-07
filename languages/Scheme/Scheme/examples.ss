@@ -162,8 +162,8 @@
     ;;(display exp)
     ;;(display " ")
     (if (equal? exp answer)
-      (printf ".")
-	  (printf "failed; was ~a, should be ~a" exp answer))))
+	(printf ".")
+	(printf "failed; was ~a, should be ~a" exp answer))))
 
 (define test-mu-lambda
   (lambda ()
