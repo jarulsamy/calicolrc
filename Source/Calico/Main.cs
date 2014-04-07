@@ -183,22 +183,37 @@ namespace Calico {
 			("     '--server', '{connection_file}']\n");
 		} else { // Linux, Mac OSX, etc
 		    string executable_path = System.IO.Path.Combine(path, "Calico.exe");
-		    string maclib_path = System.IO.Path.Combine(path, "mac");
+		    string oslib_path;
+		    string ld_lib_path;
+		    string oslib;
+		    if (System.IO.Directory.Exists("/Applications")) {
+			oslib = "mac";
+			ld_lib_path = "/Library/Frameworks/Mono.framework/Libraries/";
+		    } else {
+			oslib = "linux";
+			ld_lib_path = "";
+		    }
+		    oslib_path = System.IO.Path.Combine(path, oslib);
 		    ipython_config = String.Format(
 			"# Configuration file for ipython.\n" +
 			"\n" +
-			"# set environment vars for Mac:\n" +
+			"# set environment vars for {0}:\n" +
 			"import os \n" +
 			"if \"LD_LIBRARY_PATH\" in os.environ:\n" +
-			"    os.environ[\"LD_LIBRARY_PATH\"] = (\"/Library/Frameworks/Mono.framework/Libraries/\" + \n" +
-			"        os.pathsep + \"{1}\" + os.environ[\"LD_LIBRARY_PATH\"]) \n" +
+			"    os.environ[\"LD_LIBRARY_PATH\"] = (\"{1}\" + \n" +
+			"        os.pathsep + \"{2}\" + os.environ[\"LD_LIBRARY_PATH\"]) \n" +
 			"else:\n" +
-			"    os.environ[\"LD_LIBRARY_PATH\"] = (\"/Library/Frameworks/Mono.framework/Libraries/\" + \n" +
-			"        os.pathsep + \"{1}\") \n" +
+			"    os.environ[\"LD_LIBRARY_PATH\"] = (\"{1}\" + \n" +
+			"        os.pathsep + \"{2}\") \n" +
 			"\n" +
 			"c = get_config()\n" +
 			"c.KernelManager.kernel_cmd = [\n" +
-			"      'mono', '{0}', \n", executable_path, maclib_path) +
+			"      'mono', '{3}', \n", 
+			oslib, // {0}
+			ld_lib_path, // {1}
+			oslib_path, // {2}
+			executable_path) + // {3}
+			// rest:
 			(((IList<string>)args).Contains("--nographics") ? "     '--nographics',\n" : "") +
                         lang_string +												     
 			("      '--server', '{connection_file}']\n");
