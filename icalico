@@ -1,1 +1,24 @@
+#!/bin/bash
+uname=`uname` 
+if [ -L $0 ] ; then
+    if [[ $uname == 'Darwin' ]]; then
+        DIR=$(dirname $(readlink "$0")) ;
+    else
+        DIR=$(dirname $(readlink -f "$0")) ;
+    fi
+else
+    DIR=$(dirname "$0") ;
+fi ;
+### --------------------------------------------
+if [[ $uname == 'Darwin' ]]; then
+    export LD_LIBRARY_PATH=/Library/Frameworks/Mono.framework/Libraries/:$DIR/bin/mac:$LD_LIBRARY_PATH
+    export MONO_PATH=$DIR/bin/mac:$MONO_PATH
+else
+    export LD_LIBRARY_PATH=$DIR/bin/linux:$LD_LIBRARY_PATH
+    export MONO_PATH=$DIR/bin/linux:$MONO_PATH
+fi ;
+# To use another language (such as Spanish):
+# requires language-pack-es and language-pack-gnome-es
+# export LANGUAGE=es_ES.utf8
+/usr/bin/env mono $MONO_OPTIONS "$DIR/bin/Calico.exe" --check-profile
 ipython notebook --profile calico

@@ -138,8 +138,16 @@ namespace Calico {
             if (((IList<string>)args).Contains("--help")) {
                 Usage();
                 System.Environment.Exit(0);
+            } else if (((IList<string>)args).Contains("--check-profile")) {
+		// check if profile exists; create if not
+		string ipython_base = GetIPythonPath();
+		if (! System.IO.Directory.Exists(System.IO.Path.Combine(ipython_base, "profile_calico"))) {
+		    create_profile(args, path, ipython_base);
+		}
+                System.Environment.Exit(0);
             } else if (((IList<string>)args).Contains("--create-profile")) {
 		create_profile(args, path, GetIPythonPath());
+                System.Environment.Exit(0);
             } else if (((IList<string>)args).Contains("--version")) {
                 Print("Calico Project, version {0} on {1}", Version, System.Environment.OSVersion.VersionString);
                 Print("  " + _("Using Mono runtime version {0}"), MonoRuntimeVersion);
@@ -295,12 +303,6 @@ namespace Calico {
             }
             // Process executable commands here:
 	    if (((IList<string>)args).Contains("--exec") || ((IList<string>)args).Contains("--server")) {
-		// if they haven't run with --create-profile yet, do that for them:
-		string ipython_base = GetIPythonPath();
-		if (! System.IO.Directory.Exists(System.IO.Path.Combine(ipython_base, "profile_calico"))) {
-		    create_profile(args, path, ipython_base);
-		}
-		// now, let's start a server:
 		// implies running with noconsole, with or without repl
 		if (withGraphics) {
 		    Application.Init();
@@ -321,6 +323,7 @@ namespace Calico {
                             signal_thread.Start();
 			}
 			///-----------------------
+			string ipython_base = GetIPythonPath();
 			config.SetValue("ipython", "security", "string", System.IO.Path.Combine(ipython_base, "profile_calico", "security"));
 			GLib.Timeout.Add( 500, delegate { 
                     int t =  Thread.CurrentThread.ManagedThreadId;
@@ -359,6 +362,7 @@ namespace Calico {
                             signal_thread.Start();
 			}
 			///-----------------------
+			string ipython_base = GetIPythonPath();
 			config.SetValue("ipython", "security", "string", System.IO.Path.Combine(ipython_base, "profile_calico", "security"));
 			win = new CalicoServer(args, manager, Debug, config, -1);
 			win.Start();
@@ -509,7 +513,6 @@ namespace Calico {
 		System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
 		sw.Write(ipython_config);
 		sw.Close();
-                System.Environment.Exit(0);
 	}
 
         public static void Usage() {
@@ -531,7 +534,8 @@ namespace Calico {
             Print(_("  StartCalico --debug            Calico output goes to console rather than GUI"));
             Print(_("  StartCalico --debug-handler    Calico will not catch system errors"));
             Print(_("  StartCalico --reset            Resets config settings to factory defaults"));
-            Print(_("  StartCalico --create-profile   Create a Calico profile for IPython"));
+            Print(_("  StartCalico --create-profile   Create a new profile for IPython (overwrites)"));
+            Print(_("  StartCalico --check-profile    Create profile for IPython, if it doesn't exist"));
             Print(_("  StartCalico --server [FILE]    Used as a backend language kernel for IPython"));
             Print(_("  StartCalico --help             Displays this message"));
             Print("");
