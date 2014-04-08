@@ -139,96 +139,7 @@ namespace Calico {
                 Usage();
                 System.Environment.Exit(0);
             } else if (((IList<string>)args).Contains("--create-profile")) {
-		// Copy the /notebooks/profile to $(ipython locate)
-		// First, make a default profile:
-		var proc = new Process {
-			StartInfo = new ProcessStartInfo {
-				FileName = "ipython",
-				    Arguments = "profile create calico",
-				    UseShellExecute = false,
-				    RedirectStandardOutput = false,
-				    CreateNoWindow = true
-				    }
-		    };
-		proc.Start();
-		// Next, get destination:
-		string ipython_base = GetIPythonPath();
-		string ipython_path = System.IO.Path.Combine(ipython_base, "profile_calico");
-		// Now, copy recursively:
-		DirectoryCopy(System.IO.Path.Combine(path, "..", "notebooks", "profile"), ipython_path, true);
-		// Now, put the top level ipython_config.py
-		string ipython_config = "";
-		string lang_string = "";
-		foreach (string arg in args) { 
-		    if (arg.StartsWith("--lang=")) {
-			lang_string = String.Format("      '{0}', \n", arg);
-			break;
-		    }
-		}
-		if (System.Environment.OSVersion.Platform.ToString().Contains("Win")) {
-		    string executable_path = System.IO.Path.Combine(path, "Calico.exe");
-		    ipython_config = String.Format(
-			"# Configuration file for ipython.\n" +
-			"\n" +
-			"# set environment vars for Windows:\n" +
-			"import os \n" +
-                        "os.environ[\"MONO_PATH\"] = r\"{0}\\..\\mono\\lib\\4.0;{0}\\..\\mono\\lib\\gtk-sharp-2.0;{0};{0}\\..\\mono\\lib\\2.0;{0}\\..\\mono\\lib\\3.5;{0}\\windows\" \n" +
-			"os.environ[\"PATH\"] = os.environ[\"PATH\"] + r\";c:\\Python27\\Scripts\" \n" +
-			"\n" +
-			"c = get_config()\n" +
-			"c.KernelManager.kernel_cmd = [\n" +
-			"      r'{0}\\..\\mono\\bin\\mono.exe', r'{1}', \n", path, executable_path) +
-			(((IList<string>)args).Contains("--nographics") ? "     '--nographics',\n" : "") +
-                        lang_string +												     
-			("     '--server', '{connection_file}']\n");
-		} else { // Linux, Mac OSX, etc
-		    string executable_path = System.IO.Path.Combine(path, "Calico.exe");
-		    string oslib_path;
-		    string ld_lib_path;
-		    string oslib;
-		    if (System.IO.Directory.Exists("/Applications")) {
-			oslib = "mac";
-			ld_lib_path = "/Library/Frameworks/Mono.framework/Libraries/";
-		    } else {
-			oslib = "linux";
-			ld_lib_path = "";
-		    }
-		    oslib_path = System.IO.Path.Combine(path, oslib);
-		    ipython_config = String.Format(
-			"# Configuration file for ipython.\n" +
-			"\n" +
-			"# set environment vars for {0}:\n" +
-			"import os \n" +
-			"if \"LD_LIBRARY_PATH\" in os.environ:\n" +
-			"    os.environ[\"LD_LIBRARY_PATH\"] = (\"{1}\" + \n" +
-			"        os.pathsep + \"{2}\" + os.environ[\"LD_LIBRARY_PATH\"]) \n" +
-			"else:\n" +
-			"    os.environ[\"LD_LIBRARY_PATH\"] = (\"{1}\" + \n" +
-			"        os.pathsep + \"{2}\") \n" +
-			"\n" +
-			"if \"MONO_PATH\" in os.environ:\n" +
-			"    os.environ[\"MONO_PATH\"] = \"{2}\" + os.environ[\"MONO_PATH\"] \n" +
-			"else:\n" +
-			"    os.environ[\"MONO_PATH\"] = \"{2}\" \n" +
-			"\n" +
-			"c = get_config()\n" +
-			"c.KernelManager.kernel_cmd = [\n" +
-			"      'mono', '{3}', \n", 
-			oslib, // {0}
-			ld_lib_path, // {1}
-			oslib_path, // {2}
-			executable_path) + // {3}
-			// rest:
-			(((IList<string>)args).Contains("--nographics") ? "     '--nographics',\n" : "") +
-                        lang_string +												     
-			("      '--server', '{connection_file}']\n");
-		}
-		string filename = System.IO.Path.Combine(ipython_path, "ipython_config.py");
-		System.Console.WriteLine("    Creating ipython config: \"{0}\"...", filename);
-		System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
-		sw.Write(ipython_config);
-		sw.Close();
-                System.Environment.Exit(0);
+		create_profile(args, path, GetIPythonPath());
             } else if (((IList<string>)args).Contains("--version")) {
                 Print("Calico Project, version {0} on {1}", Version, System.Environment.OSVersion.VersionString);
                 Print("  " + _("Using Mono runtime version {0}"), MonoRuntimeVersion);
@@ -384,6 +295,12 @@ namespace Calico {
             }
             // Process executable commands here:
 	    if (((IList<string>)args).Contains("--exec") || ((IList<string>)args).Contains("--server")) {
+		// if they haven't run with --create-profile yet, do that for them:
+		string ipython_base = GetIPythonPath();
+		if (! System.IO.Directory.Exists(System.IO.Path.Combine(ipython_base, "profile_calico"))) {
+		    create_profile(args, path, ipython_base);
+		}
+		// now, let's start a server:
 		// implies running with noconsole, with or without repl
 		if (withGraphics) {
 		    Application.Init();
@@ -404,7 +321,6 @@ namespace Calico {
                             signal_thread.Start();
 			}
 			///-----------------------
-			string ipython_base = GetIPythonPath();
 			config.SetValue("ipython", "security", "string", System.IO.Path.Combine(ipython_base, "profile_calico", "security"));
 			GLib.Timeout.Add( 500, delegate { 
                     int t =  Thread.CurrentThread.ManagedThreadId;
@@ -443,7 +359,6 @@ namespace Calico {
                             signal_thread.Start();
 			}
 			///-----------------------
-			string ipython_base = GetIPythonPath();
 			config.SetValue("ipython", "security", "string", System.IO.Path.Combine(ipython_base, "profile_calico", "security"));
 			win = new CalicoServer(args, manager, Debug, config, -1);
 			win.Start();
@@ -504,6 +419,98 @@ namespace Calico {
                 return (string)method.Invoke(null, null);
             }
         }
+
+	public static void create_profile(string[] args, string path, string ipython_base) {
+		// Copy the /notebooks/profile to $(ipython locate)
+		// First, make a default profile:
+		var proc = new Process {
+			StartInfo = new ProcessStartInfo {
+				FileName = "ipython",
+				    Arguments = "profile create calico",
+				    UseShellExecute = false,
+				    RedirectStandardOutput = false,
+				    CreateNoWindow = true
+				    }
+		    };
+		proc.Start();
+		// Next, get destination:
+		string ipython_path = System.IO.Path.Combine(ipython_base, "profile_calico");
+		// Now, copy recursively:
+		DirectoryCopy(System.IO.Path.Combine(path, "..", "notebooks", "profile"), ipython_path, true);
+		// Now, put the top level ipython_config.py
+		string ipython_config = "";
+		string lang_string = "";
+		foreach (string arg in args) { 
+		    if (arg.StartsWith("--lang=")) {
+			lang_string = String.Format("      '{0}', \n", arg);
+			break;
+		    }
+		}
+		if (System.Environment.OSVersion.Platform.ToString().Contains("Win")) {
+		    string executable_path = System.IO.Path.Combine(path, "Calico.exe");
+		    ipython_config = String.Format(
+			"# Configuration file for ipython.\n" +
+			"\n" +
+			"# set environment vars for Windows:\n" +
+			"import os \n" +
+                        "os.environ[\"MONO_PATH\"] = r\"{0}\\..\\mono\\lib\\4.0;{0}\\..\\mono\\lib\\gtk-sharp-2.0;{0};{0}\\..\\mono\\lib\\2.0;{0}\\..\\mono\\lib\\3.5;{0}\\windows\" \n" +
+			"os.environ[\"PATH\"] = os.environ[\"PATH\"] + r\";c:\\Python27\\Scripts\" \n" +
+			"\n" +
+			"c = get_config()\n" +
+			"c.KernelManager.kernel_cmd = [\n" +
+			"      r'{0}\\..\\mono\\bin\\mono.exe', r'{1}', \n", path, executable_path) +
+			(((IList<string>)args).Contains("--nographics") ? "     '--nographics',\n" : "") +
+                        lang_string +												     
+			("     '--server', '{connection_file}']\n");
+		} else { // Linux, Mac OSX, etc
+		    string executable_path = System.IO.Path.Combine(path, "Calico.exe");
+		    string oslib_path;
+		    string ld_lib_path;
+		    string oslib;
+		    if (System.IO.Directory.Exists("/Applications")) {
+			oslib = "mac";
+			ld_lib_path = "/Library/Frameworks/Mono.framework/Libraries/";
+		    } else {
+			oslib = "linux";
+			ld_lib_path = "";
+		    }
+		    oslib_path = System.IO.Path.Combine(path, oslib);
+		    ipython_config = String.Format(
+			"# Configuration file for ipython.\n" +
+			"\n" +
+			"# set environment vars for {0}:\n" +
+			"import os \n" +
+			"if \"LD_LIBRARY_PATH\" in os.environ:\n" +
+			"    os.environ[\"LD_LIBRARY_PATH\"] = (\"{1}\" + \n" +
+			"        os.pathsep + \"{2}\" + os.environ[\"LD_LIBRARY_PATH\"]) \n" +
+			"else:\n" +
+			"    os.environ[\"LD_LIBRARY_PATH\"] = (\"{1}\" + \n" +
+			"        os.pathsep + \"{2}\") \n" +
+			"\n" +
+			"if \"MONO_PATH\" in os.environ:\n" +
+			"    os.environ[\"MONO_PATH\"] = \"{2}\" + os.environ[\"MONO_PATH\"] \n" +
+			"else:\n" +
+			"    os.environ[\"MONO_PATH\"] = \"{2}\" \n" +
+			"\n" +
+			"c = get_config()\n" +
+			"c.KernelManager.kernel_cmd = [\n" +
+			"      'mono', '{3}', \n", 
+			oslib, // {0}
+			ld_lib_path, // {1}
+			oslib_path, // {2}
+			executable_path) + // {3}
+			// rest:
+			(((IList<string>)args).Contains("--nographics") ? "     '--nographics',\n" : "") +
+                        lang_string +												     
+			("      '--server', '{connection_file}']\n");
+		}
+		string filename = System.IO.Path.Combine(ipython_path, "ipython_config.py");
+		System.Console.WriteLine("    Creating ipython config: \"{0}\"...", filename);
+		System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
+		sw.Write(ipython_config);
+		sw.Close();
+                System.Environment.Exit(0);
+	}
 
         public static void Usage() {
             Print("");
