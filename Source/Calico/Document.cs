@@ -410,7 +410,7 @@ namespace Calico {
     public class MyTextEditor : Mono.TextEditor.TextEditor {
         public MyTextEditor() : base() {
         }
-        public MyTextEditor(Mono.TextEditor.Document doc, Mono.TextEditor.ITextEditorOptions options) : base(doc, options) {
+        public MyTextEditor(Mono.TextEditor.TextDocument doc, Mono.TextEditor.ITextEditorOptions options) : base(doc, options) {
         }
         protected override void OnDragDataReceived (Gdk.DragContext context, Int32 x, Int32 y, Gtk.SelectionData selection_data, UInt32 info, UInt32 time_) {
             // This is overriden because there seems to be an error in the base class:
@@ -429,7 +429,7 @@ namespace Calico {
             Mono.TextEditor.Highlighting.SyntaxModeService.LoadStylesAndModes(
                 System.IO.Path.Combine(calico.path, "SyntaxModes"));
             options = new Mono.TextEditor.TextEditorOptions();
-            Mono.TextEditor.Document document = new Mono.TextEditor.Document();
+            Mono.TextEditor.TextDocument document = new Mono.TextEditor.TextDocument();
             if (System.IO.File.Exists(filename)) {
                 System.IO.TextReader reader = new System.IO.StreamReader(filename);
                 document.Text = reader.ReadToEnd();
@@ -533,7 +533,7 @@ namespace Calico {
 
         public override void Configure(Config config) {
             // FIXME: take into account user's defaults
-            texteditor.Options.ShowInvalidLines = false;
+            //texteditor.Options.ShowInvalidLines = false;
             texteditor.Options.ShowLineNumberMargin = true;
             texteditor.Options.TabsToSpaces = true;
             texteditor.Options.HighlightCaretLine = true;
@@ -557,13 +557,13 @@ namespace Calico {
         public override void GotoEndOfLine() {
             var data = texteditor.GetTextEditorData();
             var curLine = texteditor.GetLine (data.Caret.Line);
-            data.Caret.Column = System.Math.Min (curLine.EditableLength, System.Math.Max (0, curLine.Length)) + 1;
+            data.Caret.Column = System.Math.Min (curLine.LengthIncludingDelimiter, System.Math.Max (0, curLine.Length)) + 1;
         }
 
         public override void SelectLine(int lineno) {
             var data = texteditor.GetTextEditorData();
             var curLine = texteditor.GetLine (data.Caret.Line);
-    	    texteditor.SetSelection(lineno, 1, lineno, System.Math.Min (curLine.EditableLength, System.Math.Max (0, curLine.Length)) + 1);
+    	    texteditor.SetSelection(lineno, 1, lineno, System.Math.Min (curLine.LengthIncludingDelimiter, System.Math.Max (0, curLine.Length)) + 1);
         }
 
         public override string GetText() {
@@ -695,7 +695,7 @@ namespace Calico {
         }
 
         public MonoDevelop.Debugger.DebugTextMarker GetBreakpointAtLine(int lineno) {
-            Mono.TextEditor.LineSegment lineSegment = texteditor.GetLine(lineno);
+            Mono.TextEditor.DocumentLine lineSegment = texteditor.GetLine(lineno);
             if (lineSegment.MarkerCount == 1) {
                 List<object> list = new List<object>(lineSegment.Markers);
                 return (MonoDevelop.Debugger.DebugTextMarker)list[0];

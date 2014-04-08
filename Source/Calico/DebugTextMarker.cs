@@ -35,14 +35,14 @@ using System.Linq;
 
 namespace MonoDevelop.Debugger
 {
-	public abstract class DebugTextMarker : StyleTextMarker, IIconBarMarker
+	public abstract class DebugTextMarker : StyleTextLineMarker, IIconBarMarker
 	{
 		protected Mono.TextEditor.TextEditor editor;
 		
 		public new StyleFlag IncludedStyles {
 			get {
 				// check, if a message bubble is active in that line.
-				if (LineSegment != null && LineSegment.Markers.Any (m => m != this && (m is IExtendingTextMarker)))
+				if (LineSegment != null && LineSegment.Markers.Any (m => m != this && (m is StyleTextLineMarker)))
 					return StyleFlag.None;
 				return base.IncludedStyles;
 			}
@@ -57,7 +57,7 @@ namespace MonoDevelop.Debugger
 			this.editor = editor;
 		}
 		
-		public void DrawIcon (Mono.TextEditor.TextEditor editor, Cairo.Context cr, LineSegment line, int lineNumber, double x, double y, double width, double height)
+		public void DrawIcon (Mono.TextEditor.TextEditor editor, Cairo.Context cr, DocumentLine line, int lineNumber, double x, double y, double width, double height)
 		{
 			double size;
 			if (width > height) {

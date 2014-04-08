@@ -384,7 +384,7 @@ namespace Calico {
             // Set optional items of TextArea
             ShellEditor.Options.ShowFoldMargin = false;
             ShellEditor.Options.ShowIconMargin = false;
-            ShellEditor.Options.ShowInvalidLines = false;
+            //ShellEditor.Options.ShowInvalidLines = false;
             ShellEditor.Options.ShowLineNumberMargin = false;
             // option
             ShellEditor.Options.TabsToSpaces = true;
@@ -2039,14 +2039,14 @@ del _invoke, _
         }
 
         public static int CommentLine(Mono.TextEditor.TextEditorData data,
-                Mono.TextEditor.LineSegment line,
+                Mono.TextEditor.DocumentLine line,
                 string line_comment) {
             data.Insert(line.Offset, String.Format("{0} ", line_comment));
             return 1;
         }
 
         public static int UnCommentLine(Mono.TextEditor.TextEditorData data,
-                Mono.TextEditor.LineSegment line,
+                Mono.TextEditor.DocumentLine line,
                 string line_comment) {
             // FIXME: assumes a two-char comment string OR allow string
             char c1 = line_comment [0];
@@ -2062,7 +2062,7 @@ del _invoke, _
         }
 
         static void SelectLineBlock(Mono.TextEditor.TextEditorData data, int endLineNr, int startLineNr) {
-            Mono.TextEditor.LineSegment endLine = data.Document.GetLine(endLineNr);
+            Mono.TextEditor.DocumentLine endLine = data.Document.GetLine(endLineNr);
             try {
                 data.MainSelection = new Mono.TextEditor.Selection(startLineNr, 1, endLineNr, endLine.Length);
             } catch {
@@ -2091,7 +2091,7 @@ del _invoke, _
                 //data.Document.BeginAtomicUndo();
                 int first = -1;
                 int last = 0;
-                foreach (Mono.TextEditor.LineSegment line in data.SelectedLines) {
+                foreach (Mono.TextEditor.DocumentLine line in data.SelectedLines) {
                     last = CommentLine(data, line, line_comment);
                     if (first < 0) {
                         first = last;
@@ -2131,7 +2131,7 @@ del _invoke, _
                 //data.Document.BeginAtomicUndo();
                 int first = -1;
                 int last = 0;
-                foreach (Mono.TextEditor.LineSegment line in data.SelectedLines) {
+                foreach (Mono.TextEditor.DocumentLine line in data.SelectedLines) {
                     last = UnCommentLine(data, line, line_comment);
                     if (first < 0) {
                         first = last;
@@ -2236,7 +2236,7 @@ del _invoke, _
                     var texteditor = (Mono.TextEditor.TextEditor)Focus;
                     var data = texteditor.GetTextEditorData();
                     var curLine = texteditor.GetLine(data.Caret.Line);
-                    data.Caret.Column = System.Math.Min(curLine.EditableLength, System.Math.Max(0, curLine.Length)) + 1;  
+                    data.Caret.Column = System.Math.Min(curLine.LengthIncludingDelimiter, System.Math.Max(0, curLine.Length)) + 1;  
                     args.RetVal = true;
                 }
             } else if (Focus is Gtk.TreeView) {
@@ -2314,7 +2314,7 @@ del _invoke, _
                 // Emacs, go to end of line
                 var data = ShellEditor.GetTextEditorData();
                 var curLine = ShellEditor.GetLine(data.Caret.Line);
-                data.Caret.Column = System.Math.Min(curLine.EditableLength, System.Math.Max(0, curLine.Length)) + 1;
+                data.Caret.Column = System.Math.Min(curLine.LengthIncludingDelimiter, System.Math.Max(0, curLine.Length)) + 1;
             } else if (args.Event.Key == Gdk.Key.Escape) {
                 // FIXME: escape with selected, delete; else delete all
                 string text = ShellEditor.SelectedText;
@@ -2487,7 +2487,7 @@ del _invoke, _
             bool results = ExecuteInBackground(text.TrimEnd(), CurrentLanguage);
             if (results) {
                 Mono.TextEditor.SelectionActions.SelectAll(ShellEditor.GetTextEditorData());
-                Mono.TextEditor.DeleteActions.DeleteSelection(ShellEditor.GetTextEditorData());
+                Mono.TextEditor.DeleteActions.Delete(ShellEditor.GetTextEditorData());
                 ShellEditor.GrabFocus();
                 ShellEditor.Caret.Line = 1;
                 ShellEditor.Caret.Column = 1;
