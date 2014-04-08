@@ -907,8 +907,26 @@ public class PJScheme:Scheme
             return "false"
         elif name == "#\\page":
             return "'\\f'"
-        else:
-            return super(CSharpTranslator, self).replace_char(name)
+        elif name == "#\\newline":
+            return "'\\n'"
+        elif name == "#\\nul":
+            return "'\\0'"
+        elif name == "#\\return":
+            return "'\\r'"
+        elif name == "#\\space":
+            return "' '"
+        elif name == "#\\tab":
+            return "'\\t'"
+        elif name == "#\\backspace":
+            return "'\\b'"
+        elif name == "#\\page":
+            return "u\"\\u000C\""
+        elif name == "#\\'":
+            return "\"'\""
+        elif name == "#\\\\":
+            return "'\\\\'"
+        elif len(name) == 3:
+            return "'%s'" % name[2]
 
     def initialize(self):
         self.methods = {
@@ -979,7 +997,9 @@ public class PJScheme:Scheme
             self.Print(indent + 0,  "")
 
     def overrides(self):
-        return ["pc-halt-signal", "map^", "set-use-stack-trace", "run"]
+        return ["pc-halt-signal", "map^", "set-use-stack-trace", "run", 
+                "handle-debug-info", "safe-print", "reset-toplevel-env",
+                "make-safe", "highlight-expression"]
 
 if __name__ == "__main__":
     ## infile outfile

@@ -4705,7 +4705,7 @@ public class PJScheme:Scheme
         last_scan_line = scan_line;
         last_scan_char = scan_char;
         last_scan_position = scan_position;
-        if (true_q(char_is__q(next_avail(chars), make_char('\n')))) {
+        if (true_q(char_is__q(next_avail(chars), '\n'))) {
             scan_line = Add(1, scan_line);
             scan_char = 1;
         } else {
@@ -4722,7 +4722,7 @@ public class PJScheme:Scheme
     
     public static void scan_input() {
         initialize_scan_counters();
-        chars_to_scan = string_append(input_reg, make_string(make_char('\0')));
+        chars_to_scan = string_append(input_reg, make_string('\0'));
         chars_reg = 0;
         pc = scan_input_loop;
     }
@@ -4801,7 +4801,7 @@ public class PJScheme:Scheme
     public static void unexpected_char_error() {
         object c = symbol_undefined;
         c = next_avail(chars_reg);
-        if (true_q(char_is__q(c, make_char('\0')))) {
+        if (true_q(char_is__q(c, '\0'))) {
             char_reg = scan_char;
             line_reg = scan_line;
             msg_reg = "unexpected end of input";
@@ -4838,7 +4838,7 @@ public class PJScheme:Scheme
                             pc = apply_cont;
                         } else {
                             if (true_q(Eq(token_type_reg, symbol_boolean))) {
-                                value_reg = make_token2(symbol_boolean, (true_q(char_is__q(car(buffer), make_char('t'))) || true_q(char_is__q(car(buffer), make_char('T')))));
+                                value_reg = make_token2(symbol_boolean, (true_q(char_is__q(car(buffer), 't')) || true_q(char_is__q(car(buffer), 'T'))));
                                 pc = apply_cont;
                             } else {
                                 if (true_q(Eq(token_type_reg, symbol_character))) {
@@ -4849,31 +4849,31 @@ public class PJScheme:Scheme
                                         object name = symbol_undefined;
                                         name = list_to_string(buffer);
                                         if (true_q(string_is__q(name, "nul"))) {
-                                            value_reg = make_token2(symbol_character, make_char('\0'));
+                                            value_reg = make_token2(symbol_character, '\0');
                                             pc = apply_cont;
                                         } else {
                                             if (true_q(string_is__q(name, "space"))) {
-                                                value_reg = make_token2(symbol_character, make_char(' '));
+                                                value_reg = make_token2(symbol_character, ' ');
                                                 pc = apply_cont;
                                             } else {
                                                 if (true_q(string_is__q(name, "tab"))) {
-                                                    value_reg = make_token2(symbol_character, make_char('\t'));
+                                                    value_reg = make_token2(symbol_character, '\t');
                                                     pc = apply_cont;
                                                 } else {
                                                     if (true_q(string_is__q(name, "newline"))) {
-                                                        value_reg = make_token2(symbol_character, make_char('\n'));
+                                                        value_reg = make_token2(symbol_character, '\n');
                                                         pc = apply_cont;
                                                     } else {
                                                         if (true_q(string_is__q(name, "linefeed"))) {
-                                                            value_reg = make_token2(symbol_character, make_char('\n'));
+                                                            value_reg = make_token2(symbol_character, '\n');
                                                             pc = apply_cont;
                                                         } else {
                                                             if (true_q(string_is__q(name, "backspace"))) {
-                                                                value_reg = make_token2(symbol_character, make_char('\b'));
+                                                                value_reg = make_token2(symbol_character, '\b');
                                                                 pc = apply_cont;
                                                             } else {
                                                                 if (true_q(string_is__q(name, "return"))) {
-                                                                    value_reg = make_token2(symbol_character, make_char('\r'));
+                                                                    value_reg = make_token2(symbol_character, '\r');
                                                                     pc = apply_cont;
                                                                 } else {
                                                                     if (true_q(string_is__q(name, "page"))) {
@@ -5003,15 +5003,15 @@ public class PJScheme:Scheme
     }
     
     public static bool char_delimiter_q(object c) {
-        return (true_q(char_whitespace_q(c)) || true_q(char_is__q(c, make_char("'"))) || true_q(char_is__q(c, make_char('('))) || true_q(char_is__q(c, make_char('['))) || true_q(char_is__q(c, make_char(')'))) || true_q(char_is__q(c, make_char(']'))) || true_q(char_is__q(c, make_char('"'))) || true_q(char_is__q(c, make_char(';'))) || true_q(char_is__q(c, make_char('#'))) || true_q(char_is__q(c, make_char('\0'))));
+        return (true_q(char_whitespace_q(c)) || true_q(char_is__q(c, "'")) || true_q(char_is__q(c, '(')) || true_q(char_is__q(c, '[')) || true_q(char_is__q(c, ')')) || true_q(char_is__q(c, ']')) || true_q(char_is__q(c, '"')) || true_q(char_is__q(c, ';')) || true_q(char_is__q(c, '#')) || true_q(char_is__q(c, '\0')));
     }
     
     public static bool char_initial_q(object c) {
-        return (true_q(char_alphabetic_q(c)) || true_q(char_is__q(c, make_char('!'))) || true_q(char_is__q(c, make_char('$'))) || true_q(char_is__q(c, make_char('%'))) || true_q(char_is__q(c, make_char('&'))) || true_q(char_is__q(c, make_char('*'))) || true_q(char_is__q(c, make_char('/'))) || true_q(char_is__q(c, make_char(':'))) || true_q(char_is__q(c, make_char('<'))) || true_q(char_is__q(c, make_char('='))) || true_q(char_is__q(c, make_char('>'))) || true_q(char_is__q(c, make_char('?'))) || true_q(char_is__q(c, make_char('^'))) || true_q(char_is__q(c, make_char('_'))) || true_q(char_is__q(c, make_char('~'))));
+        return (true_q(char_alphabetic_q(c)) || true_q(char_is__q(c, '!')) || true_q(char_is__q(c, '$')) || true_q(char_is__q(c, '%')) || true_q(char_is__q(c, '&')) || true_q(char_is__q(c, '*')) || true_q(char_is__q(c, '/')) || true_q(char_is__q(c, ':')) || true_q(char_is__q(c, '<')) || true_q(char_is__q(c, '=')) || true_q(char_is__q(c, '>')) || true_q(char_is__q(c, '?')) || true_q(char_is__q(c, '^')) || true_q(char_is__q(c, '_')) || true_q(char_is__q(c, '~')));
     }
     
     public static bool char_special_subsequent_q(object c) {
-        return (true_q(char_is__q(c, make_char('+'))) || true_q(char_is__q(c, make_char('-'))) || true_q(char_is__q(c, make_char('@'))) || true_q(char_is__q(c, make_char('.'))));
+        return (true_q(char_is__q(c, '+')) || true_q(char_is__q(c, '-')) || true_q(char_is__q(c, '@')) || true_q(char_is__q(c, '.')));
     }
     
     public static bool char_subsequent_q(object c) {
@@ -5019,11 +5019,11 @@ public class PJScheme:Scheme
     }
     
     public static bool char_sign_q(object c) {
-        return (true_q(char_is__q(c, make_char('+'))) || true_q(char_is__q(c, make_char('-'))));
+        return (true_q(char_is__q(c, '+')) || true_q(char_is__q(c, '-')));
     }
     
     public static bool char_boolean_q(object c) {
-        return (true_q(char_is__q(c, make_char('t'))) || true_q(char_is__q(c, make_char('T'))) || true_q(char_is__q(c, make_char('f'))) || true_q(char_is__q(c, make_char('F'))));
+        return (true_q(char_is__q(c, 't')) || true_q(char_is__q(c, 'T')) || true_q(char_is__q(c, 'f')) || true_q(char_is__q(c, 'F')));
     }
     
     public static object apply_state(object state, object c) {
@@ -5031,10 +5031,10 @@ public class PJScheme:Scheme
             if (true_q(char_whitespace_q(c))) {
                 return sList(symbol_drop, sList(symbol_goto, symbol_start_state));
             } else {
-                if (true_q(char_is__q(c, make_char(';')))) {
+                if (true_q(char_is__q(c, ';'))) {
                     return sList(symbol_drop, sList(symbol_goto, symbol_comment_state));
                 } else {
-                    if (true_q(char_is__q(c, make_char('\0')))) {
+                    if (true_q(char_is__q(c, '\0'))) {
                         return sList(symbol_drop, sList(symbol_emit, symbol_end_marker));
                     } else {
                         return sList(symbol_goto, symbol_token_start_state);
@@ -5043,31 +5043,31 @@ public class PJScheme:Scheme
             }
         } else {
             if (true_q(Eq(state, symbol_token_start_state))) {
-                if (true_q(char_is__q(c, make_char('(')))) {
+                if (true_q(char_is__q(c, '('))) {
                     return sList(symbol_drop, sList(symbol_emit, symbol_lparen));
                 } else {
-                    if (true_q(char_is__q(c, make_char('[')))) {
+                    if (true_q(char_is__q(c, '['))) {
                         return sList(symbol_drop, sList(symbol_emit, symbol_lbracket));
                     } else {
-                        if (true_q(char_is__q(c, make_char(')')))) {
+                        if (true_q(char_is__q(c, ')'))) {
                             return sList(symbol_drop, sList(symbol_emit, symbol_rparen));
                         } else {
-                            if (true_q(char_is__q(c, make_char(']')))) {
+                            if (true_q(char_is__q(c, ']'))) {
                                 return sList(symbol_drop, sList(symbol_emit, symbol_rbracket));
                             } else {
-                                if (true_q(char_is__q(c, make_char("'")))) {
+                                if (true_q(char_is__q(c, "'"))) {
                                     return sList(symbol_drop, sList(symbol_emit, symbol_apostrophe));
                                 } else {
-                                    if (true_q(char_is__q(c, make_char('`')))) {
+                                    if (true_q(char_is__q(c, '`'))) {
                                         return sList(symbol_drop, sList(symbol_emit, symbol_backquote));
                                     } else {
-                                        if (true_q(char_is__q(c, make_char(',')))) {
+                                        if (true_q(char_is__q(c, ','))) {
                                             return sList(symbol_drop, sList(symbol_goto, symbol_comma_state));
                                         } else {
-                                            if (true_q(char_is__q(c, make_char('#')))) {
+                                            if (true_q(char_is__q(c, '#'))) {
                                                 return sList(symbol_drop, sList(symbol_goto, symbol_hash_prefix_state));
                                             } else {
-                                                if (true_q(char_is__q(c, make_char('"')))) {
+                                                if (true_q(char_is__q(c, '"'))) {
                                                     return sList(symbol_drop, sList(symbol_goto, symbol_string_state));
                                                 } else {
                                                     if (true_q(char_initial_q(c))) {
@@ -5076,7 +5076,7 @@ public class PJScheme:Scheme
                                                         if (true_q(char_sign_q(c))) {
                                                             return sList(symbol_shift, sList(symbol_goto, symbol_signed_state));
                                                         } else {
-                                                            if (true_q(char_is__q(c, make_char('.')))) {
+                                                            if (true_q(char_is__q(c, '.'))) {
                                                                 return sList(symbol_shift, sList(symbol_goto, symbol_decimal_point_state));
                                                             } else {
                                                                 if (true_q(char_numeric_q(c))) {
@@ -5098,10 +5098,10 @@ public class PJScheme:Scheme
                 }
             } else {
                 if (true_q(Eq(state, symbol_comment_state))) {
-                    if (true_q(char_is__q(c, make_char('\n')))) {
+                    if (true_q(char_is__q(c, '\n'))) {
                         return sList(symbol_drop, sList(symbol_goto, symbol_start_state));
                     } else {
-                        if (true_q(char_is__q(c, make_char('\0')))) {
+                        if (true_q(char_is__q(c, '\0'))) {
                             return sList(symbol_drop, sList(symbol_emit, symbol_end_marker));
                         } else {
                             return sList(symbol_drop, sList(symbol_goto, symbol_comment_state));
@@ -5109,7 +5109,7 @@ public class PJScheme:Scheme
                     }
                 } else {
                     if (true_q(Eq(state, symbol_comma_state))) {
-                        if (true_q(char_is__q(c, make_char('@')))) {
+                        if (true_q(char_is__q(c, '@'))) {
                             return sList(symbol_drop, sList(symbol_emit, symbol_comma_at));
                         } else {
                             return sList(symbol_emit, symbol_comma);
@@ -5119,10 +5119,10 @@ public class PJScheme:Scheme
                             if (true_q(char_boolean_q(c))) {
                                 return sList(symbol_shift, sList(symbol_emit, symbol_boolean));
                             } else {
-                                if (true_q(char_is__q(c, make_char('\\')))) {
+                                if (true_q(char_is__q(c, '\\'))) {
                                     return sList(symbol_drop, sList(symbol_goto, symbol_character_state));
                                 } else {
-                                    if (true_q(char_is__q(c, make_char('(')))) {
+                                    if (true_q(char_is__q(c, '('))) {
                                         return sList(symbol_drop, sList(symbol_emit, symbol_lvector));
                                     } else {
                                         return symbol_error;
@@ -5134,7 +5134,7 @@ public class PJScheme:Scheme
                                 if (true_q(char_alphabetic_q(c))) {
                                     return sList(symbol_shift, sList(symbol_goto, symbol_alphabetic_character_state));
                                 } else {
-                                    if (true_q((! true_q(char_is__q(c, make_char('\0')))))) {
+                                    if (true_q((! true_q(char_is__q(c, '\0'))))) {
                                         return sList(symbol_shift, sList(symbol_emit, symbol_character));
                                     } else {
                                         return symbol_error;
@@ -5156,13 +5156,13 @@ public class PJScheme:Scheme
                                         }
                                     } else {
                                         if (true_q(Eq(state, symbol_string_state))) {
-                                            if (true_q(char_is__q(c, make_char('"')))) {
+                                            if (true_q(char_is__q(c, '"'))) {
                                                 return sList(symbol_drop, sList(symbol_emit, symbol_make_string));
                                             } else {
-                                                if (true_q(char_is__q(c, make_char('\\')))) {
+                                                if (true_q(char_is__q(c, '\\'))) {
                                                     return sList(symbol_drop, sList(symbol_goto, symbol_string_escape_state));
                                                 } else {
-                                                    if (true_q((! true_q(char_is__q(c, make_char('\0')))))) {
+                                                    if (true_q((! true_q(char_is__q(c, '\0'))))) {
                                                         return sList(symbol_shift, sList(symbol_goto, symbol_string_state));
                                                     } else {
                                                         return symbol_error;
@@ -5171,26 +5171,26 @@ public class PJScheme:Scheme
                                             }
                                         } else {
                                             if (true_q(Eq(state, symbol_string_escape_state))) {
-                                                if (true_q(char_is__q(c, make_char('"')))) {
+                                                if (true_q(char_is__q(c, '"'))) {
                                                     return sList(symbol_shift, sList(symbol_goto, symbol_string_state));
                                                 } else {
-                                                    if (true_q(char_is__q(c, make_char('\\')))) {
+                                                    if (true_q(char_is__q(c, '\\'))) {
                                                         return sList(symbol_shift, sList(symbol_goto, symbol_string_state));
                                                     } else {
-                                                        if (true_q(char_is__q(c, make_char('b')))) {
-                                                            return sList(symbol_replace, make_char('\b'), sList(symbol_goto, symbol_string_state));
+                                                        if (true_q(char_is__q(c, 'b'))) {
+                                                            return sList(symbol_replace, '\b', sList(symbol_goto, symbol_string_state));
                                                         } else {
-                                                            if (true_q(char_is__q(c, make_char('f')))) {
+                                                            if (true_q(char_is__q(c, 'f'))) {
                                                                 return sList(symbol_replace, '\f', sList(symbol_goto, symbol_string_state));
                                                             } else {
-                                                                if (true_q(char_is__q(c, make_char('n')))) {
-                                                                    return sList(symbol_replace, make_char('\n'), sList(symbol_goto, symbol_string_state));
+                                                                if (true_q(char_is__q(c, 'n'))) {
+                                                                    return sList(symbol_replace, '\n', sList(symbol_goto, symbol_string_state));
                                                                 } else {
-                                                                    if (true_q(char_is__q(c, make_char('t')))) {
-                                                                        return sList(symbol_replace, make_char('\t'), sList(symbol_goto, symbol_string_state));
+                                                                    if (true_q(char_is__q(c, 't'))) {
+                                                                        return sList(symbol_replace, '\t', sList(symbol_goto, symbol_string_state));
                                                                     } else {
-                                                                        if (true_q(char_is__q(c, make_char('r')))) {
-                                                                            return sList(symbol_replace, make_char('\r'), sList(symbol_goto, symbol_string_state));
+                                                                        if (true_q(char_is__q(c, 'r'))) {
+                                                                            return sList(symbol_replace, '\r', sList(symbol_goto, symbol_string_state));
                                                                         } else {
                                                                             return symbol_error;
                                                                         }
@@ -5216,7 +5216,7 @@ public class PJScheme:Scheme
                                                         if (true_q(char_numeric_q(c))) {
                                                             return sList(symbol_shift, sList(symbol_goto, symbol_whole_number_state));
                                                         } else {
-                                                            if (true_q(char_is__q(c, make_char('.')))) {
+                                                            if (true_q(char_is__q(c, '.'))) {
                                                                 return sList(symbol_shift, sList(symbol_goto, symbol_signed_decimal_point_state));
                                                             } else {
                                                                 if (true_q(char_delimiter_q(c))) {
@@ -5265,13 +5265,13 @@ public class PJScheme:Scheme
                                                                     if (true_q(char_numeric_q(c))) {
                                                                         return sList(symbol_shift, sList(symbol_goto, symbol_whole_number_state));
                                                                     } else {
-                                                                        if (true_q(char_is__q(c, make_char('.')))) {
+                                                                        if (true_q(char_is__q(c, '.'))) {
                                                                             return sList(symbol_shift, sList(symbol_goto, symbol_fractional_number_state));
                                                                         } else {
-                                                                            if (true_q(char_is__q(c, make_char('/')))) {
+                                                                            if (true_q(char_is__q(c, '/'))) {
                                                                                 return sList(symbol_shift, sList(symbol_goto, symbol_rational_number_state));
                                                                             } else {
-                                                                                if (true_q((true_q(char_is__q(c, make_char('e'))) || true_q(char_is__q(c, make_char('E')))))) {
+                                                                                if (true_q((true_q(char_is__q(c, 'e')) || true_q(char_is__q(c, 'E'))))) {
                                                                                     return sList(symbol_shift, sList(symbol_goto, symbol_suffix_state));
                                                                                 } else {
                                                                                     if (true_q(char_delimiter_q(c))) {
@@ -5292,7 +5292,7 @@ public class PJScheme:Scheme
                                                                         if (true_q(char_numeric_q(c))) {
                                                                             return sList(symbol_shift, sList(symbol_goto, symbol_fractional_number_state));
                                                                         } else {
-                                                                            if (true_q((true_q(char_is__q(c, make_char('e'))) || true_q(char_is__q(c, make_char('E')))))) {
+                                                                            if (true_q((true_q(char_is__q(c, 'e')) || true_q(char_is__q(c, 'E'))))) {
                                                                                 return sList(symbol_shift, sList(symbol_goto, symbol_suffix_state));
                                                                             } else {
                                                                                 if (true_q(char_delimiter_q(c))) {
@@ -6104,7 +6104,7 @@ public class PJScheme:Scheme
     
     public static object split_variable(object var) {
         object strings = symbol_undefined;
-        strings = string_split(symbol_to_string(var), make_char('.'));
+        strings = string_split(symbol_to_string(var), '.');
         if (true_q(member("", strings))) {
             return symbol_emptylist;
         } else {
@@ -7103,19 +7103,6 @@ public class PJScheme:Scheme
         return make_cont2("cont2", 53, exp, k);
     }
     
-    public static void highlight_expression(object exp) {
-        printf("call: ~s~%", aunparse(exp));
-        object info = symbol_undefined;
-        info = rac(exp);
-        if (true_q((! true_q(Eq(info, symbol_none))))) {
-            printf("['~a', line ~a, col ~a]~%", get_srcfile(info), get_start_line(info), get_start_char(info));
-        }
-    }
-    
-    public static void handle_debug_info(object exp, object result) {
-        printf("~s => ~a~%", aunparse(exp), make_safe(result));
-    }
-    
     public static object get_use_stack_trace() {
         return _staruse_stack_trace_star;
     }
@@ -7614,31 +7601,6 @@ public class PJScheme:Scheme
         return Eq(x, end_of_session);
     }
     
-    public static void safe_print(object arg) {
-        _starneed_newline_star = false;
-        pretty_print(make_safe(arg));
-    }
-    
-    public static object make_safe(object x) {
-        if (true_q(procedure_object_q(x))) {
-            return symbol_b_procedure_d;
-        } else {
-            if (true_q(environment_object_q(x))) {
-                return symbol_b_environment_d;
-            } else {
-                if (true_q(pair_q(x))) {
-                    return cons(make_safe(car(x)), make_safe(cdr(x)));
-                } else {
-                    if (true_q(vector_q(x))) {
-                        return list_to_vector(make_safe(vector_to_list(x)));
-                    } else {
-                        return x;
-                    }
-                }
-            }
-        }
-    }
-    
     public static bool procedure_object_q(object x) {
         return (true_q(procedure_q(x)) || true_q((true_q(pair_q(x)) && true_q(Eq(car(x), symbol_procedure)))));
     }
@@ -8051,11 +8013,6 @@ public class PJScheme:Scheme
         object primitives = symbol_undefined;
         primitives = sList(sList(symbol_Multiply, times_prim), sList(symbol_Add, plus_prim), sList(symbol_Subtract, minus_prim), sList(symbol_Divide, divide_prim), sList(symbol_p, modulo_prim), sList(symbol_LessThan, lt_prim), sList(symbol_LessThanEqual, lt_or_eq_prim), sList(symbol_Equal, equal_sign_prim), sList(symbol_GreaterThan, gt_prim), sList(symbol_GreaterThanEqual, gt_or_eq_prim), sList(symbol_abort, abort_prim), sList(symbol_abs, abs_prim), sList(symbol_append, append_prim), sList(symbol_apply, apply_prim), sList(symbol_assv, assv_prim), sList(symbol_boolean_q, boolean_q_prim), sList(symbol_caddr, caddr_prim), sList(symbol_cadr, cadr_prim), sList(symbol_call_with_current_continuation, call_cc_prim), sList(symbol_call_cc, call_cc_prim), sList(symbol_car, car_prim), sList(symbol_cdr, cdr_prim), sList(symbol_caaaar, caaaar_prim), sList(symbol_caaadr, caaadr_prim), sList(symbol_caaar, caaar_prim), sList(symbol_caadar, caadar_prim), sList(symbol_caaddr, caaddr_prim), sList(symbol_caadr, caadr_prim), sList(symbol_caar, caar_prim), sList(symbol_cadaar, cadaar_prim), sList(symbol_cadadr, cadadr_prim), sList(symbol_cadar, cadar_prim), sList(symbol_caddar, caddar_prim), sList(symbol_cadddr, cadddr_prim), sList(symbol_cdaaar, cdaaar_prim), sList(symbol_cdaadr, cdaadr_prim), sList(symbol_cdaar, cdaar_prim), sList(symbol_cdadar, cdadar_prim), sList(symbol_cdaddr, cdaddr_prim), sList(symbol_cdadr, cdadr_prim), sList(symbol_cdar, cdar_prim), sList(symbol_cddaar, cddaar_prim), sList(symbol_cddadr, cddadr_prim), sList(symbol_cddar, cddar_prim), sList(symbol_cdddar, cdddar_prim), sList(symbol_cddddr, cddddr_prim), sList(symbol_cdddr, cdddr_prim), sList(symbol_cddr, cddr_prim), sList(symbol_char_q, char_q_prim), sList(symbol_char_is__q, char_is__q_prim), sList(symbol_char_whitespace_q, char_whitespace_q_prim), sList(symbol_char_alphabetic_q, char_alphabetic_q_prim), sList(symbol_char_numeric_q, char_numeric_q_prim), sList(symbol_char_to_integer, char_to_integer_prim), sList(symbol_cons, cons_prim), sList(symbol_current_time, current_time_prim), sList(symbol_cut, cut_prim), sList(symbol_dir, dir_prim), sList(symbol_display, display_prim), sList(symbol_current_environment, current_environment_prim), sList(symbol_eq_q, eq_q_prim), sList(symbol_equal_q, equal_q_prim), sList(symbol_error, error_prim), sList(symbol_eval, eval_prim), sList(symbol_eval_ast, eval_ast_prim), sList(symbol_exit, exit_prim), sList(symbol_for_each, for_each_prim), sList(symbol_format, format_prim), sList(symbol_get, get_prim), sList(symbol_get_stack_trace, get_stack_trace_prim), sList(symbol_import, import_prim), sList(symbol_integer_to_char, integer_to_char_prim), sList(symbol_length, length_prim), sList(symbol_sList, list_prim), sList(symbol_list_to_vector, list_to_vector_prim), sList(symbol_list_to_string, list_to_string_prim), sList(symbol_list_ref, list_ref_prim), sList(symbol_load, load_prim), sList(symbol_make_set, make_set_prim), sList(symbol_make_vector, make_vector_prim), sList(symbol_map, map_prim), sList(symbol_member, member_prim), sList(symbol_memq, memq_prim), sList(symbol_memv, memv_prim), sList(symbol_newline, newline_prim), sList(symbol_not, not_prim), sList(symbol_null_q, null_q_prim), sList(symbol_number_to_string, number_to_string_prim), sList(symbol_number_q, number_q_prim), sList(symbol_pair_q, pair_q_prim), sList(symbol_parse, parse_prim), sList(symbol_parse_string, parse_string_prim), sList(symbol_print, print_prim), sList(symbol_printf, printf_prim), sList(symbol_Range, range_prim), sList(symbol_read_string, read_string_prim), sList(symbol_require, require_prim), sList(symbol_reverse, reverse_prim), sList(symbol_set_car_b, set_car_b_prim), sList(symbol_set_cdr_b, set_cdr_b_prim), sList(symbol_snoc, snoc_prim), sList(symbol_rac, rac_prim), sList(symbol_rdc, rdc_prim), sList(symbol_sqrt, sqrt_prim), sList(symbol_odd_q, odd_q_prim), sList(symbol_even_q, even_q_prim), sList(symbol_quotient, quotient_prim), sList(symbol_remainder, remainder_prim), sList(symbol_make_string, string_prim), sList(symbol_string_length, string_length_prim), sList(symbol_string_ref, string_ref_prim), sList(symbol_string_q, string_q_prim), sList(symbol_string_to_number, string_to_number_prim), sList(symbol_string_is__q, string_is__q_prim), sList(symbol_substring, substring_prim), sList(symbol_symbol_q, symbol_q_prim), sList(symbol_unparse, unparse_prim), sList(symbol_unparse_procedure, unparse_procedure_prim), sList(symbol_using_native, using_prim), sList(symbol_use_stack_trace, use_stack_trace_prim), sList(symbol_vector, vector_prim), sList(symbol_vector_ref, vector_ref_prim), sList(symbol_vector_set_b, vector_set_b_prim), sList(symbol_void, void_prim), sList(symbol_zero_q, zero_q_prim), sList(symbol_current_directory, current_directory_prim), sList(symbol_cd, current_directory_prim), sList(symbol_round, round_prim), sList(symbol_char_to_string, char_to_string_prim), sList(symbol_string_to_list, string_to_list_prim), sList(symbol_string_to_symbol, string_to_symbol_prim), sList(symbol_symbol_to_string, symbol_to_string_prim), sList(symbol_vector_to_list, vector_to_list_prim), sList(symbol_eqv_q, eqv_q_prim), sList(symbol_vector_q, vector_q_prim), sList(symbol_atom_q, atom_q_prim), sList(symbol_iter_q, iter_q_prim), sList(symbol_list_q, list_q_prim), sList(symbol_procedure_q, procedure_q_prim), sList(symbol_stringLessThan_q, stringLessThan_q_prim), sList(symbol_float_, float_prim), sList(symbol_globals, globals_prim), sList(symbol_int_, int_prim), sList(symbol_apply_with_keywords, apply_with_keywords_prim), sList(symbol_assq, assq_prim), sList(symbol_dict, dict_prim), sList(symbol_property, property_prim), sList(symbol_rational, rational_prim), sList(symbol_reset_toplevel_env, reset_toplevel_env_prim), sList(symbol_sort, sort_prim), sList(symbol_string_append, string_append_prim), sList(symbol_string_split, string_split_prim), sList(symbol_symbol, symbol_prim), sList(symbol_typeof, typeof_prim), sList(symbol_use_lexical_address, use_lexical_address_prim), sList(symbol_use_tracing, use_tracing_prim));
         return make_initial_env_extended(map(car_proc, primitives), map(cadr_proc, primitives));
-    }
-    
-    public static object reset_toplevel_env() {
-        toplevel_env = make_toplevel_env();
-        return void_value;
     }
     
     public static object make_external_proc(object external_function_object) {
