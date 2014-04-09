@@ -17,7 +17,8 @@ all: ../Myro.dll Robots
 		-r:Microsoft.Dynamic \
 		-r:JigsawAttributes \
 		-r:IronPython \
-	        -r:IronRuby \
+        -r:IronRuby \
+		-r:System.Numerics \
 		-r:FarseerPhysics.dll \
 		-out:../Myro.dll \
 		-pkg:gtk-sharp-2.0 \

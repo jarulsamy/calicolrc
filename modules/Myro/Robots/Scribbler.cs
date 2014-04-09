@@ -203,6 +203,7 @@ public class Scribbler: Myro.Robot
             } else { // already closed
                 if ((serial.PortName.Equals (port) || port == null) && serial.BaudRate == baud) {
                     need_port = false;
+                    Console.WriteLine("Opening port");
                     serial.Open ();
                 } else {
                     need_port = true;
@@ -244,7 +245,7 @@ public class Scribbler: Myro.Robot
         serial = new SerialPort (port, baud);
         lock (serial) {
             serial.ReadTimeout = 1000; // milliseconds
-            //serial.WriteTimeout = 1000; // milliseconds
+            serial.WriteTimeout = 5000; // milliseconds
             try {
                 serial.Open ();
             } catch {

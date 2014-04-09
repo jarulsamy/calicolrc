@@ -845,10 +845,9 @@ public static class Myro
 
         public void lazyInit()
         {
-            if (handles != null && handles.Length == Sdl.SDL_NumJoysticks ()) return;
-            
+            if (handles != null && handles.Length == Sdl.SDL_NumJoysticks ()) return;            
+            Sdl.SDL_Init (Sdl.SDL_INIT_JOYSTICK);
             try {
-				Sdl.SDL_Init (Sdl.SDL_INIT_JOYSTICK);
 				handles = new IntPtr [Sdl.SDL_NumJoysticks ()];
 				for (int i=0; i < Sdl.SDL_NumJoysticks(); i++) {
 					handles [i] = Sdl.SDL_JoystickOpen (i);
@@ -861,6 +860,7 @@ public static class Myro
 		public List getHatStates (int index)
 		{
             lazyInit();
+            Sdl.SDL_JoystickUpdate ();
 			List retval = new List ();
 			int num = Sdl.SDL_JoystickNumHats (handles [index]);
 			for (int button = 0; button < num; button++) {
@@ -872,6 +872,7 @@ public static class Myro
 		public List getBallStates (int index)
 		{
             lazyInit();
+            Sdl.SDL_JoystickUpdate ();
 			List retval = new List ();
 			int num = Sdl.SDL_JoystickNumBalls (handles [index]);
 			for (int button = 0; button < num; button++) {
@@ -885,6 +886,7 @@ public static class Myro
 		public List getButtonStates (int index)
 		{
             lazyInit();
+            Sdl.SDL_JoystickUpdate ();
 			List retval = new List ();
 			int num = Sdl.SDL_JoystickNumButtons (handles [index]);
 			for (int button = 0; button < num; button++) {
@@ -907,6 +909,7 @@ public static class Myro
 		public PythonDictionary getGamepadNow (int index, List whats)
 		{
             lazyInit();
+            Sdl.SDL_JoystickUpdate ();
 			PythonDictionary retval = new PythonDictionary ();
 			foreach (string what in whats) {
 				retval [what] = getGamepadNow (index, what);
@@ -917,6 +920,7 @@ public static class Myro
 		public object getGamepadNow (int index, string what)
 		{
             lazyInit();
+            Sdl.SDL_JoystickUpdate ();
 			if (what == "all") {
 				return getGamepadNow (index, 
                              Graphics.PyList ("name", "axis", "ball", 
@@ -976,6 +980,7 @@ public static class Myro
 		public object getGamepad (List indices, string what)
 		{
             lazyInit();
+            Sdl.SDL_JoystickUpdate ();
 			List initials = new List ();
 			foreach (int index in indices) {
 				initials.append (getGamepadNow (index, what));
@@ -999,6 +1004,7 @@ public static class Myro
 		public object getGamepad (int index, string what)
 		{
             lazyInit();
+            Sdl.SDL_JoystickUpdate ();
 			object initial = getGamepadNow (index, what);
 			Sdl.SDL_JoystickUpdate ();
 			object current = getGamepadNow (index, what);
@@ -1013,6 +1019,7 @@ public static class Myro
 		public object getGamepad (List indices, List whats)
 		{
             lazyInit();
+			Sdl.SDL_JoystickUpdate ();
 			List initials = new List ();
 			foreach (int index in indices) {
 				initials.append (getGamepadNow (index, whats));
@@ -1036,6 +1043,7 @@ public static class Myro
 		public object getGamepad (int index, List whats)
 		{
             lazyInit();
+			Sdl.SDL_JoystickUpdate ();
 			object initial = getGamepadNow (index, whats);
 			Sdl.SDL_JoystickUpdate ();
 			object current = getGamepadNow (index, whats);
@@ -1051,42 +1059,37 @@ public static class Myro
 	[method: JigsawTab("M/Senses")]
 	public static object getGamepadNow ()
 	{
-		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepadNow (0, "all");
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getGamepadNow (int index)
 	{
-		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepadNow (index, "all");
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getGamepadNow (string what)
 	{
-		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepadNow (0, what);
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getGamepadNow (int index, string what)
 	{
-		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepadNow (index, what);
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getGamepadNow (int index, List whats)
 	{
-		Sdl.SDL_JoystickUpdate ();
+        //gamepads.lazyInit();
 		return gamepads.getGamepadNow (index, whats);
 	}
   
 	[method: JigsawTab("M/Senses")]
 	public static object getGamepadNow (IList iterable)
 	{
-		Sdl.SDL_JoystickUpdate ();
 		List retval = new List ();
 		foreach (string what in iterable)
 			retval.append (gamepads.getGamepadNow (0, what));
@@ -1096,7 +1099,6 @@ public static class Myro
 	[method: JigsawTab("M/Senses")]
 	public static object getGamepadNow (IList iterable, string what)
 	{
-		Sdl.SDL_JoystickUpdate ();
 		List retval = new List ();
 		foreach (int index in iterable)
 			retval.append (gamepads.getGamepadNow (index, what));
@@ -1106,7 +1108,6 @@ public static class Myro
 	[method: JigsawTab("M/Senses")]
 	public static object getGamepadNow (IList iterable, List whats)
 	{
-		Sdl.SDL_JoystickUpdate ();
 		List retval = new List ();
 		foreach (int index in iterable)
 			retval.append (gamepads.getGamepadNow (index, whats));
@@ -1116,56 +1117,48 @@ public static class Myro
 	[method: JigsawTab("M/Senses")]
 	public static object getGamepad ()
 	{
-		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepad (0, "all");
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getGamepad (int index)
 	{
-		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepad (index, "all");
 	}
   
 	[method: JigsawTab("M/Senses")]
 	public static object getGamepad (string what)
 	{
-		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepad (0, what);
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getGamepad (int index, string what)
 	{
-		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepad (index, what);
 	}
 
 	[method: JigsawTab("M/Senses")]
 	public static object getGamepad (int index, List whats)
 	{
-		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepad (index, whats);
 	}
   
 	[method: JigsawTab("M/Senses")]
 	public static object getGamepad (List whats)
 	{
-		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepad (0, whats);
 	}
   
 	[method: JigsawTab("M/Senses")]
 	public static object getGamepad (List indices, string what)
 	{
-		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepad (indices, what);
 	}
   
 	[method: JigsawTab("M/Senses")]
 	public static object getGamepad (List indices, List whats)
 	{
-		Sdl.SDL_JoystickUpdate ();
 		return gamepads.getGamepad (indices, whats);
 	}
   
@@ -1310,7 +1303,7 @@ public static class Myro
 			object robot;
 			try {
 			  robot = constructor.Invoke (args);
-			} catch (Exception e) {
+			} catch{
                 //System.Console.WriteLine ("Failure; skipping robot '{0}': {1}", f.Name, e.Message);
 			  continue;
 			}
@@ -4088,13 +4081,16 @@ public static class Myro
 		{
 			if (! sound_initialized)
 				initialize_sound ();
-			SdlDotNet.Audio.Sound sound;
+			SdlDotNet.Audio.Sound sound = null;
 			InvokeBlocking (delegate {
 			    sound = new SdlDotNet.Audio.Sound (filename);
 			    });
-			SdlDotNet.Audio.Channel channel = sound.Play ();
-			while (channel.IsPlaying())
-			    wait (.1);
+            if (sound != null)
+            {                
+                SdlDotNet.Audio.Channel channel = sound.Play ();
+                while (channel.IsPlaying())
+                    wait (.1);
+            }
 		}
 
 		public void playUntilDone (SdlDotNet.Audio.Sound sound)
@@ -4108,7 +4104,7 @@ public static class Myro
 		{
 			if (! sound_initialized)
 				initialize_sound ();
-			SdlDotNet.Audio.Sound sound;
+			SdlDotNet.Audio.Sound sound = null;
 			InvokeBlocking (delegate {
 			    sound = new SdlDotNet.Audio.Sound (filename);
 			    });
@@ -4119,11 +4115,12 @@ public static class Myro
 		{
 			if (! sound_initialized)
 				initialize_sound ();
-			SdlDotNet.Audio.Sound sound;
+			SdlDotNet.Audio.Sound sound = null;
 			InvokeBlocking (delegate {
 			    sound = new SdlDotNet.Audio.Sound (filename);
 			    });
-			return sound.Play (loop, (int)(seconds * 100));
+            if (sound != null) return sound.Play (loop, (int)(seconds * 100));
+            else return null;
 		}
 
 		public SdlDotNet.Audio.Channel play (string filename, int loop)
@@ -4131,22 +4128,24 @@ public static class Myro
 			if (! sound_initialized)
 				initialize_sound ();
 
-			SdlDotNet.Audio.Sound sound;
+			SdlDotNet.Audio.Sound sound = null;
 			InvokeBlocking (delegate {
 			    sound = new SdlDotNet.Audio.Sound (filename);
 			    });
-			return sound.Play (loop);
+			if (sound != null) return sound.Play (loop);
+            else return null;
 		}
 
 		public SdlDotNet.Audio.Channel play (string filename, bool loop_forever)
 		{
 			if (! sound_initialized)
 				initialize_sound ();
-			SdlDotNet.Audio.Sound sound;
+			SdlDotNet.Audio.Sound sound = null;
 			InvokeBlocking (delegate {
 			    sound = new SdlDotNet.Audio.Sound (filename);
 			    });
-			return sound.Play (loop_forever);
+			if (sound != null) return sound.Play (loop_forever);
+            else return null;
 		}
 
 		public void setPhases (double phase1, double phase2)
@@ -4189,8 +4188,8 @@ public static class Myro
 		    }
 		    InvokeBlocking (delegate {
 			    // BUG: OpenAudio (or lower) apparently requires a *visible* screen
-			    SdlDotNet.Graphics.Video.SetVideoMode (250, 1);
-			    SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
+			    //SdlDotNet.Graphics.Video.SetVideoMode (64, 32);
+			    //SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
 			    SdlDotNet.Audio.Mixer.OpenAudio (stream);
 			});
 		    audio_initialized = true;
@@ -4200,8 +4199,8 @@ public static class Myro
 		{
 		    InvokeBlocking (delegate {
 			    // BUG: OpenAudio (or lower) apparently requires a *visible* screen
-			    SdlDotNet.Graphics.Video.SetVideoMode (250, 1);
-			    SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
+			    //SdlDotNet.Graphics.Video.SetVideoMode (64, 32);
+                //SdlDotNet.Graphics.Video.WindowCaption = "Calico Audio";
 			    SdlDotNet.Audio.Mixer.Open ();
 			    SdlDotNet.Audio.Mixer.ChannelsAllocated = 1000;
 			});
