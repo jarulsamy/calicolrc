@@ -208,8 +208,8 @@ public class Scheme {
 	return config.symbol(symbol.ToString());
   }
 
-  public static object make_symbol(string symbol) {
-	return config.symbol(symbol);
+  public static object make_symbol(object symbol) {
+      return config.symbol(symbol.ToString());
   }
 
   public static BigInteger makeBigInteger(int value) {
@@ -368,10 +368,15 @@ public class Scheme {
 
   // public static Proc append_proc = new Proc("append", (Procedure1) append, -1, 1);
   // public static Proc make_binding_proc = new Proc("make-binding",(Procedure2)make_binding, 2, 1);
+  public static Proc apply_with_keywords_proc = new Proc("apply_with_keywords", (Procedure1)apply_with_keywords, 1, 1);
+  public static Proc globals_proc = new Proc("globals", (Procedure0)globals, 0, 1);
+  public static Proc float__proc = new Proc("float", (Procedure1)float_, 1, 1);
+  public static Proc int__proc = new Proc("int", (Procedure1)int_, 1, 1);
   public static Proc Add_proc = new Proc("+", (Procedure1)Add, -1, 1);
   public static Proc Divide_proc = new Proc("/", (Procedure1) Divide, -1, 1);
   public static Proc Eq_proc = new Proc("eq?", (Procedure1Bool) Eq, -1, 2);
   public static Proc EqualSign_proc = new Proc("=", (Procedure1Bool) EqualSign, -1, 2);
+  public static Proc procedure_q_proc = new Proc("procedure?", (Procedure1Bool) procedure_q, 1, 2);
   public static Proc Equal_proc = new Proc("equal?", (Procedure1Bool) Equal, -1, 2);
   public static Proc Eqv_proc = new Proc("eqv?", (Procedure1Bool) Eqv, -1, 2);
   public static Proc GreaterThan_proc = new Proc(">", (Procedure1Bool) GreaterThan, -1, 2);
@@ -388,11 +393,37 @@ public class Scheme {
   public static Proc boolean_q_proc = new Proc("boolean?", (Procedure1Bool) boolean_q, 1, 2);
   public static Proc cadddr_hat_proc = new Proc("cadddr^",(Procedure1)PJScheme.cadddr_hat, 1, 1);
   public static Proc caddr_hat_proc = new Proc("caddr^",(Procedure1)PJScheme.caddr_hat, 1, 1);
-  public static Proc caddr_proc = new Proc("caddr", (Procedure1) caddr, 1, 1);
   public static Proc cadr_hat_proc = new Proc("cadr^",(Procedure1)PJScheme.cadr_hat, 1, 1);
   public static Proc cadr_proc = new Proc("cadr", (Procedure1) cadr, 1, 1);
   public static Proc car_hat_proc = new Proc("car^",(Procedure1)PJScheme.car_hat, 1, 1);
   public static Proc car_proc = new Proc("car", (Procedure1) car, 1, 1);
+  public static Proc caar_proc = new Proc("caar", (Procedure1) caar, 1, 1);
+  public static Proc cdar_proc = new Proc("cdar", (Procedure1) cdar, 1, 1);
+  public static Proc cddr_proc = new Proc("cddr", (Procedure1) cddr, 1, 1);
+  public static Proc caaar_proc = new Proc("caaar", (Procedure1) caaar, 1, 1);
+  public static Proc caadr_proc = new Proc("caadr", (Procedure1) caadr, 1, 1);
+  public static Proc cadar_proc = new Proc("cadar", (Procedure1) cadar, 1, 1);
+  public static Proc caddr_proc = new Proc("caddr", (Procedure1) caddr, 1, 1);
+  public static Proc cdaar_proc = new Proc("cdaar", (Procedure1) cdaar, 1, 1); 
+  public static Proc cdadr_proc = new Proc("cdadr", (Procedure1) cdadr, 1, 1);
+  public static Proc cddar_proc = new Proc("cddar", (Procedure1) cddar, 1, 1); 
+  public static Proc cdddr_proc = new Proc("cdddr", (Procedure1) cdddr, 1, 1);
+  public static Proc caaaar_proc = new Proc("caaaar", (Procedure1) caaaar, 1, 1);
+  public static Proc caaadr_proc = new Proc("caaadr", (Procedure1) caaadr, 1, 1);
+  public static Proc caadar_proc = new Proc("caadar", (Procedure1) caadar, 1, 1);
+  public static Proc caaddr_proc = new Proc("caaddr", (Procedure1) caaddr, 1, 1);
+  public static Proc cadaar_proc = new Proc("cadaar", (Procedure1) cadaar, 1, 1); 
+  public static Proc cadadr_proc = new Proc("cadadr", (Procedure1) cadadr, 1, 1);
+  public static Proc caddar_proc = new Proc("caddar", (Procedure1) caddar, 1, 1); 
+  public static Proc cadddr_proc = new Proc("cadddr", (Procedure1) cadddr, 1, 1);
+  public static Proc cdaaar_proc = new Proc("cdaaar", (Procedure1) cdaaar, 1, 1);
+  public static Proc cdaadr_proc = new Proc("cdaadr", (Procedure1) cdaadr, 1, 1);
+  public static Proc cdadar_proc = new Proc("cdadar", (Procedure1) cdadar, 1, 1);
+  public static Proc cdaddr_proc = new Proc("cdaddr", (Procedure1) cdaddr, 1, 1);
+  public static Proc cddaar_proc = new Proc("cddaar", (Procedure1) cddaar, 1, 1);
+  public static Proc cddadr_proc = new Proc("cddadr", (Procedure1) cddadr, 1, 1);
+  public static Proc cdddar_proc = new Proc("cdddar", (Procedure1) cdddar, 1, 1);
+  public static Proc cddddr_proc = new Proc("cddddr", (Procedure1) cddddr, 1, 1);
   public static Proc cdddr_hat_proc = new Proc("cdddr^",(Procedure1)PJScheme.cdddr_hat, 1, 1);
   public static Proc cddr_hat_proc = new Proc("cddr^",(Procedure1)PJScheme.cddr_hat, 1, 1);
   public static Proc cdr_hat_proc = new Proc("cdr^",(Procedure1)PJScheme.cdr_hat, 1, 1);
@@ -402,6 +433,7 @@ public class Scheme {
   public static Proc char_numeric_q_proc = new Proc("char-numeric?", (Procedure1Bool) char_numeric_q, 1, 2);
   public static Proc char_q_proc = new Proc("char?", (Procedure1Bool) char_q, 1, 2);
   public static Proc char_to_string_proc = new Proc("char->string", (Procedure1) char_to_string, 1, 1);
+  public static Proc symbol_to_string_proc = new Proc("symbol->string", (Procedure1) symbol_to_string, 1, 1);
   public static Proc char_to_integer_proc = new Proc("char->integer", (Procedure1) char_to_integer, 1, 1);
   public static Proc integer_to_char_proc = new Proc("integer->char", (Procedure1) integer_to_char, 1, 1);
   public static Proc char_whitespace_q_proc = new Proc("char-whitespace?", (Procedure1Bool) char_whitespace_q, 1, 2);
@@ -414,6 +446,11 @@ public class Scheme {
   public static Proc list_ref_proc = new Proc("list-ref", (Procedure2) list_ref, 2, 1);
   public static Proc list_to_string_proc = new Proc("list->string", (Procedure1) list_to_string, 1, 1);
   public static Proc list_to_vector_proc = new Proc("list->vector", (Procedure1) list_to_vector, 1, 1);
+  public static Proc vector_to_list_proc = new Proc("vector->list", (Procedure1) vector_to_list, 1, 1);
+  public static Proc eq_q_proc = new Proc("eq?", (Procedure2Bool) Eq, 2, 2);  
+  public static Proc eqv_q_proc = new Proc("eqv?", (Procedure2Bool) Eqv, 2, 2);  
+  public static Proc vector_q_proc = new Proc("vector?", (Procedure1Bool) vector_q, 1, 1);  
+  public static Proc iter_q_proc = new Proc("iter?", (Procedure1Bool) iter_q, 1, 1);  
   public static Proc make_binding_proc = new Proc("make-binding",(Procedure1)PJScheme.make_binding, 1, 1);
   public static Proc make_external_proc_proc = new Proc("make-external-proc", (Procedure1) PJScheme.make_external_proc, 1, 1);
   public static Proc make_vector_proc = new Proc("make-vector", (Procedure1) make_vector, 1, 1);
@@ -442,26 +479,27 @@ public class Scheme {
   public static Proc string_ref_proc = new Proc("string-ref", (Procedure2) string_ref, 2, 1);
   public static Proc string_to_number_proc = new Proc("string->number", (Procedure1) string_to_number, 1, 1);
   public static Proc string_to_symbol_proc = new Proc("string->symbol", (Procedure1) string_to_symbol, 1, 1);
+  public static Proc string_to_list_proc = new Proc("sting->list", (Procedure1) string_to_list, 1, 1);
   public static Proc symbol_q_proc = new Proc("symbol?", (Procedure1Bool) symbol_q, 1, 2);
   public static Proc vector_length_proc = new Proc("vector-length", (Procedure1) vector_length, 1, 1);
   public static Proc vector_native_proc = new Proc("vector", (Procedure1) vector_native, -1, 1);
   public static Proc vector_proc = new Proc("vector", (ProcedureN) vector, -1, 1);
   public static Proc vector_ref_proc = new Proc("vector-ref", (Procedure2) vector_ref, 2, 1);
-
-
   public static Proc snoc_proc = new Proc("snoc", (Procedure2) PJScheme.snoc, 2, 1);
   public static Proc rac_proc = new Proc("rac", (Procedure1) PJScheme.rac, 1, 1);
   public static Proc rdc_proc = new Proc("rdc", (Procedure1) PJScheme.rdc, 1, 1);
-
-
-
-    //  public static Proc binding_variable_proc = new Proc("binding_variable", 
-    //							(Procedure1) PJScheme.binding_variable,
-    //							2, 1);
   public static Proc get_variables_from_frame_proc = new Proc("get_variables_from_frame", 
 								(Procedure1) PJScheme.get_variables_from_frame,
 								1, 1);
-
+    public static Proc use_lexical_address_proc = new Proc("use-lexical-address", (ProcedureN)PJScheme.use_lexical_address, -1, 1);
+    public static Proc dict_proc = new Proc("dict", (Procedure1)dict, 1, 1);
+    public static Proc property_proc = new Proc("property", (Procedure1)property, 1, 1);
+    public static Proc reset_toplevel_env_proc = new Proc("reset-toplevel-env", (Procedure0Void)reset_toplevel_env, 0, 0);
+    public static Proc string_split_proc = new Proc("string-split", (Procedure2)string_split, 2, 1);
+    public static Proc make_symbol_proc = new Proc("make-symbol", (Procedure1)make_symbol, 1, 1);
+    public static Proc type_proc = new Proc("type", (Procedure1)type, 1, 1);
+    //public static Proc apply_lexical_address_proc = new Proc("apply-lexical-address", (Procedure1)apply_lexical_address, 1, 1);
+    
     // Add new procedures above here!
     // Then add low-level C# code below
 
@@ -486,6 +524,11 @@ public class Scheme {
   }
 
   public static Func<object,bool> module_q = tagged_list(PJScheme.symbol_module, (Predicate2)GreaterOrEqual, 1);
+  public static Func<object,bool> procedure_q_native = tagged_list(PJScheme.symbol_procedure, (Predicate2)GreaterOrEqual, 1);
+
+    public static bool procedure_q(object obj) {
+	return procedure_q_native(obj);
+    }
 
   public static object get_current_time() {
 	DateTime baseTime = new DateTime(1970, 1, 1, 8, 0, 0);
@@ -511,68 +554,8 @@ public class Scheme {
   }
   
     public static object make_initial_env_extended (object names, object procs) {
-      // ProcedureN - N is arg count coming in
-      // -1, 1, 2 - number of pieces to call app with (-1 is all)
-      // 0, 1, 2 - return type 0 = void, 1 = object, 2 = bool
-      object primitives = list(
-	       list(symbol("assq"), assq_proc),
-	       list(symbol("atom?"), atom_q_proc),
-	       list(symbol("caaaar"), new Proc("caaaar", (Procedure1)caaaar, 1, 1)),
-	       list(symbol("caaadr"), new Proc("caaadr", (Procedure1)caaadr, 1, 1)),
-	       list(symbol("caaar"), new Proc("caaar", (Procedure1)caaar, 1, 1)),
-	       list(symbol("caadar"), new Proc("caadar", (Procedure1)caadar, 1, 1)),
-	       list(symbol("caaddr"), new Proc("caaddr", (Procedure1)caaddr, 1, 1)),
-	       list(symbol("caadr"), new Proc("caadr", (Procedure1)caadr, 1, 1)),
-	       list(symbol("caar"), new Proc("caar", (Procedure1)caar, 1, 1)),
-	       list(symbol("cadaar"), new Proc("cadaar", (Procedure1)cadaar, 1, 1)),
-	       list(symbol("cadadr"), new Proc("cadadr", (Procedure1)cadadr, 1, 1)),
-	       list(symbol("cadar"), new Proc("cadar", (Procedure1)cadar, 1, 1)),
-	       list(symbol("caddar"), new Proc("caddar", (Procedure1)caddar, 1, 1)),
-	       list(symbol("cadddr"), new Proc("cadddr", (Procedure1)cadddr, 1, 1)),
-	       list(symbol("cdaaar"), new Proc("cdaaar", (Procedure1)cdaaar, 1, 1)),
-	       list(symbol("cdaadr"), new Proc("cdaadr", (Procedure1)cdaadr, 1, 1)),
-	       list(symbol("cdaar"), new Proc("cdaar", (Procedure1)cdaar, 1, 1)),
-	       list(symbol("cdadar"), new Proc("cdadar", (Procedure1)cdadar, 1, 1)),
-	       list(symbol("cdaddr"), new Proc("cdaddr", (Procedure1)cdaddr, 1, 1)),
-	       list(symbol("cdadr"), new Proc("cdadr", (Procedure1)cdadr, 1, 1)),
-	       list(symbol("cdar"), new Proc("cdar", (Procedure1)cdar, 1, 1)),
-	       list(symbol("cddaar"), new Proc("cddaar", (Procedure1)cddaar, 1, 1)),
-	       list(symbol("cddadr"), new Proc("cddadr", (Procedure1)cddadr, 1, 1)),
-	       list(symbol("cddar"), new Proc("cddar", (Procedure1)cddar, 1, 1)),
-	       list(symbol("cdddar"), new Proc("cdddar", (Procedure1)cdddar, 1, 1)),
-	       list(symbol("cddddr"), new Proc("cddddr", (Procedure1)cddddr, 1, 1)),
-	       list(symbol("cdddr"), new Proc("cdddr", (Procedure1)cdddr, 1, 1)),
-	       list(symbol("cddr"), new Proc("cddr", (Procedure1)cddr, 1, 1)),
-	       list(symbol("char->string"), char_to_string_proc),
-	       list(symbol("eqv?"), Eqv_proc),
-	       list(symbol("float"), new Proc("float", (Procedure1)ToDouble, 1, 1)),
-	       list(symbol("format"), new Proc("format", (Procedure1)format_list, -1, 1)),
-	       list(symbol("globals"), new Proc("globals", (Procedure0)dlr_env_list, 0, 1)),
-	       list(symbol("int"), new Proc("int", (Procedure1)ToInt, 1, 1)),
-	       list(symbol("iter?"), new Proc("iter?", (Procedure1Bool)iter_q, 1, 2)),
-	       list(symbol("list?"), new Proc("list?", (Procedure1Bool)list_q, 1, 2)),
-	       list(symbol("procedure?"), new Proc("procedure?", (Procedure1Bool)procedure_q_proc, 1, 2)),
-	       list(symbol("property"), new Proc("property", (Procedure1)property, -1, 1)),
-	       list(symbol("rational"), new Proc("int", (Procedure2)ToRational, 2, 1)),
-	       list(symbol("sort"), new Proc("sort", (Procedure2)sort, 2, 1)),
-	       list(symbol("string->list"), new Proc("string->list", (Procedure1) string_to_list, 1, 1)),
-	       list(symbol("string->symbol"), new Proc("string->symbol", (Procedure1) string_to_symbol, 1, 1)),
-	       list(symbol("string-append"), string_append_proc),
-	       list(symbol("string-split"), new Proc("string-split", (Procedure2) string_split, 2, 1)),
-	       list(symbol("string<?"), stringLessThan_q_proc),
-	       list(symbol("symbol"), new Proc("symbol", (Procedure1)symbol, 1, 1)),
-	       list(symbol("symbol->string"), new Proc("symbol->string", (Procedure1) symbol_to_string, 1, 1)),
-	       list(symbol("typeof"), new Proc("typeof", (Procedure1)get_type, 1, 1)),
-	       list(symbol("vector->list"), new Proc("vector->list", (Procedure1)vector_to_list, 1, 1)),
-	       list(symbol("vector?"), new Proc("vector?", (Procedure1Bool)vector_q, 1, 2)),
-	       list(symbol("use-lexical-address"), new Proc("use-lexical-address", (Procedure1Bool)PJScheme.use_lexical_address, -1, 1)),
-	       list(symbol("reset-toplevel-env"), new Proc("reset-toplevel-env", (Procedure0Void)reset_toplevel_env, 0, 0)),
-	       list(symbol("dict"), new Proc("dict", (Procedure1) make_dict, -1, 1)),
-	       list(symbol("apply-with-keywords"), new Proc("apply-with-keywords", (Procedure1) apply_with_keywords, -1, 1))
-			       );
-      /// -------------------
-      // FIXME: remove check when done
-      // Check to see if overwriting a previously defined primitive:
+      object primitives = PJScheme.symbol_emptylist;
+      // add to this list
       object current = primitives;
       while (current != PJScheme.symbol_emptylist) {
       	  object sym = caar(current);
@@ -940,12 +923,6 @@ public class Scheme {
 			};
   }
 	
-  public static Func<object,bool> procedure_q = tagged_list(PJScheme.symbol_procedure, (Predicate2)GreaterOrEqual, 1);
-
-  public static bool procedure_q_proc(object obj) {
-	return (bool) procedure_q(obj);
-  }
-
   public static object vector_to_list(object obj) {
     return ((Vector)obj).ToList();
   }
@@ -3595,7 +3572,7 @@ public class Scheme {
 	return "1";
     }    
 
-    public static Function ApplyPlus(object what, object slist) {
+    public static void ApplyPlus(object what, object slist) {
 	// what is "cont", "cont2", "macro"
 	// first arg is id
 	// rest of args are arguments
@@ -3628,8 +3605,6 @@ public class Scheme {
 	} else {
 	    throw new Exception("invalid kind: " + kind);
 	}
-	
-	return (Function) null;
     }
 
     public static object set_external_member_b(object obj, object components, object value) {
@@ -3639,5 +3614,26 @@ public class Scheme {
 
     public static void set_global_docstring_b(object var, object value) {
 	// FIXME: how to set docstring?
+    }
+
+    public static object float_(object obj) {
+	return Convert.ToDouble(obj);
+    }
+
+    public static object int_(object obj) {
+	return Convert.ToInt32(obj);
+    }
+
+    public static object globals() {
+	return dlr_env_list();
+    }
+
+    public static object dict(object obj) {
+	// FIXME: make a Dictionary
+	return null;
+    }
+
+    public static object type(object obj) {
+	return obj.GetType();
     }
 }

@@ -95,7 +95,7 @@ public class CalicoSchemeEngine : Engine
 
   public void format_trace_back(object list) {
       object current = list;
-      while (current != Scheme.EmptyList) {
+      while (current != PJScheme.symbol_emptylist) {
           object info = Scheme.car(current);
 	  if (info.ToString() == "macro-generated-exp") {
               // nothing to print
@@ -158,7 +158,7 @@ public class CalicoSchemeEngine : Engine
       return true; // force it
     }
     // else, only if valid parse
-    return PJScheme.try_parse(text);
+    return (bool) PJScheme.try_parse(text);
   }
 
   public override void SetTraceOn(MainWindow calico) {

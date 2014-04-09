@@ -616,6 +616,10 @@ public class PJScheme:Scheme
         if self.contains_return(expr[2][2:]):
             if "?" in expr[1]:
                 return_type = "bool"
+            elif expr[0] == "define*":
+                return_type = "void"
+            elif expr[0].endswith("-rm"):
+                return_type = "void"
             else:
                 return_type = "object"
         else:
@@ -718,12 +722,21 @@ public class PJScheme:Scheme
         # the name of C# functions, which need a delegate:
         elif (name in ["=", ">=", "car", "cdr", "string-length", "+", "string-ref", "sqrt",
                        "/", "remainder", "quotient", "char->integer", "integer->char",
-                       "cons", "cadr", "caddr", "-", "*", "%", "<", ">", "<=", "abs", "memq",
+                       "cons", "cadr", "-", "*", "%", "<", ">", "<=", "abs", "memq",
                        "range", "snoc", "rac", "rdc", "set-car!", "set-cdr!", "reverse", 
                        "string->number", "list->vector", "list->string", "format", "printf",
                        "vector-native", "vector-ref", "make-vector", "list-ref", "setup", 
                        "safe-print", "modulo", "vector_native", "car^", "cadr^", "string->symbol",
-                       "make-binding", "aunparse", "format-stack-trace", "get-variables-from-frame"] or 
+                       "make-binding", "aunparse", "format-stack-trace", "get-variables-from-frame",
+                       "vector->list", "char->string", "string->list", "symbol->string", 
+                       "float", "int", "globals", "apply-with-keywords", "assq", "dict", "property",
+                       "reset-toplevel-env", "sort", "string-append", "string-split", "make-symbol",
+                       "type", "use-lexical-address",
+                       "caar", "cadr", "cdar", "cddr" , 
+                       "caaar", "caadr", "cadar", "caddr" , "cdaar", "cdadr", "cddar", "cdddr",
+                       "caaaar", "caaadr", "caadar", "caaddr" , "cadaar", "cadadr", "caddar", "cadddr",
+                       "cdaaar", "cdaadr", "cdadar", "cdaddr" , "cddaar", "cddadr", "cdddar", "cddddr",
+                   ] or 
             "?" in name):
             return self.fix_name(name) + "_proc"
         else:
@@ -885,10 +898,10 @@ public class PJScheme:Scheme
             return "map"
         elif name == "apply":
             return "apply"
+        elif name == "apply$":
+            return "ApplyPlus"
         elif name == "apply*":
             return "dlr_apply"
-        elif name == "apply+":
-            return "ApplyPlus"
         elif name == "+":
             return "Add"
         elif name == "-":
