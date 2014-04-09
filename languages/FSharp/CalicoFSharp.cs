@@ -164,20 +164,21 @@ public class CalicoFSharpEngine : Engine
          try
          {
              fsiSession.EvalInteraction(code);
+             shouldReturn = sbOut.ToString().Contains("val it :");
          } catch {
          } finally{
-             shouldReturn = sbOut.ToString().Contains("val it :");
              if (!shouldReturn) Console.Write(sbOut);
              Console.Error.Write(sbErr);
              sbOut.Clear();
              sbErr.Clear();
          }
-         
+
+         object returnvalue = null;
          if (shouldReturn){
              try{ 
                  var value = fsiSession.EvalExpression("it");
                  if (FSharpOption<Shell.FsiValue>.get_IsSome(value)) {
-                     return (value.Value.ReflectionValue);
+                     returnvalue = value.Value.ReflectionValue;
                  }
              } catch {
              } finally {
@@ -185,7 +186,12 @@ public class CalicoFSharpEngine : Engine
                  sbErr.Clear();
              }
          }
-         return null;
+         if (shouldReturn){
+             return returnvalue;
+         }
+         else {             
+             return null;
+         }
      }
     
     public override bool Execute(string code) {

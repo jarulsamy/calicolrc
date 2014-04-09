@@ -1,11 +1,12 @@
 from Processing import *
-
+import random
 size(640, 360)
 
 yoff = 0.0        ## 2nd dimension of perlin noise
 
 def draw():
   global yoff
+  random.seed(frameCount())
   background(51)
 
   fill(255)

@@ -5,7 +5,7 @@ from random import choice
 
 window(800, 400)
 smooth()
-textSize(12)
+textSize(48)
 txt = """<span foreground="blue">Calico Processing</span> <b>is</b> <i>sweet</i>!"""
 print(txt)
-markup(txt, 50, 50)
+markup(txt, 50, 150)

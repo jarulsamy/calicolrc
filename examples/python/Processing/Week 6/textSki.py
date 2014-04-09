@@ -71,5 +71,5 @@ def draw():
 
 # Run draw every 10-ish milliseconds
 onLoop += draw
-frameRate(100)
+frameRate(30)
 loop()
