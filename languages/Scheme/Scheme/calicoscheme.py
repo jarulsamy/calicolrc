@@ -1377,7 +1377,7 @@ temp_3 = symbol_undefined
 temp_4 = symbol_undefined
 temp_1 = symbol_undefined
 def apply_cont():
-    return Apply(cadr(k_reg), cddr(k_reg))
+    Apply(cadr(k_reg), cddr(k_reg))
 
 def b_cont_1_d(chars, fail, k):
     globals()['value3_reg'] = fail
@@ -1783,7 +1783,7 @@ def b_cont_51_d(apair1, apair2, pair1, pair2, k):
         globals()['pc'] = instantiate_hat
 
 def apply_cont2():
-    return Apply(cadr(k_reg), cddr(k_reg))
+    Apply(cadr(k_reg), cddr(k_reg))
 
 def b_cont2_1_d(token, k):
     globals()['value1_reg'] = cons(token, value1_reg)
@@ -2149,18 +2149,18 @@ def b_cont2_53_d(exp, k):
     globals()['pc'] = apply_cont2
 
 def b_cont2_54_d(exp, k):
-    pop_stack_trace(exp)
+    pop_stack_trace_b(exp)
     globals()['k_reg'] = k
     globals()['pc'] = apply_cont2
 
 def b_cont2_55_d(args, exp, env, info, handler, k):
     if _staruse_stack_trace_star:
-        push_stack_trace(exp)
+        push_stack_trace_b(exp)
     if dlr_proc_q(value1_reg):
         result = symbol_undefined
         result = dlr_apply(value1_reg, args)
         if _staruse_stack_trace_star:
-            pop_stack_trace(exp)
+            pop_stack_trace_b(exp)
         globals()['value1_reg'] = result
         globals()['k_reg'] = k
         globals()['pc'] = apply_cont2
@@ -2585,7 +2585,7 @@ def b_cont2_103_d(s2, k2):
     globals()['pc'] = instantiate_hat
 
 def apply_cont3():
-    return Apply(cadr(k_reg), cddr(k_reg))
+    Apply(cadr(k_reg), cddr(k_reg))
 
 def b_cont3_1_d(src, handler, k):
     if token_type_q(value1_reg, symbol_end_marker):
@@ -2623,7 +2623,7 @@ def b_cont3_4_d(rhs_value, k):
     globals()['pc'] = apply_cont2
 
 def apply_cont4():
-    return Apply(cadr(k_reg), cddr(k_reg))
+    Apply(cadr(k_reg), cddr(k_reg))
 
 def b_cont4_1_d(src, start, k):
     globals()['k_reg'] = make_cont(b_cont_8_d, value2_reg, value3_reg, value4_reg, k)
@@ -2742,7 +2742,7 @@ def b_cont4_13_d(src, env2, handler, k):
     globals()['pc'] = aparse
 
 def apply_fail():
-    return Apply(cadr(fail_reg), cddr(fail_reg))
+    Apply(cadr(fail_reg), cddr(fail_reg))
 
 def b_fail_1_d():
     globals()['final_reg'] = "no more choices"
@@ -2772,14 +2772,14 @@ def b_fail_5_d(exps, env, handler, fail, k):
     globals()['pc'] = eval_choices
 
 def apply_handler():
-    return Apply(cadr(handler_reg), cddr(handler_reg))
+    Apply(cadr(handler_reg), cddr(handler_reg))
 
 def b_handler_1_d():
     globals()['final_reg'] = List(symbol_exception, exception_reg)
     globals()['pc'] = pc_halt_signal
 
 def apply_handler2():
-    return Apply(cadr(handler_reg), cddr(handler_reg))
+    Apply(cadr(handler_reg), cddr(handler_reg))
 
 def b_handler2_1_d():
     globals()['final_reg'] = List(symbol_exception, exception_reg)
@@ -2822,7 +2822,7 @@ def b_handler2_6_d(cexps, cvar, fexps, env, handler, k):
     globals()['pc'] = eval_sequence
 
 def apply_proc():
-    return Apply(cadr(proc_reg), cddr(proc_reg))
+    Apply(cadr(proc_reg), cddr(proc_reg))
 
 def b_proc_1_d(bodies, formals, env):
     if Equal(length(args_reg), length(formals)):
@@ -4324,7 +4324,7 @@ def b_proc_135_d():
 
 def b_proc_136_d():
     if (length_one_q(args_reg)) and (boolean_q(car(args_reg))):
-        set_use_stack_trace(car(args_reg))
+        set_use_stack_trace_b(car(args_reg))
         globals()['value2_reg'] = fail_reg
         globals()['value1_reg'] = void_value
         globals()['k_reg'] = k2_reg
@@ -4575,7 +4575,7 @@ def b_proc_160_d(external_function_object):
     globals()['pc'] = apply_cont2
 
 def apply_macro():
-    return Apply(cadr(macro_reg), cddr(macro_reg))
+    Apply(cadr(macro_reg), cddr(macro_reg))
 
 def b_macro_1_d():
     if symbol_q_hat(cadr_hat(datum_reg)):
@@ -5740,10 +5740,10 @@ def binding_docstring(binding):
     return cdr(binding)
 
 def set_binding_value_b(binding, value):
-    return set_car_b(binding, value)
+    set_car_b(binding, value)
 
 def set_binding_docstring_b(binding, docstring):
-    return set_cdr_b(binding, docstring)
+    set_cdr_b(binding, docstring)
 
 def make_frame(variables, values):
     return List(list_to_vector(Map(make_binding, values)), variables)
@@ -5783,7 +5783,7 @@ def add_binding(new_var, new_binding, frame):
     return List(list_to_vector(append(bindings, List(new_binding))), append(vars, List(new_var)))
 
 def set_first_frame_b(env, new_frame):
-    return set_car_b(cdr(env), new_frame)
+    set_car_b(cdr(env), new_frame)
 
 def extend(env, variables, values):
     return cons(symbol_environment, cons(make_frame(variables, values), cdr(env)))
@@ -6679,18 +6679,17 @@ def read_eval_print_loop_rm():
     input_ = raw_read_line("==> ")
     result = symbol_undefined
     result = execute_rm(input_, symbol_stdin)
-    if not(void_q(result)):
+    while not(end_of_session_q(result)):
         if exception_q(result):
             handle_exception(result)
         else:
-            safe_print(result)
-    if _starneed_newline_star:
-        newline()
-    if end_of_session_q(result):
-        globals()['final_reg'] = symbol_goodbye
-        globals()['pc'] = pc_halt_signal
-    else:
-        return read_eval_print_loop_rm()
+            if not(void_q(result)):
+                if _starneed_newline_star:
+                    newline()
+                safe_print(result)
+        input_ = raw_read_line("==> ")
+        result = execute_rm(input_, symbol_stdin)
+    return symbol_goodbye
 
 def execute_string_rm(input_):
     return execute_rm(input_, symbol_stdin)
@@ -6700,7 +6699,7 @@ def execute_file_rm(filename):
 
 def execute_rm(input_, src):
     globals()['load_stack'] = symbol_emptylist
-    initialize_execute()
+    initialize_execute_b()
     globals()['k_reg'] = REP_k
     globals()['fail_reg'] = _starlast_fail_star
     globals()['handler_reg'] = REP_handler
@@ -6749,7 +6748,7 @@ def initialize_globals():
     globals()['toplevel_env'] = make_toplevel_env()
     globals()['macro_env'] = make_macro_env_hat()
     globals()['load_stack'] = symbol_emptylist
-    initialize_execute()
+    initialize_execute_b()
     globals()['_starlast_fail_star'] = REP_fail
 
 def make_debugging_k(exp, k):
@@ -6768,23 +6767,23 @@ def handle_debug_info(exp, result):
 def get_use_stack_trace():
     return _staruse_stack_trace_star
 
-def set_use_stack_trace(value):
+def set_use_stack_trace_b(value):
     globals()['_staruse_stack_trace_star'] = true_q(value)
 
-def initialize_stack_trace():
-    return set_car_b(_starstack_trace_star, symbol_emptylist)
+def initialize_stack_trace_b():
+    set_car_b(_starstack_trace_star, symbol_emptylist)
 
-def initialize_execute():
+def initialize_execute_b():
     globals()['_closure_depth'] = 0
     globals()['_trace_pause'] = False
-    return initialize_stack_trace()
+    initialize_stack_trace_b()
 
-def push_stack_trace(exp):
-    return set_car_b(_starstack_trace_star, cons(exp, car(_starstack_trace_star)))
+def push_stack_trace_b(exp):
+    set_car_b(_starstack_trace_star, cons(exp, car(_starstack_trace_star)))
 
-def pop_stack_trace(exp):
+def pop_stack_trace_b(exp):
     if not(null_q(car(_starstack_trace_star))):
-        return set_car_b(_starstack_trace_star, cdr(car(_starstack_trace_star)))
+        set_car_b(_starstack_trace_star, cdr(car(_starstack_trace_star)))
 
 def m():
     if _startracing_on_q_star:

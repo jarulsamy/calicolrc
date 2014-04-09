@@ -203,17 +203,17 @@
 (define read-eval-print-loop-rm
   (lambda ()
     (let ((input (raw-read-line "==> ")))  ;; read-line or raw-read-line
-      ;; execute gets redefined as execute-rm when no-csharp-support.ss is loaded
       (let ((result (execute-rm input 'stdin)))
-	(if (not (void? result))
-	    (if (exception? result)
-		(handle-exception result)
-		(safe-print result)))
-	(if *need-newline*
-	  (newline))
-	(if (end-of-session? result)
-	  (halt* 'goodbye)
-	  (read-eval-print-loop-rm))))))
+	(while (not (end-of-session? result))
+	   (cond 
+	    ((exception? result) (handle-exception result))
+	    ((not (void? result))
+	     (begin 
+	       (if *need-newline* (newline))
+	       (safe-print result))))
+	   (set! input (raw-read-line "==> "))  ;; read-line or raw-read-line
+	   (set! result (execute-rm input 'stdin)))
+	'goodbye))))
 
 ;;----------------------------------------------------------------------------
 ;; used only by scheme RM and C# RM code
