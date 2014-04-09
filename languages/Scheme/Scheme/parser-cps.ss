@@ -884,7 +884,7 @@
 	    cases-transformer^
 	    ))))
 
-(define macro-env (make-macro-env^))
+(define macro-env 'undefined)
 
 ;; pattern macros:
 

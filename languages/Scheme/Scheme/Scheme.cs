@@ -95,22 +95,12 @@ public class Method {
 }
 
 public class Config {
-  public int DEBUG = 0;
+  public int DEBUG = 1;
   public bool NEED_NEWLINE = false;
   public List<Assembly> assemblies = new List<Assembly>();
-  Hashtable symbol_table = new Hashtable(); //Default one
 
   public Config() {
   }
-
-  public Symbol symbol(string ssymbol) {	         
-      if (!symbol_table.ContainsKey(ssymbol)) {	                 
-      	  var newsym = new Symbol(ssymbol);	 
-      	  symbol_table.Add(ssymbol, newsym);	 
-      	  return newsym;	 
-      }	         
-      return (Symbol) symbol_table[ssymbol];	 
-  }	
 
   public void AddAssembly(Assembly assembly) {
 	assemblies.Add(assembly);
@@ -119,20 +109,9 @@ public class Config {
 
 public class Symbol {
     public string symbol;
-    int hashcode = -1;
 
     public Symbol(String ssymbol) {
 	symbol = ssymbol;
-    }
-    
-    public override bool Equals(object other) {
-	return ((other is Symbol) && (this.GetHashCode() == ((Symbol)other).GetHashCode()));
-    }
-    
-    public override int GetHashCode() {
-	if (hashcode == -1)
-	    hashcode = symbol.GetHashCode();
-	return hashcode;
     }
     
     public override string ToString() {
@@ -146,13 +125,25 @@ public class Symbol {
 
 public class Scheme {
 
-  public static int CONS_ID = 0;
+    public static Hashtable symbol_table = null;
+
+    public static object make_symbol(object symbol) {
+	if (symbol_table == null) {
+	    symbol_table = new Hashtable(); // Singleton
+	}
+	string ssymbol = symbol.ToString();
+	if (!symbol_table.ContainsKey(ssymbol)) {	                 
+	    var newsym = new Symbol(ssymbol);	 
+	    symbol_table.Add(ssymbol, newsym);	 
+	}	         
+	return symbol_table[ssymbol];
+    }
 
   private static ScriptScope _dlr_env;
   private static ScriptRuntime _dlr_runtime;
 
     //static LineEditor lineEditor = new LineEditor(null);
-  public static Config config = new Config();
+    public static Config config = new Config();
 
   public delegate object Closure(params object[] args);
   public delegate void Function();
@@ -203,14 +194,6 @@ public class Scheme {
     public static object box(object item) {
 	return sList(item);
     }
-
-  public static object symbol(object symbol) {
-	return config.symbol(symbol.ToString());
-  }
-
-  public static object make_symbol(object symbol) {
-      return config.symbol(symbol.ToString());
-  }
 
   public static BigInteger makeBigInteger(int value) {
 	return new BigInteger(value);
@@ -523,11 +506,11 @@ public class Scheme {
 	  return true;
   }
 
-  public static Func<object,bool> module_q = tagged_list(PJScheme.symbol_module, (Predicate2)GreaterOrEqual, 1);
-  public static Func<object,bool> procedure_q_native = tagged_list(PJScheme.symbol_procedure, (Predicate2)GreaterOrEqual, 1);
+    public static Func<object,bool> module_q = tagged_list((object)PJScheme.symbol_module, (Predicate2)GreaterOrEqual, 1);
+    public static Func<object,bool> procedure_q_native = tagged_list((object)PJScheme.symbol_procedure, (Predicate2)GreaterOrEqual, 1);
 
     public static bool procedure_q(object obj) {
-	return procedure_q_native(obj);
+	return (procedure_q_native(obj));
     }
 
   public static object get_current_time() {
@@ -806,7 +789,7 @@ public class Scheme {
 	else if (procedure_q(proc) && Eq(cadr(proc), PJScheme.symbol_b_extension_d)) {
 	    return ((Proc)caddr(proc)).Call(args);
 	}
-	throw new Exception(string.Format("invalid procedure: {0}", proc));
+	throw new Exception(string.Format("invalid procedure: '{0}'", proc));
     }
 
   public static object apply(object proc, object args1, object args2) {
@@ -853,25 +836,25 @@ public class Scheme {
     }
 
   public static object map(object proc, object args) {
-	object retval = PJScheme.symbol_emptylist;
-	object tail = retval;
-	object current1 = args;
-	while (!Eq(current1, PJScheme.symbol_emptylist)) {
+      object retval = PJScheme.symbol_emptylist;
+      object tail = retval;
+      object current1 = args;
+      while (!Eq(current1, PJScheme.symbol_emptylist)) {
 	  object result;
 	  if (pair_q(car(current1)))
-		result = apply(proc, list(car(current1)));
+	      result = apply(proc, list(car(current1)));
 	  else
-		result = apply(proc, car(current1));
+	      result = apply(proc, car(current1));
 	  if (Eq(tail, PJScheme.symbol_emptylist)) {
-		retval = list(result); // start of list
-		tail = retval;
+	      retval = list(result); // start of list
+	      tail = retval;
 	  } else { // pair
-		set_cdr_b(tail, new Cons(result, PJScheme.symbol_emptylist));
-		tail = cdr(tail);
+	      set_cdr_b(tail, new Cons(result, PJScheme.symbol_emptylist));
+	      tail = cdr(tail);
 	  }
 	  current1 = cdr(current1);
-	}
-	return retval;
+      }
+      return retval;
   }
 
   public static object map(object proc, object args1, object args2) {
@@ -894,15 +877,6 @@ public class Scheme {
 	return retval;
   }
 	
-	/*
-(define-native tagged-list^
-  (lambda (keyword op len)
-    (lambda (asexp)
-      (and (list?^ asexp)
-	   (op (length^ asexp) len)
-	   (symbol?^ (car^ asexp))
-	   (eq?^ (car^ asexp) keyword)))))
-	 */
     public static Func<object,bool> tagged_list_hat(object tag_symbol, object pred, object value) {
 	return (object asexp) => {
 	    return ((bool)pair_q(asexp) &&
@@ -911,17 +885,16 @@ public class Scheme {
 		    ((bool)(PJScheme.symbol_q_hat(PJScheme.car_hat(asexp)))) &&
 		    ((bool)(PJScheme.eq_q_hat(PJScheme.car_hat(asexp), tag_symbol)))
 		    );
-		//printf("is this a {0}? ({1} ...) compare {2} => {3}\n", test_string, car(lyst), value, retval);
 	};
     }
 	
-  public static Func<object,bool> tagged_list(object test_string, object pred, object value) {
-		return (object lyst) => {
-	        	return (pair_q(lyst) &&
-		                ((bool)Eq(car(lyst), string_to_symbol(test_string))) && 
-                        ((bool)((Predicate2)pred)(length_safe(lyst), value)));
-			};
-  }
+    public static Func<object,bool> tagged_list(object tag_symbol, object pred, object value) {
+	return (object lyst) => {
+	    return (pair_q(lyst) &&
+		    Eq(car(lyst), tag_symbol) && 
+		    ((Predicate2)pred)(length_safe(lyst), value));
+	};
+    }
 	
   public static object vector_to_list(object obj) {
     return ((Vector)obj).ToList();
@@ -1154,7 +1127,7 @@ public class Scheme {
   }
 
   public static object string_to_symbol(object s) {
-	return symbol(s.ToString());
+	return make_symbol(s.ToString());
   }
 
   public static object string_to_number(object s) {
@@ -1573,36 +1546,7 @@ public class Scheme {
 	  } else if (Eq(car(obj), PJScheme.symbol_environment)) {
 		return "#<environment>"; //, car(obj));
 	  } else {
-	      //System.Console.WriteLine("Here 4");
-	      System.Text.StringBuilder retval = new System.Text.StringBuilder();
-	      object current = (Cons)obj;
-	      ids[((Cons)current).id] = true;
-	      while (pair_q(current)) {
-		  //System.Console.WriteLine("Here 5");
-		  if (retval.Length != 0) {
-		      retval.Append(" ");
-		  } 
-		  object car_current = car(current);
-		  if (pair_q(car_current) && ids.ContainsKey(((Cons)car_current).id)) {
-		      retval.Append(" ...");
-		      current = null;
-		  } else {
-		      retval.Append(repr(car_current, ids));
-		      current = cdr(current);
-		      if (pair_q(current) && ids.ContainsKey(((Cons)current).id)) {
-			  retval.Append(" ...");
-			  current = null;
-		      } else if (pair_q(current) && car(current) == PJScheme.symbol_procedure) { //FIXME: hack!
-			  retval.Append(" . #<procedure>");
-			  current = null;
-		      } else {
-			  if (!pair_q(current) && !Eq(current, PJScheme.symbol_emptylist)) {
-			      retval.Append(" . ").Append(repr(current, ids)); // ...
-			  }
-		      }
-		  }
-	      }
-	      return retval.Insert(0, "(").Append(")").ToString();
+	      return obj.ToString(); /// FIXME:
 	  }
 	} else {
 	    return obj.ToString();
@@ -1720,76 +1664,23 @@ public class Scheme {
   }
 
   public static bool Eqv(object obj) {
-	object item = car(obj);
-	object current = cadr(obj);
-    return Eqv(item, current);
+      object item = car(obj);
+      object current = cadr(obj);
+      return Eqv(item, current);
   }
 
   public static bool Eq(object obj1, object obj2) {
       return Object.ReferenceEquals(obj1, obj2);
   }
-    /*
-      if (obj1 is Symbol) {
-	  if (obj2 is Symbol) { 
-	      return ((Symbol)obj1).Equals(obj2);
-	  } else {
-	      return false;
-          }
-      } else if (obj2 is Symbol) {
-	  return false;
-      } else if (pair_q(obj1)) {
-	  if (pair_q(obj2)) {
-	      return (((Cons)obj1).id == ((Cons)obj2).id);
-	  } else {
-	      return false;
-	  }
-      } else if (pair_q(obj2)) {
-	  return false;
-      } else if ((obj1 == null) || (obj2 == null)) {  // (void) object is null
-          return (obj1 == obj2);
-      } else if (!(obj1 is BigInteger) && !(obj2 is BigInteger)) {
-          try {
-              return (ObjectType.ObjTst(obj1, obj2, false) == 0);
-          } catch {
-              return false;
-          }
-      } else {
-          if (obj1 is BigInteger) {
-              return ((BigInteger)obj1).Equals(obj2);
-          } else {
-              return ((BigInteger)obj2).Equals(obj1);
-          }
-      }
-  }
-    */
 
-  public static bool Eqv(object obj1, object obj2) {
-      if ((obj1 is Symbol) || (obj2 is Symbol)) { 
-	  if ((obj1 is Symbol) && (obj2 is Symbol))
-	      return ((Symbol)obj1).Equals(obj2);
-	  else return false;
-      } else if (pair_q(obj1) && pair_q(obj2)) {
-	  if (null_q(obj1) && null_q(obj2))
-	      return true;
-	  else {
-	      return (((Cons)obj1).id == ((Cons)obj2).id);
-	  }
-      } if (pair_q(obj1) || pair_q(obj2)) {
-	  return false;
+  public static bool Eqv(object a, object b) {
+      if (number_q(a) && number_q(b)) {
+	  // but be same type, and value
+	  return a.GetType() == b.GetType() && Equal(a, b);
+      } else if (char_q(a) && char_q(b)) {
+	  return a == b;
       } else {
-	  if (! ((obj1 is BigInteger) || (obj2 is BigInteger))) {
-	      try {
-		  return (ObjectType.ObjTst(obj1, obj2, false) == 0);
-	      } catch {
-		  return false;
-	      }
-	  } else {
-	      if (obj1 is BigInteger) {
-		  return ((BigInteger)obj1).Equals(obj2);
-	      } else {
-		  return ((BigInteger)obj2).Equals(obj1);
-	      }
-	  }
+	  return Eq(a, b);
       }
   }
 
@@ -2817,7 +2708,9 @@ public class Scheme {
 
   // FIXME: need to cps/registerize this to avoid reliance on C-sharp's stack
   public static object make_safe(object x) {
-    if (PJScheme.procedure_object_q(x))
+    if (x == null)
+	return "<void>";
+    else if (PJScheme.procedure_object_q(x))
       return (PJScheme.symbol_b_procedure_d);
     else if (PJScheme.environment_object_q(x))
       return (PJScheme.symbol_b_environment_d);
@@ -2943,169 +2836,109 @@ public class Scheme {
   public class Cons : IList {
       public object car;
       public object cdr;
-      public int id;
   
-  public Cons(object a, object b) {
-      Scheme.CONS_ID++;
-      this.id = Scheme.CONS_ID;
-	this.car = a;
-	if (b is object[] || b == null) 
-	  this.cdr = list(b);
-	else
-	  this.cdr = b;
-  }
-
-  // Items necessary for it to be an IList
-  public bool IsFixedSize {
-	get {
-	  return false;
-	}
-  }
-
-  public bool IsReadOnly {
-	get {
-	  return false;
-	}
-  }
-
-  public bool IsSynchronized {
-	get {
-	  return false;
-	}
-  }
-
-  public void CopyTo(System.Array array, int index) {
-  }
-
-  public int Add(object value) {
-	return 1; // should return count
-  }
-
-  public int Count {
-	get {
-	  if (cdr(this) == PJScheme.symbol_emptylist)
-	    return 1;
+      public Cons(object a, object b) {
+	  this.car = a;
+	  if (b is object[] || b == null) 
+	      this.cdr = list(b);
 	  else
-	    return 1 + ((Cons)cdr(this)).Count;
-	}
-  }
-
-  public void Remove(object value) {
-  }
-
-  public void RemoveAt(int index) {
-  }
-
-  public void Clear() {
-  }
-
-  public bool Contains(object value) {
-      return (bool)member(value, this);
-  }
-
-  public int IndexOf(object value) {
-	return -1;
-  }
-
-  public void Insert(int index, object value) {
-  }
-
-  public object this[int index] {
-	get {
-	  object retval = null;
-	  object mylist = (object)this;
-	  while (index != -1) {
-		if (mylist is Cons) {
-		  retval = ((Cons)mylist).car;
-		  mylist = ((Cons)mylist).cdr;
-		}
-		index--;
+	      this.cdr = b;
+      }
+      
+      // Items necessary for it to be an IList
+      public bool IsFixedSize {
+	  get {
+	      return false;
 	  }
-	  return retval;
-	}
-	set { // value is the item
-	}
-  }
-  public object SyncRoot {
-	get {
-	  return this;
-	}
-  }
-  public IEnumerator GetEnumerator() {
-	// Refer to the IEnumerator documentation for an example of
-	// implementing an enumerator.
-	throw new Exception("The method or operation is not implemented.");
-  }
-
-  /// ---------------------------------------------------------------
-  public string SafeToString() {
-	if (this.car == PJScheme.symbol_quote &&
-		(this.cdr is Cons) &&
-		((Cons)this.cdr).cdr == PJScheme.symbol_emptylist) {
-	  return String.Format("'{0}", ((Cons)this.cdr).car);
-	} else if (this.car == PJScheme.symbol_quasiquote &&
-		(this.cdr is Cons) &&
-		((Cons)this.cdr).cdr == PJScheme.symbol_emptylist) {
-	  return String.Format("`{0}", ((Cons)this.cdr).car);
-	} else if (this.car == PJScheme.symbol_unquote &&
-		(this.cdr is Cons) &&
-		((Cons)this.cdr).cdr == PJScheme.symbol_emptylist) {
-	  return String.Format(",{0}", ((Cons)this.cdr).car);
-	} else if (this.car == PJScheme.symbol_unquote_splicing &&
-		(this.cdr is Cons) &&
-		((Cons)this.cdr).cdr == PJScheme.symbol_emptylist) {
-	  return String.Format(",@{0}", ((Cons)this.cdr).car);
-	} else {
-	  return String.Format("({0} ...)", this.car); //...
-	}
-  }
-
-  public String __repr__() {
-      return ToString();
-  }
-  
-  public override string ToString() { // Unsafe
-	if (procedure_q(this)) 
-	  return "#<procedure>";
-	else if (module_q(this)) 
-	  return String.Format("#<module {0}>", this.car);
-	else if (PJScheme.environment_q(this)) 
-	  return String.Format("#<environment>");
-	else if (this.car == PJScheme.symbol_quote &&
-		(this.cdr is Cons) &&
-		((Cons)this.cdr).cdr == PJScheme.symbol_emptylist) {
-	  return String.Format("'{0}", ((Cons)this.cdr).car);
-	} else if (this.car == PJScheme.symbol_quasiquote &&
-		(this.cdr is Cons) &&
-		((Cons)this.cdr).cdr == PJScheme.symbol_emptylist) {
-	  return String.Format("`{0}", ((Cons)this.cdr).car);
-	} else if (this.car == PJScheme.symbol_unquote &&
-		(this.cdr is Cons) &&
-		((Cons)this.cdr).cdr == PJScheme.symbol_emptylist) {
-	  return String.Format(",{0}", ((Cons)this.cdr).car);
-	} else if (this.car == PJScheme.symbol_unquote_splicing &&
-		(this.cdr is Cons) &&
-		((Cons)this.cdr).cdr == PJScheme.symbol_emptylist) {
-	  return String.Format(",@{0}", ((Cons)this.cdr).car);
-	} else {
-	  System.Text.StringBuilder s = new System.Text.StringBuilder("(");
-	  s.Append(this.car.ToString());
-	  object sexp = this.cdr;
-	  while (sexp is Cons) {
-	      s.Append(" ");
-	      s.Append((((Cons)sexp).car).ToString());
-	      sexp = ((Cons)sexp).cdr;
+      }
+      
+      public bool IsReadOnly {
+	  get {
+	      return false;
 	  }
-	  if (Eq(sexp, PJScheme.symbol_emptylist)) {
-	      s.Append(")");
-	  } else {
-	      s.Append(" . ").Append(sexp).Append(")");
+      }
+      
+      public bool IsSynchronized {
+	  get {
+	      return false;
 	  }
-	  return s.ToString();
-	}
+      }
+      
+      public void CopyTo(System.Array array, int index) {
+      }
+      
+      public int Add(object value) {
+	  return 1; // should return count
+      }
+      
+      public int Count {
+	  get {
+	      if (cdr(this) == PJScheme.symbol_emptylist)
+		  return 1;
+	      else
+		  return 1 + ((Cons)cdr(this)).Count;
+	  }
+      }
+      
+      public void Remove(object value) {
+      }
+      
+      public void RemoveAt(int index) {
+      }
+      
+      public void Clear() {
+      }
+      
+      public bool Contains(object value) {
+	  return (bool)member(value, this);
+      }
+      
+      public int IndexOf(object value) {
+	  return -1;
+      }
+      
+      public void Insert(int index, object value) {
+      }
+      
+      public object this[int index] {
+	  get {
+	      object retval = null;
+	      object mylist = (object)this;
+	      while (index != -1) {
+		  if (mylist is Cons) {
+		      retval = ((Cons)mylist).car;
+		      mylist = ((Cons)mylist).cdr;
+		  }
+		  index--;
+	      }
+	      return retval;
+	  }
+	  set { // value is the item
+	  }
+      }
+      public object SyncRoot {
+	  get {
+	      return this;
+	  }
+      }
+      public IEnumerator GetEnumerator() {
+	  // Refer to the IEnumerator documentation for an example of
+	  // implementing an enumerator.
+	  throw new Exception("The method or operation is not implemented.");
+      }
+      
+      public override string ToString() { // Unsafe
+	  string retval = "";
+	  object current = this;
+	  while (current != PJScheme.symbol_emptylist) {
+	      retval += make_safe(((Cons)current).car);
+	      retval += " ";
+	      current = ((Cons)current).cdr;
+	  }
+	  return "(" + retval + ")";
+      }
   }
-}
-
+    
     public class Vector : IList {
   
   private object[] values;
@@ -3234,7 +3067,8 @@ public class Scheme {
 	//printf ("  (fact2 5): {0}\n",
 	//		PJScheme.execute_string_rm("(fact2 5)"));
 
-      Console.WriteLine("Ok");
+		PJScheme.initialize_method_info ();
+		PJScheme.start_rm();
 
       //PJScheme.execute_string_rm("(define fact (lambda (n) (if (= n 1) 1 (* n (fact (- n 1))))))");
       //printf ("  (fact 1000): {0}\n",
@@ -3563,13 +3397,12 @@ public class Scheme {
     }
 
     public static string raw_read_line(string prompt) {
-	// FIXME: 
-	return "1";
+	Console.Write(prompt);
+	return Console.ReadLine();
     }    
 
     public static string raw_input() {
-	// FIXME:
-	return "1";
+	return Console.ReadLine();
     }    
 
     public static void ApplyPlus(object what, object slist) {

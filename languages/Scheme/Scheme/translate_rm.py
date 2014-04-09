@@ -697,7 +697,7 @@ public class PJScheme:Scheme
                         make_, what = expr[0].split("-", 1)
                         if what in self.methods:
                             id = expr[1].split("-", 1)[1][:-1] # <cont-3>
-                            self.methods[what]["count"] = max(self.methods[what]["count"], int(id)) + 1
+                            self.methods[what]["count"] = max(self.methods[what]["count"], int(id))
                             return "%s(%s)" % (self.fix_name(expr[0]),
                                                ", ".join([self.process_app(e) for e in (['"%s"' % what, id] + expr[2:])]))
                     return "%s(%s)" % (self.fix_name(expr[0]),
@@ -788,7 +788,7 @@ public class PJScheme:Scheme
     def process_definition(self, expr, locals, indent):
         # global
         if expr[1] == "pc":
-            self.Print(indent, "public static Function %s = (Function) %s;" % (self.fix_name(expr[1]), self.process_app(expr[2])))
+            self.Print(indent, "public static Function %s = (Function) null;" % (self.fix_name(expr[1]), ))
         elif "?^" in expr[1]:
             self.Print(indent, "public static Func<object,bool> %s = %s;" % (self.fix_name(expr[1]), self.process_app(expr[2])))
         elif expr[2] in ["#t", "#f"]:
@@ -991,10 +991,10 @@ public class PJScheme:Scheme
         self.Print(indent, "")
         self.Print(indent, "public static void initialize_method_info() {")
         for mi in self.methods:
-            self.Print(indent + 4, "mi_%s = new MethodInfo[%s];" % (mi, self.methods[mi]["count"]))
+            self.Print(indent + 4, "mi_%s = new MethodInfo[%s];" % (mi, int(self.methods[mi]["count"]) + 1))
         self.Print(indent + 4, "")
         for mi in self.methods:
-            self.Print(indent + 4,  "for (int i = 1; i < %s; i++) {" % self.methods[mi]["count"]) 
+            self.Print(indent + 4,  "for (int i = 1; i < %s; i++) {" % int(self.methods[mi]["count"] + 1)) 
             self.Print(indent + 8,  "mi_%s[i] = typeof(PJScheme).GetMethod(String.Format(\"b_%s_{0}_d\", i));" % (mi, mi))
             self.Print(indent + 8,  "if (mi_%s[i] == null) {" % mi)
             self.Print(indent + 12, "throw new Exception(String.Format(\"Undefined mi: mi_%s[{0}]\", i));" % mi)

@@ -576,7 +576,7 @@ public class PJScheme:Scheme
         return cons(symbol_choose_aexp, args);
     }
     
-    public static Function pc = (Function) symbol_undefined;
+    public static Function pc = (Function) null;
     public static object aclauses_reg = symbol_undefined;
     public static object action_reg = symbol_undefined;
     public static object adatum_list_reg = symbol_undefined;
@@ -8216,7 +8216,7 @@ public class PJScheme:Scheme
     public static object record_case_transformer_hat = make_macro("macro", 9);
     public static object define_datatype_transformer_hat = make_macro("macro", 10);
     public static object cases_transformer_hat = make_macro("macro", 11);
-    public static object macro_env = make_macro_env_hat();
+    public static object macro_env = symbol_undefined;
     public static object REP_k = make_cont2("cont2", 49);
     public static object REP_handler = make_handler2("handler2", 2);
     public static object REP_fail = make_fail("fail", 1);
@@ -8383,7 +8383,7 @@ public class PJScheme:Scheme
     public static object symbol_prim = make_proc("proc", 157);
     public static object typeof_prim = make_proc("proc", 158);
     public static object use_lexical_address_prim = make_proc("proc", 159);
-    public static object toplevel_env = make_toplevel_env();
+    public static object toplevel_env = symbol_undefined;
     public static MethodInfo[] mi_cont4;
     public static MethodInfo[] mi_handler;
     public static MethodInfo[] mi_cont;
@@ -8395,59 +8395,59 @@ public class PJScheme:Scheme
     public static MethodInfo[] mi_proc;
     
     public static void initialize_method_info() {
-        mi_cont4 = new MethodInfo[24];
-        mi_handler = new MethodInfo[0];
-        mi_cont = new MethodInfo[101];
-        mi_handler2 = new MethodInfo[9];
-        mi_cont3 = new MethodInfo[7];
-        mi_cont2 = new MethodInfo[206];
-        mi_fail = new MethodInfo[8];
+        mi_cont4 = new MethodInfo[14];
+        mi_handler = new MethodInfo[1];
+        mi_cont = new MethodInfo[52];
+        mi_handler2 = new MethodInfo[7];
+        mi_cont3 = new MethodInfo[5];
+        mi_cont2 = new MethodInfo[104];
+        mi_fail = new MethodInfo[6];
         mi_macro = new MethodInfo[12];
-        mi_proc = new MethodInfo[315];
+        mi_proc = new MethodInfo[161];
         
-        for (int i = 1; i < 24; i++) {
+        for (int i = 1; i < 14; i++) {
             mi_cont4[i] = typeof(PJScheme).GetMethod(String.Format("b_cont4_{0}_d", i));
             if (mi_cont4[i] == null) {
                 throw new Exception(String.Format("Undefined mi: mi_cont4[{0}]", i));
             }
         }
         
-        for (int i = 1; i < 0; i++) {
+        for (int i = 1; i < 1; i++) {
             mi_handler[i] = typeof(PJScheme).GetMethod(String.Format("b_handler_{0}_d", i));
             if (mi_handler[i] == null) {
                 throw new Exception(String.Format("Undefined mi: mi_handler[{0}]", i));
             }
         }
         
-        for (int i = 1; i < 101; i++) {
+        for (int i = 1; i < 52; i++) {
             mi_cont[i] = typeof(PJScheme).GetMethod(String.Format("b_cont_{0}_d", i));
             if (mi_cont[i] == null) {
                 throw new Exception(String.Format("Undefined mi: mi_cont[{0}]", i));
             }
         }
         
-        for (int i = 1; i < 9; i++) {
+        for (int i = 1; i < 7; i++) {
             mi_handler2[i] = typeof(PJScheme).GetMethod(String.Format("b_handler2_{0}_d", i));
             if (mi_handler2[i] == null) {
                 throw new Exception(String.Format("Undefined mi: mi_handler2[{0}]", i));
             }
         }
         
-        for (int i = 1; i < 7; i++) {
+        for (int i = 1; i < 5; i++) {
             mi_cont3[i] = typeof(PJScheme).GetMethod(String.Format("b_cont3_{0}_d", i));
             if (mi_cont3[i] == null) {
                 throw new Exception(String.Format("Undefined mi: mi_cont3[{0}]", i));
             }
         }
         
-        for (int i = 1; i < 206; i++) {
+        for (int i = 1; i < 104; i++) {
             mi_cont2[i] = typeof(PJScheme).GetMethod(String.Format("b_cont2_{0}_d", i));
             if (mi_cont2[i] == null) {
                 throw new Exception(String.Format("Undefined mi: mi_cont2[{0}]", i));
             }
         }
         
-        for (int i = 1; i < 8; i++) {
+        for (int i = 1; i < 6; i++) {
             mi_fail[i] = typeof(PJScheme).GetMethod(String.Format("b_fail_{0}_d", i));
             if (mi_fail[i] == null) {
                 throw new Exception(String.Format("Undefined mi: mi_fail[{0}]", i));
@@ -8461,7 +8461,7 @@ public class PJScheme:Scheme
             }
         }
         
-        for (int i = 1; i < 315; i++) {
+        for (int i = 1; i < 161; i++) {
             mi_proc[i] = typeof(PJScheme).GetMethod(String.Format("b_proc_{0}_d", i));
             if (mi_proc[i] == null) {
                 throw new Exception(String.Format("Undefined mi: mi_proc[{0}]", i));

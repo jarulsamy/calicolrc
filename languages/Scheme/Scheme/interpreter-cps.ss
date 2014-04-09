@@ -2467,7 +2467,7 @@
     (set! toplevel-env (make-toplevel-env))
     void-value))
 
-(define toplevel-env (make-toplevel-env))
+(define toplevel-env 'undefined)
 
 ;;------------------------------------------------------------------------
 ;; C# support
