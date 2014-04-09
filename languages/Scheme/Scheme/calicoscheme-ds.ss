@@ -7215,7 +7215,7 @@
   cases2
   "(cases expression exp\n     (var-exp (id info)\n       (lookup-value id env info handler fail k))\n     (if-exp (test-exp then-exp else-exp info)\n       (m test-exp env handler fail\n\t  (lambda (bool fail)\n\t    (if bool\n\t      (m then-exp env handler fail k)\n\t      (m else-exp env handler fail k)))))\n      (lambda-exp (formals bodies info)\n\t(k (closure formals bodies env) fail))\n      (app-exp (operator operands info)\n\t(m* operands env handler fail\n\t  (lambda (args fail)\n\t    (m operator env handler fail\n\t      (lambda (proc fail)\n\t\t(proc args env info handler fail k))))))\n      (else (error 'm \"bad abstract syntax: ~s\" exp)))")
 
-(define macro-env (make-macro-env^))
+(define macro-env 'undefined)
 
 (define REP-k (make-cont2 <cont2-49>))
 
@@ -7618,5 +7618,5 @@
   (lambda (names procs)
     (make-initial-environment names procs)))
 
-(define toplevel-env (make-toplevel-env))
+(define toplevel-env 'undefined)
 

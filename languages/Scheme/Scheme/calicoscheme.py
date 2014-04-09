@@ -7703,7 +7703,7 @@ case_transformer_hat = make_macro(b_macro_8_d)
 record_case_transformer_hat = make_macro(b_macro_9_d)
 define_datatype_transformer_hat = make_macro(b_macro_10_d)
 cases_transformer_hat = make_macro(b_macro_11_d)
-macro_env = make_macro_env_hat()
+macro_env = symbol_undefined
 REP_k = make_cont2(b_cont2_49_d)
 REP_handler = make_handler2(b_handler2_2_d)
 REP_fail = make_fail(b_fail_1_d)
@@ -7870,7 +7870,7 @@ string_split_prim = make_proc(b_proc_156_d)
 symbol_prim = make_proc(b_proc_157_d)
 typeof_prim = make_proc(b_proc_158_d)
 use_lexical_address_prim = make_proc(b_proc_159_d)
-toplevel_env = make_toplevel_env()
+toplevel_env = symbol_undefined
 pc_halt_signal = False
 def run(setup, *args):
     args = List(*args)
