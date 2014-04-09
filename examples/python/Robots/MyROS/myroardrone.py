@@ -1,8 +1,9 @@
 from Myro import *
 
-makeRobot("ROSARDrone")
+#makeRobot("ROSARDrone", "myip", "ROSip")
+
 speak("Please prepare for liftoff")
-for i in range(5, 0, -1):
+for i in range(10, 0, -1):
     speak(str(i))
 
 reset()
@@ -16,4 +17,4 @@ for t in timer(10):
     show(p)
 land()
 
-savePicture(lst, "animation.gif")
+savePicture(lst, "119animation.gif")
