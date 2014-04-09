@@ -160,6 +160,7 @@ Scribbler.dll: Scribbler.cs ../Myro.cs
 		-r:../../../bin/Microsoft.Scripting.dll \
 		-r:../../../bin/Microsoft.Dynamic.dll \
 		-r:System.Drawing \
+		-r:System.Numerics \
 		Scribbler.cs \
 		-out:Scribbler.dll \
 		-target:library
@@ -174,6 +175,8 @@ SimScribbler.dll: SimScribbler.cs ../Myro.cs
 		-r:../../../bin/Microsoft.Dynamic.dll \
 		-r:../../FarseerPhysics.dll \
 		-r:System.Drawing \
+		-pkg:gtk-sharp-2.0 \
+		-r:System.Numerics \
 		SimScribbler.cs \
 		-out:SimScribbler.dll \
 		-target:library
@@ -187,7 +190,9 @@ SimPioneer.dll: SimPioneer.cs ../Myro.cs
 		-r:../../../bin/Microsoft.Scripting.dll \
 		-r:../../../bin/Microsoft.Dynamic.dll \
 		-r:../../FarseerPhysics.dll \
+		-pkg:gtk-sharp-2.0 \
 		-r:System.Drawing \
+		-r:System.Numerics \
 		SimPioneer.cs \
 		-out:SimPioneer.dll \
 		-target:library
