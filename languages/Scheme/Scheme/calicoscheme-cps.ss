@@ -2033,7 +2033,7 @@
 	    cases-transformer^
 	    ))))
 
-(define macro-env (make-macro-env^))
+(define macro-env 'undefined)
 
 ;; pattern macros:
 
@@ -5069,7 +5069,7 @@
     (set! toplevel-env (make-toplevel-env))
     void-value))
 
-(define toplevel-env (make-toplevel-env))
+(define toplevel-env 'undefined)
 
 ;;------------------------------------------------------------------------
 ;; C# support
