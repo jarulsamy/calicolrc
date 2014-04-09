@@ -671,8 +671,8 @@ public class PJScheme:Scheme
     public static object temp_3 = symbol_undefined;
     public static object temp_4 = symbol_undefined;
     public static object temp_1 = symbol_undefined;
-    public static object apply_cont() {
-        return Apply(cadr(k_reg), cddr(k_reg));
+    public static void apply_cont() {
+        ApplyPlus(cadr(k_reg), cddr(k_reg));
     }
     
     public static void b_cont_1_d(object chars, object fail, object k) {
@@ -1142,8 +1142,8 @@ public class PJScheme:Scheme
         }
     }
     
-    public static object apply_cont2() {
-        return Apply(cadr(k_reg), cddr(k_reg));
+    public static void apply_cont2() {
+        ApplyPlus(cadr(k_reg), cddr(k_reg));
     }
     
     public static void b_cont2_1_d(object token, object k) {
@@ -2066,8 +2066,8 @@ public class PJScheme:Scheme
         pc = instantiate_hat;
     }
     
-    public static object apply_cont3() {
-        return Apply(cadr(k_reg), cddr(k_reg));
+    public static void apply_cont3() {
+        ApplyPlus(cadr(k_reg), cddr(k_reg));
     }
     
     public static void b_cont3_1_d(object src, object handler, object k) {
@@ -2110,8 +2110,8 @@ public class PJScheme:Scheme
         pc = apply_cont2;
     }
     
-    public static object apply_cont4() {
-        return Apply(cadr(k_reg), cddr(k_reg));
+    public static void apply_cont4() {
+        ApplyPlus(cadr(k_reg), cddr(k_reg));
     }
     
     public static void b_cont4_1_d(object src, object start, object k) {
@@ -2246,8 +2246,8 @@ public class PJScheme:Scheme
         pc = aparse;
     }
     
-    public static object apply_fail() {
-        return Apply(cadr(fail_reg), cddr(fail_reg));
+    public static void apply_fail() {
+        ApplyPlus(cadr(fail_reg), cddr(fail_reg));
     }
     
     public static void b_fail_1_d() {
@@ -2282,8 +2282,8 @@ public class PJScheme:Scheme
         pc = eval_choices;
     }
     
-    public static object apply_handler() {
-        return Apply(cadr(handler_reg), cddr(handler_reg));
+    public static void apply_handler() {
+        ApplyPlus(cadr(handler_reg), cddr(handler_reg));
     }
     
     public static void b_handler_1_d() {
@@ -2291,8 +2291,8 @@ public class PJScheme:Scheme
         pc = pc_halt_signal;
     }
     
-    public static object apply_handler2() {
-        return Apply(cadr(handler_reg), cddr(handler_reg));
+    public static void apply_handler2() {
+        ApplyPlus(cadr(handler_reg), cddr(handler_reg));
     }
     
     public static void b_handler2_1_d() {
@@ -2341,8 +2341,8 @@ public class PJScheme:Scheme
         pc = eval_sequence;
     }
     
-    public static object apply_proc() {
-        return Apply(cadr(proc_reg), cddr(proc_reg));
+    public static void apply_proc() {
+        ApplyPlus(cadr(proc_reg), cddr(proc_reg));
     }
     
     public static void b_proc_1_d(object bodies, object formals, object env) {
@@ -2943,7 +2943,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(caaaar, args_reg);
+                value1_reg = apply(caaaar_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -2960,7 +2960,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(caaadr, args_reg);
+                value1_reg = apply(caaadr_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -2977,7 +2977,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(caaar, args_reg);
+                value1_reg = apply(caaar_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -2994,7 +2994,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(caadar, args_reg);
+                value1_reg = apply(caadar_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3011,7 +3011,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(caaddr, args_reg);
+                value1_reg = apply(caaddr_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3028,7 +3028,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(caadr, args_reg);
+                value1_reg = apply(caadr_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3045,7 +3045,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(caar, args_reg);
+                value1_reg = apply(caar_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3062,7 +3062,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cadaar, args_reg);
+                value1_reg = apply(cadaar_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3079,7 +3079,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cadadr, args_reg);
+                value1_reg = apply(cadadr_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3096,7 +3096,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cadar, args_reg);
+                value1_reg = apply(cadar_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3113,7 +3113,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(caddar, args_reg);
+                value1_reg = apply(caddar_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3130,7 +3130,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cadddr, args_reg);
+                value1_reg = apply(cadddr_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3147,7 +3147,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cdaaar, args_reg);
+                value1_reg = apply(cdaaar_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3164,7 +3164,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cdaadr, args_reg);
+                value1_reg = apply(cdaadr_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3181,7 +3181,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cdaar, args_reg);
+                value1_reg = apply(cdaar_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3198,7 +3198,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cdadar, args_reg);
+                value1_reg = apply(cdadar_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3215,7 +3215,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cdaddr, args_reg);
+                value1_reg = apply(cdaddr_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3232,7 +3232,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cdadr, args_reg);
+                value1_reg = apply(cdadr_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3249,7 +3249,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cdar, args_reg);
+                value1_reg = apply(cdar_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3266,7 +3266,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cddaar, args_reg);
+                value1_reg = apply(cddaar_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3283,7 +3283,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cddadr, args_reg);
+                value1_reg = apply(cddadr_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3300,7 +3300,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cddar, args_reg);
+                value1_reg = apply(cddar_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3317,7 +3317,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cdddar, args_reg);
+                value1_reg = apply(cdddar_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3334,7 +3334,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cddddr, args_reg);
+                value1_reg = apply(cddddr_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3351,7 +3351,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cdddr, args_reg);
+                value1_reg = apply(cdddr_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3368,7 +3368,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(cddr, args_reg);
+                value1_reg = apply(cddr_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3902,7 +3902,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(char_to_string, args_reg);
+                value1_reg = apply(char_to_string_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3919,7 +3919,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(string_to_list, args_reg);
+                value1_reg = apply(string_to_list_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3953,7 +3953,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(symbol_to_string, args_reg);
+                value1_reg = apply(symbol_to_string_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -3970,7 +3970,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 value2_reg = fail_reg;
-                value1_reg = apply(vector_to_list, args_reg);
+                value1_reg = apply(vector_to_list_proc, args_reg);
                 k_reg = k2_reg;
                 pc = apply_cont2;
             }
@@ -4272,7 +4272,7 @@ public class PJScheme:Scheme
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = apply(float_, args_reg);
+            value1_reg = apply(float__proc, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }
@@ -4284,7 +4284,7 @@ public class PJScheme:Scheme
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = apply(globals, args_reg);
+            value1_reg = apply(globals_proc, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }
@@ -4296,7 +4296,7 @@ public class PJScheme:Scheme
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = apply(int_, args_reg);
+            value1_reg = apply(int__proc, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }
@@ -4308,7 +4308,7 @@ public class PJScheme:Scheme
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = apply(apply_with_keywords, args_reg);
+            value1_reg = apply(apply_with_keywords_proc, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }
@@ -4320,7 +4320,7 @@ public class PJScheme:Scheme
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = apply(assq, args_reg);
+            value1_reg = apply(assq_proc, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }
@@ -4328,7 +4328,7 @@ public class PJScheme:Scheme
     
     public static void b_proc_150_d() {
         value2_reg = fail_reg;
-        value1_reg = apply(dict, args_reg);
+        value1_reg = apply(dict_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
@@ -4339,7 +4339,7 @@ public class PJScheme:Scheme
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = apply(property, args_reg);
+            value1_reg = apply(property_proc, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }
@@ -4363,7 +4363,7 @@ public class PJScheme:Scheme
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = apply(reset_toplevel_env, args_reg);
+            value1_reg = apply(reset_toplevel_env_proc, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }
@@ -4375,7 +4375,7 @@ public class PJScheme:Scheme
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = apply(sort, args_reg);
+            value1_reg = apply(sort_proc, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }
@@ -4387,7 +4387,7 @@ public class PJScheme:Scheme
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = apply(string_append, args_reg);
+            value1_reg = apply(string_append_proc, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }
@@ -4399,7 +4399,7 @@ public class PJScheme:Scheme
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = apply(string_split, args_reg);
+            value1_reg = apply(string_split_proc, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }
@@ -4411,7 +4411,7 @@ public class PJScheme:Scheme
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = apply(make_symbol, args_reg);
+            value1_reg = apply(make_symbol_proc, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }
@@ -4423,7 +4423,7 @@ public class PJScheme:Scheme
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = apply(type, args_reg);
+            value1_reg = apply(type_proc, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }
@@ -4431,7 +4431,7 @@ public class PJScheme:Scheme
     
     public static void b_proc_159_d() {
         value2_reg = fail_reg;
-        value1_reg = apply(use_lexical_address, args_reg);
+        value1_reg = apply(use_lexical_address_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
@@ -4443,8 +4443,8 @@ public class PJScheme:Scheme
         pc = apply_cont2;
     }
     
-    public static object apply_macro() {
-        return Apply(cadr(macro_reg), cddr(macro_reg));
+    public static void apply_macro() {
+        ApplyPlus(cadr(macro_reg), cddr(macro_reg));
     }
     
     public static void b_macro_1_d() {
@@ -7011,22 +7011,21 @@ public class PJScheme:Scheme
         input_ = raw_read_line("==> ");
         object result = symbol_undefined;
         result = execute_rm(input_, symbol_stdin);
-        if (true_q((! true_q(void_q(result))))) {
+        while (true_q((! true_q(end_of_session_q(result))))) {
             if (true_q(exception_q(result))) {
                 handle_exception(result);
             } else {
-                safe_print(result);
+                if (true_q((! true_q(void_q(result))))) {
+                    if (true_q(_starneed_newline_star)) {
+                        newline();
+                    }
+                    safe_print(result);
+                }
             }
+            input_ = raw_read_line("==> ");
+            result = execute_rm(input_, symbol_stdin);
         }
-        if (true_q(_starneed_newline_star)) {
-            newline();
-        }
-        if (true_q(end_of_session_q(result))) {
-            final_reg = symbol_goodbye;
-            pc = pc_halt_signal;
-        } else {
-            return read_eval_print_loop_rm();
-        }
+        return symbol_goodbye;
     }
     
     public static object execute_string_rm(object input_) {

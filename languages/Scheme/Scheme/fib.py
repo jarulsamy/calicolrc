@@ -304,3 +304,4 @@ def run(setup, *args):
     Apply(setup, args)
     return trampoline()
 
+print(run(fib, 5))

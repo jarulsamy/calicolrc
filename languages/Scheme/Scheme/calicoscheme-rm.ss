@@ -157,7 +157,7 @@
 
 (define*
   apply-cont
-  (lambda () (return* (apply$ (cadr k_reg) (cddr k_reg)))))
+  (lambda () (apply$ (cadr k_reg) (cddr k_reg))))
 
 (define <cont-1>
   (lambda (chars fail k)
@@ -751,7 +751,7 @@
 
 (define*
   apply-cont2
-  (lambda () (return* (apply$ (cadr k_reg) (cddr k_reg)))))
+  (lambda () (apply$ (cadr k_reg) (cddr k_reg))))
 
 (define <cont2-1>
   (lambda (token k)
@@ -1883,7 +1883,7 @@
 
 (define*
   apply-cont3
-  (lambda () (return* (apply$ (cadr k_reg) (cddr k_reg)))))
+  (lambda () (apply$ (cadr k_reg) (cddr k_reg))))
 
 (define <cont3-1>
   (lambda (src handler k)
@@ -1933,7 +1933,7 @@
 
 (define*
   apply-cont4
-  (lambda () (return* (apply$ (cadr k_reg) (cddr k_reg)))))
+  (lambda () (apply$ (cadr k_reg) (cddr k_reg))))
 
 (define <cont4-1>
   (lambda (src start k)
@@ -2079,8 +2079,7 @@
 
 (define*
   apply-fail
-  (lambda ()
-    (return* (apply$ (cadr fail_reg) (cddr fail_reg)))))
+  (lambda () (apply$ (cadr fail_reg) (cddr fail_reg))))
 
 (define <fail-1>
   (lambda ()
@@ -2119,8 +2118,7 @@
 
 (define*
   apply-handler
-  (lambda ()
-    (return* (apply$ (cadr handler_reg) (cddr handler_reg)))))
+  (lambda () (apply$ (cadr handler_reg) (cddr handler_reg))))
 
 (define <handler-1>
   (lambda ()
@@ -2132,8 +2130,7 @@
 
 (define*
   apply-handler2
-  (lambda ()
-    (return* (apply$ (cadr handler_reg) (cddr handler_reg)))))
+  (lambda () (apply$ (cadr handler_reg) (cddr handler_reg))))
 
 (define <handler2-1>
   (lambda ()
@@ -2184,8 +2181,7 @@
 
 (define*
   apply-proc
-  (lambda ()
-    (return* (apply$ (cadr proc_reg) (cddr proc_reg)))))
+  (lambda () (apply$ (cadr proc_reg) (cddr proc_reg))))
 
 (define <proc-1>
   (lambda (bodies formals env)
@@ -4333,8 +4329,7 @@
 
 (define*
   apply-macro
-  (lambda ()
-    (return* (apply$ (cadr macro_reg) (cddr macro_reg)))))
+  (lambda () (apply$ (cadr macro_reg) (cddr macro_reg))))
 
 (define <macro-1>
   (lambda ()
@@ -6926,14 +6921,15 @@
       (set! input (raw-read-line "==> "))
       (let ((result 'undefined))
         (set! result (execute-rm input 'stdin))
-        (if (not (void? result))
-            (if (exception? result)
-                (handle-exception result)
-                (safe-print result)))
-        (if *need-newline* (newline))
-        (if (end-of-session? result)
-            (begin (set! final_reg 'goodbye) (set! pc pc-halt-signal))
-            (return* (read-eval-print-loop-rm)))))))
+        (while
+          (not (end-of-session? result))
+          (if (exception? result)
+              (handle-exception result)
+              (if (not (void? result))
+                  (begin (if *need-newline* (newline)) (safe-print result))))
+          (set! input (raw-read-line "==> "))
+          (set! result (execute-rm input 'stdin)))
+        (return* 'goodbye)))))
 
 (define execute-string-rm
   (lambda (input) (return* (execute-rm input 'stdin))))
