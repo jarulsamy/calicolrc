@@ -22,10 +22,10 @@ public class PJScheme:Scheme
 	        pc ();
 	    } catch (Exception e ) {
                 if (config.DEBUG > 0) {
-                    exception_reg = e.ToString();
+                    exception_reg = make_exception("UnHandledException", e.ToString(), symbol_none, symbol_none, symbol_none);
                 } else {
                     string [] parts = get_parts(e.ToString(), NEWLINE_STRING);
-		    exception_reg = format("{0}", parts[0]);
+		    exception_reg = make_exception("UnHandledException", parts[0].ToString(), symbol_none, symbol_none, symbol_none);
                 }
 		pc = (Function) apply_handler2;
 	    }
@@ -5003,7 +5003,7 @@ public class PJScheme:Scheme
     }
     
     public static bool char_delimiter_q(object c) {
-        return (true_q(char_whitespace_q(c)) || true_q(char_is__q(c, "'")) || true_q(char_is__q(c, '(')) || true_q(char_is__q(c, '[')) || true_q(char_is__q(c, ')')) || true_q(char_is__q(c, ']')) || true_q(char_is__q(c, '"')) || true_q(char_is__q(c, ';')) || true_q(char_is__q(c, '#')) || true_q(char_is__q(c, '\0')));
+        return (true_q(char_whitespace_q(c)) || true_q(char_is__q(c, '\'')) || true_q(char_is__q(c, '(')) || true_q(char_is__q(c, '[')) || true_q(char_is__q(c, ')')) || true_q(char_is__q(c, ']')) || true_q(char_is__q(c, '"')) || true_q(char_is__q(c, ';')) || true_q(char_is__q(c, '#')) || true_q(char_is__q(c, '\0')));
     }
     
     public static bool char_initial_q(object c) {
@@ -5055,7 +5055,7 @@ public class PJScheme:Scheme
                             if (true_q(char_is__q(c, ']'))) {
                                 return sList(symbol_drop, sList(symbol_emit, symbol_rbracket));
                             } else {
-                                if (true_q(char_is__q(c, "'"))) {
+                                if (true_q(char_is__q(c, '\''))) {
                                     return sList(symbol_drop, sList(symbol_emit, symbol_apostrophe));
                                 } else {
                                     if (true_q(char_is__q(c, '`'))) {
@@ -6964,13 +6964,6 @@ public class PJScheme:Scheme
         }
     }
     
-    public static object read_line(object prompt) {
-        printf(prompt);
-        object input_ = symbol_undefined;
-        input_ = raw_input();
-        return format("~s", input_);
-    }
-    
     public static void handle_exception(object exc) {
         object stack = symbol_undefined;
         object message = symbol_undefined;
@@ -7008,7 +7001,7 @@ public class PJScheme:Scheme
     
     public static object read_eval_print_loop_rm() {
         object input_ = symbol_undefined;
-        input_ = raw_read_line("==> ");
+        input_ = read_line("==> ");
         object result = symbol_undefined;
         result = execute_rm(input_, symbol_stdin);
         while (true_q((! true_q(end_of_session_q(result))))) {
@@ -7022,7 +7015,7 @@ public class PJScheme:Scheme
                     safe_print(result);
                 }
             }
-            input_ = raw_read_line("==> ");
+            input_ = read_line("==> ");
             result = execute_rm(input_, symbol_stdin);
         }
         return symbol_goodbye;

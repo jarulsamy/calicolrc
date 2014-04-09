@@ -655,9 +655,10 @@ def trampoline():
 def box(item):
     return List(item)
 
-def raw_read_line(prompt):
+# native:
+def read_line(prompt):
     try:
-        return raw_input(prompt)
+        return raw_input(prompt) ## Python 2
     except EOFError:
         return "(exit)"
     except:

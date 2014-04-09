@@ -2675,25 +2675,29 @@
       (begin (set! *use-lexical-address* (true? (car args)))
 	     void-value)))))
 
-(define read-line
+(define-native read-line
   (lambda (prompt)
     (printf prompt)
-    (let ((input (read)))
-      (format "~s" input))))
+    (format "~s" (read))))
 
 ;; because read-line uses (read), it can only read a single sexp at a
 ;; time. it always returns a string version of its input. if the input
 ;; is the list (+ 2 3), the string "(+ 2 3)" is returned; if the input
 ;; is the string "apple", the string "\"apple\"" is returned; etc.
 ;;
-;; raw-read-line is only for testing the evaluation of multiple sexps
+;; read-line-test is only for testing the evaluation of multiple sexps
 ;; at once.  the user must type the input as a string enclosed by
 ;; double quotes.
 
-(define raw-read-line
+(define read-line-test ;; redefine this to read-line to test
   (lambda (prompt)
     (printf prompt)
-    (format "~s" (read))))
+    (let loop ((input (read)))
+      (if (string? input)
+	  input
+	  (begin
+	    (printf "Error: input must be enclosed in quotation marks.\n==> ")
+	    (loop (read)))))))
 
 ;;----------------------------------------------------------------------------
 ;; used only by scheme CPS and DS code
@@ -2713,7 +2717,7 @@
 
 (define read-eval-print-loop
   (lambda ()
-    (let ((input (raw-read-line "==> ")))  ;; read-line or raw-read-line
+    (let ((input (read-line "==> ")))  
       ;; execute gets redefined as execute-rm when no-csharp-support.ss is loaded
       (let ((result (execute input 'stdin)))
 	(if (not (void? result))
@@ -2804,7 +2808,7 @@
 
 (define read-eval-print-loop-rm
   (lambda ()
-    (let ((input (raw-read-line "==> ")))  ;; read-line or raw-read-line
+    (let ((input (read-line "==> ")))  
       (let ((result (execute-rm input 'stdin)))
 	(while (not (end-of-session? result))
 	   (cond 
@@ -2813,7 +2817,7 @@
 	     (begin 
 	       (if *need-newline* (newline))
 	       (safe-print result))))
-	   (set! input (raw-read-line "==> "))  ;; read-line or raw-read-line
+	   (set! input (read-line "==> "))  
 	   (set! result (execute-rm input 'stdin)))
 	'goodbye))))
 

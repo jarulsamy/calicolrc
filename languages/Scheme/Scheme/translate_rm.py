@@ -27,8 +27,8 @@ class Translator(object):
         # FIXME: get rid of these by marking them as native,
         # or move to overrides
         return [
-            "void-value", "restart-rm", "raw-read-line", "trampoline",
-            "read-content", 
+            "void-value", "restart-rm", "trampoline",
+            "read-content", "read-line-test",
             "string->integer", "string->decimal", "string->rational", 
             "string-split", 
             "get-current-time", "type?", 
@@ -95,8 +95,6 @@ class Translator(object):
             return "GreaterThan"
         elif name == ">=":
             return "GreaterThanEqual"
-        elif name == "read":
-            return "raw_input"
         elif name == "-":
             return "minus"
         elif name == "*":
@@ -470,10 +468,10 @@ public class PJScheme:Scheme
 	        pc ();
 	    } catch (Exception e ) {
                 if (config.DEBUG > 0) {
-                    exception_reg = e.ToString();
+                    exception_reg = make_exception("UnHandledException", e.ToString(), symbol_none, symbol_none, symbol_none);
                 } else {
                     string [] parts = get_parts(e.ToString(), NEWLINE_STRING);
-		    exception_reg = format(\"{0}\", parts[0]);
+		    exception_reg = make_exception("UnHandledException", parts[0].ToString(), symbol_none, symbol_none, symbol_none);
                 }
 		pc = (Function) apply_handler2;
 	    }
@@ -935,11 +933,13 @@ public class PJScheme:Scheme
         elif name == "#\\page":
             return "u\"\\u000C\""
         elif name == "#\\'":
-            return "\"'\""
+            return "'\\''"
         elif name == "#\\\\":
             return "'\\\\'"
         elif len(name) == 3:
             return "'%s'" % name[2]
+        else:
+            raise Exception("replace_char: '%s'" % name)
 
     def initialize(self):
         self.methods = {

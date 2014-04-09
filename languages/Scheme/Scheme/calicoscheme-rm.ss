@@ -6858,17 +6858,19 @@
           (set! *use-lexical-address* (true? (car args)))
           (return* void-value)))))
 
-(define read-line
+(define read-line-test
   (lambda (prompt)
     (printf prompt)
-    (let ((input 'undefined))
-      (set! input (read))
-      (return* (format "~s" input)))))
-
-(define raw-read-line
-  (lambda (prompt)
-    (printf prompt)
-    (return* (format "~s" (read)))))
+    (let ((loop 'undefined))
+      (set! loop
+        (lambda (input)
+          (if (string? input)
+              input
+              (begin
+                (printf
+                  "Error: input must be enclosed in quotation marks.\n==> ")
+                (loop (read))))))
+      (return* (loop (read))))))
 
 (define handle-exception
   (lambda (exc)
@@ -6918,7 +6920,7 @@
 (define read-eval-print-loop-rm
   (lambda ()
     (let ((input 'undefined))
-      (set! input (raw-read-line "==> "))
+      (set! input (read-line "==> "))
       (let ((result 'undefined))
         (set! result (execute-rm input 'stdin))
         (while
@@ -6927,7 +6929,7 @@
               (handle-exception result)
               (if (not (void? result))
                   (begin (if *need-newline* (newline)) (safe-print result))))
-          (set! input (raw-read-line "==> "))
+          (set! input (read-line "==> "))
           (set! result (execute-rm input 'stdin)))
         (return* 'goodbye)))))
 
@@ -8461,6 +8463,10 @@
 (define-native iterator? (lambda ignore #f))
 
 (define-native get_type (lambda (x) 'unknown))
+
+(define-native
+  read-line
+  (lambda (prompt) (printf prompt) (format "~s" (read))))
 
 (define try-parse-handler (make-handler2 <handler2-3>))
 

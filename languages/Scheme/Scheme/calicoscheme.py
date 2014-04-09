@@ -663,9 +663,10 @@ def trampoline():
 def box(item):
     return List(item)
 
-def raw_read_line(prompt):
+# native:
+def read_line(prompt):
     try:
-        return raw_input(prompt)
+        return raw_input(prompt) ## Python 2
     except EOFError:
         return "(exit)"
     except:
@@ -6638,12 +6639,6 @@ def use_lexical_address(*args):
         globals()['_staruse_lexical_address_star'] = true_q(car(args))
         return void_value
 
-def read_line(prompt):
-    printf(prompt)
-    input_ = symbol_undefined
-    input_ = raw_input()
-    return format("~s", input_)
-
 def handle_exception(exc):
     stack = symbol_undefined
     message = symbol_undefined
@@ -6676,7 +6671,7 @@ def start_rm():
 
 def read_eval_print_loop_rm():
     input_ = symbol_undefined
-    input_ = raw_read_line("==> ")
+    input_ = read_line("==> ")
     result = symbol_undefined
     result = execute_rm(input_, symbol_stdin)
     while not(end_of_session_q(result)):
@@ -6687,7 +6682,7 @@ def read_eval_print_loop_rm():
                 if _starneed_newline_star:
                     newline()
                 safe_print(result)
-        input_ = raw_read_line("==> ")
+        input_ = read_line("==> ")
         result = execute_rm(input_, symbol_stdin)
     return symbol_goodbye
 
