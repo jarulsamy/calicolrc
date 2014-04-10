@@ -95,7 +95,7 @@ public class Method {
 }
 
 public class Config {
-  public int DEBUG = 1;
+  public int DEBUG = 0;
   public bool NEED_NEWLINE = false;
   public List<Assembly> assemblies = new List<Assembly>();
 
@@ -3441,8 +3441,14 @@ public class Scheme {
     }
 
     public static object dict(object obj) {
-	// FIXME: make a Dictionary
-	return null;
+	object current = obj;
+	Dictionary<object,object> dictionary = new Dictionary<object,object>();
+	while (current != PJScheme.symbol_emptylist) {
+	    object pair = car(current);
+	    dictionary[car(pair)] = cadr(pair);
+	    current = cdr(current);
+	}
+	return dictionary;
     }
 
     public static object type(object obj) {
