@@ -550,7 +550,7 @@ class Interpreter(object):
         for n in names:
             self.set_function(n, import_function)
 
-    def import_module(self, mod, pattern=None):
+    def import_module(self, mod, pattern=None, name="calico"):
         """
         Import a module (either a module object, or the string name of
         the module), moving all of its exported functions into the
@@ -566,20 +566,28 @@ class Interpreter(object):
         if type(mod) is str:
             mod = load_module(mod)
         #print "Importing %s" % mod.__name__
-        if os.path.exists('defs/%s.logodef' % mod.__name__):
-            defs = self.load_defs('defs/%s.logodef' % mod.__name__)
+        if hasattr(mod, "__name__"):
+            mod_name = mod.__name__
+            main_name = mod.__name__.split('.')[-1] + '_main'
+        else:
+            mod_name = name
+            main_name = name
+        if os.path.exists('defs/%s.logodef' % mod_name):
+            defs = self.load_defs('defs/%s.logodef' % mod_name)
         else:
             defs = {}
-        main_name = mod.__name__.split('.')[-1] + '_main'
         main_func = None
         for n in dir(mod):
-            obj = getattr(mod, n)
-            ##print(obj, type(obj))
+            try:
+                obj = getattr(mod, n)
+            except:
+                continue
+            ## print(obj, type(obj))
             if type(obj) is BuiltinFunctionType:
                 if pattern and re.match(pattern, n):
                     self.import_dlr_function(obj, [n])
                 else:
-                    self.import_dlr_function(obj, ["%s.%s" % (mod.__name__, n)])
+                    self.import_dlr_function(obj, ["%s.%s" % (mod_name, n)])
             elif type(obj) is FunctionType:
                 if n == main_name:
                     main_func = obj
