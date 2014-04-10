@@ -5,6 +5,7 @@ clr.AddReference("Calico")
 
 import sys
 import os
+import threading
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(
     os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -53,7 +54,13 @@ class LogoEngine(Calico.Engine):
         ## Return True if expression parses ok.
         return True
 
+    def load_calico(self):
+        Logo.import_module(self.calico) # takes time first time
+
     def PostSetup(self, calico):
+        self.calico = calico
+        t = threading.Thread(target=self.load_calico)
+        t.start()
         dir = System.IO.DirectoryInfo(System.IO.Path.Combine(calico.path, "..", "modules"))
         for f in dir.GetFiles("*.dll"):
             assembly_name = f.FullName
