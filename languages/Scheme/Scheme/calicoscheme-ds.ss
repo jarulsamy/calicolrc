@@ -4189,7 +4189,7 @@
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
-        ((not (length-two? args))
+        ((not (length-at-least? 2 args))
          (runtime-error
            "incorrect number of arguments to string-append"
            info

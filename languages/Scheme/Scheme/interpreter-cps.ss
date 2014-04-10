@@ -2258,7 +2258,7 @@
 (define string-append-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-      ((not (length-two? args))
+      ((not (length-at-least? 2 args))
        (runtime-error "incorrect number of arguments to string-append" info handler fail))
       (else (k2 (apply string-append args) fail)))))
 

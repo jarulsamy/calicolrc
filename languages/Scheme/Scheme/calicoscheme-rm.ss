@@ -4262,7 +4262,7 @@
 
 (define <proc-155>
   (lambda ()
-    (if (not (length-two? args_reg))
+    (if (not (length-at-least? 2 args_reg))
         (begin
           (set! msg_reg
             "incorrect number of arguments to string-append")

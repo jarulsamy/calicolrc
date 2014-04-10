@@ -4524,7 +4524,7 @@ def b_proc_154_d():
         globals()['pc'] = apply_cont2
 
 def b_proc_155_d():
-    if not(length_two_q(args_reg)):
+    if not(length_at_least_q(2, args_reg)):
         globals()['msg_reg'] = "incorrect number of arguments to string-append"
         globals()['pc'] = runtime_error
     else:

@@ -4382,7 +4382,7 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_155_d() {
-        if (true_q((! true_q(length_two_q(args_reg))))) {
+        if (true_q((! true_q(length_at_least_q(2, args_reg))))) {
             msg_reg = "incorrect number of arguments to string-append";
             pc = runtime_error;
         } else {
