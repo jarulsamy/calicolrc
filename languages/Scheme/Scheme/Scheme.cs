@@ -373,6 +373,7 @@ public class Scheme {
   public static Proc atom_q_proc = new Proc("atom?", (Procedure1Bool) atom_q, 1, 2);
   public static Proc aunparse_proc = new Proc("unparse", (Procedure1) PJScheme.aunparse, 1, 1);
   public static Proc boolean_q_proc = new Proc("boolean?", (Procedure1Bool) boolean_q, 1, 2);
+  public static Proc list_q_proc = new Proc("list?", (Procedure1Bool) list_q, 1, 2);
   public static Proc cadddr_hat_proc = new Proc("cadddr^",(Procedure1)PJScheme.cadddr_hat, 1, 1);
   public static Proc caddr_hat_proc = new Proc("caddr^",(Procedure1)PJScheme.caddr_hat, 1, 1);
   public static Proc cadr_hat_proc = new Proc("cadr^",(Procedure1)PJScheme.cadr_hat, 1, 1);

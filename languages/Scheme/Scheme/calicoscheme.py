@@ -4272,8 +4272,8 @@ def b_proc_131_d():
     globals()['pc'] = apply_cont2
 
 def b_proc_132_d():
-    if not(length_two_q(args_reg)):
-        globals()['msg_reg'] = "incorrect number of arguments to 'error' (should be 2)"
+    if not(length_at_least_q(1, args_reg)):
+        globals()['msg_reg'] = "incorrect number of arguments to 'error' (should at least 1)"
         globals()['pc'] = runtime_error
     else:
         location = symbol_undefined
@@ -4403,7 +4403,7 @@ def b_proc_142_d():
         globals()['pc'] = runtime_error
     else:
         globals()['value2_reg'] = fail_reg
-        globals()['value1_reg'] = Apply(vector_q, args_reg)
+        globals()['value1_reg'] = Apply(list_q, args_reg)
         globals()['k_reg'] = k2_reg
         globals()['pc'] = apply_cont2
 

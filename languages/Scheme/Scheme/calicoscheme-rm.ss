@@ -3960,10 +3960,10 @@
 
 (define <proc-132>
   (lambda ()
-    (if (not (length-two? args_reg))
+    (if (not (length-at-least? 1 args_reg))
         (begin
           (set! msg_reg
-            "incorrect number of arguments to 'error' (should be 2)")
+            "incorrect number of arguments to 'error' (should at least 1)")
           (set! pc runtime-error))
         (let ((location 'undefined) (message 'undefined))
           (set! location (format "Error in '~a': " (car args_reg)))
@@ -4115,7 +4115,7 @@
           (set! pc runtime-error))
         (begin
           (set! value2_reg fail_reg)
-          (set! value1_reg (apply vector? args_reg))
+          (set! value1_reg (apply list? args_reg))
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 

@@ -4081,8 +4081,8 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_132_d() {
-        if (true_q((! true_q(length_two_q(args_reg))))) {
-            msg_reg = "incorrect number of arguments to 'error' (should be 2)";
+        if (true_q((! true_q(length_at_least_q(1, args_reg))))) {
+            msg_reg = "incorrect number of arguments to 'error' (should at least 1)";
             pc = runtime_error;
         } else {
             object location = symbol_undefined;
@@ -4236,7 +4236,7 @@ public class PJScheme:Scheme
             pc = runtime_error;
         } else {
             value2_reg = fail_reg;
-            value1_reg = apply(vector_q_proc, args_reg);
+            value1_reg = apply(list_q_proc, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }

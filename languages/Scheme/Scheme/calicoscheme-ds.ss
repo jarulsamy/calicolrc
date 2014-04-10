@@ -3873,9 +3873,9 @@
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
-        ((not (length-two? args))
+        ((not (length-at-least? 1 args))
          (runtime-error
-           "incorrect number of arguments to 'error' (should be 2)"
+           "incorrect number of arguments to 'error' (should at least 1)"
            info
            handler
            fail))
@@ -4031,7 +4031,7 @@
            info
            handler
            fail))
-        (else (apply-cont2 k2 (apply vector? args) fail))))))
+        (else (apply-cont2 k2 (apply list? args) fail))))))
 
 (define+
   <proc-143>

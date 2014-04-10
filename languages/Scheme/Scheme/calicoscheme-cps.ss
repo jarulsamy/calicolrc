@@ -4682,8 +4682,8 @@
 (define error-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond 
-      ((not (length-two? args))
-       (runtime-error "incorrect number of arguments to 'error' (should be 2)" info handler fail))
+      ((not (length-at-least? 1 args))
+       (runtime-error "incorrect number of arguments to 'error' (should at least 1)" info handler fail))
       (else
        (let* ((location (format "Error in '~a': " (car args)))
 	      (message (string-append location (apply format (cdr args)))))
@@ -4773,7 +4773,7 @@
     (cond
      ((not (length-one? args))
       (runtime-error "incorrect number of arguments to list?" info handler fail))
-     (else (k2 (apply vector? args) fail)))))
+     (else (k2 (apply list? args) fail)))))
 
 (define procedure?-prim
   (lambda-proc (args env2 info handler fail k2)
