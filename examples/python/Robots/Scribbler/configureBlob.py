@@ -8,8 +8,10 @@ r = None
 p = None
 
 def handleMouseUp(obj, event):
-    global x1,y1,x2,y2,p
+    global r,x1,y1,x2,y2,p
     x2,y2= event.x, event.y
+    if r:
+        r.undraw()
     configureBlob(p, x1, y1, x2, y2)
     show(takePicture('blob'), "blob image")
     x1, y1, x2, y2 = None, None, None, None

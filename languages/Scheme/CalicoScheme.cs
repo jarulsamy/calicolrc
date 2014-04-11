@@ -35,6 +35,7 @@ public class CalicoSchemeEngine : Engine
   public override void PostSetup(MainWindow calico) {
     base.PostSetup(calico);
     this.calico = calico;
+    PJScheme.initialize_method_info ();
     Scheme.set_dlr(manager.scope, manager.scriptRuntime);
     Scheme.reset_toplevel_env();
     initialize_execute();

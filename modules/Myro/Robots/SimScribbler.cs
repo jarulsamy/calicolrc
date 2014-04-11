@@ -89,7 +89,7 @@ public class SimScribbler : Myro.Robot
 			Microsoft.Xna.Framework.Vector2 v2;
 
 			// sensors getObstacle("left")
-			int ir_range = 25;
+			int ir_range = 300;
 			v2 = Graphics.VectorRotate (Graphics.Vector (ir_range, 0), -45 * Math.PI / 180);
 			Graphics.Line line = new Graphics.Line (new Graphics.Point (25, -12), 
 					     new Graphics.Point (25 + v2.X, -12 + v2.Y));
@@ -143,6 +143,7 @@ public class SimScribbler : Myro.Robot
 			line.draw (frame);
 			sensors ["obstacle-right"] = line;
 
+			ir_range = 25;
 			// sensors getIR("right")
 			v2 = Graphics.VectorRotate (Graphics.Vector (ir_range, 0), -180 * Math.PI / 180);
 			line = new Graphics.Line (new Graphics.Point (-25, -12), 
@@ -622,8 +623,21 @@ public class SimScribbler : Myro.Robot
 			    } else {
 				throw new Exception ("invalid position in getObstacle()");
 			    }
+			    // ---- now get the data
 			    if (readings.Contains (key)) {
-				retval.append ((int)(((float)readings [key]) * 5000.0));
+				// distance is a percentage of length of line (300)
+				float percent = (float)(readings [key]);
+				double x_in = (percent * 300.0) / 50.0; // scribbler bodies
+				// 6400: 0-3 scribbler bodies 1920: 3-5 scribbler bodies 0: >5 scribbler bodies.
+				// body is 50 pixels
+
+				// coefficients
+				double a = 6.3999999999999927E+03;
+				double b = -1.8133333333333314E+03;
+				double c = 1.0666666666666652E+02;
+				double value = Math.Max(a + b * x_in + c * Math.Pow(x_in, 2.0), 0);
+
+				retval.append ((float)value);
 			    } else {
 				retval.append (0);
 			    }

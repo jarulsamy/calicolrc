@@ -200,7 +200,13 @@ namespace Calico {
 		    System.Console.Error.WriteLine(e.ToString());
 		}
 	    } else {
-		buffer = File.ReadAllBytes(filename);
+		if (System.IO.File.Exists(filename)) {
+		    buffer = File.ReadAllBytes(filename);
+		} else {
+		    var retval1 = new Dictionary<string, string>();
+		    retval1["text/plain"] = String.Format("File does not exist: '{0}'", filename);
+		    return retval1;
+		}
 	    }
 	    string autoplay_text = (autoplay ? "autoplay=\"autoplay\"" : "");
 	    string encodestring = System.Convert.ToBase64String(buffer, 0, buffer.Length);

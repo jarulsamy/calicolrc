@@ -95,7 +95,7 @@ public class Method {
 }
 
 public class Config {
-  public int DEBUG = 1;
+  public int DEBUG = 0;
   public bool NEED_NEWLINE = false;
   public List<Assembly> assemblies = new List<Assembly>();
 
@@ -175,7 +175,6 @@ public class Scheme {
     public delegate object Procedure10(object a0, object a1, object a2, object a3, object a4, object a5, object a6, object a7, object a8, object a9);
 
     public delegate object ProcedureN(params object [] args);
-    public delegate void Procedure1NVoid(object a0, params object [] args);
 
     public static Function pc_halt_signal = (Function) null;
 
@@ -374,6 +373,7 @@ public class Scheme {
   public static Proc atom_q_proc = new Proc("atom?", (Procedure1Bool) atom_q, 1, 2);
   public static Proc aunparse_proc = new Proc("unparse", (Procedure1) PJScheme.aunparse, 1, 1);
   public static Proc boolean_q_proc = new Proc("boolean?", (Procedure1Bool) boolean_q, 1, 2);
+  public static Proc list_q_proc = new Proc("list?", (Procedure1Bool) list_q, 1, 2);
   public static Proc cadddr_hat_proc = new Proc("cadddr^",(Procedure1)PJScheme.cadddr_hat, 1, 1);
   public static Proc caddr_hat_proc = new Proc("caddr^",(Procedure1)PJScheme.caddr_hat, 1, 1);
   public static Proc cadr_hat_proc = new Proc("cadr^",(Procedure1)PJScheme.cadr_hat, 1, 1);
@@ -444,7 +444,7 @@ public class Scheme {
   public static Proc number_q_proc = new Proc("number?", (Procedure1Bool) number_q, 1, 2);
   public static Proc pair_q_proc = new Proc("pair?", (Procedure1Bool) pair_q, 1, 2);
   public static Proc pretty_print_proc = new Proc("pretty-print", (Procedure1Void) pretty_print, -1, 0);
-  public static Proc printf_proc = new Proc("printf",(Procedure1NVoid)printf, -1, 1);
+  public static Proc printf_proc = new Proc("printf",(Procedure1)printf, -1, 1);
   public static Proc quotient_proc = new Proc("quotient", (Procedure2) quotient, 2, 1);
   public static Proc Range_proc = new Proc("range", (Procedure1) range, -1, 1);
   public static Proc remainder_proc = new Proc("modulo", (Procedure2) modulo, 2, 1);
@@ -506,11 +506,8 @@ public class Scheme {
 	  return true;
   }
 
-    public static Func<object,bool> module_q = tagged_list((object)PJScheme.symbol_module, (Predicate2)GreaterOrEqual, 1);
-    public static Func<object,bool> procedure_q_native = tagged_list((object)PJScheme.symbol_procedure, (Predicate2)GreaterOrEqual, 1);
-
-    public static bool procedure_q(object obj) {
-	return (procedure_q_native(obj));
+    public static bool procedure_q(object item) {
+	return pair_q(item) && (Eq(car(item), PJScheme.symbol_procedure));
     }
 
   public static object get_current_time() {
@@ -879,20 +876,11 @@ public class Scheme {
 	
     public static Func<object,bool> tagged_list_hat(object tag_symbol, object pred, object value) {
 	return (object asexp) => {
-	    return ((bool)pair_q(asexp) &&
-		    ((bool)PJScheme.list_q_hat(asexp)) && 
-		    ((bool)((Predicate2)pred)(PJScheme.length_hat(asexp), value)) &&
+	    return (PJScheme.list_q_hat(asexp) && 
+		    ((bool)(apply(pred, list(PJScheme.length_hat(asexp), value)))) &&
 		    ((bool)(PJScheme.symbol_q_hat(PJScheme.car_hat(asexp)))) &&
 		    ((bool)(PJScheme.eq_q_hat(PJScheme.car_hat(asexp), tag_symbol)))
 		    );
-	};
-    }
-	
-    public static Func<object,bool> tagged_list(object tag_symbol, object pred, object value) {
-	return (object lyst) => {
-	    return (pair_q(lyst) &&
-		    Eq(car(lyst), tag_symbol) && 
-		    ((Predicate2)pred)(length_safe(lyst), value));
 	};
     }
 	
@@ -1024,12 +1012,12 @@ public class Scheme {
   public static object string_ref(object args) {
       object s = car(args);
       object i = cadr(args);
-      return s.ToString()[(int)i];
+      return string_ref(s, i);
   }
 
-  public static object string_ref(object s, object i) {
-	return s.ToString()[(int)i];
-  }
+    public static object string_ref(object s, object i) {
+	return Convert.ToChar(s.ToString()[Convert.ToInt32(i)]);
+    }
 
   public static object make_string(object obj) {
       if (obj == null || obj == (object) NULL) {
@@ -1101,7 +1089,6 @@ public class Scheme {
 
   public static bool char_is__q(object c1, object c2) {
 	return ((c1 is char) && (c2 is char) && ((char)c1) == ((char)c2));
-	
   }
 
   public static bool string_is__q(object o1, object o2) {
@@ -1112,16 +1099,15 @@ public class Scheme {
 	object retval = PJScheme.symbol_emptylist;
 	object tail = PJScheme.symbol_emptylist;
 	if (str != null) {
-	  string sstr = str.ToString();
-	  for (int i = 0; i < sstr.Length; i++) {
+	    for (int i = 0; i < str.ToString().Length; i++) {
 		if (Eq(retval, PJScheme.symbol_emptylist)) {
-		  retval = new Cons(sstr[i], PJScheme.symbol_emptylist);
-		  tail = retval;
+		    retval = new Cons(string_ref(str, i), PJScheme.symbol_emptylist);
+		    tail = retval;
 		} else {
-		  set_cdr_b(tail, new Cons(sstr[i], PJScheme.symbol_emptylist));
-		  tail = cdr(tail);
+		    set_cdr_b(tail, new Cons(string_ref(str, i), PJScheme.symbol_emptylist));
+		    tail = cdr(tail);
 		}
-	  }
+	    }
 	}
 	return retval;
   }
@@ -1153,17 +1139,20 @@ public class Scheme {
   }
 
   public static object string_to_rational(object str) {
-	string[] part = (str.ToString()).Split(SPLITSLASH);
-	Rational retval = new Rational(part[0], part[1]);
-	if (retval.denominator == 1)
-	    return retval.numerator;
-	else
-	    return retval;
+      try {
+	  string[] part = (str.ToString()).Split(SPLITSLASH);
+	  Rational retval = new Rational(part[0], part[1]);
+	  if (retval.denominator == 1)
+	      return retval.numerator;
+	  else
+	      return retval;
+      } catch {
+	  return false;
+      }
   }
 
-  public static void error(object code, object msg, params object[] rest) {
-	config.NEED_NEWLINE = false;
-	Console.Error.WriteLine("Error in {0}: {1}", (code.ToString()), format(msg, rest));
+  public static void error(object code, object msg) {
+      throw new Exception(String.Format("Exception in {0}: {1}", code, msg));
   }
 
   public static void newline() {
@@ -1468,7 +1457,7 @@ public class Scheme {
       return retobj;
   }
 
-  public static object printf_native(object args) {
+  public static object printf(object args) {
 	int len = ((int) length(args)) - 1;
 	// FIXME: surely there is a better way?:
 	if (len == 0)
@@ -1491,8 +1480,9 @@ public class Scheme {
 	return null;
   }
   
-  public static void printf(object fmt, params object[] objs) {
+  public static object printf(object fmt, params object[] objs) {
 	Console.Write(format(fmt, objs));
+	return null;
   }
 
   public static string ToString(object obj) {
@@ -1670,6 +1660,8 @@ public class Scheme {
   }
 
   public static bool Eq(object obj1, object obj2) {
+      if ((obj1 is bool) && (obj2 is bool))
+	  return ((bool)obj1) == ((bool)obj2);
       return Object.ReferenceEquals(obj1, obj2);
   }
 
@@ -2496,27 +2488,28 @@ public class Scheme {
       }
       return retval.Insert(0, "(vector ").Append(")").ToString();
   }
-  
 
-  // cons/list needs to work with object[]
-
-  public static object list(params object[] args) {
-	//printf("calling list({0})\n", array_to_string(args));
+  public static object array_to_list(object[] args) {
 	Object result = PJScheme.symbol_emptylist;
 	if (args != null) {
-	  int count = ((Array)args).Length;
-	  for (int i = 0; i < count; i++) {
+	    int count = ((Array)args).Length;
+	    for (int i = 0; i < count; i++) {
 		Object item = args[count - i - 1];
-		//if (item == null) 
-		//  result = PJScheme.symbol_emptylist;
-        // else
-		if (item is object[])
-		  result = append( list((object[]) item), result);
-		else
-		  result = new Cons(item, result);
-	  }
+		result = new Cons(item, result);
+	    }
 	}
-	//printf("returning list: {0}\n", pretty_print(result));	
+	return result;
+  }
+  
+    public static object list(params object[] args) {
+	Object result = PJScheme.symbol_emptylist;
+	if (args != null) {
+	    int count = ((Array)args).Length;
+	    for (int i = 0; i < count; i++) {
+		Object item = args[count - i - 1];
+		result = new Cons(item, result);
+	    }
+	}
 	return result;
   }
 
@@ -2717,7 +2710,8 @@ public class Scheme {
     else if (pair_q(x))
       return (new Cons(make_safe(car(x)), make_safe(cdr(x))));
     else if (vector_q(x))
-      return (list_to_vector(make_safe(vector_to_list(x))));
+      // FIXME: too expensive and weird:
+      return list_to_vector(make_safe(vector_to_list(x)));
     else
       return (x);
   }
@@ -2770,8 +2764,8 @@ public class Scheme {
 	  return assv(x, cdr(ls));
   }
 
-  public static bool atom_q(object x) {
-    return ((! pair_q(x)) && (! (null_q(x))));
+  public static bool atom_q(object item) {
+      return (number_q(item) || symbol_q(item) || string_q(item));
   }
 
   public static bool isTokenType(List<object> token, string tokenType) {
@@ -3396,13 +3390,12 @@ public class Scheme {
         PJScheme._staruse_stack_trace_star = value;
     }
 
-    public static string raw_read_line(string prompt) {
-	Console.Write(prompt);
-	return Console.ReadLine();
-    }    
-
-    public static string raw_input() {
-	return Console.ReadLine();
+    public static string read_line(object prompt) {
+	Console.Write(prompt.ToString());
+	string retval = Console.ReadLine();
+	if (retval == null)
+	    retval = "(exit)";
+	return retval;
     }    
 
     public static void ApplyPlus(object what, object slist) {
@@ -3462,8 +3455,14 @@ public class Scheme {
     }
 
     public static object dict(object obj) {
-	// FIXME: make a Dictionary
-	return null;
+	object current = obj;
+	Dictionary<object,object> dictionary = new Dictionary<object,object>();
+	while (current != PJScheme.symbol_emptylist) {
+	    object pair = car(current);
+	    dictionary[car(pair)] = cadr(pair);
+	    current = cdr(current);
+	}
+	return dictionary;
     }
 
     public static object type(object obj) {

@@ -14,7 +14,7 @@ sy = int(height() / sz)
 world = [[[0 for z in range(2)] for y in range(sy)] for x in range(sx)]
 paused = True
 
-for i in range(50):
+for i in range(30):
 	#a bunch of random gliders
     x =int(random(5, width()/sz-5))
     y =int(random(5, height()/sz-5))
@@ -39,15 +39,18 @@ def neighbors(x, y):
 
 
 def addCells():
-    world[int(mouseX() / sz)][int(mouseY() / sz)][0] = 1
+    if not isKeyPressed():
+        world[int(mouseX() / sz)][int(mouseY() / sz)][0] = 1
+    else:
+        world[int(mouseX() / sz)][int(mouseY() / sz)][0] = 0
 
 onMouseDragged += addCells
 
 def handleKeys():
     global paused, world
-    if (key == 'c'):
+    if key() == 'c':
         world = [[[0 for z in range(2)] for y in range(sy)] for x in range(sx)]
-    else:
+    elif key() == "space":
         paused = not paused
 
 onKeyPressed += handleKeys

@@ -34,7 +34,7 @@ DEBUG = False
 ## Global symbols:
 
 # Set to a dictionary-like object for global-shared namespace:
-DLR_ENV = {key:getattr(__builtins__, key) for key in dir(__builtins__)}
+ENVIRONMENT = {key:getattr(__builtins__, key) for key in dir(__builtins__)}
 
 class Char(object):
     def __init__(self, c):
@@ -72,6 +72,10 @@ class Symbol(object):
         # So that EmptyList will be treated as []
         raise StopIteration
 
+    def __len__(self):
+        # So that EmptyList will be treated as []
+        return 0
+
 SYMBOLS = {}
 CHARS = {}
 
@@ -101,12 +105,16 @@ class cons(object):
         self.cdr = cdr
 
     def __repr__(self):
+        if self.car is symbol_procedure:
+            return "<procedure>"
+        elif self.car is symbol_environment:
+            return "<environment>"
         retval = ""
         current = self
         while isinstance(current, cons):
             if retval:
                 retval += " "
-            retval += repr(current.car)
+            retval += make_safe(current.car)
             current = current.cdr
         if current != symbol_emptylist:
             retval += " . " + make_safe(current)
@@ -434,8 +442,9 @@ def pair_q(item):
 def iterator_q(item):
     # return true if an iter that implementation doesn't
     # know how to handle. Python knows how to handle all
-    # of the iters, so this just returns false.
-    return False
+    # of the iters, but IronPython can import other
+    # things.
+    return hasattr(item, "MoveNext")
 
 def get_iterator(generator):
     # Not used in Python version
@@ -584,7 +593,7 @@ def string(*chars):
     return retval
 
 def string_split(string, delim):
-    return List(*string.split(str(delim)))
+    return List(*string.split(delim.char))
 
 def member(item, lyst):
     current = lyst
@@ -655,9 +664,10 @@ def trampoline():
 def box(item):
     return List(item)
 
-def raw_read_line(prompt):
+# native:
+def read_line(prompt):
     try:
-        return raw_input(prompt)
+        return raw_input(prompt) ## Python 2
     except EOFError:
         return "(exit)"
     except:
@@ -791,6 +801,7 @@ def assq(x, ls):
 ### External env interface:
 
 def apply_with_keywords(*args):
+    # FIXME: when this interface is enabled
     pass
 
 def using(libraries, environment):
@@ -803,16 +814,16 @@ def using(libraries, environment):
     return reverse(retval)
 
 def dlr_proc_q(item):
-    return callable(item)
+    return callable(item) or hasattr(item, "MoveNext")
 
 def dlr_env_contains(item):
-    return item.name in DLR_ENV
+    return item.name in ENVIRONMENT
 
 def set_global_value_b(variable, value):
-    DLR_ENV[variable.name] = value
+    ENVIRONMENT[variable.name] = value
 
 def dlr_env_lookup(variable):
-    return DLR_ENV[variable.name]
+    return ENVIRONMENT[variable.name]
 
 def dlr_object_contains(obj, components):
     # components: (math sqrt)
@@ -835,7 +846,8 @@ def get_external_member(obj, components):
     return retval
 
 def dlr_apply(f, args):
-    return f(*args)
+    largs = list_to_vector(args)
+    return f(*largs)
 
 def dlr_func(schemeProc):
     def f(*args):
@@ -853,14 +865,15 @@ def set_global_docstring_b(variable, docstring):
 def get_external_members(obj):
     return List(*[make_symbol(x) for x in  dir(obj)])
 
-def callback0(value):
-    return value
-
-def callback1(value):
-    return value
-
-def callback2(value):
-    return value
+def callback(schemeProc):
+    def cb(*args):
+        globals()["proc_reg"] = schemeProc
+        globals()["args_reg"] = List(*args)
+        globals()["handler_reg"] = REP_handler
+        globals()["k2_reg"] = REP_k
+        globals()["pc"] = apply_proc
+        return trampoline()
+    return cb
 
 def set_external_member_b(obj, components, value):
     for component in components[:-1]:
@@ -871,7 +884,10 @@ def apply_star(external_function, args):
     return external_function(*args)
 
 def next_item(iter_item):
-    return next(iter_item)
+    try:
+        return next(iter_item)
+    except StopIteration:
+        return symbol_emptylist
 
 # end of Scheme.py
 #############################################################

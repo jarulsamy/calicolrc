@@ -52,9 +52,7 @@
 (define-native dlr-proc? (lambda (x) #f))
 (define-native dlr-apply apply)
 (define-native dlr-func (lambda (x) x))
-(define-native callback0 (lambda () #f))
-(define-native callback1 (lambda (x) #f))
-(define-native callback2 (lambda (x y) #f))
+(define-native callback (lambda args #f))
 (define-native dlr-env-contains (lambda (x) #f))
 (define-native dlr-env-lookup (lambda (x) #f))
 (define-native dlr-object? (lambda (x) #f))
@@ -73,25 +71,29 @@
       (begin (set! *use-lexical-address* (true? (car args)))
 	     void-value)))))
 
-(define read-line
+(define-native read-line
   (lambda (prompt)
     (printf prompt)
-    (let ((input (read)))
-      (format "~s" input))))
+    (format "~s" (read))))
 
 ;; because read-line uses (read), it can only read a single sexp at a
 ;; time. it always returns a string version of its input. if the input
 ;; is the list (+ 2 3), the string "(+ 2 3)" is returned; if the input
 ;; is the string "apple", the string "\"apple\"" is returned; etc.
 ;;
-;; raw-read-line is only for testing the evaluation of multiple sexps
+;; read-line-test is only for testing the evaluation of multiple sexps
 ;; at once.  the user must type the input as a string enclosed by
 ;; double quotes.
 
-(define raw-read-line
+(define read-line-test ;; redefine this to read-line to test
   (lambda (prompt)
     (printf prompt)
-    (format "~s" (read))))
+    (let loop ((input (read)))
+      (if (string? input)
+	  input
+	  (begin
+	    (printf "Error: input must be enclosed in quotation marks.\n==> ")
+	    (loop (read)))))))
 
 ;;----------------------------------------------------------------------------
 ;; used only by scheme CPS and DS code
@@ -99,8 +101,7 @@
 (define start
   (lambda ()
     ;; start with fresh environments
-    (set! toplevel-env (make-toplevel-env))
-    (set! macro-env (make-macro-env^))
+    (initialize-globals)
     (read-eval-print-loop)))
 
 ;; avoids reinitializing environments on startup (useful for crash recovery)
@@ -111,7 +112,7 @@
 
 (define read-eval-print-loop
   (lambda ()
-    (let ((input (raw-read-line "==> ")))  ;; read-line or raw-read-line
+    (let ((input (read-line "==> ")))  
       ;; execute gets redefined as execute-rm when no-csharp-support.ss is loaded
       (let ((result (execute input 'stdin)))
 	(if (not (void? result))
@@ -202,7 +203,7 @@
 
 (define read-eval-print-loop-rm
   (lambda ()
-    (let ((input (raw-read-line "==> ")))  ;; read-line or raw-read-line
+    (let ((input (read-line "==> ")))  
       (let ((result (execute-rm input 'stdin)))
 	(while (not (end-of-session? result))
 	   (cond 
@@ -211,7 +212,7 @@
 	     (begin 
 	       (if *need-newline* (newline))
 	       (safe-print result))))
-	   (set! input (raw-read-line "==> "))  ;; read-line or raw-read-line
+	   (set! input (read-line "==> "))  
 	   (set! result (execute-rm input 'stdin)))
 	'goodbye))))
 
@@ -358,18 +359,10 @@
 	(m exp env handler fail
 	  (lambda-cont2 (proc fail)
 	    (k (dlr-func proc) fail))))
-      (callback0-aexp (exp info)
+      (callback-aexp (exp info)
 	(m exp env handler fail
 	  (lambda-cont2 (proc fail)
-	    (k (callback0 proc) fail))))
-      (callback1-aexp (exp info)
-	(m exp env handler fail
-	  (lambda-cont2 (proc fail)
-	    (k (callback1 proc) fail))))
-      (callback2-aexp (exp info)
-	(m exp env handler fail
-	  (lambda-cont2 (proc fail)
-	    (k (callback2 proc) fail))))
+	    (k (callback proc) fail))))
       (if-aexp (test-exp then-exp else-exp info)
 	(m test-exp env handler fail
 	  (lambda-cont2 (bool fail)
@@ -2076,8 +2069,8 @@
 (define error-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond 
-      ((not (length-two? args))
-       (runtime-error "incorrect number of arguments to 'error' (should be 2)" info handler fail))
+      ((not (length-at-least? 1 args))
+       (runtime-error "incorrect number of arguments to 'error' (should at least 1)" info handler fail))
       (else
        (let* ((location (format "Error in '~a': " (car args)))
 	      (message (string-append location (apply format (cdr args)))))
@@ -2167,7 +2160,7 @@
     (cond
      ((not (length-one? args))
       (runtime-error "incorrect number of arguments to list?" info handler fail))
-     (else (k2 (apply vector? args) fail)))))
+     (else (k2 (apply list? args) fail)))))
 
 (define procedure?-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -2254,7 +2247,7 @@
 (define string-append-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-      ((not (length-two? args))
+      ((not (length-at-least? 2 args))
        (runtime-error "incorrect number of arguments to string-append" info handler fail))
       (else (k2 (apply string-append args) fail)))))
 

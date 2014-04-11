@@ -54,3 +54,5 @@ ellipse(210, 206, 9, 9)
 ellipse(240, 198, 7, 7)
 ellipse(252, 212, 8, 8)
 ellipse(232, 222, 8, 8)
+
+save("lady.png")

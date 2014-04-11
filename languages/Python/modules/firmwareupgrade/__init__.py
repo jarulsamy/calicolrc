@@ -728,7 +728,7 @@ class SerialRobot:
             raise
         except:
             pass
-        self.ser = serial.Serial(self.serialPort, timeout = 2) 
+        self.ser = serial.Serial(self.serialPort, timeout = 60) 
     def getInfo(self): return {"robot":"Serial", "mode": "serial"}
     def restart(self):
         printStatus("Please start myro to connect onto robot")

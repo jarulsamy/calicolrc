@@ -1,7 +1,9 @@
 from Processing import *
 
 window(500, 500)
-textSize(12)
+textFont("Verdana Regular")
+smooth()
+textSize(16)
 noFill()
 rect(50, 50, 400, 400)
 
