@@ -809,6 +809,7 @@ def assq(x, ls):
 ### External env interface:
 
 def apply_with_keywords(*args):
+    # FIXME: when this interface is enabled
     pass
 
 def using(libraries, environment):
