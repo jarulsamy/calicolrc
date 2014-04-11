@@ -38,7 +38,7 @@ public class PJScheme:Scheme
     // like schemeProc by calling apply_proc on its args.
     return delegate (object[] args) { 
       proc_reg = schemeProc;
-        args_reg = PJScheme.array_to_list (args);
+      args_reg = PJScheme.array_to_list (args);
       handler_reg = REP_handler;
       k2_reg = REP_k;
       pc = (Function) apply_proc;
@@ -53,7 +53,7 @@ public class PJScheme:Scheme
     // like schemeProc by calling apply_proc on its args.
     return args => { 
       proc_reg = schemeProc;
-        args_reg = PJScheme.vector_to_list (args);
+      args_reg = PJScheme.array_to_list (args);
       handler_reg = REP_handler;
       k2_reg = REP_k;
       pc = (Function) apply_proc;

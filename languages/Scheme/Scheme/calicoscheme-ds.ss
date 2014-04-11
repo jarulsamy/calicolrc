@@ -5995,10 +5995,7 @@
             (loop (read)))))))
 
 (define start
-  (lambda ()
-    (set! toplevel-env (make-toplevel-env))
-    (set! macro-env (make-macro-env^))
-    (read-eval-print-loop)))
+  (lambda () (initialize-globals) (read-eval-print-loop)))
 
 (define restart
   (lambda ()

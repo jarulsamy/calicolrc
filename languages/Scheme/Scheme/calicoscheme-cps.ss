@@ -2681,8 +2681,7 @@
 (define start
   (lambda ()
     ;; start with fresh environments
-    (set! toplevel-env (make-toplevel-env))
-    (set! macro-env (make-macro-env^))
+    (initialize-globals)
     (read-eval-print-loop)))
 
 ;; avoids reinitializing environments on startup (useful for crash recovery)

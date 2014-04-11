@@ -441,6 +441,8 @@ class PythonTranslator(Translator):
         self.Print(4, "print('----------------------------')")
         self.Print(4, "print('Use (exit) to exit')")
         self.Print(4, "start_rm()")
+        self.Print(0, "else:")
+        self.Print(4, "initialize_globals()")
 
 class CSharpTranslator(Translator):
     def preamble(self):
