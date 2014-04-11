@@ -390,9 +390,9 @@ namespace Calico {
             ShellEditor.Options.TabsToSpaces = true;
             ShellEditor.Options.HighlightMatchingBracket = true;
 	        //ShellEditor.Document.DocumentUpdated += updateShellControls;
-	        ShellEditor.Focused +=   delegate(object o, Gtk.FocusedArgs fargs) {
-		        updateShellControls(ShellEditor.Document, null);
-	        };
+	    ShellEditor.TextArea.Focused +=   delegate(object o, Gtk.FocusedArgs fargs) {
+		updateShellControls(ShellEditor.Document, null);
+	    };
 
             PrintLine(Tag.Info, String.Format(_("The Calico Project, Version {0}"), MainClass.Version));
             // Handle all flags, in case something crashes:
@@ -1025,7 +1025,7 @@ namespace Calico {
 
         protected override bool OnScrollEvent(Gdk.EventScroll evnt) {
             // After the other items have handled their scrolls
-            if (Focus == ShellEditor) {
+            if (Focus == ShellEditor.TextArea) {
                 if (evnt.Direction == Gdk.ScrollDirection.Up) {
                     KeyUp(true);
                 } else if (evnt.Direction == Gdk.ScrollDirection.Down) {
@@ -1192,7 +1192,7 @@ namespace Calico {
         }
 
         public void UseLibrary(string fullname) {
-            if (Focus == ShellEditor) {
+            if (Focus == ShellEditor.TextArea) {
                 string text = manager [CurrentLanguage].GetUseLibraryString(fullname);
                 if (text != "") {
                     ShellEditor.Insert(0, text);
@@ -1218,7 +1218,7 @@ namespace Calico {
 		    });
 	    };
 	    ScrolledWindow.Add(_shell);
-        ScrolledWindow.FocusChildSet += delegate(object o, Gtk.FocusChildSetArgs args) {
+	    ScrolledWindow.FocusChildSet += delegate(object o, Gtk.FocusChildSetArgs args) {
                 updateShellControls(ShellEditor.Document, null);
             };
 	    ScrolledWindow.ShowAll();
@@ -1246,13 +1246,13 @@ namespace Calico {
             // This code was interacting with OnKeyPress
             if (! ProgramRunning) {
                 Invoke(delegate {
-                    if (_shell.Document.Text == "") {
-                        StartButton.Sensitive = false;
-                        StartAction.Sensitive = false;
-                    } else {
+			//if (_shell.Document.Text == "") {
+                        //StartButton.Sensitive = false;
+                        //StartAction.Sensitive = false;
+			//} else {
                         StartButton.Sensitive = true;
                         StartAction.Sensitive = true;
-                    }
+			//}
                 }
                 );
             }
@@ -1881,8 +1881,8 @@ del _invoke, _
         }
 
         protected virtual void OnCopyActionActivated(object sender, System.EventArgs e) {
-            if (Focus is Mono.TextEditor.TextEditor) {
-                Mono.TextEditor.TextEditor editor = (Mono.TextEditor.TextEditor)Focus;
+            if (Focus is Mono.TextEditor.TextArea) {
+                Mono.TextEditor.TextArea editor = (Mono.TextEditor.TextArea)Focus;
                 string text = editor.SelectedText;
                 if (text != null) {
                     clipboard.Text = text;
@@ -1967,12 +1967,12 @@ del _invoke, _
         }
 
         protected virtual void OnPasteActionActivated(object sender, System.EventArgs e) {
-            if (Focus is Mono.TextEditor.TextEditor) {
-                string text = ((Mono.TextEditor.TextEditor)Focus).SelectedText;
+            if (Focus is Mono.TextEditor.TextArea) {
+                string text = ((Mono.TextEditor.TextArea)Focus).SelectedText;
                 if (text != null) {
-                    ((Mono.TextEditor.TextEditor)Focus).DeleteSelectedText();
+                    ((Mono.TextEditor.TextArea)Focus).DeleteSelectedText();
                 }
-                ((Mono.TextEditor.TextEditor)Focus).InsertAtCaret(CleanUpText(clipboard.WaitForText()));
+                ((Mono.TextEditor.TextArea)Focus).InsertAtCaret(CleanUpText(clipboard.WaitForText()));
             } else if (Focus is Gtk.Entry) {
                 ((Gtk.Entry)Focus).PasteClipboard();
             } else if (Focus is Gtk.TextView) {
@@ -1983,12 +1983,12 @@ del _invoke, _
         }
 
         protected virtual void OnCutActionActivated(object sender, System.EventArgs e) {
-            if (Focus is Mono.TextEditor.TextEditor) {
-                string text = ((Mono.TextEditor.TextEditor)Focus).SelectedText;
+            if (Focus is Mono.TextEditor.TextArea) {
+                string text = ((Mono.TextEditor.TextArea)Focus).SelectedText;
                 if (text != null) {
                     clipboard.Text = text;
                 }
-                ((Mono.TextEditor.TextEditor)Focus).DeleteSelectedText();
+                ((Mono.TextEditor.TextArea)Focus).DeleteSelectedText();
             } else if (Focus is Gtk.Entry) {
                 ((Gtk.Entry)Focus).CutClipboard();
             } else if (Focus is Gtk.TextView) {
@@ -1997,22 +1997,22 @@ del _invoke, _
         }
 
         protected virtual void OnUndoActionActivated(object sender, System.EventArgs e) {
-            if (Focus is Mono.TextEditor.TextEditor) {
-                Mono.TextEditor.TextEditor editor = (Mono.TextEditor.TextEditor)Focus;
+            if (Focus is Mono.TextEditor.TextArea) {
+                Mono.TextEditor.TextArea editor = (Mono.TextEditor.TextArea)Focus;
                 Mono.TextEditor.MiscActions.Undo(editor.GetTextEditorData());
             }
         }
 
         protected virtual void OnRedoActionActivated(object sender, System.EventArgs e) {
-            if (Focus is Mono.TextEditor.TextEditor) {
-                Mono.TextEditor.TextEditor editor = (Mono.TextEditor.TextEditor)Focus;
+            if (Focus is Mono.TextEditor.TextArea) {
+                Mono.TextEditor.TextArea editor = (Mono.TextEditor.TextArea)Focus;
                 Mono.TextEditor.MiscActions.Redo(editor.GetTextEditorData());
             }
         }
 
         protected virtual void OnSelectAllActionActivated(object sender, System.EventArgs e) {
-            if (Focus is Mono.TextEditor.TextEditor) {
-                Mono.TextEditor.TextEditor editor = (Mono.TextEditor.TextEditor)Focus;
+            if (Focus is Mono.TextEditor.TextArea) {
+                Mono.TextEditor.TextArea editor = (Mono.TextEditor.TextArea)Focus;
                 
                 Mono.TextEditor.SelectionActions.SelectAll(editor.GetTextEditorData());
             } else if (Focus is Gtk.Entry) {
@@ -2024,16 +2024,16 @@ del _invoke, _
         }
 
         protected virtual void OnIndentActionActivated(object sender, System.EventArgs e) {
-            if (Focus is Mono.TextEditor.TextEditor) {
-                Mono.TextEditor.TextEditor editor = (Mono.TextEditor.TextEditor)Focus;
+            if (Focus is Mono.TextEditor.TextArea) {
+                Mono.TextEditor.TextArea editor = (Mono.TextEditor.TextArea)Focus;
                 
                 Mono.TextEditor.MiscActions.IndentSelection(editor.GetTextEditorData());
             }
         }
 
         protected virtual void OnUnindentActionActivated(object sender, System.EventArgs e) {
-            if (Focus is Mono.TextEditor.TextEditor) {
-                Mono.TextEditor.TextEditor editor = (Mono.TextEditor.TextEditor)Focus;
+            if (Focus is Mono.TextEditor.TextArea) {
+                Mono.TextEditor.TextArea editor = (Mono.TextEditor.TextArea)Focus;
                 Mono.TextEditor.MiscActions.RemoveIndentSelection(editor.GetTextEditorData());
             }
         }
@@ -2071,11 +2071,11 @@ del _invoke, _
         }
 
         protected virtual void OnCommentRegionActionActivated(object sender, System.EventArgs e) {
-            if (Focus is Mono.TextEditor.TextEditor) {
+            if (Focus is Mono.TextEditor.TextArea) {
                 // Shell or Text Editor
                 string language = "python";
                 string line_comment = "##";
-                if (Focus == ShellEditor) {
+                if (Focus == ShellEditor.TextArea) {
                     //if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
                     language = ShellLanguage;
                 } else {
@@ -2084,7 +2084,7 @@ del _invoke, _
                 if (manager.languages.ContainsKey(language) && manager.languages [language].IsTextLanguage) {
                     line_comment = manager.languages [language].LineComment;
                 }
-                Mono.TextEditor.TextEditor texteditor = (Mono.TextEditor.TextEditor)Focus;
+                Mono.TextEditor.TextArea texteditor = (Mono.TextEditor.TextArea)Focus;
                 Mono.TextEditor.TextEditorData data = texteditor.GetTextEditorData();
                 int startLineNr = data.IsSomethingSelected ? data.MainSelection.MinLine : data.Caret.Line;
                 int endLineNr = data.IsSomethingSelected ? data.MainSelection.MaxLine : data.Caret.Line;
@@ -2112,11 +2112,11 @@ del _invoke, _
         }
 
         protected virtual void OnUncommentRegionActionActivated(object sender, System.EventArgs e) {
-            if (Focus is Mono.TextEditor.TextEditor) {
+            if (Focus is Mono.TextEditor.TextArea) {
                 string language = "python";
                 string line_comment = "##";
                 //if (DocumentNotebook.Page == findTab(DocumentNotebook, "Shell")) {
-                if (Focus == ShellEditor) {
+                if (Focus == ShellEditor.TextArea) {
                     language = ShellLanguage;
                 } else {
                     language = CurrentLanguage;
@@ -2124,7 +2124,7 @@ del _invoke, _
                 if (manager.languages.ContainsKey(language) && manager.languages [language].IsTextLanguage) {
                     line_comment = manager.languages [language].LineComment;
                 }
-                Mono.TextEditor.TextEditor texteditor = (Mono.TextEditor.TextEditor)Focus;
+                Mono.TextEditor.TextArea texteditor = (Mono.TextEditor.TextArea)Focus;
                 Mono.TextEditor.TextEditorData data = texteditor.GetTextEditorData();
                 int startLineNr = data.IsSomethingSelected ? data.MainSelection.MinLine : data.Caret.Line;
                 int endLineNr = data.IsSomethingSelected ? data.MainSelection.MaxLine : data.Caret.Line;
@@ -2191,7 +2191,7 @@ del _invoke, _
                                                      searchEntry.Entry.Text.Length);
                         CurrentDocument.SearchMore(searchEntry.Entry.Text);
                         args.RetVal = true;
-                    } else if (Focus == ShellEditor) {
+                    } else if (Focus == ShellEditor.TextArea) {
                         //} else if (MainNotebook.Page == findTabByLabel(MainNotebook, "Shell")) {
                         if (history.SearchMore(searchEntry.ActiveText)) {
                             ShellEditor.Text = history.update();
@@ -2203,7 +2203,7 @@ del _invoke, _
                     if (CurrentDocument != null) {
                         CurrentDocument.SearchNext(searchEntry.ActiveText);
                         args.RetVal = true;
-                    } else if (Focus == ShellEditor) {
+                    } else if (Focus == ShellEditor.TextArea) {
                         //} else if (MainNotebook.Page == findTabByLabel(MainNotebook, "Shell")) {
                         if (history.SearchPrevious(searchEntry.ActiveText)) {
                             ShellEditor.Text = history.update();
@@ -2212,8 +2212,10 @@ del _invoke, _
                         }
                     } 
                 } // else, don't handle
-            } else if (Focus == ShellEditor) {
+            } else if (Focus == ShellEditor.TextArea) {
                 handleShellKey(o, args);
+		//Console.WriteLine("[press]");
+		updateShellControls(ShellEditor.Document, null);
             } else if (Focus == ChatCommand) { // This is a TextView
                 if (args.Event.Key == Gdk.Key.Return) {
                     // if control key is down, too, just insert a return
@@ -2227,13 +2229,13 @@ del _invoke, _
                     ProcessChatText(text);
                     args.RetVal = true;
                 }
-            } else if (Focus is Mono.TextEditor.TextEditor) {
+            } else if (Focus is Mono.TextEditor.TextArea) {
                 // Handle not dirty
                 // not shell
                 // Editor, handle : on end of line
                 if (args.Event.Key == Gdk.Key.e && (args.Event.State & GetControlMask()) != 0) {
                     // emacs mode control+e end of line
-                    var texteditor = (Mono.TextEditor.TextEditor)Focus;
+                    var texteditor = (Mono.TextEditor.TextArea)Focus;
                     var data = texteditor.GetTextEditorData();
                     var curLine = texteditor.GetLine(data.Caret.Line);
                     data.Caret.Column = System.Math.Min(curLine.LengthIncludingDelimiter, System.Math.Max(0, curLine.Length)) + 1;  
@@ -2880,7 +2882,7 @@ del _invoke, _
 		  Invoke( delegate {
 				//System.Console.WriteLine("updateShellControls...");
 				Gtk.Widget retval = searchForPage(ShellEditor);
-				if (retval == null || retval == lastSelectedPage)
+				if (retval == null) // || retval == lastSelectedPage)
 				  return;
 				//System.Console.WriteLine("...set!");
 				lastSelectedPage = retval;
@@ -2890,13 +2892,13 @@ del _invoke, _
 				saveaspython_menu.Sensitive = false;
 				removemodule_menu.Sensitive = false;
 				if (! ProgramRunning) {
-				  if (ShellEditor.Document.Text != "") {
+				    //if (ShellEditor.Document.Text != "") {
 					StartAction.Sensitive = true;
 					StartButton.Sensitive = true;
-				  } else {
-					StartAction.Sensitive = false;
-					StartButton.Sensitive = false;
-				  }
+					//} else {
+					//StartAction.Sensitive = false;
+					//StartButton.Sensitive = false;
+					//}
 				}
 				SetLanguage(ShellLanguage);
 				// Workaround: had to add this for notebook page selection:
