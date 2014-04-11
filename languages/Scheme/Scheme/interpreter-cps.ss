@@ -52,9 +52,7 @@
 (define-native dlr-proc? (lambda (x) #f))
 (define-native dlr-apply apply)
 (define-native dlr-func (lambda (x) x))
-(define-native callback0 (lambda () #f))
-(define-native callback1 (lambda (x) #f))
-(define-native callback2 (lambda (x y) #f))
+(define-native callback (lambda args #f))
 (define-native dlr-env-contains (lambda (x) #f))
 (define-native dlr-env-lookup (lambda (x) #f))
 (define-native dlr-object? (lambda (x) #f))
@@ -362,18 +360,10 @@
 	(m exp env handler fail
 	  (lambda-cont2 (proc fail)
 	    (k (dlr-func proc) fail))))
-      (callback0-aexp (exp info)
+      (callback-aexp (exp info)
 	(m exp env handler fail
 	  (lambda-cont2 (proc fail)
-	    (k (callback0 proc) fail))))
-      (callback1-aexp (exp info)
-	(m exp env handler fail
-	  (lambda-cont2 (proc fail)
-	    (k (callback1 proc) fail))))
-      (callback2-aexp (exp info)
-	(m exp env handler fail
-	  (lambda-cont2 (proc fail)
-	    (k (callback2 proc) fail))))
+	    (k (callback proc) fail))))
       (if-aexp (test-exp then-exp else-exp info)
 	(m test-exp env handler fail
 	  (lambda-cont2 (bool fail)

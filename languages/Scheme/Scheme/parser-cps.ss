@@ -30,9 +30,7 @@
 (define-native dlr-proc? (lambda (x) #f))
 (define-native dlr-apply apply)
 (define-native dlr-func (lambda (x) x))
-(define-native callback0 (lambda () #f))
-(define-native callback1 (lambda (x) #f))
-(define-native callback2 (lambda (x y) #f))
+(define-native callback (lambda args #f))
 (define-native dlr-env-contains (lambda (x) #f))
 (define-native dlr-env-lookup (lambda (x) #f))
 (define-native dlr-object? (lambda (x) #f))
@@ -97,13 +95,7 @@
   (func-aexp
     (exp aexpression?)
     (info source-info?))
-  (callback0-aexp
-    (exp aexpression?)
-    (info source-info?))
-  (callback1-aexp
-    (exp aexpression?)
-    (info source-info?))
-  (callback2-aexp
+  (callback-aexp
     (exp aexpression?)
     (info source-info?))
   (define-aexp
@@ -250,9 +242,7 @@
 (define if-else?^ (tagged-list^ 'if = 4))
 (define assignment?^ (tagged-list^ 'set! = 3))
 (define func?^ (tagged-list^ 'func = 2))
-(define callback0?^ (tagged-list^ 'callback0 = 2))
-(define callback1?^ (tagged-list^ 'callback1 = 2))
-(define callback2?^ (tagged-list^ 'callback2 = 2))
+(define callback?^ (tagged-list^ 'callback = 2))
 (define define?^ (tagged-list^ 'define >= 3))
 (define define!?^ (tagged-list^ 'define! >= 3))
 (define define-syntax?^ (tagged-list^ 'define-syntax >= 3))
@@ -326,18 +316,10 @@
 	 (aparse (cadr^ adatum) senv handler fail
 	   (lambda-cont2 (e fail)
 	     (k (func-aexp e info) fail))))
-	((callback0?^ adatum)
+	((callback?^ adatum)
 	 (aparse (cadr^ adatum) senv handler fail
 	   (lambda-cont2 (e fail)
-	     (k (callback0-aexp e info) fail))))
-	((callback1?^ adatum)
-	 (aparse (cadr^ adatum) senv handler fail
-	   (lambda-cont2 (e fail)
-	     (k (callback1-aexp e info) fail))))
-	((callback2?^ adatum)
-	 (aparse (cadr^ adatum) senv handler fail
-	   (lambda-cont2 (e fail)
-	     (k (callback2-aexp e info) fail))))
+	     (k (callback-aexp e info) fail))))
 	((define?^ adatum)
 	 (cond
 	   ((mit-style-define?^ adatum)
@@ -1131,12 +1113,8 @@
 	`(set! ,var ,(aunparse rhs-exp)))
       (func-aexp (exp info)
 	`(func ,(aunparse exp)))
-      (callback0-aexp (exp info)
-	`(callback0 ,(aunparse exp)))
-      (callback1-aexp (exp info)
-	`(callback1 ,(aunparse exp)))
-      (callback2-aexp (exp info)
-	`(callback2 ,(aunparse exp)))
+      (callback-aexp (exp info)
+	`(callback ,(aunparse exp)))
       (define-aexp (id docstring rhs-exp info)
 	(if (string=? docstring "")
 	  `(define ,id ,(aunparse rhs-exp))

@@ -2488,6 +2488,18 @@ public class Scheme {
       }
       return retval.Insert(0, "(vector ").Append(")").ToString();
   }
+
+  public static object array_to_list(object[] args) {
+	Object result = PJScheme.symbol_emptylist;
+	if (args != null) {
+	    int count = ((Array)args).Length;
+	    for (int i = 0; i < count; i++) {
+		Object item = args[count - i - 1];
+		result = new Cons(item, result);
+	    }
+	}
+	return result;
+  }
   
     public static object list(params object[] args) {
 	Object result = PJScheme.symbol_emptylist;
@@ -2698,7 +2710,8 @@ public class Scheme {
     else if (pair_q(x))
       return (new Cons(make_safe(car(x)), make_safe(cdr(x))));
     else if (vector_q(x))
-      return (list_to_vector(make_safe(vector_to_list(x))));
+      // FIXME: too expensive and weird:
+      return list_to_vector(make_safe(vector_to_list(x)));
     else
       return (x);
   }

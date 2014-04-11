@@ -484,7 +484,7 @@ public class PJScheme:Scheme
     // like schemeProc by calling apply_proc on its args.
     return delegate (object[] args) { 
       proc_reg = schemeProc;
-      args_reg = PJScheme.list ((object) args);
+      args_reg = PJScheme.array_to_list (args);
       handler_reg = REP_handler;
       k2_reg = REP_k;
       pc = (Function) apply_proc;
@@ -492,38 +492,14 @@ public class PJScheme:Scheme
     };
   }
 
-  public static Func<object> callback0(object schemeProc) {
-    // Return a Csharp function that when invoked acts
-    // like schemeProc by calling apply_proc on its args.
-    return () => { 
-      proc_reg = schemeProc;
-      args_reg = PJScheme.list ();
-      handler_reg = REP_handler;
-      k2_reg = REP_k;
-      pc = (Function) apply_proc;
-      return PJScheme.trampoline();
-    };
-  }
+  public delegate object ParamsFunction (params object[] args); 
 
-  public static Func<object,object> callback1(object schemeProc) {
+  public static ParamsFunction callback(object schemeProc) {
     // Return a Csharp function that when invoked acts
     // like schemeProc by calling apply_proc on its args.
-    return (object arg) => { 
+    return args => { 
       proc_reg = schemeProc;
-      args_reg = PJScheme.list (arg);
-      handler_reg = REP_handler;
-      k2_reg = REP_k;
-      pc = (Function) apply_proc;
-      return PJScheme.trampoline();
-    };
-  }
-
-  public static Func<object,object,object> callback2(object schemeProc) {
-    // Return a Csharp function that when invoked acts
-    // like schemeProc by calling apply_proc on its args.
-    return (object arg1, object arg2) => { 
-      proc_reg = schemeProc;
-      args_reg = PJScheme.list (arg1, arg2);
+      args_reg = PJScheme.array_to_list (args);
       handler_reg = REP_handler;
       k2_reg = REP_k;
       pc = (Function) apply_proc;
