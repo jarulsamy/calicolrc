@@ -3273,23 +3273,19 @@
 
 (define <proc-82>
   (lambda ()
-    (if (null? args_reg)
+    (if (not (all-numeric? args_reg))
         (begin
-          (set! msg_reg "incorrect number of arguments to /")
+          (set! msg_reg "/ called on non-numeric argument(s)")
           (set! pc runtime-error))
-        (if (not (all-numeric? args_reg))
+        (if (and (> (length args_reg) 1) (member 0 (cdr args_reg)))
             (begin
-              (set! msg_reg "/ called on non-numeric argument(s)")
+              (set! msg_reg "division by zero")
               (set! pc runtime-error))
-            (if (member 0 (cdr args_reg))
-                (begin
-                  (set! msg_reg "division by zero")
-                  (set! pc runtime-error))
-                (begin
-                  (set! value2_reg fail_reg)
-                  (set! value1_reg (apply / args_reg))
-                  (set! k_reg k2_reg)
-                  (set! pc apply-cont2)))))))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply / args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
 
 (define <proc-83>
   (lambda ()

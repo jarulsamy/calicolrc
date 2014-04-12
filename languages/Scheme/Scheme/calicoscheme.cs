@@ -3372,23 +3372,18 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_82_d() {
-        if (true_q(null_q(args_reg))) {
-            msg_reg = "incorrect number of arguments to /";
+        if (true_q((! true_q(all_numeric_q(args_reg))))) {
+            msg_reg = "/ called on non-numeric argument(s)";
             pc = runtime_error;
         } else {
-            if (true_q((! true_q(all_numeric_q(args_reg))))) {
-                msg_reg = "/ called on non-numeric argument(s)";
+            if (true_q((true_q(GreaterThan(length(args_reg), 1)) && true_q(member(0, cdr(args_reg)))))) {
+                msg_reg = "division by zero";
                 pc = runtime_error;
             } else {
-                if (true_q(member(0, cdr(args_reg)))) {
-                    msg_reg = "division by zero";
-                    pc = runtime_error;
-                } else {
-                    value2_reg = fail_reg;
-                    value1_reg = apply(Divide_proc, args_reg);
-                    k_reg = k2_reg;
-                    pc = apply_cont2;
-                }
+                value2_reg = fail_reg;
+                value1_reg = apply(Divide_proc, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
             }
         }
     }

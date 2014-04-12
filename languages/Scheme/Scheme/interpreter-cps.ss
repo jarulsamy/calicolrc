@@ -1427,11 +1427,9 @@
 (define divide-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-      ((null? args)
-       (runtime-error "incorrect number of arguments to /" info handler fail))
       ((not (all-numeric? args))
        (runtime-error "/ called on non-numeric argument(s)" info handler fail))
-      ((member 0 (cdr args))
+      ((and (> (length args) 1) (member 0 (cdr args)))
        (runtime-error "division by zero" info handler fail))
       (else (k2 (apply / args) fail)))))
 

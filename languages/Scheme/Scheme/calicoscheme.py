@@ -5,6 +5,8 @@
 ## Doug Blank
 ####################################################
 
+from __future__ import division, print_function
+
 
 #############################################################
 # Scheme.py
@@ -441,7 +443,7 @@ def char_is__q(c1, c2):
     return c1 == c2
 
 def number_q(item):
-    return isinstance(item, (int, long, float, Fraction, fractions.Fraction))
+    return isinstance(item, (int, long, float, fractions.Fraction))
 
 def null_q(item):
     return item is symbol_emptylist
@@ -490,11 +492,14 @@ def get_type(obj):
 
 ### Math and applications:
 
-class Fraction(fractions.Fraction):
-    def __repr__(self):
-        return "%s/%s" % (self.numerator, self.denominator)
-    def __str__(self):
-        return "%s/%s" % (self.numerator, self.denominator)
+fractions.Fraction.__repr__ = lambda self: "%s/%s" % (self.numerator, self.denominator)
+fractions.Fraction.__str__ = lambda self: "%s/%s" % (self.numerator, self.denominator)
+
+#class Fraction(fractions.Fraction):
+#    def __repr__(self):
+#        return "%s/%s" % (self.numerator, self.denominator)
+#    def __str__(self):
+#        return "%s/%s" % (self.numerator, self.denominator)
 
 def modulo(a, b):
     return a % b
@@ -523,7 +528,15 @@ def multiply(*args):
     return reduce(operator.mul, args, 1)
 
 def divide(*args):
-    return args[0] / args[1]
+    if len(args) == 0:
+        return 1
+    elif len(args) == 1:
+        return fractions.Fraction(1, args[0])
+    else:
+        current = fractions.Fraction(args[0], args[1])
+        for arg in args[2:]:
+            current = fractions.Fraction(current, arg)
+        return current
 
 def Equal(a, b):
     return a == b
@@ -598,7 +611,7 @@ def string_to_decimal(s):
 
 def string_to_rational(s):
     try:
-        return Fraction(s)
+        return fractions.Fraction(s)
     except:
         return False
 
@@ -3742,22 +3755,18 @@ def b_proc_81_d():
         globals()['pc'] = apply_cont2
 
 def b_proc_82_d():
-    if null_q(args_reg):
-        globals()['msg_reg'] = "incorrect number of arguments to /"
+    if not(all_numeric_q(args_reg)):
+        globals()['msg_reg'] = "/ called on non-numeric argument(s)"
         globals()['pc'] = runtime_error
     else:
-        if not(all_numeric_q(args_reg)):
-            globals()['msg_reg'] = "/ called on non-numeric argument(s)"
+        if (GreaterThan(length(args_reg), 1)) and (member(0, cdr(args_reg))):
+            globals()['msg_reg'] = "division by zero"
             globals()['pc'] = runtime_error
         else:
-            if member(0, cdr(args_reg)):
-                globals()['msg_reg'] = "division by zero"
-                globals()['pc'] = runtime_error
-            else:
-                globals()['value2_reg'] = fail_reg
-                globals()['value1_reg'] = Apply(divide, args_reg)
-                globals()['k_reg'] = k2_reg
-                globals()['pc'] = apply_cont2
+            globals()['value2_reg'] = fail_reg
+            globals()['value1_reg'] = Apply(divide, args_reg)
+            globals()['k_reg'] = k2_reg
+            globals()['pc'] = apply_cont2
 
 def b_proc_83_d():
     if not(length_two_q(args_reg)):

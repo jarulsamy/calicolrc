@@ -280,6 +280,8 @@ class PythonTranslator(Translator):
 ## Doug Blank
 ####################################################
 
+from __future__ import division, print_function
+
 """)
         self.Print(0, file("Scheme.py").read())
 
