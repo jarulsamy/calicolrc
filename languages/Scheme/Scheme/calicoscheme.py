@@ -189,9 +189,36 @@ def for_each(f, lyst):
     if current != symbol_emptylist:
         raise Exception("not a proper list")
 
-def sort(f, lyst):
-    # FIXME: sort the list based on f
-    return List(*sorted(lyst))
+def pivot (p, l):
+    if null_q(l):
+        return make_symbol("done")
+    elif null_q(cdr(l)):
+        return make_symbol("done")
+    result = apply_comparison(p, car(l), cadr(l))
+    if result:
+        return pivot(p, cdr(l))
+    else:
+        return car(l)
+
+def apply_comparison(p, carl, cadrl):
+    return apply(p, [carl, cadrl])
+
+## usage: (partition 4 '(6 4 2 1 7) () ()) -> returns partitions
+def partition (p, piv, l, p1, p2):
+    if (null_q(l)):
+        return List(p1, p2)
+    result = apply_comparison(p, car(l), piv)
+    if (result):
+        return partition(p, piv, cdr(l), cons(car(l), p1), p2)
+    else:
+        return partition(p, piv, cdr(l), p1, cons(car(l), p2))
+
+def sort(p, l):
+    piv = pivot(p, l)
+    if (piv is make_symbol("done")): return l
+    parts = partition(p, piv, l, symbol_emptylist, symbol_emptylist)
+    return append(sort(p, car(parts)),
+                  sort(p, cadr(parts)))
 
 def append(*objs):
     retval = objs[-1]
