@@ -744,10 +744,7 @@ def make_safe(item):
         # Unlike Python, Scheme's strings must start with "
         return '"%s"' % item.replace('"', '\\"')
     elif boolean_q(item):
-        if item:
-            return "#t"
-        else:
-            return "#f"
+        return "#t" if item else "#f"
     else:
         return repr(item)
 

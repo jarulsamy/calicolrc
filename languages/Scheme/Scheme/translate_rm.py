@@ -359,7 +359,7 @@ from __future__ import division, print_function
 
     def process_if(self, expr, locals, indent):
         ## (if 1 2 3)
-        self.Print(indent, "if %s:" % self.process_app(expr[1]))
+        self.Print(indent, "if true_q(%s):" % self.process_app(expr[1]))
         self.process_statement(expr[2], locals, indent + 4)
         if len(expr) > 3:
             self.Print(indent, "else:")
@@ -388,7 +388,7 @@ from __future__ import division, print_function
 
     def process_cond(self, expr, locals, indent):
         ## (cond (test result) ...)
-        self.Print(indent, "if %s:" % self.process_app(expr[1][0]))
+        self.Print(indent, "if true_q(%s):" % self.process_app(expr[1][0]))
         self.process_statement(expr[1][1], locals, indent + 4)
         for rest in expr[2:]:
             if rest[0] == "else":
