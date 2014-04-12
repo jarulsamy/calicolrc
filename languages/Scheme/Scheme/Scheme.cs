@@ -2416,7 +2416,16 @@ public class Scheme {
 
     public static bool apply_comparison(object p, object carl, object cadrl) {
 	object result = null;
-	if (p is Predicate2) {
+	if (p is Proc) {
+	    result = apply(p, list(carl, cadrl));
+	} else if (p is Procedure2Bool) {
+	    Procedure2Bool f = (Procedure2Bool)p;
+	    try {
+		result = f(carl, cadrl);
+	    } catch (Exception e) {
+		throw new Exception("error in sort comparison predicate: " + e.Message);
+	    }
+	} else if (p is Predicate2) {
 	    Predicate2 f = (Predicate2)p;
 	    try {
 		result = f(carl, cadrl);
@@ -2921,13 +2930,18 @@ public class Scheme {
 	  throw new Exception("The method or operation is not implemented.");
       }
       
-      public override string ToString() { // Unsafe
+      public override string ToString() { 
 	  string retval = "";
 	  object current = this;
-	  while (current != PJScheme.symbol_emptylist) {
+	  while (current is Cons) {
+	      if (retval != "") {
+		  retval += " ";
+	      }
 	      retval += make_safe(((Cons)current).car);
-	      retval += " ";
 	      current = ((Cons)current).cdr;
+	  } 
+	  if (current != PJScheme.symbol_emptylist) {
+	      retval += " . " + make_safe(current);
 	  }
 	  return "(" + retval + ")";
       }
