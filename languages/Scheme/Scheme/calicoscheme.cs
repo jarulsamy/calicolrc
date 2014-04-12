@@ -63,14 +63,18 @@ public class PJScheme:Scheme
 
   public static object apply_comparison_rm(object schemeProc, object arg1, object arg2) {
       // used from non-pcs code that evaluates a scheme proc in sort
+      save_k2_reg = k2_reg;
       proc_reg = schemeProc;
       args_reg = PJScheme.list (arg1, arg2);
       handler_reg = REP_handler;
       k2_reg = REP_k;
       pc = (Function) apply_proc;
-      return PJScheme.trampoline();
+      object retval = PJScheme.trampoline();
+      k2_reg = save_k2_reg;
+      return retval;
   }
 
+   static object save_k2_reg = null;
    static int _closure_depth = 0;
    static bool _trace_pause = false;
 
@@ -4327,7 +4331,7 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_156_d() {
-        if (true_q((! true_q(length_one_q(args_reg))))) {
+        if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to string-split";
             pc = runtime_error;
         } else {
@@ -6889,16 +6893,20 @@ public class PJScheme:Scheme
     }
     
     public static object format_exception_line(object line) {
-        object filename = symbol_undefined;
-        object line_number = symbol_undefined;
-        object column_number = symbol_undefined;
-        column_number = caddr(line);
-        line_number = cadr(line);
-        filename = car(line);
-        if (true_q(Equal(length(line), 3))) {
-            return format("  File \"~a\", line ~a, col ~a~%", filename, line_number, column_number);
+        if (true_q(list_q(line))) {
+            object filename = symbol_undefined;
+            object line_number = symbol_undefined;
+            object column_number = symbol_undefined;
+            column_number = caddr(line);
+            line_number = cadr(line);
+            filename = car(line);
+            if (true_q(Equal(length(line), 3))) {
+                return format("  File \"~a\", line ~a, col ~a~%", filename, line_number, column_number);
+            } else {
+                return format("  File \"~a\", line ~a, col ~a, in '~a'~%", filename, line_number, column_number, cadddr(line));
+            }
         } else {
-            return format("  File \"~a\", line ~a, col ~a, in ~a~%", filename, line_number, column_number, cadddr(line));
+            return format("  Source \"~a\"~%", line);
         }
     }
     

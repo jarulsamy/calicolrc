@@ -280,8 +280,6 @@ class PythonTranslator(Translator):
 ## Doug Blank
 ####################################################
 
-from __future__ import division, print_function
-
 """)
         self.Print(0, file("Scheme.py").read())
 
@@ -513,14 +511,18 @@ public class PJScheme:Scheme
 
   public static object apply_comparison_rm(object schemeProc, object arg1, object arg2) {
       // used from non-pcs code that evaluates a scheme proc in sort
+      save_k2_reg = k2_reg;
       proc_reg = schemeProc;
       args_reg = PJScheme.list (arg1, arg2);
       handler_reg = REP_handler;
       k2_reg = REP_k;
       pc = (Function) apply_proc;
-      return PJScheme.trampoline();
+      object retval = PJScheme.trampoline();
+      k2_reg = save_k2_reg;
+      return retval;
   }
 
+   static object save_k2_reg = null;
    static int _closure_depth = 0;
    static bool _trace_pause = false;
 

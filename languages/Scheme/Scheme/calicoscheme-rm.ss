@@ -4243,7 +4243,7 @@
 
 (define <proc-156>
   (lambda ()
-    (if (not (length-one? args_reg))
+    (if (not (length-two? args_reg))
         (begin
           (set! msg_reg
             "incorrect number of arguments to string-split")
@@ -6839,22 +6839,24 @@
 
 (define format-exception-line
   (lambda (line)
-    (let ((filename 'undefined)
-          (line-number 'undefined)
-          (column-number 'undefined))
-      (set! column-number (caddr line))
-      (set! line-number (cadr line))
-      (set! filename (car line))
-      (if (= (length line) 3)
-          (return*
-            (format
-              "  File \"~a\", line ~a, col ~a~%"
-              filename
-              line-number
-              column-number))
-          (return*
-            (format "  File \"~a\", line ~a, col ~a, in ~a~%" filename
-              line-number column-number (cadddr line)))))))
+    (if (list? line)
+        (let ((filename 'undefined)
+              (line-number 'undefined)
+              (column-number 'undefined))
+          (set! column-number (caddr line))
+          (set! line-number (cadr line))
+          (set! filename (car line))
+          (if (= (length line) 3)
+              (return*
+                (format
+                  "  File \"~a\", line ~a, col ~a~%"
+                  filename
+                  line-number
+                  column-number))
+              (return*
+                (format "  File \"~a\", line ~a, col ~a, in '~a'~%" filename
+                  line-number column-number (cadddr line)))))
+        (return* (format "  Source \"~a\"~%" line)))))
 
 (define start-rm
   (lambda ()

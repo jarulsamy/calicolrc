@@ -139,12 +139,14 @@
 
 (define format-exception-line
   (lambda (line)
-    (let ((filename (car line))
-	  (line-number (cadr line))
-	  (column-number (caddr line)))
-      (if (= (length line) 3)
-	  (format "  File \"~a\", line ~a, col ~a~%" filename line-number column-number)
-	  (format "  File \"~a\", line ~a, col ~a, in ~a~%" filename line-number column-number (cadddr line))))))
+    (if (list? line)
+	(let ((filename (car line))
+	      (line-number (cadr line))
+	      (column-number (caddr line)))
+	  (if (= (length line) 3)
+	      (format "  File \"~a\", line ~a, col ~a~%" filename line-number column-number)
+	      (format "  File \"~a\", line ~a, col ~a, in '~a'~%" filename line-number column-number (cadddr line))))
+	(format "  Source \"~a\"~%" line))))
 
 (define execute-string
   (lambda (input)
@@ -2252,7 +2254,7 @@
 (define string-split-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-      ((not (length-one? args))
+      ((not (length-two? args))
        (runtime-error "incorrect number of arguments to string-split" info handler fail))
       (else (k2 (apply string-split args) fail)))))
 
