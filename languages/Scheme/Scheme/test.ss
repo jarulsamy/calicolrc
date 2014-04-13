@@ -540,6 +540,37 @@
 (verify 'define-datatype-8 (un-parse (lambda-exp 'a (var-exp 'a))) equal? '(a (var-exp a)))
 (verify 'define-datatype-8 (un-parse (app-exp (lambda-exp 'a (var-exp 'a)) (var-exp 'a))) equal? '((lambda-exp a (var-exp a)) (var-exp a)))
 
+(define distinct?
+  (lambda (nums)
+    (or (null? nums)
+        (null? (cdr nums))
+	(and (not (member (car nums) (cdr nums)))
+	     (distinct? (cdr nums))))))
+
+(define floors2
+  (lambda ()
+    (let ((baker (choose 1 2 3 4 5)))
+      (require (not (= baker 5)))
+      (let ((fletcher (choose 1 2 3 4 5)))
+	(require (not (= fletcher 5)))
+	(require (not (= fletcher 1)))
+	(let ((cooper (choose 1 2 3 4 5)))
+	  (require (not (= cooper 1)))
+	  (require (not (= (abs (- fletcher cooper)) 1)))
+	  (let ((smith (choose 1 2 3 4 5)))
+	    (require (not (= (abs (- smith fletcher)) 1)))
+	    (let ((miller (choose 1 2 3 4 5)))
+	      (require (> miller cooper))
+	      (require (distinct? (list baker cooper fletcher miller smith)))
+	      (list
+	        (list 'baker: baker)
+		(list 'cooper: cooper)
+		(list 'fletcher: fletcher)
+		(list 'miller: miller)
+		(list 'smith: smith)))))))))
+
+(verify 'choose (floors2) equal? '((baker: 3) (cooper: 2) (fletcher: 4) (miller: 5) (smith: 1)))
+
 (newline)
 (for-each (lambda (m) (printf "~a ~%" m)) (reverse report))
 (printf "~%Results:~%    right = ~s~%    wrong = ~s ~%" right wrong)
