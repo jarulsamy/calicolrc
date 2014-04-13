@@ -1703,9 +1703,7 @@
 ;; cut
 (define cut-prim
   (lambda-proc (args env2 info handler fail k2)
-    (if (not (null? args))
-      (runtime-error "incorrect number of arguments to cut" info handler fail)
-      (k2 'ok REP-fail))))
+      (k2 args REP-fail)))
 
 ;; reverse
 (define reverse-prim

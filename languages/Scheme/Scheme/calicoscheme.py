@@ -578,8 +578,8 @@ def GreaterThan(a, b):
 def memq(item, lyst):
     current = lyst
     while isinstance(current, cons):
-        if current.car == item:
-            return current.cdr
+        if current.car is item:
+            return current
         current = current.cdr
     return False
 
@@ -4082,14 +4082,10 @@ def b_proc_106_d():
             globals()['pc'] = apply_fail
 
 def b_proc_107_d():
-    if true_q(not(null_q(args_reg))):
-        globals()['msg_reg'] = "incorrect number of arguments to cut"
-        globals()['pc'] = runtime_error
-    else:
-        globals()['value2_reg'] = REP_fail
-        globals()['value1_reg'] = symbol_ok
-        globals()['k_reg'] = k2_reg
-        globals()['pc'] = apply_cont2
+    globals()['value2_reg'] = REP_fail
+    globals()['value1_reg'] = args_reg
+    globals()['k_reg'] = k2_reg
+    globals()['pc'] = apply_cont2
 
 def b_proc_108_d():
     if true_q(not(length_one_q(args_reg))):

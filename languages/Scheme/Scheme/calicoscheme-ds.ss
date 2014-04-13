@@ -3529,14 +3529,7 @@
 (define+
   <proc-107>
   (lambda (args env2 info handler fail k2 fields)
-    (let ()
-      (if (not (null? args))
-          (runtime-error
-            "incorrect number of arguments to cut"
-            info
-            handler
-            fail)
-          (apply-cont2 k2 'ok REP-fail)))))
+    (let () (apply-cont2 k2 args REP-fail))))
 
 (define+
   <proc-108>

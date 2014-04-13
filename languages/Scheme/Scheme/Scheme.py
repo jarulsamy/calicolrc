@@ -570,8 +570,8 @@ def GreaterThan(a, b):
 def memq(item, lyst):
     current = lyst
     while isinstance(current, cons):
-        if current.car == item:
-            return current.cdr
+        if current.car is item:
+            return current
         current = current.cdr
     return False
 

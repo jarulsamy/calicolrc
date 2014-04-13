@@ -3733,15 +3733,10 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_107_d() {
-        if (true_q((! true_q(null_q(args_reg))))) {
-            msg_reg = "incorrect number of arguments to cut";
-            pc = runtime_error;
-        } else {
-            value2_reg = REP_fail;
-            value1_reg = symbol_ok;
-            k_reg = k2_reg;
-            pc = apply_cont2;
-        }
+        value2_reg = REP_fail;
+        value1_reg = args_reg;
+        k_reg = k2_reg;
+        pc = apply_cont2;
     }
     
     public static void b_proc_108_d() {

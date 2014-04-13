@@ -3616,15 +3616,10 @@
 
 (define <proc-107>
   (lambda ()
-    (if (not (null? args_reg))
-        (begin
-          (set! msg_reg "incorrect number of arguments to cut")
-          (set! pc runtime-error))
-        (begin
-          (set! value2_reg REP-fail)
-          (set! value1_reg 'ok)
-          (set! k_reg k2_reg)
-          (set! pc apply-cont2)))))
+    (set! value2_reg REP-fail)
+    (set! value1_reg args_reg)
+    (set! k_reg k2_reg)
+    (set! pc apply-cont2)))
 
 (define <proc-108>
   (lambda ()

@@ -1525,7 +1525,7 @@ public class Scheme {
 	  else
 		return String.Format("{0}.0", s);
 	} else if (obj is String) {
-	  return String.Format("\"{0}\"", obj);
+	  return String.Format("{0}", obj);
 	} else if (obj is Symbol) {
 	    //System.Console.WriteLine("Here 2");
 	  return obj.ToString();
@@ -1574,7 +1574,13 @@ public class Scheme {
 	for (int i = 0; i < smsg.Length; i++) {
 	    if (smsg[i] == TILDE) {
 		if (smsg[i+1] == 's') {
-		    new_msg.Append(ToString(rest[count]));
+		    if (rest[count] is string) {
+			new_msg.Append("\"");
+			new_msg.Append(ToString(rest[count]));
+			new_msg.Append("\"");
+		    } else {
+			new_msg.Append(ToString(rest[count]));
+		    }
 		    count += 1;
 		    i++;
 		} else if (smsg[i+1] == 'a') {
