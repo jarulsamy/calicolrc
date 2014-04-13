@@ -309,7 +309,7 @@ def caadr(lyst):
     return lyst.cdr.car.car
 
 def cadaar(lyst):
-    return lyst.car.cdr.car.car
+    return lyst.car.car.cdr.car
 
 def cadadr(lyst):
     return lyst.cdr.car.cdr.car
@@ -324,7 +324,7 @@ def cdaadr(lyst):
     return lyst.cdr.car.car.cdr
 
 def cdaar(lyst):
-    return lyst.car.car.car.cdr
+    return lyst.car.car.cdr
 
 def cdadar(lyst):
     return lyst.car.cdr.car.cdr
@@ -336,7 +336,7 @@ def cdadr(lyst):
     return lyst.cdr.car.cdr
 
 def cddaar(lyst):
-    return lyst.cdr.cdr.car.car
+    return lyst.car.car.cdr.cdr
 
 def cddadr(lyst):
     return lyst.cdr.car.cdr.cdr
@@ -443,9 +443,6 @@ def odd_q(n):
 
 def eq_q(o1, o2):
     return o1 is o2
-
-def equal_q(o1, o2):
-    return o1 == o2
 
 def char_q(item):
     return isinstance(item, Char)
@@ -556,8 +553,15 @@ def divide(*args):
             current = fractions.Fraction(current, arg)
         return current
 
-def Equal(a, b):
-    return a == b
+def Equal(o1, o2):
+    if boolean_q(o1) or boolean_q(o2):
+        return boolean_q(o1) and boolean_q(o2) and o1 is o2
+    return o1 == o2
+
+def equal_q(o1, o2):
+    if boolean_q(o1) or boolean_q(o2):
+        return boolean_q(o1) and boolean_q(o2) and o1 is o2
+    return o1 == o2
 
 def LessThan(a, b):
     return a < b
@@ -640,6 +644,9 @@ def string_to_number(s):
         return string_to_decimal(s)
     else:
         return string_to_integer(s)
+
+def int_(number):
+    return int(round(number))
 
 ### Strings:
 
@@ -1236,7 +1243,7 @@ symbol_procedure_q = make_symbol("procedure?")
 symbol_stringLessThan_q = make_symbol("string<?")
 symbol_float = make_symbol("float")
 symbol_globals = make_symbol("globals")
-symbol_int = make_symbol("int")
+symbol_int_ = make_symbol("int")
 symbol_apply_with_keywords = make_symbol("apply-with-keywords")
 symbol_assq = make_symbol("assq")
 symbol_dict = make_symbol("dict")
@@ -4494,7 +4501,7 @@ def b_proc_147_d():
         globals()['pc'] = runtime_error
     else:
         globals()['value2_reg'] = fail_reg
-        globals()['value1_reg'] = Apply(int, args_reg)
+        globals()['value1_reg'] = Apply(int_, args_reg)
         globals()['k_reg'] = k2_reg
         globals()['pc'] = apply_cont2
 
@@ -7523,7 +7530,7 @@ def for_each_primitive():
 
 def make_toplevel_env():
     primitives = symbol_undefined
-    primitives = List(List(symbol_multiply, times_prim), List(symbol_plus, plus_prim), List(symbol_minus, minus_prim), List(symbol_divide, divide_prim), List(symbol_p, modulo_prim), List(symbol_LessThan, lt_prim), List(symbol_LessThanEqual, lt_or_eq_prim), List(symbol_Equal, equal_sign_prim), List(symbol_GreaterThan, gt_prim), List(symbol_GreaterThanEqual, gt_or_eq_prim), List(symbol_abort, abort_prim), List(symbol_abs, abs_prim), List(symbol_append, append_prim), List(symbol_Apply, apply_prim), List(symbol_assv, assv_prim), List(symbol_boolean_q, boolean_q_prim), List(symbol_caddr, caddr_prim), List(symbol_cadr, cadr_prim), List(symbol_call_with_current_continuation, call_cc_prim), List(symbol_call_cc, call_cc_prim), List(symbol_car, car_prim), List(symbol_cdr, cdr_prim), List(symbol_caaaar, caaaar_prim), List(symbol_caaadr, caaadr_prim), List(symbol_caaar, caaar_prim), List(symbol_caadar, caadar_prim), List(symbol_caaddr, caaddr_prim), List(symbol_caadr, caadr_prim), List(symbol_caar, caar_prim), List(symbol_cadaar, cadaar_prim), List(symbol_cadadr, cadadr_prim), List(symbol_cadar, cadar_prim), List(symbol_caddar, caddar_prim), List(symbol_cadddr, cadddr_prim), List(symbol_cdaaar, cdaaar_prim), List(symbol_cdaadr, cdaadr_prim), List(symbol_cdaar, cdaar_prim), List(symbol_cdadar, cdadar_prim), List(symbol_cdaddr, cdaddr_prim), List(symbol_cdadr, cdadr_prim), List(symbol_cdar, cdar_prim), List(symbol_cddaar, cddaar_prim), List(symbol_cddadr, cddadr_prim), List(symbol_cddar, cddar_prim), List(symbol_cdddar, cdddar_prim), List(symbol_cddddr, cddddr_prim), List(symbol_cdddr, cdddr_prim), List(symbol_cddr, cddr_prim), List(symbol_char_q, char_q_prim), List(symbol_char_is__q, char_is__q_prim), List(symbol_char_whitespace_q, char_whitespace_q_prim), List(symbol_char_alphabetic_q, char_alphabetic_q_prim), List(symbol_char_numeric_q, char_numeric_q_prim), List(symbol_char_to_integer, char_to_integer_prim), List(symbol_cons, cons_prim), List(symbol_current_time, current_time_prim), List(symbol_cut, cut_prim), List(symbol_dir, dir_prim), List(symbol_display, display_prim), List(symbol_current_environment, current_environment_prim), List(symbol_eq_q, eq_q_prim), List(symbol_equal_q, equal_q_prim), List(symbol_error, error_prim), List(symbol_eval, eval_prim), List(symbol_eval_ast, eval_ast_prim), List(symbol_exit, exit_prim), List(symbol_for_each, for_each_prim), List(symbol_format, format_prim), List(symbol_get, get_prim), List(symbol_get_stack_trace, get_stack_trace_prim), List(symbol_import, import_prim), List(symbol_integer_to_char, integer_to_char_prim), List(symbol_length, length_prim), List(symbol_List, list_prim), List(symbol_list_to_vector, list_to_vector_prim), List(symbol_list_to_string, list_to_string_prim), List(symbol_list_ref, list_ref_prim), List(symbol_load, load_prim), List(symbol_make_set, make_set_prim), List(symbol_make_vector, make_vector_prim), List(symbol_Map, map_prim), List(symbol_member, member_prim), List(symbol_memq, memq_prim), List(symbol_memv, memv_prim), List(symbol_newline, newline_prim), List(symbol_not, not_prim), List(symbol_null_q, null_q_prim), List(symbol_number_to_string, number_to_string_prim), List(symbol_number_q, number_q_prim), List(symbol_pair_q, pair_q_prim), List(symbol_parse, parse_prim), List(symbol_parse_string, parse_string_prim), List(symbol_print, print_prim), List(symbol_printf, printf_prim), List(symbol_Range, range_prim), List(symbol_read_string, read_string_prim), List(symbol_require, require_prim), List(symbol_reverse, reverse_prim), List(symbol_set_car_b, set_car_b_prim), List(symbol_set_cdr_b, set_cdr_b_prim), List(symbol_snoc, snoc_prim), List(symbol_rac, rac_prim), List(symbol_rdc, rdc_prim), List(symbol_sqrt, sqrt_prim), List(symbol_odd_q, odd_q_prim), List(symbol_even_q, even_q_prim), List(symbol_quotient, quotient_prim), List(symbol_remainder, remainder_prim), List(symbol_string, string_prim), List(symbol_string_length, string_length_prim), List(symbol_string_ref, string_ref_prim), List(symbol_string_q, string_q_prim), List(symbol_string_to_number, string_to_number_prim), List(symbol_string_is__q, string_is__q_prim), List(symbol_substring, substring_prim), List(symbol_symbol_q, symbol_q_prim), List(symbol_unparse, unparse_prim), List(symbol_unparse_procedure, unparse_procedure_prim), List(symbol_using, using_prim), List(symbol_use_stack_trace, use_stack_trace_prim), List(symbol_vector, vector_prim), List(symbol_vector_ref, vector_ref_prim), List(symbol_vector_set_b, vector_set_b_prim), List(symbol_void, void_prim), List(symbol_zero_q, zero_q_prim), List(symbol_current_directory, current_directory_prim), List(symbol_cd, current_directory_prim), List(symbol_round, round_prim), List(symbol_char_to_string, char_to_string_prim), List(symbol_string_to_list, string_to_list_prim), List(symbol_string_to_symbol, string_to_symbol_prim), List(symbol_symbol_to_string, symbol_to_string_prim), List(symbol_vector_to_list, vector_to_list_prim), List(symbol_eqv_q, eqv_q_prim), List(symbol_vector_q, vector_q_prim), List(symbol_atom_q, atom_q_prim), List(symbol_iter_q, iter_q_prim), List(symbol_list_q, list_q_prim), List(symbol_procedure_q, procedure_q_prim), List(symbol_stringLessThan_q, stringLessThan_q_prim), List(symbol_float, float_prim), List(symbol_globals, globals_prim), List(symbol_int, int_prim), List(symbol_apply_with_keywords, apply_with_keywords_prim), List(symbol_assq, assq_prim), List(symbol_dict, dict_prim), List(symbol_property, property_prim), List(symbol_rational, rational_prim), List(symbol_reset_toplevel_env, reset_toplevel_env_prim), List(symbol_sort, sort_prim), List(symbol_string_append, string_append_prim), List(symbol_string_split, string_split_prim), List(symbol_symbol, symbol_prim), List(symbol_typeof, typeof_prim), List(symbol_use_lexical_address, use_lexical_address_prim), List(symbol_use_tracing, use_tracing_prim))
+    primitives = List(List(symbol_multiply, times_prim), List(symbol_plus, plus_prim), List(symbol_minus, minus_prim), List(symbol_divide, divide_prim), List(symbol_p, modulo_prim), List(symbol_LessThan, lt_prim), List(symbol_LessThanEqual, lt_or_eq_prim), List(symbol_Equal, equal_sign_prim), List(symbol_GreaterThan, gt_prim), List(symbol_GreaterThanEqual, gt_or_eq_prim), List(symbol_abort, abort_prim), List(symbol_abs, abs_prim), List(symbol_append, append_prim), List(symbol_Apply, apply_prim), List(symbol_assv, assv_prim), List(symbol_boolean_q, boolean_q_prim), List(symbol_caddr, caddr_prim), List(symbol_cadr, cadr_prim), List(symbol_call_with_current_continuation, call_cc_prim), List(symbol_call_cc, call_cc_prim), List(symbol_car, car_prim), List(symbol_cdr, cdr_prim), List(symbol_caaaar, caaaar_prim), List(symbol_caaadr, caaadr_prim), List(symbol_caaar, caaar_prim), List(symbol_caadar, caadar_prim), List(symbol_caaddr, caaddr_prim), List(symbol_caadr, caadr_prim), List(symbol_caar, caar_prim), List(symbol_cadaar, cadaar_prim), List(symbol_cadadr, cadadr_prim), List(symbol_cadar, cadar_prim), List(symbol_caddar, caddar_prim), List(symbol_cadddr, cadddr_prim), List(symbol_cdaaar, cdaaar_prim), List(symbol_cdaadr, cdaadr_prim), List(symbol_cdaar, cdaar_prim), List(symbol_cdadar, cdadar_prim), List(symbol_cdaddr, cdaddr_prim), List(symbol_cdadr, cdadr_prim), List(symbol_cdar, cdar_prim), List(symbol_cddaar, cddaar_prim), List(symbol_cddadr, cddadr_prim), List(symbol_cddar, cddar_prim), List(symbol_cdddar, cdddar_prim), List(symbol_cddddr, cddddr_prim), List(symbol_cdddr, cdddr_prim), List(symbol_cddr, cddr_prim), List(symbol_char_q, char_q_prim), List(symbol_char_is__q, char_is__q_prim), List(symbol_char_whitespace_q, char_whitespace_q_prim), List(symbol_char_alphabetic_q, char_alphabetic_q_prim), List(symbol_char_numeric_q, char_numeric_q_prim), List(symbol_char_to_integer, char_to_integer_prim), List(symbol_cons, cons_prim), List(symbol_current_time, current_time_prim), List(symbol_cut, cut_prim), List(symbol_dir, dir_prim), List(symbol_display, display_prim), List(symbol_current_environment, current_environment_prim), List(symbol_eq_q, eq_q_prim), List(symbol_equal_q, equal_q_prim), List(symbol_error, error_prim), List(symbol_eval, eval_prim), List(symbol_eval_ast, eval_ast_prim), List(symbol_exit, exit_prim), List(symbol_for_each, for_each_prim), List(symbol_format, format_prim), List(symbol_get, get_prim), List(symbol_get_stack_trace, get_stack_trace_prim), List(symbol_import, import_prim), List(symbol_integer_to_char, integer_to_char_prim), List(symbol_length, length_prim), List(symbol_List, list_prim), List(symbol_list_to_vector, list_to_vector_prim), List(symbol_list_to_string, list_to_string_prim), List(symbol_list_ref, list_ref_prim), List(symbol_load, load_prim), List(symbol_make_set, make_set_prim), List(symbol_make_vector, make_vector_prim), List(symbol_Map, map_prim), List(symbol_member, member_prim), List(symbol_memq, memq_prim), List(symbol_memv, memv_prim), List(symbol_newline, newline_prim), List(symbol_not, not_prim), List(symbol_null_q, null_q_prim), List(symbol_number_to_string, number_to_string_prim), List(symbol_number_q, number_q_prim), List(symbol_pair_q, pair_q_prim), List(symbol_parse, parse_prim), List(symbol_parse_string, parse_string_prim), List(symbol_print, print_prim), List(symbol_printf, printf_prim), List(symbol_Range, range_prim), List(symbol_read_string, read_string_prim), List(symbol_require, require_prim), List(symbol_reverse, reverse_prim), List(symbol_set_car_b, set_car_b_prim), List(symbol_set_cdr_b, set_cdr_b_prim), List(symbol_snoc, snoc_prim), List(symbol_rac, rac_prim), List(symbol_rdc, rdc_prim), List(symbol_sqrt, sqrt_prim), List(symbol_odd_q, odd_q_prim), List(symbol_even_q, even_q_prim), List(symbol_quotient, quotient_prim), List(symbol_remainder, remainder_prim), List(symbol_string, string_prim), List(symbol_string_length, string_length_prim), List(symbol_string_ref, string_ref_prim), List(symbol_string_q, string_q_prim), List(symbol_string_to_number, string_to_number_prim), List(symbol_string_is__q, string_is__q_prim), List(symbol_substring, substring_prim), List(symbol_symbol_q, symbol_q_prim), List(symbol_unparse, unparse_prim), List(symbol_unparse_procedure, unparse_procedure_prim), List(symbol_using, using_prim), List(symbol_use_stack_trace, use_stack_trace_prim), List(symbol_vector, vector_prim), List(symbol_vector_ref, vector_ref_prim), List(symbol_vector_set_b, vector_set_b_prim), List(symbol_void, void_prim), List(symbol_zero_q, zero_q_prim), List(symbol_current_directory, current_directory_prim), List(symbol_cd, current_directory_prim), List(symbol_round, round_prim), List(symbol_char_to_string, char_to_string_prim), List(symbol_string_to_list, string_to_list_prim), List(symbol_string_to_symbol, string_to_symbol_prim), List(symbol_symbol_to_string, symbol_to_string_prim), List(symbol_vector_to_list, vector_to_list_prim), List(symbol_eqv_q, eqv_q_prim), List(symbol_vector_q, vector_q_prim), List(symbol_atom_q, atom_q_prim), List(symbol_iter_q, iter_q_prim), List(symbol_list_q, list_q_prim), List(symbol_procedure_q, procedure_q_prim), List(symbol_stringLessThan_q, stringLessThan_q_prim), List(symbol_float, float_prim), List(symbol_globals, globals_prim), List(symbol_int_, int_prim), List(symbol_apply_with_keywords, apply_with_keywords_prim), List(symbol_assq, assq_prim), List(symbol_dict, dict_prim), List(symbol_property, property_prim), List(symbol_rational, rational_prim), List(symbol_reset_toplevel_env, reset_toplevel_env_prim), List(symbol_sort, sort_prim), List(symbol_string_append, string_append_prim), List(symbol_string_split, string_split_prim), List(symbol_symbol, symbol_prim), List(symbol_typeof, typeof_prim), List(symbol_use_lexical_address, use_lexical_address_prim), List(symbol_use_tracing, use_tracing_prim))
     return make_initial_env_extended(Map(car, primitives), Map(cadr, primitives))
 
 def reset_toplevel_env():

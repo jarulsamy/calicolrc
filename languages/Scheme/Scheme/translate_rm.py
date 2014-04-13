@@ -103,6 +103,8 @@ class Translator(object):
             return "divide"
         elif name == "+":
             return "plus"
+        elif name == "int":
+            return "int_"
         elif name.startswith('"'):
             return name
         elif name.startswith("#"):

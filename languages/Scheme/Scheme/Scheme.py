@@ -301,7 +301,7 @@ def caadr(lyst):
     return lyst.cdr.car.car
 
 def cadaar(lyst):
-    return lyst.car.cdr.car.car
+    return lyst.car.car.cdr.car
 
 def cadadr(lyst):
     return lyst.cdr.car.cdr.car
@@ -316,7 +316,7 @@ def cdaadr(lyst):
     return lyst.cdr.car.car.cdr
 
 def cdaar(lyst):
-    return lyst.car.car.car.cdr
+    return lyst.car.car.cdr
 
 def cdadar(lyst):
     return lyst.car.cdr.car.cdr
@@ -328,7 +328,7 @@ def cdadr(lyst):
     return lyst.cdr.car.cdr
 
 def cddaar(lyst):
-    return lyst.cdr.cdr.car.car
+    return lyst.car.car.cdr.cdr
 
 def cddadr(lyst):
     return lyst.cdr.car.cdr.cdr
@@ -435,9 +435,6 @@ def odd_q(n):
 
 def eq_q(o1, o2):
     return o1 is o2
-
-def equal_q(o1, o2):
-    return o1 == o2
 
 def char_q(item):
     return isinstance(item, Char)
@@ -548,8 +545,15 @@ def divide(*args):
             current = fractions.Fraction(current, arg)
         return current
 
-def Equal(a, b):
-    return a == b
+def Equal(o1, o2):
+    if boolean_q(o1) or boolean_q(o2):
+        return boolean_q(o1) and boolean_q(o2) and o1 is o2
+    return o1 == o2
+
+def equal_q(o1, o2):
+    if boolean_q(o1) or boolean_q(o2):
+        return boolean_q(o1) and boolean_q(o2) and o1 is o2
+    return o1 == o2
 
 def LessThan(a, b):
     return a < b
@@ -632,6 +636,9 @@ def string_to_number(s):
         return string_to_decimal(s)
     else:
         return string_to_integer(s)
+
+def int_(number):
+    return int(round(number))
 
 ### Strings:
 
