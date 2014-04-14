@@ -62,6 +62,11 @@
 (define-native using (lambda ignore #f))
 (define-native iterator? (lambda ignore #f))
 (define-native get_type (lambda (x) 'unknown))
+(define-native char->string (lambda (c) (string c)))
+(define-native dict (lambda (assoc) assoc))
+(define-native float (lambda (n) (exact->inexact n)))
+(define-native int (lambda (n) (inexact->exact n)))
+(define-native iter? (lambda (x) #f))
 
 (define use-lexical-address
   (lambda args
