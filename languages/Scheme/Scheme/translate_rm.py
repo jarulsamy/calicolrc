@@ -79,7 +79,7 @@ class Translator(object):
             return "List"
         elif name == "apply":
             return "Apply"
-        elif name == "apply$":
+        elif name == "apply!":
             return "Apply"
         elif name == "range":
             return "Range"
@@ -880,7 +880,7 @@ public class PJScheme:Scheme
             return "map"
         elif name == "apply":
             return "apply"
-        elif name == "apply$":
+        elif name == "apply!":
             return "ApplyPlus"
         elif name == "apply*":
             return "dlr_apply"
