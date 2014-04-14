@@ -335,6 +335,9 @@ public class SimScribbler : Myro.Robot
 					velocity = _lastTranslate * rate * -1;
 				  }
 				  frame.body.AngularVelocity = (float)(-_lastRotate * rate);
+				  frame.body.LinearVelocity = Graphics.VectorRotate (
+						    Graphics.Vector (velocity, 0), 
+						    frame.body.Rotation);
 			    });
 		    }
 		}
@@ -1166,12 +1169,12 @@ public class SimScribbler : Myro.Robot
 		{
 		}
 
-		public override void draw_simulation() {
+		public override void update_simulation() {
+		    this.frame.body.LinearVelocity = Graphics.VectorRotate (
+				       Graphics.Vector (this.velocity, 0), 
+				       this.frame.body.Rotation);
 		    float MeterInPixels = 64.0f;
 		    this.stall = false;
-		    this.frame.body.LinearVelocity = Graphics.VectorRotate (
-									    Graphics.Vector (this.velocity, 0), 
-									    this.frame.body.Rotation);
 		    // Get sensor readings
 		    this.readings.clear ();
 		    Graphics.Point p1 = null;
