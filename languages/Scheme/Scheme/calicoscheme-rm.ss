@@ -153,7 +153,7 @@
 
 (define*
   apply-cont
-  (lambda () (apply$ (cadr k_reg) (cddr k_reg))))
+  (lambda () (apply! (cadr k_reg) (cddr k_reg))))
 
 (define <cont-1>
   (lambda (chars fail k)
@@ -747,7 +747,7 @@
 
 (define*
   apply-cont2
-  (lambda () (apply$ (cadr k_reg) (cddr k_reg))))
+  (lambda () (apply! (cadr k_reg) (cddr k_reg))))
 
 (define <cont2-1>
   (lambda (token k)
@@ -1855,7 +1855,7 @@
 
 (define*
   apply-cont3
-  (lambda () (apply$ (cadr k_reg) (cddr k_reg))))
+  (lambda () (apply! (cadr k_reg) (cddr k_reg))))
 
 (define <cont3-1>
   (lambda (src handler k)
@@ -1905,7 +1905,7 @@
 
 (define*
   apply-cont4
-  (lambda () (apply$ (cadr k_reg) (cddr k_reg))))
+  (lambda () (apply! (cadr k_reg) (cddr k_reg))))
 
 (define <cont4-1>
   (lambda (src start k)
@@ -2051,7 +2051,7 @@
 
 (define*
   apply-fail
-  (lambda () (apply$ (cadr fail_reg) (cddr fail_reg))))
+  (lambda () (apply! (cadr fail_reg) (cddr fail_reg))))
 
 (define <fail-1>
   (lambda ()
@@ -2090,7 +2090,7 @@
 
 (define*
   apply-handler
-  (lambda () (apply$ (cadr handler_reg) (cddr handler_reg))))
+  (lambda () (apply! (cadr handler_reg) (cddr handler_reg))))
 
 (define <handler-1>
   (lambda ()
@@ -2102,7 +2102,7 @@
 
 (define*
   apply-handler2
-  (lambda () (apply$ (cadr handler_reg) (cddr handler_reg))))
+  (lambda () (apply! (cadr handler_reg) (cddr handler_reg))))
 
 (define <handler2-1>
   (lambda ()
@@ -2153,7 +2153,7 @@
 
 (define*
   apply-proc
-  (lambda () (apply$ (cadr proc_reg) (cddr proc_reg))))
+  (lambda () (apply! (cadr proc_reg) (cddr proc_reg))))
 
 (define <proc-1>
   (lambda (bodies formals env)
@@ -4292,7 +4292,7 @@
 
 (define*
   apply-macro
-  (lambda () (apply$ (cadr macro_reg) (cddr macro_reg))))
+  (lambda () (apply! (cadr macro_reg) (cddr macro_reg))))
 
 (define <macro-1>
   (lambda ()

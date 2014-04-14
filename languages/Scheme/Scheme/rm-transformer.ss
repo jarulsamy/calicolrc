@@ -369,25 +369,13 @@
 		  `(begin ,@new-exps))))
 	    ((define define* define-native) (name body)
 	      `(,(car code) ,name ,(transform body)))
-	    ;; streamlining record-case 3/26/2014
 	    (define+ (name body)
 	      (let* ((let-exp (caddr body)) ;; body is a preprocessed lambda
 		     (let-vars (map car (cadr let-exp)))
 		     (let-bodies (cddr let-exp)))
 		`(define ,name (lambda ,let-vars ,@(consolidate (map transform let-bodies))))))
 	    (apply+ args
-	      `(apply$ ,(car args) ,(rac args)))
-;;	    (define+ (name body)
-;;	      (let* ((formals (cadr body))
-;;		     (let-exp (caddr body))
-;;		     (let-bindings (cadr let-exp))
-;;		     (let-bodies (cddr let-exp)))
-;;		`(define ,name
-;;		   (lambda ,formals
-;;		     (let ,let-bindings ,@(map transform let-bodies))))))
-;;	     leave apply+ in final registerized code for now, as a
-;;	     flag for the C# transformer to use
-;;	    (apply+ args code)
+	      `(apply! ,(car args) ,(rac args)))
 	    (define-syntax args code)
 	    (and exps
 	      `(and ,@(map transform exps)))
@@ -704,19 +692,9 @@
 	      code))
 	  (begin exps (returnize-last code))
 	  ((define define*) (name body)
-	   (if (or (eq? name 'apply-cont)
-		   (eq? name 'apply-cont2)
-		   (eq? name 'apply-macro)
-		   (eq? name 'apply-handler)
-		   (eq? name 'apply-handler2)
-		   (eq? name 'apply-cont3)
-		   (eq? name 'apply-fail)
-		   (eq? name 'apply-proc)
-		   (eq? name 'apply-cont4))
-	       `(,(car code) ,name ,body)
-	       (if (lambda? body)
-		   `(,(car code) ,name ,(returnize body))
-		   `(,(car code) ,name ,body))))
+	   (if (lambda? body)
+	       `(,(car code) ,name ,(returnize body))
+	       `(,(car code) ,name ,body)))
 	  (apply+ args code)
 	  (define-native args code)
 	  (define-syntax args code)
@@ -730,13 +708,11 @@
 	  (define-datatype args code)
 	  (cases (type exp . clauses)
 	    `(cases ,type ,exp ,@(map returnize-last clauses)))
-;;	  (return* (value) (returnize value))
 	  (halt* (value) `(return* ,value))
 ;;	  (error (value) `(return* ,code))
 	  ((error printf pretty-print) args code)
 	  (else (cond
 		  ((ends-with-a-bang? (car code)) code)
-		  ;;((ends-with-a-rm? (car code)) code)
 		  ((memq (car code) syntactic-keywords)
 		   (error-in-source code "I don't know how to process the above code."))
 		  (else `(return* ,code)))))))))
@@ -745,14 +721,6 @@
   (lambda (symbol)
     (let ((name (symbol->string symbol)))
       (equal? (string-ref name (- (string-length name) 1)) #\!))))
-
-(define ends-with-a-rm?
-  (lambda (symbol)
-    (let ((name (symbol->string symbol)))
-      (and (> (string-length name) 3)
-	   (equal? (string-ref name (- (string-length name) 3)) #\-)
-	   (equal? (string-ref name (- (string-length name) 2)) #\r)
-	   (equal? (string-ref name (- (string-length name) 1)) #\m)))))
 
 (define returnize-last
   (lambda (exps)
