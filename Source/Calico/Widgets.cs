@@ -1202,9 +1202,12 @@ public static class Widgets {
 
 	public Dictionary<string, string> GetRepresentations() {
 	    id = Widgets.next_id++;
+	    int width = 300;
+	    if (options.Contains("width")) 
+		width = Convert.ToInt32(options["width"]);
 	    var data = new Dictionary<string, string>();
 	    data["text/plain"] = "<GeoChart availble for viewing in notebook>";
-	    data["text/html"] =String.Format("<div id=\"chart_div_{4}\"></div>\n" +
+	    data["text/html"] =String.Format("<div id=\"chart_div_{4}\" style=\"height: {5}px;\"></div>\n" +
 					     "<script type=\"text/javascript\">\n" +
 					     "  require(['{3}'], function () {{\n" +
 					     "      function draw() {{\n" +
@@ -1215,7 +1218,7 @@ public static class Widgets {
 					     "                  {{'callback': draw, 'packages':['geochart']}});\n" +
 					     "  }});\n" +
 					     "</script>\n", 
-					     id, table, ToJSON(options), "https://www.google.com/jsapi", id);
+					     id, table, ToJSON(options), "https://www.google.com/jsapi", id, width);
 	    return data;
 	}
     }
@@ -1245,9 +1248,12 @@ public static class Widgets {
 
 	public Dictionary<string, string> GetRepresentations() {
 	    id = Widgets.next_id++;
+	    int width = 300;
+	    if (options.Contains("width")) 
+		width = Convert.ToInt32(options["width"]);
 	    var data = new Dictionary<string, string>();
 	    data["text/plain"] = "<ScatterChart availble for viewing in notebook>";
-	    data["text/html"] =String.Format("<div id=\"chart_div_{4}\"></div>\n" +
+	    data["text/html"] =String.Format("<div id=\"chart_div_{4}\" style=\"height: {5}px;\"></div>\n" +
 					     "<script type=\"text/javascript\">\n" +
 					     "  require(['{3}'], function () {{\n" +
 					     "      function draw() {{\n" +
@@ -1258,7 +1264,7 @@ public static class Widgets {
 					     "                  {{'callback': draw, 'packages':['corechart']}});\n" +
 					     "  }});\n" +
 					     "</script>\n", 
-					     id, table, ToJSON(options), "https://www.google.com/jsapi", id);
+					     id, table, ToJSON(options), "https://www.google.com/jsapi", id, width);
 	    return data;
 	}
     }
@@ -1296,9 +1302,12 @@ public static class Widgets {
 
 	public Dictionary<string, string> GetRepresentations() {
 	    id = Widgets.next_id++;
+	    int width = 300;
+	    if (options.Contains("width")) 
+		width = Convert.ToInt32(options["width"]);
 	    var data = new Dictionary<string, string>();
 	    data["text/plain"] = "<LineChart availble for viewing in notebook>";
-	    data["text/html"] =String.Format("<div id=\"chart_div_{4}\"></div>\n" +
+	    data["text/html"] =String.Format("<div id=\"chart_div_{4}\" style=\"height: {5}px;\"></div>\n" +
 					     "<script type=\"text/javascript\">\n" +
 					     "  require(['{3}'], function () {{\n" +
 					     "      function draw() {{\n" +
@@ -1309,7 +1318,7 @@ public static class Widgets {
 					     "                  {{'callback': draw, 'packages':['corechart']}});\n" +
 					     "  }});\n" +
 					     "</script>\n", 
-					     id, table, ToJSON(options), "https://www.google.com/jsapi", id);
+					     id, table, ToJSON(options), "https://www.google.com/jsapi", id, width);
 	    return data;
 	}
     }

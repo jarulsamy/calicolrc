@@ -1,6 +1,11 @@
 from __future__ import print_function
 
-import Numeric, math, random, sys
+try:
+    import numpy.oldnumeric as Numeric
+except:
+    import Numeric ## pure-python version
+
+import math, random, sys
 from circularlist import CircularList
 
 __author__ = "Jeremy Stober"
@@ -136,7 +141,7 @@ def makeNoisySequence(sequence, repeat, percentNoise=0.1):
             retval.append(makeNoisyList(sequence[i], percentNoise))
     return retval
 
-class RAVQ:
+class RAVQ(object):
     """
     Implements RAVQ algorithm as described in Linaker and Niklasson.
     """
@@ -387,7 +392,7 @@ class ARAVQ(RAVQ):
         self.alpha = learningRate
         self.deltaWinner = 'No Winner'
         self.learning = 1
-        RAVQ.__init__(self, bufferSize, epsilon, delta, historySize)
+        super(ARAVQ, self).__init__(bufferSize, epsilon, delta, historySize)
     def __str__(self):
         s = RAVQ.__str__(self)
         return s[:10] + "Alpha (learning rate): " + str(self.alpha) + " " + s[10:]
