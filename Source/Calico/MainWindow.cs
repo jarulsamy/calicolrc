@@ -2167,7 +2167,7 @@ del _invoke, _
 
 	public bool handleOnKeyPressEvents(object o, Gtk.KeyPressEventArgs args, Gtk.Widget focus) {
 	    bool retval = false;
-	    //System.Console.WriteLine("'" + args.Event.Key.ToString() + "'");
+	    System.Console.WriteLine("'" + args.Event.Key.ToString() + "'");
 	    if (onKey.ContainsKey(args.Event.Key.ToString())) {
 		object tretval = onKey[args.Event.Key.ToString()](o,args,focus);
 		if (tretval is bool)
