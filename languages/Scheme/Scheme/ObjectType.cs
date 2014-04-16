@@ -112,6 +112,49 @@ public class ObjectType
 			dt2 = DateType.FromObject(o2);
 			return dt1.CompareTo(dt2);
 		*/
+			} else if ((o1 is Rational) || (o2 is Rational)) {
+			    if ((o1 is Rational) && (o2 is Rational)) {
+				Rational r1 = (Rational)o1;
+				Rational r2 = (Rational)o2;
+				if (r1.Equals(r1)) 
+				    return 0;
+				else if (r1 < r2) 
+				    return -1;
+				else
+				    return 1;
+			    } else if (o1 is Rational) {
+				Rational r1 = (Rational)o1;
+				if (o2 is Double) {
+				    double i1 = (double) r1;
+				    double i2 = (double) o2;
+				    return ObjTst(i1, i2, TextCompare);
+				} else if (o2 is int) {
+				    int i1 = (int) r1;
+				    int i2 = (int) o2;
+				    return ObjTst(i1, i2, TextCompare);
+				} else if (o2 is float) {
+				    float i1 = (float) r1;
+				    float i2 = (float) o2;
+				    return ObjTst(i1, i2, TextCompare);
+				} else 
+				    throw new Exception("can't compare these types");
+			    } else { // o2 is rational
+				Rational r2 = (Rational)o2;
+				if (o1 is Double) {
+				    double i1 = (double) o1;
+				    double i2 = (double) r2;
+				    return ObjTst(i1, i2, TextCompare);
+				} else if (o1 is int) {
+				    int i1 = (int) o1;
+				    int i2 = (int) r2;
+				    return ObjTst(i1, i2, TextCompare);
+				} else if (o1 is float) {
+				    float i1 = (float) o1;
+				    float i2 = (float) r2;
+				    return ObjTst(i1, i2, TextCompare);
+				} else 
+				    throw new Exception("can't compare these types");
+			    }
 			} else if ((o1 is String) || (o2 is String)) {
 				string s1 = Convert.ToString (o1);
 				string s2 = Convert.ToString (o2);

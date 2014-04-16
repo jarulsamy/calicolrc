@@ -432,8 +432,8 @@ public class Scheme {
   public static Proc vector_to_list_proc = new Proc("vector->list", (Procedure1) vector_to_list, 1, 1);
   public static Proc eq_q_proc = new Proc("eq?", (Procedure2Bool) Eq, 2, 2);  
   public static Proc eqv_q_proc = new Proc("eqv?", (Procedure2Bool) Eqv, 2, 2);  
-  public static Proc vector_q_proc = new Proc("vector?", (Procedure1Bool) vector_q, 1, 1);  
-  public static Proc iter_q_proc = new Proc("iter?", (Procedure1Bool) iter_q, 1, 1);  
+  public static Proc vector_q_proc = new Proc("vector?", (Procedure1Bool) vector_q, 1, 2);  
+  public static Proc iter_q_proc = new Proc("iter?", (Procedure1Bool) iter_q, 1, 2);  
   public static Proc make_binding_proc = new Proc("make-binding",(Procedure1)PJScheme.make_binding, 1, 1);
   public static Proc make_external_proc_proc = new Proc("make-external-proc", (Procedure1) PJScheme.make_external_proc, 1, 1);
   public static Proc make_vector_proc = new Proc("make-vector", (Procedure1) make_vector, 1, 1);
@@ -474,7 +474,7 @@ public class Scheme {
   public static Proc get_variables_from_frame_proc = new Proc("get_variables_from_frame", 
 								(Procedure1) PJScheme.get_variables_from_frame,
 								1, 1);
-    public static Proc use_lexical_address_proc = new Proc("use-lexical-address", (ProcedureN)PJScheme.use_lexical_address, -1, 1);
+    public static Proc use_lexical_address_proc = new Proc("use-lexical-address", (Procedure1Bool)PJScheme.use_lexical_address, -1, 2);
     public static Proc dict_proc = new Proc("dict", (Procedure1)dict, 1, 1);
     public static Proc property_proc = new Proc("property", (Procedure1)property, 1, 1);
     public static Proc reset_toplevel_env_proc = new Proc("reset-toplevel-env", (Procedure0Void)reset_toplevel_env, 0, 0);
@@ -1461,7 +1461,7 @@ public class Scheme {
 	int len = ((int) length(args)) - 1;
 	// FIXME: surely there is a better way?:
 	if (len == 0)
-	  Console.Write(car(args));
+	  Console.Write(format(car(args), PJScheme.symbol_emptylist));
 	else if (len == 1)
 	  Console.Write(format(car(args), cadr(args)));
 	else if (len == 2)
@@ -1525,7 +1525,7 @@ public class Scheme {
 	  else
 		return String.Format("{0}.0", s);
 	} else if (obj is String) {
-	  return String.Format("\"{0}\"", obj);
+	  return String.Format("{0}", obj);
 	} else if (obj is Symbol) {
 	    //System.Console.WriteLine("Here 2");
 	  return obj.ToString();
@@ -1574,7 +1574,13 @@ public class Scheme {
 	for (int i = 0; i < smsg.Length; i++) {
 	    if (smsg[i] == TILDE) {
 		if (smsg[i+1] == 's') {
-		    new_msg.Append(ToString(rest[count]));
+		    if (rest[count] is string) {
+			new_msg.Append("\"");
+			new_msg.Append(ToString(rest[count]));
+			new_msg.Append("\"");
+		    } else {
+			new_msg.Append(ToString(rest[count]));
+		    }
 		    count += 1;
 		    i++;
 		} else if (smsg[i+1] == 'a') {
@@ -1591,7 +1597,7 @@ public class Scheme {
 		new_msg.Append(smsg[i]);
 	    }
 	}
-	return String.Format(new_msg.ToString(), rest);
+	return new_msg.ToString();
   }
 
     public static bool string_eq_q(object args) {
@@ -1662,6 +1668,14 @@ public class Scheme {
   public static bool Eq(object obj1, object obj2) {
       if ((obj1 is bool) && (obj2 is bool))
 	  return ((bool)obj1) == ((bool)obj2);
+      else if ((obj1 is int) && (obj2 is int))
+	  return ((int)obj1) == ((int)obj2);
+      else if ((obj1 is float) && (obj2 is float))
+	  return ((float)obj1) == ((float)obj2);
+      else if ((obj1 is BigInteger) && (obj2 is BigInteger))
+	  return ((BigInteger)obj1) == ((BigInteger)obj2);
+      else if ((obj1 is Rational) && (obj2 is Rational))
+	  return ((Rational)obj1) == ((Rational)obj2);
       return Object.ReferenceEquals(obj1, obj2);
   }
 
@@ -2416,7 +2430,16 @@ public class Scheme {
 
     public static bool apply_comparison(object p, object carl, object cadrl) {
 	object result = null;
-	if (p is Predicate2) {
+	if (p is Proc) {
+	    result = apply(p, list(carl, cadrl));
+	} else if (p is Procedure2Bool) {
+	    Procedure2Bool f = (Procedure2Bool)p;
+	    try {
+		result = f(carl, cadrl);
+	    } catch (Exception e) {
+		throw new Exception("error in sort comparison predicate: " + e.Message);
+	    }
+	} else if (p is Predicate2) {
 	    Predicate2 f = (Predicate2)p;
 	    try {
 		result = f(carl, cadrl);
@@ -2730,14 +2753,15 @@ public class Scheme {
       return text.Append(obj2.ToString()).ToString();
   }
 
-// FIXME: Rewrite without recursion
   public static object assq(object x, object ls) {
-      if (null_q(ls)) 
-	  return false;
-      else if (Eq(x, caar(ls)))
-	  return car(ls);
-      else
-	  return assq(x, cdr(ls));
+      object current = ls;
+      while (! null_q(current)) {
+	  if (Eq(x, caar(current))) {
+	      return car(current);
+	  }
+	  current = cdr(current);
+      }
+      return false;
   }
 
 // assq compares keys with eq?
@@ -2921,13 +2945,18 @@ public class Scheme {
 	  throw new Exception("The method or operation is not implemented.");
       }
       
-      public override string ToString() { // Unsafe
+      public override string ToString() { 
 	  string retval = "";
 	  object current = this;
-	  while (current != PJScheme.symbol_emptylist) {
+	  while (current is Cons) {
+	      if (retval != "") {
+		  retval += " ";
+	      }
 	      retval += make_safe(((Cons)current).car);
-	      retval += " ";
 	      current = ((Cons)current).cdr;
+	  } 
+	  if (current != PJScheme.symbol_emptylist) {
+	      retval += " . " + make_safe(current);
 	  }
 	  return "(" + retval + ")";
       }

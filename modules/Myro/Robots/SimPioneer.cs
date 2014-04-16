@@ -721,7 +721,7 @@ using Microsoft.Xna.Framework; // Vector2, Matrix
 		{
 		}
 
-		public override void draw_simulation() {
+		public override void update_simulation() {
 		    float MeterInPixels = 64.0f;
 		    lock (this) {
 			this.stall = false;

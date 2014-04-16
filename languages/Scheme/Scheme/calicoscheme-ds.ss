@@ -3184,19 +3184,13 @@
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
-        ((null? args)
-         (runtime-error
-           "incorrect number of arguments to /"
-           info
-           handler
-           fail))
         ((not (all-numeric? args))
          (runtime-error
            "/ called on non-numeric argument(s)"
            info
            handler
            fail))
-        ((member 0 (cdr args))
+        ((and (> (length args) 1) (member 0 (cdr args)))
          (runtime-error "division by zero" info handler fail))
         (else (apply-cont2 k2 (apply / args) fail))))))
 
@@ -3535,14 +3529,7 @@
 (define+
   <proc-107>
   (lambda (args env2 info handler fail k2 fields)
-    (let ()
-      (if (not (null? args))
-          (runtime-error
-            "incorrect number of arguments to cut"
-            info
-            handler
-            fail)
-          (apply-cont2 k2 'ok REP-fail)))))
+    (let () (apply-cont2 k2 args REP-fail))))
 
 (define+
   <proc-108>
@@ -4176,7 +4163,7 @@
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
-        ((not (length-one? args))
+        ((not (length-two? args))
          (runtime-error
            "incorrect number of arguments to string-split"
            info
@@ -6029,17 +6016,19 @@
 
 (define format-exception-line
   (lambda (line)
-    (let ((filename (car line))
-          (line-number (cadr line))
-          (column-number (caddr line)))
-      (if (= (length line) 3)
-          (format
-            "  File \"~a\", line ~a, col ~a~%"
-            filename
-            line-number
-            column-number)
-          (format "  File \"~a\", line ~a, col ~a, in ~a~%" filename
-            line-number column-number (cadddr line))))))
+    (if (list? line)
+        (let ((filename (car line))
+              (line-number (cadr line))
+              (column-number (caddr line)))
+          (if (= (length line) 3)
+              (format
+                "  File \"~a\", line ~a, col ~a~%"
+                filename
+                line-number
+                column-number)
+              (format "  File \"~a\", line ~a, col ~a, in '~a'~%" filename
+                line-number column-number (cadddr line))))
+        (format "  Source \"~a\"~%" line))))
 
 (define execute-string
   (lambda (input) (execute input 'stdin)))

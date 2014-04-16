@@ -1505,14 +1505,37 @@ public static class Myro
 	      if (window.isRealized()) {
 		  lock (robots) {
 		      foreach (Robot robot in robots) {
-			  robot.draw_simulation ();
+			  robot.update_simulation ();
 		      }
 		      foreach (Robot robot in robots) {
-			  robot.update ();
+			  robot.update (); // handle any requests
 		      }
 		  }
 		  window.step (.1);
 	      }
+	  }
+	    
+	  public void simulate(double duration, double stepTime=0.1) {
+	      double timeLapsed = 0.0;
+	      // simulate the duration:
+	      while (timeLapsed < duration) { // seconds
+		  window.canvas.world.Step ((float)stepTime); 
+		  window.time += stepTime; 
+		  timeLapsed += stepTime;
+		  lock (robots) {
+		      foreach (Robot robot in robots) {
+			  robot.update_simulation ();
+		      }
+		  }
+	      }
+	      // now update the shapes from physics:
+	      lock (window.canvas.shapes) {
+		  foreach (Graphics.Shape shape in window.canvas.shapes) {
+		      shape.updateFromPhysics ();
+		  }
+	      }
+	      // and redraw the window
+	      window.update();
 	  }
 	    
 	  public void stop() {
@@ -1539,7 +1562,7 @@ public static class Myro
 		while (window.isRealized() && run) {
 		    lock (robots) {
 			foreach (Robot robot in robots) {
-			    robot.draw_simulation ();
+			    robot.update_simulation ();
 			}
 			foreach (Robot robot in robots) {
 			    robot.update ();
@@ -4007,7 +4030,7 @@ public static class Myro
 			stop();
 		}
 	  
-	  public virtual void draw_simulation ()
+	  public virtual void update_simulation ()
 	  {
 	    throw new NotImplementedException ();
 	  }

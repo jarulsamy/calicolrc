@@ -153,7 +153,7 @@
 
 (define*
   apply-cont
-  (lambda () (apply$ (cadr k_reg) (cddr k_reg))))
+  (lambda () (apply! (cadr k_reg) (cddr k_reg))))
 
 (define <cont-1>
   (lambda (chars fail k)
@@ -747,7 +747,7 @@
 
 (define*
   apply-cont2
-  (lambda () (apply$ (cadr k_reg) (cddr k_reg))))
+  (lambda () (apply! (cadr k_reg) (cddr k_reg))))
 
 (define <cont2-1>
   (lambda (token k)
@@ -1855,7 +1855,7 @@
 
 (define*
   apply-cont3
-  (lambda () (apply$ (cadr k_reg) (cddr k_reg))))
+  (lambda () (apply! (cadr k_reg) (cddr k_reg))))
 
 (define <cont3-1>
   (lambda (src handler k)
@@ -1905,7 +1905,7 @@
 
 (define*
   apply-cont4
-  (lambda () (apply$ (cadr k_reg) (cddr k_reg))))
+  (lambda () (apply! (cadr k_reg) (cddr k_reg))))
 
 (define <cont4-1>
   (lambda (src start k)
@@ -2051,7 +2051,7 @@
 
 (define*
   apply-fail
-  (lambda () (apply$ (cadr fail_reg) (cddr fail_reg))))
+  (lambda () (apply! (cadr fail_reg) (cddr fail_reg))))
 
 (define <fail-1>
   (lambda ()
@@ -2090,7 +2090,7 @@
 
 (define*
   apply-handler
-  (lambda () (apply$ (cadr handler_reg) (cddr handler_reg))))
+  (lambda () (apply! (cadr handler_reg) (cddr handler_reg))))
 
 (define <handler-1>
   (lambda ()
@@ -2102,7 +2102,7 @@
 
 (define*
   apply-handler2
-  (lambda () (apply$ (cadr handler_reg) (cddr handler_reg))))
+  (lambda () (apply! (cadr handler_reg) (cddr handler_reg))))
 
 (define <handler2-1>
   (lambda ()
@@ -2153,7 +2153,7 @@
 
 (define*
   apply-proc
-  (lambda () (apply$ (cadr proc_reg) (cddr proc_reg))))
+  (lambda () (apply! (cadr proc_reg) (cddr proc_reg))))
 
 (define <proc-1>
   (lambda (bodies formals env)
@@ -3273,23 +3273,19 @@
 
 (define <proc-82>
   (lambda ()
-    (if (null? args_reg)
+    (if (not (all-numeric? args_reg))
         (begin
-          (set! msg_reg "incorrect number of arguments to /")
+          (set! msg_reg "/ called on non-numeric argument(s)")
           (set! pc runtime-error))
-        (if (not (all-numeric? args_reg))
+        (if (and (> (length args_reg) 1) (member 0 (cdr args_reg)))
             (begin
-              (set! msg_reg "/ called on non-numeric argument(s)")
+              (set! msg_reg "division by zero")
               (set! pc runtime-error))
-            (if (member 0 (cdr args_reg))
-                (begin
-                  (set! msg_reg "division by zero")
-                  (set! pc runtime-error))
-                (begin
-                  (set! value2_reg fail_reg)
-                  (set! value1_reg (apply / args_reg))
-                  (set! k_reg k2_reg)
-                  (set! pc apply-cont2)))))))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply / args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
 
 (define <proc-83>
   (lambda ()
@@ -3620,15 +3616,10 @@
 
 (define <proc-107>
   (lambda ()
-    (if (not (null? args_reg))
-        (begin
-          (set! msg_reg "incorrect number of arguments to cut")
-          (set! pc runtime-error))
-        (begin
-          (set! value2_reg REP-fail)
-          (set! value1_reg 'ok)
-          (set! k_reg k2_reg)
-          (set! pc apply-cont2)))))
+    (set! value2_reg REP-fail)
+    (set! value1_reg args_reg)
+    (set! k_reg k2_reg)
+    (set! pc apply-cont2)))
 
 (define <proc-108>
   (lambda ()
@@ -4247,7 +4238,7 @@
 
 (define <proc-156>
   (lambda ()
-    (if (not (length-one? args_reg))
+    (if (not (length-two? args_reg))
         (begin
           (set! msg_reg
             "incorrect number of arguments to string-split")
@@ -4301,7 +4292,7 @@
 
 (define*
   apply-macro
-  (lambda () (apply$ (cadr macro_reg) (cddr macro_reg))))
+  (lambda () (apply! (cadr macro_reg) (cddr macro_reg))))
 
 (define <macro-1>
   (lambda ()
@@ -6843,22 +6834,24 @@
 
 (define format-exception-line
   (lambda (line)
-    (let ((filename 'undefined)
-          (line-number 'undefined)
-          (column-number 'undefined))
-      (set! column-number (caddr line))
-      (set! line-number (cadr line))
-      (set! filename (car line))
-      (if (= (length line) 3)
-          (return*
-            (format
-              "  File \"~a\", line ~a, col ~a~%"
-              filename
-              line-number
-              column-number))
-          (return*
-            (format "  File \"~a\", line ~a, col ~a, in ~a~%" filename
-              line-number column-number (cadddr line)))))))
+    (if (list? line)
+        (let ((filename 'undefined)
+              (line-number 'undefined)
+              (column-number 'undefined))
+          (set! column-number (caddr line))
+          (set! line-number (cadr line))
+          (set! filename (car line))
+          (if (= (length line) 3)
+              (return*
+                (format
+                  "  File \"~a\", line ~a, col ~a~%"
+                  filename
+                  line-number
+                  column-number))
+              (return*
+                (format "  File \"~a\", line ~a, col ~a, in '~a'~%" filename
+                  line-number column-number (cadddr line)))))
+        (return* (format "  Source \"~a\"~%" line)))))
 
 (define start-rm
   (lambda ()

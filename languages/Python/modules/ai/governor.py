@@ -4,13 +4,15 @@ Governor code for self regulating networks.
 
 """
 
+from __future__ import print_function
+
 __author__ = "Douglas Blank <dblank@brynmawr.edu>"
 __version__ = "$Revision$"
 
 from ai.conx import *
 from ai.ravq import ARAVQ, euclideanDistance
 
-class Governor:
+class Governor(object):
     """
     An RAVQ vitual baseclass for combination with Network. 
     """
@@ -133,7 +135,7 @@ class Governor:
         parts = len(layerWeights)
         for name in layerWeights:
             layerWeights[name] = (1.0 / layerWeights[name]) * (1.0 / parts)
-        print("layerWeights:", layerWeights)
+        print("setting balanced mask on layerWeights:", layerWeights)
         self.setMask(**layerWeights)
         
     def setMask(self, **args):
@@ -193,7 +195,7 @@ class GovernorNetwork(Governor, Network):
         if self.governing and not self._cv:
             # when layers are added one by one, ensure that mask
             # is in place
-            if not self.ravq.mask:
+            if self.ravq.mask is None:
                 self.setBalancedMask()
             argLayerNames = args.keys()
             argLayerNames.sort()
@@ -281,7 +283,7 @@ class GovernorSRN(Governor, SRN):
         SRN.addThreeLayers(self, i, h, o) 
         self.trainingNetwork.setLayerVerification(0)
         self.trainingNetwork.shareWeights(self)
-        if not self.ravq.mask:
+        if self.ravq.mask is None:
             self.setBalancedMask()
                 
     def report(self, hist=1):
@@ -359,7 +361,7 @@ class GovernorSRN(Governor, SRN):
         if self.governing and not self._cv:
             # when layers are added one by one, ensure that mask and sharing
             # are in place
-            if not self.ravq.mask:
+            if self.ravq.mask is None:
                 self.setBalancedMask()
             if self.trainingNetwork.sharedWeights == 0:
                 self.trainingNetwork.setLayerVerification(0)

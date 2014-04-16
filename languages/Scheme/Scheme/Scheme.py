@@ -3,7 +3,9 @@
 # These are native implementations of functions to allow
 # the register machine translation to run in Python
 
-from __future__ import print_function
+from __future__ import division, print_function
+
+import inspect
 import fractions
 import operator
 import types
@@ -11,8 +13,6 @@ import math
 import time
 import sys
 import os
-
-DEBUG = False
 
 #############################################################
 # Python implementation notes:
@@ -35,6 +35,7 @@ DEBUG = False
 
 # Set to a dictionary-like object for global-shared namespace:
 ENVIRONMENT = {key:getattr(__builtins__, key) for key in dir(__builtins__)}
+ENVIRONMENT["DEBUG"] = False
 
 class Char(object):
     def __init__(self, c):
@@ -121,8 +122,9 @@ class cons(object):
         return "(%s)" % retval
 
     def __iter__(self):
-        self.current = self
-        return self
+        cp = cons(self.car, self.cdr)
+        cp.current = cp
+        return cp
 
     def next(self): # Python 3: def __next__(self)
         if not isinstance(self.current, cons):
@@ -131,6 +133,10 @@ class cons(object):
             retval = self.current.car
             self.current = self.current.cdr
             return retval
+
+    def __getitem__(self, pos):
+        ls = list(self)
+        return ls[pos]
 
 def List(*args):
     # Scheme list
@@ -181,9 +187,56 @@ def for_each(f, lyst):
     if current != symbol_emptylist:
         raise Exception("not a proper list")
 
-def sort(f, lyst):
-    # FIXME: sort the list based on f
-    return List(*sorted(lyst))
+def pivot (p, l):
+    if null_q(l):
+        return make_symbol("done")
+    elif null_q(cdr(l)):
+        return make_symbol("done")
+    result = apply_comparison(p, car(l), cadr(l))
+    if result:
+        return pivot(p, cdr(l))
+    else:
+        return car(l)
+
+def make_comparison_function(procedure):
+    # FIXME: should rewrite this using CPS style
+    def compare(carl, cadrl):
+        globals()["save_k2_reg"] = k2_reg
+        globals()["proc_reg"] = procedure
+        globals()["args_reg"] = List(carl, cadrl)
+        globals()["handler_reg"] = REP_handler
+        globals()["k2_reg"] = REP_k
+        globals()["pc"] = apply_proc
+        retval = trampoline()
+        globals()["k2_reg"] = save_k2_reg
+        return retval
+    return compare
+
+def apply_comparison(p, carl, cadrl):
+    return apply(p, [carl, cadrl])
+
+## usage: (partition 4 '(6 4 2 1 7) () ()) -> returns partitions
+def partition (p, piv, l, p1, p2):
+    if (null_q(l)):
+        return List(p1, p2)
+    result = apply_comparison(p, car(l), piv)
+    if (result):
+        return partition(p, piv, cdr(l), cons(car(l), p1), p2)
+    else:
+        return partition(p, piv, cdr(l), p1, cons(car(l), p2))
+
+def sort(p, l):
+    # FIXME: should rewrite this using CPS style
+    # in order to use CPS comparison operators
+    if procedure_q(p):
+        f = make_comparison_function(p)
+    else:
+        f = p
+    piv = pivot(f, l)
+    if (piv is make_symbol("done")): return l
+    parts = partition(f, piv, l, symbol_emptylist, symbol_emptylist)
+    return append(sort(f, car(parts)),
+                  sort(f, cadr(parts)))
 
 def append(*objs):
     retval = objs[-1]
@@ -248,10 +301,10 @@ def caadr(lyst):
     return lyst.cdr.car.car
 
 def cadaar(lyst):
-    return lyst.car.cdr.car.car
+    return lyst.car.car.cdr.car
 
 def cadadr(lyst):
-    return lyst.car.cdr.car.cdr
+    return lyst.cdr.car.cdr.car
 
 def caddar(lyst):
     return lyst.car.cdr.cdr.car
@@ -263,7 +316,7 @@ def cdaadr(lyst):
     return lyst.cdr.car.car.cdr
 
 def cdaar(lyst):
-    return lyst.car.car.car.cdr
+    return lyst.car.car.cdr
 
 def cdadar(lyst):
     return lyst.car.cdr.car.cdr
@@ -272,10 +325,10 @@ def cdaddr(lyst):
     return lyst.cdr.cdr.car.cdr
 
 def cdadr(lyst):
-    return lyst.car.cdr.car.cdr
+    return lyst.cdr.car.cdr
 
 def cddaar(lyst):
-    return lyst.cdr.cdr.car.car
+    return lyst.car.car.cdr.cdr
 
 def cddadr(lyst):
     return lyst.cdr.car.cdr.cdr
@@ -383,9 +436,6 @@ def odd_q(n):
 def eq_q(o1, o2):
     return o1 is o2
 
-def equal_q(o1, o2):
-    return o1 == o2
-
 def char_q(item):
     return isinstance(item, Char)
 
@@ -406,7 +456,7 @@ def char_is__q(c1, c2):
     return c1 == c2
 
 def number_q(item):
-    return isinstance(item, (int, long, float, Fraction, fractions.Fraction))
+    return isinstance(item, (int, long, float, fractions.Fraction))
 
 def null_q(item):
     return item is symbol_emptylist
@@ -455,11 +505,8 @@ def get_type(obj):
 
 ### Math and applications:
 
-class Fraction(fractions.Fraction):
-    def __repr__(self):
-        return "%s/%s" % (self.numerator, self.denominator)
-    def __str__(self):
-        return "%s/%s" % (self.numerator, self.denominator)
+fractions.Fraction.__repr__ = lambda self: "%s/%s" % (self.numerator, self.denominator)
+fractions.Fraction.__str__ = lambda self: "%s/%s" % (self.numerator, self.denominator)
 
 def modulo(a, b):
     return a % b
@@ -488,10 +535,25 @@ def multiply(*args):
     return reduce(operator.mul, args, 1)
 
 def divide(*args):
-    return args[0] / args[1]
+    if len(args) == 0:
+        return 1
+    elif len(args) == 1:
+        return fractions.Fraction(1, args[0])
+    else:
+        current = fractions.Fraction(args[0], args[1])
+        for arg in args[2:]:
+            current = fractions.Fraction(current, arg)
+        return current
 
-def Equal(a, b):
-    return a == b
+def Equal(o1, o2):
+    if boolean_q(o1) or boolean_q(o2):
+        return boolean_q(o1) and boolean_q(o2) and o1 is o2
+    return o1 == o2
+
+def equal_q(o1, o2):
+    if boolean_q(o1) or boolean_q(o2):
+        return boolean_q(o1) and boolean_q(o2) and o1 is o2
+    return o1 == o2
 
 def LessThan(a, b):
     return a < b
@@ -508,8 +570,8 @@ def GreaterThan(a, b):
 def memq(item, lyst):
     current = lyst
     while isinstance(current, cons):
-        if current.car == item:
-            return current.cdr
+        if current.car is item:
+            return current
         current = current.cdr
     return False
 
@@ -563,7 +625,7 @@ def string_to_decimal(s):
 
 def string_to_rational(s):
     try:
-        return Fraction(s)
+        return fractions.Fraction(s)
     except:
         return False
 
@@ -574,6 +636,9 @@ def string_to_number(s):
         return string_to_decimal(s)
     else:
         return string_to_integer(s)
+
+def int_(number):
+    return int(round(number))
 
 ### Strings:
 
@@ -646,7 +711,7 @@ def newline():
 
 def trampoline():
     global pc, exception_reg
-    if DEBUG:
+    if ENVIRONMENT.get("DEBUG", False) == True:
         while pc:
             pc()
     else:
@@ -657,6 +722,13 @@ def trampoline():
                 exception_reg = make_exception("KeyboardInterrupt", "Keyboard interrupt", symbol_none, symbol_none, symbol_none)
                 pc = apply_handler2            
             except Exception, e:
+                #arginfo = inspect.getargvalues(sys.exc_info()[2].tb_frame)
+                #extra = "\nArguments:\n"
+                #for arg in arginfo.args:
+                #    extra += "   %s = %s\n" % (arg, repr(arginfo.locals[arg]))
+                #extra += "\nLocals:\n"
+                #for arg in arginfo.locals:
+                #    extra += "   %s = %s\n" % (arg, repr(arginfo.locals[arg]))
                 exception_reg = make_exception("UnhandledException", e.message, symbol_none, symbol_none, symbol_none)
                 pc = apply_handler2
     return final_reg
@@ -712,10 +784,7 @@ def make_safe(item):
         # Unlike Python, Scheme's strings must start with "
         return '"%s"' % item.replace('"', '\\"')
     elif boolean_q(item):
-        if item:
-            return "#t"
-        else:
-            return "#f"
+        return "#t" if item else "#f"
     else:
         return repr(item)
 
@@ -876,9 +945,9 @@ def callback(schemeProc):
     return cb
 
 def set_external_member_b(obj, components, value):
-    for component in components[:-1]:
-        obj = getattr(obj, component)
-    setattr(obj, components[-1], value)
+    for component in components[1:-1]:
+        obj = getattr(obj, component.name)
+    setattr(obj, components[-1].name, value)
 
 def apply_star(external_function, args):
     return external_function(*args)

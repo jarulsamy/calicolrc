@@ -88,6 +88,7 @@ class array:
         if type(other) in [int, float, long]:
             return array(map(lambda v: v - other, self.array))
         else: # array - [0, 1]
+            ##print("-", self.array, other)
             return array(map(lambda a,b: a - b, self.array, other))
 
     def __rsub__(self, other):

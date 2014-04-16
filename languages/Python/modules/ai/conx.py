@@ -19,7 +19,10 @@ __version__ = "$Revision$"
 # Jim Marshall
 
 import math, random, time, sys, operator, copy, array, traceback
-import Numeric
+try:
+    import numpy.oldnumeric as Numeric
+except:
+    import Numeric ## pure-python version
 
 def reverse(lyst):
     """ Returns a reversed list. """

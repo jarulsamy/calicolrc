@@ -79,7 +79,7 @@ class Translator(object):
             return "List"
         elif name == "apply":
             return "Apply"
-        elif name == "apply$":
+        elif name == "apply!":
             return "Apply"
         elif name == "range":
             return "Range"
@@ -103,6 +103,8 @@ class Translator(object):
             return "divide"
         elif name == "+":
             return "plus"
+        elif name == "int":
+            return "int_"
         elif name.startswith('"'):
             return name
         elif name.startswith("#"):
@@ -357,7 +359,7 @@ class PythonTranslator(Translator):
 
     def process_if(self, expr, locals, indent):
         ## (if 1 2 3)
-        self.Print(indent, "if %s:" % self.process_app(expr[1]))
+        self.Print(indent, "if true_q(%s):" % self.process_app(expr[1]))
         self.process_statement(expr[2], locals, indent + 4)
         if len(expr) > 3:
             self.Print(indent, "else:")
@@ -386,7 +388,7 @@ class PythonTranslator(Translator):
 
     def process_cond(self, expr, locals, indent):
         ## (cond (test result) ...)
-        self.Print(indent, "if %s:" % self.process_app(expr[1][0]))
+        self.Print(indent, "if true_q(%s):" % self.process_app(expr[1][0]))
         self.process_statement(expr[1][1], locals, indent + 4)
         for rest in expr[2:]:
             if rest[0] == "else":
@@ -511,14 +513,18 @@ public class PJScheme:Scheme
 
   public static object apply_comparison_rm(object schemeProc, object arg1, object arg2) {
       // used from non-pcs code that evaluates a scheme proc in sort
+      save_k2_reg = k2_reg;
       proc_reg = schemeProc;
       args_reg = PJScheme.list (arg1, arg2);
       handler_reg = REP_handler;
       k2_reg = REP_k;
       pc = (Function) apply_proc;
-      return PJScheme.trampoline();
+      object retval = PJScheme.trampoline();
+      k2_reg = save_k2_reg;
+      return retval;
   }
 
+   static object save_k2_reg = null;
    static int _closure_depth = 0;
    static bool _trace_pause = false;
 
@@ -874,7 +880,7 @@ public class PJScheme:Scheme
             return "map"
         elif name == "apply":
             return "apply"
-        elif name == "apply$":
+        elif name == "apply!":
             return "ApplyPlus"
         elif name == "apply*":
             return "dlr_apply"

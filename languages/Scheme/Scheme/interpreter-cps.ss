@@ -62,6 +62,11 @@
 (define-native using (lambda ignore #f))
 (define-native iterator? (lambda ignore #f))
 (define-native get_type (lambda (x) 'unknown))
+(define-native char->string (lambda (c) (string c)))
+(define-native dict (lambda (assoc) assoc))
+(define-native float (lambda (n) (exact->inexact n)))
+(define-native int (lambda (n) (inexact->exact n)))
+(define-native iter? (lambda (x) #f))
 
 (define use-lexical-address
   (lambda args
@@ -139,12 +144,14 @@
 
 (define format-exception-line
   (lambda (line)
-    (let ((filename (car line))
-	  (line-number (cadr line))
-	  (column-number (caddr line)))
-      (if (= (length line) 3)
-	  (format "  File \"~a\", line ~a, col ~a~%" filename line-number column-number)
-	  (format "  File \"~a\", line ~a, col ~a, in ~a~%" filename line-number column-number (cadddr line))))))
+    (if (list? line)
+	(let ((filename (car line))
+	      (line-number (cadr line))
+	      (column-number (caddr line)))
+	  (if (= (length line) 3)
+	      (format "  File \"~a\", line ~a, col ~a~%" filename line-number column-number)
+	      (format "  File \"~a\", line ~a, col ~a, in '~a'~%" filename line-number column-number (cadddr line))))
+	(format "  Source \"~a\"~%" line))))
 
 (define execute-string
   (lambda (input)
@@ -1427,11 +1434,9 @@
 (define divide-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-      ((null? args)
-       (runtime-error "incorrect number of arguments to /" info handler fail))
       ((not (all-numeric? args))
        (runtime-error "/ called on non-numeric argument(s)" info handler fail))
-      ((member 0 (cdr args))
+      ((and (> (length args) 1) (member 0 (cdr args)))
        (runtime-error "division by zero" info handler fail))
       (else (k2 (apply / args) fail)))))
 
@@ -1703,9 +1708,7 @@
 ;; cut
 (define cut-prim
   (lambda-proc (args env2 info handler fail k2)
-    (if (not (null? args))
-      (runtime-error "incorrect number of arguments to cut" info handler fail)
-      (k2 'ok REP-fail))))
+      (k2 args REP-fail)))
 
 ;; reverse
 (define reverse-prim
@@ -2254,7 +2257,7 @@
 (define string-split-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-      ((not (length-one? args))
+      ((not (length-two? args))
        (runtime-error "incorrect number of arguments to string-split" info handler fail))
       (else (k2 (apply string-split args) fail)))))
 

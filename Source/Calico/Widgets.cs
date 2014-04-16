@@ -7,6 +7,8 @@ using System.Collections.Generic; // Dictionary
 
 public static class Widgets {
 
+    public static int next_id = 1;
+
     public static Dictionary<string, Widget> comm_id = new Dictionary<string, Widget>();
 
     public static void Dispatch(string id, 
@@ -1177,6 +1179,9 @@ public static class Widgets {
 
     public class GeoChart {
 	ZMQServer.Session session;
+	public int id;
+	IDictionary options;
+	string table;
 
 	public GeoChart(ZMQServer.Session session, IEnumerable<string> keys, IDictionary data) 
 	    : this(session, keys, data, new Dictionary<string,object>()) {
@@ -1185,28 +1190,44 @@ public static class Widgets {
 	public GeoChart(ZMQServer.Session session, IEnumerable<string> keys, IDictionary data, IDictionary options) {
 	    // GeoChart(calico.sesssion, ['Country', 'Size'], {"Canada": 562, "United States": 987}, {"height"=300, "legend"=False})
 	    this.session = session;
-	    string table = ToJSON(keys);
+	    this.options = options;
+	    table = ToJSON(keys);
 	    foreach (string key in data.Keys) {
 		if (table != "") {
 		    table += ",\n";
 		}
 		table += String.Format("['{0}', {1}]", key, ToJSON(data[key]));
 	    }
-	    // FIXME: make this a Representation
-	    session.calico.display(
-	      session.calico.Javascript(
-	         String.Format("function draw() {{" +
-			       "  var chart = new google.visualization.GeoChart(element[0]);\n" +
-			       "  chart.draw(google.visualization.arrayToDataTable([{0}]), {1});\n" + 
-			       "}}\n" +
-			       "google.load('visualization', '1.0',\n" + 
-			       "            {{'callback': draw, 'packages':['geochart']}});\n", table, ToJSON(options)), 
-		 "https://www.google.com/jsapi"));
+	}
+
+	public Dictionary<string, string> GetRepresentations() {
+	    id = Widgets.next_id++;
+	    int width = 300;
+	    if (options.Contains("width")) 
+		width = Convert.ToInt32(options["width"]);
+	    var data = new Dictionary<string, string>();
+	    data["text/plain"] = "<GeoChart availble for viewing in notebook>";
+	    data["text/html"] =String.Format("<div id=\"chart_div_{4}\" style=\"height: {5}px;\"></div>\n" +
+					     "<script type=\"text/javascript\">\n" +
+					     "  require(['{3}'], function () {{\n" +
+					     "      function draw() {{\n" +
+					     "        var chart = new google.visualization.GeoChart(document.getElementById('chart_div_{0}'));\n" +
+					     "        chart.draw(google.visualization.arrayToDataTable([{1}]), {2});\n" + 
+					     "      }}\n" +
+					     "      google.load('visualization', '1.0',\n" + 
+					     "                  {{'callback': draw, 'packages':['geochart']}});\n" +
+					     "  }});\n" +
+					     "</script>\n", 
+					     id, table, ToJSON(options), "https://www.google.com/jsapi", id, width);
+	    return data;
 	}
     }
 
     public class ScatterChart {
 	ZMQServer.Session session;
+	public int id;
+	IDictionary options;
+	string table;
 
 	public ScatterChart(ZMQServer.Session session, IEnumerable<string> keys, IList data) 
 	    : this(session, keys, data, new Dictionary<string,object>()) {
@@ -1215,28 +1236,44 @@ public static class Widgets {
 	public ScatterChart(ZMQServer.Session session, IEnumerable<string> keys, IList data, IDictionary options) {
 	    // ScatterChart(["X", "Y"], [[8, 12], [10, 9], [9, 10], [8, 12]], height=300, width=500, lineWidth=1, legend='"none"')
 	    this.session = session;
-	    string table = ToJSON(keys);
+	    this.options = options;
+	    table = ToJSON(keys);
 	    foreach (IList<object> row in data) {
 		if (table != "") {
 		    table += ",\n";
 		}
 		table += ToJSON(row);
 	    }
-	    // FIXME: make this a Representation
-	    session.calico.display(
-	      session.calico.Javascript(
-	         String.Format("function draw() {{" +
-			       "  var chart = new google.visualization.ScatterChart(element[0]);\n" +
-			       "  chart.draw(google.visualization.arrayToDataTable([{0}]), {1});\n" + 
-			       "}}\n" +
-			       "google.load('visualization', '1.0',\n" + 
-			       "            {{'callback': draw, 'packages':['corechart']}});\n", table, ToJSON(options)), 
-		 "https://www.google.com/jsapi"));
+	}
+
+	public Dictionary<string, string> GetRepresentations() {
+	    id = Widgets.next_id++;
+	    int width = 300;
+	    if (options.Contains("width")) 
+		width = Convert.ToInt32(options["width"]);
+	    var data = new Dictionary<string, string>();
+	    data["text/plain"] = "<ScatterChart availble for viewing in notebook>";
+	    data["text/html"] =String.Format("<div id=\"chart_div_{4}\" style=\"height: {5}px;\"></div>\n" +
+					     "<script type=\"text/javascript\">\n" +
+					     "  require(['{3}'], function () {{\n" +
+					     "      function draw() {{\n" +
+					     "        var chart = new google.visualization.ScatterChart(document.getElementById('chart_div_{0}'));\n" +
+					     "        chart.draw(google.visualization.arrayToDataTable([{1}]), {2});\n" + 
+					     "      }}\n" +
+					     "      google.load('visualization', '1.0',\n" + 
+					     "                  {{'callback': draw, 'packages':['corechart']}});\n" +
+					     "  }});\n" +
+					     "</script>\n", 
+					     id, table, ToJSON(options), "https://www.google.com/jsapi", id, width);
+	    return data;
 	}
     }
 
     public class LineChart {
 	ZMQServer.Session session;
+	public int id;
+	IDictionary options;
+	string table;
 
 	public LineChart(ZMQServer.Session session, IList data) 
 	    : this(session, data, new Dictionary<string,object>()) {
@@ -1253,23 +1290,36 @@ public static class Widgets {
 	      ]);
 	    */
 	    this.session = session;
-	    string table = "";
+	    this.options = options;
+	    table = "";
 	    foreach (IList<object> row in data) {
 		if (table != "") {
 		    table += ",\n";
 		}
 		table += ToJSON(row);
 	    }
-	    // FIXME: make this a Representation
-	    session.calico.display(
-	      session.calico.Javascript(
-	         String.Format("function draw() {{" +
-			       "  var chart = new google.visualization.LineChart(element[0]);\n" +
-			       "  chart.draw(google.visualization.arrayToDataTable([{0}]), {1});\n" + 
-			       "}}\n" +
-			       "google.load('visualization', '1.0',\n" + 
-			       "            {{'callback': draw, 'packages':['corechart']}});\n", table, ToJSON(options)), 
-		 "https://www.google.com/jsapi"));
+	}
+
+	public Dictionary<string, string> GetRepresentations() {
+	    id = Widgets.next_id++;
+	    int width = 300;
+	    if (options.Contains("width")) 
+		width = Convert.ToInt32(options["width"]);
+	    var data = new Dictionary<string, string>();
+	    data["text/plain"] = "<LineChart availble for viewing in notebook>";
+	    data["text/html"] =String.Format("<div id=\"chart_div_{4}\" style=\"height: {5}px;\"></div>\n" +
+					     "<script type=\"text/javascript\">\n" +
+					     "  require(['{3}'], function () {{\n" +
+					     "      function draw() {{\n" +
+					     "        var chart = new google.visualization.LineChart(document.getElementById('chart_div_{0}'));\n" +
+					     "        chart.draw(google.visualization.arrayToDataTable([{1}]), {2});\n" + 
+					     "      }}\n" +
+					     "      google.load('visualization', '1.0',\n" + 
+					     "                  {{'callback': draw, 'packages':['corechart']}});\n" +
+					     "  }});\n" +
+					     "</script>\n", 
+					     id, table, ToJSON(options), "https://www.google.com/jsapi", id, width);
+	    return data;
 	}
     }
 }
