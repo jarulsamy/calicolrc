@@ -629,7 +629,7 @@ namespace Calico {
             Mono.TextEditor.SearchResult search_result = null;
             texteditor.SearchPattern = s;
             var selection_range = texteditor.SelectionRange;
-            if (selection_range != null) {
+            if (!selection_range.IsEmpty) {
                 if (from_selection_start) {
                     offset = selection_range.Offset;
                 } else {
@@ -678,7 +678,7 @@ namespace Calico {
             texteditor.SearchPattern = s;
             int offset;
             var selection_range = texteditor.SelectionRange;
-            if (selection_range != null) {
+            if (!selection_range.IsEmpty) {
                 offset = selection_range.Offset;
             } else {
                 offset = texteditor.Caret.Offset;

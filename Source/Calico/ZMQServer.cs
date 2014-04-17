@@ -904,9 +904,9 @@ public static class ZMQServer {
 				 m_header);
 	    } else if (msg_type == "shutdown_request") {
 		// respond?
-		var header = session.Header("status", m_header["session"].ToString());
-		var metadata = new Dictionary<string, object>();
-		var content = new Dictionary<string, object>();
+		//var header = session.Header("status", m_header["session"].ToString());
+		//var metadata = new Dictionary<string, object>();
+		//var content = new Dictionary<string, object>();
 		// pause, then:
 		if (Convert.ToBoolean(m_content["restart"])) { 
 		    session.need_restart = true;
