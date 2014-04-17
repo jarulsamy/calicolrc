@@ -13,7 +13,15 @@ import uuid
 import hmac
 import hashlib
 
+def read_secret_key():
+    filename = os.path.expanduser("~/.ipython/profile_calico/security/notebook_secret")
+    with open(filename, 'rb') as f:
+        return f.read()
+
 encoder = json.encoder.JSONEncoder(sort_keys=True, indent=1)
+unicode_type = unicode
+key = read_secret_key()
+SECRET = unicode(key).encode("ascii")
 
 def convert(py_file):
     py_full_path = os.path.abspath(py_file)
@@ -23,8 +31,14 @@ def convert(py_file):
     nb_full_path = os.path.join(base_path, base + ".ipynb")
     ## ---------------------
     notebook = make_notebook(code)
+    sign(notebook)
+    save(notebook, nb_full_path)
+
+def sign(notebook):
     notebook["metadata"]["signature"] = sign_notebook(notebook)
-    fp = open(nb_full_path, "w")
+
+def save(notebook, filename):
+    fp = open(filename, "w")
     fp.write(encoder.encode(notebook))
     fp.close()
 
@@ -32,8 +46,6 @@ def cast_bytes(s, encoding=None):
     if not isinstance(s, bytes):
         return encode(s, encoding)
     return s
-
-unicode_type = unicode
 
 def yield_everything(obj):
     if isinstance(obj, dict):
@@ -57,44 +69,39 @@ def sign_notebook(notebook, digestmod=hashlib.sha256):
         h.update(b)
     return "sha256:" + h.hexdigest()
 
-def make_notebook(code):
+def make_notebook(code=""):
     notebook = {}
     notebook["metadata"] = {
         "name": "",
-##        "signature": make_signature(),
+        "signature": "", ## to be signed later
     }
     notebook["nbformat"] = 3
     notebook["nbformat_minor"] = 0
     notebook["worksheets"] = [make_worksheet(code)]
     return notebook
 
-def make_worksheet(code):
+def make_worksheet(code="", cell_type="code", language="python"):
     worksheet = {}
-    worksheet["cells"] = [make_cell(code)]
+    if code:
+        worksheet["cells"] = [make_cell(code, cell_type="code", language="python")]
+    else:
+        worksheet["cells"] = []
     worksheet["metadata"] = {}
     return worksheet
 
-def make_cell(code):
+def add_cell(notebook, cell):
+    notebook["worksheets"][0]["cells"].append(cell)
+
+def make_cell(code, cell_type="code", language="python"):
     cell = {
-        "cell_type": "code",
+        "cell_type": cell_type, # markdown, code, 
         "collapsed": False,
         "input": code, ## code here: ["line\n", ...]
-        "language": "python",
+        "language": language,
         "metadata": {},
         "outputs": [],
     }
     return cell
-
-def make_signature():
-    return "" 
-
-def read_secret_key():
-    filename = os.path.expanduser("~/.ipython/profile_calico/security/notebook_secret")
-    with open(filename, 'rb') as f:
-        return f.read()
-
-key = read_secret_key()
-SECRET = unicode(key).encode("ascii")
 
 if __name__ == '__main__':
     import sys
