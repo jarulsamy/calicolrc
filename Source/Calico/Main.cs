@@ -486,7 +486,7 @@ namespace Calico {
 			"import os \n" +
 			"if \"LD_LIBRARY_PATH\" in os.environ:\n" +
 			"    os.environ[\"LD_LIBRARY_PATH\"] = (\"{1}\" + \n" +
-			"        os.pathsep + \"{2}\" + os.environ[\"LD_LIBRARY_PATH\"]) \n" +
+			"        os.pathsep + \"{2}\" + os.pathsep + os.environ[\"LD_LIBRARY_PATH\"]) \n" +
 			"else:\n" +
 			"    os.environ[\"LD_LIBRARY_PATH\"] = (\"{1}\" + \n" +
 			"        os.pathsep + \"{2}\") \n" +
