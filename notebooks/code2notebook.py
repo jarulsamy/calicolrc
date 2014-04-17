@@ -27,10 +27,10 @@ def convert(py_file):
     py_full_path = os.path.abspath(py_file)
     base_path, base_name = os.path.split(py_full_path)
     base, ext = os.path.splitext(base_name)
-    code = open(py_full_path).readlines()
+    code_list = open(py_full_path).readlines()
     nb_full_path = os.path.join(base_path, base + ".ipynb")
     ## ---------------------
-    notebook = make_notebook(code)
+    notebook = make_notebook(code_list)
     sign(notebook)
     save(notebook, nb_full_path)
 
@@ -69,7 +69,7 @@ def sign_notebook(notebook, digestmod=hashlib.sha256):
         h.update(b)
     return "sha256:" + h.hexdigest()
 
-def make_notebook(code=""):
+def make_notebook(code_list=None):
     notebook = {}
     notebook["metadata"] = {
         "name": "",
@@ -77,13 +77,13 @@ def make_notebook(code=""):
     }
     notebook["nbformat"] = 3
     notebook["nbformat_minor"] = 0
-    notebook["worksheets"] = [make_worksheet(code)]
+    notebook["worksheets"] = [make_worksheet(code_list)]
     return notebook
 
-def make_worksheet(code="", cell_type="code", language="python"):
+def make_worksheet(code_list=None, cell_type="code", language="python"):
     worksheet = {}
-    if code:
-        worksheet["cells"] = [make_cell(code, cell_type="code", language="python")]
+    if code_list:
+        worksheet["cells"] = [make_cell(code_list, cell_type="code", language="python")]
     else:
         worksheet["cells"] = []
     worksheet["metadata"] = {}
@@ -92,15 +92,18 @@ def make_worksheet(code="", cell_type="code", language="python"):
 def add_cell(notebook, cell):
     notebook["worksheets"][0]["cells"].append(cell)
 
-def make_cell(code, cell_type="code", language="python"):
+def make_cell(code_list=None, cell_type="code", language="python"):
     cell = {
         "cell_type": cell_type, # markdown, code, 
         "collapsed": False,
-        "input": code, ## code here: ["line\n", ...]
-        "language": language,
         "metadata": {},
-        "outputs": [],
     }
+    if cell_type == "code":
+        cell["input"] = code_list
+        cell["language"] = language
+        cell["outputs"] = []
+    elif cell_type == "markdown":
+        cell["source"] = code_list
     return cell
 
 if __name__ == '__main__':
