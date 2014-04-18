@@ -1,3 +1,6 @@
+Calico LC3
+==========
+
 LC3 stands for "Little Computer" (3rd version) and is an assembly
 language used in Patt and Patel's [Introduction to Computing Systems:
 From Bits and Gates to C and

@@ -22,6 +22,15 @@ def clean_dir(url, with_file=True):
 
 site_cells = []
 
+header =  ["<table><tr><td>\n",
+           "<img width=\"300\" src=\"http://calicoproject.org/wiki/images/d/d1/CalicoLogo.gif\">\n",
+           "</td>\n",
+           "<td>\n",
+           "The [Calico Project](http://calicoproject.org/) was designed to allow the easy exploration of computing ideas in a variety of programming languages. It is the product of NSF DUE grant #0920539 supporting the [Institute for Personal Robots in Education](http://wiki.roboteducation.org/).\n",
+           "</td></tr></table>\n",
+           "\n",
+           ]
+
 for root, dirs, dir_files in os.walk(".", topdown=False):
     for path in dirs + ["."]:
         if not contains(root, ignore) and not contains(path, ignore):
@@ -49,4 +58,5 @@ for root, dirs, dir_files in os.walk(".", topdown=False):
                         cell += ["*  [%s](%s)\n" % (clean_file(file), file.rsplit("/")[-1])]
                 add_cell(nb, make_cell(cell, "markdown"))
             if len(nb["worksheets"][0]["cells"]) > 0:
+                nb["worksheets"][0]["cells"].insert(0, make_cell(header, "markdown"))
                 save(nb, root + "/" + path + "/Index.ipynb")
