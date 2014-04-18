@@ -193,6 +193,15 @@ public static class Widgets {
 	public object get(string value_name) {
 	    return ((Dictionary<string,object>)data["state"])[value_name];
 	}
+
+	public void display() {
+	    session.display(this);
+	}
+
+	public void animate() {
+	    session.clear_output();
+	    session.display(this);
+	}
     }
 
     public class BoundedFloatTextWidget : Widget {
@@ -1178,7 +1187,7 @@ public static class Widgets {
     }
 
     public class GeoChart {
-	//ZMQServer.Session session;
+	ZMQServer.Session session;
 	public int id;
 	IDictionary options;
 	string table;
@@ -1189,7 +1198,7 @@ public static class Widgets {
 
 	public GeoChart(ZMQServer.Session session, IEnumerable<string> keys, IDictionary data, IDictionary options) {
 	    // GeoChart(calico.sesssion, ['Country', 'Size'], {"Canada": 562, "United States": 987}, {"height"=300, "legend"=False})
-	    //this.session = session;
+	    this.session = session;
 	    this.options = options;
 	    table = ToJSON(keys);
 	    foreach (string key in data.Keys) {
@@ -1221,10 +1230,18 @@ public static class Widgets {
 					     id, table, ToJSON(options), "https://www.google.com/jsapi", id, width);
 	    return data;
 	}
+
+	public void display() {
+	    session.display(this);
+	}
+	public void animate() {
+	    session.clear_output();
+	    session.display(this);
+	}
     }
 
     public class ScatterChart {
-	//ZMQServer.Session session;
+	ZMQServer.Session session;
 	public int id;
 	IDictionary options;
 	string table;
@@ -1235,7 +1252,7 @@ public static class Widgets {
 
 	public ScatterChart(ZMQServer.Session session, IEnumerable<string> keys, IList data, IDictionary options) {
 	    // ScatterChart(["X", "Y"], [[8, 12], [10, 9], [9, 10], [8, 12]], height=300, width=500, lineWidth=1, legend='"none"')
-	    //this.session = session;
+	    this.session = session;
 	    this.options = options;
 	    table = ToJSON(keys);
 	    foreach (IList<object> row in data) {
@@ -1267,10 +1284,18 @@ public static class Widgets {
 					     id, table, ToJSON(options), "https://www.google.com/jsapi", id, width);
 	    return data;
 	}
+
+	public void display() {
+	    session.display(this);
+	}
+	public void animate() {
+	    session.clear_output();
+	    session.display(this);
+	}
     }
 
     public class LineChart {
-	//ZMQServer.Session session;
+	ZMQServer.Session session;
 	public int id;
 	IDictionary options;
 	string table;
@@ -1289,7 +1314,7 @@ public static class Widgets {
 	      ['2007',  1030,      540]
 	      ]);
 	    */
-	    //this.session = session;
+	    this.session = session;
 	    this.options = options;
 	    table = "";
 	    foreach (IList<object> row in data) {
@@ -1320,6 +1345,14 @@ public static class Widgets {
 					     "</script>\n", 
 					     id, table, ToJSON(options), "https://www.google.com/jsapi", id, width);
 	    return data;
+	}
+
+	public void display() {
+	    session.display(this);
+	}
+	public void animate() {
+	    session.clear_output();
+	    session.display(this);
 	}
     }
 }
