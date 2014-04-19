@@ -70,15 +70,14 @@ for root, dirs, dir_files in os.walk(".", topdown=False):
                 nb["worksheets"][0]["cells"].insert(0, make_cell(header, "markdown"))
                 save(nb, root + "/" + path + "/Index.ipynb")
 
+######## Site Map:
 site_files = []
 for root, dirs, dir_files in os.walk("."):
     for file in dir_files:
         if file.endswith(".ipynb") and not contains(root +"/" + file, ignore):
             site_files.append(root + "/" + file)
-
 site_map = make_notebook()
 add_cell(site_map, make_cell(header, "markdown"))
-
 cell = []
 cell.append("\n")
 cell.append("<b>Top folder</b>:\n")
@@ -89,7 +88,6 @@ for file in sorted(site_files, key=lambda v: v.rsplit("/", 1)):
         cell.append("\n")
         cell.append("<b>%s</b>:\n" % path[2:])
         current = path
-    cell.append("* [%s](%s)\n" % (name, path))
-
+    cell.append("* [%s](%s)\n" % (name, path + "/" + name))
 add_cell(site_map, make_cell(cell, "markdown"))
 save(site_map, "SiteMap.ipynb")
