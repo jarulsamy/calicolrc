@@ -465,7 +465,7 @@ public class SimScribbler : Myro.Robot
 		    int low = 0, high = 0, zero = 0;
 		    Graphics.Color sky = new Graphics.Color ("deepskyblue");
 		    ManualResetEvent ev = new ManualResetEvent(false);
-		    Myro.Invoke (delegate {
+		    Myro.InvokeBlocking (delegate {
 			    Graphics.Color [] column = new Graphics.Color [192];
 			    int h = 0;
 			    // Compute colors
