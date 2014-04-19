@@ -3,13 +3,19 @@ from code2notebook import *
 import glob
 import os
 
-ignore = [".ipynb_checkpoints", "attic", "Bugs", "reveal.js", "profile", "rebuild"]
+ignore = [".ipynb_checkpoints", "attic", "Bugs", "reveal.js", "profile", "rebuild", "images"]
 
 def contains(root_path, items):
     for item in items:
         if item in root_path:
             return True
     return False
+
+def nice_name(path):
+    if path == ".":
+        return "top folder"
+    else:
+        return path
 
 def clean_file(url):
     return url.rsplit("/")[-1].split(".")[0]
@@ -46,7 +52,7 @@ for root, dirs, dir_files in os.walk(".", topdown=False):
             ### Dirs in this folder:
             subfolders = sorted(glob.glob(root + "/" + path + "/*/Index.ipynb"))
             if subfolders:
-                sublist = ["Subfolders in %s:\n" % path, "\n"]
+                sublist = ["Subfolders in <b>%s</b>:\n" % nice_name(path), "\n"]
                 ##print("Subfolders:", subfolders)
                 for subfolder in subfolders:
                     sublist += ["* [%s](%s)\n" % (clean_dir(subfolder, with_file=False), clean_dir(subfolder))]
@@ -55,7 +61,7 @@ for root, dirs, dir_files in os.walk(".", topdown=False):
             ##print("Checking " + root + "/" + path + "/*.ipynb")
             nb_files = sorted(glob.glob(root + "/" + path + "/*.ipynb"))
             if nb_files:
-                cell = ["Notebooks in %s:\n" % path, "\n"]
+                cell = ["Notebooks in <b>%s</b>:\n" % nice_name(path), "\n"]
                 for file in nb_files:
                     if not file.endswith("Index.ipynb"):
                         cell += ["*  [%s](%s)\n" % (clean_file(file), file.rsplit("/")[-1])]
@@ -63,3 +69,27 @@ for root, dirs, dir_files in os.walk(".", topdown=False):
             if len(nb["worksheets"][0]["cells"]) > 0:
                 nb["worksheets"][0]["cells"].insert(0, make_cell(header, "markdown"))
                 save(nb, root + "/" + path + "/Index.ipynb")
+
+site_files = []
+for root, dirs, dir_files in os.walk("."):
+    for file in dir_files:
+        if file.endswith(".ipynb") and not contains(root +"/" + file, ignore):
+            site_files.append(root + "/" + file)
+
+site_map = make_notebook()
+add_cell(site_map, make_cell(header, "markdown"))
+
+cell = []
+cell.append("\n")
+cell.append("<b>Top folder</b>:\n")
+current = "."
+for file in sorted(site_files, key=lambda v: v.rsplit("/", 1)):
+    path, name = file.rsplit("/", 1)
+    if path != current:
+        cell.append("\n")
+        cell.append("<b>%s</b>:\n" % path[2:])
+        current = path
+    cell.append("* [%s](%s)\n" % (name, path))
+
+add_cell(site_map, make_cell(cell, "markdown"))
+save(site_map, "SiteMap.ipynb")
