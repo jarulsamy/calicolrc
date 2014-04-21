@@ -309,7 +309,7 @@ namespace Calico {
                 PrintLine("Please activate and restart Calico to use this language.");
                 return null;
             }
-	    Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.Expression;
+	    Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.AutoDetect;
 	    Microsoft.Scripting.Hosting.ScriptSource source;
 	    Microsoft.Scripting.Hosting.CompiledCode compiledCode;
 	    try {
