@@ -4667,6 +4667,18 @@ public static class Graphics
 			this._fill.picture = this;
 		}
 
+
+		public Picture (Picture original, double scale) : this((int)(original.width * scale), (int)(original.height * scale)) {
+		    Picture temp = new Picture(original);
+		    for (int w=0; w < width; w++) {
+			for (int h=0; h < height; h++) {
+			    int x = (int)(((double)w)/width * temp.width);
+			    int y = (int)(((double)h)/height * temp.height);
+			    setColor(w, h, temp.getColor(x,y));
+			}
+		    }
+		}
+
 		public Picture (Picture original) : this(true)
 		{
 		    this.filename = original.filename;
