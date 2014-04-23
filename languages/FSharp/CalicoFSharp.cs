@@ -154,9 +154,11 @@ public class CalicoFSharpEngine : Engine
     }
     
      public override object Evaluate(string code) {      
-	 lock(loadingLock) {
-	     if (! finishedLoading) {
-		 return null;
+	 while (true) {
+	     lock(loadingLock) {
+		 if (finishedLoading) {
+		     break;
+		 }
 	     }
 	 }
          bool shouldReturn = false;
@@ -195,22 +197,26 @@ public class CalicoFSharpEngine : Engine
      }
     
     public override bool Execute(string code) {
-	lock(loadingLock) {
-	    if (! finishedLoading) {
-		return false;
-	    }
-	}
+	 while (true) {
+	     lock(loadingLock) {
+		 if (finishedLoading) {
+		     break;
+		 }
+	     }
+	 }
         object v = Evaluate(code);
         Console.WriteLine(v);
         return false;
     }
     
     public override bool ExecuteFile(string filename) {
-	lock(loadingLock) {
-	    if (! finishedLoading) {
-		return false;
-	    }
-	}
+	 while (true) {
+	     lock(loadingLock) {
+		 if (finishedLoading) {
+		     break;
+		 }
+	     }
+	 }
         try {
             fsiSession.EvalScript(filename);
             return true;
