@@ -63,7 +63,7 @@ for root, dirs, dir_files in os.walk(".", topdown=False):
             if nb_files:
                 cell = ["Notebooks in <b>%s</b>:\n" % nice_name(path), "\n"]
                 for file in nb_files:
-                    if not file.endswith("Index.ipynb"):
+                    if not file.endswith("Index.ipynb") and "Untitled" not in file:
                         cell += ["*  [%s](%s)\n" % (clean_file(file), file.rsplit("/")[-1])]
                 add_cell(nb, make_cell(cell, "markdown"))
             if len(nb["worksheets"][0]["cells"]) > 0:
