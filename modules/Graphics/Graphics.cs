@@ -3886,25 +3886,29 @@ public static class Graphics
 
 		    g.SelectFontFace(fontFace, FontSlant.Normal, FontWeight.Normal);
 		    g.SetFontSize(fontSize);
-		    TextExtents te = g.TextExtents(text);
 		    Point p = new Point (0, 0);
-		    if (xJustification == "center") {
-			p.x = points [0].x - te.Width / 2 - te.XBearing;
-		    } else if (xJustification == "left") {
-			p.x = points [0].x;
-		    } else if (xJustification == "right") {
-			p.x = points [0].x + te.Width;
+		    double line_offset = 0;
+		    foreach (string line in text.Split('\n')) {
+			TextExtents te = g.TextExtents(line);
+			if (xJustification == "center") {
+			    p.x = points [0].x - te.Width / 2 - te.XBearing;
+			} else if (xJustification == "left") {
+			    p.x = points [0].x;
+			} else if (xJustification == "right") {
+			    p.x = points [0].x + te.Width;
+			}
+			if (yJustification == "center") {
+			    p.y = points [0].y - te.Height / 2 - te.YBearing;
+			} else if (yJustification == "bottom") {
+			    p.y = points [0].y;
+			} else if (yJustification == "top") {
+			    p.y = points [0].y - te.Height;
+			}
+			temp = screen_coord (p);
+			g.MoveTo (temp.x, temp.y + line_offset);
+			g.ShowText(line);
+			line_offset += te.YBearing * 1.5;
 		    }
-		    if (yJustification == "center") {
-			p.y = points [0].y - te.Height / 2 - te.YBearing;
-		    } else if (yJustification == "bottom") {
-			p.y = points [0].y;
-		    } else if (yJustification == "top") {
-			p.y = points [0].y - te.Height;
-		    }
-		    temp = screen_coord (p);
-		    g.MoveTo (temp.x, temp.y);
-		    g.ShowText(text);
 		    foreach (Shape shape in shapes) {
 			shape.render (g);
 			shape.updateGlobalPosition (g);
@@ -3936,8 +3940,10 @@ public static class Graphics
 					using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
 					    g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
 					    g.SetFontSize(this.fontSize);
-					    Cairo.TextExtents te = g.TextExtents (text);
-					    retval = te.Width;
+					    foreach (string line in text.Split('\n')) {
+						TextExtents te = g.TextExtents(line);
+						retval = Math.Max(te.Width, retval);
+					    }
 					}
 				    }
 				});
@@ -3953,8 +3959,12 @@ public static class Graphics
 					using (Cairo.Context g = Gdk.CairoHelper.Create(window.canvas.GdkWindow)) {
 					    g.SelectFontFace(this.fontFace, this.fontSlant, this.fontWeight);
 					    g.SetFontSize(this.fontSize);
-					    Cairo.TextExtents te = g.TextExtents (text);
-					    retval = te.Height;
+					    foreach (string line in text.Split('\n')) {
+						TextExtents te = g.TextExtents(line);
+						if (retval != 0.0)
+						    retval += te.Height * .5;
+						retval += te.Height;
+					    }
 					}
 				    }
 				});
@@ -6736,6 +6746,16 @@ public static class Graphics
 		return p;
 	    }
 	    
+	    Point translate(double x, double y, double width, double height) {
+		// used in graphviz graphics
+		Point p = null;
+		InvokeBlocking( delegate {
+			p = new Point(x * scale + width/2 - graph.Width/ 2 * scale + 16,
+				      (graph.Height - y) * scale + height/2 - graph.Height/ 2 * scale + 16);
+		    });
+		return p;
+	    }
+	    
 	    public string recurseEdges(IList list, int left, int root, int right) {
 		string edges = "";
 		if (list == null || list.Count == 0) {
@@ -6819,22 +6839,19 @@ public static class Graphics
 	    
 	    public GraphicsRepresentation draw(WindowClass window) {
 		this.window = window;
-		draw();
-		return new GraphicsRepresentation(window);
+		return draw();
 	    }
 	    
 	    public GraphicsRepresentation draw(WindowClass window, IDictionary options) {
 		this.window = window;
-		draw(options);
-		return new GraphicsRepresentation(window);
+		return draw(options);
 	    }
 	    
 	    public GraphicsRepresentation draw(IDictionary options) {
 		foreach(KeyValuePair<object,object> kvp in (IDictionary<object,object>)options) {
 		    this.options[kvp.Key.ToString()] = kvp.Value;
 		}
-		draw();
-		return new GraphicsRepresentation(window);
+		return draw();
 	    }
 	    
 	    public GraphicsRepresentation draw() {
@@ -7043,9 +7060,228 @@ public static class Graphics
 		    }
 	            count++;
 		}
+		// force it to update, before returning:
+		InvokeBlocking( delegate {
+			window.step(0);
+		    });
 		return new GraphicsRepresentation(window);
 	    }
+
+	    public GraphicsRepresentation render(IDictionary options) {
+		foreach(KeyValuePair<object,object> kvp in (IDictionary<object,object>)options) {
+		    this.options[kvp.Key.ToString()] = kvp.Value;
+		}
+		return render();
+	    }
 	    
+	    public GraphicsRepresentation render() { // on Canvas; no window
+		int _width = 0, _height = 0;
+		string label;
+		if (options.ContainsKey("label")) {
+		    label = options["label"].ToString();
+		} else if (graph.Attributes.ContainsKey("label")) {
+		    label = graph.Attributes["label"].Trim().Split('\n')[0].Trim();
+		} else {
+		    label = String.Format("Graph #{0}", Graph.graph_count);
+		    Graph.graph_count++;
+		}
+		if (options.ContainsKey("width")) {
+		    _width = ((int)options["width"]) + 64;
+		} else {
+		    _width = ((int)graph.Width) + 64;
+		}
+		if (options.ContainsKey("height")) {
+		    _height = ((int)options["height"]) + 64;
+		} else {
+		    _height = ((int)graph.Height) + 64;
+		}
+		Graphics.Canvas canvas = new Graphics.Canvas(_width, _height);
+		if (options.ContainsKey("scale")) {
+		    scale = (double)options["scale"];
+		} else {
+		    scale = 1.0;
+		}
+		foreach(Graphviz4Net.Dot.DotVertex<string> v in graph.Vertices) {
+	            if (v.Position == null) {
+	                continue;
+		    }
+	            Point c = translate(((Graphviz4Net.Point)v.Position).X, ((Graphviz4Net.Point)v.Position).Y, _width, _height);
+	            int width = (int)(((double)v.Width) * 72 * scale);
+		    int height = (int)(((double)v.Height) * 72 * scale);
+		    string shape;
+		    if (options.ContainsKey("shape")) {
+			shape = options["shape"].ToString();
+		    } else if (v.Attributes.ContainsKey("shape")) {
+	                shape = v.Attributes["shape"];
+		    } else {
+	                shape = options["default_shape"].ToString();
+		    }
+		    Graphics.Color outline;
+		    if (options.ContainsKey("outline")) {
+	                outline = new Graphics.Color(options["outline"].ToString());
+		    } else if  (v.Attributes.ContainsKey("color")) {
+	                outline = new Graphics.Color(v.Attributes["color"]);
+		    } else {
+	                outline = new Graphics.Color(options["default_outline"].ToString());
+		    }
+	            // Shapes:
+		    Shape obj1 = null;
+		    Shape obj2 = null;
+	            if (shape == "circle" || shape == "ellipse") {
+	                obj1 = new Graphics.Oval(c, width/2, height/2);
+		    } else if (shape == "doublecircle") {
+	                obj1 = new Graphics.Oval(c, width/2, height/2);
+	                obj2 = new Graphics.Oval(c, width/2 - 4, height/2 - 4);
+		    } else if (shape == "box") {
+	                obj1 = new Graphics.Rectangle(new Point(c.x - width/2, c.y - height/2),
+						      new Point(c.x + width/2, c.y + height/2));
+			//elif shape == "diamond":
+		    } else {
+	                throw new Exception(String.Format("unknown shape: {0}", shape));
+		    }
+	            if (obj1 != null) {
+	                obj1.outline = new Graphics.Color(outline);
+	                obj1.fill = new Graphics.Color(options["fill"].ToString());
+	                obj1.border = 2;
+	                obj1.draw(canvas);
+		    }
+	            if (obj2 != null) {
+	                obj2.outline = new Graphics.Color(outline);
+	                obj2.fill = new Graphics.Color(options["fill"].ToString());
+	                obj2.border = 2;
+	                obj2.draw(canvas);
+		    }
+	            // Text:
+	            if (v.Attributes.ContainsKey("label")) {
+	                label = v.Attributes["label"].Trim();
+		    } else {
+	                label = v.Id.Trim();
+		    }
+	            if (label.Contains("|")) {
+	                string [] labels = label.Split('|');
+	                int parts = labels.Length;
+	                for (int divider = 0; divider < labels.Length - 1; divider++) {
+	                    double x1 = c.x - width/2 + (divider + 1) * width/parts;
+	                    double y1 = c.y - height/2;
+	                    double x2 = x1;
+	                    double y2 = c.y + height/2;
+	                    Line line = new Graphics.Line(new Point(x1, y1), new Point(x2, y2));
+	                    line.outline = new Graphics.Color("black");
+	                    line.draw(canvas);
+			}
+	                label = labels[1].Trim(); // FIXME: should draw each part
+		    }
+		    // Add label as tag to objects
+	            if (obj1 != null) {
+	                obj1.tag = label;
+		    }
+	            if (obj2 != null) {
+	                obj2.tag = label;
+		    }
+		    // Draw text:
+	            Graphics.Text text = new Graphics.Text(c, label);
+	            text.fontSize = 10 * scale;
+	            text.color = new Graphics.Color("black");
+	            text.draw(canvas);
+		    // Add group to shape list:
+	            vertices[label] = new Dictionary<string,Shape>();
+	            if (obj1 != null && obj2 != null) {
+	                vertices[label]["shape"] = new Graphics.Group(obj1, obj2);
+		    } else {
+	                vertices[label]["shape"] = obj1;
+		    }
+	            vertices[label]["label"] = text;
+		}
+	        int count = 0;
+	        foreach(Graphviz4Net.Dot.DotEdge<string> e in graph.Edges) {
+		    string index;
+	            if (e.LabelPos != null) {
+	                index = e.Label.Trim();
+		    } else {
+	                index = count.ToString();
+		    }
+	            edges[index] = new Dictionary<string,object>();
+	            edges[index]["line"] = new List<Shape>();
+		    List<Point> points = new List<Point>();
+		    foreach(Graphviz4Net.Point p in e.Path) {
+	            	points.Add(new Graphics.Point(translate(p.X, p.Y, _width, _height)));
+		    }
+		    string color;
+	            if (e.Attributes.ContainsKey("color")) {
+	                color = e.Attributes["color"];
+		    } else {
+	                color = "black";
+		    }
+	            // Line:
+	            if (options["line_type"].ToString() == "curve") {
+	                for (int i = 0; i < points.Count/3; i++) {
+	                    int j = i * 3;
+	                    Curve line = new Graphics.Curve(points[j], points[j + 1], points[j + 2], points[j + 3]);
+	                    line.outline = new Graphics.Color(color);
+	                    line.border = 2;
+	                    line.draw(canvas);
+	                    ((List<Shape>)edges[index]["line"]).Add(line);
+			}
+		    } else {
+	                Line line = new Graphics.Line(points[0], points[points.Count - 1]);
+	                line.outline = new Graphics.Color(color);
+	                line.border = 2;
+	                line.draw(canvas);
+	                ((List<Shape>)edges[index]["line"]).Add(line);
+		    }
+		    // Arrows:
+		    double w;
+		    double h;
+		    if (e.SourceArrowEnd != null) {
+	                Arrow arrow = new Graphics.Arrow(points[0]);
+	                if (options["line_type"].ToString() == "curve") {
+	                    w = points[0].x - points[1].x;
+	                    h = points[0].y - points[1].y;
+			} else {
+	                    w = points[0].x - points[points.Count - 1].x;
+	                    h = points[0].y - points[points.Count - 1].y;
+			}
+	                double degrees = System.Math.Atan2(w, h) * 180/System.Math.PI + 90;
+	                arrow.fill = new Graphics.Color(color);
+	                arrow.rotate(degrees);
+	                arrow.scale(scale);
+	                arrow.draw(canvas);
+	                edges[index]["source_arrow"] = arrow;
+		    }
+	            if (e.DestinationArrowEnd != null) {
+	                Arrow arrow = new Graphics.Arrow(points[points.Count - 1]);
+	                if (options["line_type"].ToString() == "curve") { // FIXME: these may be backwards:
+	                    w = points[points.Count - 2].x - points[points.Count - 1].x;
+	                    h = points[points.Count - 2].y - points[points.Count - 1].y;
+			} else {
+	                    w = points[0].x - points[points.Count - 1].x;
+	                    h = points[0].y - points[points.Count - 1].y;
+			}
+	                double degrees = System.Math.Atan2(w, h) * 180/System.Math.PI + 90;
+	                arrow.fill = new Graphics.Color(color);
+	                arrow.rotate(degrees);
+	                arrow.scale(scale);
+	                arrow.draw(canvas);
+	                edges[index]["destination_arrow"] = arrow;
+		    }
+	            if (e.LabelPos != null) {
+	                Point p = translate(((Graphviz4Net.Point)e.LabelPos).X, 
+					    ((Graphviz4Net.Point)e.LabelPos).Y, _width, _height);
+	                Text text = new Graphics.Text(p, e.Label);
+	                text.fontSize = 10 * scale;
+	                text.color = new Graphics.Color("black");
+	                text.draw(canvas);
+	                edges[index]["label"] = text;
+		    }
+	            count++;
+		}
+		// force it to update, before returning:
+		//InvokeBlocking( delegate {
+		//	window.step(0);
+		//    });
+		return new GraphicsRepresentation(canvas);
+	    }
+
 	    [method: JigsawTab("G/Misc")]
 	    public static string processDot(string text) {
 			string retval = null;

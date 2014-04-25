@@ -1515,7 +1515,7 @@ public static class Myro
 	      }
 	  }
 	    
-	  public void simulate(double duration, double stepTime=0.1) {
+	  public void simulate(double duration=0.01, double stepTime=0.01) {
 	      double timeLapsed = 0.0;
 	      // simulate the duration:
 	      while (timeLapsed < duration) { // seconds
