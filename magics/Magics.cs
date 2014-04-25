@@ -1,4 +1,5 @@
 using System;
+using System.Collections; // IDictionary
 using System.Collections.Generic; // List
 using System.Net; // http stuff
 using System.IO; // stream
@@ -283,6 +284,26 @@ namespace Calico {
 	    command = "svg";
 	    evaluate = false;
 	    session.display_svg(session.calico.SVG(code));
+	}
+    }
+
+    public class Dot : Calico.MagicBase {
+	
+	public Dot(ZMQServer.Session session, string code, 
+		   string mtype, string args) : base(session, code, mtype, args) {
+	}
+
+	public override void cell(string args) {
+	    command = "dot";
+	    evaluate = false;
+	    Graphics.Graph g = new Graphics.Graph();
+	    g.layout(code, false); // don't process Dot file
+	    if (args != "") {
+		IDictionary options = (IDictionary)session.calico.Evaluate(args, "python");
+		session.display(g.render(options));
+	    } else {
+		session.display(g.render());
+	    }
 	}
     }
 
