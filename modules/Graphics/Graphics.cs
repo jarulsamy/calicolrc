@@ -90,10 +90,10 @@ public static class Extensions
 	System.Drawing.Bitmap bitmap;
 	if (args.Length > 0) {
 	    format = formats[args[0].ToString()];
-	    bitmap = new System.Drawing.Bitmap(pix.Width, pix.Height, format);
 	} else {
-	    bitmap = new System.Drawing.Bitmap(pix.Width, pix.Height);
+	    format = formats["Format24bppRgb"];
 	}
+	bitmap = new System.Drawing.Bitmap(pix.Width, pix.Height, format);
 	for (int x=0; x < pix.Width; x++) {
 	    for (int y=0; y < pix.Height; y++) {
 		int r = Marshal.ReadByte (pix.Pixels, y * pix.Rowstride +
