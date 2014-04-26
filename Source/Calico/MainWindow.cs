@@ -3225,7 +3225,7 @@ del _invoke, _
 		    repr = String.Format("<Multidimensional array, rank={0}>", array.Rank);
 		}
             } else if (obj is string) {
-                repr = String.Format("'{0}'", obj);
+                repr = String.Format("{0}", obj);
             }
             if (repr == null) {
                 if (obj != null) {
