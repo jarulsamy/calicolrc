@@ -3844,6 +3844,7 @@ public static class Graphics
         public void setText(string text)
         {
             _text = text;
+	    QueueDraw ();
         }
 
 		public string text {
