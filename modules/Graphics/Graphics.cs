@@ -61,8 +61,33 @@ public static class Extensions
 	return "[" + retval + "]";
     }
 
-    public static System.Drawing.Bitmap ToBitmap(this Gdk.Pixbuf pix) {
-	System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(pix.Width, pix.Height);
+    public static System.Drawing.Bitmap ToBitmap(this Gdk.Pixbuf pix, params object [] args) {
+	Dictionary<string,System.Drawing.Imaging.PixelFormat> formats = new Dictionary<string,System.Drawing.Imaging.PixelFormat>();
+	formats["Alpha"] = System.Drawing.Imaging.PixelFormat.Alpha;
+	formats["Canonical"] = System.Drawing.Imaging.PixelFormat.Canonical;
+	formats["DontCare"] = System.Drawing.Imaging.PixelFormat.DontCare;
+	formats["Extended"] = System.Drawing.Imaging.PixelFormat.Extended;
+	formats["Format16bppArgb1555"] = System.Drawing.Imaging.PixelFormat.Format16bppArgb1555;
+	formats["Format16bppGrayScale"] = System.Drawing.Imaging.PixelFormat.Format16bppGrayScale;
+	formats["Format16bppRgb555"] = System.Drawing.Imaging.PixelFormat.Format16bppRgb555;
+	formats["Format16bppRgb565"] = System.Drawing.Imaging.PixelFormat.Format16bppRgb565;
+	formats["Format1bppIndexed"] = System.Drawing.Imaging.PixelFormat.Format1bppIndexed;
+	formats["Format24bppRgb"] = System.Drawing.Imaging.PixelFormat.Format24bppRgb;
+	formats["Format32bppArgb"] = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
+	formats["Format32bppPArgb"] = System.Drawing.Imaging.PixelFormat.Format32bppPArgb;
+	formats["Format32bppRgb"] = System.Drawing.Imaging.PixelFormat.Format32bppRgb;
+	formats["Format48bppRgb"] = System.Drawing.Imaging.PixelFormat.Format48bppRgb;
+	formats["Format4bppIndexed"] = System.Drawing.Imaging.PixelFormat.Format4bppIndexed;
+	formats["Format64bppArgb"] = System.Drawing.Imaging.PixelFormat.Format64bppArgb;
+	formats["Format64bppPArgb"] = System.Drawing.Imaging.PixelFormat.Format64bppPArgb;
+	formats["Format8bppIndexed"] = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
+	formats["Gdi"] = System.Drawing.Imaging.PixelFormat.Gdi;
+	formats["Indexed"] = System.Drawing.Imaging.PixelFormat.Indexed;
+	formats["Max"] = System.Drawing.Imaging.PixelFormat.Max;
+	formats["PAlpha"] = System.Drawing.Imaging.PixelFormat.PAlpha;
+	formats["Undefined"] = System.Drawing.Imaging.PixelFormat.Undefined;
+	System.Drawing.Imaging.PixelFormat format = formats[args[0].ToString()];
+	System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(pix.Width, pix.Height, format);
 	for (int x=0; x < pix.Width; x++) {
 	    for (int y=0; y < pix.Height; y++) {
 		int r = Marshal.ReadByte (pix.Pixels, y * pix.Rowstride +
@@ -643,18 +668,18 @@ public static class Graphics
 	}
 
 
-        public static System.Drawing.Bitmap toBitmap (object obj) {
+        public static System.Drawing.Bitmap toBitmap (object obj, params object [] args) {
 	    Type type = obj.GetType();
 	    System.Reflection.MethodInfo method = type.GetMethod("toBitmap");
 	    if (method != null) {
-		return (System.Drawing.Bitmap) method.Invoke(obj, new object [] {});
+		return (System.Drawing.Bitmap) method.Invoke(obj, args);
 	    } else {
 		Graphics.Picture picture = null;
 		if (obj is System.Drawing.Bitmap) {
 		    picture = new Graphics.Picture((System.Drawing.Bitmap)obj);
 		}
 		if (picture != null) {
-		    return picture.toBitmap();
+		    return picture.toBitmap(args);
 		} else {
 		    throw new Exception("Cannot convert object to bitmap");
 		}
@@ -4847,8 +4872,8 @@ public static class Graphics
 			});
 		}
 
-		public System.Drawing.Bitmap toBitmap () {
-		    return _pixbuf.ToBitmap();
+		public System.Drawing.Bitmap toBitmap (params object [] args) {
+		    return _pixbuf.ToBitmap(args);
 		}
 		
 		public Gdk.Pixbuf toPixbuf () {
