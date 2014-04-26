@@ -3236,7 +3236,7 @@ public class PImage
 	public void save(string path) { save(path, false); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public System.Drawing.Bitmap toBitmap(string sformat) {
+        public System.Drawing.Bitmap toBitmap(string sformat="Format32bppArgb") {
 	    Dictionary<string,System.Drawing.Imaging.PixelFormat> formats = new Dictionary<string,System.Drawing.Imaging.PixelFormat>();
 	    formats["Alpha"] = System.Drawing.Imaging.PixelFormat.Alpha;
 	    formats["Canonical"] = System.Drawing.Imaging.PixelFormat.Canonical;
