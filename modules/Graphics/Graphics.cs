@@ -642,6 +642,43 @@ public static class Graphics
 		return new Picture (x, y);
 	}
 
+
+        public static System.Drawing.Bitmap toBitmap (object obj) {
+	    Type type = obj.GetType();
+	    System.Reflection.MethodInfo method = type.GetMethod("toBitmap");
+	    if (method != null) {
+		return (System.Drawing.Bitmap) method.Invoke(obj, new object [] {});
+	    } else {
+		Graphics.Picture picture = null;
+		if (obj is System.Drawing.Bitmap) {
+		    picture = new Graphics.Picture((System.Drawing.Bitmap)obj);
+		}
+		if (picture != null) {
+		    return picture.toBitmap();
+		} else {
+		    throw new Exception("Cannot convert object to bitmap");
+		}
+	    }
+	}
+
+        public static Gdk.Pixbuf toPixbuf (object obj) {
+	    Type type = obj.GetType();
+	    System.Reflection.MethodInfo method = type.GetMethod("toPixbuf");
+	    if (method != null) {
+		return (Gdk.Pixbuf) method.Invoke(obj, new object [] {});
+	    } else {
+		Graphics.Picture picture = null;
+		if (obj is System.Drawing.Bitmap) {
+		    picture = new Graphics.Picture((System.Drawing.Bitmap)obj);
+		}
+		if (picture != null) {
+		    return picture.toPixbuf();
+		} else {
+		    throw new Exception("Cannot convert object to pixbuf");
+		}
+	    }
+	}
+
         [method: JigsawTab("G/Pictures")]
 	public static Picture makePicture (int x, int y, Color c)
 	{
@@ -4812,6 +4849,10 @@ public static class Graphics
 
 		public System.Drawing.Bitmap toBitmap () {
 		    return _pixbuf.ToBitmap();
+		}
+		
+		public Gdk.Pixbuf toPixbuf () {
+		    return _pixbuf.Copy();
 		}
 
 		public void fromArray (Byte [] buffer, string format)
