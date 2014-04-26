@@ -3746,18 +3746,30 @@ public static class Graphics
 				return _xJustification;
 			}
 			set {
+			    if (value == "left" ||
+				value == "right" ||
+				value == "center") {
 				_xJustification = value;
 				QueueDraw ();
+			    } else {
+				throw new Exception("xJustification should be 'left', 'right', or 'center'");
+			    }
 			}
 		}
 
 		public string yJustification {
 			get {
-				return _xJustification;
+				return _yJustification;
 			}
 			set {
-				_xJustification = value;
+			    if (value == "top" ||
+				value == "bottom" ||
+				value == "center") {
+				_yJustification = value;
 				QueueDraw ();
+			    } else {
+				throw new Exception("yJustification should be 'top', 'bottom', or 'center'");
+			    }
 			}
 		}
 
@@ -3888,6 +3900,17 @@ public static class Graphics
 		    g.SetFontSize(fontSize);
 		    Point p = new Point (0, 0);
 		    double line_offset = 0;
+		    // Get total height:
+		    double total_height = 0.0;
+		    double max_width = 0.0;
+		    foreach (string line in text.Split('\n')) {
+			TextExtents te = g.TextExtents(line);
+			if (total_height != 0.0)
+			    total_height += te.Height * .5;
+			total_height += te.Height;
+			max_width = Math.Max(te.Width, max_width);
+		    }
+		    // Draw the text:
 		    foreach (string line in text.Split('\n')) {
 			TextExtents te = g.TextExtents(line);
 			if (xJustification == "center") {
@@ -3895,17 +3918,17 @@ public static class Graphics
 			} else if (xJustification == "left") {
 			    p.x = points [0].x;
 			} else if (xJustification == "right") {
-			    p.x = points [0].x + te.Width;
+			    p.x = points [0].x - te.Width;
 			}
 			if (yJustification == "center") {
-			    p.y = points [0].y - te.Height / 2 - te.YBearing;
+			    p.y = points [0].y - total_height / 2 - te.YBearing;
 			} else if (yJustification == "bottom") {
-			    p.y = points [0].y;
+			    p.y = points [0].y - total_height + te.Height;
 			} else if (yJustification == "top") {
-			    p.y = points [0].y - te.Height;
+			    p.y = points [0].y + te.Height;
 			}
 			temp = screen_coord (p);
-			g.MoveTo (temp.x, temp.y + line_offset);
+			g.MoveTo (temp.x, temp.y - line_offset);
 			g.ShowText(line);
 			line_offset += te.YBearing * 1.5;
 		    }
