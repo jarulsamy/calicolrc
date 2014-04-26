@@ -3251,6 +3251,10 @@ public class PImage
 	    return bitmap;
 	}
 
+        public Gdk.Pixbuf toPixbuf () {
+	    return _pixbuf.Copy();
+	}
+
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         public IDictionary<string, string> GetRepresentations() {
 	    byte [] buffer;
