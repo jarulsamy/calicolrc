@@ -444,6 +444,11 @@ public static class ZMQServer {
 			    data[kvp.Key] = kvp.Value;
 			}
 		    }
+		} else if (obj is System.Drawing.Bitmap) {
+		    var reprs = new Graphics.Picture((System.Drawing.Bitmap)obj).GetRepresentations();
+		    foreach (KeyValuePair<string, string> kvp in (IDictionary<string, string>)reprs) {
+			data[kvp.Key] = kvp.Value;
+		    }
 		}
 	    }
 	    return data;

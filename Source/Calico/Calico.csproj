@@ -68,6 +68,14 @@
       <HintPath>..\..\bin\Microsoft.Scripting.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Drawing">
+      <HintPath>System.Drawing.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Graphics">
+      <HintPath>..\..\modules\Graphics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Microsoft.Dynamic, Version=1.1.0.30, Culture=neutral, PublicKeyToken=7f709c5b713576e1">
       <HintPath>..\..\bin\Microsoft.Dynamic.dll</HintPath>
       <Private>False</Private>
