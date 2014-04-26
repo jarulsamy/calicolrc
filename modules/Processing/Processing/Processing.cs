@@ -3236,8 +3236,33 @@ public class PImage
 	public void save(string path) { save(path, false); }
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        public System.Drawing.Bitmap toBitmap() {
-	    System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(_width, _height);
+        public System.Drawing.Bitmap toBitmap(string sformat="Format24bppRgb") {
+	    Dictionary<string,System.Drawing.Imaging.PixelFormat> formats = new Dictionary<string,System.Drawing.Imaging.PixelFormat>();
+	    formats["Alpha"] = System.Drawing.Imaging.PixelFormat.Alpha;
+	    formats["Canonical"] = System.Drawing.Imaging.PixelFormat.Canonical;
+	    formats["DontCare"] = System.Drawing.Imaging.PixelFormat.DontCare;
+	    formats["Extended"] = System.Drawing.Imaging.PixelFormat.Extended;
+	    formats["Format16bppArgb1555"] = System.Drawing.Imaging.PixelFormat.Format16bppArgb1555;
+	    formats["Format16bppGrayScale"] = System.Drawing.Imaging.PixelFormat.Format16bppGrayScale;
+	    formats["Format16bppRgb555"] = System.Drawing.Imaging.PixelFormat.Format16bppRgb555;
+	    formats["Format16bppRgb565"] = System.Drawing.Imaging.PixelFormat.Format16bppRgb565;
+	    formats["Format1bppIndexed"] = System.Drawing.Imaging.PixelFormat.Format1bppIndexed;
+	    formats["Format24bppRgb"] = System.Drawing.Imaging.PixelFormat.Format24bppRgb;
+	    formats["Format32bppArgb"] = System.Drawing.Imaging.PixelFormat.Format32bppArgb;
+	    formats["Format32bppPArgb"] = System.Drawing.Imaging.PixelFormat.Format32bppPArgb;
+	    formats["Format32bppRgb"] = System.Drawing.Imaging.PixelFormat.Format32bppRgb;
+	    formats["Format48bppRgb"] = System.Drawing.Imaging.PixelFormat.Format48bppRgb;
+	    formats["Format4bppIndexed"] = System.Drawing.Imaging.PixelFormat.Format4bppIndexed;
+	    formats["Format64bppArgb"] = System.Drawing.Imaging.PixelFormat.Format64bppArgb;
+	    formats["Format64bppPArgb"] = System.Drawing.Imaging.PixelFormat.Format64bppPArgb;
+	    formats["Format8bppIndexed"] = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
+	    formats["Gdi"] = System.Drawing.Imaging.PixelFormat.Gdi;
+	    formats["Indexed"] = System.Drawing.Imaging.PixelFormat.Indexed;
+	    formats["Max"] = System.Drawing.Imaging.PixelFormat.Max;
+	    formats["PAlpha"] = System.Drawing.Imaging.PixelFormat.PAlpha;
+	    formats["Undefined"] = System.Drawing.Imaging.PixelFormat.Undefined;
+	    System.Drawing.Imaging.PixelFormat format = formats[sformat];
+	    System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(_width, _height, format);
 	    for (int x=0; x < _width; x++) {
 		for (int y=0; y < _height; y++) {
 		    byte r = System.Runtime.InteropServices.Marshal.ReadByte (_pixbuf.Pixels, y * _pixbuf.Rowstride + x * _pixbuf.NChannels + 0);
