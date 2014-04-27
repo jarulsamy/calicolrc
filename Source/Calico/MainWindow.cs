@@ -5027,6 +5027,39 @@ del _invoke, _
 	    display(obj1, objs);
 	}
 
+	public void animate_png(object obj) {
+	    clear_output(true);
+	    display_png(obj);	    
+	}
+	public void animate_jpeg(object obj) {
+	    clear_output(true);
+	    display_jpeg(obj);	    
+	}
+	public void animate_html(object obj) {
+	    clear_output(true);
+	    display_html(obj);	    
+	}
+	public void animate_javascript(object obj) {
+	    clear_output(true);
+	    display_javascript(obj);	    
+	}
+	public void animate_json(object obj) {
+	    clear_output(true);
+	    display_json(obj);	    
+	}
+	public void animate_latex(object obj) {
+	    clear_output(true);
+	    display_latex(obj);	    
+	}
+	public void animate_pdf(object obj) {
+	    clear_output(true);
+	    display_pdf(obj);	    
+	}
+	public void animate_svg(object obj) {
+	    clear_output(true);
+	    display_svg(obj);	    
+	}
+
 	public string input(string prompt="") {
 	    return ZMQServer.session.input(prompt);
 	}
