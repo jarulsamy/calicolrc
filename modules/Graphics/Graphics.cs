@@ -1435,6 +1435,10 @@ public static class Graphics
 		    canvas.saveToSVG(filename);
 		}
 
+		public string toSVG() {
+		    return canvas.toSVG();
+		}
+
 		public void addScrollbars(int width, int height) {
 		    InvokeBlocking( delegate {
 			    if (Child == _canvas) {
@@ -2517,6 +2521,15 @@ public static class Graphics
 				}
 			}
 			return base.OnExposeEvent (args);
+		}
+
+		public string toSVG() {
+		    string fileName = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".svg";
+		    saveToSVG(fileName);
+		    System.IO.TextReader reader = new System.IO.StreamReader(fileName);
+		    string text = reader.ReadToEnd();
+		    reader.Close();
+		    return text;
 		}
 
 		public void saveToSVG(string filename) {
