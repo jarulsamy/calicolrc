@@ -1335,7 +1335,6 @@ public static class Graphics
 		public int _cacheWidth;
 		public bool HandleKeyPressOnShape = false;
 		public bool HandleKeyReleaseOnShape = false;
-		public Graphics.Color background_color = null;
 
 		public WindowClass (string title, Gtk.Widget widget) : base(title)
 		{
@@ -1432,11 +1431,11 @@ public static class Graphics
 		}
 		
 		public void saveToSVG(string filename) {
-		    canvas.saveToSVG(filename, background_color);
+		    canvas.saveToSVG(filename);
 		}
 
 		public Calico.Representation toSVG() {
-		    return canvas.toSVG(background_color);
+		    return canvas.toSVG();
 		}
 
 		public void addScrollbars(int width, int height) {
@@ -1521,12 +1520,8 @@ public static class Graphics
 		public void setBackground (Color color)
 		{
 		    Invoke( delegate {
-			    background_color = color;
-			    Gdk.Color bg = new Gdk.Color ((byte)color.red, 
-						(byte)color.green, 
-						(byte)color.blue);
-			    _canvas.ModifyBg (Gtk.StateType.Normal, bg);
-			});
+                    _canvas.setBackground(color);
+                });
 		}
     
 		public Gdk.Drawable getDrawable ()
@@ -2433,7 +2428,8 @@ public static class Graphics
 		public Cairo.ImageSurface surface = null;
 		public Cairo.ImageSurface finalsurface;
 		public bool need_to_draw_surface = false;
-    
+        public Color background_color = null;
+
 		public Canvas (int width, int height) : this("bitmap", width, height)
 		{
 		}
@@ -2442,9 +2438,6 @@ public static class Graphics
 		{
 		    this.mode = mode;
 		    resize (width, height);
-		    if (mode == "bitmap" || mode == "bitmapmanual") {
-			setBackground(new Graphics.Color(255, 255, 255));
-		    }
 		}
     
 		public Canvas (string mode, Gtk.Adjustment h, Gtk.Adjustment v) : base(h, v)
@@ -2482,10 +2475,17 @@ public static class Graphics
         }
     
 		public void setBackground(Graphics.Color color) {
-		    var background = new Rectangle(new List<int> {0,0}, new List<int> {width,height});
-		    background.color = color;
-		    background.draw(this);
-		}
+            background_color = color;
+            Gdk.Color bg = new Gdk.Color ((byte)color.red, 
+                                          (byte)color.green, 
+                                          (byte)color.blue);
+		    if (mode == "bitmap" || mode == "bitmapmanual") {
+                var r = new Rectangle(new List<int> {0,0}, new List<int> {width,height});
+                r.color = background_color;
+                r.draw(this);
+		    }
+            ModifyBg (Gtk.StateType.Normal, bg);
+        }
 
 		void initPhysics ()
 		{
@@ -2528,16 +2528,18 @@ public static class Graphics
 			return base.OnExposeEvent (args);
 		}
 
-		public Calico.Representation toSVG(Graphics.Color background_color=null) {
+		public Calico.Representation toSVG()
+        {            
 		    string fileName = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".svg";
-		    saveToSVG(fileName, background_color);
+		    saveToSVG(fileName);
 		    System.IO.TextReader reader = new System.IO.StreamReader(fileName);
 		    string text = reader.ReadToEnd();
 		    reader.Close();
 		    return Calico.Representation.SVG(text);
 		}
 
-		public void saveToSVG(string filename, Graphics.Color background_color=null) {
+		public void saveToSVG(string filename)
+        {
 		    var svg = new Cairo.SvgSurface(filename, width, height);
 		    using (Cairo.Context g = new Cairo.Context(svg)) {
 			if (background_color != null) {
@@ -3518,7 +3520,7 @@ public static class Graphics
 			QueueDraw (); 
 		}
 	        
-	        public GraphicsRepresentation drawAt (WindowClass win, IList iterable) {
+        public GraphicsRepresentation drawAt (WindowClass win, IList iterable) {
 		    moveTo(System.Convert.ToDouble(iterable[0]), 
 			   System.Convert.ToDouble(iterable[1]));
 		    draw(win);
@@ -4702,52 +4704,80 @@ public static class Graphics
 		public Picture (Gtk.Window gtk_window) : this(true)
 		{
 		    InvokeBlocking (delegate {
-			    Gdk.Pixbuf pixbuf = null;
-			    Gdk.Drawable drawable = gtk_window.GdkWindow;
-			    Gdk.Colormap colormap = drawable.Colormap;
-			    int _width = 0;
-			    int _height = 0;
-			    drawable.GetSize (out _width, out _height);
-			    pixbuf = Gdk.Pixbuf.FromDrawable (drawable, colormap, 0, 0, 0, 0, _width, _height);
-			    // Now, do what Picture(pixbuf) does:
-			    _pixbuf = pixbuf;
-			    if (!_pixbuf.HasAlpha) {
-                    //_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
-			    }
-                
-			    set_points (new Point (0, 0), 
-					new Point (_pixbuf.Width, 0),
-					new Point (_pixbuf.Width, _pixbuf.Height), 
-					new Point (0, _pixbuf.Height));			
-			    _cacheWidth = _pixbuf.Width;
-			    _cacheHeight = _pixbuf.Height;
-                if (on_mac()) swap_red_blue();
-			});
+                    Gdk.Pixbuf pixbuf = null;
+                    Gdk.Drawable drawable = gtk_window.GdkWindow;
+                    Gdk.Colormap colormap = drawable.Colormap;
+                    int _width = 0;
+                    int _height = 0;
+                    drawable.GetSize (out _width, out _height);
+                    pixbuf = Gdk.Pixbuf.FromDrawable (drawable, colormap, 0, 0, 0, 0, _width, _height);
+                    // Now, do what Picture(pixbuf) does:
+                    _pixbuf = pixbuf;
+                    if (!_pixbuf.HasAlpha) {
+                        //_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
+                    }
+                    
+                    set_points (new Point (0, 0), 
+                                new Point (_pixbuf.Width, 0),
+                                new Point (_pixbuf.Width, _pixbuf.Height), 
+                                new Point (0, _pixbuf.Height));			
+                    _cacheWidth = _pixbuf.Width;
+                    _cacheHeight = _pixbuf.Height;
+                    if (on_mac()) swap_red_blue();
+                });
 		}
         
-		public Picture (WindowClass window) : this(true)
+		public Picture (Canvas canvas) : this(true)
 		{ 
-		    InvokeBlocking (delegate {
-			    Gdk.Pixbuf pixbuf = null;
-			    Gdk.Drawable drawable = window.getDrawable ();
-			    Gdk.Colormap colormap = drawable.Colormap;
-			    int _width = 0;
-			    int _height = 0;
-			    drawable.GetSize (out _width, out _height);
-			    pixbuf = Gdk.Pixbuf.FromDrawable (drawable, colormap, 0, 0, 0, 0, _width, _height);
-			    // Now, do what Picture(pixbuf) does:
-			    _pixbuf = pixbuf;
-			    if (!_pixbuf.HasAlpha) {
-                    //_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
-			    }
-			    set_points (new Point (0, 0), 
-					new Point (_pixbuf.Width, 0),
-					new Point (_pixbuf.Width, _pixbuf.Height), 
-					new Point (0, _pixbuf.Height));			
-			    _cacheWidth = _pixbuf.Width;
-			    _cacheHeight = _pixbuf.Height;
-                if (on_mac()) swap_red_blue();
-			});
+		    InvokeBlocking (delegate {                    
+                    int w = canvas.width;
+                    int h = canvas.height;
+                    Gdk.Pixmap pixmap = new Gdk.Pixmap(null, w, h, 24);
+                    using (Cairo.Context g = Gdk.CairoHelper.Create(pixmap))
+                    {        
+                        // draw background                                                    
+                        Rectangle background = new Rectangle(new Point(0,0), new Point(w, h));
+                        if (canvas.background_color != null) {
+                            background.color = canvas.background_color;
+                        }
+                        else {
+                            // default background of white?
+                            background.color = new Color(255, 255, 255, 255);
+                        }
+                        background.render(g);
+                
+                        if (canvas.mode == "bitmap" || canvas.mode == "bitmapauto"){
+                            Cairo.ImageSurface surface = canvas.finalsurface;
+                            g.SetSourceSurface(surface, 0, 0);
+                            g.Paint();                        
+                        }
+                        else{
+                            foreach (Shape shape in canvas.shapes) {
+                                shape.render (g);
+                            }                                                
+                        }
+                    }
+                    
+                Gdk.Colormap colormap = pixmap.Colormap;
+                    
+                    _pixbuf = Gdk.Pixbuf.FromDrawable(pixmap, colormap,
+                                                      0, 0, 0, 0, w, h);
+                    
+                    if (!_pixbuf.HasAlpha) {
+                        _pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
+                    }
+                    set_points (new Point (0, 0), 
+                                new Point (_pixbuf.Width, 0),
+                                new Point (_pixbuf.Width, _pixbuf.Height), 
+                                new Point (0, _pixbuf.Height));			
+                    _cacheWidth = _pixbuf.Width;
+                    _cacheHeight = _pixbuf.Height;
+                    //if (on_mac()) swap_red_blue();
+                });
+		}
+        
+		public Picture (WindowClass window) : this(window._canvas)
+		{ 
 		}
         
         // THIS IS IS A SUPER HACK
@@ -4773,31 +4803,6 @@ public static class Graphics
 				}
             }
         }
-
-		public Picture (Canvas canvas) : this(true)
-		{ 
-		    InvokeBlocking (delegate {
-			    Cairo.ImageSurface surface = canvas.finalsurface;
-			    int w = surface.Width;
-			    int h = surface.Height;
-			    Gdk.Pixmap pixmap = new Gdk.Pixmap(null, w, h, 24);
-			    using (Cairo.Context cr = Gdk.CairoHelper.Create(pixmap)) {
-				cr.Operator = Cairo.Operator.Source;
-				cr.SetSource(surface);
-				cr.Paint();
-			    }
-			    _pixbuf = Gdk.Pixbuf.FromDrawable(pixmap, Gdk.Colormap.System, 0, 0, 0, 0, w, h);
-			    if (!_pixbuf.HasAlpha) {
-				_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
-			    }
-			    set_points (new Point (0, 0), 
-					new Point (_pixbuf.Width, 0),
-					new Point (_pixbuf.Width, _pixbuf.Height), 
-					new Point (0, _pixbuf.Height));			
-			    _cacheWidth = _pixbuf.Width;
-			    _cacheHeight = _pixbuf.Height;
-			});
-		}
 
 		public Picture (System.Drawing.Bitmap bitmap) : this(bitmap, bitmap.Width, bitmap.Height)
 		{ 
