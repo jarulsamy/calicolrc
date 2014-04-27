@@ -2567,6 +2567,12 @@ public static class Graphics
 		    retval["text/plain"] =  this.ToString();
 		    return retval;
 		}
+
+		public Canvas draw(Shape shape) {
+		    shape.draw(this);
+		    return this;
+		}
+
 	}
   
 	public class Shape
