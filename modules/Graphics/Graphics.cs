@@ -2220,6 +2220,10 @@ public static class Graphics
 		public IDictionary<string, string> GetRepresentations() {
 		    IDictionary<string, string> retval = new Picture (this).GetRepresentations();
 		    retval["text/plain"] =  this.ToString();
+		    IDictionary<string, string> svg_rep = toSVG().GetRepresentations();
+		    foreach(KeyValuePair<string,string> kvp in (IDictionary<string,string>)svg_rep) {
+			retval[kvp.Key] = kvp.Value;
+		    }
 		    return retval;
 		}
 	}
