@@ -131,6 +131,19 @@ namespace Calico {
 	    return new MimeRepresentation("text/html", text, 
 					  "text/plain", "<Table>");
 	}
+
+	public override string ToString() {
+	    IDictionary<string,string> repr = this.GetRepresentations();
+	    if (repr.ContainsKey("image/svg+xml")) {
+		return repr["image/svg+xml"];
+	    } else if (repr.ContainsKey("text/html")) {
+		return repr["text/plain"];
+	    } else if (repr.ContainsKey("text/plain")) {
+		return repr["text/plain"];
+	    } else {
+		return "<Representation>";
+	    }
+	}
     }
 
     public class AudioRepresentation : Representation {
