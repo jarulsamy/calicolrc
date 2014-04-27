@@ -673,7 +673,6 @@ public static class Graphics
 		return new Picture (x, y);
 	}
 
-
         public static System.Drawing.Bitmap toBitmap (object obj, params object [] args) {
 	    Type type = obj.GetType();
 	    System.Reflection.MethodInfo method = type.GetMethod("toBitmap");
@@ -1336,6 +1335,7 @@ public static class Graphics
 		public int _cacheWidth;
 		public bool HandleKeyPressOnShape = false;
 		public bool HandleKeyReleaseOnShape = false;
+		public Graphics.Color background_color = null;
 
 		public WindowClass (string title, Gtk.Widget widget) : base(title)
 		{
@@ -1432,11 +1432,11 @@ public static class Graphics
 		}
 		
 		public void saveToSVG(string filename) {
-		    canvas.saveToSVG(filename);
+		    canvas.saveToSVG(filename, background_color);
 		}
 
-		public string toSVG() {
-		    return canvas.toSVG();
+		public Calico.Representation toSVG() {
+		    return canvas.toSVG(background_color);
 		}
 
 		public void addScrollbars(int width, int height) {
@@ -1521,6 +1521,7 @@ public static class Graphics
 		public void setBackground (Color color)
 		{
 		    Invoke( delegate {
+			    background_color = color;
 			    Gdk.Color bg = new Gdk.Color ((byte)color.red, 
 						(byte)color.green, 
 						(byte)color.blue);
@@ -2523,18 +2524,24 @@ public static class Graphics
 			return base.OnExposeEvent (args);
 		}
 
-		public string toSVG() {
+		public Calico.Representation toSVG(Graphics.Color background_color=null) {
 		    string fileName = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".svg";
-		    saveToSVG(fileName);
+		    saveToSVG(fileName, background_color);
 		    System.IO.TextReader reader = new System.IO.StreamReader(fileName);
 		    string text = reader.ReadToEnd();
 		    reader.Close();
-		    return text;
+		    return Calico.Representation.SVG(text);
 		}
 
-		public void saveToSVG(string filename) {
+		public void saveToSVG(string filename, Graphics.Color background_color=null) {
 		    var svg = new Cairo.SvgSurface(filename, width, height);
 		    using (Cairo.Context g = new Cairo.Context(svg)) {
+			if (background_color != null) {
+			    // draw background
+			    Rectangle background = new Rectangle(new Point(0,0), new Point(width, height));
+			    background.color = background_color;
+			    background.render(g);
+			}
 			List<Shape> s = new List<Shape>(shapes);
 			foreach (Shape shape in s) {
 			    shape.render (g);

@@ -1,7 +1,7 @@
 
 all: ../Graphics.dll ../Shapes.dll
 
-../Graphics.dll: Graphics.cs
+../Graphics.dll: Graphics.cs 
 	MONO_PATH=../../bin dmcs -sdk:4 -target:library \
 		Graphics.cs  \
 		-lib:../../bin \
@@ -20,7 +20,7 @@ all: ../Graphics.dll ../Shapes.dll
 		-pkg:gtk-dotnet-2.0 \
 		-out:../Graphics.dll
 
-../Shapes.dll: Shapes.cs Graphics.cs
+../Shapes.dll: Shapes.cs Graphics.cs 
 	MONO_PATH=../../bin dmcs -sdk:4 -target:library \
 		Shapes.cs  \
 		-lib:../../bin \
