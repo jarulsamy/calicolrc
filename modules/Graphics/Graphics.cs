@@ -1431,6 +1431,10 @@ public static class Graphics
 		    }
 		}
 		
+		public void saveToSVG(string filename) {
+		    canvas.saveToSVG(filename);
+		}
+
 		public void addScrollbars(int width, int height) {
 		    InvokeBlocking( delegate {
 			    if (Child == _canvas) {
@@ -2513,6 +2517,17 @@ public static class Graphics
 				}
 			}
 			return base.OnExposeEvent (args);
+		}
+
+		public void saveToSVG(string filename) {
+		    var svg = new Cairo.SvgSurface(filename, width, height);
+		    using (Cairo.Context g = new Cairo.Context(svg)) {
+			List<Shape> s = new List<Shape>(shapes);
+			foreach (Shape shape in s) {
+			    shape.render (g);
+			}
+		    }
+		    svg.Finish();
 		}
 
 		public IDictionary<string, string> GetRepresentations() {
