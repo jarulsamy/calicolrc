@@ -2542,15 +2542,21 @@ public static class Graphics
         {
 		    var svg = new Cairo.SvgSurface(filename, width, height);
 		    using (Cairo.Context g = new Cairo.Context(svg)) {
-			if (background_color != null) {
-			    // draw background
-			    Rectangle background = new Rectangle(new Point(0,0), new Point(width, height));
-			    background.color = background_color;
-			    background.render(g);
-			}
-			List<Shape> s = new List<Shape>(shapes);
-			foreach (Shape shape in s) {
-			    shape.render (g);
+                        if (mode == "bitmap" || mode == "bitmapauto"){
+                            Cairo.ImageSurface surface = finalsurface;
+                            g.SetSourceSurface(surface, 0, 0);
+                            g.Paint();
+			} else {
+			    if (background_color != null) {
+				// draw background
+				Rectangle background = new Rectangle(new Point(0,0), new Point(width, height));
+				background.color = background_color;
+				background.render(g);
+			    }
+			    List<Shape> s = new List<Shape>(shapes);
+			    foreach (Shape shape in s) {
+				shape.render (g);
+			    }
 			}
 		    }
 		    svg.Finish();
@@ -4930,6 +4936,24 @@ public static class Graphics
 		    return _pixbuf.Copy();
 		}
 
+		public void saveToSVG(string filename)
+		{
+		    var svg = new Cairo.SvgSurface(filename, width, height);
+		    using (Cairo.Context g = new Cairo.Context(svg)) {
+			render(g);
+		    }
+		    svg.Finish();
+		}
+		
+		public Calico.Representation toSVG() {
+		    string fileName = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".svg";
+		    saveToSVG(fileName);
+		    System.IO.TextReader reader = new System.IO.StreamReader(fileName);
+		    string text = reader.ReadToEnd();
+		    reader.Close();
+		    return Calico.Representation.SVG(text);
+		}
+		
 		public void fromArray (Byte [] buffer, string format)
 		{
 		    InvokeBlocking( delegate {
