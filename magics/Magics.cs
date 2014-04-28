@@ -349,4 +349,37 @@ namespace Calico {
 	    }
 	}
     }
+
+    public class Nuget : Calico.MagicBase {
+	
+	public Nuget(ZMQServer.Session session, string code, 
+		     string mtype, string args) : base(session, code, mtype, args) {
+	}
+
+	public override void line(string args) {
+	    command = "nuget";
+	    evaluate = true;
+	    string nuget = System.IO.Path.Combine(session.calico.path, "NuGet.exe");
+	    string output_directory = System.IO.Path.Combine(session.calico.path, "..", "modules");
+	    args = " " + args + " ";
+	    if (args.Contains(" install ") && ! args.Contains(" -OutputDirectory ")) {
+		args += " -OutputDirectory " + output_directory;
+	    }
+	    System.Diagnostics.Process proc = new System.Diagnostics.Process {
+		    StartInfo = new System.Diagnostics.ProcessStartInfo {
+			    FileName = nuget,
+				Arguments = args,
+				UseShellExecute = false,
+				RedirectStandardOutput = true,
+				CreateNoWindow = true
+				}
+		};
+	    proc.Start();
+	    string output = "";
+	    while (!proc.StandardOutput.EndOfStream) {
+		output = proc.StandardOutput.ReadLine();
+	    }
+	    session.display(output);
+	}
+    }
 }
