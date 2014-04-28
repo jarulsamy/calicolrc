@@ -3218,15 +3218,34 @@ del _invoke, _
             } else if (obj is object[]) {
                 repr = (string)ArrayToString((object[])obj);
             } else if (obj is Array) {
-		Array array = (Array)obj;
-		if (array.Rank == 1) {
-		    repr = (string)ArrayTypeToString((Array)obj);
-		} else {
-		    repr = String.Format("<Multidimensional array, rank={0}>", array.Rank);
+		try {
+		    double [,] arr = (double[,])obj;
+		    repr = "";
+		    int rowLength = arr.GetLength(0);
+		    int colLength = arr.GetLength(1);
+		    for (int i = 0; i < rowLength; i++) {
+			if (repr != "")
+			    repr += ", " + Environment.NewLine + " ";
+			string row = "";
+			for (int j = 0; j < colLength; j++) {
+			    if (row != "")
+				row += ", ";
+			    row += Repr(arr[i, j]);
+			}
+			repr += string.Format("[{0}]", row);
+		    }
+		    repr = string.Format("[{0}]", repr);
+		} catch { // not doubles
+		    Array array = (Array)obj;
+		    if (array.Rank == 1) {
+			repr = (string)ArrayTypeToString((Array)obj);
+		    } else {
+			repr = String.Format("<Multidimensional array, rank={0}>", array.Rank);
+		    }
 		}
             } else if (obj is string) {
                 repr = String.Format("{0}", obj);
-            }
+	    }
             if (repr == null) {
                 if (obj != null) {
                     repr = obj.ToString();
