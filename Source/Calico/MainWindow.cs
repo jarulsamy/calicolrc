@@ -4980,6 +4980,23 @@ del _invoke, _
 	    return new Widgets.GeoChart(ZMQServer.session, keys, data, options);
 	}
 
+    public Widgets.GoogleChart GoogleChart(string type, IList data) {
+         return new Widgets.GoogleChart(ZMQServer.session, type, data);
+	}
+
+    public Widgets.GoogleChart GoogleChart(string type, IList data, IDictionary options) {
+        return new Widgets.GoogleChart(ZMQServer.session, type, data, options);
+	}
+
+    public Widgets.GoogleChart GoogleChart(string type, IList keys, IList data) {
+	    return new Widgets.GoogleChart(ZMQServer.session, type, keys, data);
+	}
+
+    public Widgets.GoogleChart GoogleChart(string type, IList keys, IList data,
+						 IDictionary options) {
+            return new Widgets.GoogleChart(ZMQServer.session, type, keys, data, options);
+	}
+
 	public Widgets.ScatterChart ScatterChart(IList keys, IList data,
 						 IDictionary options) {
 	    return new Widgets.ScatterChart(ZMQServer.session, keys, data, options);

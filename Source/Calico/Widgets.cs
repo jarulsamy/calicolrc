@@ -1240,6 +1240,74 @@ public static class Widgets {
 	}
     }
 
+    public class GoogleChart {
+	ZMQServer.Session session;
+	public int id;
+	IDictionary options;
+	string table = "";
+    string type;
+
+        public GoogleChart(ZMQServer.Session session, string type, IList data) 
+	    : this(session, type, null, data, new Dictionary<string,object>()) {
+        }
+
+        public GoogleChart(ZMQServer.Session session, string type, IList keys, IList data) 
+	    : this(session, type, keys, data, new Dictionary<string,object>()) {
+        }
+
+        public GoogleChart(ZMQServer.Session session, string type, IList data, IDictionary options) 
+	    : this(session, type, null, data, options) {
+        }
+
+
+        public GoogleChart(ZMQServer.Session session, string type, IList keys, IList data, IDictionary options) {
+	    // GoogleChart("ScatterChart", ["X", "Y"], [[8, 12], [10, 9], [9, 10], [8, 12]],
+            //height=300, width=500, lineWidth=1, legend='"none"')
+	    this.session = session;
+	    this.options = options;
+        this.type = type;
+        if (keys != null) table = ToJSON(keys);
+	    foreach (var row in data) {
+            if (table != "") {
+                table += ",\n";
+            }
+            table += ToJSON(row);
+	    }
+	}
+
+	public Dictionary<string, string> GetRepresentations() {
+	    id = Widgets.next_id++;
+	    int height = 300;
+	    if (options.Contains("height")) 
+		height = Convert.ToInt32(options["height"]);
+	    var data = new Dictionary<string, string>();
+	    data["text/plain"] = "<ScatterChart availble for viewing in notebook>";
+	    data["text/html"] =String.Format(
+       @"
+        <div id=""chart_div_{3}"" style=""height: {4}px;""></div>
+        <script type=""text/javascript"">
+        require(['https://www.google.com/jsapi'], function () {{
+        function drawChart() {{                
+          var data = google.visualization.arrayToDataTable([{1}]);  
+          var chart = new google.visualization.{5}(document.getElementById('chart_div_{0}'));
+          chart.draw(data, {2});
+         }}
+		google.load('visualization', '1.0', {{'callback': drawChart, 'packages':['corechart']}});
+        }});
+        </script>",
+       id, table, ToJSON(options), id, height, type);
+	    return data;
+	}
+
+	public void display() {
+	    session.display(this);
+	}
+	public void animate() {
+	    session.clear_output();
+	    session.display(this);
+	}
+    }
+
     public class ScatterChart {
 	ZMQServer.Session session;
 	public int id;
