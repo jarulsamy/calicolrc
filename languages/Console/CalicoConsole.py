@@ -49,8 +49,7 @@ class MyLanguageEngine(Calico.Engine):
         the interpreter.
         """
         import cash
-        cash.executeLines(self.calico, text, [["<module>", 1, 0, len(text), "'Calico Shell'"]])
-        return "Ok"
+        return cash.evaluateLines(self.calico, text, [["<module>", 1, 0, len(text), "'Calico Shell'"]])
 
     def ExecuteFile(self, filename):
         """

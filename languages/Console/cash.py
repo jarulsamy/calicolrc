@@ -102,6 +102,45 @@ def executeLines(calico, text, stack):
         stack[-1][1] = lineno # increment
     return retval
 
+def evaluateLines(calico, text, stack):
+    # put calico in the environment:
+    globals()["calico"] = calico
+    # compute the width, height of the output window:
+    try:
+        w = calico.Output.Allocation.Width
+        h = calico.Output.Allocation.Height
+        scale = (calico.GetFont().Size/1024)
+        globals()["width"] = int(w/(scale - 2))
+        globals()["height"] = int(h/(scale * 1.7))
+    except:
+        globals()["width"] = 80
+        globals()["height"] = 24
+    retval = None
+    lineno = stack[-1][1] # last lineno
+    for line in text.split("\n"):
+        try:
+            retval = execute(line, stack=stack[:])
+        except ConsoleException, e:
+            ErrorLine("Console stack trace:")
+            ErrorLine("Traceback (most recent call last):")
+            for s in e.stack:
+                ErrorLine("  File \"%s\", line %s, from %s" % (s[0], s[1], s[4]))
+            ErrorLine(e.message)
+            retval = None
+            break
+        except Exception, e:
+            if debug:
+                ErrorLine("".join(traceback.format_exc()))
+            ErrorLine(str(e))
+            retval = None
+            break
+        except SystemExit, e:
+            retval = none
+            break
+        lineno += 1
+        stack[-1][1] = lineno # increment
+    return retval
+
 def execute(text, return_value=False, stack=None, offset=0):
     """
     Execute a shell command line.
