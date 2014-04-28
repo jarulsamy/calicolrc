@@ -1266,12 +1266,50 @@ public static class Widgets {
 	    this.session = session;
 	    this.options = options;
         this.type = type;
-        if (keys != null) table = ToJSON(keys);
+        int nCols = 0;
+
+        // how many columns are there in the data?
+        if (data.Count > 0){
+            if (data[0] is IList) nCols = ((IList)data[0]).Count;
+            else nCols = 1;
+        }
+
+        if (keys != null)
+        {
+            table = ToJSON(keys);
+        }
+        else
+        {
+            // if we aren't given any keys just make blanks; if one column make two labels
+            table = "[''";
+            int i = 0;
+            while (((nCols == 1) && i < 1) || i < nCols-1)
+            {
+                table += ", ''";
+                i = i + 1;
+            }
+            table += "]";
+        }
+
+        int t = 0;
 	    foreach (var row in data) {
             if (table != "") {
                 table += ",\n";
             }
-            table += ToJSON(row);
+
+            // if we only have one column of data, fake a time series
+            if (nCols == 1)
+            {
+                // histograms expect categorical data in position 0
+                if (type == "Histogram")
+                    table += "['" + (t++) + "', " + ToJSON(row) + "]";
+                else
+                    table += "[" + (t++) + "," + ToJSON(row) + "]";
+            }
+            else
+            {               
+                table += ToJSON(row);
+            }
 	    }
 	}
 
