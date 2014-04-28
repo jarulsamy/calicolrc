@@ -1192,11 +1192,11 @@ public static class Widgets {
 	IDictionary options;
 	string table;
 
-	public GeoChart(ZMQServer.Session session, IEnumerable<string> keys, IDictionary data) 
+	public GeoChart(ZMQServer.Session session, IList keys, IDictionary data) 
 	    : this(session, keys, data, new Dictionary<string,object>()) {
 	}
 
-	public GeoChart(ZMQServer.Session session, IEnumerable<string> keys, IDictionary data, IDictionary options) {
+	public GeoChart(ZMQServer.Session session, IList keys, IDictionary data, IDictionary options) {
 	    // GeoChart(calico.sesssion, ['Country', 'Size'], {"Canada": 562, "United States": 987}, {"height"=300, "legend"=False})
 	    this.session = session;
 	    this.options = options;
@@ -1246,11 +1246,11 @@ public static class Widgets {
 	IDictionary options;
 	string table;
 
-	public ScatterChart(ZMQServer.Session session, IEnumerable<string> keys, IList data) 
+	public ScatterChart(ZMQServer.Session session, IList keys, IList data) 
 	    : this(session, keys, data, new Dictionary<string,object>()) {
 	}
 
-	public ScatterChart(ZMQServer.Session session, IEnumerable<string> keys, IList data, IDictionary options) {
+	public ScatterChart(ZMQServer.Session session, IList keys, IList data, IDictionary options) {
 	    // ScatterChart(["X", "Y"], [[8, 12], [10, 9], [9, 10], [8, 12]], height=300, width=500, lineWidth=1, legend='"none"')
 	    this.session = session;
 	    this.options = options;

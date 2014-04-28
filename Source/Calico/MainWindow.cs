@@ -4971,21 +4971,21 @@ del _invoke, _
 	    return new Widgets.CameraWidget(ZMQServer.session);
 	}
 
-	public Widgets.GeoChart GeoChart(IEnumerable<string> keys, IDictionary data) {
+	public Widgets.GeoChart GeoChart(IList keys, IDictionary data) {
 	    return new Widgets.GeoChart(ZMQServer.session, keys, data);
 	}
 
-	public Widgets.GeoChart GeoChart(IEnumerable<string> keys, IDictionary data, 
+	public Widgets.GeoChart GeoChart(IList keys, IDictionary data, 
 					 IDictionary options) {
 	    return new Widgets.GeoChart(ZMQServer.session, keys, data, options);
 	}
 
-	public Widgets.ScatterChart ScatterChart(IEnumerable<string> keys, IList data,
+	public Widgets.ScatterChart ScatterChart(IList keys, IList data,
 						 IDictionary options) {
 	    return new Widgets.ScatterChart(ZMQServer.session, keys, data, options);
 	}
 
-	public Widgets.ScatterChart ScatterChart(IEnumerable<string> keys, IList data) {
+	public Widgets.ScatterChart ScatterChart(IList keys, IList data) {
 	    return new Widgets.ScatterChart(ZMQServer.session, keys, data);
 	}
 
