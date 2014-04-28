@@ -135,7 +135,7 @@ def evaluateLines(calico, text, stack):
             retval = None
             break
         except SystemExit, e:
-            retval = none
+            retval = None
             break
         lineno += 1
         stack[-1][1] = lineno # increment
