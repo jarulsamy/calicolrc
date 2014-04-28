@@ -1111,8 +1111,8 @@ public static class Widgets {
 	    return "null";
 	else if (value is IEnumerable<string>) 
 	    return ToJSON((IEnumerable<string>)value);
-	else if (value is IList<object>) 
-	    return ToJSON((IList<object>)value);
+	else if (value is IList)
+	    return ToJSON((IList)value);
 	else
 	    return value.ToString();
     }
@@ -1174,10 +1174,10 @@ public static class Widgets {
 	return (IList)retval;
     }
 
-    public static string ToJSON(IList<object> items) {
+    public static string ToJSON(IList items) {
 	// ['item', 'item']
 	string retval = "";
-	foreach (object item in items) {
+	foreach (var item in items) {
 	    if (retval != "") {
 		retval += ", ";
 	    }
@@ -1255,7 +1255,7 @@ public static class Widgets {
 	    this.session = session;
 	    this.options = options;
 	    table = ToJSON(keys);
-	    foreach (IList<object> row in data) {
+	    foreach (var row in data) {
 		if (table != "") {
 		    table += ",\n";
 		}

@@ -24,3 +24,4 @@
 /Users/douglasblank/Calico/bin/Calico.exe
 /Users/douglasblank/Calico/Source/Calico/obj/x86/Debug/Calico.exe
 /Users/douglasblank/Calico/Source/Calico/obj/x86/Debug/Calico.exe.mdb
+/Users/keithohara/calico/Source/Calico/obj/x86/Debug/.NETFramework,Version=v4.0.AssemblyAttribute.cs
