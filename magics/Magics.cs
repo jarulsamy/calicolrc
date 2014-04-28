@@ -382,8 +382,7 @@ namespace Calico {
 	    evaluate = true;
 	    string nuget = System.IO.Path.Combine(session.calico.path, "NuGet.exe");
 	    string output_directory = System.IO.Path.Combine(session.calico.path, "..", "modules");
-	    args = " " + args + " ";
-	    if (args.Contains(" install ") && ! args.Contains(" -OutputDirectory ")) {
+	    if (args.StartsWith("install ") && ! args.Contains("-OutputDirectory")) {
 		args += " -OutputDirectory " + output_directory;
 	    }
 	    System.Diagnostics.Process proc = new System.Diagnostics.Process {
@@ -392,15 +391,23 @@ namespace Calico {
 				Arguments = args,
 				UseShellExecute = false,
 				RedirectStandardOutput = true,
+				RedirectStandardError = true,
 				CreateNoWindow = true
 				}
 		};
 	    proc.Start();
 	    string output = "";
+	    string error = "";
+	    while (!proc.StandardError.EndOfStream) {
+		error = proc.StandardError.ReadLine();
+	    }
 	    while (!proc.StandardOutput.EndOfStream) {
 		output = proc.StandardOutput.ReadLine();
 	    }
-	    session.display(output);
+	    if (output != "")
+		session.display(output);
+	    if (error != "")
+		session.calico.Error(error);
 	}
     }
 }
