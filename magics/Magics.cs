@@ -73,15 +73,36 @@ namespace Calico {
 	}
 
 	public override void line(string args) {
-	    Console.WriteLine("Calico Language is currently \"{0}\"", session.calico.GetCurrentProperLanguage());
-	    Console.WriteLine("");
-	    Console.WriteLine("Use: %%lang LANGUAGE to change language for a cell");
-	    Console.WriteLine("     %%%lang LANGUAGE to change language (sticky)");
-	    Console.WriteLine("");
-	    Console.WriteLine("Possible languages are: Python, Ruby, Java, F#, Basic,");
-	    Console.WriteLine("  Logo, Boo, Console, LC3, Scheme, BrainScrew, etc.");
 	    command = "lang";
-	    evaluate = true;
+	    if (args == "") {
+		Console.WriteLine("Calico Language is currently \"{0}\"", session.calico.GetCurrentProperLanguage());
+		Console.WriteLine("");
+		Console.WriteLine("Use: %%lang LANGUAGE to change language for a cell");
+		Console.WriteLine("     %%%lang LANGUAGE to change language (sticky)");
+		Console.WriteLine("");
+		Console.WriteLine("Possible languages are: Python, Ruby, Java, F#, Basic,");
+		Console.WriteLine("  Logo, Boo, Console, LC3, Scheme, BrainScrew, etc.");
+		evaluate = true;
+	    } else {
+		args = args.Trim();
+		string expr = "";
+		string language = "";
+		for (int i=0; i < args.Length; i++) {
+		    if (args.Substring(i, 1) == " ") {
+			expr = args.Substring(i + 1).Trim();
+			break;
+		    }
+		    language += args.Substring(i, 1);
+		}
+		if (session.calico.manager.ContainsKey(language)) {
+		    session.calico.StartLanguage(language);
+		    session.calico.display(session.calico.Evaluate(expr, language));
+		    evaluate = true;
+		} else {
+		    Console.Error.WriteLine("Unknown language: \"{0}\"", language);
+		    evaluate = false;
+		}
+	    }
 	}
 	
 	public override void cell(string args) {
