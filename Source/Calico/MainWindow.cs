@@ -1312,7 +1312,7 @@ namespace Calico {
 	    }
 	}
 
-	public void ActivateLanguage(string language, string backup) {
+	public void StartLanguage(string language) {
 	    if (manager.languages.ContainsKey(language) && manager[language].engine == null) {
 		manager.Register(manager[language], true);
 		manager[language].engine.Setup(path);
@@ -1320,6 +1320,10 @@ namespace Calico {
 		manager[language].engine.PostSetup(this);
 		manager[language].engine.SetRedirects(cstdout, cstderr);
 	    }
+	}
+
+	public void ActivateLanguage(string language, string backup) {
+	    StartLanguage(language);
 	    if (manager[CurrentLanguage].engine == null) {
 		CurrentLanguage = backup;
 	    } else {
@@ -2498,6 +2502,7 @@ del _invoke, _
         }
 
         public bool Execute(string text, string language) {
+	    ///
 	    if (manager[language].engine != null) {
 		return manager [language].engine.Execute(text, false);
 	    } else {
