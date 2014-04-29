@@ -48,19 +48,23 @@ public static class Widgets {
 	    this.session = session;
 	    target_name = "WidgetModel";
 	    data = new Dictionary<string, object>();
-	    data["_view_name"] = "WidgetView";
-	    data["state"] = new Dictionary<string, object>();
-	    data["_css"] = get_css();
-	    data["disabled"] = false;
-	    data["visible"] = true;
-	    data["description"] = "A generic Widget";
+	    data["state"] = new Dictionary<string,object>();
+	    set("_view_name",  "WidgetView");
+	    set("_css", get_css());
+	    set("disabled", false);
+	    set("visible", true);
+	    set("description", "A generic Widget");
+	    // and the method of update
 	    data["method"] = "update";
 	    comm_id = System.Guid.NewGuid().ToString();
-	    // Register this widget:
 	    Widgets.register(this);
 	}
 
 	// Attributes
+	public string description {
+	    get { return Convert.ToString(get("description")); }
+	    set { set("description", Convert.ToString(value)); }
+	}
 	public bool visible {
 	    get { return Convert.ToBoolean(get("visible")); }
 	    set { set("visible", Convert.ToBoolean(value)); }
@@ -92,7 +96,7 @@ public static class Widgets {
 		foreach (String value_name in value_names.Keys) {
 		    object value = value_names[value_name];
 		    // first, change the value in the widget dictionary:
-		    ((Dictionary<string,object>)this.data["state"])[value_name] = value;
+		    set(value_name, value);
 		    // Next, call any associated callbacks:
 		    if (on_value_change_callback.ContainsKey(value_name)) {
 			Callback fcb = on_value_change_callback[value_name];
@@ -206,10 +210,6 @@ public static class Widgets {
 
     public class BoundedFloatTextWidget : Widget {
 	// Attributes
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 	public double min {
 	    get { return Convert.ToDouble(get("min")); }
 	    set { set("min", Convert.ToDouble(value)); }
@@ -235,27 +235,19 @@ public static class Widgets {
 				      string description="", 
 				      bool disabled=false, 
 				      bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "BoundedFloatTextView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"description", description},
-		{"min",         min},
-		{"max",         max},
-		{"step",        step},
-		{"value",       value},
-	    };
-	    data["method"] = "update";
+	    set("_view_name", "FloatTextView");
+	    set("disabled", disabled);
+	    set("visible", visible);
+	    set("description", description);
+	    set("min", min);
+	    set("max", max);
+	    set("step", step);
+	    set("value", value);
 	}
     }
 
     public class BoundedIntTextWidget : Widget {
 	// Attributes
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 	public Int64 min {
 	    get { return Convert.ToInt64(get("min")); }
 	    set { set("min", Convert.ToInt64(value)); }
@@ -281,49 +273,32 @@ public static class Widgets {
 				    string description="", 
 				    bool disabled=false, 
 				    bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "BoundedIntTextView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"description", description},
-		{"min",         min},
-		{"max",         max},
-		{"step",        step},
-		{"value",       value},		
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "IntTextView");
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("description", description);
+	    set("min",         min);
+	    set("max",         max);
+	    set("step",        step);
+	    set("value",       value);
 	}
     }
 
     public class ButtonWidget : Widget {
 	// Attributes
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
-
 	public ButtonWidget(ZMQServer.Session session,
 			    string description="", 
 			    bool disabled=false, 
 			    bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "ButtonView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"description", description},
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "ButtonView");
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("description", description);
 	}
     }
 
     public class CheckboxWidget : Widget {
 	// Attributes
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 	public bool value {
 	    get { return Convert.ToBoolean(get("value")); }
 	    set { set("value", Convert.ToBoolean(value)); }
@@ -334,15 +309,11 @@ public static class Widgets {
 			      bool value=false,
 			      bool disabled=false, 
 			      bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "CheckboxView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"description", description},
-		{"value",       value},
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "CheckboxView");
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("description", description);
+	    set("value",       value);
 	}
     }
 
@@ -352,16 +323,12 @@ public static class Widgets {
 			    bool disabled=false, 
 			    bool visible=true) : 
 	        base(session, description, disabled, visible) {
-	    ((IDictionary<string,object>)data["state"])["_view_name"] = "DropdownView";
+	    set("_view_name", "DropdownView");
 	}
     }
 
     public class FloatProgressWidget : Widget {
 	// Attributes
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 	public double min {
 	    get { return Convert.ToDouble(get("min")); }
 	    set { set("min", Convert.ToDouble(value)); }
@@ -387,18 +354,14 @@ public static class Widgets {
 				   string description="", 
 				   bool disabled=false, 
 				   bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "FloatProgressView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"description", description},
-		{"min",         min},
-		{"max",         max},
-		{"step",        step},
-		{"value",       value},
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "ProgressView");
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("description", description);
+	    set("min",         min);
+	    set("max",         max);
+	    set("step",        step);
+	    set("value",       value);
 	}
     }
 
@@ -420,10 +383,6 @@ public static class Widgets {
 	    get { return Convert.ToDouble(get("value")); }
 	    set { set("value", Convert.ToDouble(value)); }
 	}
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 	public string orientation {
 	    get { return Convert.ToString(get("orientation")); }
 	    set { set("orientation", Convert.ToString(value)); }
@@ -443,29 +402,21 @@ public static class Widgets {
 				 bool readout=true, 
 				 bool disabled=false, 
 				 bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "FloatSliderView"},
-		{"_css",        get_css()},
-		{"min",         min},
-		{"max",         max},
-		{"step",        step},
-		{"value",       value},
-		{"orientation", orientation},
-		{"readout",     readout},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"description", description},
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "FloatSliderView");
+	    set("min",         min);
+	    set("max",         max);
+	    set("step",        step);
+	    set("value",       value);
+	    set("orientation", orientation);
+	    set("readout",     readout);
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("description", description);
 	}
     }
 
     public class FloatTextProgressWidget : Widget {
 	// Attributes
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 	public double min {
 	    get { return Convert.ToDouble(get("min")); }
 	    set { set("min", Convert.ToDouble(value)); }
@@ -491,27 +442,19 @@ public static class Widgets {
 				       string description="", 
 				       bool disabled=false, 
 				       bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "FloatTextProgressView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"description", description},
-		{"min",         min},
-		{"max",         max},
-		{"step",        step},
-		{"value",       value},
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "FloatTextProgressView");
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("description", description);
+	    set("min",         min);
+	    set("max",         max);
+	    set("step",        step);
+	    set("value",       value);
 	}
     }
 
     public class FloatTextWidget : Widget {
 	// Attributes
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 	public double value {
 	    get { return Convert.ToDouble(get("value")); }
 	    set { set("value", Convert.ToDouble(value)); }
@@ -522,24 +465,16 @@ public static class Widgets {
 			       string description="", 
 			       bool disabled=false, 
 			       bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "FloatTextView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"description", description},
-		{"value",       value},
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "FloatTextView");
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("description", description);
+	    set("value",       value);
 	}
     }
 
     public class HTMLWidget : Widget {
 	// Attributes
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 	public string value {
 	    get { return Convert.ToString(get("value")); }
 	    set { set("value", Convert.ToString(value)); }
@@ -550,15 +485,11 @@ public static class Widgets {
 			  string description="", 
 			  bool disabled=false, 
 			  bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "HTMLView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"value",       value},
-		{"description", description},
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "HTMLView");
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("value",       value);
+	    set("description", description);
 	}
     }
 
@@ -593,27 +524,19 @@ public static class Widgets {
 			    string _b64value="", 
 			    bool disabled=false, 
 			    bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "ImageView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"format",      format},
-		{"width",       width},
-		{"height",      height},
-		{"value",       value},
-		{"_b64value",   _b64value},
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "ImageView");
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("format",      format);
+	    set("width",       width);
+	    set("height",      height);
+	    set("value",       value);
+	    set("_b64value",   _b64value);
 	}
     }
 
     public class IntProgressWidget : Widget {
 	// Attributes
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 	public Int64 min {
 	    get { return Convert.ToInt64(get("min")); }
 	    set { set("min", Convert.ToInt64(value)); }
@@ -639,27 +562,19 @@ public static class Widgets {
 				 string description="", 
 				 bool disabled=false, 
 				 bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "IntProgressView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"description", description},
-		{"min",         min},
-		{"max",         max},
-		{"step",        step},
-		{"value",       value},		
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "IntProgressView");
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("description", description);
+	    set("min",         min);
+	    set("max",         max);
+	    set("step",        step);
+	    set("value",       value);
 	}
     }
 
     public class IntSliderWidget : Widget {
 	// Attributes
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 	public Int64 min {
 	    get { return Convert.ToInt64(get("min")); }
 	    set { set("min", Convert.ToInt64(value)); }
@@ -695,20 +610,16 @@ public static class Widgets {
 			       string orientation="horizontal", 
 			       bool readout=true, 
 			       bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "IntSliderView"},
-		{"_css",        get_css()},
-		{"orientation", orientation},
-		{"readout",     readout},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"description", description},
-		{"min",         min},
-		{"max",         max},
-		{"step",        step},
-		{"value",       value},
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "IntSliderView");
+	    set("orientation", orientation);
+	    set("readout",     readout);
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("description", description);
+	    set("min",         min);
+	    set("max",         max);
+	    set("step",        step);
+	    set("value",       value);
 	}
     }
 
@@ -718,34 +629,22 @@ public static class Widgets {
 	    get { return Convert.ToInt64(get("value")); }
 	    set { set("value", Convert.ToInt64(value)); }
 	}
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 
 	public IntTextWidget(ZMQServer.Session session,
 			     Int64 value=0,
 			     string description="",
 			     bool disabled=false, 
 			     bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "IntTextView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"value",       value},
-		{"description", description},
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "IntTextView");
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("value",       value);
+	    set("description", description);
 	}
     }
 
     public class LatexWidget : Widget {
 	// Attributes
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 	public string value {
 	    get { return Convert.ToString(get("value")); }
 	    set { set("value", Convert.ToString(value)); }
@@ -756,15 +655,11 @@ public static class Widgets {
 			   string description="", 
 			   bool disabled=false, 
 			   bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "LatexView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"value",       value},
-		{"description", description},
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "LatexView");
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("value",       value);
+	    set("description", description);
 	}
     }
 
@@ -774,7 +669,7 @@ public static class Widgets {
 			    bool disabled=false, 
 			    bool visible=true) : 
 	         base(session, description, disabled, visible) {
-	    ((IDictionary<string,object>)data["state"])["_view_name"] = "RadioButtonsView";
+	    set("_view_name", "RadioButtonsView");
 	}
     }
 
@@ -784,16 +679,12 @@ public static class Widgets {
 			    bool disabled=false, 
 			    bool visible=true) : 
 	    base(session, description, disabled, visible) {
-	    ((IDictionary<string,object>)data["state"])["_view_name"] = "SelectView";
+	    set("_view_name", "SelectView");
 	}
     }
 
     public class TextWidget : Widget {
 	// Attributes
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 	public string value {
 	    get { return Convert.ToString(get("value")); }
 	    set { set("value", Convert.ToString(value)); }
@@ -804,24 +695,16 @@ public static class Widgets {
 			  string description="", 
 			  bool disabled=false, 
 			  bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "TextView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"description", description},
-		{"value",       value},
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "TextView");
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("description", description);
+	    set("value",       value);
 	}
     }
 
     public class TextareaWidget : Widget {
 	// Attributes
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 	public string value {
 	    get { return Convert.ToString(get("value")); }
 	    set { set("value", Convert.ToString(value)); }
@@ -832,24 +715,16 @@ public static class Widgets {
 			      string description="", 
 			      bool disabled=false, 
 			      bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "TextareaView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"value",       value},
-		{"description", description},
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "TextareaView");
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("value",       value);
+	    set("description", description);
 	}
     }
 
     public class ToggleButtonWidget : Widget {
 	// Attributes
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 	public bool value {
 	    get { return Convert.ToBoolean(get("value")); }
 	    set { set("value", Convert.ToBoolean(value)); }
@@ -860,15 +735,11 @@ public static class Widgets {
 				  string description="", 
 				  bool disabled=false, 
 				  bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "ToggleButtonView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"description", description},
-		{"value",       value},
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "ToggleButtonView");
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("description", description);
+	    set("value",       value);
 	}
     }
 
@@ -878,7 +749,7 @@ public static class Widgets {
 				   bool disabled=false, 
 				   bool visible=true) : 
    	         base(session, description, disabled, visible) {
-	    ((IDictionary<string,object>)data["state"])["_view_name"] = "ToggleButtonsView";
+	    set("_view_name", "ToggleButtonsView");
 	}
     }
 
@@ -890,14 +761,10 @@ public static class Widgets {
 				   IList<Widget> children=null, 
 				   bool disabled=false, 
 				   bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "ContainerView"},
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-	    };
+	    set("_view_name",  "ContainerView");
+	    set("disabled",    disabled);
+	    set("visible",     visible);
 	    set("_children", new List<string>());
-	    data["method"] = "update";
 	    widgets[comm_id] = this; // add yourself to list of widgets
 	    if (children != null) {
 		foreach (Widget widget in children) {
@@ -918,10 +785,6 @@ public static class Widgets {
 
     public class PopupWidget : ContainerWidget {
 	// Attributes
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 	public string button_text {
 	    get { return Convert.ToString(get("button_text")); }
 	    set { set("button_text", Convert.ToString(value)); }
@@ -960,27 +823,15 @@ public static class Widgets {
     }
 
     public class SelectionWidget : Widget {
-	// Attributes
-	// FIXME: add stuff to this widget base class
-	// value
-	// values
-	public string description {
-	    get { return Convert.ToString(get("description")); }
-	    set { set("description", Convert.ToString(value)); }
-	}
 
 	public SelectionWidget(ZMQServer.Session session,
 			    string description="", 
 			    bool disabled=false, 
 			    bool visible=true) : base(session) {
-	    data["state"] = new Dictionary<string,object> {
-		{"_view_name",  "SelectionView"}, // Will be overridden
-		{"_css",        get_css()},
-		{"disabled",    disabled},
-		{"visible",     visible},
-		{"description", description},
-	    };
-	    data["method"] = "update";
+	    set("_view_name",  "SelectionView"); // Will be overridden
+	    set("disabled",    disabled);
+	    set("visible",     visible);
+	    set("description", description);
 	}
     }
     // FIXME: SelectionContainerWidget
@@ -994,36 +845,43 @@ public static class Widgets {
 			      bool disabled=false, 
 			      bool visible=true) : 
 	    base(session, value, description, disabled, visible) {
-
-	    ((IDictionary<string,object>)data["state"])["_view_name"] = "PasswordView";
-	    // FIXME: make this a Representation
-	    session.calico.display(
-		   session.calico.Javascript("require([\"widgets/js/widget\"], function(WidgetManager){" +
-					     "  var PasswordView = WidgetManager._view_types['TextView'].extend({  " +
-					     "         update: function(options){" +
-					     "            this.$textbox.attr('type', 'password');" +
-					     "            return PasswordView.__super__.update.apply(this);" +
-					     "         }," +
-					     "   });" +
-					     "   WidgetManager.register_widget_view('PasswordView', PasswordView);" +
-					     "});"));
+	    set("_view_name", "PasswordView");
+	}
+	 
+	public Dictionary<string,string> GetRepresentations() {
+	    var retval = new Dictionary<string,string>();
+	    retval["text/plain"] = "<PasswordWidget visible in notebook view>";
+	    retval["application/javascript"] = 
+		"require([\"widgets/js/widget\"], function(WidgetManager){ \n" +
+		"  var PasswordView = WidgetManager._view_types['TextView'].extend({  \n" +
+		"         update: function(options){ \n" +
+		"            this.$textbox.attr('type', 'password'); \n" +
+		"            return PasswordView.__super__.update.apply(this); \n" +
+		"         }, \n" +
+		"   }); \n" +
+		"   WidgetManager.register_widget_view('PasswordView', PasswordView); \n" +
+		"});\n";
+	    return retval;
 	}
     }
     
     public class CameraWidget : Widgets.Widget {
 	// based on work by Jason Grout
 	// http://nbviewer.ipython.org/gist/jasongrout/9210458
-	public string imageurl {
-	    get { return Convert.ToString(get("imageurl")); }
-	    set { set("imageurl", Convert.ToString(value)); }
+	public string imageuri {
+	    get { return Convert.ToString(get("imageuri")); }
+	    set { set("imageuri", Convert.ToString(value)); }
 	}
 
 	public CameraWidget(ZMQServer.Session session) : base(session) {
-	    ((IDictionary<string,object>)data["state"])["_view_name"] = "CameraView";
-	    ((IDictionary<string,object>)data["state"])["imageurl"] = "";
-	    // FIXME: make this a Representation
-	    session.calico.display(
-		   session.calico.Javascript(
+	    set("_view_name", "CameraView");
+	    set("imageuri", "");
+	}
+
+	public Dictionary<string,string> GetRepresentations() {
+	    var retval = new Dictionary<string,string>();
+	    retval["text/plain"] = "<CameraWidget visible in notebook>";
+	    retval["application/javascript"] =
       "require([\"widgets/js/widget\"], function(WidgetManager){\n" +
       "    var CameraView = IPython.DOMWidgetView.extend({\n" +
       "        render: function(){\n" +
@@ -1076,7 +934,7 @@ public static class Widgets {
 //      "                $(video).fadeTo(1,0).delay(100).fadeTo(1,100);\n" +
 //      "                setTimeout(function() {video.play()}, 3000);\n" +
       "                canvas.getContext('2d').drawImage(video, 0, 0, width, height);\n" +
-      "                that.model.set('imageurl',canvas.toDataURL('image/png'));\n" +
+      "                that.model.set('imageuri',canvas.toDataURL('image/png'));\n" +
       "                that.touch();\n" +
       "            }\n" +
       "            startbutton.addEventListener('click', function(ev){\n" +
@@ -1089,7 +947,8 @@ public static class Widgets {
       "    // Register the DatePickerView with the widget manager.\n" +
       "    WidgetManager.register_widget_view('CameraView', CameraView);\n" +
       "\n" +
-      "});"));
+      "});";
+	    return retval;
 	}
 
 	public void click() {
@@ -1240,37 +1099,50 @@ public static class Widgets {
 	}
     }
 
-    public class GoogleChart {
+    public class GoogleChart  {
 	ZMQServer.Session session;
 	public int id;
 	IDictionary options;
 	string table = "";
-    string type;
+	string type;
 
-        public GoogleChart(ZMQServer.Session session, string type, IList data) 
-	    : this(session, type, null, data, new Dictionary<string,object>()) {
+	/*
+	public string imageuri {
+	    get { return Convert.ToString(get("imageuri")); }
+	    set { set("imageuri", Convert.ToString(value)); }
+	}
+	*/
+
+        public GoogleChart(ZMQServer.Session session, string type, IList list) 
+	    : this(session, type, null, list, new Dictionary<string,object>()) {
         }
 
-        public GoogleChart(ZMQServer.Session session, string type, IList keys, IList data) 
-	    : this(session, type, keys, data, new Dictionary<string,object>()) {
+        public GoogleChart(ZMQServer.Session session, string type, IList keys, IList list) 
+	    : this(session, type, keys, list, new Dictionary<string,object>()) {
         }
 
-        public GoogleChart(ZMQServer.Session session, string type, IList data, IDictionary options) 
-	    : this(session, type, null, data, options) {
+        public GoogleChart(ZMQServer.Session session, string type, IList list, IDictionary options) 
+	    : this(session, type, null, list, options) {
         }
 
-
-        public GoogleChart(ZMQServer.Session session, string type, IList keys, IList data, IDictionary options) {
+        public GoogleChart(ZMQServer.Session session, string type, IList keys, IList list, IDictionary options) { //: base(session) {
 	    // GoogleChart("ScatterChart", ["X", "Y"], [[8, 12], [10, 9], [9, 10], [8, 12]],
             //height=300, width=500, lineWidth=1, legend='"none"')
+	    /*
+	      set("_view_name",  "ChartView");
+	      set("disabled",    false);
+	      set("visible",     true);
+	      set("description", "");
+	      set("imageuri",    "");
+	    */
 	    this.session = session;
 	    this.options = options;
-        this.type = type;
-        int nCols = 0;
+	    this.type = type;
+	    int nCols = 0;
 
-        // how many columns are there in the data?
-        if (data.Count > 0){
-            if (data[0] is IList) nCols = ((IList)data[0]).Count;
+        // how many columns are there in the list?
+        if (list.Count > 0){
+            if (list[0] is IList) nCols = ((IList)list[0]).Count;
             else nCols = 1;
         }
 
@@ -1292,15 +1164,15 @@ public static class Widgets {
         }
 
         int t = 0;
-	    foreach (var row in data) {
+	    foreach (var row in list) {
             if (table != "") {
                 table += ",\n";
             }
 
-            // if we only have one column of data, fake a time series
+            // if we only have one column of list, fake a time series
             if (nCols == 1)
             {
-                // histograms expect categorical data in position 0
+                // histograms expect categorical list in position 0
                 if (type == "Histogram")
                     table += "['" + (t++) + "', " + ToJSON(row) + "]";
                 else
@@ -1318,9 +1190,9 @@ public static class Widgets {
 	    int height = 300;
 	    if (options.Contains("height")) 
 		height = Convert.ToInt32(options["height"]);
-	    var data = new Dictionary<string, string>();
-	    data["text/plain"] = "<ScatterChart availble for viewing in notebook>";
-	    data["text/html"] =String.Format(
+	    var gdata = new Dictionary<string, string>();
+	    gdata["text/plain"] = "<Chart available for viewing in notebook>";
+	    gdata["text/html"] =String.Format(
        @"
         <div id=""chart_div_{3}"" style=""height: {4}px;""></div>
         <script type=""text/javascript"">
@@ -1328,18 +1200,24 @@ public static class Widgets {
         function drawChart() {{                
           var data = google.visualization.arrayToDataTable([{1}]);  
           var chart = new google.visualization.{5}(document.getElementById('chart_div_{0}'));
+          google.visualization.events.addListener(chart, 'ready', function () {{
+                if (! ('charts' in document)) {{
+                    document.chart_uri = {{}};
+                }}
+                document.chart_uri['chart_{0}'] = chart.getImageURI();
+          }});
           chart.draw(data, {2});
          }}
 		google.load('visualization', '1.0', {{'callback': drawChart, 'packages':['corechart']}});
         }});
         </script>",
        id, table, ToJSON(options), id, height, type);
-	    return data;
+	    return gdata;
 	}
-
 	public void display() {
 	    session.display(this);
 	}
+
 	public void animate() {
 	    session.clear_output();
 	    session.display(this);
