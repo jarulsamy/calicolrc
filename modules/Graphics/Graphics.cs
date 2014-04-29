@@ -5784,132 +5784,136 @@ public static class Graphics
 		return t.TotalSeconds;
 	}
 
-    // FIXME: needs to be Thread-Safe
-	public class Button : Gtk.Button
-	{
-		public double _x, _y;
-		public WindowClass window;
-    
-		public Button (IList iterable, string label) : base(label)
-		{
-			_x = System.Convert.ToDouble (iterable [0]);
-			_y = System.Convert.ToDouble (iterable [1]);
-		}
-    
-		public double x {
-			get {
-				return _x;
-			}
-			set {
-				moveTo (value, _y);
-				window.QueueDraw ();
-			}
-		}
 
-		public double y {
-			get {
-				return _y;
-			}
-			set {
-				moveTo (_x, value);
-				window.QueueDraw ();
-			}
-		}
-
-		public void moveTo (object x, object y)
-		{
-			_x = System.Convert.ToDouble (x);
-			_y = System.Convert.ToDouble (y);
-			// FIXME: actually move it
-		}
-
-		public GraphicsRepresentation draw (WindowClass win)
-		{ // button
-		    InvokeBlocking (delegate {
-			    window = win;
-			    if (gui_thread_id != -1)
-				Show ();
-			    window.getCanvas ().Put (this, (int)_x, (int)_y);
-			    window.QueueDraw ();
-			});
-		    return new GraphicsRepresentation(win);
-		}
-
-		public void connect (string signal, Func<object,Event,object> function)
-		{
-			Clicked += delegate(object obj, System.EventArgs args) {
-				Event evt = new Event ("click", Graphics.currentTime ());
-				try {
-					Invoke (delegate {
-						function (obj, evt);
-					});
-				} catch (Exception e) {
-					Console.Error.WriteLine ("Error in connected function");
-					Console.Error.WriteLine (e.Message);
-				}        
-			};
-		}
+    // Gtk-based Objects
+    // -----------------------------------------------------------------------------------
+    // FIXME: check on if these are Thread-Safe
+    public class Button : Gtk.Button
+    {
+	public double _x, _y;
+	public WindowClass window;
+	
+	public Button (IList iterable, string label) : base(label)
+	    {
+		_x = System.Convert.ToDouble (iterable [0]);
+		_y = System.Convert.ToDouble (iterable [1]);
+	    }
+	
+	public double x {
+	    get {
+		return _x;
+	    }
+	    set {
+		moveTo (value, _y);
+	    }
 	}
-
-    // FIXME: needs to be Thread-Safe
- public class Entry : Gtk.Entry
- {
-     public double _x, _y;
-     public WindowClass window;
-
-     public Entry (IList iterable, int size) : base()
-     {
-         _x = System.Convert.ToDouble (iterable [0]);
-         _y = System.Convert.ToDouble (iterable [1]);
-         WidthChars = size;
-         Text = "";
-     }
-
-     public string text {
-        get {return Text;}
-        set {Text = value;}
-     }
-
-     public double x {
-         get {
-             return _x;
-         }
-         set {
-             moveTo (value, _y);
-             window.QueueDraw ();
-         }
-     }
-
-     public double y {
-         get {
-             return _y;
-         }
-         set {
-             moveTo (_x, value);
-             window.QueueDraw ();
-         }
-     }
-
-     public void moveTo (object x, object y)
-     {
-         _x = System.Convert.ToDouble (x);
-         _y = System.Convert.ToDouble (y);
-         // FIXME: actually move it
-     }
-
-     public GraphicsRepresentation draw (WindowClass win)
-     { // button
-         window = win;
-         Invoke (delegate {
-		 if (gui_thread_id != -1)
-		     Show ();
-		 window.getCanvas ().Put (this, (int)_x, (int)_y);
-		 window.QueueDraw ();
-	     });
-	 return new GraphicsRepresentation(win);
-     }
-
-/*
+	
+	public double y {
+	    get {
+		return _y;
+	    }
+	    set {
+		moveTo (_x, value);
+	    }
+	}
+	
+	public void moveTo (object x, object y)
+	{
+	    _x = System.Convert.ToDouble (x);
+	    _y = System.Convert.ToDouble (y);
+	    InvokeBlocking (delegate {
+		    window.canvas.Move(this, (int)_x, (int)_y);
+		    window.QueueDraw ();
+		});
+	}
+	
+	public GraphicsRepresentation draw (WindowClass win)
+	{ // button
+	    InvokeBlocking (delegate {
+		    window = win;
+		    if (gui_thread_id != -1)
+			Show ();
+		    window.getCanvas ().Put (this, (int)_x, (int)_y);
+		    window.QueueDraw ();
+		});
+	    return new GraphicsRepresentation(win);
+	}
+	
+	public void connect (string signal, Func<object,Event,object> function)
+	{
+	    Clicked += delegate(object obj, System.EventArgs args) {
+		Event evt = new Event ("click", Graphics.currentTime ());
+		try {
+		    Invoke (delegate {
+			    function (obj, evt);
+			});
+		} catch (Exception e) {
+		    Console.Error.WriteLine ("Error in connected function");
+		    Console.Error.WriteLine (e.Message);
+		}        
+	    };
+	}
+    }
+    
+    public class Entry : Gtk.Entry
+    {
+	public double _x, _y;
+	public WindowClass window;
+	
+	public Entry (IList iterable, int size) : base()
+	    {
+		_x = System.Convert.ToDouble (iterable [0]);
+		_y = System.Convert.ToDouble (iterable [1]);
+		WidthChars = size;
+		Text = "";
+	    }
+	
+	public string text {
+	    get {return Text;}
+	    set {Text = value;}
+	}
+	
+	public double x {
+	    get {
+		return _x;
+	    }
+	    set {
+		moveTo (value, _y);
+	    }
+	}
+	
+	public double y {
+	    get {
+		return _y;
+	    }
+	    set {
+		moveTo (_x, value);
+	    }
+	}
+	
+	public void moveTo (object x, object y)
+	{
+	    _x = System.Convert.ToDouble (x);
+	    _y = System.Convert.ToDouble (y);
+	    InvokeBlocking (delegate {
+		    window.canvas.Move(this, (int)_x, (int)_y);
+		    window.QueueDraw ();
+		});
+	}
+	
+	public GraphicsRepresentation draw (WindowClass win)
+	{ // button
+	    window = win;
+	    Invoke (delegate {
+		    if (gui_thread_id != -1)
+			Show ();
+		    window.getCanvas ().Put (this, (int)_x, (int)_y);
+		    window.QueueDraw ();
+		});
+	    return new GraphicsRepresentation(win);
+	}
+	
+	/*
      public void connect (string signal, Func<object,Event,object> function)
      {
          Clicked += delegate(object obj, System.EventArgs args) {
@@ -5925,95 +5929,358 @@ public static class Graphics
          };
      }
      */
- }
-    // FIXME: needs to be Thread-Safe
- 	public class HSlider : Gtk.HScale
-	{
-		public WindowClass window;
-		public double _width;
-		public double _x, _y;
+    }
     
-		public HSlider (IList iterable, object width) : 
-      base(new Gtk.Adjustment (0.0, 0.0, 101.0, 0.1, 1.0, 1.0))
-		{
-			UpdatePolicy = Gtk.UpdateType.Continuous;
-			Digits = 0;
-			ValuePos = Gtk.PositionType.Top;
-			DrawValue = true;    
-			this.width = System.Convert.ToDouble (width);
-			_x = System.Convert.ToDouble (iterable [0]);
-			_y = System.Convert.ToDouble (iterable [1]);
-		}
-    
-		public double x {
-			get {
-				return _x;
-			}
-			set {
-				moveTo (value, _y);
-				window.QueueDraw ();
-			}
-		}
-
-		public double y {
-			get {
-				return _y;
-			}
-			set {
-				moveTo (_x, value);
-				window.QueueDraw ();
-			}
-		}
-
-		public double width {
-			get {
-				return _width;
-			}
-			set {
-				_width = value;
-				SetSizeRequest ((int)_width, -1);
-			}
-		}
-
-		public void moveTo (object x, object y)
-		{
-			_x = System.Convert.ToDouble (x);
-			_y = System.Convert.ToDouble (y);
-			// FIXME: actually move it
-		}
-
-		public GraphicsRepresentation draw (WindowClass win)
-		{ // hslider
-			window = win;
-			Invoke (delegate {
-				if (gui_thread_id != -1)
-				    Show ();
-				window.getCanvas ().Put (this, (int)_x, (int)_y);
-				window.QueueDraw ();
-			});
-			return new GraphicsRepresentation(win);
-		}
-
-		public void connect (string signal, Func<object,Event,object> function)
-		{
-			if (signal.Equals ("change-value")) {
-				ChangeValue += delegate(object obj, Gtk.ChangeValueArgs args) {
-					Event evt = new Event (signal, (object)Value, Graphics.currentTime ());
-					try {
-						Invoke (delegate {
-							function (obj, evt);
-						});
-					} catch (Exception e) {
-						Console.Error.WriteLine ("Error in connected function");
-						Console.Error.WriteLine (e.Message);
-					}        
-				};
-			} else {
-				throw new Exception ("invalid signal for this object");
-			}
-		}
+    public class HSlider : Gtk.HScale
+    {
+	public WindowClass window;
+	public double _width;
+	public double _x, _y;
+	
+	public HSlider (IList iterable, object width) : 
+	    base(new Gtk.Adjustment (0.0, 0.0, 101.0, 0.1, 1.0, 1.0))
+	    {
+		UpdatePolicy = Gtk.UpdateType.Continuous;
+		Digits = 0;
+		ValuePos = Gtk.PositionType.Top;
+		DrawValue = true;    
+		this.width = System.Convert.ToDouble (width);
+		_x = System.Convert.ToDouble (iterable [0]);
+		_y = System.Convert.ToDouble (iterable [1]);
+	    }
+	
+	public double x {
+	    get {
+		return _x;
+	    }
+	    set {
+		moveTo (value, _y);
+	    }
 	}
+	
+	public double y {
+	    get {
+		return _y;
+	    }
+	    set {
+		moveTo (_x, value);
+	    }
+	}
+	
+	public double width {
+	    get {
+		return _width;
+	    }
+	    set {
+		_width = value;
+		SetSizeRequest ((int)_width, -1);
+	    }
+	}
+	
+	public void moveTo (object x, object y)
+	{
+	    _x = System.Convert.ToDouble (x);
+	    _y = System.Convert.ToDouble (y);
+	    InvokeBlocking (delegate {
+		    window.canvas.Move(this, (int)_x, (int)_y);
+		    window.QueueDraw ();
+		});
+	}
+	
+	public GraphicsRepresentation draw (WindowClass win)
+	{ // hslider
+	    window = win;
+	    Invoke (delegate {
+		    if (gui_thread_id != -1)
+			Show ();
+		    window.getCanvas ().Put (this, (int)_x, (int)_y);
+		    window.QueueDraw ();
+		});
+	    return new GraphicsRepresentation(win);
+	}
+	
+	public void connect (string signal, Func<object,Event,object> function)
+	{
+	    if (signal.Equals ("change-value")) {
+		ChangeValue += delegate(object obj, Gtk.ChangeValueArgs args) {
+		    Event evt = new Event (signal, (object)Value, Graphics.currentTime ());
+		    try {
+			Invoke (delegate {
+				function (obj, evt);
+			    });
+		    } catch (Exception e) {
+			Console.Error.WriteLine ("Error in connected function");
+			Console.Error.WriteLine (e.Message);
+		    }        
+		};
+	    } else {
+		throw new Exception ("invalid signal for this object");
+	    }
+	}
+    }
+
+    public class VSlider : Gtk.VScale
+    {
+	public WindowClass window;
+	public double _height;
+	public double _x, _y;
+	
+	public VSlider (IList iterable, object height) : 
+	    base(new Gtk.Adjustment (0.0, 0.0, 101.0, 0.1, 1.0, 1.0))
+	    {
+		UpdatePolicy = Gtk.UpdateType.Continuous;
+		Digits = 0;
+		ValuePos = Gtk.PositionType.Left;
+		DrawValue = true;    
+		this.height = System.Convert.ToDouble (height);
+		_x = System.Convert.ToDouble (iterable [0]);
+		_y = System.Convert.ToDouble (iterable [1]);
+	    }
+	
+	public double x {
+	    get {
+		return _x;
+	    }
+	    set {
+		moveTo (value, _y);
+	    }
+	}
+	
+	public double y {
+	    get {
+		return _y;
+	    }
+	    set {
+		moveTo (_x, value);
+	    }
+	}
+	
+	public double height {
+	    get {
+		return _height;
+	    }
+	    set {
+		_height = value;
+		SetSizeRequest (-1, (int)_height);
+	    }
+	}
+	
+	public void moveTo (object x, object y)
+	{
+	    _x = System.Convert.ToDouble (x);
+	    _y = System.Convert.ToDouble (y);
+	    InvokeBlocking (delegate {
+		    window.canvas.Move(this, (int)_x, (int)_y);
+		    window.QueueDraw ();
+		});
+	}
+	
+	public GraphicsRepresentation draw (WindowClass win)
+	{ // hslider
+	    window = win;
+	    Invoke (delegate {
+		    if (gui_thread_id != -1)
+			Show ();
+		    window.getCanvas ().Put (this, (int)_x, (int)_y);
+		    window.QueueDraw ();
+		});
+	    return new GraphicsRepresentation(win);
+	}
+	
+	public void connect (string signal, Func<object,Event,object> function)
+	{
+	    if (signal.Equals ("change-value")) {
+		ChangeValue += delegate(object obj, Gtk.ChangeValueArgs args) {
+		    Event evt = new Event (signal, (object)Value, Graphics.currentTime ());
+		    try {
+			Invoke (delegate {
+				function (obj, evt);
+			    });
+		    } catch (Exception e) {
+			Console.Error.WriteLine ("Error in connected function");
+			Console.Error.WriteLine (e.Message);
+		    }        
+		};
+	    } else {
+		throw new Exception ("invalid signal for this object");
+	    }
+	}
+    }
+
+    public class CheckButton : Gtk.CheckButton
+    {
+	public WindowClass window;
+	public double _x, _y;
+	
+	public CheckButton (IList iterable, string label) : 
+	    base(label)
+	    {
+		_x = System.Convert.ToDouble (iterable [0]);
+		_y = System.Convert.ToDouble (iterable [1]);
+	    }
+	
+	public double x {
+	    get {
+		return _x;
+	    }
+	    set {
+		moveTo (value, _y);
+	    }
+	}
+	
+	public double y {
+	    get {
+		return _y;
+	    }
+	    set {
+		moveTo (_x, value);
+	    }
+	}
+	
+	public void moveTo (object x, object y)
+	{
+	    _x = System.Convert.ToDouble (x);
+	    _y = System.Convert.ToDouble (y);
+	    InvokeBlocking (delegate {
+		    window.canvas.Move(this, (int)_x, (int)_y);
+		    window.QueueDraw ();
+		});
+	}
+	
+	public GraphicsRepresentation draw (WindowClass win)
+	{ // CheckButton
+	    window = win;
+	    Invoke (delegate {
+		    if (gui_thread_id != -1)
+			Show ();
+		    window.getCanvas ().Put (this, (int)_x, (int)_y);
+		    window.QueueDraw ();
+		});
+	    return new GraphicsRepresentation(win);
+	}
+	
+	public void connect (string signal, Func<object,Event,object> function)
+	{
+	    if (signal.Equals ("change-value")) {
+		Toggled += delegate(object obj, System.EventArgs args) {
+		    Event evt = new Event (signal, (object)Active, Graphics.currentTime ());
+		    try {
+			Invoke (delegate {
+				function (obj, evt);
+			    });
+		    } catch (Exception e) {
+			Console.Error.WriteLine ("Error in connected function");
+			Console.Error.WriteLine (e.Message);
+		    }        
+		};
+	    } else {
+		throw new Exception ("invalid signal for this object");
+	    }
+	}
+    }
+
+    public class RadioButton : Gtk.RadioButton
+    {
+	public WindowClass window;
+	public double _x, _y;
+	
+	public RadioButton (IList iterable, string label) : 
+	    base(label)
+	    {
+		Active = true;
+		_x = System.Convert.ToDouble (iterable [0]);
+		_y = System.Convert.ToDouble (iterable [1]);
+	    }
+	
+	public RadioButton (IList iterable, string label, RadioButton button) : 
+	    base(button, label)
+	    {
+		// Add this button to Group
+		button.Group.Append(this);
+		// Now, make sure all buttons in that group
+		// have all:
+		foreach(Gtk.RadioButton b1 in button.Group) {
+		    foreach(Gtk.RadioButton b2 in button.Group) {
+			bool found = false;
+			foreach (Gtk.RadioButton b3 in b1.Group) {
+			    if (b3 == b2) {
+				found = true;
+				break;
+			    }
+			}
+			if (! found) {
+			    b1.Group.Append(b2);
+			}		    
+		    }
+		}
+		Active = false;
+		_x = System.Convert.ToDouble (iterable [0]);
+		_y = System.Convert.ToDouble (iterable [1]);
+	    }
+	
+	public double x {
+	    get {
+		return _x;
+	    }
+	    set {
+		moveTo (value, _y);
+	    }
+	}
+	
+	public double y {
+	    get {
+		return _y;
+	    }
+	    set {
+		moveTo (_x, value);
+	    }
+	}
+	
+	public void moveTo (object x, object y)
+	{
+	    _x = System.Convert.ToDouble (x);
+	    _y = System.Convert.ToDouble (y);
+	    InvokeBlocking (delegate {
+		    window.canvas.Move(this, (int)_x, (int)_y);
+		    window.QueueDraw ();
+		});
+	}
+	
+	public GraphicsRepresentation draw (WindowClass win)
+	{ // CheckButton
+	    window = win;
+	    Invoke (delegate {
+		    if (gui_thread_id != -1)
+			Show ();
+		    window.getCanvas ().Put (this, (int)_x, (int)_y);
+		    window.QueueDraw ();
+		});
+	    return new GraphicsRepresentation(win);
+	}
+	
+	public void connect (string signal, Func<object,Event,object> function)
+	{
+	    if (signal.Equals ("change-value")) {
+	        Toggled += delegate(object obj, System.EventArgs args) {
+		    Event evt = new Event (signal, (object)Active, Graphics.currentTime ());
+		    try {
+			Invoke (delegate {
+				function (obj, evt);
+			    });
+		    } catch (Exception e) {
+			Console.Error.WriteLine ("Error in connected function");
+			Console.Error.WriteLine (e.Message);
+		    }        
+		};
+	    } else {
+		throw new Exception ("invalid signal for this object");
+	    }
+	}
+    }
   
+    // End of Gtk-based objects
+    // ----------------------------------------------------------------------------------
+
 	public class Rectangle : Shape
 	{
 		public Rectangle (IList iterable1, IList iterable2) : base(true)
