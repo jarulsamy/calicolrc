@@ -319,10 +319,13 @@ public static class Widgets {
 
     public class DropdownWidget : _SelectionWidget {
 	public DropdownWidget(ZMQServer.Session session,
-			    string description="", 
-			    bool disabled=false, 
-			    bool visible=true) : 
-	        base(session, description, disabled, visible) {
+			      string description="", 
+			      IList value_names=null,
+			      IDictionary values=null,
+			      string value_name=null,
+			      bool disabled=false, 
+			      bool visible=true) : 
+	    base(session, description, value_names, values, value_name, disabled, visible) {
 	    set("_view_name", "DropdownView");
 	}
     }
@@ -627,10 +630,13 @@ public static class Widgets {
 
     public class RadioButtonsWidget : _SelectionWidget {
 	public RadioButtonsWidget(ZMQServer.Session session,
-			    string description="", 
-			    bool disabled=false, 
-			    bool visible=true) : 
-	         base(session, description, disabled, visible) {
+				  string description="", 
+				  IList value_names=null,
+				  IDictionary values=null,
+				  string value_name=null,
+				  bool disabled=false, 
+				  bool visible=true) : 
+	    base(session, description, value_names, values, value_name, disabled, visible) {
 	    set("_view_name", "RadioButtonsView");
 	}
     }
@@ -638,9 +644,12 @@ public static class Widgets {
     public class SelectWidget : _SelectionWidget {
 	public SelectWidget(ZMQServer.Session session,
 			    string description="", 
+			    IList value_names=null,
+			    IDictionary values=null,
+			    string value_name=null,
 			    bool disabled=false, 
 			    bool visible=true) : 
-	    base(session, description, disabled, visible) {
+	    base(session, description, value_names, values, value_name, disabled, visible) {
 	    set("_view_name", "SelectView");
 	}
     }
@@ -708,9 +717,12 @@ public static class Widgets {
     public class ToggleButtonsWidget : _SelectionWidget {
 	public ToggleButtonsWidget(ZMQServer.Session session,
 				   string description="", 
+				   IList value_names=null,
+				   IDictionary values=null,
+				   string value_name=null,
 				   bool disabled=false, 
 				   bool visible=true) : 
-   	         base(session, description, disabled, visible) {
+	    base(session, description, value_names, values, value_name, disabled, visible) {
 	    set("_view_name", "ToggleButtonsView");
 	}
     }
@@ -785,20 +797,52 @@ public static class Widgets {
     }
 
     public class _SelectionWidget : Widget {
+	// Attributes
+	public IList value_names {
+	    get { return (IList)get("value_names"); }
+	    set { set("value_names", (IList)value); }
+	}
+	public IDictionary values {
+	    get { return (IDictionary)get("values"); }
+	    set { set("values", (IDictionary)value); }
+	}
+	public string value_name {
+	    get { return (string)get("value_name"); }
+	    set { set("value_name", (string)value_name); }
+	}
 
 	public _SelectionWidget(ZMQServer.Session session,
-			    string description="", 
-			    bool disabled=false, 
-			    bool visible=true) : base(session) {
+				string description="", 
+				IList value_names=null,
+				IDictionary values=null,
+				string value_name=null,
+				bool disabled=false, 
+				bool visible=true) : base(session) {
 	    set("_view_name",  "_SelectionView"); // Will be overridden
+	    set("description", description);
+	    set("value_names", value_names == null ? new List<object>() : value_names);
+	    set("values", values == null ? makeValuesFromNames() : values);
+	    set("value_name", value_name == null ? getDefaultValueName() : value_name);
 	    set("disabled",    disabled);
 	    set("visible",     visible);
-	    set("description", description);
 	    set("value", null);
-	    set("values", new Dictionary<string,object>());
-	    set("value_name", "");
-	    set("values", new List<object>());
 	}
+
+	public string getDefaultValueName() {
+	    if (value_names.Count == 0)
+		return "";
+	    else
+		return value_names[0].ToString();
+	}
+
+	public IDictionary makeValuesFromNames() {
+	    var retval = new Dictionary<string,string>();
+	    foreach (string value in value_names) {
+		retval[value] = value;
+	    }
+	    return retval;
+	}
+
     }
 
     public class _SelectionContainerWidget : ContainerWidget {

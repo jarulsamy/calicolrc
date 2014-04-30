@@ -3250,6 +3250,22 @@ del _invoke, _
 		}
             } else if (obj is string) {
                 repr = String.Format("{0}", obj);
+	    } else if (obj is IList) {
+		repr = "";
+		foreach(var element in (IList)obj) {
+		    if (repr != "")
+			repr += ", ";
+		    repr += Repr(element);
+		}
+		repr = string.Format("[{0}]", repr);
+	    } else if (obj is IDictionary) {
+		repr = "";
+		foreach(System.Collections.DictionaryEntry kvp in (IDictionary)obj) { ///
+		    if (repr != "")
+			repr += ", ";
+		    repr += string.Format("{0}: {1}", kvp.Key.ToString(), Repr(kvp.Value));
+		}
+		repr = string.Format("{{{0}}}", repr);
 	    }
             if (repr == null) {
                 if (obj != null) {
@@ -4685,10 +4701,16 @@ del _invoke, _
 	}
 
 	public Widgets.DropdownWidget DropdownWidget(string description="", 
-					     bool disabled=false, 
-					     bool visible=true) {
+						     IList value_names=null,
+						     IDictionary values=null,
+						     string value_name=null,
+						     bool disabled=false, 
+						     bool visible=true) {
 	    return new Widgets.DropdownWidget(ZMQServer.session,
 					      description, 
+					      value_names,
+					      values,
+					      value_name,
 					      disabled, 
 					      visible);
 	}
@@ -4825,19 +4847,31 @@ del _invoke, _
 	}
 
 	public Widgets.RadioButtonsWidget RadioButtonsWidget(string description="", 
-						 bool disabled=false, 
-						 bool visible=true) {
+							     IList value_names=null,
+							     IDictionary values=null,
+							     string value_name=null,
+							     bool disabled=false, 
+							     bool visible=true) {
 	    return new Widgets.RadioButtonsWidget(ZMQServer.session,
 						  description, 
+						  value_names,
+						  values,
+						  value_name,
 						  disabled, 
 						  visible);
 	}
 
 	public Widgets.SelectWidget SelectWidget(string description="", 
-					   bool disabled=false, 
-					   bool visible=true) {
+						 IList value_names=null,
+						 IDictionary values=null,
+						 string value_name=null,
+						 bool disabled=false, 
+						 bool visible=true) {
 	    return new Widgets.SelectWidget(ZMQServer.session,
 					    description, 
+					    value_names,
+					    values,
+					    value_name,
 					    disabled, 
 					    visible);
 	}
@@ -4887,10 +4921,16 @@ del _invoke, _
 	}
 	
 	public Widgets.ToggleButtonsWidget ToggleButtonsWidget(string description="", 
-						  bool disabled=false, 
-						  bool visible=true) {
+							       IList value_names=null,
+							       IDictionary values=null,
+							       string value_name=null,
+							       bool disabled=false, 
+							       bool visible=true) {
 	    return new Widgets.ToggleButtonsWidget(ZMQServer.session,
 						   description, 
+						   value_names,
+						   values,
+						   value_name,
 						   disabled, 
 						   visible); 
 	}
