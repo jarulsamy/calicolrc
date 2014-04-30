@@ -9395,6 +9395,14 @@ public static class Graphics
 	    return retval;
 	}
 
+	public bool isLastFrame() {
+	  return frame == (costumes[costume].Count - 1);
+	}
+
+	public bool isFirstFrame() {
+	  return frame == 0;
+	}
+
 	public void flipToFirstFrame() {
 	  flipToFrame(0);
 	}
