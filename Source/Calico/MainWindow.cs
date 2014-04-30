@@ -4582,9 +4582,6 @@ del _invoke, _
 	public Widgets.FloatSliderWidget makeFloatSliderWidget() {
 	    return FloatSliderWidget();
 	}
-	public Widgets.FloatTextProgressWidget makeFloatTextProgressWidget() {
-	    return FloatTextProgressWidget();
-	}
 	public Widgets.FloatTextWidget makeFloatTextWidget() {
 	    return FloatTextWidget();
 	}
@@ -4638,9 +4635,6 @@ del _invoke, _
 	}
 	public Widgets.TabWidget makeTabWidget() {
 	    return TabWidget();
-	}
-	public Widgets.SelectionWidget makeSelectionWidget() {
-	    return SelectionWidget();
 	}
 	public Widgets.CameraWidget makeCameraWidget() {
 	    return CameraWidget();
@@ -4729,23 +4723,6 @@ del _invoke, _
 						 step, value, description,
 						 orientation, readout, 
 						 disabled, visible);
-	}
-
-	public Widgets.FloatTextProgressWidget FloatTextProgressWidget(double min=0.0, 
-						      double max=100.0, 
-						      double step=0.1, 
-						      double value=0.0,
-						      string description="", 
-						      bool disabled=false, 
-						      bool visible=true) {
-	    return new Widgets.FloatTextProgressWidget(ZMQServer.session,
-						       min, 
-						       max, 
-						       step, 
-						       value,
-						       description, 
-						       disabled, 
-						       visible);
 	}
 
 	public Widgets.FloatTextWidget FloatTextWidget(double value=0.0,
@@ -4956,15 +4933,6 @@ del _invoke, _
 					   children,
 					   disabled, 
 					   visible);
-	}
-
-	public Widgets.SelectionWidget SelectionWidget(string description="", 
-					      bool disabled=false, 
-					      bool visible=true) {
-	    return new Widgets.SelectionWidget(ZMQServer.session,
-					       description, 
-					       disabled, 
-					       visible);
 	}
 
 	public Widgets.CameraWidget CameraWidget() {

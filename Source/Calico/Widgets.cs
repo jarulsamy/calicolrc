@@ -317,7 +317,7 @@ public static class Widgets {
 	}
     }
 
-    public class DropdownWidget : SelectionWidget {
+    public class DropdownWidget : _SelectionWidget {
 	public DropdownWidget(ZMQServer.Session session,
 			    string description="", 
 			    bool disabled=false, 
@@ -412,44 +412,6 @@ public static class Widgets {
 	    set("disabled",    disabled);
 	    set("visible",     visible);
 	    set("description", description);
-	}
-    }
-
-    public class FloatTextProgressWidget : Widget {
-	// Attributes
-	public double min {
-	    get { return Convert.ToDouble(get("min")); }
-	    set { set("min", Convert.ToDouble(value)); }
-	}
-	public double max {
-	    get { return Convert.ToDouble(get("max")); }
-	    set { set("max", Convert.ToDouble(value)); }
-	}
-	public double step {
-	    get { return Convert.ToDouble(get("step")); }
-	    set { set("step", Convert.ToDouble(value)); }
-	}
-	public double value {
-	    get { return Convert.ToDouble(get("value")); }
-	    set { set("value", Convert.ToDouble(value)); }
-	}
-
-	public FloatTextProgressWidget(ZMQServer.Session session,
-				       double min=0.0, 
-				       double max=100.0, 
-				       double step=0.1, 
-				       double value=0.0,
-				       string description="", 
-				       bool disabled=false, 
-				       bool visible=true) : base(session) {
-	    set("_view_name",  "FloatTextProgressView");
-	    set("disabled",    disabled);
-	    set("visible",     visible);
-	    set("description", description);
-	    set("min",         min);
-	    set("max",         max);
-	    set("step",        step);
-	    set("value",       value);
 	}
     }
 
@@ -562,7 +524,7 @@ public static class Widgets {
 				 string description="", 
 				 bool disabled=false, 
 				 bool visible=true) : base(session) {
-	    set("_view_name",  "IntProgressView");
+	    set("_view_name",  "ProgressView");
 	    set("disabled",    disabled);
 	    set("visible",     visible);
 	    set("description", description);
@@ -663,7 +625,7 @@ public static class Widgets {
 	}
     }
 
-    public class RadioButtonsWidget : SelectionWidget {
+    public class RadioButtonsWidget : _SelectionWidget {
 	public RadioButtonsWidget(ZMQServer.Session session,
 			    string description="", 
 			    bool disabled=false, 
@@ -673,7 +635,7 @@ public static class Widgets {
 	}
     }
 
-    public class SelectWidget : SelectionWidget {
+    public class SelectWidget : _SelectionWidget {
 	public SelectWidget(ZMQServer.Session session,
 			    string description="", 
 			    bool disabled=false, 
@@ -743,7 +705,7 @@ public static class Widgets {
 	}
     }
 
-    public class ToggleButtonsWidget : SelectionWidget {
+    public class ToggleButtonsWidget : _SelectionWidget {
 	public ToggleButtonsWidget(ZMQServer.Session session,
 				   string description="", 
 				   bool disabled=false, 
@@ -802,17 +764,17 @@ public static class Widgets {
 	}
     }
 
-    public class AccordionWidget : ContainerWidget {
+    public class AccordionWidget : _SelectionContainerWidget {
 
 	public AccordionWidget(ZMQServer.Session session,
 			       IList<Widget> children=null,
 			       bool disabled=false, 
 			       bool visible=true) : base(session, children, disabled, visible) {
-	    set("_view_name",  "AccordianView");
+	    set("_view_name",  "AccordionView");
 	}
     }
 
-    public class TabWidget : ContainerWidget {
+    public class TabWidget : _SelectionContainerWidget {
 
 	public TabWidget(ZMQServer.Session session,
 			 IList<Widget> children=null,
@@ -822,19 +784,34 @@ public static class Widgets {
 	}
     }
 
-    public class SelectionWidget : Widget {
+    public class _SelectionWidget : Widget {
 
-	public SelectionWidget(ZMQServer.Session session,
+	public _SelectionWidget(ZMQServer.Session session,
 			    string description="", 
 			    bool disabled=false, 
 			    bool visible=true) : base(session) {
-	    set("_view_name",  "SelectionView"); // Will be overridden
+	    set("_view_name",  "_SelectionView"); // Will be overridden
 	    set("disabled",    disabled);
 	    set("visible",     visible);
 	    set("description", description);
+	    set("value", null);
+	    set("values", new Dictionary<string,object>());
+	    set("value_name", "");
+	    set("values", new List<object>());
 	}
     }
-    // FIXME: SelectionContainerWidget
+
+    public class _SelectionContainerWidget : ContainerWidget {
+
+	public _SelectionContainerWidget(ZMQServer.Session session,
+			 IList<Widget> children=null,
+			 bool disabled=false, 
+					 bool visible=true) : base(session, children, disabled, visible) {
+	    set("_view_name",  "_SelectionContainerView"); // Will be overridden
+	    set("_titles",  new Dictionary<int,string>());
+	    set("selected_index",  0);
+	}
+    }
 
     public class PasswordWidget : Widgets.TextWidget {
 	// based on work by Jonathan Frederic
@@ -846,13 +823,12 @@ public static class Widgets {
 			      bool visible=true) : 
 	    base(session, value, description, disabled, visible) {
 	    set("_view_name", "PasswordView");
+	    // need to inject the javascript now:
+	    session.display(session.calico.Javascript(javascript()));
 	}
-	 
-	public Dictionary<string,string> GetRepresentations() {
-	    var retval = new Dictionary<string,string>();
-	    retval["text/plain"] = "<PasswordWidget visible in notebook view>";
-	    retval["application/javascript"] = 
-		"require([\"widgets/js/widget\"], function(WidgetManager){ \n" +
+
+	public string javascript() {
+	    return "require([\"widgets/js/widget\"], function(WidgetManager){ \n" +
 		"  var PasswordView = WidgetManager._view_types['TextView'].extend({  \n" +
 		"         update: function(options){ \n" +
 		"            this.$textbox.attr('type', 'password'); \n" +
@@ -861,7 +837,6 @@ public static class Widgets {
 		"   }); \n" +
 		"   WidgetManager.register_widget_view('PasswordView', PasswordView); \n" +
 		"});\n";
-	    return retval;
 	}
     }
     
@@ -876,79 +851,77 @@ public static class Widgets {
 	public CameraWidget(ZMQServer.Session session) : base(session) {
 	    set("_view_name", "CameraView");
 	    set("imageuri", "");
+	    // need to inject the javascript now:
+	    session.display(session.calico.Javascript(javascript()));
 	}
 
-	public Dictionary<string,string> GetRepresentations() {
-	    var retval = new Dictionary<string,string>();
-	    retval["text/plain"] = "<CameraWidget visible in notebook>";
-	    retval["application/javascript"] =
-      "require([\"widgets/js/widget\"], function(WidgetManager){\n" +
-      "    var CameraView = IPython.DOMWidgetView.extend({\n" +
-      "        render: function(){\n" +
-      "            // based on https://developer.mozilla.org/en-US/docs/WebRTC/taking_webcam_photos\n" +
-      "            var video        = $('<video>')[0];\n" +
-      "            var canvas       = $('<canvas>')[0];\n" +
-      "            var startbutton  = $('<button id = picture_button>Take Picture</button>')[0];\n" +
-      "            var width = 320;\n" +
-      "            var height = 0;\n" +
-      "            var that = this;\n" +
-      "\n" +
-      "            setTimeout(function() {that.$el.append(video).append(startbutton).append(canvas);}, 200);\n" +
-      "            //$(canvas).hide();\n" +
-      "            //window.vvv=video;\n" +
-      "            var streaming = false;\n" +
-      "            navigator.getMedia = ( navigator.getUserMedia ||\n" +
-      "                                 navigator.webkitGetUserMedia ||\n" +
-      "                                 navigator.mozGetUserMedia ||\n" +
-      "                                 navigator.msGetUserMedia);\n" +
-      "\n" +
-      "            navigator.getMedia({video: true, audio: false},\n" +
-      "                function(stream) {\n" +
-      "                  if (navigator.mozGetUserMedia) {\n" +
-      "                    video.mozSrcObject = stream;\n" +
-      "                  } else {\n" +
-      "                    var vendorURL = window.URL || window.webkitURL;\n" +
-      "                    video.src = vendorURL.createObjectURL(stream);\n" +
-      "                  }\n" +
-      "                  video.play();\n" +
-      "                },\n" +
-      "                function(err) {\n" +
-      "                  console.log(\"An error occured! \" + err);\n" +
-      "                }\n" +
-      "            );\n" +
-      "\n" +
-      "            video.addEventListener('canplay', function(ev){\n" +
-      "                if (!streaming) {\n" +
-      "                  height = video.videoHeight / (video.videoWidth/width);\n" +
-      "                  video.setAttribute('width', width);\n" +
-      "                  video.setAttribute('height', height);\n" +
-      "                  canvas.setAttribute('width', width);\n" +
-      "                  canvas.setAttribute('height', height);\n" +
-      "                  streaming = true;\n" +
-      "                }\n" +
-      "            }, false);\n" +
-      "            function takepicture() {\n" +
-      "                canvas.width = width;\n" +
-      "                canvas.height = height;\n" +
-//      "                video.pause();\n" +
-//      "                $(video).fadeTo(1,0).delay(100).fadeTo(1,100);\n" +
-//      "                setTimeout(function() {video.play()}, 3000);\n" +
-      "                canvas.getContext('2d').drawImage(video, 0, 0, width, height);\n" +
-      "                that.model.set('imageuri',canvas.toDataURL('image/png'));\n" +
-      "                that.touch();\n" +
-      "            }\n" +
-      "            startbutton.addEventListener('click', function(ev){\n" +
-      "                takepicture();\n" +
-      "                ev.preventDefault();\n" +
-      "            }, false);\n" +
-      "        },\n" +
-      "    });\n" +
-      "    \n" +
-      "    // Register the DatePickerView with the widget manager.\n" +
-      "    WidgetManager.register_widget_view('CameraView', CameraView);\n" +
-      "\n" +
-      "});";
-	    return retval;
+	public string javascript() {
+	    return "require([\"widgets/js/widget\"], function(WidgetManager){\n" +
+		"    var CameraView = IPython.DOMWidgetView.extend({\n" +
+		"        render: function(){\n" +
+		"            // based on https://developer.mozilla.org/en-US/docs/WebRTC/taking_webcam_photos\n" +
+		"            var video        = $('<video>')[0];\n" +
+		"            var canvas       = $('<canvas>')[0];\n" +
+		"            var startbutton  = $('<button id = picture_button>Take Picture</button>')[0];\n" +
+		"            var width = 320;\n" +
+		"            var height = 0;\n" +
+		"            var that = this;\n" +
+		"\n" +
+		"            setTimeout(function() {that.$el.append(video).append(startbutton).append(canvas);}, 200);\n" +
+		"            //$(canvas).hide();\n" +
+		"            //window.vvv=video;\n" +
+		"            var streaming = false;\n" +
+		"            navigator.getMedia = ( navigator.getUserMedia ||\n" +
+		"                                 navigator.webkitGetUserMedia ||\n" +
+		"                                 navigator.mozGetUserMedia ||\n" +
+		"                                 navigator.msGetUserMedia);\n" +
+		"\n" +
+		"            navigator.getMedia({video: true, audio: false},\n" +
+		"                function(stream) {\n" +
+		"                  if (navigator.mozGetUserMedia) {\n" +
+		"                    video.mozSrcObject = stream;\n" +
+		"                  } else {\n" +
+		"                    var vendorURL = window.URL || window.webkitURL;\n" +
+		"                    video.src = vendorURL.createObjectURL(stream);\n" +
+		"                  }\n" +
+		"                  video.play();\n" +
+		"                },\n" +
+		"                function(err) {\n" +
+		"                  console.log(\"An error occured! \" + err);\n" +
+		"                }\n" +
+		"            );\n" +
+		"\n" +
+		"            video.addEventListener('canplay', function(ev){\n" +
+		"                if (!streaming) {\n" +
+		"                  height = video.videoHeight / (video.videoWidth/width);\n" +
+		"                  video.setAttribute('width', width);\n" +
+		"                  video.setAttribute('height', height);\n" +
+		"                  canvas.setAttribute('width', width);\n" +
+		"                  canvas.setAttribute('height', height);\n" +
+		"                  streaming = true;\n" +
+		"                }\n" +
+		"            }, false);\n" +
+		"            function takepicture() {\n" +
+		"                canvas.width = width;\n" +
+		"                canvas.height = height;\n" +
+		//      "                video.pause();\n" +
+		//      "                $(video).fadeTo(1,0).delay(100).fadeTo(1,100);\n" +
+		//      "                setTimeout(function() {video.play()}, 3000);\n" +
+		"                canvas.getContext('2d').drawImage(video, 0, 0, width, height);\n" +
+		"                that.model.set('imageuri',canvas.toDataURL('image/png'));\n" +
+		"                that.touch();\n" +
+		"            }\n" +
+		"            startbutton.addEventListener('click', function(ev){\n" +
+		"                takepicture();\n" +
+		"                ev.preventDefault();\n" +
+		"            }, false);\n" +
+		"        },\n" +
+		"    });\n" +
+		"    \n" +
+		"    // Register the DatePickerView with the widget manager.\n" +
+		"    WidgetManager.register_widget_view('CameraView', CameraView);\n" +
+		"\n" +
+		"});";
 	}
 
 	public void click() {
