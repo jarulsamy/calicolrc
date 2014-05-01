@@ -362,19 +362,19 @@ class MyEngine(Calico.Engine):
             try:
                 self.lc3.dump()
             except:
-                print("Error; did you should run code first?")
+                print("Error; did you run code first?")
             return True
         elif words[0] == ".regs":
             try:
                 self.lc3.dump_registers()
             except:
-                print("Error; did you should run code first?")
+                print("Error; did you run code first?")
             return True
         elif words[0] == ".dump":
             try:
                 self.lc3.dump(*[int("0" + word, 16) for word in words[1:]])
             except:
-                print("Error; did you should run code first?")
+                print("Error; did you run code first?")
             return True
         elif words[0] == ".set":
             try:
@@ -414,7 +414,11 @@ class MyEngine(Calico.Engine):
                 print("      .get warn")
             return True
         elif words[0] == ".reset":
-            self.lc3.reset()
+            self.debug = False
+            self.warn = True
+            self.trace_pause = False
+            self.filename = None
+            self.lc3 = CalicoLC3(self.calico, self.debug, self.warn, self.trace_pause, self.filename)
             return True
         elif words[0] == ".assemble":
             document = self.calico.GetDocument(".asm")

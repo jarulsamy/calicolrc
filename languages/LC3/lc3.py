@@ -139,8 +139,6 @@ class LC3(object):
 
     def __init__(self):
         # Functions for interpreting instructions:
-        self.debug = False
-        self.warn = True
         self.apply = {
             0b0000: self.BR,
             0b0001: self.ADD,
@@ -178,13 +176,16 @@ class LC3(object):
             0b1110: self.LEA_format,
             0b1111: self.TRAP_format,
         }
-        self.orig = 0x3000
         self.initialize()
 
     #### The following allow different hardware implementations:
     #### memory, register, nzp, and pc can be implemented in different
     #### means.
     def initialize(self):
+        self.debug = False
+        self.warn = True
+        self.noop_error = True
+        self.orig = 0x3000
         self.source = {}
         self.cycle = 0
         self.cont = False
@@ -848,7 +849,9 @@ class LC3(object):
         p = instruction & 0b0000001000000000
         pc_offset9 = instruction & 0b0000000111111111
         if (not any([n, z, p])):
-            if self.warn:
+            if self.noop_error:
+                raise Exception("Attempting to execute NOOP at %s\n" % lc_hex(self.get_pc() - 1))
+            elif self.warn:
                 self.Error("Attempting to execute NOOP at %s\n" % lc_hex(self.get_pc() - 1))
         if (n and self.get_nzp(0) or 
             z and self.get_nzp(1) or 
