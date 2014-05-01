@@ -31,7 +31,6 @@ using System.Threading;
 namespace Calico {
     class MainClass {
         public static string Version = "3.0.1";
-        public static bool IsLoadLanguages = true;
         public static bool verbose = false;
 
        /*
@@ -108,6 +107,71 @@ namespace Calico {
 	    return ipython_path;
 	}
 
+	public static void LoadLanguage(FileInfo f, Dictionary<string, Language> languages) {
+	    if (verbose) {
+		Print("        Loading {0}...", f.FullName);
+	    }
+	    Assembly assembly = Assembly.LoadFrom(f.FullName);
+	    if (assembly != null) {
+		foreach (Type type in assembly.GetTypes()) {
+		    MethodInfo method;
+		    try {
+			method = type.GetMethod("MakeLanguage");
+		    } catch (Exception e) {
+			Print("Failure; skipping language file '{0}': {1}", f.Name, e.Message);
+			continue;
+		    }
+		    if (method != null) {
+			Language language = null;
+			try {
+			    language = (Language)method.Invoke(type, new object[]{});
+			} catch (Exception e) {
+			    Print("Failure; skipping old language file '{0}': {1}", f.Name, e.Message);
+			    continue;
+			}
+			languages [language.name] = language;
+			//Print("Registering language...'{0}'", language.name);
+			break;
+		    }
+		}
+	    } else {
+		Console.WriteLine("Unable to load: '{0}'", f.FullName);
+	    }
+	}
+
+	public static void LoadLanguageSecondary(FileInfo f, Dictionary<string, Language> languages, string language_dependency,
+						 Config config, string path, Calico.LanguageManager manager) {
+	    System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, @"Calico(.*)\.(.*)");
+	    if (verbose) {
+		Print("        Loading {0}...", f.FullName);
+	    }
+	    //Print("Loading {0}...", f.FullName);
+	    string def_language = match.Groups [2].ToString().ToLower();
+	    if (def_language == "dll" || 
+		def_language == "cs" || 
+		def_language == "exe" || 
+		def_language.EndsWith("~") || 
+		def_language == "mdb") {
+		return;
+	    }
+	    //Console.WriteLine(def_language); FIXME: need general interface for the following:
+	    // GetVariable, extend classes, call a method from C#
+	    try {
+		Calico.DLREngine engine = ((Calico.DLREngine)languages [language_dependency].engine);
+		var scope = engine.engine.ExecuteFile(f.FullName);
+		Func<object> method = scope.GetVariable<Func<object>>("MakeLanguage");
+		Language language = (Language)method();
+		languages [language.name] = language;
+		bool visible = ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.name);
+		manager.Register(language, visible); // This may fail, which won't add language
+		if (language.engine != null) {
+		    language.engine.Setup(path);
+		    language.engine.Start(path);
+		}
+	    } catch (Exception e) {
+		Print("Failure; skipping language file '{0}': {1}", f.Name, e.Message);
+	    }
+	}
 
         [STAThread]
         public static void Main(string[] args) {
@@ -153,135 +217,51 @@ namespace Calico {
                 Print("  " + _("Using Mono runtime version {0}"), MonoRuntimeVersion);
                 System.Environment.Exit(0);
             }
-            // The rest of this involves executing files of some kind:
-            Dictionary<string, Language> languages = new Dictionary<string, Language>();
-            // for language in directory, load languages:
-            if (verbose) {
-                System.Console.WriteLine(_("    Looking for languages in \"{0}\"..."), 
-                                     System.IO.Path.Combine(path, "..", "languages"));
-            }
-            DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, "..", "languages"));
-            if (IsLoadLanguages) {
-                foreach (DirectoryInfo d in dir.GetDirectories("*")) {
-                    foreach (FileInfo f in d.GetFiles("Calico*.dll")) {
-			if (verbose) {
-                            Print("        Loading {0}...", f.FullName);
-                        }
-                        Assembly assembly = Assembly.LoadFrom(f.FullName);
-                        if (assembly != null) {
-                            foreach (Type type in assembly.GetTypes()) {
-                                MethodInfo method;
-                                try {
-                                    method = type.GetMethod("MakeLanguage");
-                                } catch (Exception e) {
-                                    Print("Failure; skipping language file '{0}': {1}", f.Name, e.Message);
-                                    continue;
-                                }
-                                if (method != null) {
-                                    Language language = null;
-                                    try {
-                                        language = (Language)method.Invoke(type, new object[]{});
-                                    } catch (Exception e) {
-                                        Print("Failure; skipping old language file '{0}': {1}", f.Name, e.Message);
-                                        continue;
-                                    }
-                                    languages [language.name] = language;
-                                    //Print("Registering language...'{0}'", language.name);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            //  Or load directly:
-            //languages["python"] = CalicoPython.CalicoPythonLanguage.MakeLanguage();
-            //languages["ruby"] = CalicoRubyLanguage.MakeLanguage();
+	    Dictionary<string, Language> languages = new Dictionary<string, Language>();
+	    DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, "..", "languages"));
+	    if (verbose) {
+		System.Console.WriteLine(_("    Looking for languages in \"{0}\"..."), 
+					 System.IO.Path.Combine(path, "..", "languages"));
+	    }
+	    foreach (DirectoryInfo d in dir.GetDirectories("*")) {
+		foreach (FileInfo f in d.GetFiles("Calico*.dll")) {
+		    LoadLanguage(f, languages);
+		}
+	    }
             // Now, let's load engines
             Calico.LanguageManager manager = new Calico.LanguageManager((IList<string>)config.GetValue("config", "visible-languages"), path, languages);
-            // Load Calico languages that depend on other Calico languages:
-            foreach (DirectoryInfo d in dir.GetDirectories("*")) {
-                foreach (FileInfo f in d.GetFiles("Calico*.py")) { // FIXME: allow other languages
-                    System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, @"Calico(.*)\.(.*)");
-		    if (verbose) {
-                        Print("        Loading {0}...", f.FullName);
-                    }
-                    //Print("Loading {0}...", f.FullName);
-                    string def_language = match.Groups [2].ToString().ToLower();
-                    if (def_language == "dll" || 
-                        def_language == "cs" || 
-                        def_language == "exe" || 
-                        def_language.EndsWith("~") || 
-                        def_language == "mdb") {
-                        continue;
-                    }
-                    //Console.WriteLine(def_language); FIXME: need general interface for the following:
-                    // GetVariable, extend classes, call a method from C#
-                    try {
-                        Calico.DLREngine engine = ((Calico.DLREngine)languages ["python"].engine);
-                        var scope = engine.engine.ExecuteFile(f.FullName);
-                        Func<object> method = scope.GetVariable<Func<object>>("MakeLanguage");
-                        Language language = (Language)method();
-                        languages [language.name] = language;
-                        bool visible = ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.name);
-                        manager.Register(language, visible); // This may fail, which won't add language
-                        if (language.engine != null) {
-                            language.engine.Setup(path);
-                            language.engine.Start(path);
-                        }
-                    } catch (Exception e) {
-                        Print("Failure; skipping language file '{0}': {1}", f.Name, e.Message);
-                    }
-                }
-            }
-            string local_lang_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
-            local_lang_path = System.IO.Path.Combine(local_lang_path, "calico", "languages");
-            if (verbose) {
-                System.Console.WriteLine(_("    Looking for local languages in \"{0}\"..."), local_lang_path);
-            }
-            dir = new DirectoryInfo(local_lang_path);
-            if (dir.Exists) {
-                foreach (DirectoryInfo d in dir.GetDirectories("*")) {
-                    foreach (FileInfo f in d.GetFiles("Calico*.py")) { // FIXME: allow other languages
-                        System.Text.RegularExpressions.Match match = System.Text.RegularExpressions.Regex.Match(f.Name, @"Calico(.*)\.(.*)");
-			if (verbose) {
-                            Print("        Loading {0}...", f.FullName);
-                        }
-                        string def_language = match.Groups [2].ToString().ToLower();
-                        if (def_language == "dll" || 
-                            def_language == "cs" || 
-                            def_language == "exe" || 
-                            def_language.EndsWith("~") || 
-                            def_language == "mdb") {
-                            continue;
-                        }
-                        //Console.WriteLine(def_language); FIXME: need general interface for the following:
-                        // GetVariable, extend classes, call a method from C#
-                        try {
-                            Calico.DLREngine engine = ((Calico.DLREngine)languages ["python"].engine);
-                            var scope = engine.engine.ExecuteFile(f.FullName);
-                            Func<object> method = scope.GetVariable<Func<object>>("MakeLanguage");
-                            Language language = (Language)method();
-                            languages [language.name] = language;
-                            bool visible = ((IList<string>)config.GetValue("config", "visible-languages")).Contains(language.name);
-                            manager.Register(language, visible); // This may fail, which won't add language
-                            if (language.engine != null) {
-                                language.engine.Setup(path);
-                                language.engine.Start(path);
-                            }
-                        } catch (Exception e) {
-                            Print("Failure; skipping local language file '{0}': {1}", f.Name, e.Message);
-                        }
-                    }
-                }
-            }
-            // If a language isn't in the manager, it doesn't exist; remove it
-            List<string> vlangs = new List<string>();
-            foreach (string lang in ((IList<string>)config.GetValue("config", "visible-languages"))) {
-                if (manager.languages.ContainsKey(lang)) {
-                    vlangs.Add(lang);
-                }
-            }
+            if (((IList<string>)args).Contains("--server")) {
+		// First, let's dynamically load any need module DLLs
+		foreach (string filename in new string [] {"../modules/Graphics.dll"}) {
+		    Assembly.LoadFrom(System.IO.Path.Combine(path, filename));
+		}
+	    }
+	    // Load Calico languages that depend on other Calico languages:
+	    foreach (DirectoryInfo d in dir.GetDirectories("*")) {
+		foreach (FileInfo f in d.GetFiles("Calico*.py")) { // FIXME: allow other languages
+		    LoadLanguageSecondary(f, languages, "python", config, path, manager);
+		}
+	    }
+	    string local_lang_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
+	    local_lang_path = System.IO.Path.Combine(local_lang_path, "calico", "languages");
+	    if (verbose) {
+		System.Console.WriteLine(_("    Looking for local languages in \"{0}\"..."), local_lang_path);
+	    }
+	    dir = new DirectoryInfo(local_lang_path);
+	    if (dir.Exists) {
+		foreach (DirectoryInfo d in dir.GetDirectories("*")) {
+		    foreach (FileInfo f in d.GetFiles("Calico*.py")) { // FIXME: allow other languages
+			LoadLanguageSecondary(f, languages, "python", config, path, manager);
+		    }
+		}
+	    }
+	    // If a language isn't in the manager, it doesn't exist; remove it
+	    List<string> vlangs = new List<string>();
+	    foreach (string lang in ((IList<string>)config.GetValue("config", "visible-languages"))) {
+		if (manager.languages.ContainsKey(lang)) {
+		    vlangs.Add(lang);
+		}
+	    }
             foreach (string lang in manager.getLanguages()) {
                 Language language = manager [lang];
                 language.InitializeConfig();
