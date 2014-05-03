@@ -539,10 +539,22 @@ def splitParts(text, stack):
 def splitLines(command_list, stack):
     commands = []
     command = []
-    for symbol in splitParts(command_list, stack):
+    parts = splitParts(command_list, stack)
+    for i in range(len(parts)):
+        symbol = parts[i]
         if symbol in ["|"]:
             commands.append([command[0], command[1:]])
             command = []
+        elif symbol in [">"]:
+            commands.append([command[0], command[1:]])
+            commands.append(["redirect", parts[i+1:]])
+            command = []
+            break
+        elif symbol in [">>"]:
+            commands.append([command[0], command[1:]])
+            commands.append(["append", parts[i+1:]])
+            command = []
+            break
         else:
             command.append(symbol) 
     if command:
@@ -600,9 +612,22 @@ def rm(name, incoming, tty, args, stack):
     Use rm to delete files.
     """
     args, flags = splitArgs(args)
-    # FIXME: remove files or directories
-    os.remove(args[0])
-    #shutil.rmtree() # removes directory and contents
+    parser = argparse.ArgumentParser(
+        prog=name, 
+        epilog="No argument will %(prog)s to HOME")
+    parser.add_argument('--recurse', '-r', action="store_true", 
+                        help='%(prog)s will recursively remove directories')
+    parser.add_argument('file', nargs="*", 
+                        help='files/directories to remove')
+    pargs = parser.parse_args(args)
+    for item in pargs.file:
+        if os.path.isfile(item):
+            os.remove(args[0])
+        elif os.path.isdir(item):
+            if pargs.recurse:
+                shutil.rmtree(item) # removes directory and contents
+            else:
+                raise Exception("attempt to remove directory without -r flag")
     return []
 
 def mkdir(name, incoming, ttyp, args, stack):
@@ -773,8 +798,8 @@ def more(name, incoming, tty, args, stack):
             if tty and (count % lines == 0):
                 # can you tell if there are more?
                 print("--more--")
-                yn = calico.yesno("More?")
-                if not yn:
+                yn = input("More? ")
+                if yn in ["no", "n", "q"]:
                     return
     else:
         for f in args:
@@ -786,13 +811,37 @@ def more(name, incoming, tty, args, stack):
                     if tty and (count % lines == 0):
                         # can you tell if there are more?
                         print("--more--")
-                        yn = calico.yesno("More?")
-                        if not yn:
+                        yn = input("More? ")
+                        if yn in ["no", "n", "q"]:
                             return
             elif os.path.isdir(f):
                 ErrorLine("%s: '%s' is a directory" % (name, f))
             else:
                 raise ConsoleException("%s: no such file '%s'" % (name, f), stack)
+
+def redirect(name, incoming, tty, args, stack):
+    """
+    redirect output; Currently must be last item in chain
+    command ... | command ... > output
+    """
+    if incoming:
+        fp = open(args[0], "w")
+        for i in incoming:
+            fp.write("%s\n" % i)
+        fp.close()
+    return []
+
+def append(name, incoming, tty, args, stack):
+    """
+    append output; Currently must be last item in chain
+    command ... | command ... >> output
+    """
+    if incoming:
+        fp = open(args[0], "a")
+        for i in incoming:
+            fp.write("%s\n" % i)
+        fp.close()
+    return []
 
 def cat(name, incoming, tty, args, stack):
     """
@@ -1046,6 +1095,8 @@ def switch(name, incoming, tty, args, stack):
             command_set = "dos"
         else:
             ErrorLine("%s: cannot switch to '%s': use 'unix' or 'dos'" % (name, args[0]))
+        commands["redirect"] = redirect
+        commands["append"] = append
     else:
         return [command_set]
     return []
@@ -1131,5 +1182,7 @@ dos_commands = {"dir": ls, "more": more, "cd": cd, "chdir": cd,
                 "ren": mv, "rmdir": rmdir, 
                 "rd": rmdir, "echo": printf, 
                 "edit": open_cmd, "switch": switch}
-commands = unix_commands
+commands = unix_commands 
+commands["redirect"] = redirect
+commands["append"] = append
 command_set = "unix"
