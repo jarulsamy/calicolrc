@@ -938,6 +938,33 @@ public static class ZMQServer {
 	    }
 	}
 
+	public string [] SplitCommandArgs(string command_line) {
+	    string [] parts = new string[2] {"", ""};
+	    string state = "start";
+	    foreach(char c in command_line) {
+		// skip leading spaces
+		if (c == ' ') {
+		    if (state == "start") {
+			// skip
+		    } else if (state == "command") {
+			state = "args";
+		    } else if (state == "args") {
+			parts[1] += c;
+		    }
+		} else {
+		    if (state == "start") {
+			state = "command";
+			parts[0] += c;
+		    } else if (state == "command") {
+			parts[0] += c;
+		    } else if (state == "args") {
+			parts[1] += c;
+		    }
+		}
+	    }
+	    return parts;
+	}
+
 	public void ExecuteInBackground(string code, IList<string> identities, IDictionary<string, object> m_header, int execution_count) {
 	    var header = session.Header("pyout", m_header["session"].ToString());
 	    var metadata = pack();
@@ -969,6 +996,31 @@ public static class ZMQServer {
 				message["start_line_number"] = 0;
 				message["source"] = "page";
 				payload.Add(message);
+			    } else if (code.StartsWith("!")) {
+				// shell out to operating system
+				string [] parts = SplitCommandArgs(code.Substring(1));
+				var proc = new System.Diagnostics.Process {
+					StartInfo = new System.Diagnostics.ProcessStartInfo {
+						FileName = parts[0],
+						    Arguments = parts[1],
+						    UseShellExecute = false,
+						    RedirectStandardOutput = true,
+						    RedirectStandardError = true,
+						    CreateNoWindow = true
+						    }
+				    };
+				try {
+				    proc.Start();
+				    while (!proc.StandardOutput.EndOfStream) {
+					Console.WriteLine(proc.StandardOutput.ReadLine());
+				    }
+				    while (!proc.StandardError.EndOfStream) {
+					Console.Error.WriteLine(proc.StandardOutput.ReadLine());
+				    }
+				    proc.WaitForExit();
+				} catch (Exception e) {
+				    Console.Error.WriteLine(e.Message);
+				}
 			    } else { // Handle code and magics:
 				// --------------------------------------
 				// Handle magics:

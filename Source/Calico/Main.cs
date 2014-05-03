@@ -230,11 +230,9 @@ namespace Calico {
 	    }
             // Now, let's load engines
             Calico.LanguageManager manager = new Calico.LanguageManager((IList<string>)config.GetValue("config", "visible-languages"), path, languages);
-            if (((IList<string>)args).Contains("--server")) {
-		// First, let's dynamically load any need module DLLs
-		foreach (string filename in new string [] {"../modules/Graphics.dll"}) {
-		    Assembly.LoadFrom(System.IO.Path.Combine(path, filename));
-		}
+	    // First, let's dynamically load any need module DLLs
+	    foreach (string filename in new string [] {"../modules/Graphics.dll"}) {
+		Assembly.LoadFrom(System.IO.Path.Combine(path, filename));
 	    }
 	    // Load Calico languages that depend on other Calico languages:
 	    foreach (DirectoryInfo d in dir.GetDirectories("*")) {
