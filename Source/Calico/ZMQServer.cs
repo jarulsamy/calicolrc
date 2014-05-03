@@ -18,6 +18,7 @@ using System.Reflection;// IEnumerator
 using Calico;
 
 namespace Calico {
+
     public class MagicBase {
 	public string command = "magic";         // magic text, eg %%file
 	public string mtype = "";                // "cell", "line", or "notebook"
@@ -116,6 +117,22 @@ namespace Calico {
 
 public static class ZMQServer {
 
+    public static Dictionary<string,object> pack(params object [] args) {
+	var retval = new Dictionary<string,object>();
+	for (int i=0; i < args.Length; i += 2) {
+	    retval[args[i].ToString()] = args[i + 1];
+	}
+	return retval;
+    }
+
+    public static List<string> list(params object [] args) {
+	var retval = new List<string>();
+	foreach(object arg in args) {
+	    retval.Add(arg.ToString());
+	}
+	return retval;
+    }
+
     public static string encode(IDictionary<string, object> dict) {
 	return JsonConvert.SerializeObject(dict);
     }
@@ -189,7 +206,8 @@ public static class ZMQServer {
 	public ControlChannel control_channel;
 	public StdInChannel stdin_channel;
 	public Authorization auth;
-	public string engine_id;
+	public string engine_identity;
+	public int engine_identity_int = -1;
 	public Calico.MainWindow calico;
 	public int current_execution_count = 0;
 	public IDictionary<string, object> parent_header;
@@ -202,29 +220,28 @@ public static class ZMQServer {
 	public object ___ = null;
 	public object _ii = null;
 	public object _iii = null;
+	public bool starting = true;
 
 	public Session(Calico.MainWindow calico, string filename) {
 	    this.calico = calico;
 	    this.filename = filename;
 	    //this.log = new System.IO.StreamWriter("zmqserver.log");
 	    session_id = System.Guid.NewGuid().ToString();
-	    engine_id = System.Guid.NewGuid().ToString();
+	    engine_identity = System.Guid.NewGuid().ToString();
 	    string json;
 	    if (this.filename != "") {
 		json = File.ReadAllText(this.filename);
 		config = decode(json);
 	    } else {
-		config = new Dictionary<string,object> {
-		    {"key", System.Guid.NewGuid().ToString()},
-		    {"signature_scheme", "hmac-sha256"},
-		    {"transport", "tcp"},
-		    {"ip", "127.0.0.1"},
-		    {"hb_port", "0"},
-		    {"shell_port", "0"},
-		    {"iopub_port", "0"},
-		    {"control_port", "0"},
-		    {"stdin_port", "0"},
-		};
+		config = pack("key", System.Guid.NewGuid().ToString(),
+			      "signature_scheme", "hmac-sha256",
+			      "transport", "tcp",
+			      "ip", "127.0.0.1",
+			      "hb_port", "0",
+			      "shell_port", "0",
+			      "iopub_port", "0",
+			      "control_port", "0",
+			      "stdin_port", "0");
 	    }
 	    auth = new Authorization(config["key"].ToString(),
 				     config["signature_scheme"].ToString());
@@ -294,7 +311,17 @@ public static class ZMQServer {
 		calico.stdout.WriteLine("To read more about this, see https://github.com/ipython/ipython/issues/2049");
 		calico.stdout.WriteLine("To connect another client to this kernel, use:");
  		calico.stdout.WriteLine("    --existing {0} --profile calico", kernelname);
+	    } 
+	}
+
+	public List<string> route(string topic) {
+	    string routing_info;
+	    if (engine_identity_int >= 0) {
+		routing_info = String.Format("engine.{0}.{1}", engine_identity_int, topic);
+	    } else {
+		routing_info = String.Format("kernel.{0}.{1}", engine_identity, topic);
 	    }
+	    return list(routing_info); 
 	}
 
 	public void SetBlocking(bool blocking) {
@@ -381,15 +408,57 @@ public static class ZMQServer {
 	    parent_header = m_header;
 	}
 
+	public void send(Channel channel,
+			 IList<string> identities,
+			 IDictionary<string,object> header,
+			 IDictionary<string,object> parent_header,
+			 IDictionary<string,object> metadata,
+			 IDictionary<string,object> content) {
+	    send(channel, identities, encode(header), encode(parent_header), encode(metadata),
+		 encode(content));
+	}
+
+	public void send(Channel channel,
+			 IList<string> identities,
+			 string header,
+			 string parent_header,
+			 string metadata,
+			 string content) {
+	    string signature = auth.sign(new List<string>() {header, parent_header, 
+							     metadata, content});
+	    send_multipart(channel, identities, 
+			   list("<IDS|MSG>",
+				signature,
+				header,
+				parent_header,
+				metadata,
+				content));
+	}
+	
+	public void send_multipart(Channel channel, 
+				   IList<string> identities, 
+				   IList<string> parts) {
+	    int count = 0;
+	    foreach (string msg in identities) {
+		channel.socket.SendMore(msg, Encoding.UTF8);
+	    }
+	    foreach (string msg in parts) {
+		if (count < parts.Count - 1) {
+		    channel.socket.SendMore(msg, Encoding.UTF8);
+		} else {
+		    channel.socket.Send(msg, Encoding.UTF8);
+		}
+		count++;
+	    }
+	}
+
 	public void StdErrWrite(string message) {
 	    if (current_execution_count > 0) {
 		var header = Header("stream");
-		var metadata = new Dictionary<string, object>();
-		var content = new Dictionary<string, object> {
-		    {"data", message},
-		    {"name", "stderr"}
-		};
-		iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+		var metadata = pack();
+		var content = pack("data", message,
+				   "name", "stderr");
+		send(iopub_channel, route("pyerr"), header, parent_header, metadata, content);
 	    } else {
 		if (log != null) {
 		    log.Write(message);
@@ -402,12 +471,10 @@ public static class ZMQServer {
 	public void StdOutWrite(string message) {
 	    if (current_execution_count > 0) {
 		var header = Header("stream");
-		var metadata = new Dictionary<string, object>();
-		var content = new Dictionary<string, object> {
-		    {"data", message},
-		    {"name", "stdout"}
-		};
-		iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+		var metadata = pack();
+		var content = pack("data", message,
+				   "name", "stdout");
+		send(iopub_channel, route("pyout"), header, parent_header, metadata, content);
 	    } else {
 		if (log != null) {
 		    log.Write(message);
@@ -421,7 +488,7 @@ public static class ZMQServer {
 	}
 
 	public Dictionary<string, string> GetRepresentations(object obj, string mime_type) {
-	    var data = new Dictionary<string, string>();
+	    var data = new Dictionary<string,string>();
 	    // Everything has a text fallback:
 	    if (obj == null) {
 		data["text/plain"] = "";
@@ -455,7 +522,7 @@ public static class ZMQServer {
 	}
 
 	public IDictionary<string, object> Header(string msg_type) {
-	    Dictionary<string,object> dict = new Dictionary<string,object>();
+	    Dictionary<string,object> dict = pack();
 	    dict["date"] = now();
 	    dict["msg_id"] = msg_id();
 	    dict["username"] = "kernel";
@@ -465,7 +532,7 @@ public static class ZMQServer {
 	}
 
 	public IDictionary<string, object> Header(string msg_type, string session_id) {
-	    Dictionary<string,object> dict = new Dictionary<string,object>();
+	    Dictionary<string,object> dict = pack();
 	    dict["date"] = now();
 	    dict["msg_id"] = msg_id();
 	    dict["username"] = "kernel";
@@ -477,26 +544,24 @@ public static class ZMQServer {
 	public void update_status(string status, IDictionary<string, object> parent_header) { 
 	    // "busy", "idle"
 	    var header = Header("status");
-	    var metadata = new Dictionary<string, object>();
-	    var content = new Dictionary<string, object>() {
-		{"execution_state", status}
-	    };
-	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	    var metadata = pack();
+	    var content = pack("execution_state", status);
+	    send(iopub_channel, route("status"), header, parent_header, metadata, content);
 	}
 
 	public void update_state(Widgets.Widget widget, IDictionary<string, object> parent_header) { 
 	    var header = Header("comm_msg");
-	    var metadata = new Dictionary<string, object>();
+	    var metadata = pack();
 	    var content = widget.GetState();
-	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	    send(iopub_channel, route("comm_msg"), header, parent_header, metadata, content);
 	}
 
 	public void clear_output(Widgets.Widget widget, bool wait) {
 	    var header = Header("clear_output");
-	    var metadata = new Dictionary<string, object>();
+	    var metadata = pack();
 	    var content = widget.GetDisplay();
 	    content["wait"] = wait;
-	    iopub_channel.send(iopub_channel, header, new Dictionary<string, object>(), metadata, content);
+	    send(iopub_channel, route("pyout"), header, pack(), metadata, content);
 	}
 
 	public void added_child_widget(Widgets.Widget widget) {
@@ -505,9 +570,9 @@ public static class ZMQServer {
 	    IDictionary<string,object> content;
 	    widget.execution_count = session.current_execution_count;
 	    header = Header("comm_open");
-	    metadata = new Dictionary<string, object>();
+	    metadata = pack();
 	    content = widget.GetInitialState();
-	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	    send(iopub_channel, route("comm_open"), header, parent_header, metadata, content);
 	    update_state(widget, parent_header);
 	}
 
@@ -517,14 +582,14 @@ public static class ZMQServer {
 	    IDictionary<string,object> content;
 	    widget.execution_count = session.current_execution_count;
 	    header = Header("comm_open");
-	    metadata = new Dictionary<string, object>();
+	    metadata = pack();
 	    content = widget.GetInitialState();
-	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	    send(iopub_channel, route("comm_open"), header, parent_header, metadata, content);
 	    update_state(widget, parent_header);
 	    header = Header("comm_msg");
-	    metadata = new Dictionary<string, object>();
+	    metadata = pack();
 	    content = widget.GetDisplay();
-	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	    send(iopub_channel, route("comm_open"), header, parent_header, metadata, content);
 	}
 
 	public void clear_output() {
@@ -533,21 +598,17 @@ public static class ZMQServer {
 
 	public void clear_output(bool wait) {
 	    var header = Header("clear_output");
-	    var metadata = new Dictionary<string, object>();
-	    var content = new Dictionary<string, object> {
-		{"wait", wait},
-	    };
-	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	    var metadata = pack();
+	    var content = pack("wait", wait);
+	    send(iopub_channel, route("pyout"), header, parent_header, metadata, content);
 	}
 
 	public string input(string prompt="") {
 	    var header = Header("input_request");
-	    var metadata = new Dictionary<string, object>();
-	    var content = new Dictionary<string, object> {
-		{"prompt", prompt}
-	    };
+	    var metadata = pack();
+	    var content = pack("prompt", prompt);
 	    stdin_channel.SetState("waiting", ""); // wait for recv "input_reply"
-	    stdin_channel.send(stdin_channel, header, parent_header, metadata, content);
+	    send(stdin_channel, list(parent_header["session"]), header, parent_header, metadata, content);
 	    while (stdin_channel.GetState() == "waiting") {
 		Thread.Sleep(100); // miliseconds
 	    }
@@ -560,12 +621,10 @@ public static class ZMQServer {
 		return;
 	    }
 	    var header = Header("display_data");
-	    var metadata = new Dictionary<string, object>();
-	    var content = new Dictionary<string, object> {
-		{"source", "display"},
-		{"data", GetRepresentations(obj)}
-	    };
-	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	    var metadata = pack();
+	    var content = pack("source", "display",
+			       "data", GetRepresentations(obj));
+	    send(iopub_channel, route("pyout"), header, parent_header, metadata, content);
 	}
 
 	public void display_mimetype(object obj, string mimetype) {
@@ -574,12 +633,10 @@ public static class ZMQServer {
 		return;
 	    }
 	    var header = Header("display_data");
-	    var metadata = new Dictionary<string, object>();
-	    var content = new Dictionary<string, object> {
-		{"source", "display"},
-		{"data", GetRepresentations(obj, mimetype)}
-	    };
-	    iopub_channel.send(iopub_channel, header, parent_header, metadata, content);
+	    var metadata = pack();
+	    var content = pack("source", "display",
+			       "data", GetRepresentations(obj, mimetype));
+	    send(iopub_channel, route("pyout"), header, parent_header, metadata, content);
 	}
 
 	public void display_png(object obj) {
@@ -657,15 +714,18 @@ public static class ZMQServer {
 		socket.Bind(String.Format("{0}://{1}:{2}", 
 			       this.transport, this.address, this.port));
 	    }
+	    socket.Identity = Encoding.UTF8.GetBytes(session.session_id);
 	    thread = new Thread (new ThreadStart (loop));
 	}
 		   
 	public virtual void loop() {
 	    string message, signature, s_header, s_parent_header, s_metadata, s_content;
+	    var identities = new List<string>();
 	    while (! session.request_quit) {
 		try {
 		    message = socket.Receive(Encoding.UTF8);
 		    while (message != "<IDS|MSG>") {
+			identities.Add(message);
 			message = socket.Receive(Encoding.UTF8);
 		    }
 		    signature = socket.Receive(Encoding.UTF8);
@@ -687,11 +747,12 @@ public static class ZMQServer {
 		IDictionary<string, object> parent_header = decode(s_parent_header);
 		IDictionary<string, object> metadata = decode(s_metadata);
 		IDictionary<string, object> content = decode(s_content);
-		on_recv(signature, header, parent_header, metadata, content);
+		on_recv(identities, signature, header, parent_header, metadata, content);
 	    }
 	}
 
-	public virtual void on_recv(string m_signature, 
+	public virtual void on_recv(List<string> identities, 
+				    string m_signature, 
 				    IDictionary<string, object> m_header, 
 				    IDictionary<string, object> m_parent_header, 
 				    IDictionary<string, object> m_metadata, 
@@ -699,50 +760,11 @@ public static class ZMQServer {
 	    throw new Exception(this.ToString() + ": unknown msg_type: " + m_header["msg_type"]);
 	}
 
-	public void send(Channel channel,
-			 IDictionary<string,object> header,
-			 IDictionary<string,object> parent_header,
-			 IDictionary<string,object> metadata,
-			 IDictionary<string,object> content) {
-	    send(channel, encode(header), encode(parent_header), encode(metadata),
-		 encode(content));
-	}
-
-
-	public void send(Channel channel,
-			 string header,
-			 string parent_header,
-			 string metadata,
-			 string content) {
-	    string signature = auth.sign(new List<string>() {header, parent_header, 
-							     metadata, content});
-	    send_multipart(channel,
-			   new List<string>() 
-			   {"<IDS|MSG>",
-				   signature,
-				   header,
-				   parent_header,
-				   metadata,
-				   content});
-	}
-
-	public void send_multipart(Channel channel, List<string> list) {
-	    int count = 0;
-	    foreach (string msg in list) {
-		if (count < list.Count - 1) {
-		    channel.socket.SendMore(msg, Encoding.UTF8);
-		} else {
-		    channel.socket.Send(msg, Encoding.UTF8);
-		}
-		count++;
-	    }
-	}
-
 	public void stop() {
 	    thread.Abort();
 	    socket.Linger = System.TimeSpan.FromSeconds(1);
 	    socket.Close();
-	    context.Terminate();
+	    //context.Terminate();
 	}
     }
 
@@ -827,58 +849,53 @@ public static class ZMQServer {
 			    string transport, 
 			    string address, 
 			    string port) : 
-	    base(session, auth, transport, address, port, SocketType.DEALER) {
+	    base(session, auth, transport, address, port, SocketType.ROUTER) {
 	}
 
-	public override void on_recv(string m_signature, 
-				IDictionary<string, object> m_header, 
-				IDictionary<string, object> m_parent_header, 
-				IDictionary<string, object> m_metadata, 
-				IDictionary<string, object> m_content) {
+	// Shell
+	public override void on_recv(List<string> identities, 
+				     string m_signature, 
+				     IDictionary<string, object> m_header, 
+				     IDictionary<string, object> m_parent_header, 
+				     IDictionary<string, object> m_metadata, 
+				     IDictionary<string, object> m_content) {
 
 	    // Shell handler
 	    string msg_type = m_header["msg_type"].ToString();
 	    if (msg_type == "execute_request") {
 		var header = session.Header("status", m_header["session"].ToString());
-		var metadata = new Dictionary<string, object>();
-		var content = new Dictionary<string, object>
-		{
-		    {"execution_state", "busy"}
-		};
-		send(session.iopub_channel, header, m_header, metadata, content);
+		var metadata = pack();
+		var content = pack("execution_state", "busy");
+		session.send(session.iopub_channel, session.route("status"), header, m_header, metadata, content);
 		// ---------------------------------------------------
 		header = session.Header("pyin", m_header["session"].ToString());
-		metadata = new Dictionary<string, object>();
-		content = new Dictionary<string, object>
-		{
-		    {"execution_count", execution_count},
-		    {"code", m_content["code"].ToString()},
-		};
-		send(session.iopub_channel, header, m_header, metadata, content);
+		metadata = pack();
+		content = pack("execution_count", execution_count,
+			       "code", m_content["code"].ToString());
+		session.send(session.iopub_channel, session.route("pyin"), header, m_header, metadata, content);
 		// ---------------------------------------------------
 		string code = m_content["code"].ToString().Trim();
 		// Execute in background, and report results
-		ExecuteInBackground(code, m_header, execution_count);
+		ExecuteInBackground(code, identities, m_header, execution_count);
 		execution_count += 1;
 	    } else if (msg_type == "kernel_info_request") {
+		if (session.starting) {
+		    session.send(session.iopub_channel, session.route("status"), session.Header("status", session.session_id), 
+			 pack(), pack(), pack("execution_state", "starting"));
+		    session.starting = false;
+		}
 		var header = session.Header("kernel_info_reply", m_header["session"].ToString());
-		var metadata = new Dictionary<string, object>();
-		var content = new Dictionary<string, object>
-		    {
-			{"protocol_version", new List<int>() {4, 1}},
-			{"ipython_version", new List<object>() {2, 0, 0, ""}},
-			{"language_version", new List<int>() {2, 5, 0}},
-			{"language", "calico"},
-		    };
-		send(session.shell_channel, header, m_header, metadata, content);
+		var metadata = pack();
+		var content = pack("protocol_version", new List<int>() {4, 1},
+				   "ipython_version", new List<object>() {2, 0, 0, ""},
+				   "language_version", new List<int>() {3, 0, 2},
+				   "language", "calico");
+		session.send(session.shell_channel, list(m_header["session"]), header, m_header, metadata, content); // ok
 	    } else if (msg_type == "history_request") {
 		// FIXME: handle history_request
-		var header = session.Header("kernel_info_reply", m_header["session"].ToString());
-		var content = new Dictionary<string, object>
-		    {
-			{"output", false}
-		    };
-		send(session.shell_channel, header, m_header, m_metadata, content);
+		var header = session.Header("history_reply", m_header["session"].ToString());
+		var content = pack("output", false);
+		session.send(session.shell_channel, list(m_header["session"]), header, m_header, m_metadata, content);
 	    } else if (msg_type == "object_info_request") {
 		// for filling in details on function calls: x(<pause>
 		// content: {"detail_level":0,"oname":"x"}
@@ -886,9 +903,9 @@ public static class ZMQServer {
 		// ask language to give help on oname
 		// return:
 		var header = session.Header("object_info_reply");
-		var meta = new Dictionary<string, object>();
+		var meta = pack();
 		var content = session.calico.GetHelpOnFunctionCall(oname);
-		send(session.shell_channel, header, m_header, meta, content);
+		session.send(session.shell_channel, list(m_header["session"]), header, m_header, meta, content);
 	    } else if (msg_type == "complete_request") {
 		// content: {"text":"","line":"x.he","block":null,"cursor_pos":4}']
 		string to_match = m_content["line"].ToString();
@@ -896,13 +913,11 @@ public static class ZMQServer {
 		var tc = session.calico.GetTabCompletion(to_match);
 		// return:
 		var header = session.Header("complete_reply");
-		var meta = new Dictionary<string, object>();
-		var content = new Dictionary<string, object> {
-		    {"matches", tc.getItems()},
-		    {"status", "ok"},
-		    {"matched_text", tc.full_prefix},
-		};
-		send(session.shell_channel, header, m_header, meta, content);
+		var meta = pack();
+		var content = pack("matches", tc.getItems(),
+				   "status", "ok",
+				   "matched_text", tc.full_prefix);
+		session.send(session.shell_channel, list(m_header["session"]), header, m_header, meta, content);
 	    } else if (msg_type == "comm_msg") {
 		Widgets.Dispatch(m_content["comm_id"].ToString(),
 				 (IDictionary<string, object>)m_content["data"],
@@ -910,8 +925,8 @@ public static class ZMQServer {
 	    } else if (msg_type == "shutdown_request") {
 		// respond?
 		//var header = session.Header("status", m_header["session"].ToString());
-		//var metadata = new Dictionary<string, object>();
-		//var content = new Dictionary<string, object>();
+		//var metadata = pack();
+		//var content = pack();
 		// pause, then:
 		if (Convert.ToBoolean(m_content["restart"])) { 
 		    session.need_restart = true;
@@ -923,9 +938,9 @@ public static class ZMQServer {
 	    }
 	}
 
-	public void ExecuteInBackground(string code, IDictionary<string, object> m_header, int execution_count) {
+	public void ExecuteInBackground(string code, IList<string> identities, IDictionary<string, object> m_header, int execution_count) {
 	    var header = session.Header("pyout", m_header["session"].ToString());
-	    var metadata = new Dictionary<string, object>();
+	    var metadata = pack();
 	    object retval = null;
 	    session.SetOutputs(execution_count, m_header);
 	    if (session.calico != null) {
@@ -936,7 +951,7 @@ public static class ZMQServer {
 			    // --------------------------------------
 			    // Handle query:
 			    if (code.Trim() == "?") {
-				Dictionary<string,object> message = new Dictionary<string,object>();
+				Dictionary<string,object> message = pack();
 				message["text"] = USAGE;
 				message["html"] = null;
 				message["start_line_number"] = 0;
@@ -948,7 +963,7 @@ public static class ZMQServer {
 				else
 				    code = code.Substring(0, code.Length - 1);
 				// give help on command
-				Dictionary<string,object> message = new Dictionary<string,object>();
+				Dictionary<string,object> message = pack();
 				message["text"] = session.calico.GetHelpOn(code);
 				message["html"] = null;
 				message["start_line_number"] = 0;
@@ -1007,41 +1022,31 @@ public static class ZMQServer {
 				    //} else if (retval is Representation) {
 				    //session.display((Representation)retval);
 				} else {
-				    content = new Dictionary<string, object>
-					{
-					    {"execution_count", execution_count},
-					    {"data", ZMQServer.session.GetRepresentations(retval)},
-					    {"metadata", new Dictionary<string, object>()}
-					};
-				    send(session.iopub_channel, header, m_header, metadata, content);
+				    content = pack("execution_count", execution_count,
+						   "data", ZMQServer.session.GetRepresentations(retval),
+						   "metadata", pack());
+				    session.send(session.iopub_channel, session.route("pyout"), header, m_header, metadata, content);
 				}
 			    }
 			    // ---------------------------------------------------
 			    header = session.Header("status", m_header["session"].ToString());
-			    metadata = new Dictionary<string, object>();
-			    content = new Dictionary<string, object>
-			    {
-				{"execution_state", "idle"}
-			    };
-			    send(session.iopub_channel, header, m_header, metadata, content);
+			    metadata = pack();
+			    content = pack("execution_state", "idle");
+			    session.send(session.iopub_channel, session.route("status"), header, m_header, metadata, content);
 			    // ---------------------------------------------------
+			    // FIXME: also send the other kind of execute_reply:
+			    // identity: 'execute_reply', ... [m_header["session"], ...]
 			    header = session.Header("execute_reply", m_header["session"].ToString());
-			    metadata = new Dictionary<string, object>
-			    {
-				{"dependencies_met", true},
-				{"engine", session.engine_id},
-				{"status", "ok"},
-				{"started", now()}
-			    };
-			    content = new Dictionary<string, object>
-			    {
-				{"status", "ok"},
-				{"execution_count", execution_count},
-				{"user_variables", new Dictionary<string, object>()},
-				{"payload", payload},
-				{"user_expressions", new Dictionary<string, object>()}
-			    };
-			    send(session.shell_channel, header, m_header, metadata, content);
+			    content = pack("status", "ok", 
+					   "execution_count", execution_count,
+					   "user_variables", pack(),
+					   "payload", payload,
+					   "user_expressions", pack());
+			    metadata = pack("dependencies_met", true,
+					    "engine", session.engine_identity,
+					    "status", "ok",
+					    "started", now());
+			    session.send(session.shell_channel, list(m_header["session"]), header, m_header, metadata, content); // ok
 			    //session.SetOutputs(0, null); // wait till after widget displays
 			}));
 		session.calico.executeThread.IsBackground = true;
@@ -1072,14 +1077,16 @@ public static class ZMQServer {
 			    string transport, 
 			    string address, 
 			    string port) : 
-	    base(session, auth, transport, address, port, SocketType.DEALER) {
+	    base(session, auth, transport, address, port, SocketType.ROUTER) {
 	}
 
-	public override void on_recv(string m_signature, 
-				IDictionary<string, object> m_header, 
-				IDictionary<string, object> m_parent_header, 
-				IDictionary<string, object> m_metadata, 
-				IDictionary<string, object> m_content) {
+	// Control
+	public override void on_recv(List<string> identities, 
+				     string m_signature, 
+				     IDictionary<string, object> m_header, 
+				     IDictionary<string, object> m_parent_header, 
+				     IDictionary<string, object> m_metadata, 
+				     IDictionary<string, object> m_content) {
 	    // Control handler
 	    string msg_type = m_header["msg_type"].ToString();
 	    if (msg_type == "shutdown_request") {
@@ -1112,15 +1119,17 @@ public static class ZMQServer {
 			    string transport, 
 			    string address, 
 			    string port) : 
-	    base(session, auth, transport, address, port, SocketType.DEALER) {
+	    base(session, auth, transport, address, port, SocketType.ROUTER) {
 	}
 
 	
-	public override void on_recv(string m_signature, 
-				IDictionary<string, object> m_header, 
-				IDictionary<string, object> m_parent_header, 
-				IDictionary<string, object> m_metadata, 
-				IDictionary<string, object> m_content) {
+	// StdIn
+	public override void on_recv(List<string> identities, 
+				     string m_signature, 
+				     IDictionary<string, object> m_header, 
+				     IDictionary<string, object> m_parent_header, 
+				     IDictionary<string, object> m_metadata, 
+				     IDictionary<string, object> m_content) {
 	    // StdIn handler
 	    string msg_type = m_header["msg_type"].ToString();
 	    if (msg_type == "input_reply") {
