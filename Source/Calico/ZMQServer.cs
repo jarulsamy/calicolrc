@@ -998,35 +998,56 @@ public static class ZMQServer {
 				payload.Add(message);
 			    } else if (code.StartsWith("!")) {
 				// shell out to operating system
-				string [] parts = SplitCommandArgs(code.Substring(1));
-				if (parts[0] == "cd") {
-				    try {
-					System.IO.Directory.SetCurrentDirectory(parts[1]);
-				    } catch (Exception e) {
-					Console.Error.WriteLine(e.Message);
-				    }
-				} else {
-				    var proc = new System.Diagnostics.Process {
-					    StartInfo = new System.Diagnostics.ProcessStartInfo {
-						    FileName = parts[0],
-							Arguments = parts[1],
-							UseShellExecute = false,
-							RedirectStandardOutput = true,
-							RedirectStandardError = true,
-							CreateNoWindow = true
-							}
-					};
-				    try {
-					proc.Start();
-					while (!proc.StandardOutput.EndOfStream) {
-					    Console.WriteLine(proc.StandardOutput.ReadLine());
+				StreamReader previous_output = null;
+				string [] commands = code.Split('|');
+				int current_command = 0;
+				foreach (string command in commands) {
+				    string [] parts = SplitCommandArgs(command.Substring(1));
+				    if (parts[0] == "cd") {
+					try {
+					    System.IO.Directory.SetCurrentDirectory(parts[1]);
+					} catch (Exception e) {
+					    Console.Error.WriteLine(e.Message);
 					}
-					while (!proc.StandardError.EndOfStream) {
-					    Console.Error.WriteLine(proc.StandardOutput.ReadLine());
+				    } else {
+					var proc = new System.Diagnostics.Process {
+						StartInfo = new System.Diagnostics.ProcessStartInfo {
+							FileName = parts[0],
+							    Arguments = parts[1],
+							    UseShellExecute = false,
+							    RedirectStandardOutput = true,
+							    RedirectStandardError = true,
+							    RedirectStandardInput = current_command != 0,
+							    CreateNoWindow = true
+							    }
+					    };
+					try {
+					    proc.Start();
+					    // Handle input:
+					    if (current_command == 0) { // first
+						// do nothing
+					    } else {
+						while (!previous_output.EndOfStream) {
+						    proc.StandardInput.WriteLine(previous_output.ReadLine());
+						}
+						proc.StandardInput.Close();
+					    }
+					    // Handle output:
+					    if (current_command == commands.Length - 1) { // last
+						while (!proc.StandardOutput.EndOfStream) {
+						    Console.WriteLine(proc.StandardOutput.ReadLine());
+						}
+					    } else { // not last
+						previous_output = proc.StandardOutput;
+					    }
+					    while (!proc.StandardError.EndOfStream) {
+						Console.Error.WriteLine(proc.StandardError.ReadLine());
+					    }
+					    proc.WaitForExit();
+					} catch (Exception e) {
+					    Console.Error.WriteLine(e.Message);
 					}
-					proc.WaitForExit();
-				    } catch (Exception e) {
-					Console.Error.WriteLine(e.Message);
+					current_command++;
 				    }
 				}
 				code = "";

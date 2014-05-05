@@ -3205,14 +3205,27 @@ del _invoke, _
             }
         }
 
+
         public string Repr(object obj) {
+	    return Repr(obj, new Dictionary<int,bool>());
+	}
+
+	public IDictionary<int,bool> Prev(IDictionary<int,bool> hashes, object obj) {
+	    hashes[obj.GetHashCode()] = true;
+	    return hashes;
+	}
+
+	public string Repr(object obj, IDictionary<int,bool> prev) {
+	    if (obj != null && prev.ContainsKey(obj.GetHashCode())) {
+		return "...";
+	    }
             string repr = null;
-            if (HasField(obj, "Value")) {
+	    if (HasField(obj, "Value")) {
                 //if (obj is IronPython.Runtime.ClosureCell) {
                 //obj = ((IronPython.Runtime.ClosureCell)obj).Value;
                 System.Reflection.FieldInfo fi = obj.GetType().GetField("Value");
-                obj = fi.GetValue(obj);
-                return Repr(obj);
+                var obj2 = fi.GetValue(obj);
+                return Repr(obj2, Prev(prev, obj));
             } else if (obj is Microsoft.Scripting.Runtime.Uninitialized) {
                 repr = "<Uninitialized value>";
             } else if (HasMethod(obj, "__repr__")) {
@@ -3235,7 +3248,7 @@ del _invoke, _
 			for (int j = 0; j < colLength; j++) {
 			    if (row != "")
 				row += ", ";
-			    row += Repr(arr[i, j]);
+			    row += Repr(arr[i, j], Prev(prev, obj));
 			}
 			repr += string.Format("[{0}]", row);
 		    }
@@ -3249,13 +3262,13 @@ del _invoke, _
 		    }
 		}
             } else if (obj is string) {
-                repr = String.Format("{0}", obj);
+                repr = String.Format("{0}", ((string)obj).Replace("\"", "\\\""));
 	    } else if (obj is IList) {
 		repr = "";
 		foreach(var element in (IList)obj) {
 		    if (repr != "")
 			repr += ", ";
-		    repr += Repr(element);
+		    repr += Repr(element, Prev(prev, obj));
 		}
 		repr = string.Format("[{0}]", repr);
 	    } else if (obj is IDictionary) {
@@ -3263,7 +3276,7 @@ del _invoke, _
 		foreach(System.Collections.DictionaryEntry kvp in (IDictionary)obj) { ///
 		    if (repr != "")
 			repr += ", ";
-		    repr += string.Format("{0}: {1}", kvp.Key.ToString(), Repr(kvp.Value));
+		    repr += string.Format("{0}: {1}", kvp.Key.ToString(), Repr(kvp.Value, Prev(prev, obj)));
 		}
 		repr = string.Format("{{{0}}}", repr);
 	    }
