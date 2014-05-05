@@ -999,28 +999,37 @@ public static class ZMQServer {
 			    } else if (code.StartsWith("!")) {
 				// shell out to operating system
 				string [] parts = SplitCommandArgs(code.Substring(1));
-				var proc = new System.Diagnostics.Process {
-					StartInfo = new System.Diagnostics.ProcessStartInfo {
-						FileName = parts[0],
-						    Arguments = parts[1],
-						    UseShellExecute = false,
-						    RedirectStandardOutput = true,
-						    RedirectStandardError = true,
-						    CreateNoWindow = true
-						    }
-				    };
-				try {
-				    proc.Start();
-				    while (!proc.StandardOutput.EndOfStream) {
-					Console.WriteLine(proc.StandardOutput.ReadLine());
+				if (parts[0] == "cd") {
+				    try {
+					System.IO.Directory.SetCurrentDirectory(parts[1]);
+				    } catch (Exception e) {
+					Console.Error.WriteLine(e.Message);
 				    }
-				    while (!proc.StandardError.EndOfStream) {
-					Console.Error.WriteLine(proc.StandardOutput.ReadLine());
+				} else {
+				    var proc = new System.Diagnostics.Process {
+					    StartInfo = new System.Diagnostics.ProcessStartInfo {
+						    FileName = parts[0],
+							Arguments = parts[1],
+							UseShellExecute = false,
+							RedirectStandardOutput = true,
+							RedirectStandardError = true,
+							CreateNoWindow = true
+							}
+					};
+				    try {
+					proc.Start();
+					while (!proc.StandardOutput.EndOfStream) {
+					    Console.WriteLine(proc.StandardOutput.ReadLine());
+					}
+					while (!proc.StandardError.EndOfStream) {
+					    Console.Error.WriteLine(proc.StandardOutput.ReadLine());
+					}
+					proc.WaitForExit();
+				    } catch (Exception e) {
+					Console.Error.WriteLine(e.Message);
 				    }
-				    proc.WaitForExit();
-				} catch (Exception e) {
-				    Console.Error.WriteLine(e.Message);
 				}
+				code = "";
 			    } else { // Handle code and magics:
 				// --------------------------------------
 				// Handle magics:
