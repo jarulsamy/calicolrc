@@ -4,6 +4,7 @@
 using System; // Int64
 using System.Collections; // IDictionary
 using System.Collections.Generic; // Dictionary
+using System.Threading;
 
 public static class Widgets {
 
@@ -869,6 +870,7 @@ public static class Widgets {
 	    set("_view_name", "PasswordView");
 	    // need to inject the javascript now:
 	    session.display(session.calico.Javascript(javascript()));
+	    Thread.Sleep(100); // miliseconds
 	}
 
 	public string javascript() {
@@ -896,7 +898,9 @@ public static class Widgets {
 	    set("_view_name", "CameraView");
 	    set("imageuri", "");
 	    // need to inject the javascript now:
+	    session.shell_channel.SetState("waiting", ""); // wait for recv "comm_open"
 	    session.display(session.calico.Javascript(javascript()));
+	    Thread.Sleep(100); // miliseconds
 	}
 
 	public string javascript() {

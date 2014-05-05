@@ -438,6 +438,7 @@ public static class ZMQServer {
 	public void send_multipart(Channel channel, 
 				   IList<string> identities, 
 				   IList<string> parts) {
+	    session.calico.stdout.WriteLine("send: {0}", parts[2]);
 	    int count = 0;
 	    foreach (string msg in identities) {
 		channel.socket.SendMore(msg, Encoding.UTF8);
@@ -607,12 +608,12 @@ public static class ZMQServer {
 	    var header = Header("input_request");
 	    var metadata = pack();
 	    var content = pack("prompt", prompt);
-	    stdin_channel.SetState("waiting", ""); // wait for recv "input_reply"
+	    stdin_channel.SetState("waiting", ""); // wait for recv "reply"
 	    send(stdin_channel, list(parent_header["session"]), header, parent_header, metadata, content);
 	    while (stdin_channel.GetState() == "waiting") {
 		Thread.Sleep(100); // miliseconds
 	    }
-	    return stdin_channel.input_reply;
+	    return stdin_channel.reply;
 	}
 
 	public void display(object obj) {
@@ -674,6 +675,9 @@ public static class ZMQServer {
 	public string port;
 	public Authorization auth;
 	public Thread thread;
+	string state = "normal"; // "waiting", "ready"
+	public string reply = "";
+	
 
 	public Channel(Session session, 
 		       Authorization auth, 
@@ -718,6 +722,20 @@ public static class ZMQServer {
 	    thread = new Thread (new ThreadStart (loop));
 	}
 		   
+	public void SetState(string newstate, string result) {
+	    lock(state) {
+		state = newstate;
+		reply = result;
+	    }
+	}
+
+	public string GetState() {
+	    lock(state) {
+		return state;
+	    }
+	}
+
+
 	public virtual void loop() {
 	    string message, signature, s_header, s_parent_header, s_metadata, s_content;
 	    var identities = new List<string>();
@@ -859,9 +877,9 @@ public static class ZMQServer {
 				     IDictionary<string, object> m_parent_header, 
 				     IDictionary<string, object> m_metadata, 
 				     IDictionary<string, object> m_content) {
-
 	    // Shell handler
 	    string msg_type = m_header["msg_type"].ToString();
+	    session.calico.stdout.WriteLine("on_recv: {0}", msg_type);
 	    if (msg_type == "execute_request") {
 		var header = session.Header("status", m_header["session"].ToString());
 		var metadata = pack();
@@ -1180,22 +1198,7 @@ public static class ZMQServer {
     }
 
     public class StdInChannel : Channel {
-	string state = "normal"; // "waiting", "ready"
-	public string input_reply = "";
 	
-	public string GetState() {
-	    lock(state) {
-		return state;
-	    }
-	}
-	
-	public void SetState(string newstate, string result) {
-	    lock(state) {
-		state = newstate;
-		input_reply = result;
-	    }
-	}
-
 	public StdInChannel(Session session, 
 			    Authorization auth, 
 			    string transport, 
