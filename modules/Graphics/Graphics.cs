@@ -7089,6 +7089,7 @@ public static class Graphics
 	public class Graph
 	{
 	    public static double graph_count = 1;
+	    public static double node_count = 1;
 	    public Graphics.WindowClass window = null;
 	    public Dictionary<string,Dictionary<string,Shape>> vertices = new Dictionary<string,Dictionary<string,Shape>> ();
 	    public Dictionary<string,Dictionary<string,object>> edges = new Dictionary<string, Dictionary<string,object>> ();
@@ -7250,13 +7251,31 @@ public static class Graphics
 		edges += "}";
 		layout(edges);
 	    }
-	    
-	    public void layout() {
+
+	    public string getLayout() {
 		string edges = "digraph {\n";
+		Dictionary<string,int> tnodes = new Dictionary<string,int>();
+		int count = 1;
 		foreach (Edge edge in graphEdges) {
-		    edges += String.Format("{0} -> {1}\n", edge.getFromName(), edge.getToName());
+		    foreach (string tnode in new string[] {edge.getFromName(), edge.getToName()}) {
+			if (!tnodes.ContainsKey(tnode)) {
+			    tnodes[tnode] = count;
+			    count++;
+			}
+		    }
+		}
+		foreach (KeyValuePair<string,int> tnode in tnodes) {
+		    edges += String.Format("    N{0} [label=\"{1}\"];\n", tnode.Value, tnode.Key);
+		}
+		foreach (Edge edge in graphEdges) {
+		    edges += String.Format("    N{0} -> N{1}\n", tnodes[edge.getFromName()], tnodes[edge.getToName()]);
 		}
 		edges += "}";
+		return edges;
+	    }
+	    
+	    public void layout() {
+		string edges = getLayout();
 		layout(edges);
 	    }
 	    
