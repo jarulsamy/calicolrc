@@ -353,15 +353,15 @@ public static class ZMQServer {
 	    if (command.Length > 1) {
 		args = command[1].Trim();
 	    } 
-	    if (command[0].StartsWith("%%%")) {
+	    if (command[0].StartsWith("%%%") && command[0].Length > 3) {
 		// Notebook command
 		name = "Calico." + TitleCase(command[0].Substring(3));
 		mtype = "notebook";
-	    } else if (command[0].StartsWith("%%")) {
+	    } else if (command[0].StartsWith("%%") && command[0].Length > 2) {
 		// Cell
 		name = "Calico." + TitleCase(command[0].Substring(2));
 		mtype = "cell";
-	    } else if (command[0].StartsWith("%")) {
+	    } else if (command[0].StartsWith("%") && command[0].Length > 1) {
 		// Line
 		name = "Calico." + TitleCase(command[0].Substring(1));
 		mtype = "line";
@@ -1045,6 +1045,7 @@ public static class ZMQServer {
 					    if (current_command == 0) { // first
 						// do nothing
 					    } else {
+						// FIXME: change to ReadAsync?
 						while (!previous_output.EndOfStream) {
 						    proc.StandardInput.WriteLine(previous_output.ReadLine());
 						}
@@ -1052,6 +1053,7 @@ public static class ZMQServer {
 					    }
 					    // Handle output:
 					    if (current_command == commands.Length - 1) { // last
+						// FIXME: change to ReadAsync?
 						while (!proc.StandardOutput.EndOfStream) {
 						    Console.WriteLine(proc.StandardOutput.ReadLine());
 						}

@@ -29,12 +29,17 @@ namespace Calico {
 	}
 
 	public override object post_process(object result) {
-	    sw.Stop();
-	    TimeSpan ts = sw.Elapsed;
-	    Console.WriteLine(String.Format("Time: {0:00} s, {1:00} ms",
-					    ts.Seconds,
-					    ts.Milliseconds));
-	    return result;
+	    if (sw != null) {
+		sw.Stop();
+		TimeSpan ts = sw.Elapsed;
+		Console.WriteLine(String.Format("Time: {0:00} s, {1:00} ms",
+						ts.Seconds,
+						ts.Milliseconds));
+		return result;
+	    } else {
+		Console.Error.WriteLine("No such magic: use %%time ...");
+		return null;
+	    }
 	}
     }
     
