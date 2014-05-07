@@ -328,6 +328,11 @@ public static class ZMQServer {
 	    this.blocking = blocking;
 	}
 
+	public void HandleException(GLib.UnhandledExceptionArgs args) {
+	    Console.Error.WriteLine(String.Format("Exception: {0}", args.ExceptionObject.ToString()));
+	    session.shell_channel.ExecutionDone(session.current_execution_count, new List<object>(), session.parent_header);
+	}
+        
 	public bool GetBlocking() {
 	    return blocking;
 	}
@@ -721,7 +726,7 @@ public static class ZMQServer {
 	    socket.Identity = Encoding.UTF8.GetBytes(session.session_id);
 	    thread = new Thread (new ThreadStart (loop));
 	}
-		   
+	
 	public void SetState(string newstate, string result) {
 	    lock(state) {
 		state = newstate;
@@ -1130,26 +1135,7 @@ public static class ZMQServer {
 				    session.send(session.iopub_channel, session.route("pyout"), header, m_header, metadata, content);
 				}
 			    }
-			    // ---------------------------------------------------
-			    header = session.Header("status", m_header["session"].ToString());
-			    metadata = pack();
-			    content = pack("execution_state", "idle");
-			    session.send(session.iopub_channel, session.route("status"), header, m_header, metadata, content);
-			    // ---------------------------------------------------
-			    // FIXME: also send the other kind of execute_reply:
-			    // identity: 'execute_reply', ... [m_header["session"], ...]
-			    header = session.Header("execute_reply", m_header["session"].ToString());
-			    content = pack("status", "ok", 
-					   "execution_count", execution_count,
-					   "user_variables", pack(),
-					   "payload", payload,
-					   "user_expressions", pack());
-			    metadata = pack("dependencies_met", true,
-					    "engine", session.engine_identity,
-					    "status", "ok",
-					    "started", now());
-			    session.send(session.shell_channel, list(m_header["session"]), header, m_header, metadata, content); // ok
-			    //session.SetOutputs(0, null); // wait till after widget displays
+			    ExecutionDone(execution_count, payload, m_header);
 			}));
 		session.calico.executeThread.IsBackground = true;
 		session.calico.executeThread.Start();
@@ -1160,6 +1146,28 @@ public static class ZMQServer {
 		// TODO: for a non-blocking kernel... what else needs
 		// to change?
 	    }
+	}
+
+	public void ExecutionDone(int execution_count, List<object> payload, IDictionary<string,object> m_header) {
+	    // ---------------------------------------------------
+	    var header = session.Header("status", m_header["session"].ToString());
+	    var metadata = pack();
+	    var content = pack("execution_state", "idle");
+	    session.send(session.iopub_channel, session.route("status"), header, m_header, metadata, content);
+	    // ---------------------------------------------------
+	    // FIXME: also send the other kind of execute_reply:
+	    // identity: 'execute_reply', ... [m_header["session"], ...]
+	    header = session.Header("execute_reply", m_header["session"].ToString());
+	    content = pack("status", "ok", 
+			   "execution_count", execution_count,
+			   "user_variables", pack(),
+			   "payload", payload,
+			   "user_expressions", pack());
+	    metadata = pack("dependencies_met", true,
+			    "engine", session.engine_identity,
+			    "status", "ok",
+			    "started", now());
+	    session.send(session.shell_channel, list(m_header["session"]), header, m_header, metadata, content); // ok
 	}
     }
 
@@ -1280,6 +1288,7 @@ public static class ZMQServer {
 
     public static void Start(Calico.MainWindow calico, string config_file) {
 	session = new Session(calico, config_file);
+	GLib.ExceptionManager.UnhandledException += session.HandleException;
 	config_file = session.filename;
 	session.start();
 	while (true) {
