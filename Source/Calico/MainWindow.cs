@@ -82,6 +82,7 @@ namespace Calico {
     }
 
     public partial class MainWindow : Gtk.Window {
+	internal string environment = "gtk";
 	public bool serverMode = false;
         public Config config;
         public Gtk.Clipboard clipboard;
@@ -1363,11 +1364,15 @@ namespace Calico {
         }
 
         public void SetStatus(string status) {
-		  Invoke(delegate {
-				this.label11.LabelProp = "<i>" + status + "</i>";
-				this.label11.UseMarkup = true;
-			  });
-		}
+	    if (GetEnvironment() == "tty") {
+		Console.WriteLine("    Calico status: {0}", status);
+	    } else {
+		Invoke(delegate {
+			this.label11.LabelProp = "<i>" + status + "</i>";
+			this.label11.UseMarkup = true;
+		    });
+	    }
+	}
 
         public void OnSwitchLanguage(object obj, EventArgs e) {
             Gtk.RadioMenuItem radioitem = (Gtk.RadioMenuItem)obj;
@@ -2759,7 +2764,7 @@ del _invoke, _
         public void ChatPrint(Tag tag, string format, bool force) {
             // These Write functions are the only approved methods of output
             Thread.Sleep(1); // Force a context switch, even for an instant
-            if (Debug) {
+            if (Debug || GetEnvironment() == "tty") {
                 Console.Write(format);
             } else {
 		Invoke(delegate {
@@ -4505,7 +4510,7 @@ del _invoke, _
 	}
 
 	public string GetEnvironment() {
-	    return "gtk";
+	    return environment;
 	}
 
         public void SetVariable(string name, object value) {

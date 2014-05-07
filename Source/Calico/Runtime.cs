@@ -39,6 +39,7 @@ namespace Calico {
         public CalicoConsole(string[] args, LanguageManager manager, bool Debug, Config config, bool startREPL,
 			     int gui_thread_id):
         base() {
+	    environment = "tty";
 	    MainWindow.gui_thread_id = gui_thread_id;
             _mainWindow = this;
 	    this.args = args;
@@ -113,10 +114,6 @@ namespace Calico {
 
         public new void Warn(string message) {
 	    Console.Error.Write(message);
-	}
-
-	public new string GetEnvironment() {
-	    return "tty";
 	}
 
 	public new double ProgramSpeedValue {
@@ -293,6 +290,7 @@ namespace Calico {
 	// ran with --nographics
         public CalicoConsoleNoGUI(string[] args, LanguageManager manager, bool Debug, Config config, bool startREPL,
 				  int gui_thread_id){
+	    environment = "tty";
 	    MainWindow.gui_thread_id = gui_thread_id;
             _mainWindow = this;
 	    this.args = args;
@@ -347,6 +345,7 @@ namespace Calico {
 
         public CalicoServer (string[] args, LanguageManager manager, bool Debug, Config config,
 			     int gui_thread_id) {
+	    environment = "tty";
 	    MainWindow.gui_thread_id = gui_thread_id;
             _mainWindow = this;
 	    this.serverMode = true;

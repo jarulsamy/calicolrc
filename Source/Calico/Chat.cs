@@ -112,7 +112,7 @@ namespace Calico {
                                             "General",
                                             user));
             }
-			calico.SetStatus(String.Format(global::Mono.Unix.Catalog.GetString("online as {0}"), user));
+	    calico.SetStatus(String.Format(global::Mono.Unix.Catalog.GetString("online as {0}"), user));
             if (debug) {
                 calico.Print(String.Format("LOGIN: {0}\n", user));
                 //self.client.SendMyPresence()
