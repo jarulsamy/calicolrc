@@ -7286,8 +7286,19 @@ public static class Graphics
 	    public void layout (string contents, bool process)
 	    {
 		pre_text = contents; // for debugging
-		if (process)
+		if (process) {
+		    string new_contents = "";
+		    // remove any line that starts with graph [...]
+		    foreach(string line in contents.Split('\n')) {
+			if (line.Trim().StartsWith("graph [")) {
+			    // skip it
+			} else {
+			    new_contents += line + "\n";
+			}
+		    }
+		    contents = new_contents;
 		    contents = processDot(contents);
+		}
 		post_text = contents; // for debugging
 		parser = Graphviz4Net.Dot.AntlrParser.AntlrParserAdapter<string>.GetParser();
 		graph = parser.Parse (contents);
@@ -7762,10 +7773,15 @@ public static class Graphics
 			  myProcess.StartInfo.FileName = "dot";
 		      }
 		      myProcess.StartInfo.CreateNoWindow = true;
-			  myProcess.StartInfo.RedirectStandardOutput = true;
+		      myProcess.StartInfo.RedirectStandardOutput = true;
+		      myProcess.StartInfo.RedirectStandardError = true;
 		      myProcess.StartInfo.Arguments = ("-Tdot " + textpath);
 		      myProcess.Start();
 		      retval = myProcess.StandardOutput.ReadToEnd();
+		      string errors = myProcess.StandardError.ReadToEnd();
+		      if (errors != "") {
+			  Console.Error.WriteLine();
+		      }
 		      myProcess.WaitForExit();
 		    } catch (Exception) {
 		      if (warn_missing_dot) {
