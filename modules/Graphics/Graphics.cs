@@ -7749,6 +7749,38 @@ public static class Graphics
 		return new GraphicsRepresentation(canvas);
 	    }
 
+	    public GraphicsRepresentation rerender() {
+		int _width = 0, _height = 0;
+		if (options.ContainsKey("width")) {
+		    _width = ((int)options["width"]) + 64;
+		} else {
+		    _width = ((int)graph.Width) + 64;
+		}
+		if (options.ContainsKey("height")) {
+		    _height = ((int)options["height"]) + 64;
+		} else {
+		    _height = ((int)graph.Height) + 64;
+		}
+		Graphics.Canvas canvas = new Graphics.Canvas(_width, _height);
+		foreach(var item in vertices.Values) {
+		    foreach(Shape shape in item.Values) {
+			shape.draw(canvas);
+		    }
+		}
+		foreach(var item in edges.Values) {
+		    foreach(var thing in item.Values) {
+			if (thing is IList) {
+			    foreach(Shape line in ((IList)thing)) {
+				line.draw(canvas);
+			    }
+			} else {
+			    ((Shape)thing).draw(canvas);
+			}
+		    }
+		}
+		return new GraphicsRepresentation(canvas);
+	    }
+
 	    [method: JigsawTab("G/Misc")]
 	    public static string processDot(string text) {
 			string retval = null;
