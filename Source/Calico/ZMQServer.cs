@@ -381,7 +381,12 @@ public static class ZMQServer {
 		    ConstructorInfo constructor = type.GetConstructor(
 		        new[] {typeof(Session), typeof(string), typeof(string), typeof(string) });
 		    if (constructor != null) {
-			MagicBase retval = (MagicBase)constructor.Invoke(new object [] {this, code, mtype, args});
+			MagicBase retval = null;
+			try {
+			    retval = (MagicBase)constructor.Invoke(new object [] {this, code, mtype, args});
+			} catch (Exception e) {
+			    Console.Error.WriteLine("Error in magic: {0}", e.Message);
+			}
 			//Console.WriteLine("Checking for magic: '{0}'", retval);
 			return retval;
 		    }
