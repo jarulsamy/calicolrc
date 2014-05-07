@@ -323,9 +323,18 @@ namespace Calico {
 	    command = "dot";
 	    evaluate = false;
 	    Graphics.Graph g = new Graphics.Graph();
-	    g.layout(code, false); // don't process Dot file
+	    IDictionary options = null;
+	    bool preprocess = true;
 	    if (args != "") {
-		IDictionary options = (IDictionary)session.calico.Evaluate(args, "python");
+		options = (IDictionary)session.calico.Evaluate(args, "python");
+	    } else {
+		options = new Dictionary<string,object>();
+	    }
+	    if (options.Contains("preprocess")) {
+		preprocess = (bool)options["preprocess"];
+	    }
+	    g.layout(code, preprocess); // pre-process Dot file?
+	    if (args != "") {
 		session.display(g.render(options));
 	    } else {
 		session.display(g.render());
