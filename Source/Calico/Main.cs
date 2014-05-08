@@ -299,6 +299,10 @@ namespace Calico {
 				    }
                                 });
                             signal_thread.Start();
+			} else {
+			    Console.CancelKeyPress += delegate {
+				win.RequestInterrupt(); 				
+			    };
 			}
 			///-----------------------
 			string ipython_base = GetIPythonPath();
@@ -338,6 +342,10 @@ namespace Calico {
 				    }
                                 });
                             signal_thread.Start();
+			} else {
+			    Console.CancelKeyPress += delegate {
+				win.RequestInterrupt(); 				
+			    };
 			}
 			///-----------------------
 			string ipython_base = GetIPythonPath();
@@ -376,7 +384,11 @@ namespace Calico {
                                 });
 			    //signal_thread.IsBackground = true;
                             signal_thread.Start();
-                }
+		} else {
+		    Console.CancelKeyPress += delegate {
+			win.RequestInterrupt(); 				
+		    };
+		}
                 // Ok, we are going to run this thing!
                 // If Gui, let's go:
                 Application.Init();
