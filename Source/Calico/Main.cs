@@ -300,20 +300,24 @@ namespace Calico {
                                 });
                             signal_thread.Start();
 			} else {
-			    Console.CancelKeyPress += RequestInterrupt;
+			    Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs cargs) => {
+				cargs.Cancel = false;
+				if (win != null)
+				    win.RequestInterrupt(); 
+			    };
 			}
 			///-----------------------
 			string ipython_base = GetIPythonPath();
 			config.SetValue("ipython", "security", "string", System.IO.Path.Combine(ipython_base, "profile_calico", "security"));
 			GLib.Timeout.Add( 500, delegate { 
-                    int t =  Thread.CurrentThread.ManagedThreadId;
-                    System.Threading.Thread thread = new System.Threading.Thread ( delegate() {                            
-                            win = new CalicoServer(args, manager, Debug, config, t); //Thread.CurrentThread.ManagedThreadId); 
-                            win.Start();
-                        });
-                    thread.Start();
-                    return false; 
-                }); 
+				int t =  Thread.CurrentThread.ManagedThreadId;
+				System.Threading.Thread thread = new System.Threading.Thread ( delegate() {                            
+					win = new CalicoServer(args, manager, Debug, config, t); //Thread.CurrentThread.ManagedThreadId); 
+					win.Start();
+				    });
+				thread.Start();
+				return false; 
+			    }); 
 			Application.Run();
 		    } else {
 			// THIS MAY NOT WOK ON MAC
@@ -341,7 +345,11 @@ namespace Calico {
                                 });
                             signal_thread.Start();
 			} else {
-			    Console.CancelKeyPress += RequestInterrupt;
+			    Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs cargs) => {
+				cargs.Cancel = false;
+				if (win != null)
+				    win.RequestInterrupt(); 
+			    };
 			}
 			///-----------------------
 			string ipython_base = GetIPythonPath();
@@ -381,7 +389,13 @@ namespace Calico {
 			    //signal_thread.IsBackground = true;
                             signal_thread.Start();
 		} else {
-		    Console.CancelKeyPress += RequestInterrupt;
+		    Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs cargs) => {
+			cargs.Cancel = false;
+			Gtk.Application.Invoke( delegate { 
+				if (win != null)
+				    win.RequestQuit(); 
+			    });
+		    };
 		}
                 // Ok, we are going to run this thing!
                 // If Gui, let's go:
@@ -391,13 +405,6 @@ namespace Calico {
                 Application.Run();
             }
         }
-
-	static void RequestInterrupt(object sender, ConsoleCancelEventArgs args) {
-	    Console.WriteLine("  Key pressed: {0}", args.SpecialKey);
-	    Console.WriteLine("  Cancel property: {0}", args.Cancel);
-	    Console.WriteLine("Setting the Cancel property to true...");
-	    args.Cancel = true;
-	}
 
         public static void Print(string message, params object[] args) {
             Console.WriteLine(String.Format(message, args));
