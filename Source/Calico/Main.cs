@@ -300,9 +300,7 @@ namespace Calico {
                                 });
                             signal_thread.Start();
 			} else {
-			    Console.CancelKeyPress += delegate {
-				win.RequestInterrupt(); 				
-			    };
+			    Console.CancelKeyPress += RequestInterrupt;
 			}
 			///-----------------------
 			string ipython_base = GetIPythonPath();
@@ -343,9 +341,7 @@ namespace Calico {
                                 });
                             signal_thread.Start();
 			} else {
-			    Console.CancelKeyPress += delegate {
-				win.RequestInterrupt(); 				
-			    };
+			    Console.CancelKeyPress += RequestInterrupt;
 			}
 			///-----------------------
 			string ipython_base = GetIPythonPath();
@@ -385,9 +381,7 @@ namespace Calico {
 			    //signal_thread.IsBackground = true;
                             signal_thread.Start();
 		} else {
-		    Console.CancelKeyPress += delegate {
-			win.RequestInterrupt(); 				
-		    };
+		    Console.CancelKeyPress += RequestInterrupt;
 		}
                 // Ok, we are going to run this thing!
                 // If Gui, let's go:
@@ -397,6 +391,13 @@ namespace Calico {
                 Application.Run();
             }
         }
+
+	static void RequestInterrupt(object sender, ConsoleCancelEventArgs args) {
+	    Console.WriteLine("  Key pressed: {0}", args.SpecialKey);
+	    Console.WriteLine("  Cancel property: {0}", args.Cancel);
+	    Console.WriteLine("Setting the Cancel property to true...");
+	    args.Cancel = true;
+	}
 
         public static void Print(string message, params object[] args) {
             Console.WriteLine(String.Format(message, args));
