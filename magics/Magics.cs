@@ -28,6 +28,18 @@ namespace Calico {
 	    sw.Start();
 	}
 
+	public override void notebook(string args) {
+	    bool on = session.ToggleStickyMagic(this);
+	    if (on) {
+		magic_line = "%%time";
+		cell("");
+		Console.WriteLine("%%time is now on");
+	    } else {
+		magic_line = "";
+		Console.WriteLine("%%time is now off");
+	    }
+	}
+
 	public override object post_process(object result) {
 	    if (sw != null) {
 		sw.Stop();
@@ -37,7 +49,6 @@ namespace Calico {
 						ts.Milliseconds));
 		return result;
 	    } else {
-		Console.Error.WriteLine("No such magic: use %%time ...");
 		return null;
 	    }
 	}

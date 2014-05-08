@@ -25,6 +25,7 @@ namespace Calico {
 	public bool evaluate = true;             // should we evaluate code next?
 	public string code = null;               // code to return after init
 	public ZMQServer.Session session = null; // current session
+	public string magic_line = "";           // sticky magic line to prefix cell
 
 	public string __doc__() {
 	    return String.Format("This is some helpful documentation on \"{0}\"", 
@@ -221,6 +222,7 @@ public static class ZMQServer {
 	public object _ii = null;
 	public object _iii = null;
 	public bool starting = true;
+	public Dictionary<string,MagicBase> stickyMagics = new Dictionary<string,MagicBase>();
 
 	public Session(Calico.MainWindow calico, string filename) {
 	    this.calico = calico;
@@ -339,6 +341,16 @@ public static class ZMQServer {
 
 	public string TitleCase(string text) {
 	    return char.ToUpper(text[0]) + text.Substring(1);
+	}
+
+	public bool ToggleStickyMagic(MagicBase magic) {
+	    if (stickyMagics.ContainsKey(magic.command)) { // remove it
+		stickyMagics.Remove(magic.command);
+		return false;
+	    } else { // add it
+		stickyMagics[magic.command] = magic;
+		return true;
+	    }
 	}
 
 	public MagicBase GetMagic(string text) {
@@ -993,6 +1005,14 @@ public static class ZMQServer {
 	    return parts;
 	}
 
+	public List<string> GetStickyMagics() {
+	    List<string> retval = new List<string>();
+	    foreach (MagicBase magic in session.stickyMagics.Values) {
+		retval.Add(magic.magic_line);
+	    }
+	    return retval;
+	}
+
 	public void ExecuteInBackground(string code, IList<string> identities, IDictionary<string, object> m_header, int execution_count) {
 	    var header = session.Header("pyout", m_header["session"].ToString());
 	    var metadata = pack();
@@ -1084,6 +1104,9 @@ public static class ZMQServer {
 			    } else { // Handle code and magics:
 				// --------------------------------------
 				// Handle magics:
+				foreach (string magic_line in GetStickyMagics()) {
+				    code = magic_line + "\n" + code;
+				}
 				while (code.StartsWith("%")) { //----------------- Magics
 				    magic = session.GetMagic(code);
 				    if (magic != null) {
