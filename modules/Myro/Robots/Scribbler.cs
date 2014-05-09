@@ -335,13 +335,10 @@ public class Scribbler: Myro.Robot
             set_cam_param (Scribbler.CAM_COMA, Scribbler.CAM_COMA_WHITE_BALANCE_ON);
             set_cam_param (Scribbler.CAM_COMB,
                            Scribbler.CAM_COMB_GAIN_CONTROL_ON | Scribbler.CAM_COMB_EXPOSURE_CONTROL_ON);
-            // Config grayscale on window 0, 1, 2
-            conf_gray_window (0, 2, 0, imagewidth/2, imageheight-1, 1, 1);
-            conf_gray_window (1, imagewidth/4, 0, 3*imagewidth/4 - 2, imageheight-1, 1, 1);
-            conf_gray_window (2, imagewidth/2, 0, imagewidth-2, imageheight-1, 1, 1);
+            if (isFluke2()) setPictureSize("small");
+            setupBrightWindows();
             //set_ir_power (135); // hack for fluke2
             conf_rle (0, 255, 51, 136, 190, 255, 90, 4);			
-            if (isFluke2()) setPictureSize("large");
         }
         if (info.Contains ("robot")) {
             loadFudge ();
@@ -1070,6 +1067,8 @@ public class Scribbler: Myro.Robot
     public override object getBright (string window)
     {
         byte byte_window = 0;
+        int oldtimeout = serial.ReadTimeout; // milliseconds
+
         if (window == null || window.ToString() == "all") {
             return get ("bright");
         } else if (is_string(window)) {
@@ -1084,9 +1083,17 @@ public class Scribbler: Myro.Robot
                 throw new Exception ("invalid bright argument");
             }
         }
+
+        if (isFluke2()){ // images can take a long time
+            serial.ReadTimeout = 15000; // milliseconds
+        }
         write (Scribbler.GET_WINDOW_LIGHT);
         write (byte_window);
-        return read_3byte (); // (63.0 * 192.0 * 255.0)
+        int v = read_3byte (); // (63.0 * 192.0 * 255.0)
+        if (isFluke2()){ // images can take a long time
+            serial.ReadTimeout = oldtimeout; // milliseconds
+        }        
+        return v;
     }
 
     public override List getBlob ()
@@ -1094,7 +1101,7 @@ public class Scribbler: Myro.Robot
         int old = serial.ReadTimeout; // milliseconds
 
         if (isFluke2()){ // image functions can take a long time
-            serial.ReadTimeout = 10000; // milliseconds
+            serial.ReadTimeout = 15000; // milliseconds
         }
 
 	write (Scribbler.GET_BLOB);
@@ -1641,8 +1648,10 @@ public class Scribbler: Myro.Robot
     {
         int width = imagewidth;
         int height = imageheight;
+        int oldtimeout = serial.ReadTimeout; // milliseconds
+
         if (isFluke2()){ // images can take a long time
-            serial.ReadTimeout = 10000; // milliseconds
+            serial.ReadTimeout = 15000; // milliseconds
         }
         Graphics.Picture p = null;
         if (mode == "color") {
@@ -1684,7 +1693,7 @@ public class Scribbler: Myro.Robot
             p = new Graphics.Picture (width, height, a);
         }
         if (isFluke2()){
-            serial.ReadTimeout = 1000; // milliseconds
+            serial.ReadTimeout = oldtimeout; // milliseconds
         }
         return p;
     }
@@ -1917,6 +1926,14 @@ public class Scribbler: Myro.Robot
         conf_window (window, lx, ly, ux, uy, xstep, ystep);
     }
 
+    private void setupBrightWindows()
+    {              
+        // Config grayscale on window 0, 1, 2
+        conf_gray_window (0, 2, 0, imagewidth/2, imageheight-1, 1, 1);
+        conf_gray_window (1, imagewidth/4, 0, 3*imagewidth/4 - 2, imageheight-1, 1, 1);
+        conf_gray_window (2, imagewidth/2, 0, imagewidth-2, imageheight-1, 1, 1);
+    }
+
     public override void setPictureSize(string size)
     {
         if (!flukeIsAtLeast("3.0.9")) return;
@@ -1946,6 +1963,8 @@ public class Scribbler: Myro.Robot
         
         write (Scribbler.SET_PIC_SIZE);
         write (sizecode);
+        
+        setupBrightWindows();
     }
 
      public override void servo(int id, int value)
