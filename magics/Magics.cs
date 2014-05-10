@@ -262,20 +262,26 @@ namespace Calico {
 	    command = "magics";
 	    evaluate = true;
 	    Console.WriteLine("%connect_info        - show ICalico JSON connection information");
+	    Console.WriteLine("%%dot [options]      - create a GraphViz dot diagram with contents of cell");
 	    Console.WriteLine("%download url [file] - download a URL to a file");
 	    Console.WriteLine("%edit FILENAME       - edit a file in an external editor");
 	    Console.WriteLine("%%file FILENAME      - create a filename with contents of cell");
 	    Console.WriteLine("%%html               - treat the cell as HTML");
 	    Console.WriteLine("%%javascript         - treat the cell as Javascript data");
 	    Console.WriteLine("%lang                - get information on current language");
-	    Console.WriteLine("%%lang LANGUAGE      - change language for just this cell");
-	    Console.WriteLine("%%%lang LANGUAGE     - change language for rest of cells");
+	    Console.WriteLine("%lang LANG EXPR      - evaluate the EXPR in the given LANG");
+	    Console.WriteLine("%%lang LANG          - change language for just this cell");
+	    Console.WriteLine("%%%lang LANG         - change language for rest of cells");
 	    Console.WriteLine("%%latex              - treat the cell as Latex");
 	    Console.WriteLine("%magic               - get information on magic meta-commands");
+	    Console.WriteLine("%nuget ...           - perform a NuGet command, such as install");
 	    Console.WriteLine("%qtconsole           - start a qtconsole");
 	    Console.WriteLine("%run FILENAME        - run a file (language determined by extension)");
+	    Console.WriteLine("%%rich_display       - output the cell data/return value as HTML");
+	    Console.WriteLine("%%%rich_display      - use %%rich_display for each cell");
 	    Console.WriteLine("%%svg                - treat the cell as SVG data");
 	    Console.WriteLine("%%time               - time how long it takes to run this cell");
+	    Console.WriteLine("%%%time              - use %%time for each cell");
 	}	
     }    
 
