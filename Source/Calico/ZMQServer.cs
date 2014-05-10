@@ -223,6 +223,7 @@ public static class ZMQServer {
 	public object _iii = null;
 	public bool starting = true;
 	public Dictionary<string,MagicBase> stickyMagics = new Dictionary<string,MagicBase>();
+	public bool rich_display = false;
 
 	public Session(Calico.MainWindow calico, string filename) {
 	    this.calico = calico;
@@ -328,6 +329,14 @@ public static class ZMQServer {
 
 	public void SetBlocking(bool blocking) {
 	    this.blocking = blocking;
+	}
+
+	public void SetRichDisplay(bool value) {
+	    this.rich_display = value;
+	}
+
+	public bool GetRichDisplay() {
+	    return this.rich_display;
 	}
 
 	public void HandleException(GLib.UnhandledExceptionArgs args) {
@@ -516,6 +525,13 @@ public static class ZMQServer {
 	    if (obj == null) {
 		data["text/plain"] = "";
 	    } else {
+		if (rich_display) {
+		    string html = calico.RichRepr(obj);
+		    // FIXME: hack to determine if HTML
+		    if (html.StartsWith("<") && html.EndsWith(">")) {
+			data["text/html"] = html;
+		    }
+		}
 		data["text/plain"] = calico.Repr(obj);
 		// Now, let's get additional ones, if they exist
 		Type type = obj.GetType();

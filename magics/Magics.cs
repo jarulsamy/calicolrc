@@ -81,6 +81,44 @@ namespace Calico {
 	}
     }    
 
+    public class Rich_display : Calico.MagicBase {
+	bool previous;
+	string state;
+	
+	public Rich_display(ZMQServer.Session session, string code, 
+			    string mtype, string args) : base(session, code, mtype, args) {
+	}
+
+	public override void line(string args) {
+	    command = "rich_display";
+	    Console.Error.WriteLine("No such magic; use %%rich_display or %%%rich_display instead");
+	    evaluate = false;
+	}
+	
+	public override void cell(string args) {
+	    // %%rich_display
+	    command = "rich_display";
+	    previous = session.GetRichDisplay();
+	    session.SetRichDisplay(true);
+	    state = "reset";
+	}
+
+	public override void notebook(string args) {
+	    // toggle rich_text
+	    // %%%rich_display
+	    command = "rich_display";
+	    bool current = session.GetRichDisplay();
+	    session.SetRichDisplay(! current);
+	}
+
+	public override object post_process(object result) {
+	    if (state == "reset") {
+		session.SetRichDisplay(previous);
+	    }
+	    return result;
+	}
+    }    
+
     public class Lang : Calico.MagicBase {
 	string tempLanguage = null;
 	

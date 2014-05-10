@@ -3132,6 +3132,10 @@ del _invoke, _
 	    return ArrayTypeToString(args, -1);
 	}
 
+        public static string ArrayTypeToHTML(Array args) {
+	    return ArrayTypeToHTML(args, -1);
+	}
+
         public static string ArrayTypeToString(Array args, int limit) {
             string retval = "";
             if (args != null) {
@@ -3156,9 +3160,65 @@ del _invoke, _
             return "[" + retval + "]";
         }
 
+        public static string ArrayTypeToHTML(Array args, int limit) {
+            string retval = "";
+	    string row;
+            if (args != null) {
+                int count = ((Array)args).Length;
+		retval += "<tr><th colspan=\"2\" align=\"center\">Array Type</th></tr>";
+		retval += "<tr><th>Position</th><th>Value</th></tr>";
+                for (int i = 0; i < count; i++) {
+		    row = "<tr>";
+		    row += String.Format("<td>{0}</td>", i);
+                    if (args.GetValue(i) is object[]) {
+                        row += String.Format("<td>{0}</td>", ArrayToHTML((object[])args.GetValue(i)));
+                    } else if (args.GetValue(i) is Array) {
+                        row += String.Format("<td>{0}</td>", ArrayTypeToHTML((Array)args.GetValue(i)));
+                    } else {
+                        row += String.Format("<td>{0}</td>", args.GetValue(i));
+                    }
+		    row += "</tr>";
+		    retval += row;
+		}
+            }
+            return "<table>" + retval + "<table>";
+        }
+
         public static string ArrayToString(object[] args) {
 	    return ArrayToString(args, -1);
 	}
+
+        public static string ArrayToHTML(object[] args) {
+	    return ArrayToHTML(args, -1);
+	}
+
+        public static string ArrayToHTML(object[] args, int limit) {
+            string retval = "";
+	    string row;
+            if (args != null) {
+                int count = ((Array)args).Length;
+                for (int i = 0; i < count; i++) {
+		    row = "<tr>";
+		    row += "<th colspan=\"2\" align=\"center\">Array</th>";
+		    row += "<th>Position</th><th>Value</th>";
+		    row += String.Format("<td>{0}</td>", i);
+		    if (i >= limit && limit != -1) {
+			row += "<td>...</td>";
+			break;
+		    }
+                    if (args.GetValue(i) is object[]) {
+                        row += ArrayToHTML((object[])args.GetValue(i));
+                    } else if (args.GetValue(i) is Array) {
+                        row += ArrayTypeToHTML((Array)args.GetValue(i));
+                    } else {
+                        row += String.Format("<td>{0}</td>", args.GetValue(i));
+                    }
+		    row += "</tr>";
+		    retval += row;
+                }
+            }
+            return "<table>" + retval + "<table>";
+        }
 
         public static string ArrayToString(object[] args, int limit) {
             string retval = "";
@@ -3216,6 +3276,17 @@ del _invoke, _
 	}
 
 	public IDictionary<int,bool> Prev(IDictionary<int,bool> hashes, object obj) {
+	    if (obj is int || 
+		obj is Int32 ||
+		obj is Int64 ||
+		obj is Double ||
+		obj is Single ||
+		obj is float ||
+		obj is string ||
+		obj is bool 
+		) {
+		return hashes;
+	    }
 	    hashes[obj.GetHashCode()] = true;
 	    return hashes;
 	}
@@ -3292,6 +3363,68 @@ del _invoke, _
                     repr = "None";
                 }
             }
+            return repr;
+        }
+
+        public string RichRepr(object obj) {
+	    return RichRepr(obj, new Dictionary<int,bool>());
+	}
+
+	public string RichRepr(object obj, IDictionary<int,bool> prev) {
+	    string repr = "";
+	    if (obj != null && prev.ContainsKey(obj.GetHashCode())) {
+		return "...";
+	    }
+            if (obj is object[]) {
+                repr = (string)ArrayToHTML((object[])obj);
+            } else if (obj is Array) {
+		try {
+		    double [,] arr = (double[,])obj;
+		    int rowLength = arr.GetLength(0);
+		    int colLength = arr.GetLength(1);
+		    repr = String.Format("<table><tr><th colspan=\"{0}\" align=\"center\">2D Array</th></tr>", colLength + 1);
+		    repr += "<tr><th>Position</th>";
+		    for (int i = 0; i < colLength; i++) {
+			repr += String.Format("<th>{0}</th>", i);
+		    }
+		    repr += "</tr>";
+		    for (int i = 0; i < rowLength; i++) {
+			string row = String.Format("<tr><td>{0}</td>", i);
+			for (int j = 0; j < colLength; j++) {
+			    row += String.Format("<td>{0}</td>", RichRepr(arr[i, j], Prev(prev, obj)));
+			}
+			row += "</tr>";
+			repr += row;
+		    }
+		    repr += "</table>";
+		} catch { // not doubles
+		    Array array = (Array)obj;
+		    if (array.Rank == 1) {
+			repr = (string)ArrayTypeToHTML((Array)obj);
+		    } else {
+			repr = String.Format("<Multidimensional array, rank={0}>", array.Rank);
+		    }
+		}
+	    } else if (obj is IList) {
+		repr = "<table>";
+		repr += "<tr><th colspan=\"2\" align=\"center\">List</th></tr>";
+		repr += "<tr><th>Position</th><th>Value</th></tr>";
+		int count = 0;
+		foreach(var element in (IList)obj) {
+		    repr += String.Format("<tr><td>{0}</td><td>{1}</td></tr>", count++, RichRepr(element, Prev(prev, obj)));
+		}
+		repr += "</table>";
+	    } else if (obj is IDictionary) {
+		repr = "<table>";
+		repr += "<tr><th colspan=\"2\" align=\"center\">Dictionary</th></tr>";
+		repr += "<tr><th>Key</th><th>Value</th></tr>";
+		foreach(System.Collections.DictionaryEntry kvp in (IDictionary)obj) { 
+		    repr += string.Format("<tr><td>{0}</td><td>{1}</td></tr>", kvp.Key.ToString(), RichRepr(kvp.Value, Prev(prev, obj)));
+		}
+		repr += "</table>";
+	    } else {
+		repr = Repr(obj, Prev(prev, obj));
+	    }
             return repr;
         }
 
