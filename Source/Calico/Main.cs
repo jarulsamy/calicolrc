@@ -301,7 +301,7 @@ namespace Calico {
                             signal_thread.Start();
 			} else {
 			    Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs cargs) => {
-				cargs.Cancel = false;
+				cargs.Cancel = true;
 				if (win != null)
 				    win.RequestInterrupt(); 
 			    };
@@ -346,7 +346,7 @@ namespace Calico {
                             signal_thread.Start();
 			} else {
 			    Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs cargs) => {
-				cargs.Cancel = false;
+				cargs.Cancel = true;
 				if (win != null)
 				    win.RequestInterrupt(); 
 			    };
@@ -390,7 +390,7 @@ namespace Calico {
                             signal_thread.Start();
 		} else {
 		    Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs cargs) => {
-			cargs.Cancel = false;
+			cargs.Cancel = true;
 			Gtk.Application.Invoke( delegate { 
 				if (win != null)
 				    win.RequestQuit(); 
