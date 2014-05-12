@@ -156,6 +156,7 @@ namespace Calico {
 
             int counter = 0;
             while ((line = getline(le, prompt, indent, dumb, isatty)) != null) {
+		/*
 		if (line == "") {
 		    if (counter > 1) {
 			usage();
@@ -165,6 +166,7 @@ namespace Calico {
 		    }
 		    continue;
 		}
+		*/
                 if (line.StartsWith("%")) {
                     string[] t = line.Split();
                     if (t [0] == "%lang" || t [0] == "%%lang" || t [0] == "%%%lang") {
