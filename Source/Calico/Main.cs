@@ -300,11 +300,7 @@ namespace Calico {
                                 });
                             signal_thread.Start();
 			} else {
-			    Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs cargs) => {
-				cargs.Cancel = true;
-				if (win != null)
-				    win.RequestInterrupt(); 
-			    };
+			    StartWindowsInterruptPoller(win);
 			}
 			///-----------------------
 			string ipython_base = GetIPythonPath();
@@ -345,11 +341,7 @@ namespace Calico {
                                 });
                             signal_thread.Start();
 			} else {
-			    Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs cargs) => {
-				cargs.Cancel = true;
-				if (win != null)
-				    win.RequestInterrupt(); 
-			    };
+			    StartWindowsInterruptPoller(win);
 			}
 			///-----------------------
 			string ipython_base = GetIPythonPath();
@@ -389,13 +381,7 @@ namespace Calico {
 			    //signal_thread.IsBackground = true;
                             signal_thread.Start();
 		} else {
-		    Console.CancelKeyPress += (object sender, ConsoleCancelEventArgs cargs) => {
-			cargs.Cancel = true;
-			Gtk.Application.Invoke( delegate { 
-				if (win != null)
-				    win.RequestQuit(); 
-			    });
-		    };
+		    StartWindowsInterruptPoller(win);
 		}
                 // Ok, we are going to run this thing!
                 // If Gui, let's go:
@@ -405,6 +391,26 @@ namespace Calico {
                 Application.Run();
             }
         }
+
+	public static void StartWindowsInterruptPoller(MainWindow win) {
+	    string ipy_interrupt_event = Environment.GetEnvironmentVariable("IPY_INTERRUPT_EVENT");
+	    if (ipy_interrupt_event != null) {
+		// start loop thread:
+		var interrupt_thread = new System.Threading.Thread (delegate () {
+			while (true) {
+			    var waits = new WaitHandle[1];
+			    var wait_handle = new System.Threading.EventWaitHandle(false, EventResetMode.AutoReset);
+			    var ipy_interrupt_event_intptr = new IntPtr(Int32.Parse(ipy_interrupt_event));
+			    wait_handle.Handle = ipy_interrupt_event_intptr;
+			    waits[0] = wait_handle; 
+			    WaitHandle.WaitAny(waits);
+			    if (win != null)
+				win.RequestInterrupt(); 
+			}
+		    });
+		interrupt_thread.Start();
+	    }
+	}
 
         public static void Print(string message, params object[] args) {
             Console.WriteLine(String.Format(message, args));
