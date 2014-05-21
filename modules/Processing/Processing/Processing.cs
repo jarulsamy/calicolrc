@@ -353,7 +353,7 @@
 		_keyPressed = false;
 		_key = ""; //(Gdk.Key)0;
 		_immediateMode = true;
-		_millis = DateTime.Now.Ticks * 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
+		_millis = DateTime.Now.Ticks / 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
 
 		frameRate(30);
 	}
@@ -417,7 +417,7 @@
 		_keyPressed = false;
 		_key = ""; //(Gdk.Key)0;
 		_immediateMode = true;
-		_millis = DateTime.Now.Ticks * 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
+		_millis = DateTime.Now.Ticks / 10000;	// Current number of milliseconds since 12:00:00 midnight, January 1, 0001
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -1231,7 +1231,7 @@
 	public static long millis()
 	{	// Gets the number of milliseconds the window has existed, if there is one
 		if (_p == null) return 0;
-		return (DateTime.Now.Ticks * 10000 - _millis);
+		return (DateTime.Now.Ticks / 10000 - _millis);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
