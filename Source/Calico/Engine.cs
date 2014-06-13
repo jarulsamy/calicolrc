@@ -75,6 +75,7 @@ namespace Calico {
         }
 
         public virtual void PostSetup(MainWindow calico) {
+	    this.calico = calico;
         }
 
         public virtual void SetTraceOn(MainWindow calico) {
@@ -203,6 +204,7 @@ namespace Calico {
         }
 
         public override void PostSetup(MainWindow calico) {
+	    base.PostSetup(calico);
             if (engine == null) {
                 PrintLine("Please restart Calico to use this language.");
                 return;
