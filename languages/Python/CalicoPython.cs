@@ -54,14 +54,6 @@ namespace CalicoPython
 				engine = scriptRuntime.GetEngine (dlr_name);  
 			}
 			scope = IronPython.Hosting.Python.CreateModule(engine, "__main__");
-			// Set the compiler options here:
-			compiler_options = engine.GetCompilerOptions ();
-			IronPython.Compiler.PythonCompilerOptions options = (IronPython.Compiler.PythonCompilerOptions)compiler_options;
-			options.PrintFunction = true;
-			options.AllowWithStatement = true;
-			options.TrueDivision = true;
-			options.ModuleName = "__main__";
-			options.Module |= IronPython.Runtime.ModuleOptions.Initialize;
 
 			// FIXME: before a executefile, __name__ is "__builtin__";
 			//        after it is "<module>"
@@ -81,9 +73,15 @@ namespace CalicoPython
 					  Microsoft.Scripting.Hosting.ScriptSource source, 
 					  Microsoft.Scripting.CompilerOptions compiler_options) {
 		    IronPython.Compiler.PythonCompilerOptions options = (IronPython.Compiler.PythonCompilerOptions)compiler_options;
-		    options.PrintFunction = true;
-		    options.AllowWithStatement = true;
-		    options.TrueDivision = true;
+		    if (calico != null && (bool)calico.config.GetValue("python-language", "python2-mode")) {
+			options.PrintFunction = false;
+			options.AllowWithStatement = false;
+			options.TrueDivision = false;
+		    } else {
+			options.PrintFunction = true;
+			options.AllowWithStatement = true;
+			options.TrueDivision = true;
+		    }
 		    return source.Compile(options);
 		}
 
@@ -160,6 +158,11 @@ namespace CalicoPython
 		
 		public override void PostSetup(MainWindow calico) {
 		    base.PostSetup(calico);
+		    // Set the compiler options here:
+		    compiler_options = engine.GetCompilerOptions ();
+		    IronPython.Compiler.PythonCompilerOptions options = (IronPython.Compiler.PythonCompilerOptions)compiler_options;
+		    options.ModuleName = "__main__";
+		    options.Module |= IronPython.Runtime.ModuleOptions.Initialize;
 		    // Set up input and recursion limit
 		    if (Calico.MainWindow.gui_thread_id != -1) {
 			Execute(
@@ -219,6 +222,25 @@ namespace CalicoPython
 			return new CalicoPythonLanguage ();
 		}
 
+		public override void InitializeConfig() {
+		    base.InitializeConfig();
+		    local_config.SetValue("python-language", "python2-mode", "bool", false);
+		}
+
+		public override void SetAdditionalOptionsMenu(Gtk.Menu submenu) {
+		    // Put language specific stuff in overloaded version
+		    bool python2_mode = (bool)config.GetValue("python-language", "python2-mode");
+		    Gtk.CheckMenuItem python2_mode_menu_item = new Gtk.CheckMenuItem(_("Python2 Mode"));
+		    python2_mode_menu_item.Active = python2_mode;
+		    python2_mode_menu_item.Activated += OnChangePython2Mode;
+		    submenu.Add(python2_mode_menu_item);
+		}
+
+		public void OnChangePython2Mode (object sender, EventArgs e)
+		{
+		    config.SetValue("python-language", "python2-mode", ((Gtk.CheckMenuItem)sender).Active);
+		}
+     
 		public override string GetUseLibraryString(string fullname) {
 			string bname = System.IO.Path.GetFileNameWithoutExtension (fullname);
 			return String.Format ("import {0}\n", bname);

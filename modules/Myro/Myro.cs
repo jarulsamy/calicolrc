@@ -2933,7 +2933,7 @@ public static class Myro
 	    Graphics.Color pickAColorResponse = null;
 	    InvokeBlocking (delegate {
 		    Gtk.ColorSelectionDialog fc = new Gtk.ColorSelectionDialog ("Select a color");
-		    if (fc.Run() == (int)Gtk.ResponseType.Accept) {
+		    if (fc.Run() == (int)Gtk.ResponseType.Ok) {
 			pickAColorResponse = new Graphics.Color (
   			   (int)Math.Round (((double)((int)fc.ColorSelection.CurrentColor.Red)) / Math.Pow (2, 16) * 255.0),
 			   (int)Math.Round (((double)((int)fc.ColorSelection.CurrentColor.Green)) / Math.Pow (2, 16) * 255.0),
@@ -2950,7 +2950,7 @@ public static class Myro
 	    string pickAFontResponse = null;
 	    InvokeBlocking (delegate {
 		    Gtk.FontSelectionDialog fc = new Gtk.FontSelectionDialog ("Select a font");
-		    if (fc.Run() == (int)Gtk.ResponseType.Accept) {
+		    if (fc.Run() == (int)Gtk.ResponseType.Ok) {
 			pickAFontResponse = fc.FontName;
 		    }
 		    fc.Destroy();
