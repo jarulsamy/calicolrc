@@ -2940,9 +2940,7 @@ public class Scheme {
 	  }
       }
       public IEnumerator GetEnumerator() {
-	  // Refer to the IEnumerator documentation for an example of
-	  // implementing an enumerator.
-	  throw new Exception("The method or operation is not implemented.");
+	  return new ConsEnum(this);
       }
       
       public override string ToString() { 
@@ -2962,7 +2960,33 @@ public class Scheme {
       }
   }
     
-    public class Vector : IList {
+
+  public class ConsEnum : IEnumerator {
+      object _list = PJScheme.symbol_emptylist;
+      object _orig = PJScheme.symbol_emptylist;
+
+      public ConsEnum(Cons list) {
+	  _list = list;
+	  _orig = list;
+      }
+
+      public bool MoveNext() {
+	  _list = ((Cons)_list).cdr;
+	  return (_list != PJScheme.symbol_emptylist);
+      }
+
+      public void Reset() {
+	  _list = _orig;
+      }
+
+      object IEnumerator.Current {
+	  get {
+	      return ((Cons)_list).car;
+	  }
+      }
+  }
+
+  public class Vector : IList {
   
   private object[] values;
   
