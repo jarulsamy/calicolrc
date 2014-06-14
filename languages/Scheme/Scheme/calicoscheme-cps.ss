@@ -2642,6 +2642,11 @@
 (define-native using (lambda ignore #f))
 (define-native iterator? (lambda ignore #f))
 (define-native get_type (lambda (x) 'unknown))
+(define-native char->string (lambda (c) (string c)))
+(define-native dict (lambda (assoc) assoc))
+(define-native float (lambda (n) (exact->inexact n)))
+(define-native int (lambda (n) (inexact->exact n)))
+(define-native iter? (lambda (x) #f))
 
 (define use-lexical-address
   (lambda args
@@ -3404,12 +3409,16 @@
        (runtime-error "incorrect number of arguments to even?" info handler fail))
       (else (k2 (even? (car args)) fail)))))
 
-;; quotient
+;; // div quotient
 (define quotient-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
       ((not (length-two? args))
        (runtime-error "incorrect number of arguments to quotient" info handler fail))
+      ((not (all-numeric? args))
+       (runtime-error "quotent called on non-numeric argument(s)" info handler fail))
+      ((member 0 (cdr args))
+       (runtime-error "division by zero" info handler fail))
       (else (k2 (apply quotient args) fail)))))
 
 ;; remainder
@@ -4015,7 +4024,7 @@
        (runtime-error "division by zero" info handler fail))
       (else (k2 (apply / args) fail)))))
 
-;; modulo
+;; % and mod
 (define modulo-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
@@ -4026,6 +4035,22 @@
       ((= (cadr args) 0)
        (runtime-error "modulo by zero" info handler fail))
       (else (k2 (apply modulo args) fail)))))
+
+;; min
+(define min-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (all-numeric? args))
+       (runtime-error "% called on non-numeric argument(s)" info handler fail))
+      (else (k2 (apply min args) fail)))))
+
+;; max
+(define max-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (all-numeric? args))
+       (runtime-error "% called on non-numeric argument(s)" info handler fail))
+      (else (k2 (apply max args) fail)))))
 
 ;; <
 (define lt-prim
@@ -4873,7 +4898,12 @@
 	    (list '+ plus-prim)
 	    (list '- minus-prim)
 	    (list '/ divide-prim)
+	    (list 'div quotient-prim)
 	    (list '% modulo-prim)
+	    (list 'mod modulo-prim)
+	    (list 'modulo modulo-prim)
+	    (list '// quotient-prim)
+	    (list 'quotient quotient-prim)
 	    (list '< lt-prim)
 	    (list '<= lt-or-eq-prim)
 	    (list '= equal-sign-prim)
@@ -4947,6 +4977,8 @@
 	    (list 'list->string list->string-prim)
 	    (list 'list-ref list-ref-prim)
 	    (list 'load load-prim)
+	    (list 'min min-prim)
+	    (list 'max max-prim)
 	    (list 'make-set make-set-prim)
 	    (list 'make-vector make-vector-prim)
 	    (list 'map map-prim)
@@ -4975,7 +5007,6 @@
 	    (list 'sqrt sqrt-prim)
 	    (list 'odd? odd?-prim)
 	    (list 'even? even?-prim)
-	    (list 'quotient quotient-prim)
 	    (list 'remainder remainder-prim)
 	    (list 'string string-prim)
 	    (list 'string-length string-length-prim)

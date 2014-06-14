@@ -713,7 +713,7 @@ public class PJScheme:Scheme
                        "vector->list", "char->string", "string->list", "symbol->string", 
                        "float", "int", "globals", "apply-with-keywords", "assq", "dict", "property",
                        "reset-toplevel-env", "sort", "string-append", "string-split", "make-symbol",
-                       "type", "use-lexical-address",
+                       "type", "use-lexical-address", "min", "max",
                        "caar", "cadr", "cdar", "cddr" , 
                        "caaar", "caadr", "cadar", "caddr" , "cdaar", "cdadr", "cddar", "cdddr",
                        "caaaar", "caaadr", "caadar", "caaddr" , "cadaar", "cadadr", "caddar", "cadddr",

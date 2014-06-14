@@ -440,6 +440,8 @@ public class Scheme {
   public static Proc make_string_proc = new Proc("make-string", (Procedure1) make_string, -1, 1);
   public static Proc memq_proc = new Proc("memq", (Procedure2) memq, 2, 1);
   public static Proc modulo_proc = new Proc("%", (Procedure1) modulo, -1, 1);
+  public static Proc min_proc = new Proc("min", (Procedure1) min, -1, 1);
+  public static Proc max_proc = new Proc("max", (Procedure1) max, -1, 1);
   public static Proc null_q_proc = new Proc("null?", (Procedure1Bool) null_q, 1, 2);
   public static Proc number_q_proc = new Proc("number?", (Procedure1Bool) number_q, 1, 2);
   public static Proc pair_q_proc = new Proc("pair?", (Procedure1Bool) pair_q, 1, 2);
@@ -1988,6 +1990,30 @@ public class Scheme {
 	return retval;
   }
 
+    public static object min(object obj) {
+	object retval = car(obj);
+	object current = cdr(obj);
+	while (!Eq(current, PJScheme.symbol_emptylist)) {
+	    object current_value = car(current);
+	    if (LessThan(current_value, retval))
+		retval = current_value;
+	    current = cdr(current);
+	}
+	return retval;
+    }
+
+    public static object max(object obj) {
+	object retval = car(obj);
+	object current = cdr(obj);
+	while (!Eq(current, PJScheme.symbol_emptylist)) {
+	    object current_value = car(current);
+	    if (GreaterThan(current_value, retval))
+		retval = current_value;
+	    current = cdr(current);
+	}
+	return retval;
+    }
+
     public static object modulo(object obj) {
 	object obj1 = car(obj);
 	object obj2 = cadr(obj);
@@ -2940,9 +2966,7 @@ public class Scheme {
 	  }
       }
       public IEnumerator GetEnumerator() {
-	  // Refer to the IEnumerator documentation for an example of
-	  // implementing an enumerator.
-	  throw new Exception("The method or operation is not implemented.");
+	  return new ConsEnum(this);
       }
       
       public override string ToString() { 
@@ -2962,7 +2986,33 @@ public class Scheme {
       }
   }
     
-    public class Vector : IList {
+
+  public class ConsEnum : IEnumerator {
+      object _list = PJScheme.symbol_emptylist;
+      object _orig = PJScheme.symbol_emptylist;
+
+      public ConsEnum(Cons list) {
+	  _list = list;
+	  _orig = list;
+      }
+
+      public bool MoveNext() {
+	  _list = ((Cons)_list).cdr;
+	  return (_list != PJScheme.symbol_emptylist);
+      }
+
+      public void Reset() {
+	  _list = _orig;
+      }
+
+      object IEnumerator.Current {
+	  get {
+	      return ((Cons)_list).car;
+	  }
+      }
+  }
+
+  public class Vector : IList {
   
   private object[] values;
   

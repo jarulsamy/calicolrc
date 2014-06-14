@@ -24,15 +24,24 @@
 
 (verify 'quasiquote `(list ,(+ 1 2) 4) equal? '(list 3 4))
 (verify '% (% 10 3) equal? 1)
+(verify 'mod (% 10 3) equal? 1)
+(verify 'modulo (% 10 3) equal? 1)
 (verify '* (* 2 3) equal? 6)
 (verify '+ (+ 7 8) equal? 15)
 (verify '- (- 5 2) equal? 3)
 (verify '/ (/ 3 4) equal? 3/4)
+(verify '/ (/ 4 3) equal? 4/3)
+(verify '// (// 3 4) equal? 0)
+(verify '// (// 4 3) equal? 1)
 (verify '< (< 5 2) equal? #f)
 (verify '<= (<= 5 6) equal? #t)
 (verify '= (= 6 7) equal? #f)
 (verify '> (> 9 2) equal? #t)
 (verify '>= (>= 4 5) equal? #f)
+
+(verify 'min (min 0 -7 4 10 7) = -7)
+(verify 'max (max 0 -7 4 10 7) = 10)
+
 ;;(abort) ;; aborts all processing and returns to the top level, optionally with a value
 (verify 'abs (abs -1) equal? 1)
 (verify 'and (and 4 1 2 #t '() 0) equal? 0)
@@ -118,7 +127,7 @@
 (verify 'for-each (for-each (lambda (n) (+ n 1)) '(1 2 3)) equal? (void))
 (verify 'format (format "~a ~s ~%" "hello" "hello") equal? "hello \"hello\" \n")
 ;;(get) ;; used with import
-(verify 'get-stack-trace (caddr (cadar (get-stack-trace))) = 69)
+(verify 'get-stack-trace (caddr (cadar (get-stack-trace))) <= 73)
 ;;(verify 'globals (globals) equal? (globals))
 ;;(import "test")
 (verify 'int (int 12.8) = 13)
@@ -429,14 +438,12 @@
 	   (catch x 'hello 77)))
     (verify2 3
       (try 3 (finally 'hi 4)))
-    (verify2 (void)
-      (define div (lambda (x y) (if (= y 0) (raise "division by zero") (/ x y)))))
     (verify2 5
       (div 10 2))
     (verify2 "division by zero"
-      (try (div 10 0) (catch e e)))
+      (try (div 10 0) (catch e (cadr e))))
     (verify2 "division by zero"
-      (try (let ((x (try (div 10 0)))) x) (catch e e)))
+      (try (let ((x (try (div 10 0)))) x) (catch e (cadr e))))
     (verify2 5
       (let ((x (try (div 10 2) (catch e -1)))) x))
     (verify2 -1
