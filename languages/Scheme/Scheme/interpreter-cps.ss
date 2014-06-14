@@ -829,7 +829,7 @@
        (runtime-error "incorrect number of arguments to even?" info handler fail))
       (else (k2 (even? (car args)) fail)))))
 
-;; quotient
+;; // div quotient
 (define quotient-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
@@ -1440,7 +1440,7 @@
        (runtime-error "division by zero" info handler fail))
       (else (k2 (apply / args) fail)))))
 
-;; modulo
+;; % and mod
 (define modulo-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
@@ -2298,7 +2298,11 @@
 	    (list '+ plus-prim)
 	    (list '- minus-prim)
 	    (list '/ divide-prim)
+	    (list 'div divide-prim)
 	    (list '% modulo-prim)
+	    (list 'mod modulo-prim)
+	    (list '// quotient-prim)
+	    (list 'quotient quotient-prim)
 	    (list '< lt-prim)
 	    (list '<= lt-or-eq-prim)
 	    (list '= equal-sign-prim)
@@ -2400,7 +2404,6 @@
 	    (list 'sqrt sqrt-prim)
 	    (list 'odd? odd?-prim)
 	    (list 'even? even?-prim)
-	    (list 'quotient quotient-prim)
 	    (list 'remainder remainder-prim)
 	    (list 'string string-prim)
 	    (list 'string-length string-length-prim)

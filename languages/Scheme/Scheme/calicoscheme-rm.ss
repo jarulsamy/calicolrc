@@ -7908,7 +7908,9 @@
       (set! primitives
         (list (list '* times-prim) (list '+ plus-prim)
          (list '- minus-prim) (list '/ divide-prim)
-         (list '% modulo-prim) (list '< lt-prim)
+         (list 'div divide-prim) (list '% modulo-prim)
+         (list 'mod modulo-prim) (list '// quotient-prim)
+         (list 'quotient quotient-prim) (list '< lt-prim)
          (list '<= lt-or-eq-prim) (list '= equal-sign-prim)
          (list '> gt-prim) (list '>= gt-or-eq-prim)
          (list 'abort abort-prim) (list 'abs abs-prim)
@@ -7969,8 +7971,8 @@
          (list 'set-cdr! set-cdr!-prim) (list 'snoc snoc-prim)
          (list 'rac rac-prim) (list 'rdc rdc-prim)
          (list 'sqrt sqrt-prim) (list 'odd? odd?-prim)
-         (list 'even? even?-prim) (list 'quotient quotient-prim)
-         (list 'remainder remainder-prim) (list 'string string-prim)
+         (list 'even? even?-prim) (list 'remainder remainder-prim)
+         (list 'string string-prim)
          (list 'string-length string-length-prim)
          (list 'string-ref string-ref-prim)
          (list 'string? string?-prim)
@@ -8386,6 +8388,16 @@
 (define-native iterator? (lambda ignore #f))
 
 (define-native get_type (lambda (x) 'unknown))
+
+(define-native char->string (lambda (c) (string c)))
+
+(define-native dict (lambda (assoc) assoc))
+
+(define-native float (lambda (n) (exact->inexact n)))
+
+(define-native int (lambda (n) (inexact->exact n)))
+
+(define-native iter? (lambda (x) #f))
 
 (define-native
   read-line
