@@ -2258,6 +2258,14 @@
            info
            handler
            fail))
+        ((not (all-numeric? args))
+         (runtime-error
+           "quotent called on non-numeric argument(s)"
+           info
+           handler
+           fail))
+        ((member 0 (cdr args))
+         (runtime-error "division by zero" info handler fail))
         (else (apply-cont2 k2 (apply quotient args) fail))))))
 
 (define+
@@ -6771,7 +6779,7 @@
   (lambda ()
     (let ((primitives (list (list '* times-prim) (list '+ plus-prim)
                        (list '- minus-prim) (list '/ divide-prim)
-                       (list 'div divide-prim) (list '% modulo-prim)
+                       (list 'div quotient-prim) (list '% modulo-prim)
                        (list 'mod modulo-prim) (list 'modulo modulo-prim)
                        (list '// quotient-prim)
                        (list 'quotient quotient-prim) (list '< lt-prim)

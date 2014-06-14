@@ -3415,6 +3415,10 @@
     (cond
       ((not (length-two? args))
        (runtime-error "incorrect number of arguments to quotient" info handler fail))
+      ((not (all-numeric? args))
+       (runtime-error "quotent called on non-numeric argument(s)" info handler fail))
+      ((member 0 (cdr args))
+       (runtime-error "division by zero" info handler fail))
       (else (k2 (apply quotient args) fail)))))
 
 ;; remainder
@@ -4878,7 +4882,7 @@
 	    (list '+ plus-prim)
 	    (list '- minus-prim)
 	    (list '/ divide-prim)
-	    (list 'div divide-prim)
+	    (list 'div quotient-prim)
 	    (list '% modulo-prim)
 	    (list 'mod modulo-prim)
 	    (list 'modulo modulo-prim)

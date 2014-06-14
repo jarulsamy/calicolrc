@@ -2415,11 +2415,19 @@
         (begin
           (set! msg_reg "incorrect number of arguments to quotient")
           (set! pc runtime-error))
-        (begin
-          (set! value2_reg fail_reg)
-          (set! value1_reg (apply quotient args_reg))
-          (set! k_reg k2_reg)
-          (set! pc apply-cont2)))))
+        (if (not (all-numeric? args_reg))
+            (begin
+              (set! msg_reg "quotent called on non-numeric argument(s)")
+              (set! pc runtime-error))
+            (if (member 0 (cdr args_reg))
+                (begin
+                  (set! msg_reg "division by zero")
+                  (set! pc runtime-error))
+                (begin
+                  (set! value2_reg fail_reg)
+                  (set! value1_reg (apply quotient args_reg))
+                  (set! k_reg k2_reg)
+                  (set! pc apply-cont2)))))))
 
 (define <proc-22>
   (lambda ()
@@ -7908,7 +7916,7 @@
       (set! primitives
         (list (list '* times-prim) (list '+ plus-prim)
          (list '- minus-prim) (list '/ divide-prim)
-         (list 'div divide-prim) (list '% modulo-prim)
+         (list 'div quotient-prim) (list '% modulo-prim)
          (list 'mod modulo-prim) (list 'modulo modulo-prim)
          (list '// quotient-prim) (list 'quotient quotient-prim)
          (list '< lt-prim) (list '<= lt-or-eq-prim)
