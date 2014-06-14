@@ -2301,6 +2301,7 @@
 	    (list 'div divide-prim)
 	    (list '% modulo-prim)
 	    (list 'mod modulo-prim)
+	    (list 'modulo modulo-prim)
 	    (list '// quotient-prim)
 	    (list 'quotient quotient-prim)
 	    (list '< lt-prim)
