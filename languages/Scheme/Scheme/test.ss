@@ -38,6 +38,10 @@
 (verify '= (= 6 7) equal? #f)
 (verify '> (> 9 2) equal? #t)
 (verify '>= (>= 4 5) equal? #f)
+
+(verify 'min (min 0 -7 4 10 7) = -7)
+(verify 'max (max 0 -7 4 10 7) = 10)
+
 ;;(abort) ;; aborts all processing and returns to the top level, optionally with a value
 (verify 'abs (abs -1) equal? 1)
 (verify 'and (and 4 1 2 #t '() 0) equal? 0)

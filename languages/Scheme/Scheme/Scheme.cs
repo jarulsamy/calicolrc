@@ -440,6 +440,8 @@ public class Scheme {
   public static Proc make_string_proc = new Proc("make-string", (Procedure1) make_string, -1, 1);
   public static Proc memq_proc = new Proc("memq", (Procedure2) memq, 2, 1);
   public static Proc modulo_proc = new Proc("%", (Procedure1) modulo, -1, 1);
+  public static Proc min_proc = new Proc("min", (Procedure1) min, -1, 1);
+  public static Proc max_proc = new Proc("max", (Procedure1) max, -1, 1);
   public static Proc null_q_proc = new Proc("null?", (Procedure1Bool) null_q, 1, 2);
   public static Proc number_q_proc = new Proc("number?", (Procedure1Bool) number_q, 1, 2);
   public static Proc pair_q_proc = new Proc("pair?", (Procedure1Bool) pair_q, 1, 2);
@@ -1987,6 +1989,30 @@ public class Scheme {
 	}
 	return retval;
   }
+
+    public static object min(object obj) {
+	object retval = car(obj);
+	object current = cdr(obj);
+	while (!Eq(current, PJScheme.symbol_emptylist)) {
+	    object current_value = car(current);
+	    if (LessThan(current_value, retval))
+		retval = current_value;
+	    current = cdr(current);
+	}
+	return retval;
+    }
+
+    public static object max(object obj) {
+	object retval = car(obj);
+	object current = cdr(obj);
+	while (!Eq(current, PJScheme.symbol_emptylist)) {
+	    object current_value = car(current);
+	    if (GreaterThan(current_value, retval))
+		retval = current_value;
+	    current = cdr(current);
+	}
+	return retval;
+    }
 
     public static object modulo(object obj) {
 	object obj1 = car(obj);

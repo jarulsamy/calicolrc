@@ -1456,6 +1456,22 @@
        (runtime-error "modulo by zero" info handler fail))
       (else (k2 (apply modulo args) fail)))))
 
+;; min
+(define min-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (all-numeric? args))
+       (runtime-error "% called on non-numeric argument(s)" info handler fail))
+      (else (k2 (apply min args) fail)))))
+
+;; max
+(define max-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (cond
+      ((not (all-numeric? args))
+       (runtime-error "% called on non-numeric argument(s)" info handler fail))
+      (else (k2 (apply max args) fail)))))
+
 ;; <
 (define lt-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -2381,6 +2397,8 @@
 	    (list 'list->string list->string-prim)
 	    (list 'list-ref list-ref-prim)
 	    (list 'load load-prim)
+	    (list 'min min-prim)
+	    (list 'max max-prim)
 	    (list 'make-set make-set-prim)
 	    (list 'make-vector make-vector-prim)
 	    (list 'map map-prim)

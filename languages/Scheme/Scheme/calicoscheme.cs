@@ -357,6 +357,8 @@ public class PJScheme:Scheme
     public static object symbol_list_to_string = make_symbol("list->string");
     public static object symbol_list_ref = make_symbol("list-ref");
     public static object symbol_load = make_symbol("load");
+    public static object symbol_min = make_symbol("min");
+    public static object symbol_max = make_symbol("max");
     public static object symbol_make_set = make_symbol("make-set");
     public static object symbol_make_vector = make_symbol("make-vector");
     public static object symbol_member = make_symbol("member");
@@ -3429,6 +3431,30 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_84_d() {
+        if (true_q((! true_q(all_numeric_q(args_reg))))) {
+            msg_reg = "% called on non-numeric argument(s)";
+            pc = runtime_error;
+        } else {
+            value2_reg = fail_reg;
+            value1_reg = apply(min_proc, args_reg);
+            k_reg = k2_reg;
+            pc = apply_cont2;
+        }
+    }
+    
+    public static void b_proc_85_d() {
+        if (true_q((! true_q(all_numeric_q(args_reg))))) {
+            msg_reg = "% called on non-numeric argument(s)";
+            pc = runtime_error;
+        } else {
+            value2_reg = fail_reg;
+            value1_reg = apply(max_proc, args_reg);
+            k_reg = k2_reg;
+            pc = apply_cont2;
+        }
+    }
+    
+    public static void b_proc_86_d() {
         if (true_q((! true_q(length_at_least_q(2, args_reg))))) {
             msg_reg = "incorrect number of arguments to <";
             pc = runtime_error;
@@ -3445,7 +3471,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_85_d() {
+    public static void b_proc_87_d() {
         if (true_q((! true_q(length_at_least_q(2, args_reg))))) {
             msg_reg = "incorrect number of arguments to >";
             pc = runtime_error;
@@ -3462,7 +3488,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_86_d() {
+    public static void b_proc_88_d() {
         if (true_q((! true_q(length_at_least_q(2, args_reg))))) {
             msg_reg = "incorrect number of arguments to <=";
             pc = runtime_error;
@@ -3479,7 +3505,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_87_d() {
+    public static void b_proc_89_d() {
         if (true_q((! true_q(length_at_least_q(2, args_reg))))) {
             msg_reg = "incorrect number of arguments to >=";
             pc = runtime_error;
@@ -3496,7 +3522,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_88_d() {
+    public static void b_proc_90_d() {
         if (true_q((! true_q(length_at_least_q(2, args_reg))))) {
             msg_reg = "incorrect number of arguments to =";
             pc = runtime_error;
@@ -3513,7 +3539,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_89_d() {
+    public static void b_proc_91_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to abs";
             pc = runtime_error;
@@ -3530,7 +3556,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_90_d() {
+    public static void b_proc_92_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to equal?";
             pc = runtime_error;
@@ -3542,7 +3568,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_91_d() {
+    public static void b_proc_93_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to eq?";
             pc = runtime_error;
@@ -3554,7 +3580,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_92_d() {
+    public static void b_proc_94_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to memq";
             pc = runtime_error;
@@ -3566,7 +3592,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_93_d() {
+    public static void b_proc_95_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to member";
             pc = runtime_error;
@@ -3579,7 +3605,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_94_d() {
+    public static void b_proc_96_d() {
         if (true_q((true_q(null_q(args_reg)) || true_q(length_at_least_q(4, args_reg))))) {
             msg_reg = "incorrect number of arguments to range";
             pc = runtime_error;
@@ -3596,28 +3622,28 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_95_d() {
+    public static void b_proc_97_d() {
         value2_reg = fail_reg;
         value1_reg = apply(snoc_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_96_d() {
+    public static void b_proc_98_d() {
         value2_reg = fail_reg;
         value1_reg = apply(rac_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_97_d() {
+    public static void b_proc_99_d() {
         value2_reg = fail_reg;
         value1_reg = apply(rdc_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_98_d() {
+    public static void b_proc_100_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to set-car!";
             pc = runtime_error;
@@ -3634,7 +3660,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_99_d() {
+    public static void b_proc_101_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to set-cdr!";
             pc = runtime_error;
@@ -3651,7 +3677,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_100_d() {
+    public static void b_proc_102_d() {
         object filename = symbol_undefined;
         filename = car(args_reg);
         if (true_q(null_q(cdr(args_reg)))) {
@@ -3669,27 +3695,27 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_101_d() {
+    public static void b_proc_103_d() {
         value2_reg = fail_reg;
         value1_reg = car(_starstack_trace_star);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_102_d() {
+    public static void b_proc_104_d() {
         k_reg = k2_reg;
         env_reg = env2_reg;
         pc = get_primitive;
     }
     
-    public static void b_proc_103_d(object k) {
+    public static void b_proc_105_d(object k) {
         value2_reg = fail_reg;
         value1_reg = car(args_reg);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_proc_104_d() {
+    public static void b_proc_106_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to call/cc";
             pc = runtime_error;
@@ -3701,7 +3727,7 @@ public class PJScheme:Scheme
                 pc = runtime_error;
             } else {
                 object fake_k = symbol_undefined;
-                fake_k = make_proc("proc", 103, k2_reg);
+                fake_k = make_proc("proc", 105, k2_reg);
                 if (true_q(dlr_proc_q(proc))) {
                     value2_reg = fail_reg;
                     value1_reg = dlr_apply(proc, sList(fake_k));
@@ -3716,7 +3742,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_105_d() {
+    public static void b_proc_107_d() {
         if (true_q(null_q(args_reg))) {
             value2_reg = fail_reg;
             value1_reg = void_value;
@@ -3730,7 +3756,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_106_d() {
+    public static void b_proc_108_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to require";
             pc = runtime_error;
@@ -3746,14 +3772,14 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_107_d() {
+    public static void b_proc_109_d() {
         value2_reg = REP_fail;
         value1_reg = args_reg;
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_108_d() {
+    public static void b_proc_110_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to reverse";
             pc = runtime_error;
@@ -3770,12 +3796,12 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_109_d() {
+    public static void b_proc_111_d() {
         lists_reg = args_reg;
         pc = append_all;
     }
     
-    public static void b_proc_110_d() {
+    public static void b_proc_112_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to string->number";
             pc = runtime_error;
@@ -3787,7 +3813,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_111_d() {
+    public static void b_proc_113_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to string=?";
             pc = runtime_error;
@@ -3799,7 +3825,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_112_d() {
+    public static void b_proc_114_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to list->vector";
             pc = runtime_error;
@@ -3816,7 +3842,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_113_d() {
+    public static void b_proc_115_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to list->string";
             pc = runtime_error;
@@ -3838,7 +3864,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_114_d() {
+    public static void b_proc_116_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to char->string";
             pc = runtime_error;
@@ -3855,7 +3881,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_115_d() {
+    public static void b_proc_117_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to string->list";
             pc = runtime_error;
@@ -3872,7 +3898,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_116_d() {
+    public static void b_proc_118_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to string->symbol";
             pc = runtime_error;
@@ -3889,7 +3915,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_117_d() {
+    public static void b_proc_119_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to symbol->string";
             pc = runtime_error;
@@ -3906,7 +3932,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_118_d() {
+    public static void b_proc_120_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to vector->list";
             pc = runtime_error;
@@ -3923,19 +3949,19 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_119_d() {
+    public static void b_proc_121_d() {
         lst_reg = directory(args_reg, env2_reg);
         pc = make_set;
     }
     
-    public static void b_proc_120_d() {
+    public static void b_proc_122_d() {
         value2_reg = fail_reg;
         value1_reg = get_current_time();
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_121_d() {
+    public static void b_proc_123_d() {
         k_reg = k2_reg;
         env_reg = env2_reg;
         proc_reg = car(args_reg);
@@ -3943,7 +3969,7 @@ public class PJScheme:Scheme
         pc = map_primitive;
     }
     
-    public static void b_proc_122_d() {
+    public static void b_proc_124_d() {
         k_reg = k2_reg;
         env_reg = env2_reg;
         lists_reg = cdr(args_reg);
@@ -3951,7 +3977,7 @@ public class PJScheme:Scheme
         pc = for_each_primitive;
     }
     
-    public static void b_proc_123_d() {
+    public static void b_proc_125_d() {
         if (true_q(LessThan(length(args_reg), 1))) {
             msg_reg = "incorrect number of arguments to format";
             pc = runtime_error;
@@ -3963,21 +3989,21 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_124_d() {
+    public static void b_proc_126_d() {
         value2_reg = fail_reg;
         value1_reg = env2_reg;
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_125_d() {
+    public static void b_proc_127_d() {
         value2_reg = fail_reg;
         value1_reg = using_native(args_reg, env2_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_126_d() {
+    public static void b_proc_128_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to not";
             pc = runtime_error;
@@ -3989,23 +4015,8 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_127_d() {
-        apply(printf_proc, args_reg);
-        value2_reg = fail_reg;
-        value1_reg = void_value;
-        k_reg = k2_reg;
-        pc = apply_cont2;
-    }
-    
-    public static void b_proc_128_d() {
-        value2_reg = fail_reg;
-        value1_reg = apply(vector_native_proc, args_reg);
-        k_reg = k2_reg;
-        pc = apply_cont2;
-    }
-    
     public static void b_proc_129_d() {
-        vector_set_b(car(args_reg), cadr(args_reg), caddr(args_reg));
+        apply(printf_proc, args_reg);
         value2_reg = fail_reg;
         value1_reg = void_value;
         k_reg = k2_reg;
@@ -4014,19 +4025,34 @@ public class PJScheme:Scheme
     
     public static void b_proc_130_d() {
         value2_reg = fail_reg;
-        value1_reg = apply(vector_ref_proc, args_reg);
+        value1_reg = apply(vector_native_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
     public static void b_proc_131_d() {
+        vector_set_b(car(args_reg), cadr(args_reg), caddr(args_reg));
+        value2_reg = fail_reg;
+        value1_reg = void_value;
+        k_reg = k2_reg;
+        pc = apply_cont2;
+    }
+    
+    public static void b_proc_132_d() {
+        value2_reg = fail_reg;
+        value1_reg = apply(vector_ref_proc, args_reg);
+        k_reg = k2_reg;
+        pc = apply_cont2;
+    }
+    
+    public static void b_proc_133_d() {
         value2_reg = fail_reg;
         value1_reg = apply(make_vector_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_132_d() {
+    public static void b_proc_134_d() {
         if (true_q((! true_q(length_at_least_q(1, args_reg))))) {
             msg_reg = "incorrect number of arguments to 'error' (should at least 1)";
             pc = runtime_error;
@@ -4040,7 +4066,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_133_d() {
+    public static void b_proc_135_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to list-ref";
             pc = runtime_error;
@@ -4052,7 +4078,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_134_d() {
+    public static void b_proc_136_d() {
         if (true_q(null_q(args_reg))) {
             value2_reg = fail_reg;
             value1_reg = current_directory();
@@ -4076,7 +4102,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_135_d() {
+    public static void b_proc_137_d() {
         if (true_q((true_q(length_one_q(args_reg)) && true_q(number_q(car(args_reg)))))) {
             value2_reg = fail_reg;
             value1_reg = round(car(args_reg));
@@ -4088,7 +4114,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_136_d() {
+    public static void b_proc_138_d() {
         if (true_q((true_q(length_one_q(args_reg)) && true_q(boolean_q(car(args_reg)))))) {
             set_use_stack_trace_b(car(args_reg));
             value2_reg = fail_reg;
@@ -4108,7 +4134,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_137_d() {
+    public static void b_proc_139_d() {
         if (true_q((true_q(length_one_q(args_reg)) && true_q(boolean_q(car(args_reg)))))) {
             _startracing_on_q_star = true_q(car(args_reg));
             value2_reg = fail_reg;
@@ -4128,7 +4154,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_138_d() {
+    public static void b_proc_140_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to eqv?";
             pc = runtime_error;
@@ -4140,7 +4166,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_139_d() {
+    public static void b_proc_141_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to vector?";
             pc = runtime_error;
@@ -4152,7 +4178,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_140_d() {
+    public static void b_proc_142_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to atom?";
             pc = runtime_error;
@@ -4164,7 +4190,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_141_d() {
+    public static void b_proc_143_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to iter?";
             pc = runtime_error;
@@ -4176,7 +4202,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_142_d() {
+    public static void b_proc_144_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to list?";
             pc = runtime_error;
@@ -4188,7 +4214,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_143_d() {
+    public static void b_proc_145_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to procedure?";
             pc = runtime_error;
@@ -4200,7 +4226,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_144_d() {
+    public static void b_proc_146_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to string<?";
             pc = runtime_error;
@@ -4212,7 +4238,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_145_d() {
+    public static void b_proc_147_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to float";
             pc = runtime_error;
@@ -4224,7 +4250,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_146_d() {
+    public static void b_proc_148_d() {
         if (true_q((! true_q(null_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to globals";
             pc = runtime_error;
@@ -4236,7 +4262,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_147_d() {
+    public static void b_proc_149_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to int";
             pc = runtime_error;
@@ -4248,7 +4274,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_148_d() {
+    public static void b_proc_150_d() {
         if (true_q((! true_q(length_at_least_q(1, args_reg))))) {
             msg_reg = "incorrect number of arguments to apply-with-keywords";
             pc = runtime_error;
@@ -4260,7 +4286,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_149_d() {
+    public static void b_proc_151_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to assq";
             pc = runtime_error;
@@ -4272,14 +4298,14 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_150_d() {
+    public static void b_proc_152_d() {
         value2_reg = fail_reg;
         value1_reg = apply(dict_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_151_d() {
+    public static void b_proc_153_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to property";
             pc = runtime_error;
@@ -4291,7 +4317,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_152_d() {
+    public static void b_proc_154_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to rational";
             pc = runtime_error;
@@ -4303,7 +4329,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_153_d() {
+    public static void b_proc_155_d() {
         if (true_q((! true_q(null_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to reset-toplevel-env";
             pc = runtime_error;
@@ -4315,7 +4341,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_154_d() {
+    public static void b_proc_156_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to sort";
             pc = runtime_error;
@@ -4327,7 +4353,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_155_d() {
+    public static void b_proc_157_d() {
         if (true_q((! true_q(length_at_least_q(2, args_reg))))) {
             msg_reg = "incorrect number of arguments to string-append";
             pc = runtime_error;
@@ -4339,7 +4365,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_156_d() {
+    public static void b_proc_158_d() {
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to string-split";
             pc = runtime_error;
@@ -4351,7 +4377,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_157_d() {
+    public static void b_proc_159_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to symbol";
             pc = runtime_error;
@@ -4363,7 +4389,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_158_d() {
+    public static void b_proc_160_d() {
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to typeof";
             pc = runtime_error;
@@ -4375,14 +4401,14 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_proc_159_d() {
+    public static void b_proc_161_d() {
         value2_reg = fail_reg;
         value1_reg = apply(use_lexical_address_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
-    public static void b_proc_160_d(object external_function_object) {
+    public static void b_proc_162_d(object external_function_object) {
         value2_reg = fail_reg;
         value1_reg = dlr_apply(external_function_object, args_reg);
         k_reg = k2_reg;
@@ -7913,12 +7939,12 @@ public class PJScheme:Scheme
     
     public static object make_toplevel_env() {
         object primitives = symbol_undefined;
-        primitives = sList(sList(symbol_Multiply, times_prim), sList(symbol_Add, plus_prim), sList(symbol_Subtract, minus_prim), sList(symbol_Divide, divide_prim), sList(symbol_div, quotient_prim), sList(symbol_p, modulo_prim), sList(symbol_mod, modulo_prim), sList(symbol_modulo, modulo_prim), sList(symbol___, quotient_prim), sList(symbol_quotient, quotient_prim), sList(symbol_LessThan, lt_prim), sList(symbol_LessThanEqual, lt_or_eq_prim), sList(symbol_Equal, equal_sign_prim), sList(symbol_GreaterThan, gt_prim), sList(symbol_GreaterThanEqual, gt_or_eq_prim), sList(symbol_abort, abort_prim), sList(symbol_abs, abs_prim), sList(symbol_append, append_prim), sList(symbol_apply, apply_prim), sList(symbol_assv, assv_prim), sList(symbol_boolean_q, boolean_q_prim), sList(symbol_caddr, caddr_prim), sList(symbol_cadr, cadr_prim), sList(symbol_call_with_current_continuation, call_cc_prim), sList(symbol_call_cc, call_cc_prim), sList(symbol_car, car_prim), sList(symbol_cdr, cdr_prim), sList(symbol_caaaar, caaaar_prim), sList(symbol_caaadr, caaadr_prim), sList(symbol_caaar, caaar_prim), sList(symbol_caadar, caadar_prim), sList(symbol_caaddr, caaddr_prim), sList(symbol_caadr, caadr_prim), sList(symbol_caar, caar_prim), sList(symbol_cadaar, cadaar_prim), sList(symbol_cadadr, cadadr_prim), sList(symbol_cadar, cadar_prim), sList(symbol_caddar, caddar_prim), sList(symbol_cadddr, cadddr_prim), sList(symbol_cdaaar, cdaaar_prim), sList(symbol_cdaadr, cdaadr_prim), sList(symbol_cdaar, cdaar_prim), sList(symbol_cdadar, cdadar_prim), sList(symbol_cdaddr, cdaddr_prim), sList(symbol_cdadr, cdadr_prim), sList(symbol_cdar, cdar_prim), sList(symbol_cddaar, cddaar_prim), sList(symbol_cddadr, cddadr_prim), sList(symbol_cddar, cddar_prim), sList(symbol_cdddar, cdddar_prim), sList(symbol_cddddr, cddddr_prim), sList(symbol_cdddr, cdddr_prim), sList(symbol_cddr, cddr_prim), sList(symbol_char_q, char_q_prim), sList(symbol_char_is__q, char_is__q_prim), sList(symbol_char_whitespace_q, char_whitespace_q_prim), sList(symbol_char_alphabetic_q, char_alphabetic_q_prim), sList(symbol_char_numeric_q, char_numeric_q_prim), sList(symbol_char_to_integer, char_to_integer_prim), sList(symbol_cons, cons_prim), sList(symbol_current_time, current_time_prim), sList(symbol_cut, cut_prim), sList(symbol_dir, dir_prim), sList(symbol_display, display_prim), sList(symbol_current_environment, current_environment_prim), sList(symbol_eq_q, eq_q_prim), sList(symbol_equal_q, equal_q_prim), sList(symbol_error, error_prim), sList(symbol_eval, eval_prim), sList(symbol_eval_ast, eval_ast_prim), sList(symbol_exit, exit_prim), sList(symbol_for_each, for_each_prim), sList(symbol_format, format_prim), sList(symbol_get, get_prim), sList(symbol_get_stack_trace, get_stack_trace_prim), sList(symbol_import, import_prim), sList(symbol_integer_to_char, integer_to_char_prim), sList(symbol_length, length_prim), sList(symbol_sList, list_prim), sList(symbol_list_to_vector, list_to_vector_prim), sList(symbol_list_to_string, list_to_string_prim), sList(symbol_list_ref, list_ref_prim), sList(symbol_load, load_prim), sList(symbol_make_set, make_set_prim), sList(symbol_make_vector, make_vector_prim), sList(symbol_map, map_prim), sList(symbol_member, member_prim), sList(symbol_memq, memq_prim), sList(symbol_memv, memv_prim), sList(symbol_newline, newline_prim), sList(symbol_not, not_prim), sList(symbol_null_q, null_q_prim), sList(symbol_number_to_string, number_to_string_prim), sList(symbol_number_q, number_q_prim), sList(symbol_pair_q, pair_q_prim), sList(symbol_parse, parse_prim), sList(symbol_parse_string, parse_string_prim), sList(symbol_print, print_prim), sList(symbol_printf, printf_prim), sList(symbol_Range, range_prim), sList(symbol_read_string, read_string_prim), sList(symbol_require, require_prim), sList(symbol_reverse, reverse_prim), sList(symbol_set_car_b, set_car_b_prim), sList(symbol_set_cdr_b, set_cdr_b_prim), sList(symbol_snoc, snoc_prim), sList(symbol_rac, rac_prim), sList(symbol_rdc, rdc_prim), sList(symbol_sqrt, sqrt_prim), sList(symbol_odd_q, odd_q_prim), sList(symbol_even_q, even_q_prim), sList(symbol_remainder, remainder_prim), sList(symbol_make_string, string_prim), sList(symbol_string_length, string_length_prim), sList(symbol_string_ref, string_ref_prim), sList(symbol_string_q, string_q_prim), sList(symbol_string_to_number, string_to_number_prim), sList(symbol_string_is__q, string_is__q_prim), sList(symbol_substring, substring_prim), sList(symbol_symbol_q, symbol_q_prim), sList(symbol_unparse, unparse_prim), sList(symbol_unparse_procedure, unparse_procedure_prim), sList(symbol_using_native, using_prim), sList(symbol_use_stack_trace, use_stack_trace_prim), sList(symbol_vector, vector_prim), sList(symbol_vector_ref, vector_ref_prim), sList(symbol_vector_set_b, vector_set_b_prim), sList(symbol_void, void_prim), sList(symbol_zero_q, zero_q_prim), sList(symbol_current_directory, current_directory_prim), sList(symbol_cd, current_directory_prim), sList(symbol_round, round_prim), sList(symbol_char_to_string, char_to_string_prim), sList(symbol_string_to_list, string_to_list_prim), sList(symbol_string_to_symbol, string_to_symbol_prim), sList(symbol_symbol_to_string, symbol_to_string_prim), sList(symbol_vector_to_list, vector_to_list_prim), sList(symbol_eqv_q, eqv_q_prim), sList(symbol_vector_q, vector_q_prim), sList(symbol_atom_q, atom_q_prim), sList(symbol_iter_q, iter_q_prim), sList(symbol_list_q, list_q_prim), sList(symbol_procedure_q, procedure_q_prim), sList(symbol_stringLessThan_q, stringLessThan_q_prim), sList(symbol_float_, float_prim), sList(symbol_globals, globals_prim), sList(symbol_int_, int_prim), sList(symbol_apply_with_keywords, apply_with_keywords_prim), sList(symbol_assq, assq_prim), sList(symbol_dict, dict_prim), sList(symbol_property, property_prim), sList(symbol_rational, rational_prim), sList(symbol_reset_toplevel_env, reset_toplevel_env_prim), sList(symbol_sort, sort_prim), sList(symbol_string_append, string_append_prim), sList(symbol_string_split, string_split_prim), sList(symbol_symbol, symbol_prim), sList(symbol_typeof, typeof_prim), sList(symbol_use_lexical_address, use_lexical_address_prim), sList(symbol_use_tracing, use_tracing_prim));
+        primitives = sList(sList(symbol_Multiply, times_prim), sList(symbol_Add, plus_prim), sList(symbol_Subtract, minus_prim), sList(symbol_Divide, divide_prim), sList(symbol_div, quotient_prim), sList(symbol_p, modulo_prim), sList(symbol_mod, modulo_prim), sList(symbol_modulo, modulo_prim), sList(symbol___, quotient_prim), sList(symbol_quotient, quotient_prim), sList(symbol_LessThan, lt_prim), sList(symbol_LessThanEqual, lt_or_eq_prim), sList(symbol_Equal, equal_sign_prim), sList(symbol_GreaterThan, gt_prim), sList(symbol_GreaterThanEqual, gt_or_eq_prim), sList(symbol_abort, abort_prim), sList(symbol_abs, abs_prim), sList(symbol_append, append_prim), sList(symbol_apply, apply_prim), sList(symbol_assv, assv_prim), sList(symbol_boolean_q, boolean_q_prim), sList(symbol_caddr, caddr_prim), sList(symbol_cadr, cadr_prim), sList(symbol_call_with_current_continuation, call_cc_prim), sList(symbol_call_cc, call_cc_prim), sList(symbol_car, car_prim), sList(symbol_cdr, cdr_prim), sList(symbol_caaaar, caaaar_prim), sList(symbol_caaadr, caaadr_prim), sList(symbol_caaar, caaar_prim), sList(symbol_caadar, caadar_prim), sList(symbol_caaddr, caaddr_prim), sList(symbol_caadr, caadr_prim), sList(symbol_caar, caar_prim), sList(symbol_cadaar, cadaar_prim), sList(symbol_cadadr, cadadr_prim), sList(symbol_cadar, cadar_prim), sList(symbol_caddar, caddar_prim), sList(symbol_cadddr, cadddr_prim), sList(symbol_cdaaar, cdaaar_prim), sList(symbol_cdaadr, cdaadr_prim), sList(symbol_cdaar, cdaar_prim), sList(symbol_cdadar, cdadar_prim), sList(symbol_cdaddr, cdaddr_prim), sList(symbol_cdadr, cdadr_prim), sList(symbol_cdar, cdar_prim), sList(symbol_cddaar, cddaar_prim), sList(symbol_cddadr, cddadr_prim), sList(symbol_cddar, cddar_prim), sList(symbol_cdddar, cdddar_prim), sList(symbol_cddddr, cddddr_prim), sList(symbol_cdddr, cdddr_prim), sList(symbol_cddr, cddr_prim), sList(symbol_char_q, char_q_prim), sList(symbol_char_is__q, char_is__q_prim), sList(symbol_char_whitespace_q, char_whitespace_q_prim), sList(symbol_char_alphabetic_q, char_alphabetic_q_prim), sList(symbol_char_numeric_q, char_numeric_q_prim), sList(symbol_char_to_integer, char_to_integer_prim), sList(symbol_cons, cons_prim), sList(symbol_current_time, current_time_prim), sList(symbol_cut, cut_prim), sList(symbol_dir, dir_prim), sList(symbol_display, display_prim), sList(symbol_current_environment, current_environment_prim), sList(symbol_eq_q, eq_q_prim), sList(symbol_equal_q, equal_q_prim), sList(symbol_error, error_prim), sList(symbol_eval, eval_prim), sList(symbol_eval_ast, eval_ast_prim), sList(symbol_exit, exit_prim), sList(symbol_for_each, for_each_prim), sList(symbol_format, format_prim), sList(symbol_get, get_prim), sList(symbol_get_stack_trace, get_stack_trace_prim), sList(symbol_import, import_prim), sList(symbol_integer_to_char, integer_to_char_prim), sList(symbol_length, length_prim), sList(symbol_sList, list_prim), sList(symbol_list_to_vector, list_to_vector_prim), sList(symbol_list_to_string, list_to_string_prim), sList(symbol_list_ref, list_ref_prim), sList(symbol_load, load_prim), sList(symbol_min, min_prim), sList(symbol_max, max_prim), sList(symbol_make_set, make_set_prim), sList(symbol_make_vector, make_vector_prim), sList(symbol_map, map_prim), sList(symbol_member, member_prim), sList(symbol_memq, memq_prim), sList(symbol_memv, memv_prim), sList(symbol_newline, newline_prim), sList(symbol_not, not_prim), sList(symbol_null_q, null_q_prim), sList(symbol_number_to_string, number_to_string_prim), sList(symbol_number_q, number_q_prim), sList(symbol_pair_q, pair_q_prim), sList(symbol_parse, parse_prim), sList(symbol_parse_string, parse_string_prim), sList(symbol_print, print_prim), sList(symbol_printf, printf_prim), sList(symbol_Range, range_prim), sList(symbol_read_string, read_string_prim), sList(symbol_require, require_prim), sList(symbol_reverse, reverse_prim), sList(symbol_set_car_b, set_car_b_prim), sList(symbol_set_cdr_b, set_cdr_b_prim), sList(symbol_snoc, snoc_prim), sList(symbol_rac, rac_prim), sList(symbol_rdc, rdc_prim), sList(symbol_sqrt, sqrt_prim), sList(symbol_odd_q, odd_q_prim), sList(symbol_even_q, even_q_prim), sList(symbol_remainder, remainder_prim), sList(symbol_make_string, string_prim), sList(symbol_string_length, string_length_prim), sList(symbol_string_ref, string_ref_prim), sList(symbol_string_q, string_q_prim), sList(symbol_string_to_number, string_to_number_prim), sList(symbol_string_is__q, string_is__q_prim), sList(symbol_substring, substring_prim), sList(symbol_symbol_q, symbol_q_prim), sList(symbol_unparse, unparse_prim), sList(symbol_unparse_procedure, unparse_procedure_prim), sList(symbol_using_native, using_prim), sList(symbol_use_stack_trace, use_stack_trace_prim), sList(symbol_vector, vector_prim), sList(symbol_vector_ref, vector_ref_prim), sList(symbol_vector_set_b, vector_set_b_prim), sList(symbol_void, void_prim), sList(symbol_zero_q, zero_q_prim), sList(symbol_current_directory, current_directory_prim), sList(symbol_cd, current_directory_prim), sList(symbol_round, round_prim), sList(symbol_char_to_string, char_to_string_prim), sList(symbol_string_to_list, string_to_list_prim), sList(symbol_string_to_symbol, string_to_symbol_prim), sList(symbol_symbol_to_string, symbol_to_string_prim), sList(symbol_vector_to_list, vector_to_list_prim), sList(symbol_eqv_q, eqv_q_prim), sList(symbol_vector_q, vector_q_prim), sList(symbol_atom_q, atom_q_prim), sList(symbol_iter_q, iter_q_prim), sList(symbol_list_q, list_q_prim), sList(symbol_procedure_q, procedure_q_prim), sList(symbol_stringLessThan_q, stringLessThan_q_prim), sList(symbol_float_, float_prim), sList(symbol_globals, globals_prim), sList(symbol_int_, int_prim), sList(symbol_apply_with_keywords, apply_with_keywords_prim), sList(symbol_assq, assq_prim), sList(symbol_dict, dict_prim), sList(symbol_property, property_prim), sList(symbol_rational, rational_prim), sList(symbol_reset_toplevel_env, reset_toplevel_env_prim), sList(symbol_sort, sort_prim), sList(symbol_string_append, string_append_prim), sList(symbol_string_split, string_split_prim), sList(symbol_symbol, symbol_prim), sList(symbol_typeof, typeof_prim), sList(symbol_use_lexical_address, use_lexical_address_prim), sList(symbol_use_tracing, use_tracing_prim));
         return make_initial_env_extended(map(car_proc, primitives), map(cadr_proc, primitives));
     }
     
     public static object make_external_proc(object external_function_object) {
-        return make_proc("proc", 160, external_function_object);
+        return make_proc("proc", 162, external_function_object);
     }
     
     public static bool pattern_q(object x) {
@@ -8209,81 +8235,83 @@ public class PJScheme:Scheme
     public static object times_prim = make_proc("proc", 81);
     public static object divide_prim = make_proc("proc", 82);
     public static object modulo_prim = make_proc("proc", 83);
-    public static object lt_prim = make_proc("proc", 84);
-    public static object gt_prim = make_proc("proc", 85);
-    public static object lt_or_eq_prim = make_proc("proc", 86);
-    public static object gt_or_eq_prim = make_proc("proc", 87);
-    public static object equal_sign_prim = make_proc("proc", 88);
-    public static object abs_prim = make_proc("proc", 89);
-    public static object equal_q_prim = make_proc("proc", 90);
-    public static object eq_q_prim = make_proc("proc", 91);
-    public static object memq_prim = make_proc("proc", 92);
-    public static object member_prim = make_proc("proc", 93);
-    public static object range_prim = make_proc("proc", 94);
-    public static object snoc_prim = make_proc("proc", 95);
-    public static object rac_prim = make_proc("proc", 96);
-    public static object rdc_prim = make_proc("proc", 97);
-    public static object set_car_b_prim = make_proc("proc", 98);
-    public static object set_cdr_b_prim = make_proc("proc", 99);
-    public static object import_prim = make_proc("proc", 100);
-    public static object get_stack_trace_prim = make_proc("proc", 101);
-    public static object get_prim = make_proc("proc", 102);
-    public static object call_cc_prim = make_proc("proc", 104);
-    public static object abort_prim = make_proc("proc", 105);
-    public static object require_prim = make_proc("proc", 106);
-    public static object cut_prim = make_proc("proc", 107);
-    public static object reverse_prim = make_proc("proc", 108);
-    public static object append_prim = make_proc("proc", 109);
-    public static object string_to_number_prim = make_proc("proc", 110);
-    public static object string_is__q_prim = make_proc("proc", 111);
-    public static object list_to_vector_prim = make_proc("proc", 112);
-    public static object list_to_string_prim = make_proc("proc", 113);
-    public static object char_to_string_prim = make_proc("proc", 114);
-    public static object string_to_list_prim = make_proc("proc", 115);
-    public static object string_to_symbol_prim = make_proc("proc", 116);
-    public static object symbol_to_string_prim = make_proc("proc", 117);
-    public static object vector_to_list_prim = make_proc("proc", 118);
-    public static object dir_prim = make_proc("proc", 119);
-    public static object current_time_prim = make_proc("proc", 120);
-    public static object map_prim = make_proc("proc", 121);
-    public static object for_each_prim = make_proc("proc", 122);
-    public static object format_prim = make_proc("proc", 123);
-    public static object current_environment_prim = make_proc("proc", 124);
-    public static object using_prim = make_proc("proc", 125);
-    public static object not_prim = make_proc("proc", 126);
-    public static object printf_prim = make_proc("proc", 127);
-    public static object vector_prim = make_proc("proc", 128);
-    public static object vector_set_b_prim = make_proc("proc", 129);
-    public static object vector_ref_prim = make_proc("proc", 130);
-    public static object make_vector_prim = make_proc("proc", 131);
-    public static object error_prim = make_proc("proc", 132);
-    public static object list_ref_prim = make_proc("proc", 133);
-    public static object current_directory_prim = make_proc("proc", 134);
-    public static object round_prim = make_proc("proc", 135);
-    public static object use_stack_trace_prim = make_proc("proc", 136);
-    public static object use_tracing_prim = make_proc("proc", 137);
-    public static object eqv_q_prim = make_proc("proc", 138);
-    public static object vector_q_prim = make_proc("proc", 139);
-    public static object atom_q_prim = make_proc("proc", 140);
-    public static object iter_q_prim = make_proc("proc", 141);
-    public static object list_q_prim = make_proc("proc", 142);
-    public static object procedure_q_prim = make_proc("proc", 143);
-    public static object stringLessThan_q_prim = make_proc("proc", 144);
-    public static object float_prim = make_proc("proc", 145);
-    public static object globals_prim = make_proc("proc", 146);
-    public static object int_prim = make_proc("proc", 147);
-    public static object apply_with_keywords_prim = make_proc("proc", 148);
-    public static object assq_prim = make_proc("proc", 149);
-    public static object dict_prim = make_proc("proc", 150);
-    public static object property_prim = make_proc("proc", 151);
-    public static object rational_prim = make_proc("proc", 152);
-    public static object reset_toplevel_env_prim = make_proc("proc", 153);
-    public static object sort_prim = make_proc("proc", 154);
-    public static object string_append_prim = make_proc("proc", 155);
-    public static object string_split_prim = make_proc("proc", 156);
-    public static object symbol_prim = make_proc("proc", 157);
-    public static object typeof_prim = make_proc("proc", 158);
-    public static object use_lexical_address_prim = make_proc("proc", 159);
+    public static object min_prim = make_proc("proc", 84);
+    public static object max_prim = make_proc("proc", 85);
+    public static object lt_prim = make_proc("proc", 86);
+    public static object gt_prim = make_proc("proc", 87);
+    public static object lt_or_eq_prim = make_proc("proc", 88);
+    public static object gt_or_eq_prim = make_proc("proc", 89);
+    public static object equal_sign_prim = make_proc("proc", 90);
+    public static object abs_prim = make_proc("proc", 91);
+    public static object equal_q_prim = make_proc("proc", 92);
+    public static object eq_q_prim = make_proc("proc", 93);
+    public static object memq_prim = make_proc("proc", 94);
+    public static object member_prim = make_proc("proc", 95);
+    public static object range_prim = make_proc("proc", 96);
+    public static object snoc_prim = make_proc("proc", 97);
+    public static object rac_prim = make_proc("proc", 98);
+    public static object rdc_prim = make_proc("proc", 99);
+    public static object set_car_b_prim = make_proc("proc", 100);
+    public static object set_cdr_b_prim = make_proc("proc", 101);
+    public static object import_prim = make_proc("proc", 102);
+    public static object get_stack_trace_prim = make_proc("proc", 103);
+    public static object get_prim = make_proc("proc", 104);
+    public static object call_cc_prim = make_proc("proc", 106);
+    public static object abort_prim = make_proc("proc", 107);
+    public static object require_prim = make_proc("proc", 108);
+    public static object cut_prim = make_proc("proc", 109);
+    public static object reverse_prim = make_proc("proc", 110);
+    public static object append_prim = make_proc("proc", 111);
+    public static object string_to_number_prim = make_proc("proc", 112);
+    public static object string_is__q_prim = make_proc("proc", 113);
+    public static object list_to_vector_prim = make_proc("proc", 114);
+    public static object list_to_string_prim = make_proc("proc", 115);
+    public static object char_to_string_prim = make_proc("proc", 116);
+    public static object string_to_list_prim = make_proc("proc", 117);
+    public static object string_to_symbol_prim = make_proc("proc", 118);
+    public static object symbol_to_string_prim = make_proc("proc", 119);
+    public static object vector_to_list_prim = make_proc("proc", 120);
+    public static object dir_prim = make_proc("proc", 121);
+    public static object current_time_prim = make_proc("proc", 122);
+    public static object map_prim = make_proc("proc", 123);
+    public static object for_each_prim = make_proc("proc", 124);
+    public static object format_prim = make_proc("proc", 125);
+    public static object current_environment_prim = make_proc("proc", 126);
+    public static object using_prim = make_proc("proc", 127);
+    public static object not_prim = make_proc("proc", 128);
+    public static object printf_prim = make_proc("proc", 129);
+    public static object vector_prim = make_proc("proc", 130);
+    public static object vector_set_b_prim = make_proc("proc", 131);
+    public static object vector_ref_prim = make_proc("proc", 132);
+    public static object make_vector_prim = make_proc("proc", 133);
+    public static object error_prim = make_proc("proc", 134);
+    public static object list_ref_prim = make_proc("proc", 135);
+    public static object current_directory_prim = make_proc("proc", 136);
+    public static object round_prim = make_proc("proc", 137);
+    public static object use_stack_trace_prim = make_proc("proc", 138);
+    public static object use_tracing_prim = make_proc("proc", 139);
+    public static object eqv_q_prim = make_proc("proc", 140);
+    public static object vector_q_prim = make_proc("proc", 141);
+    public static object atom_q_prim = make_proc("proc", 142);
+    public static object iter_q_prim = make_proc("proc", 143);
+    public static object list_q_prim = make_proc("proc", 144);
+    public static object procedure_q_prim = make_proc("proc", 145);
+    public static object stringLessThan_q_prim = make_proc("proc", 146);
+    public static object float_prim = make_proc("proc", 147);
+    public static object globals_prim = make_proc("proc", 148);
+    public static object int_prim = make_proc("proc", 149);
+    public static object apply_with_keywords_prim = make_proc("proc", 150);
+    public static object assq_prim = make_proc("proc", 151);
+    public static object dict_prim = make_proc("proc", 152);
+    public static object property_prim = make_proc("proc", 153);
+    public static object rational_prim = make_proc("proc", 154);
+    public static object reset_toplevel_env_prim = make_proc("proc", 155);
+    public static object sort_prim = make_proc("proc", 156);
+    public static object string_append_prim = make_proc("proc", 157);
+    public static object string_split_prim = make_proc("proc", 158);
+    public static object symbol_prim = make_proc("proc", 159);
+    public static object typeof_prim = make_proc("proc", 160);
+    public static object use_lexical_address_prim = make_proc("proc", 161);
     public static object toplevel_env = symbol_undefined;
     public static MethodInfo[] mi_cont4;
     public static MethodInfo[] mi_handler;
@@ -8304,7 +8332,7 @@ public class PJScheme:Scheme
         mi_cont2 = new MethodInfo[100];
         mi_fail = new MethodInfo[6];
         mi_macro = new MethodInfo[12];
-        mi_proc = new MethodInfo[161];
+        mi_proc = new MethodInfo[163];
         
         for (int i = 1; i < 14; i++) {
             mi_cont4[i] = typeof(PJScheme).GetMethod(String.Format("b_cont4_{0}_d", i));
@@ -8362,7 +8390,7 @@ public class PJScheme:Scheme
             }
         }
         
-        for (int i = 1; i < 161; i++) {
+        for (int i = 1; i < 163; i++) {
             mi_proc[i] = typeof(PJScheme).GetMethod(String.Format("b_proc_{0}_d", i));
             if (mi_proc[i] == null) {
                 throw new Exception(String.Format("Undefined mi: mi_proc[{0}]", i));
