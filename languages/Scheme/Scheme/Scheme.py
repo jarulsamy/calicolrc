@@ -736,14 +736,27 @@ def trampoline():
 def box(item):
     return List(item)
 
+def ready_to_eval(text):
+    lines = text.split()
+    if lines[-1].strip() == "":
+      return True ## force it
+    ## else, only if valid parse
+    return try_parse(text)
+
 # native:
-def read_line(prompt):
-    try:
-        return raw_input(prompt) ## Python 2
-    except EOFError:
-        return "(exit)"
-    except:
-        return ""
+def read_multiline(prompt):
+    retval = ""
+    while True:
+        try:
+            retval += raw_input(prompt) ## Python 2
+            prompt = "... "
+        except EOFError:
+            return "(exit)"
+        except:
+            return ""
+        if ready_to_eval(retval):
+            return retval
+        retval += " "
 
 def format(formatting, *lyst):
     args = list_to_vector(lyst)

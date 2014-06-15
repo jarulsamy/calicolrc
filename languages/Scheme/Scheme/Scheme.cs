@@ -3469,7 +3469,7 @@ public class Scheme {
         PJScheme._staruse_stack_trace_star = value;
     }
 
-    public static string read_line(object prompt) {
+    public static string read_multiline(object prompt) {
 	Console.Write(prompt.ToString());
 	string retval = Console.ReadLine();
 	if (retval == null)
