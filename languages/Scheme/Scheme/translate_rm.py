@@ -28,7 +28,7 @@ class Translator(object):
         # or move to overrides
         return [
             "void-value", "restart-rm", "trampoline",
-            "read-content", "read-line-test",
+            "read-content", "read-multiline-test",
             "string->integer", "string->decimal", "string->rational", 
             "string-split", 
             "get-current-time", "type?", 
@@ -443,6 +443,7 @@ class PythonTranslator(Translator):
         self.Print(4, "print('----------------------------')")
         self.Print(4, "print('Use (exit) to exit')")
         self.Print(4, "start_rm()")
+        self.Print(4, "print()")
         self.Print(0, "else:")
         self.Print(4, "initialize_globals()")
 

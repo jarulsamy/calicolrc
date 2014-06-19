@@ -6953,7 +6953,7 @@ public class PJScheme:Scheme
     
     public static object read_eval_print_loop_rm() {
         object input_ = symbol_undefined;
-        input_ = read_line("==> ");
+        input_ = read_multiline("==> ");
         object result = symbol_undefined;
         result = execute_rm(input_, symbol_stdin);
         while (true_q((! true_q(end_of_session_q(result))))) {
@@ -6967,7 +6967,7 @@ public class PJScheme:Scheme
                     safe_print(result);
                 }
             }
-            input_ = read_line("==> ");
+            input_ = read_multiline("==> ");
             result = execute_rm(input_, symbol_stdin);
         }
         return symbol_goodbye;

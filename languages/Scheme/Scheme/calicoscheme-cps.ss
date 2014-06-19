@@ -2656,21 +2656,21 @@
       (begin (set! *use-lexical-address* (true? (car args)))
 	     void-value)))))
 
-(define-native read-line
+(define-native read-multiline
   (lambda (prompt)
     (printf prompt)
     (format "~s" (read))))
 
-;; because read-line uses (read), it can only read a single sexp at a
+;; because read-multiline uses (read), it can only read a single sexp at a
 ;; time. it always returns a string version of its input. if the input
 ;; is the list (+ 2 3), the string "(+ 2 3)" is returned; if the input
 ;; is the string "apple", the string "\"apple\"" is returned; etc.
 ;;
-;; read-line-test is only for testing the evaluation of multiple sexps
+;; read-multiline-test is only for testing the evaluation of multiple sexps
 ;; at once.  the user must type the input as a string enclosed by
 ;; double quotes.
 
-(define read-line-test ;; redefine this to read-line to test
+(define read-multiline-test ;; redefine this to read-multiline to test
   (lambda (prompt)
     (printf prompt)
     (let loop ((input (read)))
@@ -2697,7 +2697,7 @@
 
 (define read-eval-print-loop
   (lambda ()
-    (let ((input (read-line "==> ")))  
+    (let ((input (read-multiline "==> ")))  
       ;; execute gets redefined as execute-rm when no-csharp-support.ss is loaded
       (let ((result (execute input 'stdin)))
 	(if (not (void? result))
@@ -2790,7 +2790,7 @@
 
 (define read-eval-print-loop-rm
   (lambda ()
-    (let ((input (read-line "==> ")))  
+    (let ((input (read-multiline "==> ")))  
       (let ((result (execute-rm input 'stdin)))
 	(while (not (end-of-session? result))
 	   (cond 
@@ -2799,7 +2799,7 @@
 	     (begin 
 	       (if *need-newline* (newline))
 	       (safe-print result))))
-	   (set! input (read-line "==> "))  
+	   (set! input (read-multiline "==> "))  
 	   (set! result (execute-rm input 'stdin)))
 	'goodbye))))
 

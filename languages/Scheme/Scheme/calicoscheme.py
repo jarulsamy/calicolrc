@@ -744,14 +744,27 @@ def trampoline():
 def box(item):
     return List(item)
 
+def ready_to_eval(text):
+    lines = text.split()
+    if lines[-1].strip() == "":
+      return True ## force it
+    ## else, only if valid parse
+    return try_parse(text)
+
 # native:
-def read_line(prompt):
-    try:
-        return raw_input(prompt) ## Python 2
-    except EOFError:
-        return "(exit)"
-    except:
-        return ""
+def read_multiline(prompt):
+    retval = ""
+    while True:
+        try:
+            retval += raw_input(prompt) ## Python 2
+            prompt = "... "
+        except EOFError:
+            return "(exit)"
+        except:
+            return ""
+        if ready_to_eval(retval):
+            return retval
+        retval += " "
 
 def format(formatting, *lyst):
     args = list_to_vector(lyst)
@@ -6732,7 +6745,7 @@ def start_rm():
 
 def read_eval_print_loop_rm():
     input_ = symbol_undefined
-    input_ = read_line("==> ")
+    input_ = read_multiline("==> ")
     result = symbol_undefined
     result = execute_rm(input_, symbol_stdin)
     while not(end_of_session_q(result)):
@@ -6743,7 +6756,7 @@ def read_eval_print_loop_rm():
                 if true_q(_starneed_newline_star):
                     newline()
                 safe_print(result)
-        input_ = read_line("==> ")
+        input_ = read_multiline("==> ")
         result = execute_rm(input_, symbol_stdin)
     return symbol_goodbye
 
@@ -7925,5 +7938,6 @@ if __name__ == '__main__':
     print('----------------------------')
     print('Use (exit) to exit')
     start_rm()
+    print()
 else:
     initialize_globals()

@@ -6004,7 +6004,7 @@
          (set! *use-lexical-address* (true? (car args)))
          void-value)))))
 
-(define read-line-test
+(define read-multiline-test
   (lambda (prompt)
     (printf prompt)
     (let loop ((input (read)))
@@ -6025,7 +6025,7 @@
 
 (define read-eval-print-loop
   (lambda ()
-    (let ((input (read-line "==> ")))
+    (let ((input (read-multiline "==> ")))
       (let ((result (execute input 'stdin)))
         (if (not (void? result))
             (if (exception? result)
@@ -6112,7 +6112,7 @@
 
 (define read-eval-print-loop-rm
   (lambda ()
-    (let ((input (read-line "==> ")))
+    (let ((input (read-multiline "==> ")))
       (let ((result (execute-rm input 'stdin)))
         (while
           (not (end-of-session? result))
@@ -6120,7 +6120,7 @@
             ((exception? result) (handle-exception result))
             ((not (void? result))
              (begin (if *need-newline* (newline)) (safe-print result))))
-          (set! input (read-line "==> "))
+          (set! input (read-multiline "==> "))
           (set! result (execute-rm input 'stdin)))
         'goodbye))))
 
@@ -7241,7 +7241,7 @@
 (define-native iter? (lambda (x) #f))
 
 (define-native
-  read-line
+  read-multiline
   (lambda (prompt) (printf prompt) (format "~s" (read))))
 
 (define try-parse-handler (make-handler2 <handler2-3>))
