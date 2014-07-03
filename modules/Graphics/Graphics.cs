@@ -2294,6 +2294,26 @@ public static class Graphics
 			this.y = dot.y;
 		}
 
+        public double getX()
+        {
+            return x;
+        }
+
+        public double getY()
+        {
+            return y;
+        }
+
+        public void setX(double x)
+        {
+            this.x = x;
+        }
+
+        public void getY(double y)
+        {
+            this.y = y;
+        }
+
 		public static double operator -(Point p1, Point p2) {
 		    return p1.distance(p2);
 		}
