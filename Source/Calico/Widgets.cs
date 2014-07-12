@@ -758,6 +758,30 @@ public static class Widgets {
 	}
     }
 
+    /*
+    public class MultipleChoiceCheckWidget : ContainerWidget {
+
+	  answers = ["a) apple", "b) banana", "c) cherry"]
+	  question = calico.LatexWidget("Q1: What is the $\dfrac{best}{x}$ fruit?")
+	  choices = calico.RadioButtonsWidget(value_names=answers)
+	  button = calico.ButtonWidget("Check Me")
+	  container = calico.ContainerWidget(children=[question, choices, button])
+	  
+	  def on_click(button):
+	  if answers.index(choices.value_name) == 1:
+	  calico.animate("Correct!! The best fruit is the banana")
+	  else:
+	  calico.animate("Incorrect. Try running the above code to see the best fruit.")
+	  
+	  button.on_click(on_click)
+	  container
+
+	public MultipleChoiceWidget() {
+	    on_click_func = function;
+	}
+    }
+    */
+
     public class PopupWidget : ContainerWidget {
 	// Attributes
 	public string button_text {

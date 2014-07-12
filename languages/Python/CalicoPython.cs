@@ -170,12 +170,14 @@ namespace CalicoPython
 				"from sys import setrecursionlimit as _srl;" +
 				"__builtins__['input'] = lambda p='': calico.input(p) if calico.GetSession() else _ask(p);" +
 				"__builtins__['raw_input'] = lambda p='': calico.input(p) if calico.GetSession() else _ask(p);" +
+				"__builtins__['calico'] = calico;" +
 				"_srl(1024);" + 
 				"del _srl;", false);
 		    } else {
 			Execute(
 				"from sys import setrecursionlimit as _srl;" +
 				"__builtins__['input'] = raw_input;" +
+				"__builtins__['calico'] = calico;" +
 				"_srl(1024);" + 
 				"del _srl;", false);
 		    }
