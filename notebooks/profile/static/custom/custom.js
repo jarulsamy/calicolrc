@@ -144,8 +144,18 @@ function section_label() {
 	}
     }
 
-    // if there is a table of contents
-    // then regenerate it
+    // If there is a Table of Contents, replace it:
+    var cells = IPython.notebook.get_cells();
+    for(var i = 0; i < cells.length; i++){
+        var cell = cells[i];
+        if (cell.cell_type == "markdown") {
+	    var cell_text = cell.get_text();
+	    if (cell_text.match(/^#Table of Contents/)) {
+		table_of_contents();
+		break;
+	    }
+	}
+    }
 }
 
 function replace_links(old_header, new_header){
@@ -154,8 +164,10 @@ function replace_links(old_header, new_header){
     for(var i = 0; i < cells.length; i++){
         var cell = cells[i];
         if (cell.cell_type == "markdown") {
-	    // Skip table of Contents
             var cell_text = cell.get_text();
+	    if (cell_text.match(/^#Table of Contents/)) {
+		continue;
+	    }
             var re_string = old_header;
             re_string = re_string.replace(/\\/g, "\\\\");
             re_string = re_string.replace(/\//g, "\\/");
@@ -169,9 +181,9 @@ function replace_links(old_header, new_header){
             re_string = re_string.replace(/\|/g, "\\|");
             re_string = re_string.replace(/\[/g, "\\[");
             re_string = re_string.replace(/\]/g, "\\]");
-            re_string = re_string.replace(/\(/g, "(?:\\(|%28)");
+            re_string = re_string.replace(/\(/g, "?:\\(|%28");
             re_string = re_string.replace(/\s/g, "-");
-            re_string = "(^\\[.*\\]:\\s*#)" + re_string;
+            re_string = "(^\\[.*\\]:\\s*#)" + re_string + "(.*)$";
             
             var re = new RegExp(re_string, "gm");
             var link_text = new_header.replace(/\s+$/g, ""); //Delete trailing spaces before they become "-"
@@ -179,11 +191,9 @@ function replace_links(old_header, new_header){
             link_text = link_text.replace(/\)/g, "%29"); //Replace right parentheses with their encoding
             link_text = link_text.replace(/ /g, "-"); //Replace all spaces with dashes to create links
             
-	    console.log("looking for: " + re);
             var match = cell_text.match(re);
             if (match) {
-		console.log(match);
-                var new_text = cell_text.replace(re, "$1" + link_text);
+                var new_text = cell_text.replace(re, "$1" + link_text + "$2");
                 cell.unrender();
                 cell.set_text(new_text);
                 cell.render();
@@ -202,7 +212,7 @@ function table_of_contents() {
 	var temp = cells[x];
 	if (temp.cell_type == "markdown"){
             var temp_text = temp.get_text();
-            var re = /#Table\sof\sContents/g;
+            var re = /^#Table of Contents/;
             if (re.test(temp_text)){
 		toc_cell = cells[x];
 		found = true;
@@ -217,7 +227,7 @@ function table_of_contents() {
 	cells = IPython.notebook.get_cells();
     }
     
-    var toc_text = "#Table of Contents  \n";
+    var toc_text = "#Table of Contents\n";
     var prev_lev = 0;
     
     for (var i = 0; i < cells.length; i++){
