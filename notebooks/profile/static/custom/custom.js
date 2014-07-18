@@ -1,51 +1,9 @@
-// leave at least 2 line with only a star on it below, or doc generation fails
 /**
  *
  *
- * Placeholder for custom user javascript
- * mainly to be overridden in profile/static/custom/custom.js
- * This will always be an empty file in IPython
- *
- * User could add any javascript in the `profile/static/custom/custom.js` file
- * (and should create it if it does not exist).
- * It will be executed by the ipython notebook at load time.
- *
- * Same thing with `profile/static/custom/custom.css` to inject custom css into the notebook.
- *
- * Example :
- *
- * Create a custom button in toolbar that execute `%qtconsole` in kernel
- * and hence open a qtconsole attached to the same kernel as the current notebook
- *
- *    $([IPython.events]).on('app_initialized.NotebookApp', function(){
- *        IPython.toolbar.add_buttons_group([
- *            {
- *                 'label'   : 'run qtconsole',
- *                 'icon'    : 'icon-terminal', // select your icon from http://fortawesome.github.io/Font-Awesome/icons
- *                 'callback': function () {
- *                     IPython.notebook.kernel.execute('%qtconsole')
- *                 }
- *            }
- *            // add more button here if needed.
- *            ]);
- *    });
- *
- * Example :
- *
- *  Use `jQuery.getScript(url [, success(script, textStatus, jqXHR)] );`
- *  to load custom script into the notebook.
- *
- *    // to load the metadata ui extension example.
- *    $.getScript('/static/notebook/js/celltoolbarpresets/example.js');
- *    // or
- *    // to load the metadata ui extension to control slideshow mode / reveal js for nbconvert
- *    $.getScript('/static/notebook/js/celltoolbarpresets/slideshow.js');
+ * Calico Custom JavaScript for Jupyter Notebooks
  *
  *
- * @module IPython
- * @namespace IPython
- * @class customjs
- * @static
  */
 
 
@@ -153,6 +111,7 @@ function section_label() {
             
             if (old_header != heading_text){
 		remove_numbering = false;
+		replace_links(old_header, heading_text);
             }
             
             cell.unrender();
@@ -170,6 +129,7 @@ function section_label() {
             var cell = cells[i];
             if (cell.cell_type == "heading"){
 		var heading_text = cell.get_text();
+		old_header = heading_text;
 		var re = /(?:\d*\.*)*\s*(.*)/
 		    var match = heading_text.match(re);
 		if (match){
@@ -178,10 +138,54 @@ function section_label() {
 		cell.unrender();
 		cell.set_text(heading_text);
 		cell.render();
+		replace_links(old_header, heading_text);
             }
 	}
     }
 }
+
+function replace_links(old_header, new_header){
+    var cells = IPython.notebook.get_cells();
+    for(var i = 0; i < cells.length; i++){
+        var cell = cells[i];
+        if (cell.cell_type == "markdown") {
+            var cell_text = cell.get_text();
+            var re_string = old_header;
+            re_string = re_string.replace(/\\/g, "\\\\");
+            re_string = re_string.replace(/\//g, "\\/");
+            re_string = re_string.replace(/\^/g, "\\^");
+            re_string = re_string.replace(/\$/g, "\\$");
+            re_string = re_string.replace(/\*/g, "\\*");
+            re_string = re_string.replace(/\+/g, "\\+");
+            re_string = re_string.replace(/\?/g, "\\?");
+            re_string = re_string.replace(/\./g, "\\.");
+            re_string = re_string.replace(/\)/g, "%29");
+            re_string = re_string.replace(/\|/g, "\\|");
+            re_string = re_string.replace(/\[/g, "\\[");
+            re_string = re_string.replace(/\]/g, "\\]");
+            re_string = re_string.replace(/\(/g, "(?:\\(|%28)");
+            re_string = re_string.replace(/\s/g, "-");
+            re_string = "(^\\[.*\\]:\\s*#|\\[.*\\]\\(#)" + re_string;
+            
+            var re = new RegExp(re_string, "g", "m");
+            var link_text = new_header.replace(/\s+$/g, ""); //Delete trailing spaces before they become "-"
+            link_text = link_text.replace(/\(/g, "%28"); //Replace left parentheses with their encoding
+            link_text = link_text.replace(/\)/g, "%29"); //Replace right parentheses with their encoding
+            link_text = link_text.replace(/ /g, "-"); //Replace all spaces with dashes to create links
+            link_text = "(#" + link_text;
+            
+            var match = cell_text.match(re);
+            if (match) {
+                cell_text = cell_text.replace(re, link_text);
+            
+                cell.unrender();
+                cell.set_text(cell_text);
+                cell.render();
+            }
+        }
+    }
+}
+
 
 function table_of_contents() {
     var toc_cell;
@@ -231,7 +235,7 @@ function table_of_contents() {
             toc_text += cell_text;
             toc_text += "](#";
             
-            var link_text = cell_text.replace(/\s+$/g, "") //Delete trailing spaces before they become "-"
+            var link_text = cell_text.replace(/\s+$/g, ""); //Delete trailing spaces before they become "-"
             link_text = link_text.replace(/\(/g, "%28"); //Replace left parentheses with their encoding
             link_text = link_text.replace(/\)/g, "%29"); //Replace right parentheses with their encoding
             link_text = link_text.replace(/ /g, "-"); //Replace all spaces with dashes to create links
