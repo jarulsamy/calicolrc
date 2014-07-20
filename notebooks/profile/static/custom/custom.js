@@ -305,10 +305,9 @@ function update_refs(citations) {
 	    var match = cell_text.match(re);
 	    while (match) {
 		var citation = match[0].slice(7, -1); // #cite-...
-		console.log(citation);
 		var cite = citations[citation];
-		console.log(cite)
-		cell_text = cell_text.replace(re, "<a name=\"ref-" + refs + "\"/>[(" + cite["AUTHOR"] + ", " + cite["YEAR"] + ")](" + citation + ")");
+		var reference = make_reference(cite, refs);
+		cell_text = cell_text.replace(re, "<a name=\"ref-" + refs + "\"/>[" + reference + "](" + citation + ")");
 		cell.set_text(cell_text);
 		need_to_render = true;
 		match = cell_text.match(re);
@@ -320,6 +319,88 @@ function update_refs(citations) {
 	    cell.render();
 	}
     }
+}
+
+function make_reference(cite, refs) {
+    // APA style, for now:
+    return "(" +  get_surnames(cite, refs) + ", " + cite["YEAR"] + ")";
+}
+
+function get_surnames(cite, refs) {
+    // could do something based on which ref (first, or later) this is
+    // refs is the current ref count
+    // cite["REFS"] is refs used for this cite
+    var author_list = [];
+    var authors = cite["AUTHOR"];
+    var state = "surname";
+    var current = "";
+    var split = split_authors(authors);
+    for (var index in split) {
+	var word = split[index];
+	if (state == "surname") {
+	    if (word == ",") {
+		author_list.push(current);
+		current = "";
+		state = "given";
+	    } else {
+		current += word;
+	    }
+	} else if (state == "given") {
+	    if (word == "and") {
+		state = "surname";
+	    } 
+	    // else, skip over given names
+	}
+    }
+    // author_list is now list of author surnames
+    // ["Smith"], ["Smith", "Jones"]...
+    var retval = "";
+    if (author_list.length <= 5) {
+	if (author_list.length == 1) { // only one
+	    retval = author_list[0];
+	} else {
+	    for (var i = 0; i < author_list.length; i++) {
+		var surname = author_list[i];
+		if (i == (author_list.length - 1)) { // last one, more than one
+		    retval += " and ";
+		    retval += surname;
+		} else {
+		    if (retval != "") { // add comma between surnames
+			retval += ", ";
+		    } 
+		    retval += surname;
+		}
+	    }
+        }
+    } else {
+	retval = author_list[0] + "et al.";
+    }
+    return retval;
+}
+
+function split_authors(string) {
+    // string is something like "van Maxwell, Bruce S. and Meeden, Lisa"
+    // returns ["van", "Maxwell", ",", "Bruce", "S.", "and", "Meeden", "Lisa"]
+    var retval = [];
+    var current = "";
+    for (var i = 0; i < string.length; i++) {
+	var ch = string.charAt(i);
+	if (ch == " ") {
+	    if (current != "") {
+		retval.push(current);
+		current = "";
+	    }
+	} else if (ch == ",") {
+	    retval.push(current);
+	    current = "";
+	    retval.push(ch);
+	} else {
+	    current += ch;
+	}
+    }
+    if (current != "")
+	retval.push(current);
+    return retval;
 }
 
 function create_reference_section(citations) {
