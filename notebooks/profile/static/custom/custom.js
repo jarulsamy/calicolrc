@@ -10,6 +10,7 @@
 $([IPython.events]).on('app_initialized.NotebookApp', function() {
   //... 
   require(['/static/custom/drag-and-drop.js']);
+  require(['/static/custom/bibtex.js']);
   var img = $('.container img')[0];
   img.src = "/static/custom/icalico_logo.png";
   IPython.toolbar.add_buttons_group([
@@ -23,6 +24,11 @@ $([IPython.events]).on('app_initialized.NotebookApp', function() {
           'label'   : 'Generate Table of Contents',
           'icon'    : 'icon-sort-by-attributes-alt', 
           'callback': table_of_contents
+      },
+      {
+          'label'   : 'Generate References',
+          'icon'    : 'icon-book', 
+          'callback': generate_references
       }
       // add more buttons here if needed.
   ]);
@@ -264,4 +270,175 @@ function table_of_contents() {
     toc_cell.unrender();
     toc_cell.set_text(toc_text);
     toc_cell.render();
+}
+
+function generate_references() {
+    //require(['/static/custom/bibtex.js']);
+    //console.log("----------------------------------------- Start")
+    read_bibliography();
+    var citations = get_citations();
+    create_reference_section(citations);
+    update_refs(citations);
+}
+
+function update_refs(citations) {
+    // go through and replace all (<a name="..."/>)*[.*](#cite-.*) with [CITE](#cite-.*)
+    for (var c in IPython.notebook.get_cells()) {
+        var cell = IPython.notebook.get_cell(c);
+        if (cell.cell_type == "markdown") {
+            var cell_text = cell.get_text();
+	    var re = new RegExp("(\\<a name\\=\".*?\"/>)*\\[.*?\\]\\((\#cite-[^\\)]+)\\)", "g");
+	    if (cell_text.match(re)) {
+		cell_text = cell_text.replace(re, "[CITE]($2)");
+		cell.set_text(cell_text);
+	    }
+	}
+    }
+    // then go through and replace each [CITE](#cite-.*) with <a name="ref-"/>[(AUTHORS)](#cite-...)
+    var refs = 1;
+    for (var c in IPython.notebook.get_cells()) {
+	var need_to_render = false;
+        var cell = IPython.notebook.get_cell(c);
+        if (cell.cell_type == "markdown") {
+            var cell_text = cell.get_text();
+	    var re = new RegExp("\\[CITE\\]\\(\#cite-[^\\)]+\\)");
+	    var match = cell_text.match(re);
+	    while (match) {
+		var citation = match[0].slice(7, -1); // #cite-...
+		console.log(citation);
+		var cite = citations[citation];
+		console.log(cite)
+		cell_text = cell_text.replace(re, "<a name=\"ref-" + refs + "\"/>[(" + cite["AUTHOR"] + ", " + cite["YEAR"] + ")](" + citation + ")");
+		cell.set_text(cell_text);
+		need_to_render = true;
+		match = cell_text.match(re);
+		refs++;
+	    }
+	}
+	if (need_to_render) {
+	    cell.unrender();
+	    cell.render();
+	}
+    }
+}
+
+function create_reference_section(citations) {
+    // If there is a References section, replace it:
+    var reference_cell;
+    var index = -1;
+    var cells = IPython.notebook.get_cells();
+    for(var i = 0; i < cells.length; i++){
+        var cell = cells[i];
+        if (cell.cell_type == "markdown") {
+            var cell_text = cell.get_text();
+            if (cell_text.match(/^#References/)) {
+                index = i;
+                break;
+            }
+        }
+    }
+    if (index == -1) {
+        reference_cell = IPython.notebook.select(IPython.notebook.ncells - 1).insert_cell_below("markdown");
+    } else {
+        reference_cell = IPython.notebook.get_cell(index);
+    }
+    var references = "#References\n\n";
+    var citation;
+    for (citation in citations) {
+        var cite = citations[citation];
+        var ref_index;
+        references = references + "<a name=\"" + citation.substring(1) + "\"/><sup>"
+        for (ref_index in cite["REFS"]) {
+            var refs = cite["REFS"][ref_index]
+            references += "[^](#ref-" +  refs + ") "
+        }
+        references += "</sup>" + cite["AUTHOR"] + ". " + cite["YEAR"] + ". _" + cite["TITLE"] + "_." + "\n\n";
+    }
+    reference_cell.unrender();
+    reference_cell.set_text(references);
+    reference_cell.render();
+}
+
+function get_citations() {
+    // Get all citations in this notebook
+    // citations are indicated by:
+    // [...](#cite-KEY)
+    // Returns dictionary with keys of #cite-KEY
+    var citations = {};
+    var refs = 1;
+    for (var c in IPython.notebook.get_cells()) {
+        var cell = IPython.notebook.get_cell(c);
+        if (cell.cell_type == "markdown") {
+            var cell_text = cell.get_text();
+            var re = new RegExp("\\[.*?\\]\\((\#cite-.*?)\\)", "g");
+            var match;
+            while (match = re.exec(cell_text)) {               
+                if (match[1] in citations) {
+                    citations[match[1]]["REFS"].push(refs);                    
+                } else {
+                    var citation = match[1];
+                    var lookup = document.bibliography[citation.substring(6).toUpperCase()];
+                    lookup["REFS"] = [refs]
+                    citations[match[1]] = lookup;
+                }
+                refs++;
+            }
+        }
+    }
+    return citations;
+}
+
+function parse_json(string) {
+    return {type: "techreport", key: "meeden-1999"}
+}
+
+function parse_bibtex(string) {
+    var parser = new BibtexParser();
+    parser.setInput(string);
+    parser.bibtex();
+    // {KEY: {AUTHOR:..., BIB_KEY:...}}
+    return parser.getEntries();
+}
+
+function read_bibliography() {
+    // Read the Bibliography notebook
+    document.bibliography = {};
+    // Wait for result:
+    $.ajaxSetup( { "async": false } );
+    $.getJSON("/api/notebooks/Bibliography.ipynb", function( data ) {
+        var index;
+        for (index in data.content.worksheets[0].cells) {
+            var cell = data.content.worksheets[0].cells[index];
+            if (cell.cell_type == "code") {
+                var json;
+                if (cell.input.match(/^%%bibtex/)) {
+                    var cell_text = cell.input.replace(/^%%bibtex/, "");
+                    json = parse_bibtex(cell_text);
+                } else if (cell.input.match(/^%%json/)) {
+                    json = parse_json(cell.input);
+                } else {
+                    // skip this cell
+                    continue;
+                }
+                // json is a dict keyed by KEY
+                $.extend(document.bibliography, json);
+            }
+        }
+    });
+}
+
+function show_bibliography() {
+    // Read the Bibliography notebook
+    $.getJSON("/api/notebooks/Bibliography.ipynb", function( data ) {
+      var items = [];
+      $.each( data, function( key, val ) {
+          items.push( "<tr><td>" + key + ": </td><td>" + val + "</td></tr>" );
+      });
+
+      element.html($( "<table/>", {
+          "border": 3,
+        "class": "my-new-list",
+        html: items.join( "" )
+      }).appendTo( "body" ));
+    });
 }
