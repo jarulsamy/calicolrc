@@ -32,6 +32,15 @@ $([IPython.events]).on('app_initialized.NotebookApp', function() {
       }
       // add more buttons here if needed.
   ]);
+
+  IPython.toolbar.add_buttons_group([
+      // select your icon from http://fortawesome.github.io/Font-Awesome/icons
+      {
+          'label'   : 'Toggle Tabbing',
+          'icon'    : 'icon-folder-close-alt', 
+          'callback': toggle_tabs
+      }      // add more buttons here if needed.
+  ]);
 });
 
 function section_label() {
@@ -323,7 +332,11 @@ function update_refs(citations) {
 
 function make_reference(cite, refs) {
     // APA style, for now:
-    return "(" +  get_surnames(cite, refs) + ", " + cite["YEAR"] + ")";
+    if (cite == undefined) {
+	return "(UNDEFINED)";
+    } else {
+	return "(" +  get_surnames(cite, refs) + ", " + cite["YEAR"] + ")";
+    }
 }
 
 function get_surnames(cite, refs) {
@@ -419,7 +432,7 @@ function create_reference_section(citations) {
         }
     }
     if (index == -1) {
-        reference_cell = IPython.notebook.select(IPython.notebook.ncells - 1).insert_cell_below("markdown");
+        reference_cell = IPython.notebook.select(cells.length-1).insert_cell_below("markdown");
     } else {
         reference_cell = IPython.notebook.get_cell(index);
     }
@@ -427,13 +440,15 @@ function create_reference_section(citations) {
     var citation;
     for (citation in citations) {
         var cite = citations[citation];
-        var ref_index;
-        references = references + "<a name=\"" + citation.substring(1) + "\"/><sup>"
-        for (ref_index in cite["REFS"]) {
-            var refs = cite["REFS"][ref_index]
-            references += "[^](#ref-" +  refs + ") "
-        }
-        references += "</sup>" + cite["AUTHOR"] + ". " + cite["YEAR"] + ". _" + cite["TITLE"] + "_." + "\n\n";
+	if (cite != undefined) {
+            var ref_index;
+            references = references + "<a name=\"" + citation.substring(1) + "\"/><sup>"
+            for (ref_index in cite["REFS"]) {
+		var refs = cite["REFS"][ref_index]
+		references += "[^](#ref-" +  refs + ") "
+            }
+            references += "</sup>" + cite["AUTHOR"] + ". " + cite["YEAR"] + ". _" + cite["TITLE"] + "_." + "\n\n";
+	}
     }
     reference_cell.unrender();
     reference_cell.set_text(references);
@@ -459,8 +474,10 @@ function get_citations() {
                 } else {
                     var citation = match[1];
                     var lookup = document.bibliography[citation.substring(6).toUpperCase()];
-                    lookup["REFS"] = [refs]
-                    citations[match[1]] = lookup;
+		    if (lookup != undefined) {
+			lookup["REFS"] = [refs]
+			citations[match[1]] = lookup;
+		    }
                 }
                 refs++;
             }
@@ -522,4 +539,129 @@ function show_bibliography() {
         html: items.join( "" )
       }).appendTo( "body" ));
     });
+}
+
+function toggle_tabs() {
+    var cells = IPython.notebook.get_cells();
+    var cell;
+    var tabLinks = new Array();
+    var contentDivs = new Array();
+    
+    for (var i = 0; i < cells.length; i++) {
+        if (cells[i].element[0].className.indexOf("unselected") != -1){
+            continue;
+        }
+        cell = cells[i];
+    }
+    
+    var toRemove = cell.element[0].getElementsByClassName("tabs");
+    if (toRemove.length > 0){
+        var length = toRemove.length;
+        for(var i = 0; i < length; i++){
+            toRemove[0].parentNode.removeChild(toRemove[0]);
+        }
+        cell.element[0].getElementsByClassName("input")[0].className = 'input';
+        cell.element[0].getElementsByClassName("output_wrapper")[0].className = 'output_wrapper';
+        cell.element[0].getElementsByClassName("input")[0].id = '';
+        cell.element[0].getElementsByClassName("output_wrapper")[0].id = '';
+    } else if (cell.cell_type == "code"){
+        var div = document.createElement("div");
+        cell.element[0].insertBefore(div, cell.element[0].getElementsByClassName("input")[0]);
+	
+        div.className = "tabs";
+        //var inputText = cell.element[0].getElementsByClassName("input_prompt")[0].textContent;
+        //var outputText = cell.element[0].getElementsByClassName("output_prompt")[0].textContent;
+        //div.innerHTML = '<ul id="tabs"><li><a href="#input_tab" class>' + inputText + '</a></li><li><a href="#output_tab" class>' + outputText + '</a></li></ul>';
+        div.innerHTML = '<ul id="tabs"><li><a href="#input_tab" class>Input</a></li><li><a href="#output_tab" class>Output</a></li></ul>';
+	
+        var inputDiv = cell.element[0].getElementsByClassName("input")[0];
+        var outputDiv = cell.element[0].getElementsByClassName("output_wrapper")[0];
+	
+        inputDiv.id = "input_tab";
+        outputDiv.id = "output_tab";
+	inputDiv.className = 'input tabContent';
+        outputDiv.className = 'output_wrapper tabContent hide';
+        init();
+    }
+}
+    
+function init() {
+	
+    // Grab the tab links and content divs from the page
+    var tabListItems = cell.element[0].getElementsByTagName("ul")[0].childNodes;
+    for ( var i = 0; i < tabListItems.length; i++ ) {
+        if ( tabListItems[i].nodeName == "LI" ) {
+	    var tabLink = getFirstChildWithTagName( tabListItems[i], 'A' );
+	    var id = getHash( tabLink.getAttribute('href') );
+	    tabLinks[id] = tabLink;
+	    if (id == "input_tab"){
+                contentDivs[id] = cell.element[0].getElementsByClassName("input")[0];
+	    } else {
+                contentDivs[id] = cell.element[0].getElementsByClassName("output_wrapper")[0];
+	    }
+        }
+    }  
+    
+    // Assign onclick events to the tab links, and
+    // highlight the first tab
+    var i = 0;
+    
+    for ( var id in tabLinks ) {
+        tabLinks[id].onclick = showTab;
+        tabLinks[id].onfocus = function() { this.blur() };
+        if ( i == 0 ) tabLinks[id].className = 'selected';
+        i++;
+    }
+    
+    // Hide all content divs except the first
+    var i = 0;
+    
+    for ( var id in contentDivs ) {
+        if ( i != 0 ){
+	    if (contentDivs[id].className.indexOf("input") != -1){
+                contentDivs[id].className = 'input tabContent hide';
+	    } else {
+                contentDivs[id].className = 'output_wrapper tabContent hide';
+	    }
+        }
+        i++;
+    }
+}
+
+function showTab() {
+    var selectedId = getHash( this.getAttribute('href') );
+    
+    // Highlight the selected tab, and dim all others.
+    // Also show the selected content div, and hide all others.
+    for ( var id in contentDivs ) {
+        if ( id == selectedId ) {
+            tabLinks[id].className = 'selected';
+            if (contentDivs[id].className.indexOf("input") != -1){
+                contentDivs[id].className = 'input tabContent';
+            } else {
+                contentDivs[id].className = 'output_wrapper tabContent';
+            }
+        } else {
+            tabLinks[id].className = '';
+            if (contentDivs[id].className.indexOf("input") != -1){
+                contentDivs[id].className = 'input tabContent hide';
+            } else {
+                contentDivs[id].className = 'output_wrapper tabContent hide';
+            }
+        }
+    }
+    
+    // Stop the browser following the link
+    return false;
+}
+
+function getFirstChildWithTagName( element, tagName ) {
+    for ( var i = 0; i < element.childNodes.length; i++ ) {
+        if ( element.childNodes[i].nodeName == tagName ) return element.childNodes[i];
+    }
+}
+
+function getHash( url ) {
+    var hashPos = url.lastIndexOf ( '#' );
+    return url.substring( hashPos + 1 );
 }
