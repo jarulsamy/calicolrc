@@ -189,7 +189,7 @@ function replace_links(old_header, new_header){
             re_string = re_string.replace(/\]/g, "\\]");
             re_string = re_string.replace(/\(/g, "?:\\(|%28");
             re_string = re_string.replace(/\s/g, "-");
-            re_string = "(^\\[.*\\]:\\s*#)" + re_string + "(.*)$";
+            re_string = "(\\[.*\\](?::\\s*|\\()#)" + re_string + "(.*\\)|$)";
             
             var re = new RegExp(re_string, "gm");
             var link_text = new_header.replace(/\s+$/g, ""); //Delete trailing spaces before they become "-"
