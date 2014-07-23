@@ -30,17 +30,24 @@ $([IPython.events]).on('app_initialized.NotebookApp', function() {
           'icon'    : 'icon-book', 
           'callback': generate_references
       }
-      // add more buttons here if needed.
   ]);
 
   IPython.toolbar.add_buttons_group([
-      // select your icon from http://fortawesome.github.io/Font-Awesome/icons
       {
           'label'   : 'Toggle Tabbing',
           'icon'    : 'icon-folder-close-alt', 
           'callback': toggle_tabs
-      }      // add more buttons here if needed.
+      },
+      {
+          'label'   : 'Toggle Columns',
+          'icon'    : 'icon-columns', 
+          'callback': toggle_columns
+      }      
   ]);
+});
+
+$([IPython.events]).on('notebook_loaded.Notebook', function(){
+  checkForTabs();	
 });
 
 function section_label() {
@@ -541,19 +548,58 @@ function show_bibliography() {
     });
 }
 
-function toggle_tabs() {
+function toggle_columns(evt, input_cell) {
+    var cells = IPython.notebook.get_cells();
+    var cell;
+
+    if (input_cell == undefined){
+	cell = IPython.notebook.get_selected_cell();
+    } else {
+	cell = input_cell;
+    }
+
+    // only toggle columns/rows if code cell:
+    if (cell.cell_type == "code") {
+	// get the div cell:
+	var div = cell.element[0];
+	if (div.css("box-orient") == "vertical") {
+	    // default:
+	    div.css("box-orient", "horizontal");
+	    div.css("flex-direction", "row");
+	    var input = div.getElementsByClassName("input")[0];
+	    input.style.width = "50%";
+	    var output = div.getElementsByClassName("output_wrapper")[0];
+	    output.style.width = "50%";
+	    div.getElementsByClassName("prompt")[0].css("width", "80px");
+	} else {
+	    div.css("box-orient", "vertical");
+	    div.css("flex-direction", "column");
+	    var input = div.getElementsByClassName("input")[0];
+	    input.style.width = "";
+	    var output = div.getElementsByClassName("output_wrapper")[0];
+	    outputs.style.width = "";
+	    div.getElementsByClassName("prompt")[0].css("width", "80px");
+	}
+    }
+}
+    
+function toggle_tabs(evt, input_cell) {
     var cells = IPython.notebook.get_cells();
     var cell;
     var tabLinks = new Array();
     var contentDivs = new Array();
-    
-    for (var i = 0; i < cells.length; i++) {
-        if (cells[i].element[0].className.indexOf("unselected") != -1){
-            continue;
+
+    if (input_cell == undefined){
+        for (var i = 0; i < cells.length; i++) {
+            if (cells[i].element[0].className.indexOf("unselected") != -1){
+                continue;
+            }
+            cell = cells[i];
         }
-        cell = cells[i];
+    } else {
+	cell = input_cell;
     }
-    
+
     var toRemove = cell.element[0].getElementsByClassName("tabs");
     if (toRemove.length > 0){
         var length = toRemove.length;
@@ -564,6 +610,7 @@ function toggle_tabs() {
         cell.element[0].getElementsByClassName("output_wrapper")[0].className = 'output_wrapper';
         cell.element[0].getElementsByClassName("input")[0].id = '';
         cell.element[0].getElementsByClassName("output_wrapper")[0].id = '';
+	cell.metadata.format = "row";
     } else if (cell.cell_type == "code"){
         var div = document.createElement("div");
         cell.element[0].insertBefore(div, cell.element[0].getElementsByClassName("input")[0]);
@@ -581,6 +628,7 @@ function toggle_tabs() {
         outputDiv.id = "output_tab";
 	inputDiv.className = 'input tabContent';
         outputDiv.className = 'output_wrapper tabContent hide';
+	cell.metadata.format = "tab";
         init();
     }
     
@@ -663,5 +711,17 @@ function toggle_tabs() {
     function getHash( url ) {
 	var hashPos = url.lastIndexOf ( '#' );
 	return url.substring( hashPos + 1 );
+    }
+}
+
+function checkForTabs() {
+    var cells = IPython.notebook.get_cells();
+    for(var i = 0; i < cells.length; i++){
+        var cell = cells[i];
+        if (cell.cell_type == "code"){
+            if (cell.metadata.format == "tab"){
+                toggle_tabs("temp", cell);
+            }
+        }
     }
 }
