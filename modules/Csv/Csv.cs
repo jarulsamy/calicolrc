@@ -11,16 +11,11 @@ namespace Csv {
     private Stream stream;
     private StreamReader _reader;
     private char separator;
+    private bool number_mode;
 
-    public reader(Stream s) : this(s, null, ',') { }
-
-    public reader(Stream s, char separator) : this(s, null, separator) { }
-
-    public reader(Stream s, Encoding enc) : this(s, enc, ',') { }
-
-    public reader(Stream s, Encoding enc, char separator) {
-
+    public reader(Stream s, Encoding enc, char separator, bool number_mode) {
       this.separator = separator;
+      this.number_mode = number_mode;
       this.stream = s;
       if (!s.CanRead) {
         throw new readerException("Could not read the given data stream!");
@@ -28,15 +23,22 @@ namespace Csv {
       _reader = (enc != null) ? new StreamReader(s, enc) : new StreamReader(s);
     }
 
-    public reader(string filename) : this(filename, null, ',') { }
+    public reader(Stream s) : this(s, null, ',', false) { }
 
-    public reader(string filename, char separator) : this(filename, null, separator) { }
+    public reader(Stream s, char separator) : this(s, null, separator, false) { }
 
-    public reader(string filename, Encoding enc) 
-      : this(filename, enc, ',') { }
+    public reader(Stream s, Encoding enc) : this(s, enc, ',', false) { }
 
-    public reader(string filename, Encoding enc, char separator) 
-      : this(new FileStream(filename, FileMode.Open), enc, separator) { }
+    public reader(string filename, Encoding enc): this(filename, enc, ',', false) { }
+
+    public reader(string filename, bool number_mode) : this(filename, null, ',', number_mode) { }
+
+    public reader(string filename) : this(filename, null, ',', false) { }
+
+    public reader(string filename, char separator) : this(filename, null, separator, false) { }
+
+    public reader(string filename, Encoding enc, char separator, bool number_mode) 
+	: this(new FileStream(filename, FileMode.Open), enc, separator, number_mode) { }
 
     public char Separator {
       get { return separator; }
@@ -77,8 +79,20 @@ namespace Csv {
     private void ParseFields(List result, string data) {
 
       int pos = -1;
-      while (pos < data.Length)
-        result.Add(ParseField(data, ref pos));
+      while (pos < data.Length) {
+	  string field = ParseField(data, ref pos);
+	  if (this.number_mode) {
+	      if (field.Contains(".")) {
+		  result.Add(Double.Parse(field));
+	      } else if (field == "") {
+		  result.Add(0);
+	      } else {
+		  result.Add(int.Parse(field));
+	      }
+	  } else {
+	      result.Add(field);
+	  }
+      }
     }
 
     // Parses the field at the given position of the data, modified pos to match
