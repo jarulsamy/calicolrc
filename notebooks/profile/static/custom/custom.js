@@ -583,85 +583,85 @@ function toggle_tabs() {
         outputDiv.className = 'output_wrapper tabContent hide';
         init();
     }
-}
     
-function init() {
+    function init() {
 	
-    // Grab the tab links and content divs from the page
-    var tabListItems = cell.element[0].getElementsByTagName("ul")[0].childNodes;
-    for ( var i = 0; i < tabListItems.length; i++ ) {
-        if ( tabListItems[i].nodeName == "LI" ) {
-	    var tabLink = getFirstChildWithTagName( tabListItems[i], 'A' );
-	    var id = getHash( tabLink.getAttribute('href') );
-	    tabLinks[id] = tabLink;
-	    if (id == "input_tab"){
-                contentDivs[id] = cell.element[0].getElementsByClassName("input")[0];
-	    } else {
-                contentDivs[id] = cell.element[0].getElementsByClassName("output_wrapper")[0];
-	    }
-        }
-    }  
-    
-    // Assign onclick events to the tab links, and
-    // highlight the first tab
-    var i = 0;
-    
-    for ( var id in tabLinks ) {
-        tabLinks[id].onclick = showTab;
-        tabLinks[id].onfocus = function() { this.blur() };
-        if ( i == 0 ) tabLinks[id].className = 'selected';
-        i++;
-    }
-    
-    // Hide all content divs except the first
-    var i = 0;
-    
-    for ( var id in contentDivs ) {
-        if ( i != 0 ){
-	    if (contentDivs[id].className.indexOf("input") != -1){
-                contentDivs[id].className = 'input tabContent hide';
-	    } else {
-                contentDivs[id].className = 'output_wrapper tabContent hide';
-	    }
-        }
-        i++;
-    }
-}
-
-function showTab() {
-    var selectedId = getHash( this.getAttribute('href') );
-    
-    // Highlight the selected tab, and dim all others.
-    // Also show the selected content div, and hide all others.
-    for ( var id in contentDivs ) {
-        if ( id == selectedId ) {
-            tabLinks[id].className = 'selected';
-            if (contentDivs[id].className.indexOf("input") != -1){
-                contentDivs[id].className = 'input tabContent';
-            } else {
-                contentDivs[id].className = 'output_wrapper tabContent';
+	// Grab the tab links and content divs from the page
+	var tabListItems = cell.element[0].getElementsByTagName("ul")[0].childNodes;
+	for ( var i = 0; i < tabListItems.length; i++ ) {
+            if ( tabListItems[i].nodeName == "LI" ) {
+		var tabLink = getFirstChildWithTagName( tabListItems[i], 'A' );
+		var id = getHash( tabLink.getAttribute('href') );
+		tabLinks[id] = tabLink;
+		if (id == "input_tab"){
+                    contentDivs[id] = cell.element[0].getElementsByClassName("input")[0];
+		} else {
+                    contentDivs[id] = cell.element[0].getElementsByClassName("output_wrapper")[0];
+		}
             }
-        } else {
-            tabLinks[id].className = '';
-            if (contentDivs[id].className.indexOf("input") != -1){
-                contentDivs[id].className = 'input tabContent hide';
-            } else {
-                contentDivs[id].className = 'output_wrapper tabContent hide';
+	}  
+	
+	// Assign onclick events to the tab links, and
+	// highlight the first tab
+	var i = 0;
+	
+	for ( var id in tabLinks ) {
+            tabLinks[id].onclick = showTab;
+            tabLinks[id].onfocus = function() { this.blur() };
+            if ( i == 0 ) tabLinks[id].className = 'selected';
+            i++;
+	}
+	
+	// Hide all content divs except the first
+	var i = 0;
+	
+	for ( var id in contentDivs ) {
+            if ( i != 0 ){
+		if (contentDivs[id].className.indexOf("input") != -1){
+                    contentDivs[id].className = 'input tabContent hide';
+		} else {
+                    contentDivs[id].className = 'output_wrapper tabContent hide';
+		}
             }
-        }
+            i++;
+	}
     }
     
-    // Stop the browser following the link
-    return false;
-}
-
-function getFirstChildWithTagName( element, tagName ) {
-    for ( var i = 0; i < element.childNodes.length; i++ ) {
-        if ( element.childNodes[i].nodeName == tagName ) return element.childNodes[i];
+    function showTab() {
+	var selectedId = getHash( this.getAttribute('href') );
+	
+	// Highlight the selected tab, and dim all others.
+	// Also show the selected content div, and hide all others.
+	for ( var id in contentDivs ) {
+            if ( id == selectedId ) {
+		tabLinks[id].className = 'selected';
+		if (contentDivs[id].className.indexOf("input") != -1){
+                    contentDivs[id].className = 'input tabContent';
+		} else {
+                    contentDivs[id].className = 'output_wrapper tabContent';
+		}
+            } else {
+		tabLinks[id].className = '';
+		if (contentDivs[id].className.indexOf("input") != -1){
+                    contentDivs[id].className = 'input tabContent hide';
+		} else {
+                    contentDivs[id].className = 'output_wrapper tabContent hide';
+		}
+            }
+	}
+	
+	// Stop the browser following the link
+	return false;
     }
-}
-
-function getHash( url ) {
-    var hashPos = url.lastIndexOf ( '#' );
-    return url.substring( hashPos + 1 );
+    
+    function getFirstChildWithTagName( element, tagName ) {
+	for ( var i = 0; i < element.childNodes.length; i++ ) {
+            if ( element.childNodes[i].nodeName == tagName ) return element.childNodes[i];
+	}
+    }
+    
+    function getHash( url ) {
+	var hashPos = url.lastIndexOf ( '#' );
+	return url.substring( hashPos + 1 );
+    }
 }
