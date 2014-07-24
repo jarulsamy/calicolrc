@@ -47,7 +47,7 @@ $([IPython.events]).on('app_initialized.NotebookApp', function() {
 });
 
 $([IPython.events]).on('notebook_loaded.Notebook', function(){
-  checkForTabs();	
+  checkForFormatting();	
 });
 
 function section_label() {
@@ -560,26 +560,40 @@ function toggle_columns(evt, input_cell) {
 
     // only toggle columns/rows if code cell:
     if (cell.cell_type == "code") {
-	// get the div cell:
-	var div = cell.element[0];
-	if (div.css("box-orient") == "vertical") {
-	    // default:
-	    div.css("box-orient", "horizontal");
-	    div.css("flex-direction", "row");
-	    var input = div.getElementsByClassName("input")[0];
-	    input.style.width = "50%";
-	    var output = div.getElementsByClassName("output_wrapper")[0];
-	    output.style.width = "50%";
-	    div.getElementsByClassName("prompt")[0].css("width", "80px");
-	} else {
-	    div.css("box-orient", "vertical");
-	    div.css("flex-direction", "column");
-	    var input = div.getElementsByClassName("input")[0];
-	    input.style.width = "";
-	    var output = div.getElementsByClassName("output_wrapper")[0];
-	    outputs.style.width = "";
-	    div.getElementsByClassName("prompt")[0].css("width", "80px");
-	}
+    // get the div cell:
+        var div = cell.element;
+        if (cell.metadata.format == "tab"){
+            var toRemove = cell.element[0].getElementsByClassName("tabs");
+            if (toRemove.length > 0){
+                var length = toRemove.length;
+                for(var i = 0; i < length; i++){
+                    toRemove[0].parentNode.removeChild(toRemove[0]);
+                }
+                cell.element[0].getElementsByClassName("input")[0].className = 'input';
+                cell.element[0].getElementsByClassName("output_wrapper")[0].className = 'output_wrapper';
+                cell.element[0].getElementsByClassName("input")[0].id = '';
+                cell.element[0].getElementsByClassName("output_wrapper")[0].id = '';
+	        cell.metadata.format = "row";
+            }
+        }
+        if (div.css("box-orient") == "vertical") {
+            div.css("box-orient", "horizontal");
+            div.css("flex-direction", "row");
+            var input = div[0].getElementsByClassName("input")[0];
+            input.style.width = "50%";
+            var output = div[0].getElementsByClassName("output_wrapper")[0];
+            output.style.width = "50%";
+	    cell.metadata.format = "column";
+        } else {
+	    //default:
+            div.css("box-orient", "vertical");
+            div.css("flex-direction", "column");
+            var input = div[0].getElementsByClassName("input")[0];
+            input.style.width = "";
+            var output = div[0].getElementsByClassName("output_wrapper")[0];
+            output.style.width = "";
+	    cell.metadata.format = "row";
+        }
     }
 }
     
@@ -590,12 +604,7 @@ function toggle_tabs(evt, input_cell) {
     var contentDivs = new Array();
 
     if (input_cell == undefined){
-        for (var i = 0; i < cells.length; i++) {
-            if (cells[i].element[0].className.indexOf("unselected") != -1){
-                continue;
-            }
-            cell = cells[i];
-        }
+        cell = IPython.notebook.get_selected_cell();
     } else {
 	cell = input_cell;
     }
@@ -612,13 +621,20 @@ function toggle_tabs(evt, input_cell) {
         cell.element[0].getElementsByClassName("output_wrapper")[0].id = '';
 	cell.metadata.format = "row";
     } else if (cell.cell_type == "code"){
+        if(cell.metadata.format == "column"){
+            var tempDiv = cell.element;
+            tempDiv.css("box-orient", "vertical");
+            tempDiv.css("flex-direction", "column");
+            var input = tempDiv[0].getElementsByClassName("input")[0];
+            input.style.width = "";
+            var output = tempDiv[0].getElementsByClassName("output_wrapper")[0];
+            output.style.width = "";
+	    cell.metadata.format = "row";
+        }
         var div = document.createElement("div");
         cell.element[0].insertBefore(div, cell.element[0].getElementsByClassName("input")[0]);
 	
         div.className = "tabs";
-        //var inputText = cell.element[0].getElementsByClassName("input_prompt")[0].textContent;
-        //var outputText = cell.element[0].getElementsByClassName("output_prompt")[0].textContent;
-        //div.innerHTML = '<ul id="tabs"><li><a href="#input_tab" class>' + inputText + '</a></li><li><a href="#output_tab" class>' + outputText + '</a></li></ul>';
         div.innerHTML = '<ul id="tabs"><li><a href="#input_tab" class>Input</a></li><li><a href="#output_tab" class>Output</a></li></ul>';
 	
         var inputDiv = cell.element[0].getElementsByClassName("input")[0];
@@ -714,14 +730,17 @@ function toggle_tabs(evt, input_cell) {
     }
 }
 
-function checkForTabs() {
+function checkForFormatting() {
     var cells = IPython.notebook.get_cells();
     for(var i = 0; i < cells.length; i++){
         var cell = cells[i];
         if (cell.cell_type == "code"){
             if (cell.metadata.format == "tab"){
                 toggle_tabs("temp", cell);
-            }
+            } else if (cell.metadata.format == "column"){
+		toggle_columns("temp", cell);
+	    }
         }
     }
 }
+
