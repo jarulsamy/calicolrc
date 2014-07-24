@@ -263,29 +263,31 @@ function replace_links(old_header, new_header){
     }
 }
 
-
-function table_of_contents() {
-    var toc_cell;
-    var found = false;
-    
+function find_cell(cell_type, text) {
+    // Finds first cell of cell_type that starts with text
+    var cell = undefined;
     var cells = IPython.notebook.get_cells();
     for (var x = 0; x < cells.length; x++) {
 	var temp = cells[x];
-	if (temp.cell_type == "markdown"){
+	if (temp.cell_type == cell_type){
             var temp_text = temp.get_text();
-            var re = /^#Table of Contents/;
+            var re = new RegExp("^" + text);
             if (re.test(temp_text)){
-		toc_cell = cells[x];
-		found = true;
+		cell = cells[x];
 		break;
             }
 	}
     }
-    
-    if (!found){
-	IPython.notebook.select(0).insert_cell_above("markdown"); //Create a new markdown cell at the top of the Notebook
-	toc_cell = IPython.notebook.get_cell(0);
-	cells = IPython.notebook.get_cells();
+    return cell;
+}
+
+function table_of_contents() {
+    var cells = IPython.notebook.get_cells();
+    var toc_cell = find_cell("markdown", "#Table of Contents");
+
+    if (toc_cell == undefined){
+	//Create a new markdown cell at the top of the Notebook
+	toc_cell = IPython.notebook.select(0).insert_cell_above("markdown"); 
     }
     
     var toc_text = "#Table of Contents\n";
@@ -464,23 +466,10 @@ function split_authors(string) {
 
 function create_reference_section(citations) {
     // If there is a References section, replace it:
-    var reference_cell;
-    var index = -1;
+    var reference_cell = find_cell("markdown", "#References");
     var cells = IPython.notebook.get_cells();
-    for(var i = 0; i < cells.length; i++){
-        var cell = cells[i];
-        if (cell.cell_type == "markdown") {
-            var cell_text = cell.get_text();
-            if (cell_text.match(/^#References/)) {
-                index = i;
-                break;
-            }
-        }
-    }
-    if (index == -1) {
+    if (reference_cell == undefined) {
         reference_cell = IPython.notebook.select(cells.length-1).insert_cell_below("markdown");
-    } else {
-        reference_cell = IPython.notebook.get_cell(index);
     }
     var references = "#References\n\n";
     var citation;
@@ -547,28 +536,38 @@ function parse_bibtex(string) {
 function read_bibliography() {
     // Read the Bibliography notebook
     document.bibliography = {};
-    // Wait for result:
-    $.ajaxSetup( { "async": false } );
-    $.getJSON("/api/notebooks/Bibliography.ipynb", function( data ) {
-        var index;
-        for (index in data.content.worksheets[0].cells) {
-            var cell = data.content.worksheets[0].cells[index];
-            if (cell.cell_type == "code") {
-                var json;
-                if (cell.input.match(/^%%bibtex/)) {
-                    var cell_text = cell.input.replace(/^%%bibtex/, "");
-                    json = parse_bibtex(cell_text);
-                } else if (cell.input.match(/^%%json/)) {
-                    json = parse_json(cell.input);
-                } else {
-                    // skip this cell
-                    continue;
-                }
-                // json is a dict keyed by KEY
-                $.extend(document.bibliography, json);
+    // First, check to see if there is a %%bibtex here
+    var bibtex = find_cell("code", "%%bibtex");
+    if (bibtex != undefined) {
+	console.log(bibtex);
+	var cell_text = bibtex.get_text().replace(/^%%bibtex/, "");
+	var json = parse_bibtex(cell_text);
+        $.extend(document.bibliography, json);
+    } else {
+	// if not, read from Bibliography.ipynb in top-level directory:
+	// Wait for result:
+	$.ajaxSetup( { "async": false } );
+	$.getJSON("/api/notebooks/Bibliography.ipynb", function( data ) {
+            var index;
+            for (index in data.content.worksheets[0].cells) {
+		var cell = data.content.worksheets[0].cells[index];
+		if (cell.cell_type == "code") {
+                    var json;
+                    if (cell.input.match(/^%%bibtex/)) {
+			var cell_text = cell.input.replace(/^%%bibtex/, "");
+			json = parse_bibtex(cell_text);
+                    } else if (cell.input.match(/^%%json/)) {
+			json = parse_json(cell.input);
+                    } else {
+			// skip this cell
+			continue;
+                    }
+                    // json is a dict keyed by KEY
+                    $.extend(document.bibliography, json);
+		}
             }
-        }
-    });
+	});
+    }
 }
 
 function show_bibliography() {
