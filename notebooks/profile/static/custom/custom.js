@@ -680,8 +680,8 @@ function toggle_tabs(evt, input_cell) {
 	
         inputDiv.id = "input_tab";
         outputDiv.id = "output_tab";
-	inputDiv.className = 'input tabContent';
-        outputDiv.className = 'output_wrapper tabContent hide';
+	inputDiv.className = 'input tabContent hide';
+        outputDiv.className = 'output_wrapper tabContent';
 	cell.metadata.format = "tab";
         init();
     }
@@ -704,13 +704,13 @@ function toggle_tabs(evt, input_cell) {
 	}  
 	
 	// Assign onclick events to the tab links, and
-	// highlight the first tab
+	// highlight the second tab
 	var i = 0;
 	
 	for ( var id in tabLinks ) {
             tabLinks[id].onclick = showTab;
             tabLinks[id].onfocus = function() { this.blur() };
-            if ( i == 0 ) tabLinks[id].className = 'selected';
+            if ( i == 1 ) tabLinks[id].className = 'selected';
             i++;
 	}
 	
@@ -718,7 +718,7 @@ function toggle_tabs(evt, input_cell) {
 	var i = 0;
 	
 	for ( var id in contentDivs ) {
-            if ( i != 0 ){
+            if ( i != 1 ){
 		if (contentDivs[id].className.indexOf("input") != -1){
                     contentDivs[id].className = 'input tabContent hide';
 		} else {
