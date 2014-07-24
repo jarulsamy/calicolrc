@@ -42,13 +42,52 @@ $([IPython.events]).on('app_initialized.NotebookApp', function() {
           'label'   : 'Toggle Columns',
           'icon'    : 'icon-columns', 
           'callback': toggle_columns
+      },
+      {
+          'label'   : 'Toggle Spelling Checking',
+//          'icon'    : '/static/custom/icon-spell-check.png', 
+	  'icon'    : 'icon-check-sign',
+          'callback': toggle_spell_check
       }      
   ]);
+
 });
 
 $([IPython.events]).on('notebook_loaded.Notebook', function(){
   checkForFormatting();	
 });
+
+function toggle_spell_check() {
+    var typo = { check: function(current) {
+        var dictionary = {"apple": 1, "banana":1, "can't":1, "this":1, "that":1, "the":1};
+        return current.toLowerCase() in dictionary;
+    }};
+    
+    CodeMirror.defineMode("spell-check", function(config, parserConfig) {
+	var rx_word = new RegExp("[^\!\"\#\$\%\&\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~\ ]");
+	var spellOverlay = {
+            token: function (stream, state) {
+		var ch;
+		if (stream.match(rx_word)) { 
+		    while ((ch = stream.peek()) != null) {
+			if (!ch.match(rx_word)) {
+			    break;
+			}
+			stream.next();
+		    }
+		    if (!typo.check(stream.current()))
+			return "spell-error";
+		    return null;
+		}
+		while (stream.next() != null && !stream.match(rx_word, false)) {}
+		return null;
+            }
+	};
+	return CodeMirror.overlayMode(CodeMirror.getMode(config, "htmlmixed"), spellOverlay);
+    });
+    
+    CodeMirror.defaults["mode"] = "spell-check";
+}
 
 function section_label() {
     var cells = IPython.notebook.get_cells();
