@@ -45,7 +45,6 @@ $([IPython.events]).on('app_initialized.NotebookApp', function() {
       },
       {
           'label'   : 'Toggle Spelling Checking',
-//          'icon'    : '/static/custom/icon-spell-check.png', 
 	  'icon'    : 'icon-check-sign',
           'callback': toggle_spell_check
       }      
@@ -83,10 +82,10 @@ function toggle_spell_check() {
 		return null;
             }
 	};
-	return CodeMirror.overlayMode(CodeMirror.getMode(config, "htmlmixed"), spellOverlay);
+	return CodeMirror.overlayMode(CodeMirror.getMode(config, "markdown"), spellOverlay);
     });
     
-    CodeMirror.defaults["mode"] = "spell-check";
+    IPython.MarkdownCell.options_default.cm_config.mode = "spell-check";
 }
 
 function section_label() {
