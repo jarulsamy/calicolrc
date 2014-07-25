@@ -11,6 +11,12 @@ $([IPython.events]).on('app_initialized.NotebookApp', function() {
   //... 
   require(['/static/custom/drag-and-drop.js']);
   require(['/static/custom/bibtex.js']);
+  require(['/static/custom/typo.js'], function() {
+      var lang = "en_US";
+      document.dictionary = new Typo(lang, undefined, undefined, 
+				     {"platform": "web", 
+				      "dictionaryPath": "/static/custom/dictionaries"});
+  });
   var img = $('.container img')[0];
   img.src = "/static/custom/icalico_logo.png";
   IPython.toolbar.add_buttons_group([
@@ -57,10 +63,11 @@ $([IPython.events]).on('notebook_loaded.Notebook', function(){
 });
 
 function toggle_spell_check() {
-    var typo = { check: function(current) {
-        var dictionary = {"apple": 1, "banana":1, "can't":1, "this":1, "that":1, "the":1};
-        return current.toLowerCase() in dictionary;
-    }};
+    var typo_check = function(current) {
+	return document.dictionary.check(current);
+        //var dictionary = {"apple": 1, "banana":1, "can't":1, "this":1, "that":1, "the":1};
+        //return current.toLowerCase() in dictionary;
+    };
     
     CodeMirror.defineMode("spell-check", function(config, parserConfig) {
 	var rx_word = new RegExp("[^\!\"\#\$\%\&\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~\ ]");
@@ -74,7 +81,7 @@ function toggle_spell_check() {
 			}
 			stream.next();
 		    }
-		    if (!typo.check(stream.current()))
+		    if (!typo_check(stream.current()))
 			return "spell-error";
 		    return null;
 		}
@@ -84,8 +91,23 @@ function toggle_spell_check() {
 	};
 	return CodeMirror.overlayMode(CodeMirror.getMode(config, "markdown"), spellOverlay);
     });
+
+    // toggle mode
+    var new_mode;
+    if (IPython.MarkdownCell.options_default.cm_config.mode == "spell-check") {
+	new_mode = "markdown";
+    } else {
+	new_mode = "spell-check";
+    }
     
-    IPython.MarkdownCell.options_default.cm_config.mode = "spell-check";
+    IPython.MarkdownCell.options_default.cm_config.mode = new_mode;
+    var cells = IPython.notebook.get_cells();
+    for(var i = 0; i < cells.length; i++){
+        var cell = cells[i];
+        if (cell.cell_type == "markdown") {
+	    IPython.notebook.get_cell(i).code_mirror.setOption('mode', new_mode);
+	}
+    }
 }
 
 function section_label() {
