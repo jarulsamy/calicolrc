@@ -575,12 +575,23 @@ function read_bibliography() {
             for (index in data.content.worksheets[0].cells) {
 		var cell = data.content.worksheets[0].cells[index];
                 var json;
-                if (cell.input.match(/^<!--bibtex/)) {
-		    var cell_text = cell.input.replace(/^<!--bibtex/, "");
+		var cell_text;
+		console.log(cell);
+		if (cell.cell_type == "markdown") {
+		    cell_text = cell.source;
+		} else if (cell.cell_type == "raw") {
+		    cell_text = cell.source;
+		} else if (cell.cell_type == "code") {
+		    cell_text = cell.input;
+		} else {
+		    continue;
+		}
+                if (cell_text.match(/^<!--bibtex/)) {
+		    cell_text = cell_text.replace(/^<!--bibtex/, "");
 		    cell_text = cell_text.replace(/-->s*$/, "");
 		    json = parse_bibtex(cell_text);
-                } else if (cell.input.match(/^<!--json/)) {
-		    json = parse_json(cell.input);
+                } else if (cell_text.match(/^<!--json/)) {
+		    json = parse_json(cell_text);
                 } else {
 		    // skip this cell
 		    continue;
