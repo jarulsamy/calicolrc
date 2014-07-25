@@ -290,7 +290,7 @@ function find_cell(cell_type, text) {
     var cells = IPython.notebook.get_cells();
     for (var x = 0; x < cells.length; x++) {
 	var temp = cells[x];
-	if (temp.cell_type == cell_type){
+	if (temp.cell_type.match(cell_type) != undefined){
             var temp_text = temp.get_text();
             var re = new RegExp("^" + text);
             if (re.test(temp_text)){
@@ -557,11 +557,13 @@ function parse_bibtex(string) {
 function read_bibliography() {
     // Read the Bibliography notebook
     document.bibliography = {};
-    // First, check to see if there is a %%bibtex here
-    var bibtex = find_cell("code", "%%bibtex");
+    // First, check to see if there is a <!--bibtex here
+    var bibtex = find_cell(".*", "<!--bibtex");
     if (bibtex != undefined) {
 	console.log(bibtex);
-	var cell_text = bibtex.get_text().replace(/^%%bibtex/, "");
+	var cell_text = bibtex.get_text().replace(/^<!--bibtex/, "");
+	cell_text = cell_text.replace(/-->\s*$/, "");
+	console.log("cell_text: " + cell_text);
 	var json = parse_bibtex(cell_text);
         $.extend(document.bibliography, json);
     } else {
@@ -572,20 +574,19 @@ function read_bibliography() {
             var index;
             for (index in data.content.worksheets[0].cells) {
 		var cell = data.content.worksheets[0].cells[index];
-		if (cell.cell_type == "code") {
-                    var json;
-                    if (cell.input.match(/^%%bibtex/)) {
-			var cell_text = cell.input.replace(/^%%bibtex/, "");
-			json = parse_bibtex(cell_text);
-                    } else if (cell.input.match(/^%%json/)) {
-			json = parse_json(cell.input);
-                    } else {
-			// skip this cell
-			continue;
-                    }
-                    // json is a dict keyed by KEY
-                    $.extend(document.bibliography, json);
-		}
+                var json;
+                if (cell.input.match(/^<!--bibtex/)) {
+		    var cell_text = cell.input.replace(/^<!--bibtex/, "");
+		    cell_text = cell_text.replace(/-->s*$/, "");
+		    json = parse_bibtex(cell_text);
+                } else if (cell.input.match(/^<!--json/)) {
+		    json = parse_json(cell.input);
+                } else {
+		    // skip this cell
+		    continue;
+                }
+                // json is a dict keyed by KEY
+                $.extend(document.bibliography, json);
             }
 	});
     }
