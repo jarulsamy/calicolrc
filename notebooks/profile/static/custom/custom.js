@@ -37,39 +37,44 @@ $([IPython.events]).on('app_initialized.NotebookApp', function() {
           'callback': generate_references
       }
   ]);
-
   IPython.toolbar.add_buttons_group([
       {
-          'label'   : 'Toggle Tabbing',
+          'label'   : 'Toggle tabbed view on a code cell',
           'icon'    : 'icon-folder-close-alt', 
           'callback': toggle_tabs
       },
       {
-          'label'   : 'Toggle Columns',
+          'label'   : 'Toggle two-column view on a code cell',
           'icon'    : 'icon-columns', 
           'callback': toggle_columns
       },
       {
-          'label'   : 'Toggle Spelling Checking',
+          'label'   : 'Toggle spell checking on a markdown cell',
 	  'icon'    : 'icon-check-sign',
           'callback': toggle_spell_check
       }      
   ]);
-
 });
 
-$([IPython.events]).on('notebook_loaded.Notebook', function(){
+$([IPython.events]).on('notebook_loaded.Notebook', function() {
   checkForFormatting();	
 });
 
 function toggle_spell_check() {
-    var typo_check = function(current) {
-	return document.dictionary.check(current);
-        //var dictionary = {"apple": 1, "banana":1, "can't":1, "this":1, "that":1, "the":1};
-        //return current.toLowerCase() in dictionary;
+    // Toggle on/off spelling checking on a markdown cell
+
+    var typo_check = function(word) {
+	// Put your specific method of checking the spell of words here:
+	// remove beginning or ending single quote
+	return document.dictionary.check(word.replace(/(^')|('$)/g, ""));
     };
     
     CodeMirror.defineMode("spell-check", function(config, parserConfig) {
+	// This overlay sits on top of a mode, given below.
+	// It first checks here to see if a CSS class should be given.
+	// Here, "spell-error" is defined in the associated CSS file
+
+	// rx_word defines characters not in words. Everything except single quote.
 	var rx_word = new RegExp("[^\!\"\#\$\%\&\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~\ ]");
 	var spellOverlay = {
             token: function (stream, state) {
@@ -89,10 +94,12 @@ function toggle_spell_check() {
 		return null;
             }
 	};
-	return CodeMirror.overlayMode(CodeMirror.getMode(config, "markdown"), spellOverlay);
+	// Put this overlay on top of "markdown" mode.
+	// opaque: true allows the styles (spell-check and markdown) to be combined.
+	return CodeMirror.overlayMode(CodeMirror.getMode(config, "markdown"), spellOverlay, {"opaque": true});
     });
 
-    // toggle mode
+    // Now the toggle the default markdown mode
     var new_mode;
     if (IPython.MarkdownCell.options_default.cm_config.mode == "spell-check") {
 	new_mode = "markdown";
@@ -100,9 +107,10 @@ function toggle_spell_check() {
 	new_mode = "spell-check";
     }
     
+    // And change any existing markdown cells:
     IPython.MarkdownCell.options_default.cm_config.mode = new_mode;
     var cells = IPython.notebook.get_cells();
-    for(var i = 0; i < cells.length; i++){
+    for (var i = 0; i < cells.length; i++) {
         var cell = cells[i];
         if (cell.cell_type == "markdown") {
 	    IPython.notebook.get_cell(i).code_mirror.setOption('mode', new_mode);
@@ -111,6 +119,8 @@ function toggle_spell_check() {
 }
 
 function section_label() {
+    // Label headings with numbers, or toggle them off
+    // If there is a table of contents, re-do it
     var cells = IPython.notebook.get_cells();
     var levels = [0,0,0,0,0,0];
     var current_level = 1;
@@ -119,19 +129,19 @@ function section_label() {
     var alert_flag = false;
     var remove_numbering = true;
     
-    for (var i = 0; i < cells.length; i++){
+    for (var i = 0; i < cells.length; i++) {
 	var cell = cells[i];
-	if (cell.cell_type == "heading"){
+	if (cell.cell_type == "heading") {
             var level = cell.level;
             
-            if (level >= current_level){ //just keep incrementing
+            if (level >= current_level) { //just keep incrementing
 		current_level = level;
 		levels[level-1]++;
             } else {                    //went back a level
 		levels[current_level-1] = 0;
 		
-		if (current_level-level > 1){ //Skipped levels in between
-                    for(var j = 1; j < current_level-level; j++){ //back-prop the zeros
+		if (current_level-level > 1) { //Skipped levels in between
+                    for (var j = 1; j < current_level-level; j++) { //back-prop the zeros
 			levels[current_level - 1 - j] = 0;
                     }
 		}
@@ -145,9 +155,9 @@ function section_label() {
             var error_no_end = 0;
             var error_heading_label = "";
             var heading_label = ""; //Generate the appropriate number for the heading
-            for (var k = 0; k < level; k++){
-		if (levels[k] == 0){
-                    if (!error){
+            for (var k = 0; k < level; k++) {
+		if (levels[k] == 0) {
+                    if (!error) {
 			error_heading_label = heading_label;
 			error = true;
 			error_no_begin = k;
@@ -156,18 +166,18 @@ function section_label() {
                     }
 		}
 		heading_label += levels[k];
-		if (level-k == 1 && level > 1){
+		if (level-k == 1 && level > 1) {
                     break;
 		}
 		heading_label += ".";
             }
 	    
-            if (error){
-		if (error_no_end == 0){
+            if (error) {
+		if (error_no_end == 0) {
                     error_no_end = error_no_begin + 2;
 		}
-		if (error_heading_label == ""){
-                    if (!flag){
+		if (error_heading_label == "") {
+                    if (!flag) {
 			var temp1 = "Notebook begins with a Header " + error_no_end + " cell." + "\n";
 			alert_text += temp1;
 			alert_flag = true;
@@ -185,13 +195,13 @@ function section_label() {
             var re = /(?:\d*\.*)*\s*(.*)/;
 	    var match = heading_text.match(re);
             
-            if (match){
+            if (match) {
 		heading_text = heading_label + " " + match[1];
             } else {
 		heading_text = heading_label;
             }
             
-            if (old_header != heading_text){
+            if (old_header != heading_text) {
 		remove_numbering = false;
 		replace_links(old_header, heading_text);
             }
@@ -203,19 +213,19 @@ function section_label() {
 	}
     }
     
-    if (alert_flag){
+    if (alert_flag) {
 	alert(alert_text);
     }
     
-    if (remove_numbering){
-	for (var i = 0; i < cells.length; i++){
+    if (remove_numbering) {
+	for (var i = 0; i < cells.length; i++) {
             var cell = cells[i];
-            if (cell.cell_type == "heading"){
+            if (cell.cell_type == "heading") {
 		var heading_text = cell.get_text();
 		old_header = heading_text;
 		var re = /(?:\d*\.*)*\s*(.*)/;
 		var match = heading_text.match(re);
-		if (match){
+		if (match) {
                     heading_text = match[1];
 		}
 		cell.unrender();
@@ -228,26 +238,29 @@ function section_label() {
 
     // If there is a Table of Contents, replace it:
     var cells = IPython.notebook.get_cells();
-    for(var i = 0; i < cells.length; i++){
+    for (var i = 0; i < cells.length; i++) {
         var cell = cells[i];
         if (cell.cell_type == "markdown") {
 	    var cell_text = cell.get_text();
-	    if (cell_text.match(/^#Table of Contents/)) {
-		table_of_contents();
+	    var match = cell_text.match(/^#+Table of Contents/);
+	    if (match) {
+		table_of_contents(match[0]);
 		break;
 	    }
 	}
     }
 }
 
-function replace_links(old_header, new_header){
+function replace_links(old_header, new_header) {
+    // Replace an old internal link with new link
     new_header = new_header.trim();
     var cells = IPython.notebook.get_cells();
-    for(var i = 0; i < cells.length; i++){
+    for (var i = 0; i < cells.length; i++) {
         var cell = cells[i];
         if (cell.cell_type == "markdown") {
             var cell_text = cell.get_text();
-	    if (cell_text.match(/^#Table of Contents/)) {
+	    // Skip over table of contents:
+	    if (cell_text.match(/^#+Table of Contents/)) {
 		continue;
 	    }
             var re_string = old_header;
@@ -286,14 +299,15 @@ function replace_links(old_header, new_header){
 
 function find_cell(cell_type, text) {
     // Finds first cell of cell_type that starts with text
+    // cell_type and text are interpreted as a regular expression
     var cell = undefined;
     var cells = IPython.notebook.get_cells();
     for (var x = 0; x < cells.length; x++) {
 	var temp = cells[x];
-	if (temp.cell_type.match(cell_type) != undefined){
+	if (temp.cell_type.match(cell_type) != undefined) {
             var temp_text = temp.get_text();
             var re = new RegExp("^" + text);
-            if (re.test(temp_text)){
+            if (re.test(temp_text)) {
 		cell = cells[x];
 		break;
             }
@@ -303,43 +317,42 @@ function find_cell(cell_type, text) {
 }
 
 function table_of_contents() {
+    // Create and/or replace Table of Contents
     var cells = IPython.notebook.get_cells();
-    var toc_cell = find_cell("markdown", "#Table of Contents");
-
-    if (toc_cell == undefined){
+    var toc_cell = find_cell("markdown", "#+Table of Contents");
+    // Default to top-level heading
+    var toc_text = "#Table of Contents\n";
+    if (toc_cell == undefined) {
 	//Create a new markdown cell at the top of the Notebook
 	toc_cell = IPython.notebook.select(0).insert_cell_above("markdown"); 
+    } else {
+	// already exists:
+	toc_text = toc_cell.get_text().match(/^#+Table of Contents/)[0] + "\n";
     }
-    
-    var toc_text = "#Table of Contents\n";
     var prev_lev = 0;
-    
-    for (var i = 0; i < cells.length; i++){
+    for (var i = 0; i < cells.length; i++) {
 	var cell = cells[i];
-	if (cell.cell_type == "heading"){
+	if (cell.cell_type == "heading") {
             
-            if (cell.level - prev_lev > 1){ //Skipped levels. Enter Dummy levels
-		for (var x = 0; x < ((cell.level - prev_lev) - 1); x++){
-                    for (var y = 0; y < (prev_lev + x); y++){
+            if (cell.level - prev_lev > 1) { //Skipped levels. Enter Dummy levels
+		for (var x = 0; x < ((cell.level - prev_lev) - 1); x++) {
+                    for (var y = 0; y < (prev_lev + x); y++) {
 			toc_text += "\t";
                     }
                     toc_text += "* &nbsp;\n";
 		}
             }
-            
             var cell_text = cell.get_text();
-            for (var j = 0; j < cell.level -1; j++){ //Loop to add the proper amount of tabs based on header level
+            for (var j = 0; j < cell.level -1; j++) { //Loop to add the proper amount of tabs based on header level
 		toc_text += "\t";
             }
             toc_text += "* [";
             toc_text += cell_text;
             toc_text += "](#";
-            
             var link_text = cell_text.replace(/\s+$/g, ""); //Delete trailing spaces before they become "-"
             link_text = link_text.replace(/\(/g, "%28"); //Replace left parentheses with their encoding
             link_text = link_text.replace(/\)/g, "%29"); //Replace right parentheses with their encoding
             link_text = link_text.replace(/ /g, "-"); //Replace all spaces with dashes to create links
-            
             toc_text += link_text;
             toc_text += ")\n";
             prev_lev = cell.level;
@@ -351,8 +364,6 @@ function table_of_contents() {
 }
 
 function generate_references() {
-    //require(['/static/custom/bibtex.js']);
-    //console.log("----------------------------------------- Start")
     read_bibliography();
     var citations = get_citations();
     create_reference_section(citations);
@@ -487,12 +498,16 @@ function split_authors(string) {
 
 function create_reference_section(citations) {
     // If there is a References section, replace it:
-    var reference_cell = find_cell("markdown", "#References");
+    var reference_cell = find_cell("markdown", "#+References");
     var cells = IPython.notebook.get_cells();
+    // default to top-level heading:
+    var references = "#References\n\n";
     if (reference_cell == undefined) {
         reference_cell = IPython.notebook.select(cells.length-1).insert_cell_below("markdown");
+    } else {
+	// already exists:
+	references = reference_cell.get_text().match("#+References")[0] + "\n\n";
     }
-    var references = "#References\n\n";
     var citation;
     for (citation in citations) {
         var cite = citations[citation];
@@ -543,6 +558,7 @@ function get_citations() {
 }
 
 function parse_json(string) {
+    // FIXME: allow JSON bibtex data
     return {type: "techreport", key: "meeden-1999"}
 }
 
@@ -560,23 +576,20 @@ function read_bibliography() {
     // First, check to see if there is a <!--bibtex here
     var bibtex = find_cell(".*", "<!--bibtex");
     if (bibtex != undefined) {
-	console.log(bibtex);
 	var cell_text = bibtex.get_text().replace(/^<!--bibtex/, "");
 	cell_text = cell_text.replace(/-->\s*$/, "");
-	console.log("cell_text: " + cell_text);
 	var json = parse_bibtex(cell_text);
         $.extend(document.bibliography, json);
     } else {
 	// if not, read from Bibliography.ipynb in top-level directory:
 	// Wait for result:
-	$.ajaxSetup( { "async": false } );
-	$.getJSON("/api/notebooks/Bibliography.ipynb", function( data ) {
+	$.ajaxSetup({ "async": false });
+	$.getJSON("/api/notebooks/Bibliography.ipynb", function(data) {
             var index;
             for (index in data.content.worksheets[0].cells) {
 		var cell = data.content.worksheets[0].cells[index];
                 var json;
 		var cell_text;
-		console.log(cell);
 		if (cell.cell_type == "markdown") {
 		    cell_text = cell.source;
 		} else if (cell.cell_type == "raw") {
@@ -605,25 +618,26 @@ function read_bibliography() {
 
 function show_bibliography() {
     // Read the Bibliography notebook
-    $.getJSON("/api/notebooks/Bibliography.ipynb", function( data ) {
+    $.getJSON("/api/notebooks/Bibliography.ipynb", function(data) {
       var items = [];
-      $.each( data, function( key, val ) {
-          items.push( "<tr><td>" + key + ": </td><td>" + val + "</td></tr>" );
+      $.each(data, function(key, val) {
+          items.push("<tr><td>" + key + ": </td><td>" + val + "</td></tr>");
       });
 
-      element.html($( "<table/>", {
+      element.html($("<table/>", {
           "border": 3,
         "class": "my-new-list",
-        html: items.join( "" )
-      }).appendTo( "body" ));
+        html: items.join("")
+      }).appendTo("body"));
     });
 }
 
 function toggle_columns(evt, input_cell) {
+    // Toggle code cells into two columns
     var cells = IPython.notebook.get_cells();
     var cell;
 
-    if (input_cell == undefined){
+    if (input_cell == undefined) {
 	cell = IPython.notebook.get_selected_cell();
     } else {
 	cell = input_cell;
@@ -633,11 +647,11 @@ function toggle_columns(evt, input_cell) {
     if (cell.cell_type == "code") {
     // get the div cell:
         var div = cell.element;
-        if (cell.metadata.format == "tab"){
+        if (cell.metadata.format == "tab") {
             var toRemove = cell.element[0].getElementsByClassName("tabs");
-            if (toRemove.length > 0){
+            if (toRemove.length > 0) {
                 var length = toRemove.length;
-                for(var i = 0; i < length; i++){
+                for (var i = 0; i < length; i++) {
                     toRemove[0].parentNode.removeChild(toRemove[0]);
                 }
                 cell.element[0].getElementsByClassName("input")[0].className = 'input';
@@ -669,21 +683,22 @@ function toggle_columns(evt, input_cell) {
 }
     
 function toggle_tabs(evt, input_cell) {
+    // Toggle code cells into Input/Output tabs
     var cells = IPython.notebook.get_cells();
     var cell;
     var tabLinks = new Array();
     var contentDivs = new Array();
 
-    if (input_cell == undefined){
+    if (input_cell == undefined) {
         cell = IPython.notebook.get_selected_cell();
     } else {
 	cell = input_cell;
     }
 
     var toRemove = cell.element[0].getElementsByClassName("tabs");
-    if (toRemove.length > 0){
+    if (toRemove.length > 0) {
         var length = toRemove.length;
-        for(var i = 0; i < length; i++){
+        for (var i = 0; i < length; i++) {
             toRemove[0].parentNode.removeChild(toRemove[0]);
         }
         cell.element[0].getElementsByClassName("input")[0].className = 'input';
@@ -691,8 +706,8 @@ function toggle_tabs(evt, input_cell) {
         cell.element[0].getElementsByClassName("input")[0].id = '';
         cell.element[0].getElementsByClassName("output_wrapper")[0].id = '';
 	cell.metadata.format = "row";
-    } else if (cell.cell_type == "code"){
-        if(cell.metadata.format == "column"){
+    } else if (cell.cell_type == "code") {
+        if (cell.metadata.format == "column") {
             var tempDiv = cell.element;
             tempDiv.css("box-orient", "vertical");
             tempDiv.css("flex-direction", "column");
@@ -720,15 +735,14 @@ function toggle_tabs(evt, input_cell) {
     }
     
     function init() {
-	
 	// Grab the tab links and content divs from the page
 	var tabListItems = cell.element[0].getElementsByTagName("ul")[0].childNodes;
-	for ( var i = 0; i < tabListItems.length; i++ ) {
-            if ( tabListItems[i].nodeName == "LI" ) {
-		var tabLink = getFirstChildWithTagName( tabListItems[i], 'A' );
-		var id = getHash( tabLink.getAttribute('href') );
+	for (var i = 0; i < tabListItems.length; i++) {
+            if (tabListItems[i].nodeName == "LI") {
+		var tabLink = getFirstChildWithTagName(tabListItems[i], 'A');
+		var id = getHash(tabLink.getAttribute('href'));
 		tabLinks[id] = tabLink;
-		if (id == "input_tab"){
+		if (id == "input_tab") {
                     contentDivs[id] = cell.element[0].getElementsByClassName("input")[0];
 		} else {
                     contentDivs[id] = cell.element[0].getElementsByClassName("output_wrapper")[0];
@@ -740,19 +754,19 @@ function toggle_tabs(evt, input_cell) {
 	// highlight the second tab
 	var i = 0;
 	
-	for ( var id in tabLinks ) {
+	for (var id in tabLinks) {
             tabLinks[id].onclick = showTab;
             tabLinks[id].onfocus = function() { this.blur() };
-            if ( i == 1 ) tabLinks[id].className = 'selected';
+            if (i == 1) tabLinks[id].className = 'selected';
             i++;
 	}
 	
 	// Hide all content divs except the first
 	var i = 0;
 	
-	for ( var id in contentDivs ) {
-            if ( i != 1 ){
-		if (contentDivs[id].className.indexOf("input") != -1){
+	for (var id in contentDivs) {
+            if (i != 1) {
+		if (contentDivs[id].className.indexOf("input") != -1) {
                     contentDivs[id].className = 'input tabContent hide';
 		} else {
                     contentDivs[id].className = 'output_wrapper tabContent hide';
@@ -763,21 +777,21 @@ function toggle_tabs(evt, input_cell) {
     }
     
     function showTab() {
-	var selectedId = getHash( this.getAttribute('href') );
+	var selectedId = getHash(this.getAttribute('href'));
 	
 	// Highlight the selected tab, and dim all others.
 	// Also show the selected content div, and hide all others.
-	for ( var id in contentDivs ) {
-            if ( id == selectedId ) {
+	for (var id in contentDivs) {
+            if (id == selectedId) {
 		tabLinks[id].className = 'selected';
-		if (contentDivs[id].className.indexOf("input") != -1){
+		if (contentDivs[id].className.indexOf("input") != -1) {
                     contentDivs[id].className = 'input tabContent';
 		} else {
                     contentDivs[id].className = 'output_wrapper tabContent';
 		}
             } else {
 		tabLinks[id].className = '';
-		if (contentDivs[id].className.indexOf("input") != -1){
+		if (contentDivs[id].className.indexOf("input") != -1) {
                     contentDivs[id].className = 'input tabContent hide';
 		} else {
                     contentDivs[id].className = 'output_wrapper tabContent hide';
@@ -789,26 +803,28 @@ function toggle_tabs(evt, input_cell) {
 	return false;
     }
     
-    function getFirstChildWithTagName( element, tagName ) {
-	for ( var i = 0; i < element.childNodes.length; i++ ) {
-            if ( element.childNodes[i].nodeName == tagName ) return element.childNodes[i];
+    function getFirstChildWithTagName(element, tagName) {
+	for (var i = 0; i < element.childNodes.length; i++) {
+            if (element.childNodes[i].nodeName == tagName) return element.childNodes[i];
 	}
     }
     
-    function getHash( url ) {
-	var hashPos = url.lastIndexOf ( '#' );
-	return url.substring( hashPos + 1 );
+    function getHash(url) {
+	var hashPos = url.lastIndexOf ('#');
+	return url.substring(hashPos + 1);
     }
 }
 
 function checkForFormatting() {
+    // Check to see if code cells have metadata formatting (two-column, tabs)
+    // and toggle if they do.
     var cells = IPython.notebook.get_cells();
-    for(var i = 0; i < cells.length; i++){
+    for (var i = 0; i < cells.length; i++) {
         var cell = cells[i];
-        if (cell.cell_type == "code"){
-            if (cell.metadata.format == "tab"){
+        if (cell.cell_type == "code") {
+            if (cell.metadata.format == "tab") {
                 toggle_tabs("temp", cell);
-            } else if (cell.metadata.format == "column"){
+            } else if (cell.metadata.format == "column") {
 		toggle_columns("temp", cell);
 	    }
         }

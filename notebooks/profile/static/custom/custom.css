@@ -6,7 +6,6 @@ mainly to be overridden in profile/static/custom/custom.css
 This will always be an empty file in IPython
 */
 
-body { font-size: 80%; font-family: 'Lucida Grande', Verdana, Arial, Sans-Serif; }
 ul#tabs { list-style-type: none; margin: 30px 0 0 0; padding: 0 0 0.3em 0; }
 ul#tabs li { display: inline; }
 ul#tabs li a { color: #42454a; background-color: #dedbde; border: 1px solid #c9c3ba; border-bottom: none; padding: 0.3em; text-decoration: none; }
@@ -16,5 +15,5 @@ div.tabContent { border: 1px solid #c9c3ba; padding: 0.5em; background-color: #f
 div.tabContent.hide { display: none; }
 
 .CodeMirror .cm-spell-error {
-     background: url("https://raw.githubusercontent.com/jwulf/typojs-project/master/public/images/red-wavy-underline.gif") bottom repeat-x;
+     background: url('red-wavy-underline.gif') bottom repeat-x;
 }
