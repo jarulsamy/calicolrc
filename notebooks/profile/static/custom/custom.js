@@ -461,12 +461,12 @@ function get_surnames(cite, refs) {
 		    if (retval != "") { // add comma between surnames
 			retval += ", ";
 		    } 
-		    retval += surname;
+		    retval += tex2html(surname);
 		}
 	    }
         }
     } else {
-	retval = author_list[0] + "et al.";
+	retval = tex2html(author_list[0]) + " et al.";
     }
     return retval;
 }
@@ -518,7 +518,9 @@ function create_reference_section(citations) {
 		var refs = cite["REFS"][ref_index]
 		references += "[^](#ref-" +  refs + ") "
             }
-            references += "</sup>" + cite["AUTHOR"] + ". " + cite["YEAR"] + ". _" + cite["TITLE"] + "_." + "\n\n";
+            references += ("</sup>" + tex2html(cite["AUTHOR"]) + ". " + 
+			   cite["YEAR"] + ". _" + tex2html(cite["TITLE"]) + "_." + 
+			   "\n\n");
 	}
     }
     reference_cell.unrender();
@@ -830,4 +832,334 @@ function checkForFormatting() {
         }
     }
 }
+
+function tex2html(text) {
+    var retval = "";
+    var i = 0;
+    while (i < text.length) {
+	var ch = text.charAt(i);
+	switch (ch) {
+	case "\\": // escape
+	    i++;
+	    ch = text.charAt(i);
+	    switch (ch) {
+	    case "'": // acute
+		i++;
+		ch = text.charAt(i);
+		switch (ch) {
+		case 'a':
+		    retval += '&aacute;';
+		    break;
+		case 'e':
+		    retval += '&eacute;';
+		    break;
+		case 'i':
+		    retval += '&iacute;';
+		    break;
+		case 'o':
+		    retval += '&oacute;';
+		    break;
+		case 'u':
+		    retval += '&uacute;';
+		    break;
+		case 'A':
+		    retval += '&Aacute;';
+		    break;
+		case 'E':
+		    retval += '&Eacute;';
+		    break;
+		case 'I':
+		    retval += '&Iacute;';
+		    break;
+		case 'O':
+		    retval += '&Oacute;';
+		    break;
+		case 'U':
+		    retval += '&Uacute;';
+		    break;
+		default:
+		    retval += "\\'" + ch;
+		    break;
+		}
+		break; 
+	    case "`": // agrave
+		i++;
+		ch = text.charAt(i);
+		switch (ch) {
+		case 'a':
+		    retval += '&agrave;';
+		    break;
+		case 'e':
+		    retval += '&egrave;';
+		    break;
+		case 'i':
+		    retval += '&igrave;';
+		    break;
+		case 'o':
+		    retval += '&ograve;';
+		    break;
+		case 'u':
+		    retval += '&ugrave;';
+		    break;
+		case 'y':
+		    retval += '&ygrave;';
+		    break;
+		case 'A':
+		    retval += '&Agrave;';
+		    break;
+		case 'E':
+		    retval += '&Egrave;';
+		    break;
+		case 'I':
+		    retval += '&Igrave;';
+		    break;
+		case 'O':
+		    retval += '&Ograve;';
+		    break;
+		case 'U':
+		    retval += '&Ugrave;';
+		    break;
+		case 'Y':
+		    retval += '&Ygrave;';
+		    break;
+		default:
+		    retval += "\\`" + ch;
+		    break;
+		}
+		break;
+	    case '"': // umlate
+		i++;
+		ch = text.charAt(i);
+		switch (ch) {
+		case 'a':
+		    retval += '&auml;';
+		    break;
+		case 'e':
+		    retval += '&euml;';
+		    break;
+		case 'i':
+		    retval += '&iuml;';
+		    break;
+		case 'o':
+		    retval += '&ouml;';
+		    break;
+		case 'u':
+		    retval += '&uuml;';
+		    break;
+		case 'A':
+		    retval += '&Auml;';
+		    break;
+		case 'E':
+		    retval += '&Euml;';
+		    break;
+		case 'I':
+		    retval += '&Iuml;';
+		    break;
+		case 'O':
+		    retval += '&Ouml;';
+		    break;
+		case 'U':
+		    retval += '&Uuml;';
+		    break;
+		default:
+		    retval += "\\\"" + ch;
+		    break;
+		}
+		break;
+	    case '^': // circumflex
+		i++;
+		ch = text.charAt(i);
+		switch (ch) {
+		case 'a':
+		    retval += '&acirc;';
+		    break;
+		case 'e':
+		    retval += '&ecirc;';
+		    break;
+		case 'i':
+		    retval += '&icirc;';
+		    break;
+		case 'o':
+		    retval += '&ocirc;';
+		    break;
+		case 'u':
+		    retval += '&ucirc;';
+		    break;
+		case 'A':
+		    retval += '&Acirc;';
+		    break;
+		case 'E':
+		    retval += '&Ecirc;';
+		    break;
+		case 'I':
+		    retval += '&Icirc;';
+		    break;
+		case 'O':
+		    retval += '&Ocirc;';
+		    break;
+		case 'U':
+		    retval += '&Ucirc;';
+		    break;
+		default:
+		    retval += "\\^" + ch;
+		    break;
+		}
+		break;
+	    case '~': // tilde
+		i++;
+		ch = text.charAt(i);
+		switch (ch) {
+		case 'a':
+		    retval += '&atilde;';
+		    break;
+		case 'n':
+		    retval += '&ntilde;';
+		    break;
+		case 'o':
+		    retval += '&otilde;';
+		    break;
+		case 'A':
+		    retval += '&Atilde;';
+		    break;
+		case 'N':
+		    retval += '&Ntilde;';
+		    break;
+		case 'O':
+		    retval += '&Otilde;';
+		    break;
+		default:
+		    retval += "\\~" + ch;
+		    break;
+		}
+		break;
+	    case '=': // macron/bar
+		i++;
+		ch = text.charAt(i);
+		switch (ch) {
+		case 'e':
+		    retval += "&#275;";
+		    break;
+		case 'E':
+		    retval += "&#274;";
+		    break;
+		default:
+		    retval += "\\=" + ch;
+		    break;
+		}
+		break;
+	    case '.': // dot
+		i++;
+		ch = text.charAt(i);
+		switch (ch) {
+		case 'e':
+		    retval += "&#279;";
+		    break;
+		case 'E':
+		    retval += "&#278;";
+		    break;
+		case 'z':
+		    retval += "&#380;";
+		    break;
+		case 'Z':
+		    retval += "&#379;";
+		    break;
+		default:
+		    retval += "\\." + ch;
+		    break;
+		}
+		break;
+	    case 'u': // breve
+		i++;
+		ch = text.charAt(i);
+		switch (ch) {
+		default:
+		    retval += "\\u" + ch;
+		    break;
+		}
+		break;
+	    case 'v': // check
+		i++;
+		ch = text.charAt(i);
+		switch (ch) {
+		case 'c':
+		    retval += "&#269;";
+		    break;
+		default:
+		    retval += "\\c" + ch;
+		    break;
+		}
+		break;
+	    case 'H': // long hungarian umlat
+		i++;
+		ch = text.charAt(i);
+		switch (ch) {
+		default:
+		    retval += "\\H" + ch;
+		    break;
+		}
+		break;
+	    case 't': // tie-after
+		i++;
+		ch = text.charAt(i);
+		switch (ch) {
+		default:
+		    retval += "\\t" + ch;
+		    break;
+		}
+		break;
+	    case 'c': // cedilla
+		i++;
+		ch = text.charAt(i);
+		switch (ch) {
+		default:
+		    retval += "\\c" + ch;
+		    break;
+		}
+		break;
+	    case 'd': // dot-under
+		i++;
+		ch = text.charAt(i);
+		switch (ch) {
+		default:
+		    retval += "\\d" + ch;
+		    break;
+		}
+		break;
+	    case 'b': // bar-under
+		i++;
+		ch = text.charAt(i);
+		switch (ch) {
+		default:
+		    retval += "\\d" + ch;
+		    break;
+		}
+		break;
+	    default:
+		retval += "\\" + ch;
+		break;
+	    }
+	case '{': // literal
+	    // skip it
+	    break;
+	case '}': // literal
+	    // skip it
+	    break;
+	default:
+	    retval += ch;
+	    break;
+	}
+	i++;
+    }
+    return retval;
+}
+/*
+  æ, Æ	&aelig;, &AElig;	\ae, \AE	CTRL + SHIFT + & + a or A
+  ø, Ø	&oslash;, &Oslash;	\o, \O	CTRL + / + o or O
+  å, Å	&aring;, &Aring;	\aa, \AA	CTRL + SHIFT + @ + a or A
+  \glqq, "&bdquo;"
+  \grqq, '&rdquo;'
+  --- '&mdash;'
+  \ss '&szlig;'
+*/
+
 
