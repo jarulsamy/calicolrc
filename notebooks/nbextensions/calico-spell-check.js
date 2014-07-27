@@ -15,7 +15,7 @@ define( function () {
 	
 	var new_mode;
 	if (IPython.MarkdownCell.options_default.cm_config.mode == "spell-check") {
-	    new_mode = "markdown";
+	    new_mode = "gfm";
 	} else {
 	    new_mode = "spell-check";
 	}
@@ -25,7 +25,7 @@ define( function () {
 	var cells = IPython.notebook.get_cells();
 	for (var i = 0; i < cells.length; i++) {
             var cell = cells[i];
-            if (cell.cell_type == "markdown") {
+            if (cell.cell_type == "gfm") {
 		IPython.notebook.get_cell(i).code_mirror.setOption('mode', new_mode);
 	    }
 	}
