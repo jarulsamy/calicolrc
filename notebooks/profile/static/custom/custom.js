@@ -21,31 +21,30 @@ $([IPython.events]).on('app_initialized.NotebookApp', function() {
     /* End Drag and Drop Images ------------------------------ */
         
     /* Document Tools: --------------------------------------- */
-    require(['/static/custom/bibtex.js', 
-	     '/static/custom/document-tools.js'], function () {
-		 IPython.toolbar.add_buttons_group([
-		     // select your icon from http://fortawesome.github.io/Font-Awesome/icons
-		     {
-			 'label'   : 'Number Sections',
-			 'icon'    : 'icon-sort-by-order', 
-			 'callback': section_label
-		     },
-		     {
-			 'label'   : 'Generate Table of Contents',
-			 'icon'    : 'icon-sort-by-attributes-alt', 
-			 'callback': table_of_contents
-		     },
-		     {
-			 'label'   : 'Generate References',
-			 'icon'    : 'icon-book', 
-			 'callback': generate_references
-		     }
-		 ]);
-	     });
+    $.getScript('/static/custom/document-tools.js', function () {
+	IPython.toolbar.add_buttons_group([
+	    // select your icon from http://fortawesome.github.io/Font-Awesome/icons
+	    {
+		'label'   : 'Number Sections',
+		'icon'    : 'icon-sort-by-order', 
+		'callback': section_label
+	    },
+	    {
+		'label'   : 'Generate Table of Contents',
+		'icon'    : 'icon-sort-by-attributes-alt', 
+		'callback': table_of_contents
+	    },
+	    {
+		'label'   : 'Generate References',
+		'icon'    : 'icon-book', 
+		'callback': generate_references
+	    }
+	]);
+    });
     /* End Document Tools: ----------------------------------- */
 
     /* Cell Tools: ------------------------------------------- */
-    require(['/static/custom/cell-tools.js'], function () {
+    $.getScript('/static/custom/cell-tools.js', function() {
 	IPython.toolbar.add_buttons_group([
 	    // select your icon from http://fortawesome.github.io/Font-Awesome/icons
 	    {
@@ -60,26 +59,30 @@ $([IPython.events]).on('app_initialized.NotebookApp', function() {
 	    }
 	]);
 	$([IPython.events]).on('notebook_loaded.Notebook', function() {
+	    console.log("checking for formatting!");
 	    checkForFormatting();	
+	    console.log("checking for formatting done!");
 	});
     });
     /* End Cell Tools: --------------------------------------- */
-
+    
     /* Spelling Checking ------------------------------------- */
-    require(['/static/custom/spell-check.js', 
-	     '/static/custom/typo/typo.js'], function() {
-		 var lang = "en_US";
-		 document.dictionary = new Typo(lang, undefined, undefined, 
-						{"platform": "web", 
-						 "dictionaryPath": "/static/custom/typo/dictionaries"});
-		 IPython.toolbar.add_buttons_group([
-		     // select your icon from http://fortawesome.github.io/Font-Awesome/icons
-		     {
-			 'label'   : 'Toggle spell checking on a markdown cell',
-			 'icon'    : 'icon-check-sign',
-			 'callback': toggle_spell_check
-		     }      
-		 ]);
-	     });
+    require(['/static/custom/typo/typo.js'], function() {
+	var lang = "en_US";
+	document.dictionary = new Typo(lang, undefined, undefined, 
+				       {"platform": "web", 
+					"dictionaryPath": "/static/custom/typo/dictionaries"});
+	});
+
+    $.getScript('/static/custom/spell-check.js', function () {
+	IPython.toolbar.add_buttons_group([
+	    // select your icon from http://fortawesome.github.io/Font-Awesome/icons
+	    {
+		'label'   : 'Toggle spell checking on a markdown cell',
+		'icon'    : 'icon-check-sign',
+		'callback': toggle_spell_check
+	    }      
+	]);
+    });
     /* End Spelling Checking --------------------------------- */
 });

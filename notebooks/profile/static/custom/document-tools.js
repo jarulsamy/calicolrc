@@ -8,6 +8,8 @@
  *
  **/
 
+require(['/static/custom/bibtex.js']);
+
 function section_label() {
     // Label headings with numbers, or toggle them off
     // If there is a table of contents, re-do it

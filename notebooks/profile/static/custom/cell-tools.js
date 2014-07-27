@@ -191,19 +191,18 @@ function toggle_tabs(evt, input_cell) {
     }
 }
 
-function checkForFormatting() {
+function checkForFormatting () {
     // Check to see if code cells have metadata formatting (two-column, tabs)
     // and toggle if they do.
     var cells = IPython.notebook.get_cells();
     for (var i = 0; i < cells.length; i++) {
-        var cell = cells[i];
-        if (cell.cell_type == "code") {
-            if (cell.metadata.format == "tab") {
-                toggle_tabs("temp", cell);
-            } else if (cell.metadata.format == "column") {
+	var cell = cells[i];
+	if (cell.cell_type == "code") {
+	    if (cell.metadata.format == "tab") {
+		toggle_tabs("temp", cell);
+	    } else if (cell.metadata.format == "column") {
 		toggle_columns("temp", cell);
 	    }
-        }
+	}
     }
 }
-
