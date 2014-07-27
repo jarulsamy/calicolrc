@@ -25,7 +25,7 @@ define( function () {
 	var cells = IPython.notebook.get_cells();
 	for (var i = 0; i < cells.length; i++) {
             var cell = cells[i];
-            if (cell.cell_type == "gfm") {
+            if (cell.cell_type == "markdown") {
 		IPython.notebook.get_cell(i).code_mirror.setOption('mode', new_mode);
 	    }
 	}
@@ -75,9 +75,9 @@ define( function () {
 		    return null;
 		}
 	    };
-	    // Put this overlay on top of "markdown" mode.
+	    // Put this overlay on top of Markdown's mode.
 	    // opaque: true allows the styles (spell-check and markdown) to be combined.
-	    return CodeMirror.overlayMode(CodeMirror.getMode(config, "markdown"), spellOverlay, {"opaque": true});
+	    return CodeMirror.overlayMode(CodeMirror.getMode(config, "gfm"), spellOverlay, {"opaque": true});
 	});
 
 	// Load dictionary:
