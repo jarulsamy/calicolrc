@@ -3,7 +3,7 @@ from code2notebook import *
 import glob
 import os
 
-ignore = [".ipynb_checkpoints", "attic", "Bugs", "reveal.js", "profile", "rebuild", "images"]
+ignore = [".ipynb_checkpoints", "attic", "Bugs", "reveal.js", "profile", "rebuild", "images", "nbextensions"]
 
 def contains(root_path, items):
     for item in items:
