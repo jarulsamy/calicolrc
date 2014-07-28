@@ -10,6 +10,154 @@
 
 define( function () {
 
+    function move_section_down(event, index) {
+        var i = IPython.notebook.index_or_selected(index);
+	var max_pos = IPython.notebook.get_cells().length - 1
+        if (IPython.notebook.is_valid_cell_index(i) && i < max_pos) {
+	    var curr_section = IPython.notebook.get_cell(i);
+	    if (curr_section.cell_type != "heading") {
+		// Just one cell to move:
+		IPython.notebook.move_cell_down(i);
+	    } else {
+		// move an entire section
+		// find same level below this section, next_section
+		var next_section = get_index_level_below(curr_section.level, i);
+		if (next_section == undefined) {
+		    return;
+		}
+		// get last cell in section:
+		next_section = get_last_cell_index_in_section(curr_section.level, next_section);
+		// detach all in curr_section
+		var detach = [IPython.notebook.get_cell_element(i)];
+		var current = i + 1;
+		while (IPython.notebook.is_valid_cell_index(current)) {
+		    // part of section?
+		    var cell = IPython.notebook.get_cell(current);
+		    if (cell.cell_type == "heading" && cell.level <= curr_section.level) {
+			console.log("break!");
+			break;
+		    } else {
+			console.log("will move " + current)
+			detach.push(IPython.notebook.get_cell_element(current));
+		    }
+		    current++;
+		}
+		// Get target now:
+		console.log("Found target (pivot) at " + next_section);
+		var target = IPython.notebook.get_cell_element(next_section);
+		var element_index;
+		var element;
+		for (element_index in detach) {
+		    element = detach[element_index];
+		    element.detach();
+		}
+		var count = 0;
+		for (element_index in detach) {
+		    element = detach[element_index];
+		    target.after(element);
+		    target = element;
+		    count++;
+		}
+		console.log("Done! Now setting focus on cell " + next_section - count + 1);
+		// focus on original section, in new location:
+		IPython.notebook.select(next_section - count + 1);
+		var cell = IPython.notebook.get_selected_cell();
+		cell.focus_cell();
+		IPython.notebook.set_dirty(true);
+	    }
+        }
+    }
+    
+    function move_section_up(event, index) {
+        var i = IPython.notebook.index_or_selected(index);
+        if (IPython.notebook.is_valid_cell_index(i) && i > 0) {
+	    var curr_section = IPython.notebook.get_cell(i);
+	    if (curr_section.cell_type != "heading") {
+		// Just one cell to move:
+		IPython.notebook.move_cell_up(i);
+	    } else {
+		// move an entire section
+		// find same level above this section, prev_section
+		var prev_section = get_index_level_above(curr_section.level, i);
+		if (prev_section == undefined) {
+		    return;
+		}
+		// detach all in curr_section
+		var detach = [IPython.notebook.get_cell_element(i)];
+		var current = i + 1;
+		while (IPython.notebook.is_valid_cell_index(current)) {
+		    // part of section?
+		    var cell = IPython.notebook.get_cell(current);
+		    if (cell.cell_type == "heading" && cell.level <= curr_section.level) {
+			console.log("break!");
+			break;
+		    } else {
+			console.log("will move " + current)
+			detach.push(IPython.notebook.get_cell_element(current));
+		    }
+		    current++;
+		}
+		// Get target now:
+		console.log("Found target (pivot) at " + prev_section);
+		var target = IPython.notebook.get_cell_element(prev_section);
+		var element_index;
+		var element;
+		for (element_index in detach) {
+		    element = detach[element_index];
+		    element.detach();
+		}
+		var count = 0;
+		for (element_index in detach) {
+		    element = detach[element_index];
+		    target.before(element);
+		    count++;
+		}
+		console.log("Done! Now setting focus on cell " + prev_section);
+		// focus on original section, in new location:
+		IPython.notebook.select(prev_section);
+		var cell = IPython.notebook.get_selected_cell();
+		cell.focus_cell();
+		IPython.notebook.set_dirty(true);
+	    }
+        }
+    }  
+
+    function get_last_cell_index_in_section(level, index) {
+	var current = index;
+        while (IPython.notebook.is_valid_cell_index(current + 1)) {
+	    var cell = IPython.notebook.get_cell(current + 1);
+	    if (cell.cell_type == "heading" && cell.level <= level) {
+		return current;
+	    }
+	    current++;
+	}
+	return current;
+    }
+
+    function get_index_level_above(level, index) {
+	var current = current = index - 1;
+        while (IPython.notebook.is_valid_cell_index(current)) {
+	    var cell = IPython.notebook.get_cell(current);
+	    if (cell.cell_type == "heading" && cell.level <= level) {
+		return current;
+	    }
+	    current--;
+	}
+	return undefined;
+    }
+
+    function get_index_level_below(level, index) {
+	var current = current = index + 1;
+        while (IPython.notebook.is_valid_cell_index(current)) {
+	    var cell = IPython.notebook.get_cell(current);
+	    if (cell.cell_type == "heading" && cell.level <= level) {
+		return current;
+	    }
+	    current++;
+	}
+	return undefined;
+    }
+    
     function section_label() {
 	// Label headings with numbers, or toggle them off
 	// If there is a table of contents, re-do it
@@ -869,6 +1017,16 @@ define( function () {
     var add_toolbar_buttons = function () {
 	IPython.toolbar.add_buttons_group([
 	    // select your icon from http://fortawesome.github.io/Font-Awesome/icons
+	    {
+		'label'   : 'Move Section Up',
+		'icon'    : 'icon-level-up', 
+		'callback': move_section_up
+	    },
+	    {
+		'label'   : 'Move Section Down',
+		'icon'    : 'icon-level-down', 
+		'callback': move_section_down
+	    },
 	    {
 		'label'   : 'Number Sections',
 		'icon'    : 'icon-sort-by-order', 
