@@ -11,22 +11,20 @@
 define( function () {
 
     function toggle_spell_check() {
-	// Toggle on/off spelling checking on a markdown cell
-	
-	var new_mode;
-	if (IPython.MarkdownCell.options_default.cm_config.mode == "spell-check") {
-	    new_mode = "gfm";
-	} else {
-	    new_mode = "spell-check";
-	}
-	
+	// Toggle on/off spelling checking on for markdown and heading cells
+	// toggle it!
+	var spelling_mode = (IPython.MarkdownCell.options_default.cm_config.mode == "gfm");
+	// Change defaults for new cells:
+	IPython.MarkdownCell.options_default.cm_config.mode = (spelling_mode ? "spell-check-gfm" : "gfm");
+	IPython.HeadingCell.options_default.cm_config = {"mode": (spelling_mode ? "spell-check-mixedhtml" : "mixedhtml")};
 	// And change any existing markdown cells:
-	IPython.MarkdownCell.options_default.cm_config.mode = new_mode;
 	var cells = IPython.notebook.get_cells();
 	for (var i = 0; i < cells.length; i++) {
             var cell = cells[i];
             if (cell.cell_type == "markdown") {
-		IPython.notebook.get_cell(i).code_mirror.setOption('mode', new_mode);
+		IPython.notebook.get_cell(i).code_mirror.setOption('mode', (spelling_mode ? "spell-check-gfm" : "gfm"));
+	    } else if (cell.cell_type == "heading") {
+		IPython.notebook.get_cell(i).code_mirror.setOption('mode', (spelling_mode ? "spell-check-mixedhtml" : "mixedhtml"));
 	    }
 	}
     }
@@ -36,7 +34,6 @@ define( function () {
 	link.type = "text/css";
 	link.rel = "stylesheet";
 	link.href = require.toUrl("/nbextensions/calico-spell-check.css");
-	console.log(link);
 	document.getElementsByTagName("head")[0].appendChild(link);
     };
 
@@ -50,35 +47,40 @@ define( function () {
 	// Load the CSS for spelling errors (red wavy line under misspelled word):
 	load_css();
 
-	CodeMirror.defineMode("spell-check", function(config, parserConfig) {
-	    // This overlay sits on top of a mode, given below.
-	    // It first checks here to see if a CSS class should be given.
-	    // Here, "spell-error" is defined in the associated CSS file
-	    
-	    // rx_word defines characters not in words. Everything except single quote.
-	    var rx_word = new RegExp("[^\!\"\#\$\%\&\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~\ ]");
-	    var spellOverlay = {
-		token: function (stream, state) {
-		    var ch;
-		    if (stream.match(rx_word)) { 
-			while ((ch = stream.peek()) != null) {
-			    if (!ch.match(rx_word)) {
-				break;
+	var makeOverlay = function(mode) {
+	    return function(config, parserConfig) {
+		// This overlay sits on top of a mode, given below.
+		// It first checks here to see if a CSS class should be given.
+		// Here, "spell-error" is defined in the associated CSS file
+		
+		// rx_word defines characters not in words. Everything except single quote.
+		var rx_word = new RegExp("[^\!\"\#\$\%\&\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~\ ]");
+		var spellOverlay = {
+		    token: function (stream, state) {
+			var ch;
+			if (stream.match(rx_word)) { 
+			    while ((ch = stream.peek()) != null) {
+				if (!ch.match(rx_word)) {
+				    break;
+				}
+				stream.next();
 			    }
-			    stream.next();
+			    if (!typo_check(stream.current()))
+				return "spell-error";
+			    return null;
 			}
-			if (!typo_check(stream.current()))
-			    return "spell-error";
+			while (stream.next() != null && !stream.match(rx_word, false)) {}
 			return null;
 		    }
-		    while (stream.next() != null && !stream.match(rx_word, false)) {}
-		    return null;
-		}
-	    };
-	    // Put this overlay on top of Markdown's mode.
-	    // opaque: true allows the styles (spell-check and markdown) to be combined.
-	    return CodeMirror.overlayMode(CodeMirror.getMode(config, "gfm"), spellOverlay, {"opaque": true});
-	});
+		};
+		// Put this overlay on top of mode.
+		// opaque: true allows the styles (spell-check and markdown) to be combined.
+		return CodeMirror.overlayMode(CodeMirror.getMode(config, mode), spellOverlay, {"opaque": true});
+	    }
+	}
+	
+	CodeMirror.defineMode("spell-check-gfm", makeOverlay("gfm"));
+	CodeMirror.defineMode("spell-check-mixedhtml", makeOverlay("mixedhtml"));
 
 	// Load dictionary:
 	require(['/nbextensions/typo/typo.js'], function() {

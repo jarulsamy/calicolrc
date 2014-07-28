@@ -34,16 +34,13 @@ define( function () {
 		    // part of section?
 		    var cell = IPython.notebook.get_cell(current);
 		    if (cell.cell_type == "heading" && cell.level <= curr_section.level) {
-			console.log("break!");
 			break;
 		    } else {
-			console.log("will move " + current)
 			detach.push(IPython.notebook.get_cell_element(current));
 		    }
 		    current++;
 		}
 		// Get target now:
-		console.log("Found target (pivot) at " + next_section);
 		var target = IPython.notebook.get_cell_element(next_section);
 		var element_index;
 		var element;
@@ -58,7 +55,6 @@ define( function () {
 		    target = element;
 		    count++;
 		}
-		console.log("Done! Now setting focus on cell " + next_section - count + 1);
 		// focus on original section, in new location:
 		IPython.notebook.select(next_section - count + 1);
 		var cell = IPython.notebook.get_selected_cell();
@@ -89,16 +85,13 @@ define( function () {
 		    // part of section?
 		    var cell = IPython.notebook.get_cell(current);
 		    if (cell.cell_type == "heading" && cell.level <= curr_section.level) {
-			console.log("break!");
 			break;
 		    } else {
-			console.log("will move " + current)
 			detach.push(IPython.notebook.get_cell_element(current));
 		    }
 		    current++;
 		}
 		// Get target now:
-		console.log("Found target (pivot) at " + prev_section);
 		var target = IPython.notebook.get_cell_element(prev_section);
 		var element_index;
 		var element;
@@ -112,7 +105,6 @@ define( function () {
 		    target.before(element);
 		    count++;
 		}
-		console.log("Done! Now setting focus on cell " + prev_section);
 		// focus on original section, in new location:
 		IPython.notebook.select(prev_section);
 		var cell = IPython.notebook.get_selected_cell();

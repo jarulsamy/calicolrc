@@ -214,7 +214,6 @@ define( function () {
 	link.type = "text/css";
 	link.rel = "stylesheet";
 	link.href = require.toUrl("/nbextensions/calico-cell-tools.css");
-	console.log(link);
 	document.getElementsByTagName("head")[0].appendChild(link);
     };
 
@@ -239,9 +238,7 @@ define( function () {
 	load_css();
 	
 	$([IPython.events]).on('notebook_loaded.Notebook', function() {
-	    console.log("checking for formatting!");
 	    checkForFormatting();	
-	    console.log("checking for formatting done!");
 	});
 	
 	// Put a button on the toolbar:
