@@ -100,11 +100,12 @@ define( function () {
     };
 
     var add_toolbar_buttons = function () {
+	var version = IPython.version.substring(0, 1);
 	IPython.toolbar.add_buttons_group([
 	    // select your icon from http://fortawesome.github.io/Font-Awesome/icons
 	    {
 		'label'   : 'Toggle spell checking on a markdown cell',
-		'icon'    : 'icon-check-sign',
+		'icon'    : (version === "2") ? 'icon-check-sign' : 'fa-check-square',
 		'callback': toggle_spell_check
 	    }      
 	]);

@@ -1007,31 +1007,32 @@ define( function () {
     };
 
     var add_toolbar_buttons = function () {
+	var version = IPython.version.substring(0, 1);
 	IPython.toolbar.add_buttons_group([
 	    // select your icon from http://fortawesome.github.io/Font-Awesome/icons
 	    {
 		'label'   : 'Move Section Up',
-		'icon'    : 'icon-level-up', 
+		'icon'    : (version === "2") ? 'icon-level-up' : 'fa-level-up', 
 		'callback': move_section_up
 	    },
 	    {
 		'label'   : 'Move Section Down',
-		'icon'    : 'icon-level-down', 
+		'icon'    : (version === "2") ? 'icon-level-down' : 'fa-level-down', 
 		'callback': move_section_down
 	    },
 	    {
 		'label'   : 'Number Sections',
-		'icon'    : 'icon-sort-by-order', 
+		'icon'    : (version === "2") ? 'icon-sort-by-order' : 'fa-sort-numeric-asc', 
 		'callback': section_label
 	    },
 	    {
 		'label'   : 'Generate Table of Contents',
-		'icon'    : 'icon-sort-by-attributes-alt', 
+		'icon'    : (version === "2") ? 'icon-sort-by-attributes-alt' : 'fa-list', 
 		'callback': table_of_contents
 	    },
 	    {
 		'label'   : 'Generate References',
-		'icon'    : 'icon-book', 
+		'icon'    : (version === "2") ? 'icon-book' : 'fa-book', 
 		'callback': generate_references
 	    }
 	]);
