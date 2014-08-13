@@ -1,0 +1,5 @@
+{
+    "argv": ["python", "-m","calico_scheme_kernel", "-f", "{connection_file}"],
+    "display_name": "Scheme",
+    "language": "scheme"
+}
