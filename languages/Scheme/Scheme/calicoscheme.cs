@@ -2493,15 +2493,10 @@ public class PJScheme:Scheme
             msg_reg = "incorrect number of arguments to sqrt";
             pc = runtime_error;
         } else {
-            if (true_q((! true_q(all_numeric_q(args_reg))))) {
-                msg_reg = "sqrt called on non-numeric argument(s)";
-                pc = runtime_error;
-            } else {
-                value2_reg = fail_reg;
-                value1_reg = apply(sqrt_proc, args_reg);
-                k_reg = k2_reg;
-                pc = apply_cont2;
-            }
+            value2_reg = fail_reg;
+            value1_reg = apply(sqrt_proc, args_reg);
+            k_reg = k2_reg;
+            pc = apply_cont2;
         }
     }
     
@@ -2534,19 +2529,14 @@ public class PJScheme:Scheme
             msg_reg = "incorrect number of arguments to quotient";
             pc = runtime_error;
         } else {
-            if (true_q((! true_q(all_numeric_q(args_reg))))) {
-                msg_reg = "quotent called on non-numeric argument(s)";
+            if (true_q(member(0, cdr(args_reg)))) {
+                msg_reg = "division by zero";
                 pc = runtime_error;
             } else {
-                if (true_q(member(0, cdr(args_reg)))) {
-                    msg_reg = "division by zero";
-                    pc = runtime_error;
-                } else {
-                    value2_reg = fail_reg;
-                    value1_reg = apply(quotient_proc, args_reg);
-                    k_reg = k2_reg;
-                    pc = apply_cont2;
-                }
+                value2_reg = fail_reg;
+                value1_reg = apply(quotient_proc, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
             }
         }
     }
@@ -3351,15 +3341,10 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_79_d() {
-        if (true_q((! true_q(all_numeric_q(args_reg))))) {
-            msg_reg = "+ called on non-numeric argument(s)";
-            pc = runtime_error;
-        } else {
-            value2_reg = fail_reg;
-            value1_reg = apply(Add_proc, args_reg);
-            k_reg = k2_reg;
-            pc = apply_cont2;
-        }
+        value2_reg = fail_reg;
+        value1_reg = apply(Add_proc, args_reg);
+        k_reg = k2_reg;
+        pc = apply_cont2;
     }
     
     public static void b_proc_80_d() {
@@ -3367,44 +3352,29 @@ public class PJScheme:Scheme
             msg_reg = "incorrect number of arguments to -";
             pc = runtime_error;
         } else {
-            if (true_q((! true_q(all_numeric_q(args_reg))))) {
-                msg_reg = "- called on non-numeric argument(s)";
-                pc = runtime_error;
-            } else {
-                value2_reg = fail_reg;
-                value1_reg = apply(Subtract_proc, args_reg);
-                k_reg = k2_reg;
-                pc = apply_cont2;
-            }
-        }
-    }
-    
-    public static void b_proc_81_d() {
-        if (true_q((! true_q(all_numeric_q(args_reg))))) {
-            msg_reg = "* called on non-numeric argument(s)";
-            pc = runtime_error;
-        } else {
             value2_reg = fail_reg;
-            value1_reg = apply(Multiply_proc, args_reg);
+            value1_reg = apply(Subtract_proc, args_reg);
             k_reg = k2_reg;
             pc = apply_cont2;
         }
     }
     
+    public static void b_proc_81_d() {
+        value2_reg = fail_reg;
+        value1_reg = apply(Multiply_proc, args_reg);
+        k_reg = k2_reg;
+        pc = apply_cont2;
+    }
+    
     public static void b_proc_82_d() {
-        if (true_q((! true_q(all_numeric_q(args_reg))))) {
-            msg_reg = "/ called on non-numeric argument(s)";
+        if (true_q((true_q(GreaterThan(length(args_reg), 1)) && true_q(member(0, cdr(args_reg)))))) {
+            msg_reg = "division by zero";
             pc = runtime_error;
         } else {
-            if (true_q((true_q(GreaterThan(length(args_reg), 1)) && true_q(member(0, cdr(args_reg)))))) {
-                msg_reg = "division by zero";
-                pc = runtime_error;
-            } else {
-                value2_reg = fail_reg;
-                value1_reg = apply(Divide_proc, args_reg);
-                k_reg = k2_reg;
-                pc = apply_cont2;
-            }
+            value2_reg = fail_reg;
+            value1_reg = apply(Divide_proc, args_reg);
+            k_reg = k2_reg;
+            pc = apply_cont2;
         }
     }
     
@@ -3413,45 +3383,30 @@ public class PJScheme:Scheme
             msg_reg = "incorrect number of arguments to %";
             pc = runtime_error;
         } else {
-            if (true_q((! true_q(all_numeric_q(args_reg))))) {
-                msg_reg = "% called on non-numeric argument(s)";
+            if (true_q(Equal(cadr(args_reg), 0))) {
+                msg_reg = "modulo by zero";
                 pc = runtime_error;
             } else {
-                if (true_q(Equal(cadr(args_reg), 0))) {
-                    msg_reg = "modulo by zero";
-                    pc = runtime_error;
-                } else {
-                    value2_reg = fail_reg;
-                    value1_reg = apply(modulo_proc, args_reg);
-                    k_reg = k2_reg;
-                    pc = apply_cont2;
-                }
+                value2_reg = fail_reg;
+                value1_reg = apply(modulo_proc, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
             }
         }
     }
     
     public static void b_proc_84_d() {
-        if (true_q((! true_q(all_numeric_q(args_reg))))) {
-            msg_reg = "% called on non-numeric argument(s)";
-            pc = runtime_error;
-        } else {
-            value2_reg = fail_reg;
-            value1_reg = apply(min_proc, args_reg);
-            k_reg = k2_reg;
-            pc = apply_cont2;
-        }
+        value2_reg = fail_reg;
+        value1_reg = apply(min_proc, args_reg);
+        k_reg = k2_reg;
+        pc = apply_cont2;
     }
     
     public static void b_proc_85_d() {
-        if (true_q((! true_q(all_numeric_q(args_reg))))) {
-            msg_reg = "% called on non-numeric argument(s)";
-            pc = runtime_error;
-        } else {
-            value2_reg = fail_reg;
-            value1_reg = apply(max_proc, args_reg);
-            k_reg = k2_reg;
-            pc = apply_cont2;
-        }
+        value2_reg = fail_reg;
+        value1_reg = apply(max_proc, args_reg);
+        k_reg = k2_reg;
+        pc = apply_cont2;
     }
     
     public static void b_proc_86_d() {
@@ -3459,15 +3414,10 @@ public class PJScheme:Scheme
             msg_reg = "incorrect number of arguments to <";
             pc = runtime_error;
         } else {
-            if (true_q((! true_q(all_numeric_q(args_reg))))) {
-                msg_reg = "< called on non-numeric argument(s)";
-                pc = runtime_error;
-            } else {
-                value2_reg = fail_reg;
-                value1_reg = apply(LessThan_proc, args_reg);
-                k_reg = k2_reg;
-                pc = apply_cont2;
-            }
+            value2_reg = fail_reg;
+            value1_reg = apply(LessThan_proc, args_reg);
+            k_reg = k2_reg;
+            pc = apply_cont2;
         }
     }
     
@@ -3476,15 +3426,10 @@ public class PJScheme:Scheme
             msg_reg = "incorrect number of arguments to >";
             pc = runtime_error;
         } else {
-            if (true_q((! true_q(all_numeric_q(args_reg))))) {
-                msg_reg = "> called on non-numeric argument(s)";
-                pc = runtime_error;
-            } else {
-                value2_reg = fail_reg;
-                value1_reg = apply(GreaterThan_proc, args_reg);
-                k_reg = k2_reg;
-                pc = apply_cont2;
-            }
+            value2_reg = fail_reg;
+            value1_reg = apply(GreaterThan_proc, args_reg);
+            k_reg = k2_reg;
+            pc = apply_cont2;
         }
     }
     
@@ -3493,15 +3438,10 @@ public class PJScheme:Scheme
             msg_reg = "incorrect number of arguments to <=";
             pc = runtime_error;
         } else {
-            if (true_q((! true_q(all_numeric_q(args_reg))))) {
-                msg_reg = "<= called on non-numeric argument(s)";
-                pc = runtime_error;
-            } else {
-                value2_reg = fail_reg;
-                value1_reg = apply(LessThanEqual_proc, args_reg);
-                k_reg = k2_reg;
-                pc = apply_cont2;
-            }
+            value2_reg = fail_reg;
+            value1_reg = apply(LessThanEqual_proc, args_reg);
+            k_reg = k2_reg;
+            pc = apply_cont2;
         }
     }
     
@@ -3510,15 +3450,10 @@ public class PJScheme:Scheme
             msg_reg = "incorrect number of arguments to >=";
             pc = runtime_error;
         } else {
-            if (true_q((! true_q(all_numeric_q(args_reg))))) {
-                msg_reg = ">= called on non-numeric argument(s)";
-                pc = runtime_error;
-            } else {
-                value2_reg = fail_reg;
-                value1_reg = apply(GreaterThanEqual_proc, args_reg);
-                k_reg = k2_reg;
-                pc = apply_cont2;
-            }
+            value2_reg = fail_reg;
+            value1_reg = apply(GreaterThanEqual_proc, args_reg);
+            k_reg = k2_reg;
+            pc = apply_cont2;
         }
     }
     
@@ -3527,15 +3462,10 @@ public class PJScheme:Scheme
             msg_reg = "incorrect number of arguments to =";
             pc = runtime_error;
         } else {
-            if (true_q((! true_q(all_numeric_q(args_reg))))) {
-                msg_reg = "= called on non-numeric argument(s)";
-                pc = runtime_error;
-            } else {
-                value2_reg = fail_reg;
-                value1_reg = apply(Equal_proc, args_reg);
-                k_reg = k2_reg;
-                pc = apply_cont2;
-            }
+            value2_reg = fail_reg;
+            value1_reg = apply(Equal_proc, args_reg);
+            k_reg = k2_reg;
+            pc = apply_cont2;
         }
     }
     
@@ -3544,15 +3474,10 @@ public class PJScheme:Scheme
             msg_reg = "incorrect number of arguments to abs";
             pc = runtime_error;
         } else {
-            if (true_q((! true_q(all_numeric_q(args_reg))))) {
-                msg_reg = "abs called on non-numeric argument(s)";
-                pc = runtime_error;
-            } else {
-                value2_reg = fail_reg;
-                value1_reg = apply(abs_proc, args_reg);
-                k_reg = k2_reg;
-                pc = apply_cont2;
-            }
+            value2_reg = fail_reg;
+            value1_reg = apply(abs_proc, args_reg);
+            k_reg = k2_reg;
+            pc = apply_cont2;
         }
     }
     
@@ -3610,15 +3535,10 @@ public class PJScheme:Scheme
             msg_reg = "incorrect number of arguments to range";
             pc = runtime_error;
         } else {
-            if (true_q((! true_q(all_numeric_q(args_reg))))) {
-                msg_reg = "range called on non-numeric argument(s)";
-                pc = runtime_error;
-            } else {
-                value2_reg = fail_reg;
-                value1_reg = apply(Range_proc, args_reg);
-                k_reg = k2_reg;
-                pc = apply_cont2;
-            }
+            value2_reg = fail_reg;
+            value1_reg = apply(Range_proc, args_reg);
+            k_reg = k2_reg;
+            pc = apply_cont2;
         }
     }
     

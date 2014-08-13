@@ -3066,14 +3066,10 @@ def b_proc_18_d():
         globals()['msg_reg'] = "incorrect number of arguments to sqrt"
         globals()['pc'] = runtime_error
     else:
-        if true_q(not(all_numeric_q(args_reg))):
-            globals()['msg_reg'] = "sqrt called on non-numeric argument(s)"
-            globals()['pc'] = runtime_error
-        else:
-            globals()['value2_reg'] = fail_reg
-            globals()['value1_reg'] = Apply(sqrt, args_reg)
-            globals()['k_reg'] = k2_reg
-            globals()['pc'] = apply_cont2
+        globals()['value2_reg'] = fail_reg
+        globals()['value1_reg'] = Apply(sqrt, args_reg)
+        globals()['k_reg'] = k2_reg
+        globals()['pc'] = apply_cont2
 
 def b_proc_19_d():
     if true_q(not(length_one_q(args_reg))):
@@ -3100,18 +3096,14 @@ def b_proc_21_d():
         globals()['msg_reg'] = "incorrect number of arguments to quotient"
         globals()['pc'] = runtime_error
     else:
-        if true_q(not(all_numeric_q(args_reg))):
-            globals()['msg_reg'] = "quotent called on non-numeric argument(s)"
+        if true_q(member(0, cdr(args_reg))):
+            globals()['msg_reg'] = "division by zero"
             globals()['pc'] = runtime_error
         else:
-            if true_q(member(0, cdr(args_reg))):
-                globals()['msg_reg'] = "division by zero"
-                globals()['pc'] = runtime_error
-            else:
-                globals()['value2_reg'] = fail_reg
-                globals()['value1_reg'] = Apply(quotient, args_reg)
-                globals()['k_reg'] = k2_reg
-                globals()['pc'] = apply_cont2
+            globals()['value2_reg'] = fail_reg
+            globals()['value1_reg'] = Apply(quotient, args_reg)
+            globals()['k_reg'] = k2_reg
+            globals()['pc'] = apply_cont2
 
 def b_proc_22_d():
     if true_q(not(length_two_q(args_reg))):
@@ -3777,174 +3769,122 @@ def b_proc_78_d():
         globals()['pc'] = make_set
 
 def b_proc_79_d():
-    if true_q(not(all_numeric_q(args_reg))):
-        globals()['msg_reg'] = "+ called on non-numeric argument(s)"
-        globals()['pc'] = runtime_error
-    else:
-        globals()['value2_reg'] = fail_reg
-        globals()['value1_reg'] = Apply(plus, args_reg)
-        globals()['k_reg'] = k2_reg
-        globals()['pc'] = apply_cont2
+    globals()['value2_reg'] = fail_reg
+    globals()['value1_reg'] = Apply(plus, args_reg)
+    globals()['k_reg'] = k2_reg
+    globals()['pc'] = apply_cont2
 
 def b_proc_80_d():
     if true_q(null_q(args_reg)):
         globals()['msg_reg'] = "incorrect number of arguments to -"
         globals()['pc'] = runtime_error
     else:
-        if true_q(not(all_numeric_q(args_reg))):
-            globals()['msg_reg'] = "- called on non-numeric argument(s)"
-            globals()['pc'] = runtime_error
-        else:
-            globals()['value2_reg'] = fail_reg
-            globals()['value1_reg'] = Apply(minus, args_reg)
-            globals()['k_reg'] = k2_reg
-            globals()['pc'] = apply_cont2
-
-def b_proc_81_d():
-    if true_q(not(all_numeric_q(args_reg))):
-        globals()['msg_reg'] = "* called on non-numeric argument(s)"
-        globals()['pc'] = runtime_error
-    else:
         globals()['value2_reg'] = fail_reg
-        globals()['value1_reg'] = Apply(multiply, args_reg)
+        globals()['value1_reg'] = Apply(minus, args_reg)
         globals()['k_reg'] = k2_reg
         globals()['pc'] = apply_cont2
 
+def b_proc_81_d():
+    globals()['value2_reg'] = fail_reg
+    globals()['value1_reg'] = Apply(multiply, args_reg)
+    globals()['k_reg'] = k2_reg
+    globals()['pc'] = apply_cont2
+
 def b_proc_82_d():
-    if true_q(not(all_numeric_q(args_reg))):
-        globals()['msg_reg'] = "/ called on non-numeric argument(s)"
+    if true_q((GreaterThan(length(args_reg), 1)) and (member(0, cdr(args_reg)))):
+        globals()['msg_reg'] = "division by zero"
         globals()['pc'] = runtime_error
     else:
-        if true_q((GreaterThan(length(args_reg), 1)) and (member(0, cdr(args_reg)))):
-            globals()['msg_reg'] = "division by zero"
-            globals()['pc'] = runtime_error
-        else:
-            globals()['value2_reg'] = fail_reg
-            globals()['value1_reg'] = Apply(divide, args_reg)
-            globals()['k_reg'] = k2_reg
-            globals()['pc'] = apply_cont2
+        globals()['value2_reg'] = fail_reg
+        globals()['value1_reg'] = Apply(divide, args_reg)
+        globals()['k_reg'] = k2_reg
+        globals()['pc'] = apply_cont2
 
 def b_proc_83_d():
     if true_q(not(length_two_q(args_reg))):
         globals()['msg_reg'] = "incorrect number of arguments to %"
         globals()['pc'] = runtime_error
     else:
-        if true_q(not(all_numeric_q(args_reg))):
-            globals()['msg_reg'] = "% called on non-numeric argument(s)"
+        if true_q(Equal(cadr(args_reg), 0)):
+            globals()['msg_reg'] = "modulo by zero"
             globals()['pc'] = runtime_error
         else:
-            if true_q(Equal(cadr(args_reg), 0)):
-                globals()['msg_reg'] = "modulo by zero"
-                globals()['pc'] = runtime_error
-            else:
-                globals()['value2_reg'] = fail_reg
-                globals()['value1_reg'] = Apply(modulo, args_reg)
-                globals()['k_reg'] = k2_reg
-                globals()['pc'] = apply_cont2
+            globals()['value2_reg'] = fail_reg
+            globals()['value1_reg'] = Apply(modulo, args_reg)
+            globals()['k_reg'] = k2_reg
+            globals()['pc'] = apply_cont2
 
 def b_proc_84_d():
-    if true_q(not(all_numeric_q(args_reg))):
-        globals()['msg_reg'] = "% called on non-numeric argument(s)"
-        globals()['pc'] = runtime_error
-    else:
-        globals()['value2_reg'] = fail_reg
-        globals()['value1_reg'] = Apply(min, args_reg)
-        globals()['k_reg'] = k2_reg
-        globals()['pc'] = apply_cont2
+    globals()['value2_reg'] = fail_reg
+    globals()['value1_reg'] = Apply(min, args_reg)
+    globals()['k_reg'] = k2_reg
+    globals()['pc'] = apply_cont2
 
 def b_proc_85_d():
-    if true_q(not(all_numeric_q(args_reg))):
-        globals()['msg_reg'] = "% called on non-numeric argument(s)"
-        globals()['pc'] = runtime_error
-    else:
-        globals()['value2_reg'] = fail_reg
-        globals()['value1_reg'] = Apply(max, args_reg)
-        globals()['k_reg'] = k2_reg
-        globals()['pc'] = apply_cont2
+    globals()['value2_reg'] = fail_reg
+    globals()['value1_reg'] = Apply(max, args_reg)
+    globals()['k_reg'] = k2_reg
+    globals()['pc'] = apply_cont2
 
 def b_proc_86_d():
     if true_q(not(length_at_least_q(2, args_reg))):
         globals()['msg_reg'] = "incorrect number of arguments to <"
         globals()['pc'] = runtime_error
     else:
-        if true_q(not(all_numeric_q(args_reg))):
-            globals()['msg_reg'] = "< called on non-numeric argument(s)"
-            globals()['pc'] = runtime_error
-        else:
-            globals()['value2_reg'] = fail_reg
-            globals()['value1_reg'] = Apply(LessThan, args_reg)
-            globals()['k_reg'] = k2_reg
-            globals()['pc'] = apply_cont2
+        globals()['value2_reg'] = fail_reg
+        globals()['value1_reg'] = Apply(LessThan, args_reg)
+        globals()['k_reg'] = k2_reg
+        globals()['pc'] = apply_cont2
 
 def b_proc_87_d():
     if true_q(not(length_at_least_q(2, args_reg))):
         globals()['msg_reg'] = "incorrect number of arguments to >"
         globals()['pc'] = runtime_error
     else:
-        if true_q(not(all_numeric_q(args_reg))):
-            globals()['msg_reg'] = "> called on non-numeric argument(s)"
-            globals()['pc'] = runtime_error
-        else:
-            globals()['value2_reg'] = fail_reg
-            globals()['value1_reg'] = Apply(GreaterThan, args_reg)
-            globals()['k_reg'] = k2_reg
-            globals()['pc'] = apply_cont2
+        globals()['value2_reg'] = fail_reg
+        globals()['value1_reg'] = Apply(GreaterThan, args_reg)
+        globals()['k_reg'] = k2_reg
+        globals()['pc'] = apply_cont2
 
 def b_proc_88_d():
     if true_q(not(length_at_least_q(2, args_reg))):
         globals()['msg_reg'] = "incorrect number of arguments to <="
         globals()['pc'] = runtime_error
     else:
-        if true_q(not(all_numeric_q(args_reg))):
-            globals()['msg_reg'] = "<= called on non-numeric argument(s)"
-            globals()['pc'] = runtime_error
-        else:
-            globals()['value2_reg'] = fail_reg
-            globals()['value1_reg'] = Apply(LessThanEqual, args_reg)
-            globals()['k_reg'] = k2_reg
-            globals()['pc'] = apply_cont2
+        globals()['value2_reg'] = fail_reg
+        globals()['value1_reg'] = Apply(LessThanEqual, args_reg)
+        globals()['k_reg'] = k2_reg
+        globals()['pc'] = apply_cont2
 
 def b_proc_89_d():
     if true_q(not(length_at_least_q(2, args_reg))):
         globals()['msg_reg'] = "incorrect number of arguments to >="
         globals()['pc'] = runtime_error
     else:
-        if true_q(not(all_numeric_q(args_reg))):
-            globals()['msg_reg'] = ">= called on non-numeric argument(s)"
-            globals()['pc'] = runtime_error
-        else:
-            globals()['value2_reg'] = fail_reg
-            globals()['value1_reg'] = Apply(GreaterThanEqual, args_reg)
-            globals()['k_reg'] = k2_reg
-            globals()['pc'] = apply_cont2
+        globals()['value2_reg'] = fail_reg
+        globals()['value1_reg'] = Apply(GreaterThanEqual, args_reg)
+        globals()['k_reg'] = k2_reg
+        globals()['pc'] = apply_cont2
 
 def b_proc_90_d():
     if true_q(not(length_at_least_q(2, args_reg))):
         globals()['msg_reg'] = "incorrect number of arguments to ="
         globals()['pc'] = runtime_error
     else:
-        if true_q(not(all_numeric_q(args_reg))):
-            globals()['msg_reg'] = "= called on non-numeric argument(s)"
-            globals()['pc'] = runtime_error
-        else:
-            globals()['value2_reg'] = fail_reg
-            globals()['value1_reg'] = Apply(Equal, args_reg)
-            globals()['k_reg'] = k2_reg
-            globals()['pc'] = apply_cont2
+        globals()['value2_reg'] = fail_reg
+        globals()['value1_reg'] = Apply(Equal, args_reg)
+        globals()['k_reg'] = k2_reg
+        globals()['pc'] = apply_cont2
 
 def b_proc_91_d():
     if true_q(not(length_one_q(args_reg))):
         globals()['msg_reg'] = "incorrect number of arguments to abs"
         globals()['pc'] = runtime_error
     else:
-        if true_q(not(all_numeric_q(args_reg))):
-            globals()['msg_reg'] = "abs called on non-numeric argument(s)"
-            globals()['pc'] = runtime_error
-        else:
-            globals()['value2_reg'] = fail_reg
-            globals()['value1_reg'] = Apply(abs, args_reg)
-            globals()['k_reg'] = k2_reg
-            globals()['pc'] = apply_cont2
+        globals()['value2_reg'] = fail_reg
+        globals()['value1_reg'] = Apply(abs, args_reg)
+        globals()['k_reg'] = k2_reg
+        globals()['pc'] = apply_cont2
 
 def b_proc_92_d():
     if true_q(not(length_two_q(args_reg))):
@@ -3992,14 +3932,10 @@ def b_proc_96_d():
         globals()['msg_reg'] = "incorrect number of arguments to range"
         globals()['pc'] = runtime_error
     else:
-        if true_q(not(all_numeric_q(args_reg))):
-            globals()['msg_reg'] = "range called on non-numeric argument(s)"
-            globals()['pc'] = runtime_error
-        else:
-            globals()['value2_reg'] = fail_reg
-            globals()['value1_reg'] = Apply(Range, args_reg)
-            globals()['k_reg'] = k2_reg
-            globals()['pc'] = apply_cont2
+        globals()['value2_reg'] = fail_reg
+        globals()['value1_reg'] = Apply(Range, args_reg)
+        globals()['k_reg'] = k2_reg
+        globals()['pc'] = apply_cont2
 
 def b_proc_97_d():
     globals()['value2_reg'] = fail_reg

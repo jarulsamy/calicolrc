@@ -2375,15 +2375,11 @@
         (begin
           (set! msg_reg "incorrect number of arguments to sqrt")
           (set! pc runtime-error))
-        (if (not (all-numeric? args_reg))
-            (begin
-              (set! msg_reg "sqrt called on non-numeric argument(s)")
-              (set! pc runtime-error))
-            (begin
-              (set! value2_reg fail_reg)
-              (set! value1_reg (apply sqrt args_reg))
-              (set! k_reg k2_reg)
-              (set! pc apply-cont2))))))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply sqrt args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
 
 (define <proc-19>
   (lambda ()
@@ -2415,19 +2411,15 @@
         (begin
           (set! msg_reg "incorrect number of arguments to quotient")
           (set! pc runtime-error))
-        (if (not (all-numeric? args_reg))
+        (if (member 0 (cdr args_reg))
             (begin
-              (set! msg_reg "quotent called on non-numeric argument(s)")
+              (set! msg_reg "division by zero")
               (set! pc runtime-error))
-            (if (member 0 (cdr args_reg))
-                (begin
-                  (set! msg_reg "division by zero")
-                  (set! pc runtime-error))
-                (begin
-                  (set! value2_reg fail_reg)
-                  (set! value1_reg (apply quotient args_reg))
-                  (set! k_reg k2_reg)
-                  (set! pc apply-cont2)))))))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply quotient args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
 
 (define <proc-22>
   (lambda ()
@@ -3241,15 +3233,10 @@
 
 (define <proc-79>
   (lambda ()
-    (if (not (all-numeric? args_reg))
-        (begin
-          (set! msg_reg "+ called on non-numeric argument(s)")
-          (set! pc runtime-error))
-        (begin
-          (set! value2_reg fail_reg)
-          (set! value1_reg (apply + args_reg))
-          (set! k_reg k2_reg)
-          (set! pc apply-cont2)))))
+    (set! value2_reg fail_reg)
+    (set! value1_reg (apply + args_reg))
+    (set! k_reg k2_reg)
+    (set! pc apply-cont2)))
 
 (define <proc-80>
   (lambda ()
@@ -3257,43 +3244,30 @@
         (begin
           (set! msg_reg "incorrect number of arguments to -")
           (set! pc runtime-error))
-        (if (not (all-numeric? args_reg))
-            (begin
-              (set! msg_reg "- called on non-numeric argument(s)")
-              (set! pc runtime-error))
-            (begin
-              (set! value2_reg fail_reg)
-              (set! value1_reg (apply - args_reg))
-              (set! k_reg k2_reg)
-              (set! pc apply-cont2))))))
-
-(define <proc-81>
-  (lambda ()
-    (if (not (all-numeric? args_reg))
-        (begin
-          (set! msg_reg "* called on non-numeric argument(s)")
-          (set! pc runtime-error))
         (begin
           (set! value2_reg fail_reg)
-          (set! value1_reg (apply * args_reg))
+          (set! value1_reg (apply - args_reg))
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
+(define <proc-81>
+  (lambda ()
+    (set! value2_reg fail_reg)
+    (set! value1_reg (apply * args_reg))
+    (set! k_reg k2_reg)
+    (set! pc apply-cont2)))
+
 (define <proc-82>
   (lambda ()
-    (if (not (all-numeric? args_reg))
+    (if (and (> (length args_reg) 1) (member 0 (cdr args_reg)))
         (begin
-          (set! msg_reg "/ called on non-numeric argument(s)")
+          (set! msg_reg "division by zero")
           (set! pc runtime-error))
-        (if (and (> (length args_reg) 1) (member 0 (cdr args_reg)))
-            (begin
-              (set! msg_reg "division by zero")
-              (set! pc runtime-error))
-            (begin
-              (set! value2_reg fail_reg)
-              (set! value1_reg (apply / args_reg))
-              (set! k_reg k2_reg)
-              (set! pc apply-cont2))))))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply / args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
 
 (define <proc-83>
   (lambda ()
@@ -3301,43 +3275,29 @@
         (begin
           (set! msg_reg "incorrect number of arguments to %")
           (set! pc runtime-error))
-        (if (not (all-numeric? args_reg))
+        (if (= (cadr args_reg) 0)
             (begin
-              (set! msg_reg "% called on non-numeric argument(s)")
+              (set! msg_reg "modulo by zero")
               (set! pc runtime-error))
-            (if (= (cadr args_reg) 0)
-                (begin
-                  (set! msg_reg "modulo by zero")
-                  (set! pc runtime-error))
-                (begin
-                  (set! value2_reg fail_reg)
-                  (set! value1_reg (apply modulo args_reg))
-                  (set! k_reg k2_reg)
-                  (set! pc apply-cont2)))))))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply modulo args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
 
 (define <proc-84>
   (lambda ()
-    (if (not (all-numeric? args_reg))
-        (begin
-          (set! msg_reg "% called on non-numeric argument(s)")
-          (set! pc runtime-error))
-        (begin
-          (set! value2_reg fail_reg)
-          (set! value1_reg (apply min args_reg))
-          (set! k_reg k2_reg)
-          (set! pc apply-cont2)))))
+    (set! value2_reg fail_reg)
+    (set! value1_reg (apply min args_reg))
+    (set! k_reg k2_reg)
+    (set! pc apply-cont2)))
 
 (define <proc-85>
   (lambda ()
-    (if (not (all-numeric? args_reg))
-        (begin
-          (set! msg_reg "% called on non-numeric argument(s)")
-          (set! pc runtime-error))
-        (begin
-          (set! value2_reg fail_reg)
-          (set! value1_reg (apply max args_reg))
-          (set! k_reg k2_reg)
-          (set! pc apply-cont2)))))
+    (set! value2_reg fail_reg)
+    (set! value1_reg (apply max args_reg))
+    (set! k_reg k2_reg)
+    (set! pc apply-cont2)))
 
 (define <proc-86>
   (lambda ()
@@ -3345,15 +3305,11 @@
         (begin
           (set! msg_reg "incorrect number of arguments to <")
           (set! pc runtime-error))
-        (if (not (all-numeric? args_reg))
-            (begin
-              (set! msg_reg "< called on non-numeric argument(s)")
-              (set! pc runtime-error))
-            (begin
-              (set! value2_reg fail_reg)
-              (set! value1_reg (apply < args_reg))
-              (set! k_reg k2_reg)
-              (set! pc apply-cont2))))))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply < args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
 
 (define <proc-87>
   (lambda ()
@@ -3361,15 +3317,11 @@
         (begin
           (set! msg_reg "incorrect number of arguments to >")
           (set! pc runtime-error))
-        (if (not (all-numeric? args_reg))
-            (begin
-              (set! msg_reg "> called on non-numeric argument(s)")
-              (set! pc runtime-error))
-            (begin
-              (set! value2_reg fail_reg)
-              (set! value1_reg (apply > args_reg))
-              (set! k_reg k2_reg)
-              (set! pc apply-cont2))))))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply > args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
 
 (define <proc-88>
   (lambda ()
@@ -3377,15 +3329,11 @@
         (begin
           (set! msg_reg "incorrect number of arguments to <=")
           (set! pc runtime-error))
-        (if (not (all-numeric? args_reg))
-            (begin
-              (set! msg_reg "<= called on non-numeric argument(s)")
-              (set! pc runtime-error))
-            (begin
-              (set! value2_reg fail_reg)
-              (set! value1_reg (apply <= args_reg))
-              (set! k_reg k2_reg)
-              (set! pc apply-cont2))))))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply <= args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
 
 (define <proc-89>
   (lambda ()
@@ -3393,15 +3341,11 @@
         (begin
           (set! msg_reg "incorrect number of arguments to >=")
           (set! pc runtime-error))
-        (if (not (all-numeric? args_reg))
-            (begin
-              (set! msg_reg ">= called on non-numeric argument(s)")
-              (set! pc runtime-error))
-            (begin
-              (set! value2_reg fail_reg)
-              (set! value1_reg (apply >= args_reg))
-              (set! k_reg k2_reg)
-              (set! pc apply-cont2))))))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply >= args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
 
 (define <proc-90>
   (lambda ()
@@ -3409,15 +3353,11 @@
         (begin
           (set! msg_reg "incorrect number of arguments to =")
           (set! pc runtime-error))
-        (if (not (all-numeric? args_reg))
-            (begin
-              (set! msg_reg "= called on non-numeric argument(s)")
-              (set! pc runtime-error))
-            (begin
-              (set! value2_reg fail_reg)
-              (set! value1_reg (apply = args_reg))
-              (set! k_reg k2_reg)
-              (set! pc apply-cont2))))))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply = args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
 
 (define <proc-91>
   (lambda ()
@@ -3425,15 +3365,11 @@
         (begin
           (set! msg_reg "incorrect number of arguments to abs")
           (set! pc runtime-error))
-        (if (not (all-numeric? args_reg))
-            (begin
-              (set! msg_reg "abs called on non-numeric argument(s)")
-              (set! pc runtime-error))
-            (begin
-              (set! value2_reg fail_reg)
-              (set! value1_reg (apply abs args_reg))
-              (set! k_reg k2_reg)
-              (set! pc apply-cont2))))))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply abs args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
 
 (define <proc-92>
   (lambda ()
@@ -3490,15 +3426,11 @@
         (begin
           (set! msg_reg "incorrect number of arguments to range")
           (set! pc runtime-error))
-        (if (not (all-numeric? args_reg))
-            (begin
-              (set! msg_reg "range called on non-numeric argument(s)")
-              (set! pc runtime-error))
-            (begin
-              (set! value2_reg fail_reg)
-              (set! value1_reg (apply range args_reg))
-              (set! k_reg k2_reg)
-              (set! pc apply-cont2))))))
+        (begin
+          (set! value2_reg fail_reg)
+          (set! value1_reg (apply range args_reg))
+          (set! k_reg k2_reg)
+          (set! pc apply-cont2)))))
 
 (define <proc-97>
   (lambda ()

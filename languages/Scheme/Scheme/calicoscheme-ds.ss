@@ -2213,12 +2213,6 @@
            info
            handler
            fail))
-        ((not (all-numeric? args))
-         (runtime-error
-           "sqrt called on non-numeric argument(s)"
-           info
-           handler
-           fail))
         (else (apply-cont2 k2 (apply sqrt args) fail))))))
 
 (define+
@@ -2255,12 +2249,6 @@
         ((not (length-two? args))
          (runtime-error
            "incorrect number of arguments to quotient"
-           info
-           handler
-           fail))
-        ((not (all-numeric? args))
-         (runtime-error
-           "quotent called on non-numeric argument(s)"
            info
            handler
            fail))
@@ -3147,14 +3135,7 @@
 (define+
   <proc-79>
   (lambda (args env2 info handler fail k2 fields)
-    (let ()
-      (if (not (all-numeric? args))
-          (runtime-error
-            "+ called on non-numeric argument(s)"
-            info
-            handler
-            fail)
-          (apply-cont2 k2 (apply + args) fail)))))
+    (let () (apply-cont2 k2 (apply + args) fail))))
 
 (define+
   <proc-80>
@@ -3167,37 +3148,18 @@
            info
            handler
            fail))
-        ((not (all-numeric? args))
-         (runtime-error
-           "- called on non-numeric argument(s)"
-           info
-           handler
-           fail))
         (else (apply-cont2 k2 (apply - args) fail))))))
 
 (define+
   <proc-81>
   (lambda (args env2 info handler fail k2 fields)
-    (let ()
-      (if (not (all-numeric? args))
-          (runtime-error
-            "* called on non-numeric argument(s)"
-            info
-            handler
-            fail)
-          (apply-cont2 k2 (apply * args) fail)))))
+    (let () (apply-cont2 k2 (apply * args) fail))))
 
 (define+
   <proc-82>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
-        ((not (all-numeric? args))
-         (runtime-error
-           "/ called on non-numeric argument(s)"
-           info
-           handler
-           fail))
         ((and (> (length args) 1) (member 0 (cdr args)))
          (runtime-error "division by zero" info handler fail))
         (else (apply-cont2 k2 (apply / args) fail))))))
@@ -3213,12 +3175,6 @@
            info
            handler
            fail))
-        ((not (all-numeric? args))
-         (runtime-error
-           "% called on non-numeric argument(s)"
-           info
-           handler
-           fail))
         ((= (cadr args) 0)
          (runtime-error "modulo by zero" info handler fail))
         (else (apply-cont2 k2 (apply modulo args) fail))))))
@@ -3227,27 +3183,12 @@
   <proc-84>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
-      (cond
-        ((not (all-numeric? args))
-         (runtime-error
-           "% called on non-numeric argument(s)"
-           info
-           handler
-           fail))
-        (else (apply-cont2 k2 (apply min args) fail))))))
+      (cond (else (apply-cont2 k2 (apply min args) fail))))))
 
 (define+
   <proc-85>
   (lambda (args env2 info handler fail k2 fields)
-    (let ()
-      (cond
-        ((not (all-numeric? args))
-         (runtime-error
-           "% called on non-numeric argument(s)"
-           info
-           handler
-           fail))
-        (else (apply-cont2 k2 (apply max args) fail))))))
+    (let () (apply-cont2 k2 (apply max args) fail))))
 
 (define+
   <proc-86>
@@ -3257,12 +3198,6 @@
         ((not (length-at-least? 2 args))
          (runtime-error
            "incorrect number of arguments to <"
-           info
-           handler
-           fail))
-        ((not (all-numeric? args))
-         (runtime-error
-           "< called on non-numeric argument(s)"
            info
            handler
            fail))
@@ -3279,12 +3214,6 @@
            info
            handler
            fail))
-        ((not (all-numeric? args))
-         (runtime-error
-           "> called on non-numeric argument(s)"
-           info
-           handler
-           fail))
         (else (apply-cont2 k2 (apply > args) fail))))))
 
 (define+
@@ -3295,12 +3224,6 @@
         ((not (length-at-least? 2 args))
          (runtime-error
            "incorrect number of arguments to <="
-           info
-           handler
-           fail))
-        ((not (all-numeric? args))
-         (runtime-error
-           "<= called on non-numeric argument(s)"
            info
            handler
            fail))
@@ -3317,12 +3240,6 @@
            info
            handler
            fail))
-        ((not (all-numeric? args))
-         (runtime-error
-           ">= called on non-numeric argument(s)"
-           info
-           handler
-           fail))
         (else (apply-cont2 k2 (apply >= args) fail))))))
 
 (define+
@@ -3336,12 +3253,6 @@
            info
            handler
            fail))
-        ((not (all-numeric? args))
-         (runtime-error
-           "= called on non-numeric argument(s)"
-           info
-           handler
-           fail))
         (else (apply-cont2 k2 (apply = args) fail))))))
 
 (define+
@@ -3352,12 +3263,6 @@
         ((not (length-one? args))
          (runtime-error
            "incorrect number of arguments to abs"
-           info
-           handler
-           fail))
-        ((not (all-numeric? args))
-         (runtime-error
-           "abs called on non-numeric argument(s)"
            info
            handler
            fail))
@@ -3425,12 +3330,6 @@
         ((or (null? args) (length-at-least? 4 args))
          (runtime-error
            "incorrect number of arguments to range"
-           info
-           handler
-           fail))
-        ((not (all-numeric? args))
-         (runtime-error
-           "range called on non-numeric argument(s)"
            info
            handler
            fail))

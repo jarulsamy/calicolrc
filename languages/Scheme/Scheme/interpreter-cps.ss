@@ -809,8 +809,6 @@
     (cond
       ((not (length-one? args))
        (runtime-error "incorrect number of arguments to sqrt" info handler fail))
-      ((not (all-numeric? args))
-       (runtime-error "sqrt called on non-numeric argument(s)" info handler fail))
       (else (k2 (apply sqrt args) fail)))))
 
 ;; odd?
@@ -835,8 +833,6 @@
     (cond
       ((not (length-two? args))
        (runtime-error "incorrect number of arguments to quotient" info handler fail))
-      ((not (all-numeric? args))
-       (runtime-error "quotent called on non-numeric argument(s)" info handler fail))
       ((member 0 (cdr args))
        (runtime-error "division by zero" info handler fail))
       (else (k2 (apply quotient args) fail)))))
@@ -1413,9 +1409,7 @@
 ;; +
 (define plus-prim
   (lambda-proc (args env2 info handler fail k2)
-    (if (not (all-numeric? args))
-      (runtime-error "+ called on non-numeric argument(s)" info handler fail)
-      (k2 (apply + args) fail))))
+     (k2 (apply + args) fail)))
 
 ;; -
 (define minus-prim
@@ -1423,23 +1417,17 @@
     (cond
       ((null? args)
        (runtime-error "incorrect number of arguments to -" info handler fail))
-      ((not (all-numeric? args))
-       (runtime-error "- called on non-numeric argument(s)" info handler fail))
       (else (k2 (apply - args) fail)))))
 
 ;; *
 (define times-prim
   (lambda-proc (args env2 info handler fail k2)
-    (if (not (all-numeric? args))
-      (runtime-error "* called on non-numeric argument(s)" info handler fail)
-      (k2 (apply * args) fail))))
+      (k2 (apply * args) fail)))
 
 ;; /
 (define divide-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-      ((not (all-numeric? args))
-       (runtime-error "/ called on non-numeric argument(s)" info handler fail))
       ((and (> (length args) 1) (member 0 (cdr args)))
        (runtime-error "division by zero" info handler fail))
       (else (k2 (apply / args) fail)))))
@@ -1450,8 +1438,6 @@
     (cond
       ((not (length-two? args))
        (runtime-error "incorrect number of arguments to %" info handler fail))
-      ((not (all-numeric? args))
-       (runtime-error "% called on non-numeric argument(s)" info handler fail))
       ((= (cadr args) 0)
        (runtime-error "modulo by zero" info handler fail))
       (else (k2 (apply modulo args) fail)))))
@@ -1460,17 +1446,12 @@
 (define min-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
-      ((not (all-numeric? args))
-       (runtime-error "% called on non-numeric argument(s)" info handler fail))
       (else (k2 (apply min args) fail)))))
 
 ;; max
 (define max-prim
   (lambda-proc (args env2 info handler fail k2)
-    (cond
-      ((not (all-numeric? args))
-       (runtime-error "% called on non-numeric argument(s)" info handler fail))
-      (else (k2 (apply max args) fail)))))
+     (k2 (apply max args) fail)))
 
 ;; <
 (define lt-prim
@@ -1478,8 +1459,6 @@
     (cond
       ((not (length-at-least? 2 args))
        (runtime-error "incorrect number of arguments to <" info handler fail))
-      ((not (all-numeric? args))
-       (runtime-error "< called on non-numeric argument(s)" info handler fail))
       (else (k2 (apply < args) fail)))))
 
 ;; >
@@ -1488,8 +1467,6 @@
     (cond
       ((not (length-at-least? 2 args))
        (runtime-error "incorrect number of arguments to >" info handler fail))
-      ((not (all-numeric? args))
-       (runtime-error "> called on non-numeric argument(s)" info handler fail))
       (else (k2 (apply > args) fail)))))
 
 ;; <=
@@ -1498,8 +1475,6 @@
     (cond
       ((not (length-at-least? 2 args))
        (runtime-error "incorrect number of arguments to <=" info handler fail))
-      ((not (all-numeric? args))
-       (runtime-error "<= called on non-numeric argument(s)" info handler fail))
       (else (k2 (apply <= args) fail)))))
 
 ;; >=
@@ -1508,8 +1483,6 @@
     (cond
       ((not (length-at-least? 2 args))
        (runtime-error "incorrect number of arguments to >=" info handler fail))
-      ((not (all-numeric? args))
-       (runtime-error ">= called on non-numeric argument(s)" info handler fail))
       (else (k2 (apply >= args) fail)))))
 
 ;; =
@@ -1518,8 +1491,6 @@
     (cond
       ((not (length-at-least? 2 args))
        (runtime-error "incorrect number of arguments to =" info handler fail))
-      ((not (all-numeric? args))
-       (runtime-error "= called on non-numeric argument(s)" info handler fail))
       (else (k2 (apply = args) fail)))))
 
 ;; abs
@@ -1528,8 +1499,6 @@
     (cond
       ((not (length-one? args))
        (runtime-error "incorrect number of arguments to abs" info handler fail))
-      ((not (all-numeric? args))
-       (runtime-error "abs called on non-numeric argument(s)" info handler fail))
       (else (k2 (apply abs args) fail)))))
 
 ;; equal?
@@ -1613,8 +1582,6 @@
     (cond
       ((or (null? args) (length-at-least? 4 args))
        (runtime-error "incorrect number of arguments to range" info handler fail))
-      ((not (all-numeric? args))
-       (runtime-error "range called on non-numeric argument(s)" info handler fail))
       (else (k2 (apply range args) fail)))))
 
 (define snoc-prim
