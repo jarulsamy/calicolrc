@@ -1,6 +1,6 @@
 from calico import Magic
-
 import time
+
 class TimeMagic(Magic):
     name = "time"
     def cell(self, args):
@@ -14,9 +14,9 @@ class TimeMagic(Magic):
         self.start = time.time()
 
     def post_process(self, retval):
-        result = "Time: %s seconds.\n" % (time.time() - self.start)
-        stream_content = {'name': 'stdout', 'data': result}
-        self.kernel.send_response(self.kernel.iopub_socket, 'stream', stream_content)
+        if self.code.strip():
+            result = "Time: %s seconds.\n" % (time.time() - self.start)
+            self.Print(result)
         return retval
 
 def register_magics(magics):

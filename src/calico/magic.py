@@ -26,11 +26,17 @@ class Magic(object):
         name = "%%" + self.name
         if name in self.kernel.sticky_magics:
             del self.kernel.sticky_magics[name]
+            self.Print("%s removed from notebook.\n" % name)
         else:
             self.kernel.sticky_magics[name] = args
+            self.Print("%s added to notebook.\n" % name)
 
     def get_code(self):
         return self.code
         
     def post_process(self, retval):
         return retval
+
+    def Print(self, message):
+        stream_content = {'name': 'stdout', 'data': message}
+        self.kernel.send_response(self.kernel.iopub_socket, 'stream', stream_content)

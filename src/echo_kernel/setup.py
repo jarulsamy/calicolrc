@@ -21,7 +21,6 @@ setup(name='echo_kernel',
       author_email='doug.blank@gmail.com',
       py_modules=['echo_kernel'],
       cmdclass={'install': install_with_kernelspec},
-      install_requires=['pexpect>=3.3'],
       classifiers = [
           'Framework :: IPython',
           'License :: OSI Approved :: BSD License',
