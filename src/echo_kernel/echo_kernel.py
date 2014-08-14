@@ -24,7 +24,7 @@ class EchoKernel(MagicKernel):
 
     def do_execute_direct(self, code):
         try:
-            return str(eval(code.strip()))
+            return eval(code.strip())
         except:
             return "Error: " + code
 

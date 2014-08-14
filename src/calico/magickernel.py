@@ -22,8 +22,11 @@ class MagicKernel(Kernel):
         sys.path.append(magic_directory)
         magic_files = glob.glob(os.path.join(magic_directory, "*.py"))
         for magic in magic_files:
-            module = __import__(os.path.splitext(os.path.basename(magic))[0])
-            module.register_magics(self.magics)
+            try:
+                module = __import__(os.path.splitext(os.path.basename(magic))[0])
+                module.register_magics(self.magics)
+            except Exception as e:
+                print("Skipping %s: %s" % (magic, e.message))
 
     def get_usage(self):
         return "This is a usage statement."
@@ -73,7 +76,6 @@ class MagicKernel(Kernel):
         retval = ""
         for key in self.sticky_magics:
             retval += (key + " " + " ".join(self.sticky_magics[key])).strip() + "\n"
-        print("get:", retval)
         return retval
 
     def formatter(self, data):
@@ -185,7 +187,6 @@ class MagicKernel(Kernel):
                 self.__ = retval
                 content = {'execution_count': self.execution_count, 'data': self.formatter(retval)}
                 self.send_response(self.iopub_socket, 'execute_result', content)
-        print("sticky: ", self.sticky_magics)
         return {
             'status': 'ok',
             # The base class increments the execution count
