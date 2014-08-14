@@ -920,7 +920,7 @@ def dlr_object_contains(obj, components):
     retval = obj
     for component in cdr(components):
         if hasattr(retval, component.name):
-            retval = getattr(obj, component.name)
+            retval = getattr(retval, component.name)
         else:
             return False
     return True
@@ -930,7 +930,7 @@ def get_external_member(obj, components):
     retval = obj
     for component in cdr(components):
         if hasattr(retval, component.name):
-            retval = getattr(obj, component.name)
+            retval = getattr(retval, component.name)
         else:
             return void_value
     return retval
