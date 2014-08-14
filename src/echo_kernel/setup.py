@@ -20,6 +20,7 @@ setup(name='echo_kernel',
       author='Douglas Blank',
       author_email='doug.blank@gmail.com',
       py_modules=['echo_kernel'],
+      requires=["calico"],
       cmdclass={'install': install_with_kernelspec},
       classifiers = [
           'Framework :: IPython',

@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 from calico import MagicKernel
-import calicoscheme
+import calico.scheme
 import os
 
 class CalicoSchemeKernel(MagicKernel):
@@ -25,7 +25,7 @@ class CalicoSchemeKernel(MagicKernel):
 
     def do_execute_direct(self, code):
         try:
-            return calicoscheme.execute_string_rm(code)
+            return calico.scheme.execute_string_rm(code)
         except:
             return "Error: " + code
 
