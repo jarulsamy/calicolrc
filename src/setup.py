@@ -12,6 +12,7 @@ setup(name='calico',
       long_description="A long description",
       author='Douglas Blank',
       author_email='doug.blank@gmail.com',
+      url="https://bitbucket.org/ipre/calico/src/master/src/",
       packages=['calico', 'calico.magics'],
       classifiers = [
           'Framework :: IPython',
