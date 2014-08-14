@@ -25,7 +25,7 @@ class CalicoSchemeKernel(MagicKernel):
 
     def do_execute_direct(self, code):
         try:
-            return str(calicoscheme.execute_string_rm(code))
+            return calicoscheme.execute_string_rm(code)
         except:
             return "Error: " + code
 

@@ -2,6 +2,7 @@ from IPython.kernel.zmq.kernelbase import Kernel
 import os
 import sys
 import glob
+import base64
 
 class MagicKernel(Kernel):
     def __init__(self, *args, **kwargs):
@@ -75,6 +76,47 @@ class MagicKernel(Kernel):
         print("get:", retval)
         return retval
 
+    def formatter(self, data):
+        retval = {}
+        retval["text/plain"] = repr(data)
+        if hasattr(data, "_repr_png_"):
+            obj = data._repr_png_()
+            if obj:
+                retval["image/png"] = base64.encodestring(obj)
+        if hasattr(data, "_repr_jpeg_"):
+            obj = data._repr_jpeg_()
+            if obj:
+                retval["image/jpeg"] = base64.encodestring(obj)
+        if hasattr(data, "_repr_html_"):
+            obj = data._repr_html_()
+            if obj:
+                retval["text/html"] = obj
+        if hasattr(data, "_repr_markdown_"):
+            obj = data._repr_markdown_()
+            if obj:
+                retval["text/markdown"] = obj
+        if hasattr(data, "_repr_svg_"):
+            obj = data._repr_svg_()
+            if obj:
+                retval["image/svg+xml"] = obj
+        if hasattr(data, "_repr_latex_"):
+            obj = data._repr_latex_()
+            if obj:
+                retval["text/latex"] = obj
+        if hasattr(data, "_repr_json_"):
+            obj = data._repr_json_()
+            if obj:
+                retval["application/json"] = obj
+        if hasattr(data, "_repr_javascript_"):
+            obj = data._repr_javascript_()
+            if obj:
+                retval["application/javascript"] = obj
+        if hasattr(data, "_repr_pdf_"):
+            obj = data._repr_pdf_()
+            if obj:
+                retval["application/pdf"] = obj
+        return retval
+
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
                    allow_stdin=False):
         # Handle Magics
@@ -141,7 +183,7 @@ class MagicKernel(Kernel):
                 self.set_variable("_" + str(self.execution_count), retval)
                 self.___ = self.__
                 self.__ = retval
-                content = {'execution_count': self.execution_count, 'data': {"text/plain": retval}}
+                content = {'execution_count': self.execution_count, 'data': self.formatter(retval)}
                 self.send_response(self.iopub_socket, 'execute_result', content)
         print("sticky: ", self.sticky_magics)
         return {
