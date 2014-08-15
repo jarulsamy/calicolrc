@@ -3392,12 +3392,17 @@
   <proc-102>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
-      (let ((filename (car args)))
-        (if (null? (cdr args))
-            (load-file filename env2 'none handler fail k2)
-            (let ((module-name (cadr args)))
-              (lookup-binding-in-first-frame module-name env2 handler fail
-                (make-cont2 <cont2-82> filename handler k2))))))))
+      (cond
+        ((not (length-two? args))
+         (runtime-error
+           "incorrect number of arguments to load-as"
+           info
+           handler
+           fail))
+        (else
+         (let ((filename (car args)) (module-name (cadr args)))
+           (lookup-binding-in-first-frame module-name env2 handler fail
+             (make-cont2 <cont2-82> filename handler k2))))))))
 
 (define+
   <proc-103>
@@ -3718,7 +3723,7 @@
 (define+
   <proc-127>
   (lambda (args env2 info handler fail k2 fields)
-    (let () (apply-cont2 k2 (using args env2) fail))))
+    (let () (apply-cont2 k2 (import-native args env2) fail))))
 
 (define+
   <proc-128>
@@ -6751,7 +6756,7 @@
                        (list 'for-each for-each-prim)
                        (list 'format format-prim) (list 'get get-prim)
                        (list 'get-stack-trace get-stack-trace-prim)
-                       (list 'import import-prim)
+                       (list 'load-as load-as-prim)
                        (list 'integer->char integer->char-prim)
                        (list 'length length-prim) (list 'list list-prim)
                        (list 'list->vector list->vector-prim)
@@ -6789,7 +6794,7 @@
                        (list 'symbol? symbol?-prim)
                        (list 'unparse unparse-prim)
                        (list 'unparse-procedure unparse-procedure-prim)
-                       (list 'using using-prim)
+                       (list 'import import-prim)
                        (list 'use-stack-trace use-stack-trace-prim)
                        (list 'vector vector-prim)
                        (list 'vector-ref vector-ref-prim)
@@ -6996,7 +7001,7 @@
 
 (define-native printf-prim printf)
 
-(define-native using-prim (lambda ignore #f))
+(define-native import-native (lambda ignore #f))
 
 (define-native iterator? (lambda ignore #f))
 
@@ -7123,7 +7128,7 @@
 
 (define-native set-global-docstring! (lambda (var x) #f))
 
-(define-native using (lambda ignore #f))
+(define-native import-native (lambda ignore #f))
 
 (define-native iterator? (lambda ignore #f))
 
@@ -7381,7 +7386,7 @@
 
 (define set-cdr!-prim (make-proc <proc-101>))
 
-(define import-prim (make-proc <proc-102>))
+(define load-as-prim (make-proc <proc-102>))
 
 (define get-stack-trace-prim (make-proc <proc-103>))
 
@@ -7429,7 +7434,7 @@
 
 (define current-environment-prim (make-proc <proc-126>))
 
-(define using-prim (make-proc <proc-127>))
+(define import-prim (make-proc <proc-127>))
 
 (define not-prim (make-proc <proc-128>))
 

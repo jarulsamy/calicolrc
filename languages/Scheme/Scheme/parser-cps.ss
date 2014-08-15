@@ -38,7 +38,7 @@
 (define-native set-global-value! (lambda (var x) #f))
 (define-native set-global-docstring! (lambda (var x) #f))
 (define-native printf-prim printf)
-(define-native using-prim (lambda ignore #f))
+(define-native import-native (lambda ignore #f))
 (define-native iterator? (lambda ignore #f))
 (define-native get_type (lambda (x) 'unknown))
 

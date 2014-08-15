@@ -1,5 +1,7 @@
 MCS=MONO_PATH=../../../bin:../../../modules dmcs -sdk:4
 
+all:  ../PJScheme.dll calicoscheme.py
+
 ../PJScheme.dll: calicoscheme.cs Scheme.cs calicoscheme-rm.ss Makefile ObjectType.cs Rational.cs 
 	$(MCS) Scheme.cs calicoscheme.cs ObjectType.cs Rational.cs -target:library -lib:../../../bin -r:Microsoft.Scripting -r:Microsoft.CSharp -r:IronPython.dll -r:Microsoft.Dynamic -r:Calico.exe -pkg:gtk-sharp-2.0 -r:Mono.TextEditor.dll -r:System.Numerics -out:../PJScheme.dll
 

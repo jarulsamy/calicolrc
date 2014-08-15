@@ -1283,7 +1283,7 @@ public class Scheme {
 	throw new Exception(String.Format("no such external type '{0}'", type));
   }
 
-  public static object using_native(object args, object env) {
+  public static object import_native(object args, object env) {
       // Works with Python Types
       // implements "using"
       Assembly assembly = null;

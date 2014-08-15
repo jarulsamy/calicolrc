@@ -873,8 +873,6 @@ public class PJScheme:Scheme
             return "char_";
         elif (name == "eq?"):
             return "Eq";
-        elif (name == "using"):
-            return "using_native";
         elif (name == "equal?"):
             return "Equal";
         elif name == "map":

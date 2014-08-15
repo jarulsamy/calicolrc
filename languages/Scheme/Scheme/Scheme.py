@@ -886,7 +886,7 @@ def apply_with_keywords(*args):
     # FIXME: when this interface is enabled
     pass
 
-def using(libraries, environment):
+def import_native(libraries, environment):
     retval = symbol_emptylist
     for library in libraries:
         lib = __import__(library)

@@ -59,7 +59,7 @@
 (define-native dlr-lookup-components (lambda (x y) #f))
 (define-native set-global-value! (lambda (var x) #f))
 (define-native set-global-docstring! (lambda (var x) #f))
-(define-native using (lambda ignore #f))
+(define-native import-native (lambda ignore #f))
 (define-native iterator? (lambda ignore #f))
 (define-native get_type (lambda (x) 'unknown))
 (define-native char->string (lambda (c) (string c)))
@@ -1629,18 +1629,19 @@
        (runtime-error (format "set-cdr! called on non-pair ~s" (car args)) info handler fail))
       (else (k2 (apply set-cdr! args) fail)))))
 
-;; import
-(define import-prim
+;; load-as
+(define load-as-prim
   (lambda-proc (args env2 info handler fail k2)
-    (let ((filename (car args)))
-      (if (null? (cdr args))
-	(load-file filename env2 'none handler fail k2)
-	(let ((module-name (cadr args)))
-	  (lookup-binding-in-first-frame module-name env2 handler fail
-	    (lambda-cont2 (binding fail)
-	      (let ((module (make-toplevel-env)))
-		(set-binding-value! binding module)
-		(load-file filename module 'none handler fail k2)))))))))
+    (cond
+      ((not (length-two? args))
+       (runtime-error "incorrect number of arguments to load-as" info handler fail))
+      (else (let ((filename (car args))
+		  (module-name (cadr args)))
+	      (lookup-binding-in-first-frame module-name env2 handler fail
+		(lambda-cont2 (binding fail)
+		  (let ((module (make-toplevel-env)))
+		    (set-binding-value! binding module)
+		    (load-file filename module 'none handler fail k2)))))))))
 
 ;; get-stack-trace-prim
 (define get-stack-trace-prim
@@ -2011,10 +2012,10 @@
   (lambda-proc (args env2 info handler fail k2)
     (k2 env2 fail)))
 
-;; using (not defined in scheme)
-(define using-prim
+;; import
+(define import-prim
   (lambda-proc (args env2 info handler fail k2)
-    (k2 (using args env2) fail)))
+    (k2 (import-native args env2) fail)))
 
 ;; not
 (define not-prim
@@ -2356,7 +2357,7 @@
 	    (list 'format format-prim)
 	    (list 'get get-prim)
 	    (list 'get-stack-trace get-stack-trace-prim)
-	    (list 'import import-prim)
+	    (list 'load-as load-as-prim)
 	    (list 'integer->char integer->char-prim)
 	    (list 'length length-prim)
 	    (list 'list list-prim)
@@ -2405,7 +2406,7 @@
 	    (list 'symbol? symbol?-prim)
 	    (list 'unparse unparse-prim)    ;; unparse should be in CPS
 	    (list 'unparse-procedure unparse-procedure-prim)  ;; unparse should be in CPS
-	    (list 'using using-prim)
+	    (list 'import import-prim)
 	    (list 'use-stack-trace use-stack-trace-prim)
 	    (list 'vector vector-prim)
 	    (list 'vector-ref vector-ref-prim)

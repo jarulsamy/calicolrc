@@ -204,10 +204,10 @@
 (verify 'use-lexial-address (use-lexical-address) eq? #t)
 (verify 'use-satck-trace (use-stack-trace) eq? #t)
 (verify 'use-tracing (use-tracing) eq? #f)
-(verify 'using (try 
-		(using "math")
+(verify 'import (try 
+		(import "math")
 		(catch e e 
-		       (using "Graphics"))) (lambda (a b) (not (null? b))) '())
+		       (import "Graphics"))) (lambda (a b) (not (null? b))) '())
 (verify 'vector (vector 1 2 3) equal? (vector 1 2 3))
 (verify 'vector->lsit (vector->list (vector 1 2 3)) equal? '(1 2 3))
 (verify 'vector-ref (vector-ref (vector 1 2 3) 2) = 3)
