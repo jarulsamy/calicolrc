@@ -37,6 +37,8 @@ import os
 ENVIRONMENT = {key:getattr(__builtins__, key) for key in dir(__builtins__)}
 ENVIRONMENT["DEBUG"] = False
 
+GLOBALS = globals()
+
 class Char(object):
     def __init__(self, c):
         self.char = c
@@ -201,14 +203,14 @@ def pivot (p, l):
 def make_comparison_function(procedure):
     # FIXME: should rewrite this using CPS style
     def compare(carl, cadrl):
-        globals()["save_k2_reg"] = k2_reg
-        globals()["proc_reg"] = procedure
-        globals()["args_reg"] = List(carl, cadrl)
-        globals()["handler_reg"] = REP_handler
-        globals()["k2_reg"] = REP_k
-        globals()["pc"] = apply_proc
+        GLOBALS["save_k2_reg"] = k2_reg
+        GLOBALS["proc_reg"] = procedure
+        GLOBALS["args_reg"] = List(carl, cadrl)
+        GLOBALS["handler_reg"] = REP_handler
+        GLOBALS["k2_reg"] = REP_k
+        GLOBALS["pc"] = apply_proc
         retval = trampoline()
-        globals()["k2_reg"] = save_k2_reg
+        GLOBALS["k2_reg"] = save_k2_reg
         return retval
     return compare
 
@@ -933,11 +935,11 @@ def dlr_apply(f, args):
 
 def dlr_func(schemeProc):
     def f(*args):
-        globals()["proc_reg"] = schemeProc
-        globals()["args_reg"] = List(*args)
-        globals()["handler_reg"] = REP_handler
-        globals()["k2_reg"] = REP_k
-        globals()["pc"] = apply_proc
+        GLOBALS["proc_reg"] = schemeProc
+        GLOBALS["args_reg"] = List(*args)
+        GLOBALS["handler_reg"] = REP_handler
+        GLOBALS["k2_reg"] = REP_k
+        GLOBALS["pc"] = apply_proc
         return trampoline()
     return f
 
@@ -949,11 +951,11 @@ def get_external_members(obj):
 
 def callback(schemeProc):
     def cb(*args):
-        globals()["proc_reg"] = schemeProc
-        globals()["args_reg"] = List(*args)
-        globals()["handler_reg"] = REP_handler
-        globals()["k2_reg"] = REP_k
-        globals()["pc"] = apply_proc
+        GLOBALS["proc_reg"] = schemeProc
+        GLOBALS["args_reg"] = List(*args)
+        GLOBALS["handler_reg"] = REP_handler
+        GLOBALS["k2_reg"] = REP_k
+        GLOBALS["pc"] = apply_proc
         return trampoline()
     return cb
 

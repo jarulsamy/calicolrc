@@ -373,7 +373,7 @@ class PythonTranslator(Translator):
         if name in locals:
             return self.fix_name(name)
         else:
-            return "globals()['%s']" % self.fix_name(name)
+            return "GLOBALS['%s']" % self.fix_name(name)
 
     def process_assignment(self, expr, locals, indent):
         self.Print(indent, "%s = %s" % (self.check_global(expr[1], locals), 
