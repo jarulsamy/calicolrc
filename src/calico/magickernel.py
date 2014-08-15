@@ -22,11 +22,14 @@ class MagicKernel(Kernel):
         sys.path.append(magic_directory)
         magic_files = glob.glob(os.path.join(magic_directory, "*.py"))
         for magic in magic_files:
+            basename = os.path.basename(magic)
+            if basename == "__init__.py":
+                continue
             try:
-                module = __import__(os.path.splitext(os.path.basename(magic))[0])
+                module = __import__(os.path.splitext(basename)[0])
                 module.register_magics(self.magics)
             except Exception as e:
-                print("Skipping %s: %s" % (magic, e.message))
+                print("Can't load '%s': error: %s" % (magic, e.message))
 
     def get_usage(self):
         return "This is a usage statement."
