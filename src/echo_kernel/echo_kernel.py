@@ -9,6 +9,7 @@ class EchoKernel(MagicKernel):
     language = 'no-op'
     language_version = '0.1'
     banner = "Echo kernel - as useful as a parrot"
+    env = {}
 
     def get_usage(self):
         return "This is a usage statement."
@@ -26,7 +27,10 @@ class EchoKernel(MagicKernel):
         try:
             return eval(code.strip())
         except:
-            return "Error: " + code
+            try:
+                exec code.strip() in self.env
+            except:
+                return "Error: " + code
 
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp

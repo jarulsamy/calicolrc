@@ -195,3 +195,7 @@ class MagicKernel(Kernel):
             'user_expressions': {},
         }
 
+    def display(self, data):
+        content = {"name": "display_data", "source": "display", 'data': self.formatter(data)}
+        self.send_response(self.iopub_socket, 'stdout', content)
+
