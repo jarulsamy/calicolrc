@@ -1,4 +1,7 @@
-from IPython.kernel.zmq.kernelbase import Kernel
+try:
+    from IPython.kernel.zmq.kernelbase import Kernel
+except:
+    Kernel = object
 import os
 import sys
 import glob
