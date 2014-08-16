@@ -18,14 +18,14 @@ class EchoKernel(MagicKernel):
         """
         Set a variable in the kernel language.
         """
-        os.environ[name] = str(value)
+        self.env[name] = value
 
     def get_help_on(self, expr):
         return "Sorry, no help is available on '%s'." % expr
 
     def do_execute_direct(self, code):
         try:
-            return eval(code.strip())
+            return eval(code.strip(), self.env)
         except:
             try:
                 exec code.strip() in self.env
