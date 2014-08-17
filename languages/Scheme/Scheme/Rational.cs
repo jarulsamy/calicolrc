@@ -74,10 +74,10 @@ public class Rational {
   }
 
   public override string ToString() {
-	//if (denominator != 1)
-	return string.Format("{0}/{1}", numerator, denominator);
-	//else
-	//return numerator.ToString();
+      if (denominator != 1)
+	  return string.Format("{0}/{1}", numerator, denominator);
+      else
+	  return numerator.ToString();
   }
   
   public static implicit operator double(Rational f) {
