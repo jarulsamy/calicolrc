@@ -981,6 +981,14 @@ def next_item(iter_item):
     except StopIteration:
         return symbol_emptylist
 
+def load_native(filename):
+    GLOBALS["handler_reg"] = REP_handler
+    GLOBALS["k2_reg"] = REP_k
+    GLOBALS['env2_reg'] = toplevel_env
+    GLOBALS['filenames_reg'] = List(filename)
+    GLOBALS['pc'] = load_files
+    trampoline()
+
 # end of Scheme.py
 #############################################################
 
@@ -7873,7 +7881,14 @@ if __name__ == '__main__':
     print('Calico Scheme, version 3.0.0')
     print('----------------------------')
     print('Use (exit) to exit')
-    start_rm()
-    print()
+    GLOBALS['toplevel_env'] = make_toplevel_env()
+    GLOBALS['macro_env'] = make_macro_env_hat()
+    import sys
+    for filename in sys.argv[1:]:
+        if filename.startswith('-'): continue
+        load_native(filename)
+    if '-i' in sys.argv[1:] or sys.argv[1:] == []:
+        read_eval_print_loop_rm()
+        print()
 else:
     initialize_globals()
