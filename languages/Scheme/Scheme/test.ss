@@ -1,4 +1,5 @@
 ;; Unit tests for Scheme functions
+(define start-time (current-time))
 
 (define right 0)
 (define wrong 0)
@@ -581,3 +582,4 @@
 (newline)
 (for-each (lambda (m) (printf "~a ~%" m)) (reverse report))
 (printf "~%Results:~%    right = ~s~%    wrong = ~s ~%" right wrong)
+(printf "Time: ~s seconds~%" (- (current-time) start-time))
