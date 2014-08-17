@@ -128,6 +128,12 @@ class cons(object):
         cp.current = cp
         return cp
 
+    def __len__(self):
+        if isinstance(self.cdr, cons):
+            return 1 + len(self.cdr)
+        else:
+            return 1
+
     def next(self): # Python 3: def __next__(self)
         if not isinstance(self.current, cons):
             raise StopIteration
