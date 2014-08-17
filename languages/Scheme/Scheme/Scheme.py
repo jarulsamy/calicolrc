@@ -973,5 +973,13 @@ def next_item(iter_item):
     except StopIteration:
         return symbol_emptylist
 
+def load_native(filename):
+    GLOBALS["handler_reg"] = REP_handler
+    GLOBALS["k2_reg"] = REP_k
+    GLOBALS['env2_reg'] = toplevel_env
+    GLOBALS['filenames_reg'] = List(filename)
+    GLOBALS['pc'] = load_files
+    trampoline()
+
 # end of Scheme.py
 #############################################################
