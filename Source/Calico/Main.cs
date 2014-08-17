@@ -443,8 +443,10 @@ namespace Calico {
 		proc.Start();
 		// Next, get destination:
 		string ipython_path = System.IO.Path.Combine(ipython_base, "profile_calico");
+		string nbextensions_path = System.IO.Path.Combine(ipython_base, "nbextensions");
 		// Now, copy recursively:
 		DirectoryCopy(System.IO.Path.Combine(path, "..", "notebooks", "profile"), ipython_path, true);
+		DirectoryCopy(System.IO.Path.Combine(path, "..", "notebooks", "nbextensions"), nbextensions_path, true);
 		// Now, put the top level ipython_config.py
 		string ipython_config = "";
 		string lang_string = "";
