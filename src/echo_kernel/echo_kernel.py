@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 from calico import MagicKernel
-import os
 
 class EchoKernel(MagicKernel):
     implementation = 'Echo'
@@ -12,25 +11,10 @@ class EchoKernel(MagicKernel):
     env = {}
 
     def get_usage(self):
-        return "This is a usage statement."
-
-    def set_variable(self, name, value):
-        """
-        Set a variable in the kernel language.
-        """
-        self.env[name] = value
-
-    def get_help_on(self, expr):
-        return "Sorry, no help is available on '%s'." % expr
+        return "This is the echo kernel."
 
     def do_execute_direct(self, code):
-        try:
-            return eval(code.strip(), self.env)
-        except:
-            try:
-                exec code.strip() in self.env
-            except:
-                return "Error: " + code
+        return code
 
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp

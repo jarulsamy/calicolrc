@@ -3,5 +3,5 @@
 	     "-m","echo_kernel", 
 	     "-f", "{connection_file}"],
     "display_name": "Echo",
-    "language": "shell"
+    "language": "no-op"
 }

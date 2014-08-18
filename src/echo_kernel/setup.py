@@ -29,9 +29,9 @@ if svem_flag in sys.argv:
     sys.argv.remove(svem_flag)
 
 setup(name='echo_kernel',
-      version='0.3',
-      description='A simple eval kernel for IPython',
-      long_description="A simple eval kernel for IPython, based on MagicKernel",
+      version='0.4',
+      description='A simple echo kernel for IPython',
+      long_description="A simple echo kernel for IPython, based on MagicKernel",
       url="https://bitbucket.org/ipre/calico/src/master/src/echo_kernel/",
       author='Douglas Blank',
       author_email='doug.blank@gmail.com',
