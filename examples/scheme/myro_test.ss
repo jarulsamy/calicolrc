@@ -1,8 +1,8 @@
 ;; Scheme
-(using "Myro")
+(import "Myro")
 (Myro.init)
 (define pic (Myro.takePicture))
-(Myro.show pic)
+;;(Myro.show pic)
 (Myro.backward 1 1)
 (Myro.forward 1 1)
 (Myro.beep 1 440)

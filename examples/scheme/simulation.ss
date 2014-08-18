@@ -1,4 +1,4 @@
-(using "Myro")
+(import "Myro")
 (Myro.init "sim")
 
 (define do

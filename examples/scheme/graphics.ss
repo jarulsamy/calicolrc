@@ -20,7 +20,7 @@
 
 (define test
    (lambda ()
-     (using "Graphics")
+     (import "Graphics")
      (define win (Graphics.Window "Hello1"))
      (define line (Graphics.Line (Graphics.Point 0 0)
                                  (Graphics.Point 100 100)))
@@ -29,7 +29,7 @@
 
 (define test2
    (lambda ()
-      (using "Graphics")
+      (import "Graphics")
       (let ((win (Graphics.Window "Hello2"))
             (line (Graphics.Line (Graphics.Point 0 0)
                                 (Graphics.Point 100 100))))
