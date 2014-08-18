@@ -5,7 +5,7 @@ class ReloadMagicsMagic(Magic):
     def post_process(self, retval):
         self.kernel.reload_magics()
         result = "Magics reloaded: %s\n" % ", ".join(self.kernel.magics.keys())
-        self.Print(result)
+        self.kernel.Print(result)
         return retval
 
 def register_magics(magics):

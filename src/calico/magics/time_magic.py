@@ -9,14 +9,10 @@ class TimeMagic(Magic):
     def line(self, args):
         self.start = time.time()
 
-    def notebook(self, args):
-        super(TimeMagic, self).notebook(args)
-        self.start = time.time()
-
     def post_process(self, retval):
         if self.code.strip():
             result = "Time: %s seconds.\n" % (time.time() - self.start)
-            self.Print(result)
+            self.kernel.Print(result)
         return retval
 
 def register_magics(magics):

@@ -6,6 +6,7 @@ import os
 import sys
 import glob
 import base64
+from magic import Magic
 
 class MagicKernel(Kernel):
     def __init__(self, *args, **kwargs):
@@ -40,9 +41,21 @@ class MagicKernel(Kernel):
     def parse(self, text):
         lines = text.split("\n")
         command = lines[0]
-        args = []
+        if command.startswith("%"):
+            if " " in command:
+                command, args = command.split(" ", 1)
+            else:
+                args = ""
+        elif command.startswith("!"):
+            args = command[1:]
+        else:
+            args = ""
         code = "\n".join(lines[1:])
         return command, args, code
+
+    def Print(self, message):
+        stream_content = {'name': 'stdout', 'data': message}
+        self.send_response(self.iopub_socket, 'stream', stream_content)
 
     def get_magic(self, text):
         # if first line matches a magic,
@@ -51,14 +64,29 @@ class MagicKernel(Kernel):
         if parts:
             command, args, code = parts
             if command.startswith("%%%"):
-                name = command[3:]
-                mtype = "notebook"
+                name = "%%" + command[3:]
+                if name in self.sticky_magics:
+                    del self.sticky_magics[name]
+                    self.Print("%s removed from session magics.\n" % name)
+                    # dummy magic to eat this line and continue:
+                    return Magic(self, code, "cell", args)
+                else:
+                    self.sticky_magics[name] = args
+                    self.Print("%s added to session magics.\n" % name)
+                    name = name[2:]
+                    mtype = "cell"
             elif command.startswith("%%"):
                 name = command[2:]
                 mtype = "cell"
             elif command.startswith("%"):
                 name = command[1:]
                 mtype = "line"
+            elif command.startswith("!"):
+                name = "shell"
+                mtype = "line"
+            elif command.startswith("!!"):
+                name = "shell"
+                mtype = "cell"
             else:
                 return None
             if name in self.magics:
@@ -83,6 +111,26 @@ class MagicKernel(Kernel):
         for key in self.sticky_magics:
             retval += (key + " " + " ".join(self.sticky_magics[key])).strip() + "\n"
         return retval
+
+    def split_magics_code(self, code):
+        lines = code.split("\n")
+        ret_magics = []
+        ret_code = []
+        index = 0
+        while index < len(lines) and (lines[index].startswith("!") or 
+                                      lines[index].startswith("%")):
+            ret_magics.append(lines[index])
+            index += 1
+        while index < len(lines):
+            ret_code.append(lines[index])
+            index += 1
+        ret_magics_str = "\n".join(ret_magics)
+        if ret_magics_str:
+            ret_magics_str += "\n"
+        ret_code_str = "\n".join(ret_code)
+        if ret_code_str:
+            ret_code_str += "\n"
+        return (ret_magics_str, ret_code_str)
 
     def formatter(self, data):
         retval = {}
@@ -144,11 +192,12 @@ class MagicKernel(Kernel):
         else:                      # process magics/code/shell
             retval = None
             if self.sticky_magics:
-                code = self.get_sticky_magics() + code
+                magics, code = self.split_magics_code(code)
+                code = magics + self.get_sticky_magics() + code
             stack = []
             # Handle magics:
             magic = None
-            while code.startswith("%"):
+            while code.startswith("%") or code.startswith("!"):
                 magic = self.get_magic(code)
                 if magic != None:
                     stack.append(magic)
@@ -159,19 +208,7 @@ class MagicKernel(Kernel):
                     break
             # Execute code, if any:
             if ((magic is None or magic.evaluate) and code.strip() != ""):
-                # execute code
-                if code.startswith("!"): # shell command
-                    import subprocess
-                    try:
-                        process = subprocess.Popen(code[1:], shell=True, 
-                                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                        retval, error = process.communicate()
-                        if error:
-                            retval = error
-                    except Exception as e:
-                        retval = e.message
-                else:
-                    retval = self.do_execute_direct(code)
+                retval = self.do_execute_direct(code)
             # Post-process magics:
             for magic in reversed(stack):
                 retval = magic.post_process(retval)

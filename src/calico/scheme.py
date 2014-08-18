@@ -6661,17 +6661,23 @@ def use_lexical_address(*args):
         return void_value
 
 def handle_exception(exc):
+    display(get_traceback_string(exc))
+    return void_value
+
+def get_traceback_string(exc):
     stack = symbol_undefined
     message = symbol_undefined
     error_type = symbol_undefined
+    retval = symbol_undefined
+    retval = ""
     error_type = car(cadr(exc))
     message = cadr(cadr(exc))
     stack = cadddr(cddr(cadr(exc)))
-    printf("~%Traceback (most recent call last):~%")
+    retval = string_append(retval, format("~%Traceback (most recent call last):~%"))
     while not(null_q(stack)):
-        display(format_exception_line(car(stack)))
+        retval = string_append(retval, format_exception_line(car(stack)))
         stack = cdr(stack)
-    printf("~a: ~a~%", error_type, message)
+    return string_append(retval, format("~a: ~a~%", error_type, message))
 
 def format_exception_line(line):
     if true_q(list_q(line)):

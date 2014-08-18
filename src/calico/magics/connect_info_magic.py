@@ -26,7 +26,7 @@ or even just:
     $> ipython <app> --existing
 if this is the most recent ICalico session you have started.
 """ % config
-        self.Print(retval)
+        self.kernel.Print(retval)
 
     def cell(self, args):
         self.line(args)
