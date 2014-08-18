@@ -6780,18 +6780,32 @@
 
 (define handle-exception
   (lambda (exc)
+    (display (get-traceback-string exc))
+    (return* void-value)))
+
+(define get-traceback-string
+  (lambda (exc)
     (let ((stack 'undefined)
           (message 'undefined)
-          (error-type 'undefined))
+          (error-type 'undefined)
+          (retval 'undefined))
+      (set! retval "")
       (set! error-type (car (cadr exc)))
       (set! message (cadr (cadr exc)))
       (set! stack (cadddr (cddr (cadr exc))))
-      (printf "~%Traceback (most recent call last):~%")
+      (set! retval
+        (string-append
+          retval
+          (format "~%Traceback (most recent call last):~%")))
       (while
         (not (null? stack))
-        (display (format-exception-line (car stack)))
+        (set! retval
+          (string-append retval (format-exception-line (car stack))))
         (set! stack (cdr stack)))
-      (printf "~a: ~a~%" error-type message))))
+      (return*
+        (string-append
+          retval
+          (format "~a: ~a~%" error-type message))))))
 
 (define format-exception-line
   (lambda (line)

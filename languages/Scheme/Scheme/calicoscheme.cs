@@ -6830,19 +6830,26 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void handle_exception(object exc) {
+    public static object handle_exception(object exc) {
+        display(get_traceback_string(exc));
+        return void_value;
+    }
+    
+    public static object get_traceback_string(object exc) {
         object stack = symbol_undefined;
         object message = symbol_undefined;
         object error_type = symbol_undefined;
+        object retval = symbol_undefined;
+        retval = "";
         error_type = car(cadr(exc));
         message = cadr(cadr(exc));
         stack = cadddr(cddr(cadr(exc)));
-        printf("~%Traceback (most recent call last):~%");
+        retval = string_append(retval, format("~%Traceback (most recent call last):~%"));
         while (true_q((! true_q(null_q(stack))))) {
-            display(format_exception_line(car(stack)));
+            retval = string_append(retval, format_exception_line(car(stack)));
             stack = cdr(stack);
         }
-        printf("~a: ~a~%", error_type, message);
+        return string_append(retval, format("~a: ~a~%", error_type, message));
     }
     
     public static object format_exception_line(object line) {

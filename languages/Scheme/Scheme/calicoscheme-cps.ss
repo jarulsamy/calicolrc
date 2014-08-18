@@ -2712,15 +2712,21 @@
 
 (define handle-exception
   (lambda (exc)
+    (display (get-traceback-string exc))
+    void-value))
+
+(define get-traceback-string
+  (lambda (exc)
     ;; (exception ("ReadError" "cannot represent 1/0" stdin 1 1 ()))
     (let ((stack (cadddr (cddr (cadr exc))))
 	  (message (cadr (cadr exc)))
-	  (error-type (car (cadr exc))))
-      (printf "~%Traceback (most recent call last):~%")
+	  (error-type (car (cadr exc)))
+	  (retval ""))
+      (set! retval (string-append retval (format "~%Traceback (most recent call last):~%")))
       (while (not (null? stack))
-	     (display (format-exception-line (car stack)))
+	     (set! retval (string-append retval (format-exception-line (car stack))))
 	     (set! stack (cdr stack)))
-      (printf "~a: ~a~%" error-type message))))
+      (string-append retval (format "~a: ~a~%" error-type message)))))
 
 (define format-exception-line
   (lambda (line)
