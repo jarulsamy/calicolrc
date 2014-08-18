@@ -7,7 +7,7 @@ if svem_flag in sys.argv:
     sys.argv.remove(svem_flag)
 
 setup(name='calico',
-      version='0.2.1',
+      version='0.2.3',
       description='Tools for Python and IPython',
       long_description="Tools for IPython, and Scheme for Python",
       author='Douglas Blank',
