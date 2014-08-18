@@ -25,9 +25,13 @@ class CalicoSchemeKernel(MagicKernel):
 
     def do_execute_direct(self, code):
         try:
-            return calico.scheme.execute_string_rm(code)
+            retval = calico.scheme.execute_string_rm(code)
         except:
-            return "Error: " + code
+            return "Unhandled Error: " + code
+        if calico.scheme.exception_q(retval):
+            self.Print(calico.scheme.get_traceback_string(retval))
+            retval = None
+        return retval
 
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
