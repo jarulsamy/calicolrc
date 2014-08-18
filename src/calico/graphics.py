@@ -1,23 +1,30 @@
 
-__all__ = ['Canvas', 'Shape', 'Line', 'Circle', 'Text',
+__all__ = ['Canvas', 'Shape', 'Line', 'Circle', 'Text', 'Rectangle', 
+           'Ellipse', 'Polyline', 'Polygon', 'Image',
            'cm', 'em', 'ex', 'mm', 'pc', 'pt', 'px']
 
 import svgwrite
 from svgwrite import cm, em, ex, mm, pc, pt, px
 
 class Canvas(object):
-    def __init__(self, *args, **kwargs):
-        if "debug" not in kwargs:
-            kwargs["debug"] = False
-        self.args = args
-        self.kwargs = kwargs
+    def __init__(self, filename="noname.svg", size=(300, 300), **extras):
+        if "debug" not in extras:
+            extras["debug"] = False
+        self.filename = filename
+        self.size = size
+        self.extras = extras
         self.shapes = []
 
-    def _repr_svg_(self):
-        canvas = svgwrite.Drawing(*self.args, **self.kwargs)
-        for shape in self.shapes:
-            shape._add(canvas)
-        return canvas.tostring()
+    def render(self):
+        canvas = svgwrite.Drawing(self.filename, self.size, **self.extras)
+        return canvas
+
+    def save(self, filename=None):
+        canvas = self.render()
+        if filename:
+            canvas.saveas(filename)
+        else:
+            canvas.save()
 
     def draw(self, shape):
         shape.canvas = self
@@ -26,6 +33,12 @@ class Canvas(object):
     def undraw(self, shape):
         shape.canvas = None
         del self.shapes[shape]
+
+    def _repr_svg_(self):
+        canvas = self.render()
+        for shape in self.shapes:
+            shape._add(canvas)
+        return canvas.tostring()
 
     def __str__(self):
         return self._repr_svg_()
@@ -65,6 +78,10 @@ class Circle(Shape):
 class Line(Shape):
     def __init__(self, start=(0,0), end=(0,0), **extra):
         super(Line, self).__init__()
+        if "stroke" not in extra:
+            extra["stroke"] = "black"
+        if "stroke_width" not in extra:
+            extra["stroke_width"] = 1
         self.start = start
         self.end = end
         self.extra = extra
@@ -101,6 +118,12 @@ class Text(Shape):
 class Rectangle(Shape):
     def __init__(self, start=(0,0), size=(1,1), rx=None, ry=None, **extra):
         super(Rectangle, self).__init__()
+        if "fill" not in extra:
+            extra["fill"] = "purple"
+        if "stroke" not in extra:
+            extra["stroke"] = "black"
+        if "stroke_width" not in extra:
+            extra["stroke_width"] = 1
         self.start = start
         self.size = size
         self.rx = rx
@@ -119,6 +142,12 @@ class Rectangle(Shape):
 class Ellipse(Shape):
     def __init__(self, center=(0,0), radii=(1,1), **extra):
         super(Ellipse, self).__init__()
+        if "fill" not in extra:
+            extra["fill"] = "purple"
+        if "stroke" not in extra:
+            extra["stroke"] = "black"
+        if "stroke_width" not in extra:
+            extra["stroke_width"] = 1
         self.center = center
         self.radii = radii
         self.extra = extra
@@ -154,6 +183,12 @@ class Polyline(Shape):
 class Polygon(Shape):
     def __init__(self, points=[], **extra):
         super(Polygon, self).__init__()
+        if "fill" not in extra:
+            extra["fill"] = "purple"
+        if "stroke" not in extra:
+            extra["stroke"] = "black"
+        if "stroke_width" not in extra:
+            extra["stroke_width"] = 1
         self.points = points
         self.extra = extra
 
@@ -171,10 +206,11 @@ class Polygon(Shape):
         drawing.polygon(points=self.points, **self.extra)
 
 class Image(Shape):
-    def __init__(self, href, start=(0,0), **extra):
+    def __init__(self, href, start=None, size=None, **extra):
         super(Image, self).__init__()
         self.href = href
         self.start = start
+        self.size = size
         self.extra = extra
 
     def moveTo(self, start):
@@ -184,7 +220,7 @@ class Image(Shape):
         self.start = self.start[0] + delta_x, self.start[1] + delta_y
 
     def _add(self, drawing):
-        drawing.image(href, insert=self.start, size=self.size, **self.extra)
+        drawing.image(self.href, insert=self.start, size=self.size, **self.extra)
 
 #g(**extra) # Group
 #symbol(**extra)
