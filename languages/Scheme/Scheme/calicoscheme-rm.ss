@@ -6785,14 +6785,20 @@
 
 (define get-traceback-string
   (lambda (exc)
-    (let ((stack 'undefined)
+    (let ((error-type 'undefined)
           (message 'undefined)
-          (error-type 'undefined)
+          (src-file 'undefined)
+          (src-line 'undefined)
+          (src-col 'undefined)
+          (stack 'undefined)
           (retval 'undefined))
       (set! retval "")
-      (set! error-type (car (cadr exc)))
-      (set! message (cadr (cadr exc)))
       (set! stack (cadddr (cddr (cadr exc))))
+      (set! src-col (cadddr (cdr (cadr exc))))
+      (set! src-line (cadddr (cadr exc)))
+      (set! src-file (caddr (cadr exc)))
+      (set! message (cadr (cadr exc)))
+      (set! error-type (car (cadr exc)))
       (set! retval
         (string-append
           retval
@@ -6802,6 +6808,15 @@
         (set! retval
           (string-append retval (format-exception-line (car stack))))
         (set! stack (cdr stack)))
+      (if (not (eq? src-file 'none))
+          (set! retval
+            (string-append
+              retval
+              (format
+                "  File \"~a\", line ~a, col ~a~%"
+                src-file
+                src-line
+                src-col))))
       (return*
         (string-append
           retval

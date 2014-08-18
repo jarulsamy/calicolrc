@@ -6836,18 +6836,27 @@ public class PJScheme:Scheme
     }
     
     public static object get_traceback_string(object exc) {
-        object stack = symbol_undefined;
-        object message = symbol_undefined;
         object error_type = symbol_undefined;
+        object message = symbol_undefined;
+        object src_file = symbol_undefined;
+        object src_line = symbol_undefined;
+        object src_col = symbol_undefined;
+        object stack = symbol_undefined;
         object retval = symbol_undefined;
         retval = "";
-        error_type = car(cadr(exc));
-        message = cadr(cadr(exc));
         stack = cadddr(cddr(cadr(exc)));
+        src_col = cadddr(cdr(cadr(exc)));
+        src_line = cadddr(cadr(exc));
+        src_file = caddr(cadr(exc));
+        message = cadr(cadr(exc));
+        error_type = car(cadr(exc));
         retval = string_append(retval, format("~%Traceback (most recent call last):~%"));
         while (true_q((! true_q(null_q(stack))))) {
             retval = string_append(retval, format_exception_line(car(stack)));
             stack = cdr(stack);
+        }
+        if (true_q((! true_q(Eq(src_file, symbol_none))))) {
+            retval = string_append(retval, format("  File \"~a\", line ~a, col ~a~%", src_file, src_line, src_col));
         }
         return string_append(retval, format("~a: ~a~%", error_type, message));
     }

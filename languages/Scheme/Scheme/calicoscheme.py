@@ -6665,18 +6665,26 @@ def handle_exception(exc):
     return void_value
 
 def get_traceback_string(exc):
-    stack = symbol_undefined
-    message = symbol_undefined
     error_type = symbol_undefined
+    message = symbol_undefined
+    src_file = symbol_undefined
+    src_line = symbol_undefined
+    src_col = symbol_undefined
+    stack = symbol_undefined
     retval = symbol_undefined
     retval = ""
-    error_type = car(cadr(exc))
-    message = cadr(cadr(exc))
     stack = cadddr(cddr(cadr(exc)))
+    src_col = cadddr(cdr(cadr(exc)))
+    src_line = cadddr(cadr(exc))
+    src_file = caddr(cadr(exc))
+    message = cadr(cadr(exc))
+    error_type = car(cadr(exc))
     retval = string_append(retval, format("~%Traceback (most recent call last):~%"))
     while not(null_q(stack)):
         retval = string_append(retval, format_exception_line(car(stack)))
         stack = cdr(stack)
+    if true_q(not((src_file) is (symbol_none))):
+        retval = string_append(retval, format("  File \"~a\", line ~a, col ~a~%", src_file, src_line, src_col))
     return string_append(retval, format("~a: ~a~%", error_type, message))
 
 def format_exception_line(line):
