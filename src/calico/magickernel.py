@@ -53,11 +53,15 @@ class MagicKernel(Kernel):
         code = "\n".join(lines[1:])
         return command, args, code
 
-    def Print(self, message):
+    def Print(self, *args, **kwargs):
+        end = kwargs["end"] if ("end" in kwargs) else "\n"
+        message = " ".join(args) + end
         stream_content = {'name': 'stdout', 'data': message}
         self.send_response(self.iopub_socket, 'stream', stream_content)
 
-    def Error(self, message):
+    def Error(self, *args, **kwargs):
+        end = kwargs["end"] if ("end" in kwargs) else "\n"
+        message = " ".join(args) + end
         stream_content = {'name': 'stderr', 'data': message}
         self.send_response(self.iopub_socket, 'stream', stream_content)
 

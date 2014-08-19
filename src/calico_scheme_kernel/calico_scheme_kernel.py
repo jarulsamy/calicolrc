@@ -31,6 +31,8 @@ class CalicoSchemeKernel(MagicKernel):
         if calico.scheme.exception_q(retval):
             self.Error(calico.scheme.get_traceback_string(retval))
             retval = None
+        if retval is calico.scheme.void_value:
+            retval = None
         return retval
 
 if __name__ == '__main__':
