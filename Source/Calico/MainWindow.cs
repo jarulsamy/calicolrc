@@ -3338,7 +3338,7 @@ del _invoke, _
 		    }
 		}
             } else if (obj is string) {
-                repr = String.Format("{0}", ((string)obj).Replace("\"", "\\\""));
+                repr = String.Format("\"{0}\"", ((string)obj).Replace("\"", "\\\""));
 	    } else if (obj is IList) {
 		repr = "";
 		foreach(var element in (IList)obj) {
