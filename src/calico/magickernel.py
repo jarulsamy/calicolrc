@@ -57,6 +57,10 @@ class MagicKernel(Kernel):
         stream_content = {'name': 'stdout', 'data': message}
         self.send_response(self.iopub_socket, 'stream', stream_content)
 
+    def Error(self, message):
+        stream_content = {'name': 'stderr', 'data': message}
+        self.send_response(self.iopub_socket, 'stream', stream_content)
+
     def get_magic(self, text):
         # if first line matches a magic,
         # return Magic(self, code, args)
