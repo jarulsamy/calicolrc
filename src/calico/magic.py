@@ -1,5 +1,6 @@
 class Magic(object):
     name = None
+    help_lines = []
     def __init__(self, kernel, code, mtype, args):
         self.kernel = kernel
         self.code = code

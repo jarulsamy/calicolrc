@@ -7,6 +7,7 @@ import sys
 import glob
 import base64
 from magic import Magic
+import imp
 
 class MagicKernel(Kernel):
     def __init__(self, *args, **kwargs):
@@ -19,6 +20,7 @@ class MagicKernel(Kernel):
         self.__ = None
         self.___ = None
         self.reload_magics()
+        sys.stdout.write = self.Print
 
     def reload_magics(self):
         self.magics = {}
@@ -31,6 +33,8 @@ class MagicKernel(Kernel):
                 continue
             try:
                 module = __import__(os.path.splitext(basename)[0])
+                ## FIXME: this doesn't actually reload changed code:
+                imp.reload(module)
                 module.register_magics(self.magics)
             except Exception as e:
                 print("Can't load '%s': error: %s" % (magic, e.message))
@@ -38,7 +42,7 @@ class MagicKernel(Kernel):
     def get_usage(self):
         return "This is a usage statement."
 
-    def parse(self, text):
+    def parse_magic(self, text):
         lines = text.split("\n")
         command = lines[0]
         if command.startswith("%"):
@@ -51,7 +55,13 @@ class MagicKernel(Kernel):
         else:
             args = ""
         code = "\n".join(lines[1:])
+        args = args.strip()
         return command, args, code
+
+    def Display(self, *args):
+        for message in args:
+            self.send_response(self.iopub_socket, 'display_data', 
+                               {'data': self.formatter(message)})
 
     def Print(self, *args, **kwargs):
         end = kwargs["end"] if ("end" in kwargs) else "\n"
@@ -68,7 +78,7 @@ class MagicKernel(Kernel):
     def get_magic(self, text):
         # if first line matches a magic,
         # return Magic(self, code, args)
-        parts = self.parse(text)
+        parts = self.parse_magic(text)
         if parts:
             command, args, code = parts
             if command.startswith("%%%"):

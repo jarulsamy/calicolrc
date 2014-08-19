@@ -3,10 +3,16 @@ from IPython.display import Latex
 
 class LatexMagic(Magic):
     name = "latex"
+    help_lines = ["%%latex - display contents of cell as LaTeX",
+                  " %latex - display argument as LaTex"]
+
+    def line(self, args):
+        latex = Latex(args)
+        self.kernel.Display(latex)
+
     def cell(self, args):
         latex = Latex(self.code)
-        self.kernel.send_response(self.kernel.iopub_socket, 'display_data', 
-                                  {'data': self.kernel.formatter(latex)})
+        self.kernel.Display(latex)
         self.evaluate = False
 
 def register_magics(magics):

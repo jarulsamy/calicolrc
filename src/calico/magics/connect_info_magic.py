@@ -1,11 +1,13 @@
 from calico import Magic
+import json
 
-class ConnectFileMagic(Magic):
-    name = "connect_file"
+class ConnectInfoMagic(Magic):
+    name = "connect_info"
+    help_lines = [" %connect_info = show connection information"]
 
     def line(self, args):
         connection_file = self.kernel.config["IPKernelApp"]["connection_file"]
-        config = eval(open(connection_file).read())
+        config = json.loads(open(connection_file).read())
         retval = """{
   "stdin_port": %(stdin_port)s,
   "shell_port": %(shell_port)s,
@@ -32,4 +34,4 @@ if this is the most recent ICalico session you have started.
         self.line(args)
 
 def register_magics(magics):
-    magics[ConnectFileMagic.name] = ConnectFileMagic
+    magics[ConnectInfoMagic.name] = ConnectInfoMagic

@@ -3,6 +3,9 @@ import time
 
 class TimeMagic(Magic):
     name = "time"
+    help_lines = [" %time - show time to run line",
+                  "%%time - show time to run cell"]
+
     def cell(self, args):
         self.start = time.time()
 

@@ -3,10 +3,16 @@ from IPython.display import HTML
 
 class HTMLMagic(Magic):
     name = "html"
+    help_lines = ["%%html - display contents of cell as HTML",
+                  " %html - display argument as HTML"]
+
+    def line(self, args):
+        html = HTML(args)
+        self.kernel.Display(html)
+
     def cell(self, args):
         html = HTML(self.code)
-        self.kernel.send_response(self.kernel.iopub_socket, 'display_data', 
-                                  {'data': self.kernel.formatter(html)})
+        self.kernel.Display(html)
         self.evaluate = False
 
 def register_magics(magics):
