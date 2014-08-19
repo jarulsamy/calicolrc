@@ -29,7 +29,7 @@ class CalicoSchemeKernel(MagicKernel):
         except:
             return "Unhandled Error: " + code
         if calico.scheme.exception_q(retval):
-            self.Print(calico.scheme.get_traceback_string(retval))
+            self.Error(calico.scheme.get_traceback_string(retval))
             retval = None
         return retval
 
