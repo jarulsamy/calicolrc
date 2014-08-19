@@ -109,9 +109,9 @@ class cons(object):
 
     def __repr__(self):
         if self.car is symbol_procedure:
-            return "<procedure>"
+            return "#<procedure>"
         elif self.car is symbol_environment:
-            return "<environment>"
+            return "#<environment>"
         retval = ""
         current = self
         while isinstance(current, cons):
@@ -798,9 +798,9 @@ def pretty_print(thing):
 
 def make_safe(item):
     if procedure_q(item):
-        return "<procedure>"
+        return "#<procedure>"
     elif environment_q(item):
-        return "<environment>"
+        return "#<environment>"
     elif string_q(item):
         # Unlike Python, Scheme's strings must start with "
         return '"%s"' % item.replace('"', '\\"')

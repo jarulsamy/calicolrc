@@ -2968,6 +2968,16 @@ public class Scheme {
           return new ConsEnum(this);
       }
       
+      public string to_s() { 
+	  if (car == PJScheme.symbol_procedure) {
+	      return "#<procedure>";
+	  } else if (car == PJScheme.symbol_environment) {
+	      return "#<environment>";
+	  } else {
+	      return this.ToString();
+	  }
+      }
+
       public override string ToString() { 
           string retval = "";
           object current = this;
