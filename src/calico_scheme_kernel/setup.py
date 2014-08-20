@@ -29,7 +29,7 @@ if svem_flag in sys.argv:
     sys.argv.remove(svem_flag)
 
 setup(name='calico_scheme_kernel',
-      version='0.2',
+      version='0.2.1',
       description='A Scheme kernel for IPython',
       url="https://bitbucket.org/ipre/calico/src/master/src/calico_scheme_kernel/",
       long_description="A Scheme kernel for IPython",
