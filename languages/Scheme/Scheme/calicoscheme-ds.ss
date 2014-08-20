@@ -303,7 +303,7 @@
   <cont-22>
   (lambda (value fields)
     (let ((bindings (car fields)) (k (cadr fields)))
-      (apply-cont k `(let ((unquote (car^ bindings))) ,value)))))
+      (apply-cont k `(let (,(car^ bindings)) ,value)))))
 
 (define+
   <cont-23>
@@ -334,7 +334,7 @@
     (let ((fields (car fields))
           (name (cadr fields))
           (k2 (caddr fields)))
-      (let ((constructor-def `(define (unquote name)
+      (let ((constructor-def `(define ,name
                                 (lambda args
                                   (if (= (length args) ,(length^ fields))
                                       ,value
@@ -977,9 +977,7 @@
   <cont2-36>
   (lambda (value1 value2 fields)
     (let ((bodies (car fields)) (k (cadr fields)))
-      (apply-cont
-        k
-        `(let (unquote value1) ,@value2 ,@(at^ bodies))))))
+      (apply-cont k `(let ,value1 ,@value2 ,@(at^ bodies))))))
 
 (define+
   <cont2-37>
@@ -996,10 +994,7 @@
   <cont2-38>
   (lambda (value1 value2 fields)
     (let ((exp (car fields)) (k (cadr fields)))
-      (apply-cont
-        k
-        `(let ((r ,exp) (unquote-splicing value1))
-           (cond (unquote-splicing value2)))))))
+      (apply-cont k `(let ((r ,exp) ,@value1) (cond ,@value2))))))
 
 (define+
   <cont2-39>
@@ -1049,8 +1044,7 @@
                     k2
                     (cons
                       `(,name
-                         (lambda (unquote (cadr^ clause))
-                           ,@(at^ (cddr^ clause))))
+                         (lambda ,(cadr^ clause) ,@(at^ (cddr^ clause))))
                       value1)
                     (cons
                       `((eq? (car ,var) ',(car^ clause))
@@ -1061,8 +1055,7 @@
                     k2
                     (cons
                       `(,name
-                         (lambda (unquote (cadr^ clause))
-                           ,@(at^ (cddr^ clause))))
+                         (lambda ,(cadr^ clause) ,@(at^ (cddr^ clause))))
                       value1)
                     (cons
                       `((memq (car ,var) ',(car^ clause))
@@ -1073,7 +1066,7 @@
   <cont2-41>
   (lambda (value1 value2 fields)
     (let ((type-tester-name (car fields)) (k (cadr fields)))
-      (let ((tester-def `(define (unquote type-tester-name)
+      (let ((tester-def `(define ,type-tester-name
                            (lambda (x)
                              (and (pair? x)
                                   (not (not (memq (car x) ',value1))))))))
@@ -1104,10 +1097,10 @@
           (k (cadddr fields)))
       (apply-cont
         k
-        `(let ((r ,exp) (unquote-splicing value1))
+        `(let ((r ,exp) ,@value1)
            (if (not (,type-tester-name r))
                (error 'cases "~a is not a valid ~a" r ',type-name)
-               (cond (unquote-splicing value2))))))))
+               (cond ,@value2)))))))
 
 (define+
   <cont2-45>
@@ -4173,7 +4166,7 @@
                  (bodies (cdddr^ datum)))
             (apply-cont
               k
-              `(letrec ((,name (lambda (unquote vars) ,@(at^ bodies))))
+              `(letrec ((,name (lambda ,vars ,@(at^ bodies))))
                  (,name ,@(at^ exps)))))
           (let* ((bindings (cadr^ datum))
                  (vars (map^ car^ bindings))
@@ -4181,7 +4174,7 @@
                  (bodies (cddr^ datum)))
             (apply-cont
               k
-              `((lambda (unquote vars) ,@(at^ bodies)) ,@(at^ exps))))))))
+              `((lambda ,vars ,@(at^ bodies)) ,@(at^ exps))))))))
 
 (define+
   <macro-2>
@@ -4205,8 +4198,7 @@
             (bodies (cddr^ datum)))
         (apply-cont
           k
-          `(define (unquote name)
-             (lambda (unquote formals) ,@(at^ bodies))))))))
+          `(define ,name (lambda ,formals ,@(at^ bodies))))))))
 
 (define+
   <macro-4>
@@ -4275,8 +4267,7 @@
                              `(let ((bool ,test-exp)
                                     (else-code (lambda ()
                                                  (cond
-                                                   (unquote-splicing
-                                                    (at^ other-clauses))))))
+                                                   ,@(at^ other-clauses)))))
                                 (if bool bool (else-code))))))
                       ((eq?^ (car^ then-exps) '=>)
                        (cond
@@ -4299,8 +4290,7 @@
                                    (th (lambda () ,(cadr^ then-exps)))
                                    (else-code (lambda ()
                                                 (cond
-                                                  (unquote-splicing
-                                                   (at^ other-clauses))))))
+                                                  ,@(at^ other-clauses)))))
                                (if bool ((th) bool) (else-code)))))))
                       ((null?^ other-clauses)
                        (if (null?^ (cdr^ then-exps))
@@ -4313,16 +4303,13 @@
                          k
                          `(if ,test-exp
                               ,(car^ then-exps)
-                              (cond
-                                (unquote-splicing (at^ other-clauses))))))
+                              (cond ,@(at^ other-clauses)))))
                       (else
                        (apply-cont
                          k
                          `(if ,test-exp
                               (begin ,@(at^ then-exps))
-                              (cond
-                                (unquote-splicing
-                                 (at^ other-clauses)))))))))))))))
+                              (cond ,@(at^ other-clauses))))))))))))))
 
 (define+
   <macro-7>
@@ -5622,7 +5609,7 @@
   nest-let*-bindings^
   (lambda (bindings bodies k)
     (if (or (null?^ bindings) (null?^ (cdr^ bindings)))
-        (apply-cont k `(let (unquote bindings) ,@(at^ bodies)))
+        (apply-cont k `(let ,bindings ,@(at^ bodies)))
         (nest-let*-bindings^
           (cdr^ bindings)
           bodies
@@ -5859,8 +5846,8 @@
      (define-aexp
        (id docstring rhs-exp info)
        (if (string=? docstring "")
-           `(define (unquote id) ,(aunparse rhs-exp))
-           `(define (unquote id) ,docstring ,(aunparse rhs-exp))))
+           `(define ,id ,(aunparse rhs-exp))
+           `(define ,id ,docstring ,(aunparse rhs-exp))))
      (define!-aexp
        (id docstring rhs-exp info)
        (if (string=? docstring "")
@@ -5868,11 +5855,11 @@
            `(define! ,id ,docstring ,(aunparse rhs-exp))))
      (define-syntax-aexp
        (name clauses aclauses info)
-       `(define-syntax (unquote name) ,@clauses))
+       `(define-syntax ,name ,@clauses))
      (begin-aexp (exps info) `(begin ,@(map aunparse exps)))
      (lambda-aexp
        (formals bodies info)
-       `(lambda (unquote formals) ,@(map aunparse bodies)))
+       `(lambda ,formals ,@(map aunparse bodies)))
      (mu-lambda-aexp
        (formals runt bodies info)
        `(lambda (,@formals . ,runt) ,@(map aunparse bodies)))
@@ -6255,12 +6242,10 @@
             (cases aexpression operator
               (lexical-address-aexp (depth offset id info) id)
               (var-aexp (id info) id)
-              (lambda-aexp
-                (formals bodies info)
-                `(lambda (unquote formals) ...))
+              (lambda-aexp (formals bodies info) `(lambda ,formals ...))
               (mu-lambda-aexp
                 (formals runt bodies info)
-                `(lambda (unquote (append formals runt)) ...))
+                `(lambda ,(append formals runt) ...))
               (trace-lambda-aexp (name formals bodies info) name)
               (mu-trace-lambda-aexp (name formals runt bodies info) name)
               (else 'application)))
