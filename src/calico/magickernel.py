@@ -33,7 +33,6 @@ class MagicKernel(Kernel):
                 continue
             try:
                 module = __import__(os.path.splitext(basename)[0])
-                ## FIXME: this doesn't actually reload changed code:
                 imp.reload(module)
                 module.register_magics(self.magics)
             except Exception as e:

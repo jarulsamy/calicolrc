@@ -1,9 +1,13 @@
+# Copyright (c) Calico Development Team.
+# Distributed under the terms of the Modified BSD License.
+# http://calicoproject.org/
+
 from calico import Magic
 import time
 
 class TimeMagic(Magic):
     name = "time"
-    help_lines = [" %time - show time to run line",
+    help_lines = [" %time COMMAND - show time to run line",
                   "%%time - show time to run cell"]
 
     def cell(self, args):

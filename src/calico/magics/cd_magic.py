@@ -1,9 +1,13 @@
+# Copyright (c) Calico Development Team.
+# Distributed under the terms of the Modified BSD License.
+# http://calicoproject.org/
+
 from calico import Magic
 import os
 
 class CDMagic(Magic):
     name = "cd"
-    help_lines = [" %cd - change current directory of session"]
+    help_lines = [" %cd PATH - change current directory of session"]
 
     def line(self, args):
         try:

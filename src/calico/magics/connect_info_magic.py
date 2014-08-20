@@ -1,9 +1,13 @@
+# Copyright (c) Calico Development Team.
+# Distributed under the terms of the Modified BSD License.
+# http://calicoproject.org/
+
 from calico import Magic
 import json
 
 class ConnectInfoMagic(Magic):
     name = "connect_info"
-    help_lines = [" %connect_info = show connection information"]
+    help_lines = [" %connect_info - show connection information"]
 
     def line(self, args):
         connection_file = self.kernel.config["IPKernelApp"]["connection_file"]

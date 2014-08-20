@@ -1,3 +1,7 @@
+# Copyright (c) Calico Development Team.
+# Distributed under the terms of the Modified BSD License.
+# http://calicoproject.org/
+
 from calico import Magic
 
 class ReloadMagicsMagic(Magic):

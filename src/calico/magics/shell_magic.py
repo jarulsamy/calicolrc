@@ -1,9 +1,13 @@
+# Copyright (c) Calico Development Team.
+# Distributed under the terms of the Modified BSD License.
+# http://calicoproject.org/
+
 from calico import Magic
 import subprocess
 
 class ShellMagic(Magic):
     name = "shell"
-    help_lines = [" %shell - run the line as a shell command",
+    help_lines = [" %shell COMMAND - run the line as a shell command",
                   "%%shell - run the contents of the cell as shell commands"]
 
     def line(self, args):
@@ -16,7 +20,8 @@ class ShellMagic(Magic):
         except Exception as e:
             self.kernel.Error(e.message)
             retval = None
-        self.kernel.Print(retval)
+        if retval:
+            self.kernel.Print(retval)
 
     def cell(self, args):
         self.line(self.code)

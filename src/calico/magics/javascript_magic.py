@@ -1,10 +1,14 @@
+# Copyright (c) Calico Development Team.
+# Distributed under the terms of the Modified BSD License.
+# http://calicoproject.org/
+
 from calico import Magic
 from IPython.display import Javascript
 
 class JavascriptMagic(Magic):
     name = "javascript"
-    help_lines = [" %javascript - display line as JavaScript",
-                  "%%javascript - display contents of cell as JavaScript"]
+    help_lines = [" %javascript CODE - send code as JavaScript",
+                  "%%javascript - send contents of cell as JavaScript"]
 
     def line(self, args):
         jscode = Javascript(args)

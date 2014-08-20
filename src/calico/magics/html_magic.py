@@ -1,10 +1,14 @@
+# Copyright (c) Calico Development Team.
+# Distributed under the terms of the Modified BSD License.
+# http://calicoproject.org/
+
 from calico import Magic
 from IPython.display import HTML
 
 class HTMLMagic(Magic):
     name = "html"
     help_lines = ["%%html - display contents of cell as HTML",
-                  " %html - display argument as HTML"]
+                  " %html CODE - display code as HTML"]
 
     def line(self, args):
         html = HTML(args)
