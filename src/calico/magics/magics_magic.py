@@ -19,7 +19,7 @@ class MagicsMagic(Magic):
         self.kernel.Print("    " + ("\n    ".join(sorted([line for line in retval if line.startswith("%")]))))
         self.kernel.Print("")
         self.kernel.Print("Shell shortcut:")
-        self.kernel.Print("    ! COMMAND ... - execute comand in shell")
+        self.kernel.Print("    ! COMMAND ... - execute command in shell")
         self.kernel.Print("")
         self.kernel.Print("Any cell magic can be made persistent for rest of session by using %%% prefix.")
 
