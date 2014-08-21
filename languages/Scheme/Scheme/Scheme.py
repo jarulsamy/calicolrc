@@ -34,14 +34,14 @@ import os
 ## Global symbols:
 
 # Set to a dictionary-like object for global-shared namespace:
-ENVIRONMENT = {key:getattr(__builtins__, key) 
-               for key in dir(__builtins__)}
-try:
-    # Loads functions from IPython
-    ENVIRONMENT.update({key:getattr(__builtin__, key) 
-                        for key in dir(__builtin__)})
-except:
-    pass
+ENVIRONMENT = {}
+# Python environment:
+if "str" in dir(__builtins__):
+    ENVIRONMENT.update({key: getattr(__builtins__, key) 
+                        for key in dir(__builtins__)})
+# IPython environment:
+if "keys" in dir(__builtins__):
+    ENVIRONMENT.update(__builtins__)
 ENVIRONMENT["DEBUG"] = False
 
 GLOBALS = globals()
