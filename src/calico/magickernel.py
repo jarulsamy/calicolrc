@@ -149,9 +149,12 @@ class MagicKernel(Kernel):
             ret_code_str += "\n"
         return (ret_magics_str, ret_code_str)
 
+    def repr(self, item):
+        return repr(item)
+
     def formatter(self, data):
         retval = {}
-        retval["text/plain"] = repr(data)
+        retval["text/plain"] = self.repr(data)
         if hasattr(data, "_repr_png_"):
             obj = data._repr_png_()
             if obj:

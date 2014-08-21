@@ -23,6 +23,19 @@ class CalicoSchemeKernel(MagicKernel):
     def get_help_on(self, expr):
         return "Sorry, no help is available on '%s'." % expr
 
+    def repr(self, item):
+        if isinstance(item, list):
+            items = " ".join(map(repr, item))
+            return "#%d(%s)" % (len(item), items)
+        elif isinstance(item, str):
+            retval = repr(item)
+            if retval.startswith("'"):
+                retval = retval.replace('"', '\\"')
+                retval = retval.replace('\n', '\\n')
+                return '"' + retval[1:-1] + '"'
+        # FIXME: newlines, chars?
+        return repr(item)
+
     def do_execute_direct(self, code):
         try:
             retval = calico.scheme.execute_string_rm(code)
