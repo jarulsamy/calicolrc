@@ -626,7 +626,7 @@ def list_to_string(lyst):
 
 def list_to_vector(lyst):
     # this works because cons implements iter
-    return list(lyst)
+    return Vector(lyst)
 
 def vector_to_list(vector):
     return List(*vector)
@@ -871,10 +871,14 @@ def memv(item, ls):
     return False
 
 def make_vector(size):
-    return [0] * size
+    return Vector([0] * size)
+
+class Vector(list):
+    def __repr__(self):
+        return "#%d(%s)" % (len(self), " ".join(map(repr, self)))
 
 def vector_native(*ls):
-    return list(ls)
+    return Vector(ls)
 
 def vector_set_b(vec, pos, value):
     vec[pos] = value
