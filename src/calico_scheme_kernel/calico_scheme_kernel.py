@@ -24,9 +24,12 @@ class CalicoSchemeKernel(MagicKernel):
         return "Sorry, no help is available on '%s'." % expr
 
     def repr(self, item):
-        if isinstance(item, list):
-            items = " ".join(map(repr, item))
+        if isinstance(item, list): # a scheme vector
+            items = " ".join(map(self.repr, item))
             return "#%d(%s)" % (len(item), items)
+        elif isinstance(item, calico.scheme.cons): # a scheme list
+            items = " ".join(map(self.repr, item))
+            return "(%s)" % items
         elif isinstance(item, str):
             retval = repr(item)
             if retval.startswith("'"):
@@ -34,6 +37,8 @@ class CalicoSchemeKernel(MagicKernel):
                 retval = retval.replace('\n', '\\n')
                 return '"' + retval[1:-1] + '"'
         # FIXME: newlines, chars?
+        elif isinstance(item, bool):
+            return '#t' if item else '#f'
         return repr(item)
 
     def do_execute_direct(self, code):
