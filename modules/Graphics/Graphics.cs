@@ -3245,22 +3245,35 @@ public static class Graphics
 
 		public Line penUp ()
 		{
-		    return penUp(false);
+		    return penUp(false, null);
+		}
+
+	        public Line penUp (Color fillColor)
+	        {
+		    return penUp(false, fillColor);
 		}
     
-		public Line penUp (bool getLine)
+	        public Line penUp (bool getLine, Color fillColor)
 		{
 		  if (pen.down) {
 		    if (getLine) {
 			  pen._down = false;
 			  Line line = pen.resetPath ();
 			  line.color = pen.color;
+			  if (fillColor == null)
+			      line.fill = null;
+			  else
+			      line.fill = fillColor;
 			  return line;
 		    } else {
 			  if (window != null) {
 			    pen._down = false;
 			    Line line = pen.resetPath ();
 			    line.color = pen.color;
+			    if (fillColor == null)
+				line.fill = null;
+			    else
+				line.fill = fillColor;
 			    line.draw(window);
 			  }
 			  return null;
@@ -4499,7 +4512,7 @@ public static class Graphics
 	{
 		private List<Point> _path; // = new List<Point>();
 		public bool _down;
-		public double minDistance = 1;
+		public double minDistance = 0.1;
     
 		public Pen (Color color, int border) : base(false)
 		{
