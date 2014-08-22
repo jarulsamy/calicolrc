@@ -1,10 +1,21 @@
 
-__all__ = ['Canvas', 'Shape', 'Line', 'Circle', 'Text', 'Rectangle', 
-           'Ellipse', 'Polyline', 'Polygon', 'Image',
-           'cm', 'em', 'ex', 'mm', 'pc', 'pt', 'px']
+__all__ = [
+    # The container:
+    'Canvas', 
+    # Shapes:
+    'Shape', 'Line', 'Circle', 'Text', 'Rectangle', 
+    'Ellipse', 'Polyline', 'Polygon', 'Picture',
+    # Pixel-based items:
+    'Pixel', 'Color',
+    # Units:
+    'cm', 'em', 'ex', 'mm', 'pc', 'pt', 'px'
+]
 
 import svgwrite
 from svgwrite import cm, em, ex, mm, pc, pt, px
+import cairosvg
+import numpy
+from cairosvg.parser import Tree
 
 class Canvas(object):
     def __init__(self, filename="noname.svg", size=(300, 300), **extras):
@@ -15,12 +26,12 @@ class Canvas(object):
         self.extras = extras
         self.shapes = []
 
-    def render(self):
+    def _render(self):
         canvas = svgwrite.Drawing(self.filename, self.size, **self.extras)
         return canvas
 
     def save(self, filename=None):
-        canvas = self.render()
+        canvas = self._render()
         if filename:
             canvas.saveas(filename)
         else:
@@ -29,13 +40,15 @@ class Canvas(object):
     def draw(self, shape):
         shape.canvas = self
         self.shapes.append(shape)
+        return self
 
     def undraw(self, shape):
         shape.canvas = None
         del self.shapes[shape]
+        return self
 
     def _repr_svg_(self):
-        canvas = self.render()
+        canvas = self._render()
         for shape in self.shapes:
             shape._add(canvas)
         return canvas.tostring()
@@ -43,15 +56,77 @@ class Canvas(object):
     def __str__(self):
         return self._repr_svg_()
 
+    def convert(self, format="png", **kwargs):
+        """
+        png, ps, pdf, gif, jpg, svg
+        returns image in format as string
+        """
+        surface = cairosvg.SURFACES[format.upper()]
+        return surface.convert(bytestring=str(self), **kwargs)
+
+    def toArray(self, dpi=96, **kwargs):
+        """
+        Converts svg-based image as a numpy array.
+        """
+        kwargs['bytestring'] = str(self)
+        tree = Tree(**kwargs)
+        pngsurface = cairosvg.SURFACES["PNG"](tree, None, dpi)
+        buffer = pngsurface.cairo.get_data()
+        width = pngsurface.cairo.get_width()
+        height = pngsurface.cairo.get_height()
+        array = numpy.frombuffer(buffer, numpy.uint8)
+        array.shape = (width, height, 4) # 4 = rgb + alpha
+        return array
+
+    def getPixels(self):
+        """
+        Return a stream of pixels from current Canvas.
+        """
+        array = self.toArray()
+        (width, height, depth) = 
+        for x in range(width):
+            for x in range(height):
+                yield Pixel(array, x, y)
+
+class Pixel(object):
+    """
+    Wrapper interface to numpy array.
+    """
+    def __init__(self, array, x, y):
+        self.array = array
+        self.x = x
+        self.y = y
+
+    def getColor(self):
+        return Color(*self.array[x, y])
+
+    def setColor(self, color):
+        self.array[x, y][0] = color.red
+        self.array[x, y][1] = color.green
+        self.array[x, y][2] = color.blue
+        self.array[x, y][3] = color.alpha
+
+    def getRGBA(self):
+        return self.array[x, y]
+
+class Color(object):
+    def __init__(self, r, g, b, a=255):
+        self.red = r
+        self.green = g
+        self.blue = b
+        self.alpha
+
 class Shape(object):
     def __init__(self):
         self.canvas = None
 
     def draw(self, canvas):
         canvas.draw(self)
+        return canvas
 
     def undraw(self, canvas):
         canvas.undraw(self)
+        return canvas
 
 class Circle(Shape):
     def __init__(self, center=(0,0), radius=1, **extra):
@@ -68,9 +143,11 @@ class Circle(Shape):
 
     def moveTo(self, center):
         self.center = center
+        return self.canvas
 
     def move(self, (delta_x, delta_y)):
         self.center = self.center[0] + delta_x, self.center[1] + delta_y
+        return self.canvas
 
     def _add(self, drawing):
         drawing.add(drawing.circle(center=self.center, r=self.radius, **self.extra))
@@ -91,10 +168,12 @@ class Line(Shape):
         diff_y = start[1] - self.start[1]
         self.start = start
         self.end = self.end[0] + diff_x, self.end[1] + diff_y
+        return self.canvas
 
     def move(self, (delta_x, delta_y)):
         self.start = self.start[0] + delta_x, self.start[1] + delta_y
         self.end = self.end[0] + delta_x, self.end[1] + delta_y
+        return self.canvas
 
     def _add(self, drawing):
         drawing.add(drawing.line(start=self.start, end=self.end, **self.extra))
@@ -108,9 +187,11 @@ class Text(Shape):
 
     def moveTo(self, start):
         self.start = start
+        return self.canvas
 
     def move(self, (delta_x, delta_y)):
         self.start = self.start[0] + delta_x, self.start[1] + delta_y
+        return self.canvas
 
     def _add(self, drawing):
         drawing.add(drawing.text(text=self.text, insert=self.start, **self.extra))
@@ -132,9 +213,11 @@ class Rectangle(Shape):
 
     def moveTo(self, start):
         self.start = start
+        return self.canvas
 
     def move(self, (delta_x, delta_y)):
         self.start = self.start[0] + delta_x, self.start[1] + delta_y
+        return self.canvas
 
     def _add(self, drawing):
         drawing.rect(insert=self.start, size=self.size, rx=self.rx, ry=self.ry, **self.extra)
@@ -154,9 +237,11 @@ class Ellipse(Shape):
 
     def moveTo(self, center):
         self.center = center
+        return self.canvas
 
     def move(self, (delta_x, delta_y)):
         self.center = self.center[0] + delta_x, self.center[1] + delta_y
+        return self.canvas
 
     def _add(self, drawing):
         drawing.ellipse(center=self.center, r=self.radii, **self.extra)
@@ -172,10 +257,12 @@ class Polyline(Shape):
         diff_y = start[1] - points[0][1]
         for p in range(len(self.points)):
             point[i] = point[i][0] + diff_x, point[i][1] + diff_y
+        return self.canvas
 
     def move(self, (delta_x, delta_y)):
         for p in range(len(self.points)):
             point[i] = point[i][0] + delta_x, point[i][1] + delta_y
+        return self.canvas
 
     def _add(self, drawing):
         drawing.polyline(points=self.points, **self.extra)
@@ -197,15 +284,17 @@ class Polygon(Shape):
         diff_y = start[1] - points[0][1]
         for p in range(len(self.points)):
             point[i] = point[i][0] + diff_x, point[i][1] + diff_y
+        return self.canvas
 
     def move(self, (delta_x, delta_y)):
         for p in range(len(self.points)):
             point[i] = point[i][0] + delta_x, point[i][1] + delta_y
+        return self.canvas
 
     def _add(self, drawing):
         drawing.polygon(points=self.points, **self.extra)
 
-class Image(Shape):
+class Picture(Shape):
     def __init__(self, href, start=None, size=None, **extra):
         super(Image, self).__init__()
         self.href = href
@@ -215,9 +304,11 @@ class Image(Shape):
 
     def moveTo(self, start):
         self.start = start
+        return self.canvas
 
     def move(self, (delta_x, delta_y)):
         self.start = self.start[0] + delta_x, self.start[1] + delta_y
+        return self.canvas
 
     def _add(self, drawing):
         drawing.image(self.href, insert=self.start, size=self.size, **self.extra)
