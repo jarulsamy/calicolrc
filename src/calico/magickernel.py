@@ -20,7 +20,7 @@ class MagicKernel(Kernel):
         self.__ = None
         self.___ = None
         self.reload_magics()
-        sys.stdout.write = self.Print
+        sys.stdout.write = self.Write
 
     def reload_magics(self):
         self.magics = {}
@@ -65,6 +65,10 @@ class MagicKernel(Kernel):
     def Print(self, *args, **kwargs):
         end = kwargs["end"] if ("end" in kwargs) else "\n"
         message = " ".join(args) + end
+        stream_content = {'name': 'stdout', 'data': message}
+        self.send_response(self.iopub_socket, 'stream', stream_content)
+
+    def Write(self, message):
         stream_content = {'name': 'stdout', 'data': message}
         self.send_response(self.iopub_socket, 'stream', stream_content)
 
