@@ -4512,7 +4512,7 @@ public static class Graphics
 	{
 		private List<Point> _path; // = new List<Point>();
 		public bool _down;
-		public double minDistance = 0.1;
+		public double minDistance = 1;
     
 		public Pen (Color color, int border) : base(false)
 		{
