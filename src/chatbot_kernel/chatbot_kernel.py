@@ -14,8 +14,10 @@ class ChatbotKernel(MagicKernel):
     def help_patterns(self):
         # Longest first:
         return [
-            ("^\?\?(.*)$", 2), # "??code"
-            ("^\?(.*)$", 1),   # "?code"
+            ("^\?\?(.*)$", 2,
+             "??item - get detailed help on item"), # "??code"
+            ("^\?(.*)$", 1, 
+             "?item - get help on item"),   # "?code"
         ]
         
     def __init__(self, *args, **kwargs):

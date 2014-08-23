@@ -195,10 +195,14 @@ class MagicKernel(Kernel):
     def help_patterns(self):
         # Longest first:
         return [
-            ("^(.*)\?\?$", 2), # "code??"
-            ("^(.*)\?$", 1),   # "code?"
-            ("^\?\?(.*)$", 2), # "??code"
-            ("^\?(.*)$", 1),   # "?code"
+            ("^(.*)\?\?$", 2, 
+             "item?? - get detailed help on item"), # "code??", level, explain
+            ("^(.*)\?$", 1, 
+             "item? - get help on item"),   # "code?"
+            ("^\?\?(.*)$", 2, 
+             "??item - get detailed help on item"), # "??code"
+            ("^\?(.*)$", 1, 
+             "?item - get help on item"),   # "?code"
         ]
         
     def get_help_on(self, expr, level):
@@ -218,7 +222,7 @@ class MagicKernel(Kernel):
                      "source": "page"}]
 
     def _process_help(self, code):
-        for (pattern, level) in self.help_patterns():
+        for (pattern, level, doc) in self.help_patterns():
             match = re.match(pattern, code.strip())
             if match:
                 return self._handle_help(match.groups()[0], level)

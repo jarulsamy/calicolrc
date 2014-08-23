@@ -29,7 +29,7 @@ if svem_flag in sys.argv:
     sys.argv.remove(svem_flag)
 
 setup(name='chatbot_kernel',
-      version='0.2',
+      version='0.3',
       description='A simple chatbot kernel for IPython',
       long_description="A simple chatbot kernel for IPython, based on MagicKernel",
       url="https://bitbucket.org/ipre/calico/src/master/src/chatbot_kernel/",
