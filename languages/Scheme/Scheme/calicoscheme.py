@@ -528,8 +528,13 @@ def get_type(obj):
 
 ### Math and applications:
 
-fractions.Fraction.__repr__ = lambda self: "%s/%s" % (self.numerator, self.denominator)
-fractions.Fraction.__str__ = lambda self: "%s/%s" % (self.numerator, self.denominator)
+def fraction_repr(self):
+    if self.denominator == 1:
+        return str(self.numerator)
+    return "%s/%s" % (self.numerator, self.denominator)
+
+fractions.Fraction.__repr__ = fraction_repr 
+fractions.Fraction.__str__ = fraction_repr
 
 def modulo(a, b):
     return a % b
