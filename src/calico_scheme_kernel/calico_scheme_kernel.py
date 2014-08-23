@@ -20,7 +20,7 @@ class CalicoSchemeKernel(MagicKernel):
         """
         pass
 
-    def get_help_on(self, expr):
+    def get_help_on(self, expr, level):
         return "Sorry, no help is available on '%s'." % expr
 
     def repr(self, item):

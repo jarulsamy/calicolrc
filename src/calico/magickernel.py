@@ -8,6 +8,7 @@ import glob
 import base64
 from magic import Magic
 import imp
+import re
 
 class MagicKernel(Kernel):
     def __init__(self, *args, **kwargs):
@@ -37,9 +38,6 @@ class MagicKernel(Kernel):
                 module.register_magics(self.magics)
             except Exception as e:
                 print("Can't load '%s': error: %s" % (magic, e.message))
-
-    def get_usage(self):
-        return "This is a usage statement."
 
     def parse_magic(self, text):
         lines = text.split("\n")
@@ -124,9 +122,6 @@ class MagicKernel(Kernel):
         """
         pass
 
-    def get_help_on(self, expr):
-        return "Sorry, no help is available."
-
     def get_sticky_magics(self):
         retval = ""
         for key in self.sticky_magics:
@@ -197,23 +192,43 @@ class MagicKernel(Kernel):
                 retval["application/pdf"] = obj
         return retval
 
+    def help_patterns(self):
+        # Longest first:
+        return [
+            ("^(.*)\?\?$", 2), # "code??"
+            ("^(.*)\?$", 1),   # "code?"
+            ("^\?\?(.*)$", 2), # "??code"
+            ("^\?(.*)$", 1),   # "?code"
+        ]
+        
+    def get_help_on(self, expr, level):
+        return "Sorry, no help is available."
+
+    def get_usage(self):
+        return "This is a usage statement."
+
+    def _handle_help(self, item, level):
+        if item == "":            # help!
+            return [{"start_line_number": 0,
+                     "data": {"text/plain": self.get_usage()},
+                     "source": "page"}]
+        else:
+            return [{"data": {"text/plain": self.get_help_on(item, level)}, 
+                     "start_line_number": 0,
+                     "source": "page"}]
+
+    def _process_help(self, code):
+        for (pattern, level) in self.help_patterns():
+            match = re.match(pattern, code.strip())
+            if match:
+                return self._handle_help(match.groups()[0], level)
+        return []
+
     def do_execute(self, code, silent, store_history=True, user_expressions=None,
                    allow_stdin=False):
         # Handle Magics
-        payload = []
-        if code.strip() == "?":            # help!
-            payload.append({"start_line_number": 0,
-                            "data": {"text/plain": self.get_usage()},
-                            "source": "page"})
-        elif code.rstrip().endswith("?"):   # doc info
-            payload.append({"data": {"text/plain": self.get_help_on(code.rstrip()[:-1])}, 
-                            "start_line_number": 0,
-                            "source": "page"})
-        elif code.startswith("?"): # doc info
-            payload.append({"data": {"text/plain": self.get_help_on(code[1:].rstrip())}, 
-                            "start_line_number": 0,
-                            "source": "page"})
-        else:                      # process magics/code/shell
+        payload = self._process_help(code)
+        if not payload:
             retval = None
             if self.sticky_magics:
                 magics, code = self.split_magics_code(code)

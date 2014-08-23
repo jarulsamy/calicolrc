@@ -29,7 +29,7 @@ if svem_flag in sys.argv:
     sys.argv.remove(svem_flag)
 
 setup(name='eval_kernel',
-      version='0.3',
+      version='0.4',
       description='A simple eval kernel for IPython',
       long_description="A simple eval kernel for IPython, based on MagicKernel",
       url="https://bitbucket.org/ipre/calico/src/master/src/eval_kernel/",
