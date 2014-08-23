@@ -83,9 +83,9 @@ class Canvas(object):
         Return a stream of pixels from current Canvas.
         """
         array = self.toArray()
-        (width, height, depth) = 
+        (width, height, depth) = array.size
         for x in range(width):
-            for x in range(height):
+            for y in range(height):
                 yield Pixel(array, x, y)
 
 class Pixel(object):
@@ -97,16 +97,16 @@ class Pixel(object):
         self.x = x
         self.y = y
 
-    def getColor(self):
+    def getColor(self, x, y):
         return Color(*self.array[x, y])
 
-    def setColor(self, color):
+    def setColor(self, x, y, color):
         self.array[x, y][0] = color.red
         self.array[x, y][1] = color.green
         self.array[x, y][2] = color.blue
         self.array[x, y][3] = color.alpha
 
-    def getRGBA(self):
+    def getRGBA(self, x, y):
         return self.array[x, y]
 
 class Color(object):
@@ -114,7 +114,7 @@ class Color(object):
         self.red = r
         self.green = g
         self.blue = b
-        self.alpha
+        self.alpha = a
 
 class Shape(object):
     def __init__(self):
@@ -253,15 +253,15 @@ class Polyline(Shape):
         self.extra = extra
 
     def moveTo(self, start):
-        diff_x = start[0] - points[0][0]
-        diff_y = start[1] - points[0][1]
-        for p in range(len(self.points)):
-            point[i] = point[i][0] + diff_x, point[i][1] + diff_y
+        diff_x = start[0] - self.points[0][0]
+        diff_y = start[1] - self.points[0][1]
+        for i in range(len(self.points)):
+            self.points[i] = self.points[i][0] + diff_x, self.points[i][1] + diff_y
         return self.canvas
 
     def move(self, (delta_x, delta_y)):
-        for p in range(len(self.points)):
-            point[i] = point[i][0] + delta_x, point[i][1] + delta_y
+        for i in range(len(self.points)):
+            self.points[i] = self.points[i][0] + delta_x, self.points[i][1] + delta_y
         return self.canvas
 
     def _add(self, drawing):
@@ -280,15 +280,15 @@ class Polygon(Shape):
         self.extra = extra
 
     def moveTo(self, start):
-        diff_x = start[0] - points[0][0]
-        diff_y = start[1] - points[0][1]
-        for p in range(len(self.points)):
-            point[i] = point[i][0] + diff_x, point[i][1] + diff_y
+        diff_x = start[0] - self.points[0][0]
+        diff_y = start[1] - self.points[0][1]
+        for i in range(len(self.points)):
+            self.points[i] = self.points[i][0] + diff_x, self.points[i][1] + diff_y
         return self.canvas
 
     def move(self, (delta_x, delta_y)):
-        for p in range(len(self.points)):
-            point[i] = point[i][0] + delta_x, point[i][1] + delta_y
+        for i in range(len(self.points)):
+            self.points[i] = self.points[i][0] + delta_x, self.points[i][1] + delta_y
         return self.canvas
 
     def _add(self, drawing):
@@ -296,7 +296,7 @@ class Polygon(Shape):
 
 class Picture(Shape):
     def __init__(self, href, start=None, size=None, **extra):
-        super(Image, self).__init__()
+        super(Picture, self).__init__()
         self.href = href
         self.start = start
         self.size = size

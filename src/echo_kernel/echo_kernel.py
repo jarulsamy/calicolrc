@@ -8,7 +8,6 @@ class EchoKernel(MagicKernel):
     language = 'no-op'
     language_version = '0.1'
     banner = "Echo kernel - as useful as a parrot"
-    env = {}
 
     def get_usage(self):
         return "This is the echo kernel."
