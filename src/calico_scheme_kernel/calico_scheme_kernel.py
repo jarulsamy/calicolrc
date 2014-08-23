@@ -28,6 +28,9 @@ class CalicoSchemeKernel(MagicKernel):
             items = " ".join(map(self.repr, item))
             return "#%d(%s)" % (len(item), items)
         elif isinstance(item, calico.scheme.cons): # a scheme list
+            retval = repr(item)
+            if retval.startswith("#"):
+                return retval
             items = " ".join(map(self.repr, item))
             return "(%s)" % items
         elif isinstance(item, str):
