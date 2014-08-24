@@ -1,5 +1,6 @@
 try:
     from IPython.kernel.zmq.kernelbase import Kernel
+    from IPython.utils.path import locate_profile
 except:
     Kernel = object
 import os
@@ -20,6 +21,13 @@ class MagicKernel(Kernel):
         self._ = None
         self.__ = None
         self.___ = None
+        self.max_hist_cache = 1000
+        self.hist_cache = []
+        try:
+            self.hist_file = os.path.join(locate_profile(),
+                                          self.__class__.__name__ + '.hist')
+        except IOError:
+            self.hist_file = None
         self.reload_magics()
         sys.stdout.write = self.Write
 
@@ -281,4 +289,31 @@ class MagicKernel(Kernel):
             'user_expressions': {},
         }
 
+    def do_history(self, hist_access_type, output, raw, session=None,
+                   start=None, stop=None, n=None, pattern=None, unique=False):
+        """
+        Access history at startup.
+        """
+        if not self.hist_file:
+            return {'history': []}
+        # else:
+        if not os.path.exists(self.hist_file):
+            with open(self.hist_file, 'wb') as fid:
+                fid.write('')
+        with open(self.hist_file, 'rb') as fid:
+            history = fid.readlines()
+        history = history[:self.max_hist_cache]
+        self.hist_cache = history
+        history = [(None, None, h) for h in history]
+        return {'history': history}
+
+    def do_shutdown(self, restart):
+        """
+        Shut down the app gracefully, saving history.
+        """
+        if self.hist_file:
+            with open(self.hist_file, 'wb') as fid:
+                data = '\n'.join(self.hist_cache[-self.max_hist_cache:])
+                fid.write(data.encode('utf-8'))
+        return {'status': 'ok', 'restart': restart}
 

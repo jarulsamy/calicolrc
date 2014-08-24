@@ -23,3 +23,13 @@ class Magic(object):
         
     def post_process(self, retval):
         return retval
+    
+    def get_help(self):
+        if self.__doc__:
+            return self.__doc__
+        else:
+            retval = "The '%s' magic can be used as follows:\n" % self.name
+            for line in sorted(self.help_lines):
+                retval += "    " + line + "\n"
+            retval += "\n"
+            return retval
