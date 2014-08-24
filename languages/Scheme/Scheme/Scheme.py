@@ -371,9 +371,11 @@ def cdddar(lyst):
 
 def set_car_b(cell, item):
     cell.car = item
+    return void_value
 
 def set_cdr_b(cell, item):
     cell.cdr = item
+    return void_value
 
 def list_tail(lyst, pos):
     if pos < 0:
@@ -570,15 +572,18 @@ def multiply(*args):
     return reduce(operator.mul, args, 1)
 
 def divide(*args):
-    if len(args) == 0:
-        return 1
-    elif len(args) == 1:
-        return fractions.Fraction(1, args[0])
-    else:
-        current = fractions.Fraction(args[0], args[1])
-        for arg in args[2:]:
-            current = fractions.Fraction(current, arg)
-        return current
+    try:
+        if len(args) == 0:
+            return 1
+        elif len(args) == 1:
+            return fractions.Fraction(1, args[0])
+        else:
+            current = fractions.Fraction(args[0], args[1])
+            for arg in args[2:]:
+                current = fractions.Fraction(current, arg)
+            return current
+    except:
+        return reduce(operator.div, args)
 
 def Equal(o1, o2):
     if boolean_q(o1) or boolean_q(o2):
