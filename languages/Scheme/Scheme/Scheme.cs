@@ -434,7 +434,7 @@ public class Scheme {
   public static Proc eqv_q_proc = new Proc("eqv?", (Procedure2Bool) Eqv, 2, 2);  
   public static Proc vector_q_proc = new Proc("vector?", (Procedure1Bool) vector_q, 1, 2);  
   public static Proc iter_q_proc = new Proc("iter?", (Procedure1Bool) iter_q, 1, 2);  
-  public static Proc make_binding_proc = new Proc("make-binding",(Procedure1)PJScheme.make_binding, 1, 1);
+  public static Proc make_binding_proc = new Proc("make-binding",(Procedure2)PJScheme.make_binding, 2, 1);
   public static Proc make_external_proc_proc = new Proc("make-external-proc", (Procedure1) PJScheme.make_external_proc, 1, 1);
   public static Proc make_vector_proc = new Proc("make-vector", (Procedure1) make_vector, 1, 1);
   public static Proc make_string_proc = new Proc("make-string", (Procedure1) make_string, -1, 1);
@@ -535,7 +535,7 @@ public class Scheme {
         return (path, args) => call_external_proc(tname, path, args);
   }
   
-    public static object make_initial_env_extended (object names, object procs) {
+    public static object make_initial_env_extended (object names, object procs, object docstrings) {
       object primitives = PJScheme.symbol_emptylist;
       // add to this list
       object current = primitives;
@@ -549,7 +549,8 @@ public class Scheme {
       /// -------------------
       names = PJScheme.append(names, map(car_proc, primitives));
       procs = PJScheme.append(procs, map(PJScheme.make_external_proc_proc, map(cadr_proc, primitives)));
-      return PJScheme.make_initial_environment(names, procs);
+      docstrings = PJScheme.append(docstrings, map(caddr_proc, primitives));
+      return PJScheme.make_initial_environment(names, procs, docstrings);
   }
   
   public static void reset_toplevel_env() {
@@ -3555,5 +3556,9 @@ public class Scheme {
 
     public static object type(object obj) {
         return obj.GetType();
+    }
+
+    public static object help(object obj) {
+	return "No available help for host-system item.";
     }
 }

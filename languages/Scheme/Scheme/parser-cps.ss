@@ -87,6 +87,10 @@
     (then-aexp aexpression?)
     (else-aexp aexpression?)
     (info source-info?))
+  (help-aexp
+    (var symbol?)
+    (var-info source-info?)
+    (info source-info?))
   (assign-aexp
     (var symbol?)
     (rhs-exp aexpression?)
@@ -240,6 +244,7 @@
 (define unquote-splicing?^ (tagged-list^ 'unquote-splicing >= 2))
 (define if-then?^ (tagged-list^ 'if = 3))
 (define if-else?^ (tagged-list^ 'if = 4))
+(define help?^ (tagged-list^ 'help = 2))
 (define assignment?^ (tagged-list^ 'set! = 3))
 (define func?^ (tagged-list^ 'func = 2))
 (define callback?^ (tagged-list^ 'callback = 2))
@@ -307,6 +312,9 @@
 		 (aparse (cadddr^ adatum) senv handler fail
 		   (lambda-cont2 (v3 fail)
 		     (k (if-aexp v1 v2 v3 info) fail))))))))
+	((help?^ adatum)
+	   (let ((var-info (get-source-info (cadr^ adatum))))
+	     (k (help-aexp (untag-atom^ (cadr^ adatum)) var-info info) fail)))
 	((assignment?^ adatum)
 	 (aparse (caddr^ adatum) senv handler fail
 	   (lambda-cont2 (v fail)
@@ -864,7 +872,8 @@
 	    record-case-transformer^
 	    define-datatype-transformer^
 	    cases-transformer^
-	    ))))
+	    )
+      (list "" "" "" "" "" "" "" "" "" ""))))
 
 (define macro-env 'undefined)
 

@@ -19,6 +19,10 @@
    (then-aexp aexpression?)
    (else-aexp aexpression?)
    (info source-info?))
+ (help-aexp
+   (var symbol?)
+   (var-info source-info?)
+   (info source-info?))
  (assign-aexp
    (var symbol?)
    (rhs-exp aexpression?)
@@ -507,7 +511,7 @@
           (fail (caddr fields))
           (k2 (cadddr fields)))
       (aparse value (initial-contours (cadr args)) handler fail
-        (make-cont2 <cont2-72> args handler k2)))))
+        (make-cont2 <cont2-74> args handler k2)))))
 
 (define+
   <cont-42>
@@ -516,7 +520,7 @@
           (fail (cadr fields))
           (k2 (caddr fields)))
       (aparse value (initial-contours toplevel-env) handler fail
-        (make-cont2 <cont2-73> handler k2)))))
+        (make-cont2 <cont2-75> handler k2)))))
 
 (define+
   <cont-43>
@@ -609,7 +613,7 @@
             (cdr pair1)
             value
             (cdr^ apair1)
-            (make-cont2 <cont2-96> apair2 pair2 value k))))))
+            (make-cont2 <cont2-98> apair2 pair2 value k))))))
 
 ;;----------------------------------------------------------------------
 ;; continuation2 datatype
@@ -1308,6 +1312,18 @@
 (define+
   <cont2-65>
   (lambda (value1 value2 fields)
+    (let ((k (car fields)))
+      (apply-cont2 k (binding-docstring value1) value2))))
+
+(define+
+  <cont2-66>
+  (lambda (value1 value2 fields)
+    (let ((k (car fields)))
+      (apply-cont2 k (help (dlr-env-lookup value1)) value2))))
+
+(define+
+  <cont2-67>
+  (lambda (value1 value2 fields)
     (let ((else-exp (car fields))
           (then-exp (cadr fields))
           (env (caddr fields))
@@ -1318,19 +1334,19 @@
           (m else-exp env handler value2 k)))))
 
 (define+
-  <cont2-66>
+  <cont2-68>
   (lambda (value1 value2 fields)
     (let ((k (car fields)))
       (apply-cont2 k (callback value1) value2))))
 
 (define+
-  <cont2-67>
+  <cont2-69>
   (lambda (value1 value2 fields)
     (let ((k (car fields)))
       (apply-cont2 k (dlr-func value1) value2))))
 
 (define+
-  <cont2-68>
+  <cont2-70>
   (lambda (value1 value2 fields)
     (let ((exps (car fields))
           (env (cadr fields))
@@ -1340,7 +1356,7 @@
           (make-cont2 <cont2-34> value1 k)))))
 
 (define+
-  <cont2-69>
+  <cont2-71>
   (lambda (value1 value2 fields)
     (let ((exps (car fields))
           (env (cadr fields))
@@ -1349,13 +1365,13 @@
       (eval-sequence (cdr exps) env handler value2 k))))
 
 (define+
-  <cont2-70>
+  <cont2-72>
   (lambda (value1 value2 fields)
     (let ((e (car fields)) (handler (cadr fields)))
       (apply-handler2 handler e value2))))
 
 (define+
-  <cont2-71>
+  <cont2-73>
   (lambda (value1 value2 fields)
     (let ((trace-depth (car fields)) (k2 (cadr fields)))
       (set! trace-depth (- trace-depth 1))
@@ -1366,7 +1382,7 @@
       (apply-cont2 k2 value1 value2))))
 
 (define+
-  <cont2-72>
+  <cont2-74>
   (lambda (value1 value2 fields)
     (let ((args (car fields))
           (handler (cadr fields))
@@ -1374,27 +1390,27 @@
       (m value1 (cadr args) handler value2 k2))))
 
 (define+
-  <cont2-73>
+  <cont2-75>
   (lambda (value1 value2 fields)
     (let ((handler (car fields)) (k2 (cadr fields)))
       (m value1 toplevel-env handler value2 k2))))
 
 (define+
-  <cont2-74>
+  <cont2-76>
   (lambda (value1 value2 fields)
     (let ((handler (car fields)) (k2 (cadr fields)))
       (read-sexp value1 'stdin handler value2
         (make-cont4 <cont4-11> handler k2)))))
 
 (define+
-  <cont2-75>
+  <cont2-77>
   (lambda (value1 value2 fields)
     (let ((handler (car fields)) (k2 (cadr fields)))
       (read-sexp value1 'stdin handler value2
         (make-cont4 <cont4-12> handler k2)))))
 
 (define+
-  <cont2-76>
+  <cont2-78>
   (lambda (value1 value2 fields)
     (let ((k (car fields)))
       (if (null? load-stack)
@@ -1403,17 +1419,17 @@
       (apply-cont2 k void-value value2))))
 
 (define+
-  <cont2-77>
+  <cont2-79>
   (lambda (value1 value2 fields)
     (let ((filename (car fields))
           (env2 (cadr fields))
           (handler (caddr fields))
           (k (cadddr fields)))
       (read-and-eval-asexps value1 filename env2 handler value2
-        (make-cont2 <cont2-76> k)))))
+        (make-cont2 <cont2-78> k)))))
 
 (define+
-  <cont2-78>
+  <cont2-80>
   (lambda (value1 value2 fields)
     (let ((src (car fields))
           (tokens-left (cadr fields))
@@ -1426,7 +1442,7 @@
             k)))))
 
 (define+
-  <cont2-79>
+  <cont2-81>
   (lambda (value1 value2 fields)
     (let ((src (car fields))
           (tokens-left (cadr fields))
@@ -1434,10 +1450,10 @@
           (handler (cadddr fields))
           (k (list-ref fields 4)))
       (m value1 env2 handler value2
-         (make-cont2 <cont2-78> src tokens-left env2 handler k)))))
+         (make-cont2 <cont2-80> src tokens-left env2 handler k)))))
 
 (define+
-  <cont2-80>
+  <cont2-82>
   (lambda (value1 value2 fields)
     (let ((filenames (car fields))
           (env2 (cadr fields))
@@ -1447,7 +1463,7 @@
       (load-files (cdr filenames) env2 info handler value2 k))))
 
 (define+
-  <cont2-81>
+  <cont2-83>
   (lambda (value1 value2 fields)
     (let ((lst (car fields)) (k2 (cadr fields)))
       (if (member (car lst) value1)
@@ -1455,7 +1471,7 @@
           (apply-cont2 k2 (cons (car lst) value1) value2)))))
 
 (define+
-  <cont2-82>
+  <cont2-84>
   (lambda (value1 value2 fields)
     (let ((filename (car fields))
           (handler (cadr fields))
@@ -1465,7 +1481,7 @@
         (load-file filename module 'none handler value2 k2)))))
 
 (define+
-  <cont2-83>
+  <cont2-85>
   (lambda (value1 value2 fields)
     (let ((args (car fields))
           (sym (cadr fields))
@@ -1484,19 +1500,19 @@
          (get-primitive (cdr args) value1 info handler value2 k))))))
 
 (define+
-  <cont2-84>
+  <cont2-86>
   (lambda (value1 value2 fields)
     (let ((ls1 (car fields)) (k2 (cadr fields)))
       (apply-cont2 k2 (cons (car ls1) value1) value2))))
 
 (define+
-  <cont2-85>
+  <cont2-87>
   (lambda (value1 value2 fields)
     (let ((lists (car fields)) (k2 (cadr fields)))
       (append2 (car lists) value1 value2 k2))))
 
 (define+
-  <cont2-86>
+  <cont2-88>
   (lambda (value1 value2 fields)
     (let ((iterator (car fields))
           (proc (cadr fields))
@@ -1506,7 +1522,7 @@
       (iterate-continue proc iterator env handler value2 k))))
 
 (define+
-  <cont2-87>
+  <cont2-89>
   (lambda (value1 value2 fields)
     (let ((iterator (car fields))
           (proc (cadr fields))
@@ -1517,7 +1533,7 @@
         (make-cont2 <cont2-34> value1 k)))))
 
 (define+
-  <cont2-88>
+  <cont2-90>
   (lambda (value1 value2 fields)
     (let ((list1 (car fields))
           (proc (cadr fields))
@@ -1528,7 +1544,7 @@
         (make-cont2 <cont2-34> value1 k)))))
 
 (define+
-  <cont2-89>
+  <cont2-91>
   (lambda (value1 value2 fields)
     (let ((list1 (car fields))
           (proc (cadr fields))
@@ -1539,7 +1555,7 @@
         value2))))
 
 (define+
-  <cont2-90>
+  <cont2-92>
   (lambda (value1 value2 fields)
     (let ((list1 (car fields))
           (list2 (cadr fields))
@@ -1551,7 +1567,7 @@
         (make-cont2 <cont2-34> value1 k)))))
 
 (define+
-  <cont2-91>
+  <cont2-93>
   (lambda (value1 value2 fields)
     (let ((list1 (car fields))
           (list2 (cadr fields))
@@ -1565,7 +1581,7 @@
         value2))))
 
 (define+
-  <cont2-92>
+  <cont2-94>
   (lambda (value1 value2 fields)
     (let ((lists (car fields))
           (proc (cadr fields))
@@ -1576,7 +1592,7 @@
         (make-cont2 <cont2-34> value1 k)))))
 
 (define+
-  <cont2-93>
+  <cont2-95>
   (lambda (value1 value2 fields)
     (let ((lists (car fields))
           (proc (cadr fields))
@@ -1587,7 +1603,7 @@
         value2))))
 
 (define+
-  <cont2-94>
+  <cont2-96>
   (lambda (value1 value2 fields)
     (let ((arg-list (car fields))
           (proc (cadr fields))
@@ -1598,7 +1614,7 @@
         value2 k))))
 
 (define+
-  <cont2-95>
+  <cont2-97>
   (lambda (value1 value2 fields)
     (let ((new-acdr1 (car fields))
           (new-cdr1 (cadr fields))
@@ -1608,7 +1624,7 @@
         (make-cont <cont-50> s-car k)))))
 
 (define+
-  <cont2-96>
+  <cont2-98>
   (lambda (value1 value2 fields)
     (let ((apair2 (car fields))
           (pair2 (cadr fields))
@@ -1618,10 +1634,10 @@
         (cdr pair2)
         s-car
         (cdr^ apair2)
-        (make-cont2 <cont2-95> value2 value1 s-car k)))))
+        (make-cont2 <cont2-97> value2 value1 s-car k)))))
 
 (define+
-  <cont2-97>
+  <cont2-99>
   (lambda (value1 value2 fields)
     (let ((a (car fields))
           (aa (cadr fields))
@@ -1633,7 +1649,7 @@
         (cons^ aa value2 (get-source-info ap))))))
 
 (define+
-  <cont2-98>
+  <cont2-100>
   (lambda (value1 value2 fields)
     (let ((ap (car fields))
           (pattern (cadr fields))
@@ -1643,10 +1659,10 @@
         (cdr pattern)
         s
         (cdr^ ap)
-        (make-cont2 <cont2-97> value1 value2 ap k2)))))
+        (make-cont2 <cont2-99> value1 value2 ap k2)))))
 
 (define+
-  <cont2-99>
+  <cont2-101>
   (lambda (value1 value2 fields)
     (let ((s2 (car fields)) (k2 (cadr fields)))
       (instantiate^ value1 s2 value2 k2))))
@@ -1695,6 +1711,15 @@
         (let ((new-fail (make-fail <fail-3> value2 value1 old-value
                           value3)))
           (apply-cont2 k void-value new-fail))))))
+
+(define+
+  <cont3-5>
+  (lambda (value1 value2 value3 fields)
+    (let ((k (car fields)))
+      (apply-cont2
+        k
+        (help (get-external-member value1 value2))
+        value3))))
 
 ;;----------------------------------------------------------------------
 ;; continuation4 datatype
@@ -1830,7 +1855,7 @@
           (handler (caddr fields))
           (k (cadddr fields)))
       (aparse value1 (initial-contours env2) handler value4
-        (make-cont2 <cont2-79> src value3 env2 handler k)))))
+        (make-cont2 <cont2-81> src value3 env2 handler k)))))
 
 ;;----------------------------------------------------------------------
 ;; fail-continuation datatype
@@ -1933,7 +1958,11 @@
           (env (caddr fields))
           (handler (cadddr fields))
           (k (list-ref fields 4)))
-      (let ((new-env (extend env (list cvar) (list exception))))
+      (let ((new-env (extend
+                       env
+                       (list cvar)
+                       (list exception)
+                       (list ""))))
         (eval-sequence cexps new-env handler fail k)))))
 
 (define+
@@ -1943,7 +1972,7 @@
           (env (cadr fields))
           (handler (caddr fields)))
       (eval-sequence fexps env handler fail
-        (make-cont2 <cont2-70> exception handler)))))
+        (make-cont2 <cont2-72> exception handler)))))
 
 (define+
   <handler2-6>
@@ -1954,7 +1983,11 @@
           (env (cadddr fields))
           (handler (list-ref fields 4))
           (k (list-ref fields 5)))
-      (let ((new-env (extend env (list cvar) (list exception))))
+      (let ((new-env (extend
+                       env
+                       (list cvar)
+                       (list exception)
+                       (list ""))))
         (let ((catch-handler (try-finally-handler
                                fexps
                                env
@@ -1980,8 +2013,13 @@
           (formals (cadr fields))
           (env (caddr fields)))
       (if (= (length args) (length formals))
-          (eval-sequence bodies (extend env formals args) handler fail
-            k2)
+          (eval-sequence bodies
+            (extend
+              env
+              formals
+              args
+              (make-empty-docstrings (length args)))
+            handler fail k2)
           (runtime-error
             "incorrect number of arguments in application"
             info
@@ -2001,7 +2039,9 @@
                            (cons runt formals)
                            (cons
                              (list-tail args (length formals))
-                             (list-head args (length formals))))))
+                             (list-head args (length formals)))
+                           (make-empty-docstrings
+                             (+ 1 (length formals))))))
             (eval-sequence bodies new-env handler fail k2))
           (runtime-error
             "not enough arguments in application"
@@ -2024,8 +2064,13 @@
               (make-trace-depth-string trace-depth)
               (cons name args))
             (set! trace-depth (+ trace-depth 1))
-            (eval-sequence bodies (extend env formals args) handler fail
-              (make-cont2 <cont2-71> trace-depth k2)))
+            (eval-sequence bodies
+              (extend
+                env
+                formals
+                args
+                (make-empty-docstrings (length formals)))
+              handler fail (make-cont2 <cont2-73> trace-depth k2)))
           (runtime-error
             "incorrect number of arguments in application"
             info
@@ -2047,14 +2092,16 @@
                            (cons runt formals)
                            (cons
                              (list-tail args (length formals))
-                             (list-head args (length formals))))))
+                             (list-head args (length formals)))
+                           (make-empty-docstrings
+                             (+ 1 (length formals))))))
             (printf
               "~acall: ~s~%"
               (make-trace-depth-string trace-depth)
               (cons name args))
             (set! trace-depth (+ trace-depth 1))
             (eval-sequence bodies new-env handler fail
-              (make-cont2 <cont2-71> trace-depth k2)))
+              (make-cont2 <cont2-73> trace-depth k2)))
           (runtime-error
             "not enough arguments in application"
             info
@@ -2186,14 +2233,14 @@
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (scan-input (car args) 'stdin handler fail
-        (make-cont2 <cont2-74> handler k2)))))
+        (make-cont2 <cont2-76> handler k2)))))
 
 (define+
   <proc-16>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (scan-input (car args) 'stdin handler fail
-        (make-cont2 <cont2-75> handler k2)))))
+        (make-cont2 <cont2-77> handler k2)))))
 
 (define+
   <proc-17>
@@ -3402,7 +3449,7 @@
         (else
          (let ((filename (car args)) (module-name (cadr args)))
            (lookup-binding-in-first-frame module-name env2 handler fail
-             (make-cont2 <cont2-82> filename handler k2))))))))
+             (make-cont2 <cont2-84> filename handler k2))))))))
 
 (define+
   <proc-103>
@@ -5144,7 +5191,8 @@
               tokens src handler fail))))
         (else (unexpected-token-error tokens src handler fail))))))
 
-(define make-binding (lambda (value) (cons value "")))
+(define make-binding
+  (lambda (value docstring) (cons value docstring)))
 
 (define binding-value (lambda (binding) (car binding)))
 
@@ -5157,8 +5205,10 @@
   (lambda (binding docstring) (set-cdr! binding docstring)))
 
 (define make-frame
-  (lambda (variables values)
-    (list (list->vector (map make-binding values)) variables)))
+  (lambda (variables values docstrings)
+    (list
+      (list->vector (map make-binding values docstrings))
+      variables)))
 
 (define empty-frame? (lambda (frame) (null? (cadr frame))))
 
@@ -5168,11 +5218,11 @@
   (lambda (x) (and (pair? x) (eq? (car x) 'environment))))
 
 (define make-empty-environment
-  (lambda () (list 'environment (make-frame '() '()))))
+  (lambda () (list 'environment (make-frame '() '() '()))))
 
 (define make-initial-environment
-  (lambda (vars vals)
-    (list 'environment (make-frame vars vals))))
+  (lambda (vars vals docstrings)
+    (list 'environment (make-frame vars vals docstrings))))
 
 (define first-frame (lambda (env) (cadr env)))
 
@@ -5196,10 +5246,10 @@
   (lambda (env new-frame) (set-car! (cdr env) new-frame)))
 
 (define extend
-  (lambda (env variables values)
+  (lambda (env variables values docstrings)
     (cons
       'environment
-      (cons (make-frame variables values) (cdr env)))))
+      (cons (make-frame variables values docstrings) (cdr env)))))
 
 (define search-env
   (lambda (env variable) (search-frames (cdr env) variable)))
@@ -5318,7 +5368,7 @@
       (let ((binding (search-frame frame var)))
         (if binding
             (apply-cont2 k binding fail)
-            (let ((new-binding (make-binding 'undefined)))
+            (let ((new-binding (make-binding 'undefined "")))
               (let ((new-frame (add-binding var new-binding frame)))
                 (set-first-frame! env new-frame)
                 (apply-cont2 k new-binding fail))))))))
@@ -5461,6 +5511,12 @@
         ((if-else?^ adatum)
          (aparse (cadr^ adatum) senv handler fail
            (make-cont2 <cont2-28> adatum senv info handler k)))
+        ((help?^ adatum)
+         (let ((var-info (get-source-info (cadr^ adatum))))
+           (apply-cont2
+             k
+             (help-aexp (untag-atom^ (cadr^ adatum)) var-info info)
+             fail)))
         ((assignment?^ adatum)
          (aparse (caddr^ adatum) senv handler fail
            (make-cont2 <cont2-25> adatum info k)))
@@ -5696,7 +5752,8 @@
       (list and-transformer^ or-transformer^ cond-transformer^
         let-transformer^ letrec-transformer^ let*-transformer^
         case-transformer^ record-case-transformer^
-        define-datatype-transformer^ cases-transformer^))))
+        define-datatype-transformer^ cases-transformer^)
+      (list "" "" "" "" "" "" "" "" "" ""))))
 
 (define make-pattern-macro^
   (lambda (clauses aclauses)
@@ -6160,14 +6217,18 @@
            fail k))
        (func-aexp
          (exp info)
-         (m exp env handler fail (make-cont2 <cont2-67> k)))
+         (m exp env handler fail (make-cont2 <cont2-69> k)))
        (callback-aexp
          (exp info)
-         (m exp env handler fail (make-cont2 <cont2-66> k)))
+         (m exp env handler fail (make-cont2 <cont2-68> k)))
        (if-aexp
          (test-exp then-exp else-exp info)
          (m test-exp env handler fail
-            (make-cont2 <cont2-65> else-exp then-exp env handler k)))
+            (make-cont2 <cont2-67> else-exp then-exp env handler k)))
+       (help-aexp
+         (var var-info info)
+         (lookup-variable var env var-info handler fail (make-cont2 <cont2-66> k)
+           (make-cont3 <cont3-5> k) (make-cont2 <cont2-65> k)))
        (assign-aexp
          (var rhs-exp var-info info)
          (m rhs-exp env handler fail
@@ -6300,7 +6361,7 @@
     (if (null? exps)
         (apply-cont2 k '() fail)
         (m (car exps) env handler fail
-           (make-cont2 <cont2-68> exps env handler k)))))
+           (make-cont2 <cont2-70> exps env handler k)))))
 
 (define*
   eval-sequence
@@ -6308,7 +6369,7 @@
     (if (null? (cdr exps))
         (m (car exps) env handler fail k)
         (m (car exps) env handler fail
-           (make-cont2 <cont2-69> exps env handler k)))))
+           (make-cont2 <cont2-71> exps env handler k)))))
 
 (define try-catch-handler
   (lambda (cvar cexps env handler k)
@@ -6331,6 +6392,12 @@
         (let ((new-fail (make-fail <fail-5> exps env handler fail
                           k)))
           (m (car exps) env handler new-fail k)))))
+
+(define make-empty-docstrings
+  (lambda (n)
+    (cond
+      ((= n 0) '())
+      (else (cons "" (make-empty-docstrings (- n 1)))))))
 
 (define closure
   (lambda (formals bodies env)
@@ -6448,7 +6515,7 @@
       (else
        (set! load-stack (cons filename load-stack))
        (scan-input (read-content filename) filename handler fail
-         (make-cont2 <cont2-77> filename env2 handler k))))))
+         (make-cont2 <cont2-79> filename env2 handler k))))))
 
 (define*
   read-and-eval-asexps
@@ -6464,7 +6531,7 @@
     (if (null? filenames)
         (apply-cont2 k void-value fail)
         (load-file (car filenames) env2 info handler fail
-          (make-cont2 <cont2-80> filenames env2 info handler k)))))
+          (make-cont2 <cont2-82> filenames env2 info handler k)))))
 
 (define*
   length-loop
@@ -6486,7 +6553,7 @@
     (if (null? lst)
         (apply-cont2 k2 lst fail)
         (make-set (cdr lst) env2 info handler fail
-          (make-cont2 <cont2-81> lst k2)))))
+          (make-cont2 <cont2-83> lst k2)))))
 
 (define*
   equal-objects?
@@ -6545,7 +6612,7 @@
   (lambda (args env info handler fail k)
     (let ((sym (car args)))
       (lookup-value sym env 'none handler fail
-        (make-cont2 <cont2-83> args sym info handler k)))))
+        (make-cont2 <cont2-85> args sym info handler k)))))
 
 (define*
   append2
@@ -6556,7 +6623,7 @@
           (cdr ls1)
           ls2
           fail
-          (make-cont2 <cont2-84> ls1 k2)))))
+          (make-cont2 <cont2-86> ls1 k2)))))
 
 (define*
   append-all
@@ -6574,7 +6641,7 @@
          fail))
       (else
        (append-all (cdr lists) info handler fail
-         (make-cont2 <cont2-85> lists k2))))))
+         (make-cont2 <cont2-87> lists k2))))))
 
 (define directory
   (lambda (args env)
@@ -6660,7 +6727,7 @@
       (if (null? item)
           (apply-cont2 k '() fail)
           (apply-proc proc (list item) env 'none handler fail
-            (make-cont2 <cont2-86> iterator proc env handler k))))))
+            (make-cont2 <cont2-88> iterator proc env handler k))))))
 
 (define*
   iterate-collect
@@ -6676,7 +6743,7 @@
       (if (null? item)
           (apply-cont2 k '() fail)
           (apply-proc proc (list item) env 'none handler fail
-            (make-cont2 <cont2-87> iterator proc env handler k))))))
+            (make-cont2 <cont2-89> iterator proc env handler k))))))
 
 (define*
   map1
@@ -6685,9 +6752,9 @@
         (apply-cont2 k '() fail)
         (if (dlr-proc? proc)
             (map1 proc (cdr list1) env handler fail
-              (make-cont2 <cont2-89> list1 proc k))
+              (make-cont2 <cont2-91> list1 proc k))
             (apply-proc proc (list (car list1)) env 'none handler fail
-              (make-cont2 <cont2-88> list1 proc env handler k))))))
+              (make-cont2 <cont2-90> list1 proc env handler k))))))
 
 (define*
   map2
@@ -6696,9 +6763,9 @@
         (apply-cont2 k '() fail)
         (if (dlr-proc? proc)
             (map2 proc (cdr list1) (cdr list2) env handler fail
-              (make-cont2 <cont2-91> list1 list2 proc k))
+              (make-cont2 <cont2-93> list1 list2 proc k))
             (apply-proc proc (list (car list1) (car list2)) env 'none handler fail
-              (make-cont2 <cont2-90> list1 list2 proc env handler k))))))
+              (make-cont2 <cont2-92> list1 list2 proc env handler k))))))
 
 (define*
   mapN
@@ -6707,9 +6774,9 @@
         (apply-cont2 k '() fail)
         (if (dlr-proc? proc)
             (mapN proc (map cdr lists) env handler fail
-              (make-cont2 <cont2-93> lists proc k))
+              (make-cont2 <cont2-95> lists proc k))
             (apply-proc proc (map car lists) env 'none handler fail
-              (make-cont2 <cont2-92> lists proc env handler k))))))
+              (make-cont2 <cont2-94> lists proc env handler k))))))
 
 (define*
   for-each-primitive
@@ -6726,134 +6793,182 @@
                       fail k))
                   (apply-proc proc (map car arg-list) env 'none handler
                     fail
-                    (make-cont2 <cont2-94> arg-list proc env handler
+                    (make-cont2 <cont2-96> arg-list proc env handler
                       k))))))))
 
 (define make-toplevel-env
   (lambda ()
-    (let ((primitives (list (list '* times-prim) (list '+ plus-prim)
-                       (list '- minus-prim) (list '/ divide-prim)
-                       (list 'div quotient-prim) (list '% modulo-prim)
-                       (list 'mod modulo-prim) (list 'modulo modulo-prim)
-                       (list '// quotient-prim)
-                       (list 'quotient quotient-prim) (list '< lt-prim)
-                       (list '<= lt-or-eq-prim) (list '= equal-sign-prim)
-                       (list '> gt-prim) (list '>= gt-or-eq-prim)
-                       (list 'abort abort-prim) (list 'abs abs-prim)
-                       (list 'append append-prim) (list 'apply apply-prim)
-                       (list 'assv assv-prim)
-                       (list 'boolean? boolean?-prim)
-                       (list 'caddr caddr-prim) (list 'cadr cadr-prim)
-                       (list 'call-with-current-continuation call/cc-prim)
-                       (list 'call/cc call/cc-prim) (list 'car car-prim)
-                       (list 'cdr cdr-prim) (list 'caaaar caaaar-prim)
-                       (list 'caaadr caaadr-prim) (list 'caaar caaar-prim)
-                       (list 'caadar caadar-prim)
-                       (list 'caaddr caaddr-prim) (list 'caadr caadr-prim)
-                       (list 'caar caar-prim) (list 'cadaar cadaar-prim)
-                       (list 'cadadr cadadr-prim) (list 'cadar cadar-prim)
-                       (list 'caddar caddar-prim)
-                       (list 'cadddr cadddr-prim)
-                       (list 'cdaaar cdaaar-prim)
-                       (list 'cdaadr cdaadr-prim) (list 'cdaar cdaar-prim)
-                       (list 'cdadar cdadar-prim)
-                       (list 'cdaddr cdaddr-prim) (list 'cdadr cdadr-prim)
-                       (list 'cdar cdar-prim) (list 'cddaar cddaar-prim)
-                       (list 'cddadr cddadr-prim) (list 'cddar cddar-prim)
-                       (list 'cdddar cdddar-prim)
-                       (list 'cddddr cddddr-prim) (list 'cdddr cdddr-prim)
-                       (list 'cddr cddr-prim) (list 'char? char?-prim)
-                       (list 'char=? char=?-prim)
-                       (list 'char-whitespace? char-whitespace?-prim)
-                       (list 'char-alphabetic? char-alphabetic?-prim)
-                       (list 'char-numeric? char-numeric?-prim)
-                       (list 'char->integer char->integer-prim)
-                       (list 'cons cons-prim)
-                       (list 'current-time current-time-prim)
-                       (list 'cut cut-prim) (list 'dir dir-prim)
-                       (list 'display display-prim)
-                       (list 'current-environment current-environment-prim)
-                       (list 'eq? eq?-prim) (list 'equal? equal?-prim)
-                       (list 'error error-prim) (list 'eval eval-prim)
-                       (list 'eval-ast eval-ast-prim)
-                       (list 'exit exit-prim)
-                       (list 'for-each for-each-prim)
-                       (list 'format format-prim) (list 'get get-prim)
-                       (list 'get-stack-trace get-stack-trace-prim)
-                       (list 'load-as load-as-prim)
-                       (list 'integer->char integer->char-prim)
-                       (list 'length length-prim) (list 'list list-prim)
-                       (list 'list->vector list->vector-prim)
-                       (list 'list->string list->string-prim)
-                       (list 'list-ref list-ref-prim)
-                       (list 'load load-prim) (list 'min min-prim)
-                       (list 'max max-prim) (list 'make-set make-set-prim)
-                       (list 'make-vector make-vector-prim)
-                       (list 'map map-prim) (list 'member member-prim)
-                       (list 'memq memq-prim) (list 'memv memv-prim)
-                       (list 'newline newline-prim) (list 'not not-prim)
-                       (list 'null? null?-prim)
-                       (list 'number->string number->string-prim)
-                       (list 'number? number?-prim)
-                       (list 'pair? pair?-prim) (list 'parse parse-prim)
-                       (list 'parse-string parse-string-prim)
-                       (list 'print print-prim) (list 'printf printf-prim)
-                       (list 'range range-prim)
-                       (list 'read-string read-string-prim)
-                       (list 'require require-prim)
-                       (list 'reverse reverse-prim)
-                       (list 'set-car! set-car!-prim)
-                       (list 'set-cdr! set-cdr!-prim)
-                       (list 'snoc snoc-prim) (list 'rac rac-prim)
-                       (list 'rdc rdc-prim) (list 'sqrt sqrt-prim)
-                       (list 'odd? odd?-prim) (list 'even? even?-prim)
-                       (list 'remainder remainder-prim)
-                       (list 'string string-prim)
-                       (list 'string-length string-length-prim)
-                       (list 'string-ref string-ref-prim)
-                       (list 'string? string?-prim)
-                       (list 'string->number string->number-prim)
-                       (list 'string=? string=?-prim)
-                       (list 'substring substring-prim)
-                       (list 'symbol? symbol?-prim)
-                       (list 'unparse unparse-prim)
-                       (list 'unparse-procedure unparse-procedure-prim)
-                       (list 'import import-prim)
-                       (list 'use-stack-trace use-stack-trace-prim)
-                       (list 'vector vector-prim)
-                       (list 'vector-ref vector-ref-prim)
-                       (list 'vector-set! vector-set!-prim)
-                       (list 'void void-prim) (list 'zero? zero?-prim)
-                       (list 'current-directory current-directory-prim)
-                       (list 'cd current-directory-prim)
-                       (list 'round round-prim)
-                       (list 'char->string char->string-prim)
-                       (list 'string->list string->list-prim)
-                       (list 'string->symbol string->symbol-prim)
-                       (list 'symbol->string symbol->string-prim)
-                       (list 'vector->list vector->list-prim)
-                       (list 'eqv? eqv?-prim) (list 'vector? vector?-prim)
-                       (list 'atom? atom?-prim) (list 'iter? iter?-prim)
-                       (list 'list? list?-prim)
-                       (list 'procedure? procedure?-prim)
-                       (list 'string<? string<?-prim)
-                       (list 'float float-prim)
-                       (list 'globals globals-prim) (list 'int int-prim)
-                       (list 'apply-with-keywords apply-with-keywords-prim)
-                       (list 'assq assq-prim) (list 'dict dict-prim)
-                       (list 'property property-prim)
-                       (list 'rational rational-prim)
-                       (list 'reset-toplevel-env reset-toplevel-env-prim)
-                       (list 'sort sort-prim)
-                       (list 'string-append string-append-prim)
-                       (list 'string-split string-split-prim)
-                       (list 'symbol symbol-prim)
-                       (list 'typeof typeof-prim)
-                       (list 'use-lexical-address use-lexical-address-prim)
-                       (list 'use-tracing use-tracing-prim))))
+    (let ((primitives (list (list '* times-prim "") (list '+ plus-prim "")
+                       (list '- minus-prim "") (list '/ divide-prim "")
+                       (list 'div quotient-prim "")
+                       (list '% modulo-prim "") (list 'mod modulo-prim "")
+                       (list 'modulo modulo-prim "")
+                       (list '// quotient-prim "")
+                       (list 'quotient quotient-prim "")
+                       (list '< lt-prim "") (list '<= lt-or-eq-prim "")
+                       (list '= equal-sign-prim "") (list '> gt-prim "")
+                       (list '>= gt-or-eq-prim "")
+                       (list 'abort abort-prim "") (list 'abs abs-prim "")
+                       (list 'append append-prim "")
+                       (list 'apply apply-prim "")
+                       (list 'assv assv-prim "")
+                       (list 'boolean? boolean?-prim "")
+                       (list 'caddr caddr-prim "")
+                       (list 'cadr cadr-prim "")
+                       (list
+                         'call-with-current-continuation
+                         call/cc-prim
+                         "")
+                       (list 'call/cc call/cc-prim "")
+                       (list
+                         'car
+                         car-prim
+                         "(car LIST) returns the first element of LIST")
+                       (list 'cdr cdr-prim "")
+                       (list 'caaaar caaaar-prim "")
+                       (list 'caaadr caaadr-prim "")
+                       (list 'caaar caaar-prim "")
+                       (list 'caadar caadar-prim "")
+                       (list 'caaddr caaddr-prim "")
+                       (list 'caadr caadr-prim "")
+                       (list 'caar caar-prim "")
+                       (list 'cadaar cadaar-prim "")
+                       (list 'cadadr cadadr-prim "")
+                       (list 'cadar cadar-prim "")
+                       (list 'caddar caddar-prim "")
+                       (list 'cadddr cadddr-prim "")
+                       (list 'cdaaar cdaaar-prim "")
+                       (list 'cdaadr cdaadr-prim "")
+                       (list 'cdaar cdaar-prim "")
+                       (list 'cdadar cdadar-prim "")
+                       (list 'cdaddr cdaddr-prim "")
+                       (list 'cdadr cdadr-prim "")
+                       (list 'cdar cdar-prim "")
+                       (list 'cddaar cddaar-prim "")
+                       (list 'cddadr cddadr-prim "")
+                       (list 'cddar cddar-prim "")
+                       (list 'cdddar cdddar-prim "")
+                       (list 'cddddr cddddr-prim "")
+                       (list 'cdddr cdddr-prim "")
+                       (list 'cddr cddr-prim "")
+                       (list 'char? char?-prim "")
+                       (list 'char=? char=?-prim "")
+                       (list 'char-whitespace? char-whitespace?-prim "")
+                       (list 'char-alphabetic? char-alphabetic?-prim "")
+                       (list 'char-numeric? char-numeric?-prim "")
+                       (list 'char->integer char->integer-prim "")
+                       (list 'cons cons-prim "")
+                       (list 'current-time current-time-prim "")
+                       (list 'cut cut-prim "") (list 'dir dir-prim "")
+                       (list 'display display-prim "")
+                       (list
+                         'current-environment
+                         current-environment-prim
+                         "")
+                       (list 'eq? eq?-prim "")
+                       (list 'equal? equal?-prim "")
+                       (list 'error error-prim "")
+                       (list 'eval eval-prim "")
+                       (list 'eval-ast eval-ast-prim "")
+                       (list 'exit exit-prim "")
+                       (list 'for-each for-each-prim "")
+                       (list 'format format-prim "")
+                       (list 'get get-prim "")
+                       (list 'get-stack-trace get-stack-trace-prim "")
+                       (list 'load-as load-as-prim "")
+                       (list 'integer->char integer->char-prim "")
+                       (list 'length length-prim "")
+                       (list 'list list-prim "")
+                       (list 'list->vector list->vector-prim "")
+                       (list 'list->string list->string-prim "")
+                       (list 'list-ref list-ref-prim "")
+                       (list 'load load-prim "") (list 'min min-prim "")
+                       (list 'max max-prim "")
+                       (list 'make-set make-set-prim "")
+                       (list 'make-vector make-vector-prim "")
+                       (list 'map map-prim "")
+                       (list 'member member-prim "")
+                       (list 'memq memq-prim "") (list 'memv memv-prim "")
+                       (list 'newline newline-prim "")
+                       (list 'not not-prim "") (list 'null? null?-prim "")
+                       (list 'number->string number->string-prim "")
+                       (list 'number? number?-prim "")
+                       (list 'pair? pair?-prim "")
+                       (list 'parse parse-prim "")
+                       (list 'parse-string parse-string-prim "")
+                       (list 'print print-prim "")
+                       (list 'printf printf-prim "")
+                       (list 'range range-prim "")
+                       (list 'read-string read-string-prim "")
+                       (list 'require require-prim "")
+                       (list 'reverse reverse-prim "")
+                       (list 'set-car! set-car!-prim "")
+                       (list 'set-cdr! set-cdr!-prim "")
+                       (list 'snoc snoc-prim "") (list 'rac rac-prim "")
+                       (list 'rdc rdc-prim "") (list 'sqrt sqrt-prim "")
+                       (list 'odd? odd?-prim "")
+                       (list 'even? even?-prim "")
+                       (list 'remainder remainder-prim "")
+                       (list 'string string-prim "")
+                       (list 'string-length string-length-prim "")
+                       (list 'string-ref string-ref-prim "")
+                       (list 'string? string?-prim "")
+                       (list 'string->number string->number-prim "")
+                       (list 'string=? string=?-prim "")
+                       (list 'substring substring-prim "")
+                       (list 'symbol? symbol?-prim "")
+                       (list 'unparse unparse-prim "")
+                       (list 'unparse-procedure unparse-procedure-prim "")
+                       (list 'import import-prim "")
+                       (list 'use-stack-trace use-stack-trace-prim "")
+                       (list 'vector vector-prim "")
+                       (list 'vector-ref vector-ref-prim "")
+                       (list 'vector-set! vector-set!-prim "")
+                       (list 'void void-prim "")
+                       (list 'zero? zero?-prim "")
+                       (list 'current-directory current-directory-prim "")
+                       (list 'cd current-directory-prim "")
+                       (list 'round round-prim "")
+                       (list 'char->string char->string-prim "")
+                       (list 'string->list string->list-prim "")
+                       (list 'string->symbol string->symbol-prim "")
+                       (list 'symbol->string symbol->string-prim "")
+                       (list 'vector->list vector->list-prim "")
+                       (list 'eqv? eqv?-prim "")
+                       (list 'vector? vector?-prim "")
+                       (list 'atom? atom?-prim "")
+                       (list 'iter? iter?-prim "")
+                       (list 'list? list?-prim "")
+                       (list 'procedure? procedure?-prim "")
+                       (list 'string<? string<?-prim "")
+                       (list 'float float-prim "")
+                       (list 'globals globals-prim "")
+                       (list 'int int-prim "")
+                       (list
+                         'apply-with-keywords
+                         apply-with-keywords-prim
+                         "")
+                       (list 'assq assq-prim "") (list 'dict dict-prim "")
+                       (list 'property property-prim "")
+                       (list 'rational rational-prim "")
+                       (list
+                         'reset-toplevel-env
+                         reset-toplevel-env-prim
+                         "")
+                       (list 'sort sort-prim "")
+                       (list 'string-append string-append-prim "")
+                       (list 'string-split string-split-prim "")
+                       (list 'symbol symbol-prim "")
+                       (list 'typeof typeof-prim "")
+                       (list
+                         'use-lexical-address
+                         use-lexical-address-prim
+                         "")
+                       (list 'use-tracing use-tracing-prim ""))))
       (make-initial-env-extended
         (map car primitives)
-        (map cadr primitives)))))
+        (map cadr primitives)
+        (map caddr primitives)))))
 
 (define reset-toplevel-env
   (lambda ()
@@ -6925,7 +7040,7 @@
          (car pattern)
          s
          (car^ ap)
-         (make-cont2 <cont2-98> ap pattern s k2)))
+         (make-cont2 <cont2-100> ap pattern s k2)))
       (else (error 'instantiate^ "bad pattern: ~a" pattern)))))
 
 (define make-sub (lambda args (cons 'substitution args)))
@@ -6940,7 +7055,7 @@
            (apply-cont2 k2 new-pattern new-apattern)
            (apply-cont2 k2 var avar)))
       (composite (s1 s2)
-       (apply-sub^ s1 var avar (make-cont2 <cont2-99> s2 k2)))
+       (apply-sub^ s1 var avar (make-cont2 <cont2-101> s2 k2)))
       (else (error 'apply-sub^ "bad substitution: ~a" s)))))
 
 (define chars-to-scan 'undefined)
@@ -7052,6 +7167,8 @@
 (define if-then?^ (tagged-list^ 'if = 3))
 
 (define if-else?^ (tagged-list^ 'if = 4))
+
+(define help?^ (tagged-list^ 'help = 2))
 
 (define assignment?^ (tagged-list^ 'set! = 3))
 
@@ -7534,8 +7651,8 @@
 
 (define-native
   make-initial-env-extended
-  (lambda (names procs)
-    (make-initial-environment names procs)))
+  (lambda (names procs docstrings)
+    (make-initial-environment names procs docstrings)))
 
 (define toplevel-env 'undefined)
 

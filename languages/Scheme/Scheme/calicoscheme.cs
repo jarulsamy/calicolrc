@@ -142,6 +142,7 @@ public class PJScheme:Scheme
     public static object symbol_var_aexp = make_symbol("var-aexp");
     public static object symbol_lexical_address_aexp = make_symbol("lexical-address-aexp");
     public static object symbol_if_aexp = make_symbol("if-aexp");
+    public static object symbol_help_aexp = make_symbol("help-aexp");
     public static object symbol_assign_aexp = make_symbol("assign-aexp");
     public static object symbol_func_aexp = make_symbol("func-aexp");
     public static object symbol_callback_aexp = make_symbol("callback-aexp");
@@ -435,6 +436,7 @@ public class PJScheme:Scheme
     public static object symbol_apply_sub_hat = make_symbol("apply-sub^");
     public static object symbol_atom = make_symbol("atom");
     public static object symbol_pair = make_symbol("pair");
+    public static object symbol_help = make_symbol("help");
     public static object symbol_b__q_q_q_d = make_symbol("<???>");
     public static object symbol_b_fail_d = make_symbol("<fail>");
     public static object symbol_b_handler_d = make_symbol("<handler>");
@@ -461,6 +463,11 @@ public class PJScheme:Scheme
     public static object if_aexp(params object [] t_args) {
         object args = sList(t_args);
         return cons(symbol_if_aexp, args);
+    }
+    
+    public static object help_aexp(params object [] t_args) {
+        object args = sList(t_args);
+        return cons(symbol_help_aexp, args);
     }
     
     public static object assign_aexp(params object [] t_args) {
@@ -985,7 +992,7 @@ public class PJScheme:Scheme
     }
     
     public static void b_cont_41_d(object args, object handler, object fail, object k2) {
-        k_reg = make_cont2("cont2", 72, args, handler, k2);
+        k_reg = make_cont2("cont2", 74, args, handler, k2);
         fail_reg = fail;
         handler_reg = handler;
         senv_reg = initial_contours(cadr(args));
@@ -994,7 +1001,7 @@ public class PJScheme:Scheme
     }
     
     public static void b_cont_42_d(object handler, object fail, object k2) {
-        k_reg = make_cont2("cont2", 73, handler, k2);
+        k_reg = make_cont2("cont2", 75, handler, k2);
         fail_reg = fail;
         handler_reg = handler;
         senv_reg = initial_contours(toplevel_env);
@@ -1106,7 +1113,7 @@ public class PJScheme:Scheme
             k_reg = k;
             pc = apply_cont;
         } else {
-            k2_reg = make_cont2("cont2", 96, apair2, pair2, value_reg, k);
+            k2_reg = make_cont2("cont2", 98, apair2, pair2, value_reg, k);
             ap_reg = cdr_hat(apair1);
             s_reg = value_reg;
             pattern_reg = cdr(pair1);
@@ -1681,7 +1688,19 @@ public class PJScheme:Scheme
         pc = lookup_variable;
     }
     
-    public static void b_cont2_65_d(object else_exp, object then_exp, object env, object handler, object k) {
+    public static void b_cont2_65_d(object k) {
+        value1_reg = binding_docstring(value1_reg);
+        k_reg = k;
+        pc = apply_cont2;
+    }
+    
+    public static void b_cont2_66_d(object k) {
+        value1_reg = help(dlr_env_lookup(value1_reg));
+        k_reg = k;
+        pc = apply_cont2;
+    }
+    
+    public static void b_cont2_67_d(object else_exp, object then_exp, object env, object handler, object k) {
         if (true_q(value1_reg)) {
             k_reg = k;
             fail_reg = value2_reg;
@@ -1699,19 +1718,19 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_cont2_66_d(object k) {
+    public static void b_cont2_68_d(object k) {
         value1_reg = callback(value1_reg);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_67_d(object k) {
+    public static void b_cont2_69_d(object k) {
         value1_reg = dlr_func(value1_reg);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_68_d(object exps, object env, object handler, object k) {
+    public static void b_cont2_70_d(object exps, object env, object handler, object k) {
         k_reg = make_cont2("cont2", 34, value1_reg, k);
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1720,7 +1739,7 @@ public class PJScheme:Scheme
         pc = m_star;
     }
     
-    public static void b_cont2_69_d(object exps, object env, object handler, object k) {
+    public static void b_cont2_71_d(object exps, object env, object handler, object k) {
         k_reg = k;
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1729,21 +1748,21 @@ public class PJScheme:Scheme
         pc = eval_sequence;
     }
     
-    public static void b_cont2_70_d(object e, object handler) {
+    public static void b_cont2_72_d(object e, object handler) {
         fail_reg = value2_reg;
         exception_reg = e;
         handler_reg = handler;
         pc = apply_handler2;
     }
     
-    public static void b_cont2_71_d(object trace_depth, object k2) {
+    public static void b_cont2_73_d(object trace_depth, object k2) {
         trace_depth = Subtract(trace_depth, 1);
         printf("~areturn: ~s~%", make_trace_depth_string(trace_depth), value1_reg);
         k_reg = k2;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_72_d(object args, object handler, object k2) {
+    public static void b_cont2_74_d(object args, object handler, object k2) {
         k_reg = k2;
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1752,7 +1771,7 @@ public class PJScheme:Scheme
         pc = m;
     }
     
-    public static void b_cont2_73_d(object handler, object k2) {
+    public static void b_cont2_75_d(object handler, object k2) {
         k_reg = k2;
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1761,7 +1780,7 @@ public class PJScheme:Scheme
         pc = m;
     }
     
-    public static void b_cont2_74_d(object handler, object k2) {
+    public static void b_cont2_76_d(object handler, object k2) {
         k_reg = make_cont4("cont4", 11, handler, k2);
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1770,7 +1789,7 @@ public class PJScheme:Scheme
         pc = read_sexp;
     }
     
-    public static void b_cont2_75_d(object handler, object k2) {
+    public static void b_cont2_77_d(object handler, object k2) {
         k_reg = make_cont4("cont4", 12, handler, k2);
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1779,7 +1798,7 @@ public class PJScheme:Scheme
         pc = read_sexp;
     }
     
-    public static void b_cont2_76_d(object k) {
+    public static void b_cont2_78_d(object k) {
         if (true_q(null_q(load_stack))) {
             printf("WARNING: empty load-stack encountered!\n");
         } else {
@@ -1790,8 +1809,8 @@ public class PJScheme:Scheme
         pc = apply_cont2;
     }
     
-    public static void b_cont2_77_d(object filename, object env2, object handler, object k) {
-        k_reg = make_cont2("cont2", 76, k);
+    public static void b_cont2_79_d(object filename, object env2, object handler, object k) {
+        k_reg = make_cont2("cont2", 78, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         env2_reg = env2;
@@ -1800,7 +1819,7 @@ public class PJScheme:Scheme
         pc = read_and_eval_asexps;
     }
     
-    public static void b_cont2_78_d(object src, object tokens_left, object env2, object handler, object k) {
+    public static void b_cont2_80_d(object src, object tokens_left, object env2, object handler, object k) {
         if (true_q(token_type_q(first(tokens_left), symbol_end_marker))) {
             k_reg = k;
             pc = apply_cont2;
@@ -1815,8 +1834,8 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_cont2_79_d(object src, object tokens_left, object env2, object handler, object k) {
-        k_reg = make_cont2("cont2", 78, src, tokens_left, env2, handler, k);
+    public static void b_cont2_81_d(object src, object tokens_left, object env2, object handler, object k) {
+        k_reg = make_cont2("cont2", 80, src, tokens_left, env2, handler, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         env_reg = env2;
@@ -1824,7 +1843,7 @@ public class PJScheme:Scheme
         pc = m;
     }
     
-    public static void b_cont2_80_d(object filenames, object env2, object info, object handler, object k) {
+    public static void b_cont2_82_d(object filenames, object env2, object info, object handler, object k) {
         k_reg = k;
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1834,7 +1853,7 @@ public class PJScheme:Scheme
         pc = load_files;
     }
     
-    public static void b_cont2_81_d(object lst, object k2) {
+    public static void b_cont2_83_d(object lst, object k2) {
         if (true_q(member(car(lst), value1_reg))) {
             k_reg = k2;
             pc = apply_cont2;
@@ -1845,7 +1864,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_cont2_82_d(object filename, object handler, object k2) {
+    public static void b_cont2_84_d(object filename, object handler, object k2) {
         object module = symbol_undefined;
         module = make_toplevel_env();
         set_binding_value_b(value1_reg, module);
@@ -1858,7 +1877,7 @@ public class PJScheme:Scheme
         pc = load_file;
     }
     
-    public static void b_cont2_83_d(object args, object sym, object info, object handler, object k) {
+    public static void b_cont2_85_d(object args, object sym, object info, object handler, object k) {
         if (true_q(null_q(cdr(args)))) {
             k_reg = k;
             pc = apply_cont2;
@@ -1881,13 +1900,13 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_cont2_84_d(object ls1, object k2) {
+    public static void b_cont2_86_d(object ls1, object k2) {
         value1_reg = cons(car(ls1), value1_reg);
         k_reg = k2;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_85_d(object lists, object k2) {
+    public static void b_cont2_87_d(object lists, object k2) {
         k2_reg = k2;
         fail_reg = value2_reg;
         ls2_reg = value1_reg;
@@ -1895,7 +1914,7 @@ public class PJScheme:Scheme
         pc = append2;
     }
     
-    public static void b_cont2_86_d(object iterator, object proc, object env, object handler, object k) {
+    public static void b_cont2_88_d(object iterator, object proc, object env, object handler, object k) {
         k_reg = k;
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1905,7 +1924,7 @@ public class PJScheme:Scheme
         pc = iterate_continue;
     }
     
-    public static void b_cont2_87_d(object iterator, object proc, object env, object handler, object k) {
+    public static void b_cont2_89_d(object iterator, object proc, object env, object handler, object k) {
         k_reg = make_cont2("cont2", 34, value1_reg, k);
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1915,7 +1934,7 @@ public class PJScheme:Scheme
         pc = iterate_collect_continue;
     }
     
-    public static void b_cont2_88_d(object list1, object proc, object env, object handler, object k) {
+    public static void b_cont2_90_d(object list1, object proc, object env, object handler, object k) {
         k_reg = make_cont2("cont2", 34, value1_reg, k);
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1925,13 +1944,13 @@ public class PJScheme:Scheme
         pc = map1;
     }
     
-    public static void b_cont2_89_d(object list1, object proc, object k) {
+    public static void b_cont2_91_d(object list1, object proc, object k) {
         value1_reg = cons(dlr_apply(proc, sList(car(list1))), value1_reg);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_90_d(object list1, object list2, object proc, object env, object handler, object k) {
+    public static void b_cont2_92_d(object list1, object list2, object proc, object env, object handler, object k) {
         k_reg = make_cont2("cont2", 34, value1_reg, k);
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1942,13 +1961,13 @@ public class PJScheme:Scheme
         pc = map2;
     }
     
-    public static void b_cont2_91_d(object list1, object list2, object proc, object k) {
+    public static void b_cont2_93_d(object list1, object list2, object proc, object k) {
         value1_reg = cons(dlr_apply(proc, sList(car(list1), car(list2))), value1_reg);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_92_d(object lists, object proc, object env, object handler, object k) {
+    public static void b_cont2_94_d(object lists, object proc, object env, object handler, object k) {
         k_reg = make_cont2("cont2", 34, value1_reg, k);
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1958,13 +1977,13 @@ public class PJScheme:Scheme
         pc = mapN;
     }
     
-    public static void b_cont2_93_d(object lists, object proc, object k) {
+    public static void b_cont2_95_d(object lists, object proc, object k) {
         value1_reg = cons(dlr_apply(proc, map(car_proc, lists)), value1_reg);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_94_d(object arg_list, object proc, object env, object handler, object k) {
+    public static void b_cont2_96_d(object arg_list, object proc, object env, object handler, object k) {
         k_reg = k;
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1974,7 +1993,7 @@ public class PJScheme:Scheme
         pc = for_each_primitive;
     }
     
-    public static void b_cont2_95_d(object new_acdr1, object new_cdr1, object s_car, object k) {
+    public static void b_cont2_97_d(object new_acdr1, object new_cdr1, object s_car, object k) {
         k_reg = make_cont("cont", 50, s_car, k);
         ap2_reg = value2_reg;
         ap1_reg = new_acdr1;
@@ -1983,30 +2002,30 @@ public class PJScheme:Scheme
         pc = unify_patterns_hat;
     }
     
-    public static void b_cont2_96_d(object apair2, object pair2, object s_car, object k) {
-        k2_reg = make_cont2("cont2", 95, value2_reg, value1_reg, s_car, k);
+    public static void b_cont2_98_d(object apair2, object pair2, object s_car, object k) {
+        k2_reg = make_cont2("cont2", 97, value2_reg, value1_reg, s_car, k);
         ap_reg = cdr_hat(apair2);
         s_reg = s_car;
         pattern_reg = cdr(pair2);
         pc = instantiate_hat;
     }
     
-    public static void b_cont2_97_d(object a, object aa, object ap, object k2) {
+    public static void b_cont2_99_d(object a, object aa, object ap, object k2) {
         value2_reg = cons_hat(aa, value2_reg, get_source_info(ap));
         value1_reg = cons(a, value1_reg);
         k_reg = k2;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_98_d(object ap, object pattern, object s, object k2) {
-        k2_reg = make_cont2("cont2", 97, value1_reg, value2_reg, ap, k2);
+    public static void b_cont2_100_d(object ap, object pattern, object s, object k2) {
+        k2_reg = make_cont2("cont2", 99, value1_reg, value2_reg, ap, k2);
         ap_reg = cdr_hat(ap);
         s_reg = s;
         pattern_reg = cdr(pattern);
         pc = instantiate_hat;
     }
     
-    public static void b_cont2_99_d(object s2, object k2) {
+    public static void b_cont2_101_d(object s2, object k2) {
         k2_reg = k2;
         ap_reg = value2_reg;
         s_reg = s2;
@@ -2054,6 +2073,13 @@ public class PJScheme:Scheme
         new_fail = make_fail("fail", 3, value2_reg, value1_reg, old_value, value3_reg);
         value2_reg = new_fail;
         value1_reg = void_value;
+        k_reg = k;
+        pc = apply_cont2;
+    }
+    
+    public static void b_cont3_5_d(object k) {
+        value1_reg = help(get_external_member(value1_reg, value2_reg));
+        value2_reg = value3_reg;
         k_reg = k;
         pc = apply_cont2;
     }
@@ -2186,7 +2212,7 @@ public class PJScheme:Scheme
     }
     
     public static void b_cont4_13_d(object src, object env2, object handler, object k) {
-        k_reg = make_cont2("cont2", 79, src, value3_reg, env2, handler, k);
+        k_reg = make_cont2("cont2", 81, src, value3_reg, env2, handler, k);
         fail_reg = value4_reg;
         handler_reg = handler;
         senv_reg = initial_contours(env2);
@@ -2261,7 +2287,7 @@ public class PJScheme:Scheme
     
     public static void b_handler2_4_d(object cexps, object cvar, object env, object handler, object k) {
         object new_env = symbol_undefined;
-        new_env = extend(env, sList(cvar), sList(exception_reg));
+        new_env = extend(env, sList(cvar), sList(exception_reg), sList(""));
         k_reg = k;
         handler_reg = handler;
         env_reg = new_env;
@@ -2270,7 +2296,7 @@ public class PJScheme:Scheme
     }
     
     public static void b_handler2_5_d(object fexps, object env, object handler) {
-        k_reg = make_cont2("cont2", 70, exception_reg, handler);
+        k_reg = make_cont2("cont2", 72, exception_reg, handler);
         handler_reg = handler;
         env_reg = env;
         exps_reg = fexps;
@@ -2279,7 +2305,7 @@ public class PJScheme:Scheme
     
     public static void b_handler2_6_d(object cexps, object cvar, object fexps, object env, object handler, object k) {
         object new_env = symbol_undefined;
-        new_env = extend(env, sList(cvar), sList(exception_reg));
+        new_env = extend(env, sList(cvar), sList(exception_reg), sList(""));
         object catch_handler = symbol_undefined;
         catch_handler = try_finally_handler(fexps, env, handler);
         k_reg = make_cont2("cont2", 57, fexps, env, handler, k);
@@ -2296,7 +2322,7 @@ public class PJScheme:Scheme
     public static void b_proc_1_d(object bodies, object formals, object env) {
         if (true_q(Equal(length(args_reg), length(formals)))) {
             k_reg = k2_reg;
-            env_reg = extend(env, formals, args_reg);
+            env_reg = extend(env, formals, args_reg, make_empty_docstrings(length(args_reg)));
             exps_reg = bodies;
             pc = eval_sequence;
         } else {
@@ -2308,7 +2334,7 @@ public class PJScheme:Scheme
     public static void b_proc_2_d(object bodies, object formals, object runt, object env) {
         if (true_q(GreaterThanEqual(length(args_reg), length(formals)))) {
             object new_env = symbol_undefined;
-            new_env = extend(env, cons(runt, formals), cons(list_tail(args_reg, length(formals)), list_head(args_reg, length(formals))));
+            new_env = extend(env, cons(runt, formals), cons(list_tail(args_reg, length(formals)), list_head(args_reg, length(formals))), make_empty_docstrings(Add(1, length(formals))));
             k_reg = k2_reg;
             env_reg = new_env;
             exps_reg = bodies;
@@ -2323,8 +2349,8 @@ public class PJScheme:Scheme
         if (true_q(Equal(length(args_reg), length(formals)))) {
             printf("~acall: ~s~%", make_trace_depth_string(trace_depth), cons(name, args_reg));
             trace_depth = Add(trace_depth, 1);
-            k_reg = make_cont2("cont2", 71, trace_depth, k2_reg);
-            env_reg = extend(env, formals, args_reg);
+            k_reg = make_cont2("cont2", 73, trace_depth, k2_reg);
+            env_reg = extend(env, formals, args_reg, make_empty_docstrings(length(formals)));
             exps_reg = bodies;
             pc = eval_sequence;
         } else {
@@ -2336,10 +2362,10 @@ public class PJScheme:Scheme
     public static void b_proc_4_d(object bodies, object name, object trace_depth, object formals, object runt, object env) {
         if (true_q(GreaterThanEqual(length(args_reg), length(formals)))) {
             object new_env = symbol_undefined;
-            new_env = extend(env, cons(runt, formals), cons(list_tail(args_reg, length(formals)), list_head(args_reg, length(formals))));
+            new_env = extend(env, cons(runt, formals), cons(list_tail(args_reg, length(formals)), list_head(args_reg, length(formals))), make_empty_docstrings(Add(1, length(formals))));
             printf("~acall: ~s~%", make_trace_depth_string(trace_depth), cons(name, args_reg));
             trace_depth = Add(trace_depth, 1);
-            k_reg = make_cont2("cont2", 71, trace_depth, k2_reg);
+            k_reg = make_cont2("cont2", 73, trace_depth, k2_reg);
             env_reg = new_env;
             exps_reg = bodies;
             pc = eval_sequence;
@@ -2465,14 +2491,14 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_15_d() {
-        k_reg = make_cont2("cont2", 74, handler_reg, k2_reg);
+        k_reg = make_cont2("cont2", 76, handler_reg, k2_reg);
         src_reg = symbol_stdin;
         input_reg = car(args_reg);
         pc = scan_input;
     }
     
     public static void b_proc_16_d() {
-        k_reg = make_cont2("cont2", 75, handler_reg, k2_reg);
+        k_reg = make_cont2("cont2", 77, handler_reg, k2_reg);
         src_reg = symbol_stdin;
         input_reg = car(args_reg);
         pc = scan_input;
@@ -3606,7 +3632,7 @@ public class PJScheme:Scheme
             object module_name = symbol_undefined;
             module_name = cadr(args_reg);
             filename = car(args_reg);
-            k_reg = make_cont2("cont2", 82, filename, handler_reg, k2_reg);
+            k_reg = make_cont2("cont2", 84, filename, handler_reg, k2_reg);
             env_reg = env2_reg;
             var_reg = module_name;
             pc = lookup_binding_in_first_frame;
@@ -5759,8 +5785,8 @@ public class PJScheme:Scheme
         }
     }
     
-    public static object make_binding(object value) {
-        return cons(value, "");
+    public static object make_binding(object value, object docstring) {
+        return cons(value, docstring);
     }
     
     public static object binding_value(object binding) {
@@ -5779,8 +5805,8 @@ public class PJScheme:Scheme
         set_cdr_b(binding, docstring);
     }
     
-    public static object make_frame(object variables, object values) {
-        return sList(list_to_vector(map(make_binding_proc, values)), variables);
+    public static object make_frame(object variables, object values, object docstrings) {
+        return sList(list_to_vector(map(make_binding_proc, values, docstrings)), variables);
     }
     
     public static bool empty_frame_q(object frame) {
@@ -5796,11 +5822,11 @@ public class PJScheme:Scheme
     }
     
     public static object make_empty_environment() {
-        return sList(symbol_environment, make_frame(symbol_emptylist, symbol_emptylist));
+        return sList(symbol_environment, make_frame(symbol_emptylist, symbol_emptylist, symbol_emptylist));
     }
     
-    public static object make_initial_environment(object vars, object vals) {
-        return sList(symbol_environment, make_frame(vars, vals));
+    public static object make_initial_environment(object vars, object vals, object docstrings) {
+        return sList(symbol_environment, make_frame(vars, vals, docstrings));
     }
     
     public static object first_frame(object env) {
@@ -5831,8 +5857,8 @@ public class PJScheme:Scheme
         set_car_b(cdr(env), new_frame);
     }
     
-    public static object extend(object env, object variables, object values) {
-        return cons(symbol_environment, cons(make_frame(variables, values), cdr(env)));
+    public static object extend(object env, object variables, object values, object docstrings) {
+        return cons(symbol_environment, cons(make_frame(variables, values, docstrings), cdr(env)));
     }
     
     public static object search_env(object env, object variable) {
@@ -5982,7 +6008,7 @@ public class PJScheme:Scheme
             pc = apply_cont2;
         } else {
             object new_binding = symbol_undefined;
-            new_binding = make_binding(symbol_undefined);
+            new_binding = make_binding(symbol_undefined, "");
             object new_frame = symbol_undefined;
             new_frame = add_binding(var_reg, new_binding, frame);
             set_first_frame_b(env_reg, new_frame);
@@ -6144,45 +6170,29 @@ public class PJScheme:Scheme
                                                 adatum_reg = cadr_hat(adatum_reg);
                                                 pc = aparse;
                                             } else {
-                                                if (true_q(assignment_q_hat(adatum_reg))) {
-                                                    k_reg = make_cont2("cont2", 25, adatum_reg, info, k_reg);
-                                                    adatum_reg = caddr_hat(adatum_reg);
-                                                    pc = aparse;
+                                                if (true_q(help_q_hat(adatum_reg))) {
+                                                    object var_info = symbol_undefined;
+                                                    var_info = get_source_info(cadr_hat(adatum_reg));
+                                                    value2_reg = fail_reg;
+                                                    value1_reg = help_aexp(untag_atom_hat(cadr_hat(adatum_reg)), var_info, info);
+                                                    pc = apply_cont2;
                                                 } else {
-                                                    if (true_q(func_q_hat(adatum_reg))) {
-                                                        k_reg = make_cont2("cont2", 24, info, k_reg);
-                                                        adatum_reg = cadr_hat(adatum_reg);
+                                                    if (true_q(assignment_q_hat(adatum_reg))) {
+                                                        k_reg = make_cont2("cont2", 25, adatum_reg, info, k_reg);
+                                                        adatum_reg = caddr_hat(adatum_reg);
                                                         pc = aparse;
                                                     } else {
-                                                        if (true_q(callback_q_hat(adatum_reg))) {
-                                                            k_reg = make_cont2("cont2", 23, info, k_reg);
+                                                        if (true_q(func_q_hat(adatum_reg))) {
+                                                            k_reg = make_cont2("cont2", 24, info, k_reg);
                                                             adatum_reg = cadr_hat(adatum_reg);
                                                             pc = aparse;
                                                         } else {
-                                                            if (true_q(define_q_hat(adatum_reg))) {
-                                                                if (true_q(mit_style_define_q_hat(adatum_reg))) {
-                                                                    k_reg = make_cont("cont", 16, senv_reg, info, handler_reg, fail_reg, k_reg);
-                                                                    datum_reg = adatum_reg;
-                                                                    macro_reg = mit_define_transformer_hat;
-                                                                    pc = apply_macro;
-                                                                } else {
-                                                                    if (true_q(Equal(length_hat(adatum_reg), 3))) {
-                                                                        k_reg = make_cont2("cont2", 22, adatum_reg, info, k_reg);
-                                                                        adatum_reg = caddr_hat(adatum_reg);
-                                                                        pc = aparse;
-                                                                    } else {
-                                                                        if (true_q((true_q(Equal(length_hat(adatum_reg), 4)) && true_q(string_q_hat(caddr_hat(adatum_reg)))))) {
-                                                                            k_reg = make_cont2("cont2", 21, adatum_reg, info, k_reg);
-                                                                            adatum_reg = cadddr_hat(adatum_reg);
-                                                                            pc = aparse;
-                                                                        } else {
-                                                                            msg_reg = "bad concrete syntax:";
-                                                                            pc = aparse_error;
-                                                                        }
-                                                                    }
-                                                                }
+                                                            if (true_q(callback_q_hat(adatum_reg))) {
+                                                                k_reg = make_cont2("cont2", 23, info, k_reg);
+                                                                adatum_reg = cadr_hat(adatum_reg);
+                                                                pc = aparse;
                                                             } else {
-                                                                if (true_q(define_b_q_hat(adatum_reg))) {
+                                                                if (true_q(define_q_hat(adatum_reg))) {
                                                                     if (true_q(mit_style_define_q_hat(adatum_reg))) {
                                                                         k_reg = make_cont("cont", 16, senv_reg, info, handler_reg, fail_reg, k_reg);
                                                                         datum_reg = adatum_reg;
@@ -6190,12 +6200,12 @@ public class PJScheme:Scheme
                                                                         pc = apply_macro;
                                                                     } else {
                                                                         if (true_q(Equal(length_hat(adatum_reg), 3))) {
-                                                                            k_reg = make_cont2("cont2", 20, adatum_reg, info, k_reg);
+                                                                            k_reg = make_cont2("cont2", 22, adatum_reg, info, k_reg);
                                                                             adatum_reg = caddr_hat(adatum_reg);
                                                                             pc = aparse;
                                                                         } else {
                                                                             if (true_q((true_q(Equal(length_hat(adatum_reg), 4)) && true_q(string_q_hat(caddr_hat(adatum_reg)))))) {
-                                                                                k_reg = make_cont2("cont2", 19, adatum_reg, info, k_reg);
+                                                                                k_reg = make_cont2("cont2", 21, adatum_reg, info, k_reg);
                                                                                 adatum_reg = cadddr_hat(adatum_reg);
                                                                                 pc = aparse;
                                                                             } else {
@@ -6205,84 +6215,108 @@ public class PJScheme:Scheme
                                                                         }
                                                                     }
                                                                 } else {
-                                                                    if (true_q(define_syntax_q_hat(adatum_reg))) {
-                                                                        object name = symbol_undefined;
-                                                                        object aclauses = symbol_undefined;
-                                                                        aclauses = cddr_hat(adatum_reg);
-                                                                        name = define_var_hat(adatum_reg);
-                                                                        k_reg = make_cont("cont", 14, aclauses, name, info, fail_reg, k_reg);
-                                                                        x_reg = aclauses;
-                                                                        pc = unannotate_cps;
-                                                                    } else {
-                                                                        if (true_q(begin_q_hat(adatum_reg))) {
-                                                                            if (true_q(null_q_hat(cdr_hat(adatum_reg)))) {
-                                                                                msg_reg = "bad concrete syntax:";
-                                                                                pc = aparse_error;
+                                                                    if (true_q(define_b_q_hat(adatum_reg))) {
+                                                                        if (true_q(mit_style_define_q_hat(adatum_reg))) {
+                                                                            k_reg = make_cont("cont", 16, senv_reg, info, handler_reg, fail_reg, k_reg);
+                                                                            datum_reg = adatum_reg;
+                                                                            macro_reg = mit_define_transformer_hat;
+                                                                            pc = apply_macro;
+                                                                        } else {
+                                                                            if (true_q(Equal(length_hat(adatum_reg), 3))) {
+                                                                                k_reg = make_cont2("cont2", 20, adatum_reg, info, k_reg);
+                                                                                adatum_reg = caddr_hat(adatum_reg);
+                                                                                pc = aparse;
                                                                             } else {
-                                                                                if (true_q(null_q_hat(cddr_hat(adatum_reg)))) {
-                                                                                    adatum_reg = cadr_hat(adatum_reg);
+                                                                                if (true_q((true_q(Equal(length_hat(adatum_reg), 4)) && true_q(string_q_hat(caddr_hat(adatum_reg)))))) {
+                                                                                    k_reg = make_cont2("cont2", 19, adatum_reg, info, k_reg);
+                                                                                    adatum_reg = cadddr_hat(adatum_reg);
                                                                                     pc = aparse;
                                                                                 } else {
-                                                                                    k_reg = make_cont2("cont2", 18, info, k_reg);
-                                                                                    adatum_list_reg = cdr_hat(adatum_reg);
-                                                                                    pc = aparse_all;
+                                                                                    msg_reg = "bad concrete syntax:";
+                                                                                    pc = aparse_error;
                                                                                 }
                                                                             }
+                                                                        }
+                                                                    } else {
+                                                                        if (true_q(define_syntax_q_hat(adatum_reg))) {
+                                                                            object name = symbol_undefined;
+                                                                            object aclauses = symbol_undefined;
+                                                                            aclauses = cddr_hat(adatum_reg);
+                                                                            name = define_var_hat(adatum_reg);
+                                                                            k_reg = make_cont("cont", 14, aclauses, name, info, fail_reg, k_reg);
+                                                                            x_reg = aclauses;
+                                                                            pc = unannotate_cps;
                                                                         } else {
-                                                                            if (true_q(lambda_q_hat(adatum_reg))) {
-                                                                                k_reg = make_cont("cont", 13, adatum_reg, senv_reg, info, handler_reg, fail_reg, k_reg);
-                                                                                x_reg = cadr_hat(adatum_reg);
-                                                                                pc = unannotate_cps;
+                                                                            if (true_q(begin_q_hat(adatum_reg))) {
+                                                                                if (true_q(null_q_hat(cdr_hat(adatum_reg)))) {
+                                                                                    msg_reg = "bad concrete syntax:";
+                                                                                    pc = aparse_error;
+                                                                                } else {
+                                                                                    if (true_q(null_q_hat(cddr_hat(adatum_reg)))) {
+                                                                                        adatum_reg = cadr_hat(adatum_reg);
+                                                                                        pc = aparse;
+                                                                                    } else {
+                                                                                        k_reg = make_cont2("cont2", 18, info, k_reg);
+                                                                                        adatum_list_reg = cdr_hat(adatum_reg);
+                                                                                        pc = aparse_all;
+                                                                                    }
+                                                                                }
                                                                             } else {
-                                                                                if (true_q(trace_lambda_q_hat(adatum_reg))) {
-                                                                                    k_reg = make_cont("cont", 12, adatum_reg, senv_reg, info, handler_reg, fail_reg, k_reg);
-                                                                                    x_reg = caddr_hat(adatum_reg);
+                                                                                if (true_q(lambda_q_hat(adatum_reg))) {
+                                                                                    k_reg = make_cont("cont", 13, adatum_reg, senv_reg, info, handler_reg, fail_reg, k_reg);
+                                                                                    x_reg = cadr_hat(adatum_reg);
                                                                                     pc = unannotate_cps;
                                                                                 } else {
-                                                                                    if (true_q(try_q_hat(adatum_reg))) {
-                                                                                        if (true_q(Equal(length_hat(adatum_reg), 2))) {
-                                                                                            adatum_reg = try_body_hat(adatum_reg);
-                                                                                            pc = aparse;
-                                                                                        } else {
-                                                                                            if (true_q((true_q(Equal(length_hat(adatum_reg), 3)) && true_q(catch_q_hat(caddr_hat(adatum_reg)))))) {
-                                                                                                k_reg = make_cont2("cont2", 15, adatum_reg, senv_reg, info, handler_reg, k_reg);
+                                                                                    if (true_q(trace_lambda_q_hat(adatum_reg))) {
+                                                                                        k_reg = make_cont("cont", 12, adatum_reg, senv_reg, info, handler_reg, fail_reg, k_reg);
+                                                                                        x_reg = caddr_hat(adatum_reg);
+                                                                                        pc = unannotate_cps;
+                                                                                    } else {
+                                                                                        if (true_q(try_q_hat(adatum_reg))) {
+                                                                                            if (true_q(Equal(length_hat(adatum_reg), 2))) {
                                                                                                 adatum_reg = try_body_hat(adatum_reg);
                                                                                                 pc = aparse;
                                                                                             } else {
-                                                                                                if (true_q((true_q(Equal(length_hat(adatum_reg), 3)) && true_q(finally_q_hat(caddr_hat(adatum_reg)))))) {
-                                                                                                    k_reg = make_cont2("cont2", 13, adatum_reg, senv_reg, info, handler_reg, k_reg);
+                                                                                                if (true_q((true_q(Equal(length_hat(adatum_reg), 3)) && true_q(catch_q_hat(caddr_hat(adatum_reg)))))) {
+                                                                                                    k_reg = make_cont2("cont2", 15, adatum_reg, senv_reg, info, handler_reg, k_reg);
                                                                                                     adatum_reg = try_body_hat(adatum_reg);
                                                                                                     pc = aparse;
                                                                                                 } else {
-                                                                                                    if (true_q((true_q(Equal(length_hat(adatum_reg), 4)) && true_q(catch_q_hat(caddr_hat(adatum_reg))) && true_q(finally_q_hat(cadddr_hat(adatum_reg)))))) {
-                                                                                                        k_reg = make_cont2("cont2", 11, adatum_reg, senv_reg, info, handler_reg, k_reg);
+                                                                                                    if (true_q((true_q(Equal(length_hat(adatum_reg), 3)) && true_q(finally_q_hat(caddr_hat(adatum_reg)))))) {
+                                                                                                        k_reg = make_cont2("cont2", 13, adatum_reg, senv_reg, info, handler_reg, k_reg);
                                                                                                         adatum_reg = try_body_hat(adatum_reg);
                                                                                                         pc = aparse;
                                                                                                     } else {
-                                                                                                        msg_reg = "bad try syntax:";
-                                                                                                        pc = aparse_error;
+                                                                                                        if (true_q((true_q(Equal(length_hat(adatum_reg), 4)) && true_q(catch_q_hat(caddr_hat(adatum_reg))) && true_q(finally_q_hat(cadddr_hat(adatum_reg)))))) {
+                                                                                                            k_reg = make_cont2("cont2", 11, adatum_reg, senv_reg, info, handler_reg, k_reg);
+                                                                                                            adatum_reg = try_body_hat(adatum_reg);
+                                                                                                            pc = aparse;
+                                                                                                        } else {
+                                                                                                            msg_reg = "bad try syntax:";
+                                                                                                            pc = aparse_error;
+                                                                                                        }
                                                                                                     }
                                                                                                 }
                                                                                             }
-                                                                                        }
-                                                                                    } else {
-                                                                                        if (true_q(raise_q_hat(adatum_reg))) {
-                                                                                            k_reg = make_cont2("cont2", 8, info, k_reg);
-                                                                                            adatum_reg = cadr_hat(adatum_reg);
-                                                                                            pc = aparse;
                                                                                         } else {
-                                                                                            if (true_q(choose_q_hat(adatum_reg))) {
-                                                                                                k_reg = make_cont2("cont2", 7, info, k_reg);
-                                                                                                adatum_list_reg = cdr_hat(adatum_reg);
-                                                                                                pc = aparse_all;
+                                                                                            if (true_q(raise_q_hat(adatum_reg))) {
+                                                                                                k_reg = make_cont2("cont2", 8, info, k_reg);
+                                                                                                adatum_reg = cadr_hat(adatum_reg);
+                                                                                                pc = aparse;
                                                                                             } else {
-                                                                                                if (true_q(application_q_hat(adatum_reg))) {
-                                                                                                    k_reg = make_cont2("cont2", 6, adatum_reg, senv_reg, info, handler_reg, k_reg);
-                                                                                                    adatum_reg = car_hat(adatum_reg);
-                                                                                                    pc = aparse;
+                                                                                                if (true_q(choose_q_hat(adatum_reg))) {
+                                                                                                    k_reg = make_cont2("cont2", 7, info, k_reg);
+                                                                                                    adatum_list_reg = cdr_hat(adatum_reg);
+                                                                                                    pc = aparse_all;
                                                                                                 } else {
-                                                                                                    msg_reg = "bad concrete syntax:";
-                                                                                                    pc = aparse_error;
+                                                                                                    if (true_q(application_q_hat(adatum_reg))) {
+                                                                                                        k_reg = make_cont2("cont2", 6, adatum_reg, senv_reg, info, handler_reg, k_reg);
+                                                                                                        adatum_reg = car_hat(adatum_reg);
+                                                                                                        pc = aparse;
+                                                                                                    } else {
+                                                                                                        msg_reg = "bad concrete syntax:";
+                                                                                                        pc = aparse_error;
+                                                                                                    }
                                                                                                 }
                                                                                             }
                                                                                         }
@@ -6476,7 +6510,7 @@ public class PJScheme:Scheme
     }
     
     public static object make_macro_env_hat() {
-        return make_initial_environment(sList(symbol_and, symbol_or, symbol_cond, symbol_let, symbol_letrec, symbol_let_star, symbol_case, symbol_record_case, symbol_define_datatype, symbol_cases), sList(and_transformer_hat, or_transformer_hat, cond_transformer_hat, let_transformer_hat, letrec_transformer_hat, let_star_transformer_hat, case_transformer_hat, record_case_transformer_hat, define_datatype_transformer_hat, cases_transformer_hat));
+        return make_initial_environment(sList(symbol_and, symbol_or, symbol_cond, symbol_let, symbol_letrec, symbol_let_star, symbol_case, symbol_record_case, symbol_define_datatype, symbol_cases), sList(and_transformer_hat, or_transformer_hat, cond_transformer_hat, let_transformer_hat, letrec_transformer_hat, let_star_transformer_hat, case_transformer_hat, record_case_transformer_hat, define_datatype_transformer_hat, cases_transformer_hat), sList("", "", "", "", "", "", "", "", "", ""));
     }
     
     public static object make_pattern_macro_hat(object clauses, object aclauses) {
@@ -7047,14 +7081,14 @@ public class PJScheme:Scheme
                     if (true_q(Eq(car(exp_reg), symbol_func_aexp))) {
                         object exp = symbol_undefined;
                         exp = list_ref(exp_reg, 1);
-                        k_reg = make_cont2("cont2", 67, k);
+                        k_reg = make_cont2("cont2", 69, k);
                         exp_reg = exp;
                         pc = m;
                     } else {
                         if (true_q(Eq(car(exp_reg), symbol_callback_aexp))) {
                             object exp = symbol_undefined;
                             exp = list_ref(exp_reg, 1);
-                            k_reg = make_cont2("cont2", 66, k);
+                            k_reg = make_cont2("cont2", 68, k);
                             exp_reg = exp;
                             pc = m;
                         } else {
@@ -7065,178 +7099,191 @@ public class PJScheme:Scheme
                                 else_exp = list_ref(exp_reg, 3);
                                 then_exp = list_ref(exp_reg, 2);
                                 test_exp = list_ref(exp_reg, 1);
-                                k_reg = make_cont2("cont2", 65, else_exp, then_exp, env_reg, handler_reg, k);
+                                k_reg = make_cont2("cont2", 67, else_exp, then_exp, env_reg, handler_reg, k);
                                 exp_reg = test_exp;
                                 pc = m;
                             } else {
-                                if (true_q(Eq(car(exp_reg), symbol_assign_aexp))) {
+                                if (true_q(Eq(car(exp_reg), symbol_help_aexp))) {
                                     object var = symbol_undefined;
-                                    object rhs_exp = symbol_undefined;
                                     object var_info = symbol_undefined;
-                                    var_info = list_ref(exp_reg, 3);
-                                    rhs_exp = list_ref(exp_reg, 2);
+                                    var_info = list_ref(exp_reg, 2);
                                     var = list_ref(exp_reg, 1);
-                                    k_reg = make_cont2("cont2", 64, var, var_info, env_reg, handler_reg, k);
-                                    exp_reg = rhs_exp;
-                                    pc = m;
+                                    sk_reg = make_cont2("cont2", 65, k);
+                                    dk_reg = make_cont3("cont3", 5, k);
+                                    gk_reg = make_cont2("cont2", 66, k);
+                                    var_info_reg = var_info;
+                                    var_reg = var;
+                                    pc = lookup_variable;
                                 } else {
-                                    if (true_q(Eq(car(exp_reg), symbol_define_aexp))) {
+                                    if (true_q(Eq(car(exp_reg), symbol_assign_aexp))) {
                                         object var = symbol_undefined;
-                                        object docstring = symbol_undefined;
                                         object rhs_exp = symbol_undefined;
-                                        rhs_exp = list_ref(exp_reg, 3);
-                                        docstring = list_ref(exp_reg, 2);
+                                        object var_info = symbol_undefined;
+                                        var_info = list_ref(exp_reg, 3);
+                                        rhs_exp = list_ref(exp_reg, 2);
                                         var = list_ref(exp_reg, 1);
-                                        k_reg = make_cont2("cont2", 61, docstring, var, env_reg, handler_reg, k);
+                                        k_reg = make_cont2("cont2", 64, var, var_info, env_reg, handler_reg, k);
                                         exp_reg = rhs_exp;
                                         pc = m;
                                     } else {
-                                        if (true_q(Eq(car(exp_reg), symbol_define_b_aexp))) {
+                                        if (true_q(Eq(car(exp_reg), symbol_define_aexp))) {
                                             object var = symbol_undefined;
                                             object docstring = symbol_undefined;
                                             object rhs_exp = symbol_undefined;
                                             rhs_exp = list_ref(exp_reg, 3);
                                             docstring = list_ref(exp_reg, 2);
                                             var = list_ref(exp_reg, 1);
-                                            k_reg = make_cont2("cont2", 59, docstring, var, k);
+                                            k_reg = make_cont2("cont2", 61, docstring, var, env_reg, handler_reg, k);
                                             exp_reg = rhs_exp;
                                             pc = m;
                                         } else {
-                                            if (true_q(Eq(car(exp_reg), symbol_define_syntax_aexp))) {
-                                                object name = symbol_undefined;
-                                                object clauses = symbol_undefined;
-                                                object aclauses = symbol_undefined;
-                                                aclauses = list_ref(exp_reg, 3);
-                                                clauses = list_ref(exp_reg, 2);
-                                                name = list_ref(exp_reg, 1);
-                                                k_reg = make_cont2("cont2", 58, aclauses, clauses, k);
-                                                env_reg = macro_env;
-                                                var_reg = name;
-                                                pc = lookup_binding_in_first_frame;
+                                            if (true_q(Eq(car(exp_reg), symbol_define_b_aexp))) {
+                                                object var = symbol_undefined;
+                                                object docstring = symbol_undefined;
+                                                object rhs_exp = symbol_undefined;
+                                                rhs_exp = list_ref(exp_reg, 3);
+                                                docstring = list_ref(exp_reg, 2);
+                                                var = list_ref(exp_reg, 1);
+                                                k_reg = make_cont2("cont2", 59, docstring, var, k);
+                                                exp_reg = rhs_exp;
+                                                pc = m;
                                             } else {
-                                                if (true_q(Eq(car(exp_reg), symbol_begin_aexp))) {
-                                                    object exps = symbol_undefined;
-                                                    exps = list_ref(exp_reg, 1);
-                                                    k_reg = k;
-                                                    exps_reg = exps;
-                                                    pc = eval_sequence;
+                                                if (true_q(Eq(car(exp_reg), symbol_define_syntax_aexp))) {
+                                                    object name = symbol_undefined;
+                                                    object clauses = symbol_undefined;
+                                                    object aclauses = symbol_undefined;
+                                                    aclauses = list_ref(exp_reg, 3);
+                                                    clauses = list_ref(exp_reg, 2);
+                                                    name = list_ref(exp_reg, 1);
+                                                    k_reg = make_cont2("cont2", 58, aclauses, clauses, k);
+                                                    env_reg = macro_env;
+                                                    var_reg = name;
+                                                    pc = lookup_binding_in_first_frame;
                                                 } else {
-                                                    if (true_q(Eq(car(exp_reg), symbol_lambda_aexp))) {
-                                                        object formals = symbol_undefined;
-                                                        object bodies = symbol_undefined;
-                                                        bodies = list_ref(exp_reg, 2);
-                                                        formals = list_ref(exp_reg, 1);
-                                                        value2_reg = fail_reg;
-                                                        value1_reg = closure(formals, bodies, env_reg);
+                                                    if (true_q(Eq(car(exp_reg), symbol_begin_aexp))) {
+                                                        object exps = symbol_undefined;
+                                                        exps = list_ref(exp_reg, 1);
                                                         k_reg = k;
-                                                        pc = apply_cont2;
+                                                        exps_reg = exps;
+                                                        pc = eval_sequence;
                                                     } else {
-                                                        if (true_q(Eq(car(exp_reg), symbol_mu_lambda_aexp))) {
+                                                        if (true_q(Eq(car(exp_reg), symbol_lambda_aexp))) {
                                                             object formals = symbol_undefined;
-                                                            object runt = symbol_undefined;
                                                             object bodies = symbol_undefined;
-                                                            bodies = list_ref(exp_reg, 3);
-                                                            runt = list_ref(exp_reg, 2);
+                                                            bodies = list_ref(exp_reg, 2);
                                                             formals = list_ref(exp_reg, 1);
                                                             value2_reg = fail_reg;
-                                                            value1_reg = mu_closure(formals, runt, bodies, env_reg);
+                                                            value1_reg = closure(formals, bodies, env_reg);
                                                             k_reg = k;
                                                             pc = apply_cont2;
                                                         } else {
-                                                            if (true_q(Eq(car(exp_reg), symbol_trace_lambda_aexp))) {
-                                                                object name = symbol_undefined;
+                                                            if (true_q(Eq(car(exp_reg), symbol_mu_lambda_aexp))) {
                                                                 object formals = symbol_undefined;
+                                                                object runt = symbol_undefined;
                                                                 object bodies = symbol_undefined;
                                                                 bodies = list_ref(exp_reg, 3);
-                                                                formals = list_ref(exp_reg, 2);
-                                                                name = list_ref(exp_reg, 1);
+                                                                runt = list_ref(exp_reg, 2);
+                                                                formals = list_ref(exp_reg, 1);
                                                                 value2_reg = fail_reg;
-                                                                value1_reg = trace_closure(name, formals, bodies, env_reg);
+                                                                value1_reg = mu_closure(formals, runt, bodies, env_reg);
                                                                 k_reg = k;
                                                                 pc = apply_cont2;
                                                             } else {
-                                                                if (true_q(Eq(car(exp_reg), symbol_mu_trace_lambda_aexp))) {
+                                                                if (true_q(Eq(car(exp_reg), symbol_trace_lambda_aexp))) {
                                                                     object name = symbol_undefined;
                                                                     object formals = symbol_undefined;
-                                                                    object runt = symbol_undefined;
                                                                     object bodies = symbol_undefined;
-                                                                    bodies = list_ref(exp_reg, 4);
-                                                                    runt = list_ref(exp_reg, 3);
+                                                                    bodies = list_ref(exp_reg, 3);
                                                                     formals = list_ref(exp_reg, 2);
                                                                     name = list_ref(exp_reg, 1);
                                                                     value2_reg = fail_reg;
-                                                                    value1_reg = mu_trace_closure(name, formals, runt, bodies, env_reg);
+                                                                    value1_reg = trace_closure(name, formals, bodies, env_reg);
                                                                     k_reg = k;
                                                                     pc = apply_cont2;
                                                                 } else {
-                                                                    if (true_q(Eq(car(exp_reg), symbol_try_catch_aexp))) {
-                                                                        object body = symbol_undefined;
-                                                                        object cvar = symbol_undefined;
-                                                                        object cexps = symbol_undefined;
-                                                                        cexps = list_ref(exp_reg, 3);
-                                                                        cvar = list_ref(exp_reg, 2);
-                                                                        body = list_ref(exp_reg, 1);
-                                                                        object new_handler = symbol_undefined;
-                                                                        new_handler = try_catch_handler(cvar, cexps, env_reg, handler_reg, k);
+                                                                    if (true_q(Eq(car(exp_reg), symbol_mu_trace_lambda_aexp))) {
+                                                                        object name = symbol_undefined;
+                                                                        object formals = symbol_undefined;
+                                                                        object runt = symbol_undefined;
+                                                                        object bodies = symbol_undefined;
+                                                                        bodies = list_ref(exp_reg, 4);
+                                                                        runt = list_ref(exp_reg, 3);
+                                                                        formals = list_ref(exp_reg, 2);
+                                                                        name = list_ref(exp_reg, 1);
+                                                                        value2_reg = fail_reg;
+                                                                        value1_reg = mu_trace_closure(name, formals, runt, bodies, env_reg);
                                                                         k_reg = k;
-                                                                        handler_reg = new_handler;
-                                                                        exp_reg = body;
-                                                                        pc = m;
+                                                                        pc = apply_cont2;
                                                                     } else {
-                                                                        if (true_q(Eq(car(exp_reg), symbol_try_finally_aexp))) {
+                                                                        if (true_q(Eq(car(exp_reg), symbol_try_catch_aexp))) {
                                                                             object body = symbol_undefined;
-                                                                            object fexps = symbol_undefined;
-                                                                            fexps = list_ref(exp_reg, 2);
+                                                                            object cvar = symbol_undefined;
+                                                                            object cexps = symbol_undefined;
+                                                                            cexps = list_ref(exp_reg, 3);
+                                                                            cvar = list_ref(exp_reg, 2);
                                                                             body = list_ref(exp_reg, 1);
                                                                             object new_handler = symbol_undefined;
-                                                                            new_handler = try_finally_handler(fexps, env_reg, handler_reg);
-                                                                            k_reg = make_cont2("cont2", 57, fexps, env_reg, handler_reg, k);
+                                                                            new_handler = try_catch_handler(cvar, cexps, env_reg, handler_reg, k);
+                                                                            k_reg = k;
                                                                             handler_reg = new_handler;
                                                                             exp_reg = body;
                                                                             pc = m;
                                                                         } else {
-                                                                            if (true_q(Eq(car(exp_reg), symbol_try_catch_finally_aexp))) {
+                                                                            if (true_q(Eq(car(exp_reg), symbol_try_finally_aexp))) {
                                                                                 object body = symbol_undefined;
-                                                                                object cvar = symbol_undefined;
-                                                                                object cexps = symbol_undefined;
                                                                                 object fexps = symbol_undefined;
-                                                                                fexps = list_ref(exp_reg, 4);
-                                                                                cexps = list_ref(exp_reg, 3);
-                                                                                cvar = list_ref(exp_reg, 2);
+                                                                                fexps = list_ref(exp_reg, 2);
                                                                                 body = list_ref(exp_reg, 1);
                                                                                 object new_handler = symbol_undefined;
-                                                                                new_handler = try_catch_finally_handler(cvar, cexps, fexps, env_reg, handler_reg, k);
+                                                                                new_handler = try_finally_handler(fexps, env_reg, handler_reg);
                                                                                 k_reg = make_cont2("cont2", 57, fexps, env_reg, handler_reg, k);
                                                                                 handler_reg = new_handler;
                                                                                 exp_reg = body;
                                                                                 pc = m;
                                                                             } else {
-                                                                                if (true_q(Eq(car(exp_reg), symbol_raise_aexp))) {
-                                                                                    object exp = symbol_undefined;
-                                                                                    exp = list_ref(exp_reg, 1);
-                                                                                    k_reg = make_cont2("cont2", 55, handler_reg);
-                                                                                    exp_reg = exp;
+                                                                                if (true_q(Eq(car(exp_reg), symbol_try_catch_finally_aexp))) {
+                                                                                    object body = symbol_undefined;
+                                                                                    object cvar = symbol_undefined;
+                                                                                    object cexps = symbol_undefined;
+                                                                                    object fexps = symbol_undefined;
+                                                                                    fexps = list_ref(exp_reg, 4);
+                                                                                    cexps = list_ref(exp_reg, 3);
+                                                                                    cvar = list_ref(exp_reg, 2);
+                                                                                    body = list_ref(exp_reg, 1);
+                                                                                    object new_handler = symbol_undefined;
+                                                                                    new_handler = try_catch_finally_handler(cvar, cexps, fexps, env_reg, handler_reg, k);
+                                                                                    k_reg = make_cont2("cont2", 57, fexps, env_reg, handler_reg, k);
+                                                                                    handler_reg = new_handler;
+                                                                                    exp_reg = body;
                                                                                     pc = m;
                                                                                 } else {
-                                                                                    if (true_q(Eq(car(exp_reg), symbol_choose_aexp))) {
-                                                                                        object exps = symbol_undefined;
-                                                                                        exps = list_ref(exp_reg, 1);
-                                                                                        k_reg = k;
-                                                                                        exps_reg = exps;
-                                                                                        pc = eval_choices;
+                                                                                    if (true_q(Eq(car(exp_reg), symbol_raise_aexp))) {
+                                                                                        object exp = symbol_undefined;
+                                                                                        exp = list_ref(exp_reg, 1);
+                                                                                        k_reg = make_cont2("cont2", 55, handler_reg);
+                                                                                        exp_reg = exp;
+                                                                                        pc = m;
                                                                                     } else {
-                                                                                        if (true_q(Eq(car(exp_reg), symbol_app_aexp))) {
-                                                                                            object operator_ = symbol_undefined;
-                                                                                            object operands = symbol_undefined;
-                                                                                            object info = symbol_undefined;
-                                                                                            info = list_ref(exp_reg, 3);
-                                                                                            operands = list_ref(exp_reg, 2);
-                                                                                            operator_ = list_ref(exp_reg, 1);
-                                                                                            k_reg = make_cont2("cont2", 54, exp_reg, operator_, env_reg, info, handler_reg, k);
-                                                                                            exps_reg = operands;
-                                                                                            pc = m_star;
+                                                                                        if (true_q(Eq(car(exp_reg), symbol_choose_aexp))) {
+                                                                                            object exps = symbol_undefined;
+                                                                                            exps = list_ref(exp_reg, 1);
+                                                                                            k_reg = k;
+                                                                                            exps_reg = exps;
+                                                                                            pc = eval_choices;
                                                                                         } else {
-                                                                                            throw new Exception("symbol_m: " + format("bad abstract syntax: '~s'", exp_reg));;
+                                                                                            if (true_q(Eq(car(exp_reg), symbol_app_aexp))) {
+                                                                                                object operator_ = symbol_undefined;
+                                                                                                object operands = symbol_undefined;
+                                                                                                object info = symbol_undefined;
+                                                                                                info = list_ref(exp_reg, 3);
+                                                                                                operands = list_ref(exp_reg, 2);
+                                                                                                operator_ = list_ref(exp_reg, 1);
+                                                                                                k_reg = make_cont2("cont2", 54, exp_reg, operator_, env_reg, info, handler_reg, k);
+                                                                                                exps_reg = operands;
+                                                                                                pc = m_star;
+                                                                                            } else {
+                                                                                                throw new Exception("symbol_m: " + format("bad abstract syntax: '~s'", exp_reg));;
+                                                                                            }
                                                                                         }
                                                                                     }
                                                                                 }
@@ -7354,7 +7401,7 @@ public class PJScheme:Scheme
             value1_reg = symbol_emptylist;
             pc = apply_cont2;
         } else {
-            k_reg = make_cont2("cont2", 68, exps_reg, env_reg, handler_reg, k_reg);
+            k_reg = make_cont2("cont2", 70, exps_reg, env_reg, handler_reg, k_reg);
             exp_reg = car(exps_reg);
             pc = m;
         }
@@ -7365,7 +7412,7 @@ public class PJScheme:Scheme
             exp_reg = car(exps_reg);
             pc = m;
         } else {
-            k_reg = make_cont2("cont2", 69, exps_reg, env_reg, handler_reg, k_reg);
+            k_reg = make_cont2("cont2", 71, exps_reg, env_reg, handler_reg, k_reg);
             exp_reg = car(exps_reg);
             pc = m;
         }
@@ -7392,6 +7439,14 @@ public class PJScheme:Scheme
             fail_reg = new_fail;
             exp_reg = car(exps_reg);
             pc = m;
+        }
+    }
+    
+    public static object make_empty_docstrings(object n) {
+        if (true_q(Equal(n, 0))) {
+            return symbol_emptylist;
+        } else {
+            return cons("", make_empty_docstrings(Subtract(n, 1)));
         }
     }
     
@@ -7493,7 +7548,7 @@ public class PJScheme:Scheme
                     pc = runtime_error;
                 } else {
                     load_stack = cons(filename_reg, load_stack);
-                    k_reg = make_cont2("cont2", 77, filename_reg, env2_reg, handler_reg, k_reg);
+                    k_reg = make_cont2("cont2", 79, filename_reg, env2_reg, handler_reg, k_reg);
                     src_reg = filename_reg;
                     input_reg = read_content(filename_reg);
                     pc = scan_input;
@@ -7519,7 +7574,7 @@ public class PJScheme:Scheme
             value1_reg = void_value;
             pc = apply_cont2;
         } else {
-            k_reg = make_cont2("cont2", 80, filenames_reg, env2_reg, info_reg, handler_reg, k_reg);
+            k_reg = make_cont2("cont2", 82, filenames_reg, env2_reg, info_reg, handler_reg, k_reg);
             filename_reg = car(filenames_reg);
             pc = load_file;
         }
@@ -7550,7 +7605,7 @@ public class PJScheme:Scheme
             k_reg = k2_reg;
             pc = apply_cont2;
         } else {
-            k2_reg = make_cont2("cont2", 81, lst_reg, k2_reg);
+            k2_reg = make_cont2("cont2", 83, lst_reg, k2_reg);
             lst_reg = cdr(lst_reg);
             pc = make_set;
         }
@@ -7612,7 +7667,7 @@ public class PJScheme:Scheme
     public static void get_primitive() {
         object sym = symbol_undefined;
         sym = car(args_reg);
-        k_reg = make_cont2("cont2", 83, args_reg, sym, info_reg, handler_reg, k_reg);
+        k_reg = make_cont2("cont2", 85, args_reg, sym, info_reg, handler_reg, k_reg);
         var_info_reg = symbol_none;
         var_reg = sym;
         pc = lookup_value;
@@ -7625,7 +7680,7 @@ public class PJScheme:Scheme
             k_reg = k2_reg;
             pc = apply_cont2;
         } else {
-            k2_reg = make_cont2("cont2", 84, ls1_reg, k2_reg);
+            k2_reg = make_cont2("cont2", 86, ls1_reg, k2_reg);
             ls1_reg = cdr(ls1_reg);
             pc = append2;
         }
@@ -7648,7 +7703,7 @@ public class PJScheme:Scheme
                     msg_reg = format("append called on incorrect list structure ~s", car(lists_reg));
                     pc = runtime_error;
                 } else {
-                    k2_reg = make_cont2("cont2", 85, lists_reg, k2_reg);
+                    k2_reg = make_cont2("cont2", 87, lists_reg, k2_reg);
                     lists_reg = cdr(lists_reg);
                     pc = append_all;
                 }
@@ -7752,7 +7807,7 @@ public class PJScheme:Scheme
             value1_reg = symbol_emptylist;
             pc = apply_cont2;
         } else {
-            k2_reg = make_cont2("cont2", 86, iterator_reg, proc_reg, env_reg, handler_reg, k_reg);
+            k2_reg = make_cont2("cont2", 88, iterator_reg, proc_reg, env_reg, handler_reg, k_reg);
             info_reg = symbol_none;
             env2_reg = env_reg;
             args_reg = sList(item);
@@ -7775,7 +7830,7 @@ public class PJScheme:Scheme
             value1_reg = symbol_emptylist;
             pc = apply_cont2;
         } else {
-            k2_reg = make_cont2("cont2", 87, iterator_reg, proc_reg, env_reg, handler_reg, k_reg);
+            k2_reg = make_cont2("cont2", 89, iterator_reg, proc_reg, env_reg, handler_reg, k_reg);
             info_reg = symbol_none;
             env2_reg = env_reg;
             args_reg = sList(item);
@@ -7790,11 +7845,11 @@ public class PJScheme:Scheme
             pc = apply_cont2;
         } else {
             if (true_q(dlr_proc_q(proc_reg))) {
-                k_reg = make_cont2("cont2", 89, list1_reg, proc_reg, k_reg);
+                k_reg = make_cont2("cont2", 91, list1_reg, proc_reg, k_reg);
                 list1_reg = cdr(list1_reg);
                 pc = map1;
             } else {
-                k2_reg = make_cont2("cont2", 88, list1_reg, proc_reg, env_reg, handler_reg, k_reg);
+                k2_reg = make_cont2("cont2", 90, list1_reg, proc_reg, env_reg, handler_reg, k_reg);
                 info_reg = symbol_none;
                 env2_reg = env_reg;
                 args_reg = sList(car(list1_reg));
@@ -7810,12 +7865,12 @@ public class PJScheme:Scheme
             pc = apply_cont2;
         } else {
             if (true_q(dlr_proc_q(proc_reg))) {
-                k_reg = make_cont2("cont2", 91, list1_reg, list2_reg, proc_reg, k_reg);
+                k_reg = make_cont2("cont2", 93, list1_reg, list2_reg, proc_reg, k_reg);
                 list2_reg = cdr(list2_reg);
                 list1_reg = cdr(list1_reg);
                 pc = map2;
             } else {
-                k2_reg = make_cont2("cont2", 90, list1_reg, list2_reg, proc_reg, env_reg, handler_reg, k_reg);
+                k2_reg = make_cont2("cont2", 92, list1_reg, list2_reg, proc_reg, env_reg, handler_reg, k_reg);
                 info_reg = symbol_none;
                 env2_reg = env_reg;
                 args_reg = sList(car(list1_reg), car(list2_reg));
@@ -7831,11 +7886,11 @@ public class PJScheme:Scheme
             pc = apply_cont2;
         } else {
             if (true_q(dlr_proc_q(proc_reg))) {
-                k_reg = make_cont2("cont2", 93, lists_reg, proc_reg, k_reg);
+                k_reg = make_cont2("cont2", 95, lists_reg, proc_reg, k_reg);
                 lists_reg = map(cdr_proc, lists_reg);
                 pc = mapN;
             } else {
-                k2_reg = make_cont2("cont2", 92, lists_reg, proc_reg, env_reg, handler_reg, k_reg);
+                k2_reg = make_cont2("cont2", 94, lists_reg, proc_reg, env_reg, handler_reg, k_reg);
                 info_reg = symbol_none;
                 env2_reg = env_reg;
                 args_reg = map(car_proc, lists_reg);
@@ -7861,7 +7916,7 @@ public class PJScheme:Scheme
                     lists_reg = map(cdr_proc, arg_list);
                     pc = for_each_primitive;
                 } else {
-                    k2_reg = make_cont2("cont2", 94, arg_list, proc_reg, env_reg, handler_reg, k_reg);
+                    k2_reg = make_cont2("cont2", 96, arg_list, proc_reg, env_reg, handler_reg, k_reg);
                     info_reg = symbol_none;
                     env2_reg = env_reg;
                     args_reg = map(car_proc, arg_list);
@@ -7873,8 +7928,8 @@ public class PJScheme:Scheme
     
     public static object make_toplevel_env() {
         object primitives = symbol_undefined;
-        primitives = sList(sList(symbol_Multiply, times_prim), sList(symbol_Add, plus_prim), sList(symbol_Subtract, minus_prim), sList(symbol_Divide, divide_prim), sList(symbol_div, quotient_prim), sList(symbol_p, modulo_prim), sList(symbol_mod, modulo_prim), sList(symbol_modulo, modulo_prim), sList(symbol___, quotient_prim), sList(symbol_quotient, quotient_prim), sList(symbol_LessThan, lt_prim), sList(symbol_LessThanEqual, lt_or_eq_prim), sList(symbol_Equal, equal_sign_prim), sList(symbol_GreaterThan, gt_prim), sList(symbol_GreaterThanEqual, gt_or_eq_prim), sList(symbol_abort, abort_prim), sList(symbol_abs, abs_prim), sList(symbol_append, append_prim), sList(symbol_apply, apply_prim), sList(symbol_assv, assv_prim), sList(symbol_boolean_q, boolean_q_prim), sList(symbol_caddr, caddr_prim), sList(symbol_cadr, cadr_prim), sList(symbol_call_with_current_continuation, call_cc_prim), sList(symbol_call_cc, call_cc_prim), sList(symbol_car, car_prim), sList(symbol_cdr, cdr_prim), sList(symbol_caaaar, caaaar_prim), sList(symbol_caaadr, caaadr_prim), sList(symbol_caaar, caaar_prim), sList(symbol_caadar, caadar_prim), sList(symbol_caaddr, caaddr_prim), sList(symbol_caadr, caadr_prim), sList(symbol_caar, caar_prim), sList(symbol_cadaar, cadaar_prim), sList(symbol_cadadr, cadadr_prim), sList(symbol_cadar, cadar_prim), sList(symbol_caddar, caddar_prim), sList(symbol_cadddr, cadddr_prim), sList(symbol_cdaaar, cdaaar_prim), sList(symbol_cdaadr, cdaadr_prim), sList(symbol_cdaar, cdaar_prim), sList(symbol_cdadar, cdadar_prim), sList(symbol_cdaddr, cdaddr_prim), sList(symbol_cdadr, cdadr_prim), sList(symbol_cdar, cdar_prim), sList(symbol_cddaar, cddaar_prim), sList(symbol_cddadr, cddadr_prim), sList(symbol_cddar, cddar_prim), sList(symbol_cdddar, cdddar_prim), sList(symbol_cddddr, cddddr_prim), sList(symbol_cdddr, cdddr_prim), sList(symbol_cddr, cddr_prim), sList(symbol_char_q, char_q_prim), sList(symbol_char_is__q, char_is__q_prim), sList(symbol_char_whitespace_q, char_whitespace_q_prim), sList(symbol_char_alphabetic_q, char_alphabetic_q_prim), sList(symbol_char_numeric_q, char_numeric_q_prim), sList(symbol_char_to_integer, char_to_integer_prim), sList(symbol_cons, cons_prim), sList(symbol_current_time, current_time_prim), sList(symbol_cut, cut_prim), sList(symbol_dir, dir_prim), sList(symbol_display, display_prim), sList(symbol_current_environment, current_environment_prim), sList(symbol_eq_q, eq_q_prim), sList(symbol_equal_q, equal_q_prim), sList(symbol_error, error_prim), sList(symbol_eval, eval_prim), sList(symbol_eval_ast, eval_ast_prim), sList(symbol_exit, exit_prim), sList(symbol_for_each, for_each_prim), sList(symbol_format, format_prim), sList(symbol_get, get_prim), sList(symbol_get_stack_trace, get_stack_trace_prim), sList(symbol_load_as, load_as_prim), sList(symbol_integer_to_char, integer_to_char_prim), sList(symbol_length, length_prim), sList(symbol_sList, list_prim), sList(symbol_list_to_vector, list_to_vector_prim), sList(symbol_list_to_string, list_to_string_prim), sList(symbol_list_ref, list_ref_prim), sList(symbol_load, load_prim), sList(symbol_min, min_prim), sList(symbol_max, max_prim), sList(symbol_make_set, make_set_prim), sList(symbol_make_vector, make_vector_prim), sList(symbol_map, map_prim), sList(symbol_member, member_prim), sList(symbol_memq, memq_prim), sList(symbol_memv, memv_prim), sList(symbol_newline, newline_prim), sList(symbol_not, not_prim), sList(symbol_null_q, null_q_prim), sList(symbol_number_to_string, number_to_string_prim), sList(symbol_number_q, number_q_prim), sList(symbol_pair_q, pair_q_prim), sList(symbol_parse, parse_prim), sList(symbol_parse_string, parse_string_prim), sList(symbol_print, print_prim), sList(symbol_printf, printf_prim), sList(symbol_Range, range_prim), sList(symbol_read_string, read_string_prim), sList(symbol_require, require_prim), sList(symbol_reverse, reverse_prim), sList(symbol_set_car_b, set_car_b_prim), sList(symbol_set_cdr_b, set_cdr_b_prim), sList(symbol_snoc, snoc_prim), sList(symbol_rac, rac_prim), sList(symbol_rdc, rdc_prim), sList(symbol_sqrt, sqrt_prim), sList(symbol_odd_q, odd_q_prim), sList(symbol_even_q, even_q_prim), sList(symbol_remainder, remainder_prim), sList(symbol_make_string, string_prim), sList(symbol_string_length, string_length_prim), sList(symbol_string_ref, string_ref_prim), sList(symbol_string_q, string_q_prim), sList(symbol_string_to_number, string_to_number_prim), sList(symbol_string_is__q, string_is__q_prim), sList(symbol_substring, substring_prim), sList(symbol_symbol_q, symbol_q_prim), sList(symbol_unparse, unparse_prim), sList(symbol_unparse_procedure, unparse_procedure_prim), sList(symbol_import, import_prim), sList(symbol_use_stack_trace, use_stack_trace_prim), sList(symbol_vector, vector_prim), sList(symbol_vector_ref, vector_ref_prim), sList(symbol_vector_set_b, vector_set_b_prim), sList(symbol_void, void_prim), sList(symbol_zero_q, zero_q_prim), sList(symbol_current_directory, current_directory_prim), sList(symbol_cd, current_directory_prim), sList(symbol_round, round_prim), sList(symbol_char_to_string, char_to_string_prim), sList(symbol_string_to_list, string_to_list_prim), sList(symbol_string_to_symbol, string_to_symbol_prim), sList(symbol_symbol_to_string, symbol_to_string_prim), sList(symbol_vector_to_list, vector_to_list_prim), sList(symbol_eqv_q, eqv_q_prim), sList(symbol_vector_q, vector_q_prim), sList(symbol_atom_q, atom_q_prim), sList(symbol_iter_q, iter_q_prim), sList(symbol_list_q, list_q_prim), sList(symbol_procedure_q, procedure_q_prim), sList(symbol_stringLessThan_q, stringLessThan_q_prim), sList(symbol_float_, float_prim), sList(symbol_globals, globals_prim), sList(symbol_int_, int_prim), sList(symbol_apply_with_keywords, apply_with_keywords_prim), sList(symbol_assq, assq_prim), sList(symbol_dict, dict_prim), sList(symbol_property, property_prim), sList(symbol_rational, rational_prim), sList(symbol_reset_toplevel_env, reset_toplevel_env_prim), sList(symbol_sort, sort_prim), sList(symbol_string_append, string_append_prim), sList(symbol_string_split, string_split_prim), sList(symbol_symbol, symbol_prim), sList(symbol_typeof, typeof_prim), sList(symbol_use_lexical_address, use_lexical_address_prim), sList(symbol_use_tracing, use_tracing_prim));
-        return make_initial_env_extended(map(car_proc, primitives), map(cadr_proc, primitives));
+        primitives = sList(sList(symbol_Multiply, times_prim, ""), sList(symbol_Add, plus_prim, ""), sList(symbol_Subtract, minus_prim, ""), sList(symbol_Divide, divide_prim, ""), sList(symbol_div, quotient_prim, ""), sList(symbol_p, modulo_prim, ""), sList(symbol_mod, modulo_prim, ""), sList(symbol_modulo, modulo_prim, ""), sList(symbol___, quotient_prim, ""), sList(symbol_quotient, quotient_prim, ""), sList(symbol_LessThan, lt_prim, ""), sList(symbol_LessThanEqual, lt_or_eq_prim, ""), sList(symbol_Equal, equal_sign_prim, ""), sList(symbol_GreaterThan, gt_prim, ""), sList(symbol_GreaterThanEqual, gt_or_eq_prim, ""), sList(symbol_abort, abort_prim, ""), sList(symbol_abs, abs_prim, ""), sList(symbol_append, append_prim, ""), sList(symbol_apply, apply_prim, ""), sList(symbol_assv, assv_prim, ""), sList(symbol_boolean_q, boolean_q_prim, ""), sList(symbol_caddr, caddr_prim, ""), sList(symbol_cadr, cadr_prim, ""), sList(symbol_call_with_current_continuation, call_cc_prim, ""), sList(symbol_call_cc, call_cc_prim, ""), sList(symbol_car, car_prim, "(car LIST) returns the first element of LIST"), sList(symbol_cdr, cdr_prim, ""), sList(symbol_caaaar, caaaar_prim, ""), sList(symbol_caaadr, caaadr_prim, ""), sList(symbol_caaar, caaar_prim, ""), sList(symbol_caadar, caadar_prim, ""), sList(symbol_caaddr, caaddr_prim, ""), sList(symbol_caadr, caadr_prim, ""), sList(symbol_caar, caar_prim, ""), sList(symbol_cadaar, cadaar_prim, ""), sList(symbol_cadadr, cadadr_prim, ""), sList(symbol_cadar, cadar_prim, ""), sList(symbol_caddar, caddar_prim, ""), sList(symbol_cadddr, cadddr_prim, ""), sList(symbol_cdaaar, cdaaar_prim, ""), sList(symbol_cdaadr, cdaadr_prim, ""), sList(symbol_cdaar, cdaar_prim, ""), sList(symbol_cdadar, cdadar_prim, ""), sList(symbol_cdaddr, cdaddr_prim, ""), sList(symbol_cdadr, cdadr_prim, ""), sList(symbol_cdar, cdar_prim, ""), sList(symbol_cddaar, cddaar_prim, ""), sList(symbol_cddadr, cddadr_prim, ""), sList(symbol_cddar, cddar_prim, ""), sList(symbol_cdddar, cdddar_prim, ""), sList(symbol_cddddr, cddddr_prim, ""), sList(symbol_cdddr, cdddr_prim, ""), sList(symbol_cddr, cddr_prim, ""), sList(symbol_char_q, char_q_prim, ""), sList(symbol_char_is__q, char_is__q_prim, ""), sList(symbol_char_whitespace_q, char_whitespace_q_prim, ""), sList(symbol_char_alphabetic_q, char_alphabetic_q_prim, ""), sList(symbol_char_numeric_q, char_numeric_q_prim, ""), sList(symbol_char_to_integer, char_to_integer_prim, ""), sList(symbol_cons, cons_prim, ""), sList(symbol_current_time, current_time_prim, ""), sList(symbol_cut, cut_prim, ""), sList(symbol_dir, dir_prim, ""), sList(symbol_display, display_prim, ""), sList(symbol_current_environment, current_environment_prim, ""), sList(symbol_eq_q, eq_q_prim, ""), sList(symbol_equal_q, equal_q_prim, ""), sList(symbol_error, error_prim, ""), sList(symbol_eval, eval_prim, ""), sList(symbol_eval_ast, eval_ast_prim, ""), sList(symbol_exit, exit_prim, ""), sList(symbol_for_each, for_each_prim, ""), sList(symbol_format, format_prim, ""), sList(symbol_get, get_prim, ""), sList(symbol_get_stack_trace, get_stack_trace_prim, ""), sList(symbol_load_as, load_as_prim, ""), sList(symbol_integer_to_char, integer_to_char_prim, ""), sList(symbol_length, length_prim, ""), sList(symbol_sList, list_prim, ""), sList(symbol_list_to_vector, list_to_vector_prim, ""), sList(symbol_list_to_string, list_to_string_prim, ""), sList(symbol_list_ref, list_ref_prim, ""), sList(symbol_load, load_prim, ""), sList(symbol_min, min_prim, ""), sList(symbol_max, max_prim, ""), sList(symbol_make_set, make_set_prim, ""), sList(symbol_make_vector, make_vector_prim, ""), sList(symbol_map, map_prim, ""), sList(symbol_member, member_prim, ""), sList(symbol_memq, memq_prim, ""), sList(symbol_memv, memv_prim, ""), sList(symbol_newline, newline_prim, ""), sList(symbol_not, not_prim, ""), sList(symbol_null_q, null_q_prim, ""), sList(symbol_number_to_string, number_to_string_prim, ""), sList(symbol_number_q, number_q_prim, ""), sList(symbol_pair_q, pair_q_prim, ""), sList(symbol_parse, parse_prim, ""), sList(symbol_parse_string, parse_string_prim, ""), sList(symbol_print, print_prim, ""), sList(symbol_printf, printf_prim, ""), sList(symbol_Range, range_prim, ""), sList(symbol_read_string, read_string_prim, ""), sList(symbol_require, require_prim, ""), sList(symbol_reverse, reverse_prim, ""), sList(symbol_set_car_b, set_car_b_prim, ""), sList(symbol_set_cdr_b, set_cdr_b_prim, ""), sList(symbol_snoc, snoc_prim, ""), sList(symbol_rac, rac_prim, ""), sList(symbol_rdc, rdc_prim, ""), sList(symbol_sqrt, sqrt_prim, ""), sList(symbol_odd_q, odd_q_prim, ""), sList(symbol_even_q, even_q_prim, ""), sList(symbol_remainder, remainder_prim, ""), sList(symbol_make_string, string_prim, ""), sList(symbol_string_length, string_length_prim, ""), sList(symbol_string_ref, string_ref_prim, ""), sList(symbol_string_q, string_q_prim, ""), sList(symbol_string_to_number, string_to_number_prim, ""), sList(symbol_string_is__q, string_is__q_prim, ""), sList(symbol_substring, substring_prim, ""), sList(symbol_symbol_q, symbol_q_prim, ""), sList(symbol_unparse, unparse_prim, ""), sList(symbol_unparse_procedure, unparse_procedure_prim, ""), sList(symbol_import, import_prim, ""), sList(symbol_use_stack_trace, use_stack_trace_prim, ""), sList(symbol_vector, vector_prim, ""), sList(symbol_vector_ref, vector_ref_prim, ""), sList(symbol_vector_set_b, vector_set_b_prim, ""), sList(symbol_void, void_prim, ""), sList(symbol_zero_q, zero_q_prim, ""), sList(symbol_current_directory, current_directory_prim, ""), sList(symbol_cd, current_directory_prim, ""), sList(symbol_round, round_prim, ""), sList(symbol_char_to_string, char_to_string_prim, ""), sList(symbol_string_to_list, string_to_list_prim, ""), sList(symbol_string_to_symbol, string_to_symbol_prim, ""), sList(symbol_symbol_to_string, symbol_to_string_prim, ""), sList(symbol_vector_to_list, vector_to_list_prim, ""), sList(symbol_eqv_q, eqv_q_prim, ""), sList(symbol_vector_q, vector_q_prim, ""), sList(symbol_atom_q, atom_q_prim, ""), sList(symbol_iter_q, iter_q_prim, ""), sList(symbol_list_q, list_q_prim, ""), sList(symbol_procedure_q, procedure_q_prim, ""), sList(symbol_stringLessThan_q, stringLessThan_q_prim, ""), sList(symbol_float_, float_prim, ""), sList(symbol_globals, globals_prim, ""), sList(symbol_int_, int_prim, ""), sList(symbol_apply_with_keywords, apply_with_keywords_prim, ""), sList(symbol_assq, assq_prim, ""), sList(symbol_dict, dict_prim, ""), sList(symbol_property, property_prim, ""), sList(symbol_rational, rational_prim, ""), sList(symbol_reset_toplevel_env, reset_toplevel_env_prim, ""), sList(symbol_sort, sort_prim, ""), sList(symbol_string_append, string_append_prim, ""), sList(symbol_string_split, string_split_prim, ""), sList(symbol_symbol, symbol_prim, ""), sList(symbol_typeof, typeof_prim, ""), sList(symbol_use_lexical_address, use_lexical_address_prim, ""), sList(symbol_use_tracing, use_tracing_prim, ""));
+        return make_initial_env_extended(map(car_proc, primitives), map(cadr_proc, primitives), map(caddr_proc, primitives));
     }
     
     public static object make_external_proc(object external_function_object) {
@@ -7973,7 +8028,7 @@ public class PJScheme:Scheme
                 pc = apply_sub_hat;
             } else {
                 if (true_q(pair_q(pattern_reg))) {
-                    k2_reg = make_cont2("cont2", 98, ap_reg, pattern_reg, s_reg, k2_reg);
+                    k2_reg = make_cont2("cont2", 100, ap_reg, pattern_reg, s_reg, k2_reg);
                     ap_reg = car_hat(ap_reg);
                     pattern_reg = car(pattern_reg);
                     pc = instantiate_hat;
@@ -8022,7 +8077,7 @@ public class PJScheme:Scheme
                     object s2 = symbol_undefined;
                     s2 = list_ref(temp_1, 2);
                     s1 = list_ref(temp_1, 1);
-                    k2_reg = make_cont2("cont2", 99, s2, k2_reg);
+                    k2_reg = make_cont2("cont2", 101, s2, k2_reg);
                     s_reg = s1;
                     pc = apply_sub_hat;
                 } else {
@@ -8052,6 +8107,7 @@ public class PJScheme:Scheme
     public static Func<object,bool> unquote_splicing_q_hat = tagged_list_hat(symbol_unquote_splicing, GreaterThanEqual_proc, 2);
     public static Func<object,bool> if_then_q_hat = tagged_list_hat(symbol_if, Equal_proc, 3);
     public static Func<object,bool> if_else_q_hat = tagged_list_hat(symbol_if, Equal_proc, 4);
+    public static Func<object,bool> help_q_hat = tagged_list_hat(symbol_help, Equal_proc, 2);
     public static Func<object,bool> assignment_q_hat = tagged_list_hat(symbol_set_b, Equal_proc, 3);
     public static Func<object,bool> func_q_hat = tagged_list_hat(symbol_func, Equal_proc, 2);
     public static Func<object,bool> callback_q_hat = tagged_list_hat(symbol_callback, Equal_proc, 2);
@@ -8262,8 +8318,8 @@ public class PJScheme:Scheme
         mi_handler = new MethodInfo[1];
         mi_cont = new MethodInfo[52];
         mi_handler2 = new MethodInfo[7];
-        mi_cont3 = new MethodInfo[5];
-        mi_cont2 = new MethodInfo[100];
+        mi_cont3 = new MethodInfo[6];
+        mi_cont2 = new MethodInfo[102];
         mi_fail = new MethodInfo[6];
         mi_macro = new MethodInfo[12];
         mi_proc = new MethodInfo[163];
@@ -8296,14 +8352,14 @@ public class PJScheme:Scheme
             }
         }
         
-        for (int i = 1; i < 5; i++) {
+        for (int i = 1; i < 6; i++) {
             mi_cont3[i] = typeof(PJScheme).GetMethod(String.Format("b_cont3_{0}_d", i));
             if (mi_cont3[i] == null) {
                 throw new Exception(String.Format("Undefined mi: mi_cont3[{0}]", i));
             }
         }
         
-        for (int i = 1; i < 100; i++) {
+        for (int i = 1; i < 102; i++) {
             mi_cont2[i] = typeof(PJScheme).GetMethod(String.Format("b_cont2_{0}_d", i));
             if (mi_cont2[i] == null) {
                 throw new Exception(String.Format("Undefined mi: mi_cont2[{0}]", i));

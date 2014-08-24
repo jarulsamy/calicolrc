@@ -109,10 +109,10 @@ def make_char(c):
 
 void_value = make_symbol("<void>")
 
-def make_initial_env_extended(names, procs):
+def make_initial_env_extended(names, procs, docstrings):
     ## If you wish to extend the environment to 
     ## include native values, do so here:
-    return make_initial_environment(names, procs)
+    return make_initial_environment(names, procs, docstrings)
 
 ### Lists:
 
@@ -191,16 +191,31 @@ def length(lyst):
         raise Exception("not a proper list")
     return count
 
-def Map(f, lyst):
-    retval = symbol_emptylist
-    current = lyst
-    while isinstance(current, cons):
-        retval = cons(f(current.car), retval)
-        current = current.cdr
-    if current != symbol_emptylist:
-        raise Exception("not a proper list")
-    # FIXME: rewrite without reverse
-    return reverse(retval)
+def Map(f, lyst, lyst2=None):
+    if lyst2 is None:
+        retval = symbol_emptylist
+        current = lyst
+        while isinstance(current, cons):
+            retval = cons(f(current.car), retval)
+            current = current.cdr
+        if current != symbol_emptylist:
+            raise Exception("not a proper list")
+        # FIXME: rewrite without reverse
+        return reverse(retval)
+    else:
+        retval = symbol_emptylist
+        current1 = lyst
+        current2 = lyst2
+        while isinstance(current1, cons) and isinstance(current2, cons):
+            retval = cons(f(current1.car, current2.car), retval)
+            current1 = current1.cdr
+            current2 = current2.cdr
+        if current1 != symbol_emptylist:
+            raise Exception("not a proper list")
+        if current2 != symbol_emptylist:
+            raise Exception("not a proper list")
+        # FIXME: rewrite without reverse
+        return reverse(retval)
 
 def for_each(f, lyst):
     current = lyst
@@ -1019,6 +1034,7 @@ symbol_lit_aexp = make_symbol("lit-aexp")
 symbol_var_aexp = make_symbol("var-aexp")
 symbol_lexical_address_aexp = make_symbol("lexical-address-aexp")
 symbol_if_aexp = make_symbol("if-aexp")
+symbol_help_aexp = make_symbol("help-aexp")
 symbol_assign_aexp = make_symbol("assign-aexp")
 symbol_func_aexp = make_symbol("func-aexp")
 symbol_callback_aexp = make_symbol("callback-aexp")
@@ -1313,6 +1329,7 @@ symbol_substitution = make_symbol("substitution")
 symbol_apply_sub_hat = make_symbol("apply-sub^")
 symbol_atom = make_symbol("atom")
 symbol_pair = make_symbol("pair")
+symbol_help = make_symbol("help")
 symbol_b__q_q_q_d = make_symbol("<???>")
 symbol_b_fail_d = make_symbol("<fail>")
 symbol_b_handler_d = make_symbol("<handler>")
@@ -1336,6 +1353,10 @@ def lexical_address_aexp(*args):
 def if_aexp(*args):
     args = List(*args)
     return cons(symbol_if_aexp, args)
+
+def help_aexp(*args):
+    args = List(*args)
+    return cons(symbol_help_aexp, args)
 
 def assign_aexp(*args):
     args = List(*args)
@@ -1795,7 +1816,7 @@ def b_cont_40_d(k):
     GLOBALS['pc'] = apply_cont
 
 def b_cont_41_d(args, handler, fail, k2):
-    GLOBALS['k_reg'] = make_cont2(b_cont2_72_d, args, handler, k2)
+    GLOBALS['k_reg'] = make_cont2(b_cont2_74_d, args, handler, k2)
     GLOBALS['fail_reg'] = fail
     GLOBALS['handler_reg'] = handler
     GLOBALS['senv_reg'] = initial_contours(cadr(args))
@@ -1803,7 +1824,7 @@ def b_cont_41_d(args, handler, fail, k2):
     GLOBALS['pc'] = aparse
 
 def b_cont_42_d(handler, fail, k2):
-    GLOBALS['k_reg'] = make_cont2(b_cont2_73_d, handler, k2)
+    GLOBALS['k_reg'] = make_cont2(b_cont2_75_d, handler, k2)
     GLOBALS['fail_reg'] = fail
     GLOBALS['handler_reg'] = handler
     GLOBALS['senv_reg'] = initial_contours(toplevel_env)
@@ -1900,7 +1921,7 @@ def b_cont_51_d(apair1, apair2, pair1, pair2, k):
         GLOBALS['k_reg'] = k
         GLOBALS['pc'] = apply_cont
     else:
-        GLOBALS['k2_reg'] = make_cont2(b_cont2_96_d, apair2, pair2, value_reg, k)
+        GLOBALS['k2_reg'] = make_cont2(b_cont2_98_d, apair2, pair2, value_reg, k)
         GLOBALS['ap_reg'] = cdr_hat(apair1)
         GLOBALS['s_reg'] = value_reg
         GLOBALS['pattern_reg'] = cdr(pair1)
@@ -2396,7 +2417,17 @@ def b_cont2_64_d(var, var_info, env, handler, k):
     GLOBALS['var_reg'] = var
     GLOBALS['pc'] = lookup_variable
 
-def b_cont2_65_d(else_exp, then_exp, env, handler, k):
+def b_cont2_65_d(k):
+    GLOBALS['value1_reg'] = binding_docstring(value1_reg)
+    GLOBALS['k_reg'] = k
+    GLOBALS['pc'] = apply_cont2
+
+def b_cont2_66_d(k):
+    GLOBALS['value1_reg'] = help(dlr_env_lookup(value1_reg))
+    GLOBALS['k_reg'] = k
+    GLOBALS['pc'] = apply_cont2
+
+def b_cont2_67_d(else_exp, then_exp, env, handler, k):
     if true_q(value1_reg):
         GLOBALS['k_reg'] = k
         GLOBALS['fail_reg'] = value2_reg
@@ -2412,17 +2443,17 @@ def b_cont2_65_d(else_exp, then_exp, env, handler, k):
         GLOBALS['exp_reg'] = else_exp
         GLOBALS['pc'] = m
 
-def b_cont2_66_d(k):
+def b_cont2_68_d(k):
     GLOBALS['value1_reg'] = callback(value1_reg)
     GLOBALS['k_reg'] = k
     GLOBALS['pc'] = apply_cont2
 
-def b_cont2_67_d(k):
+def b_cont2_69_d(k):
     GLOBALS['value1_reg'] = dlr_func(value1_reg)
     GLOBALS['k_reg'] = k
     GLOBALS['pc'] = apply_cont2
 
-def b_cont2_68_d(exps, env, handler, k):
+def b_cont2_70_d(exps, env, handler, k):
     GLOBALS['k_reg'] = make_cont2(b_cont2_34_d, value1_reg, k)
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['handler_reg'] = handler
@@ -2430,7 +2461,7 @@ def b_cont2_68_d(exps, env, handler, k):
     GLOBALS['exps_reg'] = cdr(exps)
     GLOBALS['pc'] = m_star
 
-def b_cont2_69_d(exps, env, handler, k):
+def b_cont2_71_d(exps, env, handler, k):
     GLOBALS['k_reg'] = k
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['handler_reg'] = handler
@@ -2438,19 +2469,19 @@ def b_cont2_69_d(exps, env, handler, k):
     GLOBALS['exps_reg'] = cdr(exps)
     GLOBALS['pc'] = eval_sequence
 
-def b_cont2_70_d(e, handler):
+def b_cont2_72_d(e, handler):
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['exception_reg'] = e
     GLOBALS['handler_reg'] = handler
     GLOBALS['pc'] = apply_handler2
 
-def b_cont2_71_d(trace_depth, k2):
+def b_cont2_73_d(trace_depth, k2):
     GLOBALS['trace_depth'] = (trace_depth) - (1)
     printf("~areturn: ~s~%", make_trace_depth_string(trace_depth), value1_reg)
     GLOBALS['k_reg'] = k2
     GLOBALS['pc'] = apply_cont2
 
-def b_cont2_72_d(args, handler, k2):
+def b_cont2_74_d(args, handler, k2):
     GLOBALS['k_reg'] = k2
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['handler_reg'] = handler
@@ -2458,7 +2489,7 @@ def b_cont2_72_d(args, handler, k2):
     GLOBALS['exp_reg'] = value1_reg
     GLOBALS['pc'] = m
 
-def b_cont2_73_d(handler, k2):
+def b_cont2_75_d(handler, k2):
     GLOBALS['k_reg'] = k2
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['handler_reg'] = handler
@@ -2466,7 +2497,7 @@ def b_cont2_73_d(handler, k2):
     GLOBALS['exp_reg'] = value1_reg
     GLOBALS['pc'] = m
 
-def b_cont2_74_d(handler, k2):
+def b_cont2_76_d(handler, k2):
     GLOBALS['k_reg'] = make_cont4(b_cont4_11_d, handler, k2)
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['handler_reg'] = handler
@@ -2474,7 +2505,7 @@ def b_cont2_74_d(handler, k2):
     GLOBALS['tokens_reg'] = value1_reg
     GLOBALS['pc'] = read_sexp
 
-def b_cont2_75_d(handler, k2):
+def b_cont2_77_d(handler, k2):
     GLOBALS['k_reg'] = make_cont4(b_cont4_12_d, handler, k2)
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['handler_reg'] = handler
@@ -2482,7 +2513,7 @@ def b_cont2_75_d(handler, k2):
     GLOBALS['tokens_reg'] = value1_reg
     GLOBALS['pc'] = read_sexp
 
-def b_cont2_76_d(k):
+def b_cont2_78_d(k):
     if true_q(null_q(load_stack)):
         printf("WARNING: empty load-stack encountered!\n")
     else:
@@ -2491,8 +2522,8 @@ def b_cont2_76_d(k):
     GLOBALS['k_reg'] = k
     GLOBALS['pc'] = apply_cont2
 
-def b_cont2_77_d(filename, env2, handler, k):
-    GLOBALS['k_reg'] = make_cont2(b_cont2_76_d, k)
+def b_cont2_79_d(filename, env2, handler, k):
+    GLOBALS['k_reg'] = make_cont2(b_cont2_78_d, k)
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['handler_reg'] = handler
     GLOBALS['env2_reg'] = env2
@@ -2500,7 +2531,7 @@ def b_cont2_77_d(filename, env2, handler, k):
     GLOBALS['tokens_reg'] = value1_reg
     GLOBALS['pc'] = read_and_eval_asexps
 
-def b_cont2_78_d(src, tokens_left, env2, handler, k):
+def b_cont2_80_d(src, tokens_left, env2, handler, k):
     if true_q(token_type_q(first(tokens_left), symbol_end_marker)):
         GLOBALS['k_reg'] = k
         GLOBALS['pc'] = apply_cont2
@@ -2513,15 +2544,15 @@ def b_cont2_78_d(src, tokens_left, env2, handler, k):
         GLOBALS['tokens_reg'] = tokens_left
         GLOBALS['pc'] = read_and_eval_asexps
 
-def b_cont2_79_d(src, tokens_left, env2, handler, k):
-    GLOBALS['k_reg'] = make_cont2(b_cont2_78_d, src, tokens_left, env2, handler, k)
+def b_cont2_81_d(src, tokens_left, env2, handler, k):
+    GLOBALS['k_reg'] = make_cont2(b_cont2_80_d, src, tokens_left, env2, handler, k)
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['handler_reg'] = handler
     GLOBALS['env_reg'] = env2
     GLOBALS['exp_reg'] = value1_reg
     GLOBALS['pc'] = m
 
-def b_cont2_80_d(filenames, env2, info, handler, k):
+def b_cont2_82_d(filenames, env2, info, handler, k):
     GLOBALS['k_reg'] = k
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['handler_reg'] = handler
@@ -2530,7 +2561,7 @@ def b_cont2_80_d(filenames, env2, info, handler, k):
     GLOBALS['filenames_reg'] = cdr(filenames)
     GLOBALS['pc'] = load_files
 
-def b_cont2_81_d(lst, k2):
+def b_cont2_83_d(lst, k2):
     if true_q(member(car(lst), value1_reg)):
         GLOBALS['k_reg'] = k2
         GLOBALS['pc'] = apply_cont2
@@ -2539,7 +2570,7 @@ def b_cont2_81_d(lst, k2):
         GLOBALS['k_reg'] = k2
         GLOBALS['pc'] = apply_cont2
 
-def b_cont2_82_d(filename, handler, k2):
+def b_cont2_84_d(filename, handler, k2):
     module = symbol_undefined
     module = make_toplevel_env()
     set_binding_value_b(value1_reg, module)
@@ -2551,7 +2582,7 @@ def b_cont2_82_d(filename, handler, k2):
     GLOBALS['filename_reg'] = filename
     GLOBALS['pc'] = load_file
 
-def b_cont2_83_d(args, sym, info, handler, k):
+def b_cont2_85_d(args, sym, info, handler, k):
     if true_q(null_q(cdr(args))):
         GLOBALS['k_reg'] = k
         GLOBALS['pc'] = apply_cont2
@@ -2571,19 +2602,19 @@ def b_cont2_83_d(args, sym, info, handler, k):
             GLOBALS['args_reg'] = cdr(args)
             GLOBALS['pc'] = get_primitive
 
-def b_cont2_84_d(ls1, k2):
+def b_cont2_86_d(ls1, k2):
     GLOBALS['value1_reg'] = cons(car(ls1), value1_reg)
     GLOBALS['k_reg'] = k2
     GLOBALS['pc'] = apply_cont2
 
-def b_cont2_85_d(lists, k2):
+def b_cont2_87_d(lists, k2):
     GLOBALS['k2_reg'] = k2
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['ls2_reg'] = value1_reg
     GLOBALS['ls1_reg'] = car(lists)
     GLOBALS['pc'] = append2
 
-def b_cont2_86_d(iterator, proc, env, handler, k):
+def b_cont2_88_d(iterator, proc, env, handler, k):
     GLOBALS['k_reg'] = k
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['handler_reg'] = handler
@@ -2592,7 +2623,7 @@ def b_cont2_86_d(iterator, proc, env, handler, k):
     GLOBALS['proc_reg'] = proc
     GLOBALS['pc'] = iterate_continue
 
-def b_cont2_87_d(iterator, proc, env, handler, k):
+def b_cont2_89_d(iterator, proc, env, handler, k):
     GLOBALS['k_reg'] = make_cont2(b_cont2_34_d, value1_reg, k)
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['handler_reg'] = handler
@@ -2601,7 +2632,7 @@ def b_cont2_87_d(iterator, proc, env, handler, k):
     GLOBALS['proc_reg'] = proc
     GLOBALS['pc'] = iterate_collect_continue
 
-def b_cont2_88_d(list1, proc, env, handler, k):
+def b_cont2_90_d(list1, proc, env, handler, k):
     GLOBALS['k_reg'] = make_cont2(b_cont2_34_d, value1_reg, k)
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['handler_reg'] = handler
@@ -2610,12 +2641,12 @@ def b_cont2_88_d(list1, proc, env, handler, k):
     GLOBALS['proc_reg'] = proc
     GLOBALS['pc'] = map1
 
-def b_cont2_89_d(list1, proc, k):
+def b_cont2_91_d(list1, proc, k):
     GLOBALS['value1_reg'] = cons(dlr_apply(proc, List(car(list1))), value1_reg)
     GLOBALS['k_reg'] = k
     GLOBALS['pc'] = apply_cont2
 
-def b_cont2_90_d(list1, list2, proc, env, handler, k):
+def b_cont2_92_d(list1, list2, proc, env, handler, k):
     GLOBALS['k_reg'] = make_cont2(b_cont2_34_d, value1_reg, k)
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['handler_reg'] = handler
@@ -2625,12 +2656,12 @@ def b_cont2_90_d(list1, list2, proc, env, handler, k):
     GLOBALS['proc_reg'] = proc
     GLOBALS['pc'] = map2
 
-def b_cont2_91_d(list1, list2, proc, k):
+def b_cont2_93_d(list1, list2, proc, k):
     GLOBALS['value1_reg'] = cons(dlr_apply(proc, List(car(list1), car(list2))), value1_reg)
     GLOBALS['k_reg'] = k
     GLOBALS['pc'] = apply_cont2
 
-def b_cont2_92_d(lists, proc, env, handler, k):
+def b_cont2_94_d(lists, proc, env, handler, k):
     GLOBALS['k_reg'] = make_cont2(b_cont2_34_d, value1_reg, k)
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['handler_reg'] = handler
@@ -2639,12 +2670,12 @@ def b_cont2_92_d(lists, proc, env, handler, k):
     GLOBALS['proc_reg'] = proc
     GLOBALS['pc'] = mapN
 
-def b_cont2_93_d(lists, proc, k):
+def b_cont2_95_d(lists, proc, k):
     GLOBALS['value1_reg'] = cons(dlr_apply(proc, Map(car, lists)), value1_reg)
     GLOBALS['k_reg'] = k
     GLOBALS['pc'] = apply_cont2
 
-def b_cont2_94_d(arg_list, proc, env, handler, k):
+def b_cont2_96_d(arg_list, proc, env, handler, k):
     GLOBALS['k_reg'] = k
     GLOBALS['fail_reg'] = value2_reg
     GLOBALS['handler_reg'] = handler
@@ -2653,7 +2684,7 @@ def b_cont2_94_d(arg_list, proc, env, handler, k):
     GLOBALS['proc_reg'] = proc
     GLOBALS['pc'] = for_each_primitive
 
-def b_cont2_95_d(new_acdr1, new_cdr1, s_car, k):
+def b_cont2_97_d(new_acdr1, new_cdr1, s_car, k):
     GLOBALS['k_reg'] = make_cont(b_cont_50_d, s_car, k)
     GLOBALS['ap2_reg'] = value2_reg
     GLOBALS['ap1_reg'] = new_acdr1
@@ -2661,27 +2692,27 @@ def b_cont2_95_d(new_acdr1, new_cdr1, s_car, k):
     GLOBALS['p1_reg'] = new_cdr1
     GLOBALS['pc'] = unify_patterns_hat
 
-def b_cont2_96_d(apair2, pair2, s_car, k):
-    GLOBALS['k2_reg'] = make_cont2(b_cont2_95_d, value2_reg, value1_reg, s_car, k)
+def b_cont2_98_d(apair2, pair2, s_car, k):
+    GLOBALS['k2_reg'] = make_cont2(b_cont2_97_d, value2_reg, value1_reg, s_car, k)
     GLOBALS['ap_reg'] = cdr_hat(apair2)
     GLOBALS['s_reg'] = s_car
     GLOBALS['pattern_reg'] = cdr(pair2)
     GLOBALS['pc'] = instantiate_hat
 
-def b_cont2_97_d(a, aa, ap, k2):
+def b_cont2_99_d(a, aa, ap, k2):
     GLOBALS['value2_reg'] = cons_hat(aa, value2_reg, get_source_info(ap))
     GLOBALS['value1_reg'] = cons(a, value1_reg)
     GLOBALS['k_reg'] = k2
     GLOBALS['pc'] = apply_cont2
 
-def b_cont2_98_d(ap, pattern, s, k2):
-    GLOBALS['k2_reg'] = make_cont2(b_cont2_97_d, value1_reg, value2_reg, ap, k2)
+def b_cont2_100_d(ap, pattern, s, k2):
+    GLOBALS['k2_reg'] = make_cont2(b_cont2_99_d, value1_reg, value2_reg, ap, k2)
     GLOBALS['ap_reg'] = cdr_hat(ap)
     GLOBALS['s_reg'] = s
     GLOBALS['pattern_reg'] = cdr(pattern)
     GLOBALS['pc'] = instantiate_hat
 
-def b_cont2_99_d(s2, k2):
+def b_cont2_101_d(s2, k2):
     GLOBALS['k2_reg'] = k2
     GLOBALS['ap_reg'] = value2_reg
     GLOBALS['s_reg'] = s2
@@ -2723,6 +2754,12 @@ def b_cont3_4_d(rhs_value, k):
     new_fail = make_fail(b_fail_3_d, value2_reg, value1_reg, old_value, value3_reg)
     GLOBALS['value2_reg'] = new_fail
     GLOBALS['value1_reg'] = void_value
+    GLOBALS['k_reg'] = k
+    GLOBALS['pc'] = apply_cont2
+
+def b_cont3_5_d(k):
+    GLOBALS['value1_reg'] = help(get_external_member(value1_reg, value2_reg))
+    GLOBALS['value2_reg'] = value3_reg
     GLOBALS['k_reg'] = k
     GLOBALS['pc'] = apply_cont2
 
@@ -2838,7 +2875,7 @@ def b_cont4_12_d(handler, k2):
         GLOBALS['pc'] = read_error
 
 def b_cont4_13_d(src, env2, handler, k):
-    GLOBALS['k_reg'] = make_cont2(b_cont2_79_d, src, value3_reg, env2, handler, k)
+    GLOBALS['k_reg'] = make_cont2(b_cont2_81_d, src, value3_reg, env2, handler, k)
     GLOBALS['fail_reg'] = value4_reg
     GLOBALS['handler_reg'] = handler
     GLOBALS['senv_reg'] = initial_contours(env2)
@@ -2900,7 +2937,7 @@ def b_handler2_3_d():
 
 def b_handler2_4_d(cexps, cvar, env, handler, k):
     new_env = symbol_undefined
-    new_env = extend(env, List(cvar), List(exception_reg))
+    new_env = extend(env, List(cvar), List(exception_reg), List(""))
     GLOBALS['k_reg'] = k
     GLOBALS['handler_reg'] = handler
     GLOBALS['env_reg'] = new_env
@@ -2908,7 +2945,7 @@ def b_handler2_4_d(cexps, cvar, env, handler, k):
     GLOBALS['pc'] = eval_sequence
 
 def b_handler2_5_d(fexps, env, handler):
-    GLOBALS['k_reg'] = make_cont2(b_cont2_70_d, exception_reg, handler)
+    GLOBALS['k_reg'] = make_cont2(b_cont2_72_d, exception_reg, handler)
     GLOBALS['handler_reg'] = handler
     GLOBALS['env_reg'] = env
     GLOBALS['exps_reg'] = fexps
@@ -2916,7 +2953,7 @@ def b_handler2_5_d(fexps, env, handler):
 
 def b_handler2_6_d(cexps, cvar, fexps, env, handler, k):
     new_env = symbol_undefined
-    new_env = extend(env, List(cvar), List(exception_reg))
+    new_env = extend(env, List(cvar), List(exception_reg), List(""))
     catch_handler = symbol_undefined
     catch_handler = try_finally_handler(fexps, env, handler)
     GLOBALS['k_reg'] = make_cont2(b_cont2_57_d, fexps, env, handler, k)
@@ -2931,7 +2968,7 @@ def apply_proc():
 def b_proc_1_d(bodies, formals, env):
     if true_q(Equal(length(args_reg), length(formals))):
         GLOBALS['k_reg'] = k2_reg
-        GLOBALS['env_reg'] = extend(env, formals, args_reg)
+        GLOBALS['env_reg'] = extend(env, formals, args_reg, make_empty_docstrings(length(args_reg)))
         GLOBALS['exps_reg'] = bodies
         GLOBALS['pc'] = eval_sequence
     else:
@@ -2941,7 +2978,7 @@ def b_proc_1_d(bodies, formals, env):
 def b_proc_2_d(bodies, formals, runt, env):
     if true_q(GreaterThanEqual(length(args_reg), length(formals))):
         new_env = symbol_undefined
-        new_env = extend(env, cons(runt, formals), cons(list_tail(args_reg, length(formals)), list_head(args_reg, length(formals))))
+        new_env = extend(env, cons(runt, formals), cons(list_tail(args_reg, length(formals)), list_head(args_reg, length(formals))), make_empty_docstrings((1) + (length(formals))))
         GLOBALS['k_reg'] = k2_reg
         GLOBALS['env_reg'] = new_env
         GLOBALS['exps_reg'] = bodies
@@ -2954,8 +2991,8 @@ def b_proc_3_d(bodies, name, trace_depth, formals, env):
     if true_q(Equal(length(args_reg), length(formals))):
         printf("~acall: ~s~%", make_trace_depth_string(trace_depth), cons(name, args_reg))
         GLOBALS['trace_depth'] = (trace_depth) + (1)
-        GLOBALS['k_reg'] = make_cont2(b_cont2_71_d, trace_depth, k2_reg)
-        GLOBALS['env_reg'] = extend(env, formals, args_reg)
+        GLOBALS['k_reg'] = make_cont2(b_cont2_73_d, trace_depth, k2_reg)
+        GLOBALS['env_reg'] = extend(env, formals, args_reg, make_empty_docstrings(length(formals)))
         GLOBALS['exps_reg'] = bodies
         GLOBALS['pc'] = eval_sequence
     else:
@@ -2965,10 +3002,10 @@ def b_proc_3_d(bodies, name, trace_depth, formals, env):
 def b_proc_4_d(bodies, name, trace_depth, formals, runt, env):
     if true_q(GreaterThanEqual(length(args_reg), length(formals))):
         new_env = symbol_undefined
-        new_env = extend(env, cons(runt, formals), cons(list_tail(args_reg, length(formals)), list_head(args_reg, length(formals))))
+        new_env = extend(env, cons(runt, formals), cons(list_tail(args_reg, length(formals)), list_head(args_reg, length(formals))), make_empty_docstrings((1) + (length(formals))))
         printf("~acall: ~s~%", make_trace_depth_string(trace_depth), cons(name, args_reg))
         GLOBALS['trace_depth'] = (trace_depth) + (1)
-        GLOBALS['k_reg'] = make_cont2(b_cont2_71_d, trace_depth, k2_reg)
+        GLOBALS['k_reg'] = make_cont2(b_cont2_73_d, trace_depth, k2_reg)
         GLOBALS['env_reg'] = new_env
         GLOBALS['exps_reg'] = bodies
         GLOBALS['pc'] = eval_sequence
@@ -3073,13 +3110,13 @@ def b_proc_14_d():
     GLOBALS['pc'] = apply_cont2
 
 def b_proc_15_d():
-    GLOBALS['k_reg'] = make_cont2(b_cont2_74_d, handler_reg, k2_reg)
+    GLOBALS['k_reg'] = make_cont2(b_cont2_76_d, handler_reg, k2_reg)
     GLOBALS['src_reg'] = symbol_stdin
     GLOBALS['input_reg'] = car(args_reg)
     GLOBALS['pc'] = scan_input
 
 def b_proc_16_d():
-    GLOBALS['k_reg'] = make_cont2(b_cont2_75_d, handler_reg, k2_reg)
+    GLOBALS['k_reg'] = make_cont2(b_cont2_77_d, handler_reg, k2_reg)
     GLOBALS['src_reg'] = symbol_stdin
     GLOBALS['input_reg'] = car(args_reg)
     GLOBALS['pc'] = scan_input
@@ -4024,7 +4061,7 @@ def b_proc_102_d():
         module_name = symbol_undefined
         module_name = cadr(args_reg)
         filename = car(args_reg)
-        GLOBALS['k_reg'] = make_cont2(b_cont2_82_d, filename, handler_reg, k2_reg)
+        GLOBALS['k_reg'] = make_cont2(b_cont2_84_d, filename, handler_reg, k2_reg)
         GLOBALS['env_reg'] = env2_reg
         GLOBALS['var_reg'] = module_name
         GLOBALS['pc'] = lookup_binding_in_first_frame
@@ -5788,8 +5825,8 @@ def close_sexp_sequence():
     else:
         GLOBALS['pc'] = unexpected_token_error
 
-def make_binding(value):
-    return cons(value, "")
+def make_binding(value, docstring):
+    return cons(value, docstring)
 
 def binding_value(binding):
     return car(binding)
@@ -5803,8 +5840,8 @@ def set_binding_value_b(binding, value):
 def set_binding_docstring_b(binding, docstring):
     set_cdr_b(binding, docstring)
 
-def make_frame(variables, values):
-    return List(list_to_vector(Map(make_binding, values)), variables)
+def make_frame(variables, values, docstrings):
+    return List(list_to_vector(Map(make_binding, values, docstrings)), variables)
 
 def empty_frame_q(frame):
     return null_q(cadr(frame))
@@ -5816,10 +5853,10 @@ def environment_q(x):
     return (pair_q(x)) and ((car(x)) is (symbol_environment))
 
 def make_empty_environment():
-    return List(symbol_environment, make_frame(symbol_emptylist, symbol_emptylist))
+    return List(symbol_environment, make_frame(symbol_emptylist, symbol_emptylist, symbol_emptylist))
 
-def make_initial_environment(vars, vals):
-    return List(symbol_environment, make_frame(vars, vals))
+def make_initial_environment(vars, vals, docstrings):
+    return List(symbol_environment, make_frame(vars, vals, docstrings))
 
 def first_frame(env):
     return cadr(env)
@@ -5843,8 +5880,8 @@ def add_binding(new_var, new_binding, frame):
 def set_first_frame_b(env, new_frame):
     set_car_b(cdr(env), new_frame)
 
-def extend(env, variables, values):
-    return cons(symbol_environment, cons(make_frame(variables, values), cdr(env)))
+def extend(env, variables, values, docstrings):
+    return cons(symbol_environment, cons(make_frame(variables, values, docstrings), cdr(env)))
 
 def search_env(env, variable):
     return search_frames(cdr(env), variable)
@@ -5973,7 +6010,7 @@ def lookup_binding_in_first_frame():
         GLOBALS['pc'] = apply_cont2
     else:
         new_binding = symbol_undefined
-        new_binding = make_binding(symbol_undefined)
+        new_binding = make_binding(symbol_undefined, "")
         new_frame = symbol_undefined
         new_frame = add_binding(var_reg, new_binding, frame)
         set_first_frame_b(env_reg, new_frame)
@@ -6109,42 +6146,29 @@ def aparse():
                                             GLOBALS['adatum_reg'] = cadr_hat(adatum_reg)
                                             GLOBALS['pc'] = aparse
                                         else:
-                                            if true_q(assignment_q_hat(adatum_reg)):
-                                                GLOBALS['k_reg'] = make_cont2(b_cont2_25_d, adatum_reg, info, k_reg)
-                                                GLOBALS['adatum_reg'] = caddr_hat(adatum_reg)
-                                                GLOBALS['pc'] = aparse
+                                            if true_q(help_q_hat(adatum_reg)):
+                                                var_info = symbol_undefined
+                                                var_info = get_source_info(cadr_hat(adatum_reg))
+                                                GLOBALS['value2_reg'] = fail_reg
+                                                GLOBALS['value1_reg'] = help_aexp(untag_atom_hat(cadr_hat(adatum_reg)), var_info, info)
+                                                GLOBALS['pc'] = apply_cont2
                                             else:
-                                                if true_q(func_q_hat(adatum_reg)):
-                                                    GLOBALS['k_reg'] = make_cont2(b_cont2_24_d, info, k_reg)
-                                                    GLOBALS['adatum_reg'] = cadr_hat(adatum_reg)
+                                                if true_q(assignment_q_hat(adatum_reg)):
+                                                    GLOBALS['k_reg'] = make_cont2(b_cont2_25_d, adatum_reg, info, k_reg)
+                                                    GLOBALS['adatum_reg'] = caddr_hat(adatum_reg)
                                                     GLOBALS['pc'] = aparse
                                                 else:
-                                                    if true_q(callback_q_hat(adatum_reg)):
-                                                        GLOBALS['k_reg'] = make_cont2(b_cont2_23_d, info, k_reg)
+                                                    if true_q(func_q_hat(adatum_reg)):
+                                                        GLOBALS['k_reg'] = make_cont2(b_cont2_24_d, info, k_reg)
                                                         GLOBALS['adatum_reg'] = cadr_hat(adatum_reg)
                                                         GLOBALS['pc'] = aparse
                                                     else:
-                                                        if true_q(define_q_hat(adatum_reg)):
-                                                            if true_q(mit_style_define_q_hat(adatum_reg)):
-                                                                GLOBALS['k_reg'] = make_cont(b_cont_16_d, senv_reg, info, handler_reg, fail_reg, k_reg)
-                                                                GLOBALS['datum_reg'] = adatum_reg
-                                                                GLOBALS['macro_reg'] = mit_define_transformer_hat
-                                                                GLOBALS['pc'] = apply_macro
-                                                            else:
-                                                                if true_q(Equal(length_hat(adatum_reg), 3)):
-                                                                    GLOBALS['k_reg'] = make_cont2(b_cont2_22_d, adatum_reg, info, k_reg)
-                                                                    GLOBALS['adatum_reg'] = caddr_hat(adatum_reg)
-                                                                    GLOBALS['pc'] = aparse
-                                                                else:
-                                                                    if true_q((Equal(length_hat(adatum_reg), 4)) and (string_q_hat(caddr_hat(adatum_reg)))):
-                                                                        GLOBALS['k_reg'] = make_cont2(b_cont2_21_d, adatum_reg, info, k_reg)
-                                                                        GLOBALS['adatum_reg'] = cadddr_hat(adatum_reg)
-                                                                        GLOBALS['pc'] = aparse
-                                                                    else:
-                                                                        GLOBALS['msg_reg'] = "bad concrete syntax:"
-                                                                        GLOBALS['pc'] = aparse_error
+                                                        if true_q(callback_q_hat(adatum_reg)):
+                                                            GLOBALS['k_reg'] = make_cont2(b_cont2_23_d, info, k_reg)
+                                                            GLOBALS['adatum_reg'] = cadr_hat(adatum_reg)
+                                                            GLOBALS['pc'] = aparse
                                                         else:
-                                                            if true_q(define_b_q_hat(adatum_reg)):
+                                                            if true_q(define_q_hat(adatum_reg)):
                                                                 if true_q(mit_style_define_q_hat(adatum_reg)):
                                                                     GLOBALS['k_reg'] = make_cont(b_cont_16_d, senv_reg, info, handler_reg, fail_reg, k_reg)
                                                                     GLOBALS['datum_reg'] = adatum_reg
@@ -6152,90 +6176,110 @@ def aparse():
                                                                     GLOBALS['pc'] = apply_macro
                                                                 else:
                                                                     if true_q(Equal(length_hat(adatum_reg), 3)):
-                                                                        GLOBALS['k_reg'] = make_cont2(b_cont2_20_d, adatum_reg, info, k_reg)
+                                                                        GLOBALS['k_reg'] = make_cont2(b_cont2_22_d, adatum_reg, info, k_reg)
                                                                         GLOBALS['adatum_reg'] = caddr_hat(adatum_reg)
                                                                         GLOBALS['pc'] = aparse
                                                                     else:
                                                                         if true_q((Equal(length_hat(adatum_reg), 4)) and (string_q_hat(caddr_hat(adatum_reg)))):
-                                                                            GLOBALS['k_reg'] = make_cont2(b_cont2_19_d, adatum_reg, info, k_reg)
+                                                                            GLOBALS['k_reg'] = make_cont2(b_cont2_21_d, adatum_reg, info, k_reg)
                                                                             GLOBALS['adatum_reg'] = cadddr_hat(adatum_reg)
                                                                             GLOBALS['pc'] = aparse
                                                                         else:
                                                                             GLOBALS['msg_reg'] = "bad concrete syntax:"
                                                                             GLOBALS['pc'] = aparse_error
                                                             else:
-                                                                if true_q(define_syntax_q_hat(adatum_reg)):
-                                                                    name = symbol_undefined
-                                                                    aclauses = symbol_undefined
-                                                                    aclauses = cddr_hat(adatum_reg)
-                                                                    name = define_var_hat(adatum_reg)
-                                                                    GLOBALS['k_reg'] = make_cont(b_cont_14_d, aclauses, name, info, fail_reg, k_reg)
-                                                                    GLOBALS['x_reg'] = aclauses
-                                                                    GLOBALS['pc'] = unannotate_cps
-                                                                else:
-                                                                    if true_q(begin_q_hat(adatum_reg)):
-                                                                        if true_q(null_q_hat(cdr_hat(adatum_reg))):
-                                                                            GLOBALS['msg_reg'] = "bad concrete syntax:"
-                                                                            GLOBALS['pc'] = aparse_error
+                                                                if true_q(define_b_q_hat(adatum_reg)):
+                                                                    if true_q(mit_style_define_q_hat(adatum_reg)):
+                                                                        GLOBALS['k_reg'] = make_cont(b_cont_16_d, senv_reg, info, handler_reg, fail_reg, k_reg)
+                                                                        GLOBALS['datum_reg'] = adatum_reg
+                                                                        GLOBALS['macro_reg'] = mit_define_transformer_hat
+                                                                        GLOBALS['pc'] = apply_macro
+                                                                    else:
+                                                                        if true_q(Equal(length_hat(adatum_reg), 3)):
+                                                                            GLOBALS['k_reg'] = make_cont2(b_cont2_20_d, adatum_reg, info, k_reg)
+                                                                            GLOBALS['adatum_reg'] = caddr_hat(adatum_reg)
+                                                                            GLOBALS['pc'] = aparse
                                                                         else:
-                                                                            if true_q(null_q_hat(cddr_hat(adatum_reg))):
-                                                                                GLOBALS['adatum_reg'] = cadr_hat(adatum_reg)
+                                                                            if true_q((Equal(length_hat(adatum_reg), 4)) and (string_q_hat(caddr_hat(adatum_reg)))):
+                                                                                GLOBALS['k_reg'] = make_cont2(b_cont2_19_d, adatum_reg, info, k_reg)
+                                                                                GLOBALS['adatum_reg'] = cadddr_hat(adatum_reg)
                                                                                 GLOBALS['pc'] = aparse
                                                                             else:
-                                                                                GLOBALS['k_reg'] = make_cont2(b_cont2_18_d, info, k_reg)
-                                                                                GLOBALS['adatum_list_reg'] = cdr_hat(adatum_reg)
-                                                                                GLOBALS['pc'] = aparse_all
+                                                                                GLOBALS['msg_reg'] = "bad concrete syntax:"
+                                                                                GLOBALS['pc'] = aparse_error
+                                                                else:
+                                                                    if true_q(define_syntax_q_hat(adatum_reg)):
+                                                                        name = symbol_undefined
+                                                                        aclauses = symbol_undefined
+                                                                        aclauses = cddr_hat(adatum_reg)
+                                                                        name = define_var_hat(adatum_reg)
+                                                                        GLOBALS['k_reg'] = make_cont(b_cont_14_d, aclauses, name, info, fail_reg, k_reg)
+                                                                        GLOBALS['x_reg'] = aclauses
+                                                                        GLOBALS['pc'] = unannotate_cps
                                                                     else:
-                                                                        if true_q(lambda_q_hat(adatum_reg)):
-                                                                            GLOBALS['k_reg'] = make_cont(b_cont_13_d, adatum_reg, senv_reg, info, handler_reg, fail_reg, k_reg)
-                                                                            GLOBALS['x_reg'] = cadr_hat(adatum_reg)
-                                                                            GLOBALS['pc'] = unannotate_cps
+                                                                        if true_q(begin_q_hat(adatum_reg)):
+                                                                            if true_q(null_q_hat(cdr_hat(adatum_reg))):
+                                                                                GLOBALS['msg_reg'] = "bad concrete syntax:"
+                                                                                GLOBALS['pc'] = aparse_error
+                                                                            else:
+                                                                                if true_q(null_q_hat(cddr_hat(adatum_reg))):
+                                                                                    GLOBALS['adatum_reg'] = cadr_hat(adatum_reg)
+                                                                                    GLOBALS['pc'] = aparse
+                                                                                else:
+                                                                                    GLOBALS['k_reg'] = make_cont2(b_cont2_18_d, info, k_reg)
+                                                                                    GLOBALS['adatum_list_reg'] = cdr_hat(adatum_reg)
+                                                                                    GLOBALS['pc'] = aparse_all
                                                                         else:
-                                                                            if true_q(trace_lambda_q_hat(adatum_reg)):
-                                                                                GLOBALS['k_reg'] = make_cont(b_cont_12_d, adatum_reg, senv_reg, info, handler_reg, fail_reg, k_reg)
-                                                                                GLOBALS['x_reg'] = caddr_hat(adatum_reg)
+                                                                            if true_q(lambda_q_hat(adatum_reg)):
+                                                                                GLOBALS['k_reg'] = make_cont(b_cont_13_d, adatum_reg, senv_reg, info, handler_reg, fail_reg, k_reg)
+                                                                                GLOBALS['x_reg'] = cadr_hat(adatum_reg)
                                                                                 GLOBALS['pc'] = unannotate_cps
                                                                             else:
-                                                                                if true_q(try_q_hat(adatum_reg)):
-                                                                                    if true_q(Equal(length_hat(adatum_reg), 2)):
-                                                                                        GLOBALS['adatum_reg'] = try_body_hat(adatum_reg)
-                                                                                        GLOBALS['pc'] = aparse
-                                                                                    else:
-                                                                                        if true_q((Equal(length_hat(adatum_reg), 3)) and (catch_q_hat(caddr_hat(adatum_reg)))):
-                                                                                            GLOBALS['k_reg'] = make_cont2(b_cont2_15_d, adatum_reg, senv_reg, info, handler_reg, k_reg)
+                                                                                if true_q(trace_lambda_q_hat(adatum_reg)):
+                                                                                    GLOBALS['k_reg'] = make_cont(b_cont_12_d, adatum_reg, senv_reg, info, handler_reg, fail_reg, k_reg)
+                                                                                    GLOBALS['x_reg'] = caddr_hat(adatum_reg)
+                                                                                    GLOBALS['pc'] = unannotate_cps
+                                                                                else:
+                                                                                    if true_q(try_q_hat(adatum_reg)):
+                                                                                        if true_q(Equal(length_hat(adatum_reg), 2)):
                                                                                             GLOBALS['adatum_reg'] = try_body_hat(adatum_reg)
                                                                                             GLOBALS['pc'] = aparse
                                                                                         else:
-                                                                                            if true_q((Equal(length_hat(adatum_reg), 3)) and (finally_q_hat(caddr_hat(adatum_reg)))):
-                                                                                                GLOBALS['k_reg'] = make_cont2(b_cont2_13_d, adatum_reg, senv_reg, info, handler_reg, k_reg)
+                                                                                            if true_q((Equal(length_hat(adatum_reg), 3)) and (catch_q_hat(caddr_hat(adatum_reg)))):
+                                                                                                GLOBALS['k_reg'] = make_cont2(b_cont2_15_d, adatum_reg, senv_reg, info, handler_reg, k_reg)
                                                                                                 GLOBALS['adatum_reg'] = try_body_hat(adatum_reg)
                                                                                                 GLOBALS['pc'] = aparse
                                                                                             else:
-                                                                                                if true_q((Equal(length_hat(adatum_reg), 4)) and (catch_q_hat(caddr_hat(adatum_reg))) and (finally_q_hat(cadddr_hat(adatum_reg)))):
-                                                                                                    GLOBALS['k_reg'] = make_cont2(b_cont2_11_d, adatum_reg, senv_reg, info, handler_reg, k_reg)
+                                                                                                if true_q((Equal(length_hat(adatum_reg), 3)) and (finally_q_hat(caddr_hat(adatum_reg)))):
+                                                                                                    GLOBALS['k_reg'] = make_cont2(b_cont2_13_d, adatum_reg, senv_reg, info, handler_reg, k_reg)
                                                                                                     GLOBALS['adatum_reg'] = try_body_hat(adatum_reg)
                                                                                                     GLOBALS['pc'] = aparse
                                                                                                 else:
-                                                                                                    GLOBALS['msg_reg'] = "bad try syntax:"
-                                                                                                    GLOBALS['pc'] = aparse_error
-                                                                                else:
-                                                                                    if true_q(raise_q_hat(adatum_reg)):
-                                                                                        GLOBALS['k_reg'] = make_cont2(b_cont2_8_d, info, k_reg)
-                                                                                        GLOBALS['adatum_reg'] = cadr_hat(adatum_reg)
-                                                                                        GLOBALS['pc'] = aparse
+                                                                                                    if true_q((Equal(length_hat(adatum_reg), 4)) and (catch_q_hat(caddr_hat(adatum_reg))) and (finally_q_hat(cadddr_hat(adatum_reg)))):
+                                                                                                        GLOBALS['k_reg'] = make_cont2(b_cont2_11_d, adatum_reg, senv_reg, info, handler_reg, k_reg)
+                                                                                                        GLOBALS['adatum_reg'] = try_body_hat(adatum_reg)
+                                                                                                        GLOBALS['pc'] = aparse
+                                                                                                    else:
+                                                                                                        GLOBALS['msg_reg'] = "bad try syntax:"
+                                                                                                        GLOBALS['pc'] = aparse_error
                                                                                     else:
-                                                                                        if true_q(choose_q_hat(adatum_reg)):
-                                                                                            GLOBALS['k_reg'] = make_cont2(b_cont2_7_d, info, k_reg)
-                                                                                            GLOBALS['adatum_list_reg'] = cdr_hat(adatum_reg)
-                                                                                            GLOBALS['pc'] = aparse_all
+                                                                                        if true_q(raise_q_hat(adatum_reg)):
+                                                                                            GLOBALS['k_reg'] = make_cont2(b_cont2_8_d, info, k_reg)
+                                                                                            GLOBALS['adatum_reg'] = cadr_hat(adatum_reg)
+                                                                                            GLOBALS['pc'] = aparse
                                                                                         else:
-                                                                                            if true_q(application_q_hat(adatum_reg)):
-                                                                                                GLOBALS['k_reg'] = make_cont2(b_cont2_6_d, adatum_reg, senv_reg, info, handler_reg, k_reg)
-                                                                                                GLOBALS['adatum_reg'] = car_hat(adatum_reg)
-                                                                                                GLOBALS['pc'] = aparse
+                                                                                            if true_q(choose_q_hat(adatum_reg)):
+                                                                                                GLOBALS['k_reg'] = make_cont2(b_cont2_7_d, info, k_reg)
+                                                                                                GLOBALS['adatum_list_reg'] = cdr_hat(adatum_reg)
+                                                                                                GLOBALS['pc'] = aparse_all
                                                                                             else:
-                                                                                                GLOBALS['msg_reg'] = "bad concrete syntax:"
-                                                                                                GLOBALS['pc'] = aparse_error
+                                                                                                if true_q(application_q_hat(adatum_reg)):
+                                                                                                    GLOBALS['k_reg'] = make_cont2(b_cont2_6_d, adatum_reg, senv_reg, info, handler_reg, k_reg)
+                                                                                                    GLOBALS['adatum_reg'] = car_hat(adatum_reg)
+                                                                                                    GLOBALS['pc'] = aparse
+                                                                                                else:
+                                                                                                    GLOBALS['msg_reg'] = "bad concrete syntax:"
+                                                                                                    GLOBALS['pc'] = aparse_error
 
 def aparse_all():
     if true_q(null_q_hat(adatum_list_reg)):
@@ -6379,7 +6423,7 @@ def verify_dd_constructor_fields_hat():
         GLOBALS['pc'] = verify_dd_constructor_fields_hat
 
 def make_macro_env_hat():
-    return make_initial_environment(List(symbol_and, symbol_or, symbol_cond, symbol_let, symbol_letrec, symbol_let_star, symbol_case, symbol_record_case, symbol_define_datatype, symbol_cases), List(and_transformer_hat, or_transformer_hat, cond_transformer_hat, let_transformer_hat, letrec_transformer_hat, let_star_transformer_hat, case_transformer_hat, record_case_transformer_hat, define_datatype_transformer_hat, cases_transformer_hat))
+    return make_initial_environment(List(symbol_and, symbol_or, symbol_cond, symbol_let, symbol_letrec, symbol_let_star, symbol_case, symbol_record_case, symbol_define_datatype, symbol_cases), List(and_transformer_hat, or_transformer_hat, cond_transformer_hat, let_transformer_hat, letrec_transformer_hat, let_star_transformer_hat, case_transformer_hat, record_case_transformer_hat, define_datatype_transformer_hat, cases_transformer_hat), List("", "", "", "", "", "", "", "", "", ""))
 
 def make_pattern_macro_hat(clauses, aclauses):
     return List(symbol_pattern_macro, clauses, aclauses)
@@ -6871,14 +6915,14 @@ def m():
                 if true_q((car(exp_reg)) is (symbol_func_aexp)):
                     exp = symbol_undefined
                     exp = list_ref(exp_reg, 1)
-                    GLOBALS['k_reg'] = make_cont2(b_cont2_67_d, k)
+                    GLOBALS['k_reg'] = make_cont2(b_cont2_69_d, k)
                     GLOBALS['exp_reg'] = exp
                     GLOBALS['pc'] = m
                 else:
                     if true_q((car(exp_reg)) is (symbol_callback_aexp)):
                         exp = symbol_undefined
                         exp = list_ref(exp_reg, 1)
-                        GLOBALS['k_reg'] = make_cont2(b_cont2_66_d, k)
+                        GLOBALS['k_reg'] = make_cont2(b_cont2_68_d, k)
                         GLOBALS['exp_reg'] = exp
                         GLOBALS['pc'] = m
                     else:
@@ -6889,178 +6933,190 @@ def m():
                             else_exp = list_ref(exp_reg, 3)
                             then_exp = list_ref(exp_reg, 2)
                             test_exp = list_ref(exp_reg, 1)
-                            GLOBALS['k_reg'] = make_cont2(b_cont2_65_d, else_exp, then_exp, env_reg, handler_reg, k)
+                            GLOBALS['k_reg'] = make_cont2(b_cont2_67_d, else_exp, then_exp, env_reg, handler_reg, k)
                             GLOBALS['exp_reg'] = test_exp
                             GLOBALS['pc'] = m
                         else:
-                            if true_q((car(exp_reg)) is (symbol_assign_aexp)):
+                            if true_q((car(exp_reg)) is (symbol_help_aexp)):
                                 var = symbol_undefined
-                                rhs_exp = symbol_undefined
                                 var_info = symbol_undefined
-                                var_info = list_ref(exp_reg, 3)
-                                rhs_exp = list_ref(exp_reg, 2)
+                                var_info = list_ref(exp_reg, 2)
                                 var = list_ref(exp_reg, 1)
-                                GLOBALS['k_reg'] = make_cont2(b_cont2_64_d, var, var_info, env_reg, handler_reg, k)
-                                GLOBALS['exp_reg'] = rhs_exp
-                                GLOBALS['pc'] = m
+                                GLOBALS['sk_reg'] = make_cont2(b_cont2_65_d, k)
+                                GLOBALS['dk_reg'] = make_cont3(b_cont3_5_d, k)
+                                GLOBALS['gk_reg'] = make_cont2(b_cont2_66_d, k)
+                                GLOBALS['var_info_reg'] = var_info
+                                GLOBALS['var_reg'] = var
+                                GLOBALS['pc'] = lookup_variable
                             else:
-                                if true_q((car(exp_reg)) is (symbol_define_aexp)):
+                                if true_q((car(exp_reg)) is (symbol_assign_aexp)):
                                     var = symbol_undefined
-                                    docstring = symbol_undefined
                                     rhs_exp = symbol_undefined
-                                    rhs_exp = list_ref(exp_reg, 3)
-                                    docstring = list_ref(exp_reg, 2)
+                                    var_info = symbol_undefined
+                                    var_info = list_ref(exp_reg, 3)
+                                    rhs_exp = list_ref(exp_reg, 2)
                                     var = list_ref(exp_reg, 1)
-                                    GLOBALS['k_reg'] = make_cont2(b_cont2_61_d, docstring, var, env_reg, handler_reg, k)
+                                    GLOBALS['k_reg'] = make_cont2(b_cont2_64_d, var, var_info, env_reg, handler_reg, k)
                                     GLOBALS['exp_reg'] = rhs_exp
                                     GLOBALS['pc'] = m
                                 else:
-                                    if true_q((car(exp_reg)) is (symbol_define_b_aexp)):
+                                    if true_q((car(exp_reg)) is (symbol_define_aexp)):
                                         var = symbol_undefined
                                         docstring = symbol_undefined
                                         rhs_exp = symbol_undefined
                                         rhs_exp = list_ref(exp_reg, 3)
                                         docstring = list_ref(exp_reg, 2)
                                         var = list_ref(exp_reg, 1)
-                                        GLOBALS['k_reg'] = make_cont2(b_cont2_59_d, docstring, var, k)
+                                        GLOBALS['k_reg'] = make_cont2(b_cont2_61_d, docstring, var, env_reg, handler_reg, k)
                                         GLOBALS['exp_reg'] = rhs_exp
                                         GLOBALS['pc'] = m
                                     else:
-                                        if true_q((car(exp_reg)) is (symbol_define_syntax_aexp)):
-                                            name = symbol_undefined
-                                            clauses = symbol_undefined
-                                            aclauses = symbol_undefined
-                                            aclauses = list_ref(exp_reg, 3)
-                                            clauses = list_ref(exp_reg, 2)
-                                            name = list_ref(exp_reg, 1)
-                                            GLOBALS['k_reg'] = make_cont2(b_cont2_58_d, aclauses, clauses, k)
-                                            GLOBALS['env_reg'] = macro_env
-                                            GLOBALS['var_reg'] = name
-                                            GLOBALS['pc'] = lookup_binding_in_first_frame
+                                        if true_q((car(exp_reg)) is (symbol_define_b_aexp)):
+                                            var = symbol_undefined
+                                            docstring = symbol_undefined
+                                            rhs_exp = symbol_undefined
+                                            rhs_exp = list_ref(exp_reg, 3)
+                                            docstring = list_ref(exp_reg, 2)
+                                            var = list_ref(exp_reg, 1)
+                                            GLOBALS['k_reg'] = make_cont2(b_cont2_59_d, docstring, var, k)
+                                            GLOBALS['exp_reg'] = rhs_exp
+                                            GLOBALS['pc'] = m
                                         else:
-                                            if true_q((car(exp_reg)) is (symbol_begin_aexp)):
-                                                exps = symbol_undefined
-                                                exps = list_ref(exp_reg, 1)
-                                                GLOBALS['k_reg'] = k
-                                                GLOBALS['exps_reg'] = exps
-                                                GLOBALS['pc'] = eval_sequence
+                                            if true_q((car(exp_reg)) is (symbol_define_syntax_aexp)):
+                                                name = symbol_undefined
+                                                clauses = symbol_undefined
+                                                aclauses = symbol_undefined
+                                                aclauses = list_ref(exp_reg, 3)
+                                                clauses = list_ref(exp_reg, 2)
+                                                name = list_ref(exp_reg, 1)
+                                                GLOBALS['k_reg'] = make_cont2(b_cont2_58_d, aclauses, clauses, k)
+                                                GLOBALS['env_reg'] = macro_env
+                                                GLOBALS['var_reg'] = name
+                                                GLOBALS['pc'] = lookup_binding_in_first_frame
                                             else:
-                                                if true_q((car(exp_reg)) is (symbol_lambda_aexp)):
-                                                    formals = symbol_undefined
-                                                    bodies = symbol_undefined
-                                                    bodies = list_ref(exp_reg, 2)
-                                                    formals = list_ref(exp_reg, 1)
-                                                    GLOBALS['value2_reg'] = fail_reg
-                                                    GLOBALS['value1_reg'] = closure(formals, bodies, env_reg)
+                                                if true_q((car(exp_reg)) is (symbol_begin_aexp)):
+                                                    exps = symbol_undefined
+                                                    exps = list_ref(exp_reg, 1)
                                                     GLOBALS['k_reg'] = k
-                                                    GLOBALS['pc'] = apply_cont2
+                                                    GLOBALS['exps_reg'] = exps
+                                                    GLOBALS['pc'] = eval_sequence
                                                 else:
-                                                    if true_q((car(exp_reg)) is (symbol_mu_lambda_aexp)):
+                                                    if true_q((car(exp_reg)) is (symbol_lambda_aexp)):
                                                         formals = symbol_undefined
-                                                        runt = symbol_undefined
                                                         bodies = symbol_undefined
-                                                        bodies = list_ref(exp_reg, 3)
-                                                        runt = list_ref(exp_reg, 2)
+                                                        bodies = list_ref(exp_reg, 2)
                                                         formals = list_ref(exp_reg, 1)
                                                         GLOBALS['value2_reg'] = fail_reg
-                                                        GLOBALS['value1_reg'] = mu_closure(formals, runt, bodies, env_reg)
+                                                        GLOBALS['value1_reg'] = closure(formals, bodies, env_reg)
                                                         GLOBALS['k_reg'] = k
                                                         GLOBALS['pc'] = apply_cont2
                                                     else:
-                                                        if true_q((car(exp_reg)) is (symbol_trace_lambda_aexp)):
-                                                            name = symbol_undefined
+                                                        if true_q((car(exp_reg)) is (symbol_mu_lambda_aexp)):
                                                             formals = symbol_undefined
+                                                            runt = symbol_undefined
                                                             bodies = symbol_undefined
                                                             bodies = list_ref(exp_reg, 3)
-                                                            formals = list_ref(exp_reg, 2)
-                                                            name = list_ref(exp_reg, 1)
+                                                            runt = list_ref(exp_reg, 2)
+                                                            formals = list_ref(exp_reg, 1)
                                                             GLOBALS['value2_reg'] = fail_reg
-                                                            GLOBALS['value1_reg'] = trace_closure(name, formals, bodies, env_reg)
+                                                            GLOBALS['value1_reg'] = mu_closure(formals, runt, bodies, env_reg)
                                                             GLOBALS['k_reg'] = k
                                                             GLOBALS['pc'] = apply_cont2
                                                         else:
-                                                            if true_q((car(exp_reg)) is (symbol_mu_trace_lambda_aexp)):
+                                                            if true_q((car(exp_reg)) is (symbol_trace_lambda_aexp)):
                                                                 name = symbol_undefined
                                                                 formals = symbol_undefined
-                                                                runt = symbol_undefined
                                                                 bodies = symbol_undefined
-                                                                bodies = list_ref(exp_reg, 4)
-                                                                runt = list_ref(exp_reg, 3)
+                                                                bodies = list_ref(exp_reg, 3)
                                                                 formals = list_ref(exp_reg, 2)
                                                                 name = list_ref(exp_reg, 1)
                                                                 GLOBALS['value2_reg'] = fail_reg
-                                                                GLOBALS['value1_reg'] = mu_trace_closure(name, formals, runt, bodies, env_reg)
+                                                                GLOBALS['value1_reg'] = trace_closure(name, formals, bodies, env_reg)
                                                                 GLOBALS['k_reg'] = k
                                                                 GLOBALS['pc'] = apply_cont2
                                                             else:
-                                                                if true_q((car(exp_reg)) is (symbol_try_catch_aexp)):
-                                                                    body = symbol_undefined
-                                                                    cvar = symbol_undefined
-                                                                    cexps = symbol_undefined
-                                                                    cexps = list_ref(exp_reg, 3)
-                                                                    cvar = list_ref(exp_reg, 2)
-                                                                    body = list_ref(exp_reg, 1)
-                                                                    new_handler = symbol_undefined
-                                                                    new_handler = try_catch_handler(cvar, cexps, env_reg, handler_reg, k)
+                                                                if true_q((car(exp_reg)) is (symbol_mu_trace_lambda_aexp)):
+                                                                    name = symbol_undefined
+                                                                    formals = symbol_undefined
+                                                                    runt = symbol_undefined
+                                                                    bodies = symbol_undefined
+                                                                    bodies = list_ref(exp_reg, 4)
+                                                                    runt = list_ref(exp_reg, 3)
+                                                                    formals = list_ref(exp_reg, 2)
+                                                                    name = list_ref(exp_reg, 1)
+                                                                    GLOBALS['value2_reg'] = fail_reg
+                                                                    GLOBALS['value1_reg'] = mu_trace_closure(name, formals, runt, bodies, env_reg)
                                                                     GLOBALS['k_reg'] = k
-                                                                    GLOBALS['handler_reg'] = new_handler
-                                                                    GLOBALS['exp_reg'] = body
-                                                                    GLOBALS['pc'] = m
+                                                                    GLOBALS['pc'] = apply_cont2
                                                                 else:
-                                                                    if true_q((car(exp_reg)) is (symbol_try_finally_aexp)):
+                                                                    if true_q((car(exp_reg)) is (symbol_try_catch_aexp)):
                                                                         body = symbol_undefined
-                                                                        fexps = symbol_undefined
-                                                                        fexps = list_ref(exp_reg, 2)
+                                                                        cvar = symbol_undefined
+                                                                        cexps = symbol_undefined
+                                                                        cexps = list_ref(exp_reg, 3)
+                                                                        cvar = list_ref(exp_reg, 2)
                                                                         body = list_ref(exp_reg, 1)
                                                                         new_handler = symbol_undefined
-                                                                        new_handler = try_finally_handler(fexps, env_reg, handler_reg)
-                                                                        GLOBALS['k_reg'] = make_cont2(b_cont2_57_d, fexps, env_reg, handler_reg, k)
+                                                                        new_handler = try_catch_handler(cvar, cexps, env_reg, handler_reg, k)
+                                                                        GLOBALS['k_reg'] = k
                                                                         GLOBALS['handler_reg'] = new_handler
                                                                         GLOBALS['exp_reg'] = body
                                                                         GLOBALS['pc'] = m
                                                                     else:
-                                                                        if true_q((car(exp_reg)) is (symbol_try_catch_finally_aexp)):
+                                                                        if true_q((car(exp_reg)) is (symbol_try_finally_aexp)):
                                                                             body = symbol_undefined
-                                                                            cvar = symbol_undefined
-                                                                            cexps = symbol_undefined
                                                                             fexps = symbol_undefined
-                                                                            fexps = list_ref(exp_reg, 4)
-                                                                            cexps = list_ref(exp_reg, 3)
-                                                                            cvar = list_ref(exp_reg, 2)
+                                                                            fexps = list_ref(exp_reg, 2)
                                                                             body = list_ref(exp_reg, 1)
                                                                             new_handler = symbol_undefined
-                                                                            new_handler = try_catch_finally_handler(cvar, cexps, fexps, env_reg, handler_reg, k)
+                                                                            new_handler = try_finally_handler(fexps, env_reg, handler_reg)
                                                                             GLOBALS['k_reg'] = make_cont2(b_cont2_57_d, fexps, env_reg, handler_reg, k)
                                                                             GLOBALS['handler_reg'] = new_handler
                                                                             GLOBALS['exp_reg'] = body
                                                                             GLOBALS['pc'] = m
                                                                         else:
-                                                                            if true_q((car(exp_reg)) is (symbol_raise_aexp)):
-                                                                                exp = symbol_undefined
-                                                                                exp = list_ref(exp_reg, 1)
-                                                                                GLOBALS['k_reg'] = make_cont2(b_cont2_55_d, handler_reg)
-                                                                                GLOBALS['exp_reg'] = exp
+                                                                            if true_q((car(exp_reg)) is (symbol_try_catch_finally_aexp)):
+                                                                                body = symbol_undefined
+                                                                                cvar = symbol_undefined
+                                                                                cexps = symbol_undefined
+                                                                                fexps = symbol_undefined
+                                                                                fexps = list_ref(exp_reg, 4)
+                                                                                cexps = list_ref(exp_reg, 3)
+                                                                                cvar = list_ref(exp_reg, 2)
+                                                                                body = list_ref(exp_reg, 1)
+                                                                                new_handler = symbol_undefined
+                                                                                new_handler = try_catch_finally_handler(cvar, cexps, fexps, env_reg, handler_reg, k)
+                                                                                GLOBALS['k_reg'] = make_cont2(b_cont2_57_d, fexps, env_reg, handler_reg, k)
+                                                                                GLOBALS['handler_reg'] = new_handler
+                                                                                GLOBALS['exp_reg'] = body
                                                                                 GLOBALS['pc'] = m
                                                                             else:
-                                                                                if true_q((car(exp_reg)) is (symbol_choose_aexp)):
-                                                                                    exps = symbol_undefined
-                                                                                    exps = list_ref(exp_reg, 1)
-                                                                                    GLOBALS['k_reg'] = k
-                                                                                    GLOBALS['exps_reg'] = exps
-                                                                                    GLOBALS['pc'] = eval_choices
+                                                                                if true_q((car(exp_reg)) is (symbol_raise_aexp)):
+                                                                                    exp = symbol_undefined
+                                                                                    exp = list_ref(exp_reg, 1)
+                                                                                    GLOBALS['k_reg'] = make_cont2(b_cont2_55_d, handler_reg)
+                                                                                    GLOBALS['exp_reg'] = exp
+                                                                                    GLOBALS['pc'] = m
                                                                                 else:
-                                                                                    if true_q((car(exp_reg)) is (symbol_app_aexp)):
-                                                                                        operator = symbol_undefined
-                                                                                        operands = symbol_undefined
-                                                                                        info = symbol_undefined
-                                                                                        info = list_ref(exp_reg, 3)
-                                                                                        operands = list_ref(exp_reg, 2)
-                                                                                        operator = list_ref(exp_reg, 1)
-                                                                                        GLOBALS['k_reg'] = make_cont2(b_cont2_54_d, exp_reg, operator, env_reg, info, handler_reg, k)
-                                                                                        GLOBALS['exps_reg'] = operands
-                                                                                        GLOBALS['pc'] = m_star
+                                                                                    if true_q((car(exp_reg)) is (symbol_choose_aexp)):
+                                                                                        exps = symbol_undefined
+                                                                                        exps = list_ref(exp_reg, 1)
+                                                                                        GLOBALS['k_reg'] = k
+                                                                                        GLOBALS['exps_reg'] = exps
+                                                                                        GLOBALS['pc'] = eval_choices
                                                                                     else:
-                                                                                        raise Exception("symbol_m: " + format("bad abstract syntax: '~s'", *[exp_reg]))
+                                                                                        if true_q((car(exp_reg)) is (symbol_app_aexp)):
+                                                                                            operator = symbol_undefined
+                                                                                            operands = symbol_undefined
+                                                                                            info = symbol_undefined
+                                                                                            info = list_ref(exp_reg, 3)
+                                                                                            operands = list_ref(exp_reg, 2)
+                                                                                            operator = list_ref(exp_reg, 1)
+                                                                                            GLOBALS['k_reg'] = make_cont2(b_cont2_54_d, exp_reg, operator, env_reg, info, handler_reg, k)
+                                                                                            GLOBALS['exps_reg'] = operands
+                                                                                            GLOBALS['pc'] = m_star
+                                                                                        else:
+                                                                                            raise Exception("symbol_m: " + format("bad abstract syntax: '~s'", *[exp_reg]))
 
 def make_exception(exception, message, source, line, column):
     return List(exception, message, source, line, column, make_stack_trace())
@@ -7141,7 +7197,7 @@ def m_star():
         GLOBALS['value1_reg'] = symbol_emptylist
         GLOBALS['pc'] = apply_cont2
     else:
-        GLOBALS['k_reg'] = make_cont2(b_cont2_68_d, exps_reg, env_reg, handler_reg, k_reg)
+        GLOBALS['k_reg'] = make_cont2(b_cont2_70_d, exps_reg, env_reg, handler_reg, k_reg)
         GLOBALS['exp_reg'] = car(exps_reg)
         GLOBALS['pc'] = m
 
@@ -7150,7 +7206,7 @@ def eval_sequence():
         GLOBALS['exp_reg'] = car(exps_reg)
         GLOBALS['pc'] = m
     else:
-        GLOBALS['k_reg'] = make_cont2(b_cont2_69_d, exps_reg, env_reg, handler_reg, k_reg)
+        GLOBALS['k_reg'] = make_cont2(b_cont2_71_d, exps_reg, env_reg, handler_reg, k_reg)
         GLOBALS['exp_reg'] = car(exps_reg)
         GLOBALS['pc'] = m
 
@@ -7172,6 +7228,12 @@ def eval_choices():
         GLOBALS['fail_reg'] = new_fail
         GLOBALS['exp_reg'] = car(exps_reg)
         GLOBALS['pc'] = m
+
+def make_empty_docstrings(n):
+    if true_q(Equal(n, 0)):
+        return symbol_emptylist
+    else:
+        return cons("", make_empty_docstrings((n) - (1)))
 
 def closure(formals, bodies, env):
     return make_proc(b_proc_1_d, bodies, formals, env)
@@ -7238,7 +7300,7 @@ def load_file():
                 GLOBALS['pc'] = runtime_error
             else:
                 GLOBALS['load_stack'] = cons(filename_reg, load_stack)
-                GLOBALS['k_reg'] = make_cont2(b_cont2_77_d, filename_reg, env2_reg, handler_reg, k_reg)
+                GLOBALS['k_reg'] = make_cont2(b_cont2_79_d, filename_reg, env2_reg, handler_reg, k_reg)
                 GLOBALS['src_reg'] = filename_reg
                 GLOBALS['input_reg'] = read_content(filename_reg)
                 GLOBALS['pc'] = scan_input
@@ -7258,7 +7320,7 @@ def load_files():
         GLOBALS['value1_reg'] = void_value
         GLOBALS['pc'] = apply_cont2
     else:
-        GLOBALS['k_reg'] = make_cont2(b_cont2_80_d, filenames_reg, env2_reg, info_reg, handler_reg, k_reg)
+        GLOBALS['k_reg'] = make_cont2(b_cont2_82_d, filenames_reg, env2_reg, info_reg, handler_reg, k_reg)
         GLOBALS['filename_reg'] = car(filenames_reg)
         GLOBALS['pc'] = load_file
 
@@ -7284,7 +7346,7 @@ def make_set():
         GLOBALS['k_reg'] = k2_reg
         GLOBALS['pc'] = apply_cont2
     else:
-        GLOBALS['k2_reg'] = make_cont2(b_cont2_81_d, lst_reg, k2_reg)
+        GLOBALS['k2_reg'] = make_cont2(b_cont2_83_d, lst_reg, k2_reg)
         GLOBALS['lst_reg'] = cdr(lst_reg)
         GLOBALS['pc'] = make_set
 
@@ -7335,7 +7397,7 @@ def member_loop():
 def get_primitive():
     sym = symbol_undefined
     sym = car(args_reg)
-    GLOBALS['k_reg'] = make_cont2(b_cont2_83_d, args_reg, sym, info_reg, handler_reg, k_reg)
+    GLOBALS['k_reg'] = make_cont2(b_cont2_85_d, args_reg, sym, info_reg, handler_reg, k_reg)
     GLOBALS['var_info_reg'] = symbol_none
     GLOBALS['var_reg'] = sym
     GLOBALS['pc'] = lookup_value
@@ -7347,7 +7409,7 @@ def append2():
         GLOBALS['k_reg'] = k2_reg
         GLOBALS['pc'] = apply_cont2
     else:
-        GLOBALS['k2_reg'] = make_cont2(b_cont2_84_d, ls1_reg, k2_reg)
+        GLOBALS['k2_reg'] = make_cont2(b_cont2_86_d, ls1_reg, k2_reg)
         GLOBALS['ls1_reg'] = cdr(ls1_reg)
         GLOBALS['pc'] = append2
 
@@ -7368,7 +7430,7 @@ def append_all():
                 GLOBALS['msg_reg'] = format("append called on incorrect list structure ~s", car(lists_reg))
                 GLOBALS['pc'] = runtime_error
             else:
-                GLOBALS['k2_reg'] = make_cont2(b_cont2_85_d, lists_reg, k2_reg)
+                GLOBALS['k2_reg'] = make_cont2(b_cont2_87_d, lists_reg, k2_reg)
                 GLOBALS['lists_reg'] = cdr(lists_reg)
                 GLOBALS['pc'] = append_all
 
@@ -7450,7 +7512,7 @@ def iterate_continue():
         GLOBALS['value1_reg'] = symbol_emptylist
         GLOBALS['pc'] = apply_cont2
     else:
-        GLOBALS['k2_reg'] = make_cont2(b_cont2_86_d, iterator_reg, proc_reg, env_reg, handler_reg, k_reg)
+        GLOBALS['k2_reg'] = make_cont2(b_cont2_88_d, iterator_reg, proc_reg, env_reg, handler_reg, k_reg)
         GLOBALS['info_reg'] = symbol_none
         GLOBALS['env2_reg'] = env_reg
         GLOBALS['args_reg'] = List(item)
@@ -7470,7 +7532,7 @@ def iterate_collect_continue():
         GLOBALS['value1_reg'] = symbol_emptylist
         GLOBALS['pc'] = apply_cont2
     else:
-        GLOBALS['k2_reg'] = make_cont2(b_cont2_87_d, iterator_reg, proc_reg, env_reg, handler_reg, k_reg)
+        GLOBALS['k2_reg'] = make_cont2(b_cont2_89_d, iterator_reg, proc_reg, env_reg, handler_reg, k_reg)
         GLOBALS['info_reg'] = symbol_none
         GLOBALS['env2_reg'] = env_reg
         GLOBALS['args_reg'] = List(item)
@@ -7483,11 +7545,11 @@ def map1():
         GLOBALS['pc'] = apply_cont2
     else:
         if true_q(dlr_proc_q(proc_reg)):
-            GLOBALS['k_reg'] = make_cont2(b_cont2_89_d, list1_reg, proc_reg, k_reg)
+            GLOBALS['k_reg'] = make_cont2(b_cont2_91_d, list1_reg, proc_reg, k_reg)
             GLOBALS['list1_reg'] = cdr(list1_reg)
             GLOBALS['pc'] = map1
         else:
-            GLOBALS['k2_reg'] = make_cont2(b_cont2_88_d, list1_reg, proc_reg, env_reg, handler_reg, k_reg)
+            GLOBALS['k2_reg'] = make_cont2(b_cont2_90_d, list1_reg, proc_reg, env_reg, handler_reg, k_reg)
             GLOBALS['info_reg'] = symbol_none
             GLOBALS['env2_reg'] = env_reg
             GLOBALS['args_reg'] = List(car(list1_reg))
@@ -7500,12 +7562,12 @@ def map2():
         GLOBALS['pc'] = apply_cont2
     else:
         if true_q(dlr_proc_q(proc_reg)):
-            GLOBALS['k_reg'] = make_cont2(b_cont2_91_d, list1_reg, list2_reg, proc_reg, k_reg)
+            GLOBALS['k_reg'] = make_cont2(b_cont2_93_d, list1_reg, list2_reg, proc_reg, k_reg)
             GLOBALS['list2_reg'] = cdr(list2_reg)
             GLOBALS['list1_reg'] = cdr(list1_reg)
             GLOBALS['pc'] = map2
         else:
-            GLOBALS['k2_reg'] = make_cont2(b_cont2_90_d, list1_reg, list2_reg, proc_reg, env_reg, handler_reg, k_reg)
+            GLOBALS['k2_reg'] = make_cont2(b_cont2_92_d, list1_reg, list2_reg, proc_reg, env_reg, handler_reg, k_reg)
             GLOBALS['info_reg'] = symbol_none
             GLOBALS['env2_reg'] = env_reg
             GLOBALS['args_reg'] = List(car(list1_reg), car(list2_reg))
@@ -7518,11 +7580,11 @@ def mapN():
         GLOBALS['pc'] = apply_cont2
     else:
         if true_q(dlr_proc_q(proc_reg)):
-            GLOBALS['k_reg'] = make_cont2(b_cont2_93_d, lists_reg, proc_reg, k_reg)
+            GLOBALS['k_reg'] = make_cont2(b_cont2_95_d, lists_reg, proc_reg, k_reg)
             GLOBALS['lists_reg'] = Map(cdr, lists_reg)
             GLOBALS['pc'] = mapN
         else:
-            GLOBALS['k2_reg'] = make_cont2(b_cont2_92_d, lists_reg, proc_reg, env_reg, handler_reg, k_reg)
+            GLOBALS['k2_reg'] = make_cont2(b_cont2_94_d, lists_reg, proc_reg, env_reg, handler_reg, k_reg)
             GLOBALS['info_reg'] = symbol_none
             GLOBALS['env2_reg'] = env_reg
             GLOBALS['args_reg'] = Map(car, lists_reg)
@@ -7545,7 +7607,7 @@ def for_each_primitive():
                 GLOBALS['lists_reg'] = Map(cdr, arg_list)
                 GLOBALS['pc'] = for_each_primitive
             else:
-                GLOBALS['k2_reg'] = make_cont2(b_cont2_94_d, arg_list, proc_reg, env_reg, handler_reg, k_reg)
+                GLOBALS['k2_reg'] = make_cont2(b_cont2_96_d, arg_list, proc_reg, env_reg, handler_reg, k_reg)
                 GLOBALS['info_reg'] = symbol_none
                 GLOBALS['env2_reg'] = env_reg
                 GLOBALS['args_reg'] = Map(car, arg_list)
@@ -7553,8 +7615,8 @@ def for_each_primitive():
 
 def make_toplevel_env():
     primitives = symbol_undefined
-    primitives = List(List(symbol_multiply, times_prim), List(symbol_plus, plus_prim), List(symbol_minus, minus_prim), List(symbol_divide, divide_prim), List(symbol_div, quotient_prim), List(symbol_p, modulo_prim), List(symbol_mod, modulo_prim), List(symbol_modulo, modulo_prim), List(symbol___, quotient_prim), List(symbol_quotient, quotient_prim), List(symbol_LessThan, lt_prim), List(symbol_LessThanEqual, lt_or_eq_prim), List(symbol_Equal, equal_sign_prim), List(symbol_GreaterThan, gt_prim), List(symbol_GreaterThanEqual, gt_or_eq_prim), List(symbol_abort, abort_prim), List(symbol_abs, abs_prim), List(symbol_append, append_prim), List(symbol_Apply, apply_prim), List(symbol_assv, assv_prim), List(symbol_boolean_q, boolean_q_prim), List(symbol_caddr, caddr_prim), List(symbol_cadr, cadr_prim), List(symbol_call_with_current_continuation, call_cc_prim), List(symbol_call_cc, call_cc_prim), List(symbol_car, car_prim), List(symbol_cdr, cdr_prim), List(symbol_caaaar, caaaar_prim), List(symbol_caaadr, caaadr_prim), List(symbol_caaar, caaar_prim), List(symbol_caadar, caadar_prim), List(symbol_caaddr, caaddr_prim), List(symbol_caadr, caadr_prim), List(symbol_caar, caar_prim), List(symbol_cadaar, cadaar_prim), List(symbol_cadadr, cadadr_prim), List(symbol_cadar, cadar_prim), List(symbol_caddar, caddar_prim), List(symbol_cadddr, cadddr_prim), List(symbol_cdaaar, cdaaar_prim), List(symbol_cdaadr, cdaadr_prim), List(symbol_cdaar, cdaar_prim), List(symbol_cdadar, cdadar_prim), List(symbol_cdaddr, cdaddr_prim), List(symbol_cdadr, cdadr_prim), List(symbol_cdar, cdar_prim), List(symbol_cddaar, cddaar_prim), List(symbol_cddadr, cddadr_prim), List(symbol_cddar, cddar_prim), List(symbol_cdddar, cdddar_prim), List(symbol_cddddr, cddddr_prim), List(symbol_cdddr, cdddr_prim), List(symbol_cddr, cddr_prim), List(symbol_char_q, char_q_prim), List(symbol_char_is__q, char_is__q_prim), List(symbol_char_whitespace_q, char_whitespace_q_prim), List(symbol_char_alphabetic_q, char_alphabetic_q_prim), List(symbol_char_numeric_q, char_numeric_q_prim), List(symbol_char_to_integer, char_to_integer_prim), List(symbol_cons, cons_prim), List(symbol_current_time, current_time_prim), List(symbol_cut, cut_prim), List(symbol_dir, dir_prim), List(symbol_display, display_prim), List(symbol_current_environment, current_environment_prim), List(symbol_eq_q, eq_q_prim), List(symbol_equal_q, equal_q_prim), List(symbol_error, error_prim), List(symbol_eval, eval_prim), List(symbol_eval_ast, eval_ast_prim), List(symbol_exit, exit_prim), List(symbol_for_each, for_each_prim), List(symbol_format, format_prim), List(symbol_get, get_prim), List(symbol_get_stack_trace, get_stack_trace_prim), List(symbol_load_as, load_as_prim), List(symbol_integer_to_char, integer_to_char_prim), List(symbol_length, length_prim), List(symbol_List, list_prim), List(symbol_list_to_vector, list_to_vector_prim), List(symbol_list_to_string, list_to_string_prim), List(symbol_list_ref, list_ref_prim), List(symbol_load, load_prim), List(symbol_min, min_prim), List(symbol_max, max_prim), List(symbol_make_set, make_set_prim), List(symbol_make_vector, make_vector_prim), List(symbol_Map, map_prim), List(symbol_member, member_prim), List(symbol_memq, memq_prim), List(symbol_memv, memv_prim), List(symbol_newline, newline_prim), List(symbol_not, not_prim), List(symbol_null_q, null_q_prim), List(symbol_number_to_string, number_to_string_prim), List(symbol_number_q, number_q_prim), List(symbol_pair_q, pair_q_prim), List(symbol_parse, parse_prim), List(symbol_parse_string, parse_string_prim), List(symbol_print, print_prim), List(symbol_printf, printf_prim), List(symbol_Range, range_prim), List(symbol_read_string, read_string_prim), List(symbol_require, require_prim), List(symbol_reverse, reverse_prim), List(symbol_set_car_b, set_car_b_prim), List(symbol_set_cdr_b, set_cdr_b_prim), List(symbol_snoc, snoc_prim), List(symbol_rac, rac_prim), List(symbol_rdc, rdc_prim), List(symbol_sqrt, sqrt_prim), List(symbol_odd_q, odd_q_prim), List(symbol_even_q, even_q_prim), List(symbol_remainder, remainder_prim), List(symbol_string, string_prim), List(symbol_string_length, string_length_prim), List(symbol_string_ref, string_ref_prim), List(symbol_string_q, string_q_prim), List(symbol_string_to_number, string_to_number_prim), List(symbol_string_is__q, string_is__q_prim), List(symbol_substring, substring_prim), List(symbol_symbol_q, symbol_q_prim), List(symbol_unparse, unparse_prim), List(symbol_unparse_procedure, unparse_procedure_prim), List(symbol_import, import_prim), List(symbol_use_stack_trace, use_stack_trace_prim), List(symbol_vector, vector_prim), List(symbol_vector_ref, vector_ref_prim), List(symbol_vector_set_b, vector_set_b_prim), List(symbol_void, void_prim), List(symbol_zero_q, zero_q_prim), List(symbol_current_directory, current_directory_prim), List(symbol_cd, current_directory_prim), List(symbol_round, round_prim), List(symbol_char_to_string, char_to_string_prim), List(symbol_string_to_list, string_to_list_prim), List(symbol_string_to_symbol, string_to_symbol_prim), List(symbol_symbol_to_string, symbol_to_string_prim), List(symbol_vector_to_list, vector_to_list_prim), List(symbol_eqv_q, eqv_q_prim), List(symbol_vector_q, vector_q_prim), List(symbol_atom_q, atom_q_prim), List(symbol_iter_q, iter_q_prim), List(symbol_list_q, list_q_prim), List(symbol_procedure_q, procedure_q_prim), List(symbol_stringLessThan_q, stringLessThan_q_prim), List(symbol_float, float_prim), List(symbol_globals, globals_prim), List(symbol_int_, int_prim), List(symbol_apply_with_keywords, apply_with_keywords_prim), List(symbol_assq, assq_prim), List(symbol_dict, dict_prim), List(symbol_property, property_prim), List(symbol_rational, rational_prim), List(symbol_reset_toplevel_env, reset_toplevel_env_prim), List(symbol_sort, sort_prim), List(symbol_string_append, string_append_prim), List(symbol_string_split, string_split_prim), List(symbol_symbol, symbol_prim), List(symbol_typeof, typeof_prim), List(symbol_use_lexical_address, use_lexical_address_prim), List(symbol_use_tracing, use_tracing_prim))
-    return make_initial_env_extended(Map(car, primitives), Map(cadr, primitives))
+    primitives = List(List(symbol_multiply, times_prim, ""), List(symbol_plus, plus_prim, ""), List(symbol_minus, minus_prim, ""), List(symbol_divide, divide_prim, ""), List(symbol_div, quotient_prim, ""), List(symbol_p, modulo_prim, ""), List(symbol_mod, modulo_prim, ""), List(symbol_modulo, modulo_prim, ""), List(symbol___, quotient_prim, ""), List(symbol_quotient, quotient_prim, ""), List(symbol_LessThan, lt_prim, ""), List(symbol_LessThanEqual, lt_or_eq_prim, ""), List(symbol_Equal, equal_sign_prim, ""), List(symbol_GreaterThan, gt_prim, ""), List(symbol_GreaterThanEqual, gt_or_eq_prim, ""), List(symbol_abort, abort_prim, ""), List(symbol_abs, abs_prim, ""), List(symbol_append, append_prim, ""), List(symbol_Apply, apply_prim, ""), List(symbol_assv, assv_prim, ""), List(symbol_boolean_q, boolean_q_prim, ""), List(symbol_caddr, caddr_prim, ""), List(symbol_cadr, cadr_prim, ""), List(symbol_call_with_current_continuation, call_cc_prim, ""), List(symbol_call_cc, call_cc_prim, ""), List(symbol_car, car_prim, "(car LIST) returns the first element of LIST"), List(symbol_cdr, cdr_prim, ""), List(symbol_caaaar, caaaar_prim, ""), List(symbol_caaadr, caaadr_prim, ""), List(symbol_caaar, caaar_prim, ""), List(symbol_caadar, caadar_prim, ""), List(symbol_caaddr, caaddr_prim, ""), List(symbol_caadr, caadr_prim, ""), List(symbol_caar, caar_prim, ""), List(symbol_cadaar, cadaar_prim, ""), List(symbol_cadadr, cadadr_prim, ""), List(symbol_cadar, cadar_prim, ""), List(symbol_caddar, caddar_prim, ""), List(symbol_cadddr, cadddr_prim, ""), List(symbol_cdaaar, cdaaar_prim, ""), List(symbol_cdaadr, cdaadr_prim, ""), List(symbol_cdaar, cdaar_prim, ""), List(symbol_cdadar, cdadar_prim, ""), List(symbol_cdaddr, cdaddr_prim, ""), List(symbol_cdadr, cdadr_prim, ""), List(symbol_cdar, cdar_prim, ""), List(symbol_cddaar, cddaar_prim, ""), List(symbol_cddadr, cddadr_prim, ""), List(symbol_cddar, cddar_prim, ""), List(symbol_cdddar, cdddar_prim, ""), List(symbol_cddddr, cddddr_prim, ""), List(symbol_cdddr, cdddr_prim, ""), List(symbol_cddr, cddr_prim, ""), List(symbol_char_q, char_q_prim, ""), List(symbol_char_is__q, char_is__q_prim, ""), List(symbol_char_whitespace_q, char_whitespace_q_prim, ""), List(symbol_char_alphabetic_q, char_alphabetic_q_prim, ""), List(symbol_char_numeric_q, char_numeric_q_prim, ""), List(symbol_char_to_integer, char_to_integer_prim, ""), List(symbol_cons, cons_prim, ""), List(symbol_current_time, current_time_prim, ""), List(symbol_cut, cut_prim, ""), List(symbol_dir, dir_prim, ""), List(symbol_display, display_prim, ""), List(symbol_current_environment, current_environment_prim, ""), List(symbol_eq_q, eq_q_prim, ""), List(symbol_equal_q, equal_q_prim, ""), List(symbol_error, error_prim, ""), List(symbol_eval, eval_prim, ""), List(symbol_eval_ast, eval_ast_prim, ""), List(symbol_exit, exit_prim, ""), List(symbol_for_each, for_each_prim, ""), List(symbol_format, format_prim, ""), List(symbol_get, get_prim, ""), List(symbol_get_stack_trace, get_stack_trace_prim, ""), List(symbol_load_as, load_as_prim, ""), List(symbol_integer_to_char, integer_to_char_prim, ""), List(symbol_length, length_prim, ""), List(symbol_List, list_prim, ""), List(symbol_list_to_vector, list_to_vector_prim, ""), List(symbol_list_to_string, list_to_string_prim, ""), List(symbol_list_ref, list_ref_prim, ""), List(symbol_load, load_prim, ""), List(symbol_min, min_prim, ""), List(symbol_max, max_prim, ""), List(symbol_make_set, make_set_prim, ""), List(symbol_make_vector, make_vector_prim, ""), List(symbol_Map, map_prim, ""), List(symbol_member, member_prim, ""), List(symbol_memq, memq_prim, ""), List(symbol_memv, memv_prim, ""), List(symbol_newline, newline_prim, ""), List(symbol_not, not_prim, ""), List(symbol_null_q, null_q_prim, ""), List(symbol_number_to_string, number_to_string_prim, ""), List(symbol_number_q, number_q_prim, ""), List(symbol_pair_q, pair_q_prim, ""), List(symbol_parse, parse_prim, ""), List(symbol_parse_string, parse_string_prim, ""), List(symbol_print, print_prim, ""), List(symbol_printf, printf_prim, ""), List(symbol_Range, range_prim, ""), List(symbol_read_string, read_string_prim, ""), List(symbol_require, require_prim, ""), List(symbol_reverse, reverse_prim, ""), List(symbol_set_car_b, set_car_b_prim, ""), List(symbol_set_cdr_b, set_cdr_b_prim, ""), List(symbol_snoc, snoc_prim, ""), List(symbol_rac, rac_prim, ""), List(symbol_rdc, rdc_prim, ""), List(symbol_sqrt, sqrt_prim, ""), List(symbol_odd_q, odd_q_prim, ""), List(symbol_even_q, even_q_prim, ""), List(symbol_remainder, remainder_prim, ""), List(symbol_string, string_prim, ""), List(symbol_string_length, string_length_prim, ""), List(symbol_string_ref, string_ref_prim, ""), List(symbol_string_q, string_q_prim, ""), List(symbol_string_to_number, string_to_number_prim, ""), List(symbol_string_is__q, string_is__q_prim, ""), List(symbol_substring, substring_prim, ""), List(symbol_symbol_q, symbol_q_prim, ""), List(symbol_unparse, unparse_prim, ""), List(symbol_unparse_procedure, unparse_procedure_prim, ""), List(symbol_import, import_prim, ""), List(symbol_use_stack_trace, use_stack_trace_prim, ""), List(symbol_vector, vector_prim, ""), List(symbol_vector_ref, vector_ref_prim, ""), List(symbol_vector_set_b, vector_set_b_prim, ""), List(symbol_void, void_prim, ""), List(symbol_zero_q, zero_q_prim, ""), List(symbol_current_directory, current_directory_prim, ""), List(symbol_cd, current_directory_prim, ""), List(symbol_round, round_prim, ""), List(symbol_char_to_string, char_to_string_prim, ""), List(symbol_string_to_list, string_to_list_prim, ""), List(symbol_string_to_symbol, string_to_symbol_prim, ""), List(symbol_symbol_to_string, symbol_to_string_prim, ""), List(symbol_vector_to_list, vector_to_list_prim, ""), List(symbol_eqv_q, eqv_q_prim, ""), List(symbol_vector_q, vector_q_prim, ""), List(symbol_atom_q, atom_q_prim, ""), List(symbol_iter_q, iter_q_prim, ""), List(symbol_list_q, list_q_prim, ""), List(symbol_procedure_q, procedure_q_prim, ""), List(symbol_stringLessThan_q, stringLessThan_q_prim, ""), List(symbol_float, float_prim, ""), List(symbol_globals, globals_prim, ""), List(symbol_int_, int_prim, ""), List(symbol_apply_with_keywords, apply_with_keywords_prim, ""), List(symbol_assq, assq_prim, ""), List(symbol_dict, dict_prim, ""), List(symbol_property, property_prim, ""), List(symbol_rational, rational_prim, ""), List(symbol_reset_toplevel_env, reset_toplevel_env_prim, ""), List(symbol_sort, sort_prim, ""), List(symbol_string_append, string_append_prim, ""), List(symbol_string_split, string_split_prim, ""), List(symbol_symbol, symbol_prim, ""), List(symbol_typeof, typeof_prim, ""), List(symbol_use_lexical_address, use_lexical_address_prim, ""), List(symbol_use_tracing, use_tracing_prim, ""))
+    return make_initial_env_extended(Map(car, primitives), Map(cadr, primitives), Map(caddr, primitives))
 
 def reset_toplevel_env():
     GLOBALS['toplevel_env'] = make_toplevel_env()
@@ -7642,7 +7704,7 @@ def instantiate_hat():
             GLOBALS['pc'] = apply_sub_hat
         else:
             if true_q(pair_q(pattern_reg)):
-                GLOBALS['k2_reg'] = make_cont2(b_cont2_98_d, ap_reg, pattern_reg, s_reg, k2_reg)
+                GLOBALS['k2_reg'] = make_cont2(b_cont2_100_d, ap_reg, pattern_reg, s_reg, k2_reg)
                 GLOBALS['ap_reg'] = car_hat(ap_reg)
                 GLOBALS['pattern_reg'] = car(pattern_reg)
                 GLOBALS['pc'] = instantiate_hat
@@ -7685,7 +7747,7 @@ def apply_sub_hat():
                 s2 = symbol_undefined
                 s2 = list_ref(temp_1, 2)
                 s1 = list_ref(temp_1, 1)
-                GLOBALS['k2_reg'] = make_cont2(b_cont2_99_d, s2, k2_reg)
+                GLOBALS['k2_reg'] = make_cont2(b_cont2_101_d, s2, k2_reg)
                 GLOBALS['s_reg'] = s1
                 GLOBALS['pc'] = apply_sub_hat
             else:
@@ -7711,6 +7773,7 @@ unquote_q_hat = tagged_list_hat(symbol_unquote, GreaterThanEqual, 2)
 unquote_splicing_q_hat = tagged_list_hat(symbol_unquote_splicing, GreaterThanEqual, 2)
 if_then_q_hat = tagged_list_hat(symbol_if, Equal, 3)
 if_else_q_hat = tagged_list_hat(symbol_if, Equal, 4)
+help_q_hat = tagged_list_hat(symbol_help, Equal, 2)
 assignment_q_hat = tagged_list_hat(symbol_set_b, Equal, 3)
 func_q_hat = tagged_list_hat(symbol_func, Equal, 2)
 callback_q_hat = tagged_list_hat(symbol_callback, Equal, 2)

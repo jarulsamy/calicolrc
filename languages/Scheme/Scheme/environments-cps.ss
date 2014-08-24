@@ -9,8 +9,8 @@
 ;; bindings
 
 (define make-binding
-  (lambda (value)
-    (cons value "")))
+  (lambda (value docstring)
+    (cons value docstring)))
 
 (define binding-value
   (lambda (binding)
@@ -31,8 +31,8 @@
 ;; frames
 
 (define make-frame
-  (lambda (variables values)
-    (list (list->vector (map make-binding values)) variables)))
+  (lambda (variables values docstrings)
+    (list (list->vector (map make-binding values docstrings)) variables)))
 
 (define empty-frame?
   (lambda (frame)
@@ -52,11 +52,11 @@
 
 (define make-empty-environment
   (lambda ()
-    (list 'environment (make-frame '() '()))))
+    (list 'environment (make-frame '() '() '()))))
 
 (define make-initial-environment
-  (lambda (vars vals)
-    (list 'environment (make-frame vars vals))))
+  (lambda (vars vals docstrings)
+    (list 'environment (make-frame vars vals docstrings))))
 
 (define first-frame
   (lambda (env)
@@ -88,8 +88,8 @@
     (set-car! (cdr env) new-frame)))
 
 (define extend
-  (lambda (env variables values)
-    (cons 'environment (cons (make-frame variables values) (cdr env)))))
+  (lambda (env variables values docstrings)
+    (cons 'environment (cons (make-frame variables values docstrings) (cdr env)))))
 
 ;; variable lookup
 
@@ -197,7 +197,7 @@
       (let ((binding (search-frame frame var)))
         (if binding
 	  (k binding fail)
-	  (let ((new-binding (make-binding 'undefined)))
+	  (let ((new-binding (make-binding 'undefined "")))
 	    (let ((new-frame (add-binding var new-binding frame)))
 	      (set-first-frame! env new-frame)
 	      (k new-binding fail))))))))

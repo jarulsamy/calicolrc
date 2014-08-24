@@ -101,10 +101,10 @@ def make_char(c):
 
 void_value = make_symbol("<void>")
 
-def make_initial_env_extended(names, procs):
+def make_initial_env_extended(names, procs, docstrings):
     ## If you wish to extend the environment to 
     ## include native values, do so here:
-    return make_initial_environment(names, procs)
+    return make_initial_environment(names, procs, docstrings)
 
 ### Lists:
 
@@ -183,16 +183,31 @@ def length(lyst):
         raise Exception("not a proper list")
     return count
 
-def Map(f, lyst):
-    retval = symbol_emptylist
-    current = lyst
-    while isinstance(current, cons):
-        retval = cons(f(current.car), retval)
-        current = current.cdr
-    if current != symbol_emptylist:
-        raise Exception("not a proper list")
-    # FIXME: rewrite without reverse
-    return reverse(retval)
+def Map(f, lyst, lyst2=None):
+    if lyst2 is None:
+        retval = symbol_emptylist
+        current = lyst
+        while isinstance(current, cons):
+            retval = cons(f(current.car), retval)
+            current = current.cdr
+        if current != symbol_emptylist:
+            raise Exception("not a proper list")
+        # FIXME: rewrite without reverse
+        return reverse(retval)
+    else:
+        retval = symbol_emptylist
+        current1 = lyst
+        current2 = lyst2
+        while isinstance(current1, cons) and isinstance(current2, cons):
+            retval = cons(f(current1.car, current2.car), retval)
+            current1 = current1.cdr
+            current2 = current2.cdr
+        if current1 != symbol_emptylist:
+            raise Exception("not a proper list")
+        if current2 != symbol_emptylist:
+            raise Exception("not a proper list")
+        # FIXME: rewrite without reverse
+        return reverse(retval)
 
 def for_each(f, lyst):
     current = lyst
