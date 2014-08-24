@@ -4,9 +4,9 @@
 
 from calico import Magic
 
-class MagicsMagic(Magic):
-    name = "magics"
-    help_lines = [" %magics - show installed magics"]
+class MagicMagic(Magic):
+    name = "magic"
+    help_lines = [" %magic - show installed magics"]
 
     def line(self, args):
         retval = []
@@ -30,6 +30,6 @@ class MagicsMagic(Magic):
         self.kernel.Print("")
 
 def register_magics(magics):
-    magics[MagicsMagic.name] = MagicsMagic
+    magics[MagicMagic.name] = MagicMagic
     
 
