@@ -366,18 +366,23 @@ public class SimScribbler : Myro.Robot
 		{ 
 			//
 		}
-
 		public override void penDown (string color)
-		{ 
+		 {
 			frame.outline = new Graphics.Color (color);
+			frame.setPenColor(new Graphics.Color(color));
 			frame.penDown ();
 		}
 
+	  //
 		public override Graphics.Line penUp ()
 		{ 
-			return frame.penUp ();
+			return penUp (null);
 		}
 
+		public override Graphics.Line penUp (string fillColor)
+		{ 
+			return frame.penUp (fillColor);
+		}
 
 		public override void update () {
 		    // Go through all of the delegates that have built up, and run them

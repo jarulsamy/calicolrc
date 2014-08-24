@@ -1819,11 +1819,19 @@ public static class Myro
 	public static Graphics.Line penUp ()
 	{
 	    if (robot != null) 
-		return robot.penUp ();
+		return robot.penUp (null);
 	    else
 		throw new Exception("Robot has not been initialized");
 	}
   
+  public static Graphics.Line penUp (string fillColor)
+	{
+	    if (robot != null) 
+		return robot.penUp (fillColor);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
 	[method: JigsawTab("M/Advanced 3")]
 	public static void togglecam ()
 	{
@@ -3841,6 +3849,11 @@ public static class Myro
 		{
 		  return null;
 		}
+		public virtual Graphics.Line penUp (string fillColor)
+		{
+		  return null;
+		}
+
 	  
 	       //arduino
 	       public virtual void pinMode (int port, int mode)

@@ -1,3 +1,4 @@
+
 /*
 Calico - Scripting Environment
 
@@ -3248,12 +3249,13 @@ public static class Graphics
 		    return penUp(false, null);
 		}
 
-	        public Line penUp (Color fillColor)
+	        public Line penUp (string fillColor)
 	        {
 		    return penUp(false, fillColor);
 		}
+	  //testing
     
-	        public Line penUp (bool getLine, Color fillColor)
+	        public Line penUp (bool getLine, string fillColor)
 		{
 		  if (pen.down) {
 		    if (getLine) {
@@ -3263,7 +3265,7 @@ public static class Graphics
 			  if (fillColor == null)
 			      line.fill = null;
 			  else
-			      line.fill = fillColor;
+			    line.fill =new Color(fillColor);
 			  return line;
 		    } else {
 			  if (window != null) {
@@ -3273,7 +3275,7 @@ public static class Graphics
 			    if (fillColor == null)
 				line.fill = null;
 			    else
-				line.fill = fillColor;
+			      line.fill = new Color(fillColor);
 			    line.draw(window);
 			  }
 			  return null;
