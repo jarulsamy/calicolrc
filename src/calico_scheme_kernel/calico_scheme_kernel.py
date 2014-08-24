@@ -113,7 +113,8 @@ MAIN FEATURES
         token = ""
         current = end - 1
         while current >= 0:
-            if code[current] == "(":
+            # go backwards until we find beginning of token:
+            if code[current] in ["(", " ", ")", "\n", "\t", '"', ]:
                 return (token, current + 1, end)
             token = code[current] + token
             current -= 1
@@ -140,18 +141,20 @@ MAIN FEATURES
                 item_str = str(item)
                 if item_str.startswith(token):
                     content["matches"].append(item_str)
-        # special forms:
+        # special forms and constants:
         for item in ["define", "define!", "func", "callback", "if",
                      "help", "define-syntax", "begin", "lambda", "trace-lambda",
                      "try", "catch", "finally", "raise", "choose"]:
             if item.startswith(token):
                 content["matches"].append(item)
         # from magics:
-        for magic in self.magics.values():
-            for help_line in magic.help_lines:
-                item = help_line.split("-", 1)[0].strip().split(" ", 1)[0]
-                if item.startswith(token):
-                    content["matches"].append(item)
+        if code.startswith("%"):
+            for magic in self.magics.values():
+                for help_line in magic.help_lines:
+                    item = help_line.split("-", 1)[0].strip().split(" ", 1)[0]
+                    if item.startswith(token):
+                        content["matches"].append(item)
+        content["matches"] = sorted(content["matches"])
         return content
 
     def do_inspect(self, code, cursor_pos, detail_level=0):
@@ -174,14 +177,20 @@ MAIN FEATURES
         
     def set_variable(self, name, value):
         """
-        Set a variable in the kernel language.
+        Set a variable in the kernel's enviroment.
         """
         pass
 
     def get_help_on(self, expr, level):
-        result = calico.scheme.execute_string_rm("(help %s)" % expr)
-        if not calico.scheme.exception_q(result):
-            return result
+        if expr.startswith("%"):
+            magic = expr.strip().split("%")[-1]
+            return "\n".join(self.magics[magic].help_lines)
+        else:
+            result = calico.scheme.execute_string_rm("(help %s)" % expr)
+            if not calico.scheme.exception_q(result):
+                return result
+            else:
+                return "No available help on '%s'" % expr
 
     def repr(self, item):
         if isinstance(item, list): # a scheme vector
