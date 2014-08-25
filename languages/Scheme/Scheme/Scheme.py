@@ -777,17 +777,21 @@ def box(item):
     return List(item)
 
 def ready_to_eval(text):
-    lines = text.split()
-    if lines[-1].strip() == "":
-      return True ## force it
-    ## else, only if valid parse
-    return try_parse(text)
+    if text:
+        lines = text.split("\n")
+        if len(lines) > 0 and lines[-1].strip() == "":
+            return True ## force it
+        ## else, only if valid parse
+        return try_parse(text)
+    return True
 
 # native:
 def read_multiline(prompt):
     retval = ""
     while True:
         try:
+            if retval:
+                retval += "\n"
             retval += raw_input(prompt) ## Python 2
             prompt = "... "
         except EOFError:

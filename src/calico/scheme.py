@@ -785,17 +785,22 @@ def box(item):
     return List(item)
 
 def ready_to_eval(text):
-    lines = text.split()
-    if lines[-1].strip() == "":
-      return True ## force it
-    ## else, only if valid parse
-    return try_parse(text)
+    print("ready_to_eval: %s" % repr(text))
+    if text:
+        lines = text.split("\n")
+        if len(lines) > 0 and lines[-1].strip() == "":
+            return True ## force it
+        ## else, only if valid parse
+        return try_parse(text)
+    return True
 
 # native:
 def read_multiline(prompt):
     retval = ""
     while True:
         try:
+            if retval:
+                retval += "\n"
             retval += raw_input(prompt) ## Python 2
             prompt = "... "
         except EOFError:
@@ -6730,27 +6735,32 @@ def handle_exception(exc):
     return void_value
 
 def get_traceback_string(exc):
-    error_type = symbol_undefined
-    message = symbol_undefined
-    src_file = symbol_undefined
-    src_line = symbol_undefined
-    src_col = symbol_undefined
-    stack = symbol_undefined
-    retval = symbol_undefined
-    retval = ""
-    stack = cadddr(cddr(cadr(exc)))
-    src_col = cadddr(cdr(cadr(exc)))
-    src_line = cadddr(cadr(exc))
-    src_file = caddr(cadr(exc))
-    message = cadr(cadr(exc))
-    error_type = car(cadr(exc))
-    retval = string_append(retval, format("~%Traceback (most recent call last):~%"))
-    while not(null_q(stack)):
-        retval = string_append(retval, format_exception_line(car(stack)))
-        stack = cdr(stack)
-    if true_q(not((src_file) is (symbol_none))):
-        retval = string_append(retval, format("  File \"~a\", line ~a, col ~a~%", src_file, src_line, src_col))
-    return string_append(retval, format("~a: ~a~%", error_type, message))
+    if true_q(list_q(cadr(exc))):
+        error_type = symbol_undefined
+        message = symbol_undefined
+        src_file = symbol_undefined
+        src_line = symbol_undefined
+        src_col = symbol_undefined
+        stack = symbol_undefined
+        retval = symbol_undefined
+        retval = ""
+        stack = cadddr(cddr(cadr(exc)))
+        src_col = cadddr(cdr(cadr(exc)))
+        src_line = cadddr(cadr(exc))
+        src_file = caddr(cadr(exc))
+        message = cadr(cadr(exc))
+        error_type = car(cadr(exc))
+        retval = string_append(retval, format("~%Traceback (most recent call last):~%"))
+        while not(null_q(stack)):
+            retval = string_append(retval, format_exception_line(car(stack)))
+            stack = cdr(stack)
+        if true_q(not((src_file) is (symbol_none))):
+            retval = string_append(retval, format("  File \"~a\", line ~a, col ~a~%", src_file, src_line, src_col))
+        return string_append(retval, format("~a: ~a~%", error_type, message))
+    else:
+        retval = symbol_undefined
+        retval = format("~%Traceback (most recent call last):~%")
+        return string_append(retval, format("Raised Exception: ~a~%", cadr(exc)))
 
 def format_exception_line(line):
     if true_q(list_q(line)):

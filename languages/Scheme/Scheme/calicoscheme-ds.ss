@@ -6004,34 +6004,40 @@
 
 (define get-traceback-string
   (lambda (exc)
-    (let ((error-type (car (cadr exc)))
-          (message (cadr (cadr exc)))
-          (src-file (caddr (cadr exc)))
-          (src-line (cadddr (cadr exc)))
-          (src-col (cadddr (cdr (cadr exc))))
-          (stack (cadddr (cddr (cadr exc))))
-          (retval ""))
-      (set! retval
-        (string-append
-          retval
-          (format "~%Traceback (most recent call last):~%")))
-      (while
-        (not (null? stack))
-        (set! retval
-          (string-append retval (format-exception-line (car stack))))
-        (set! stack (cdr stack)))
-      (if (not (eq? src-file 'none))
+    (if (list? (cadr exc))
+        (let ((error-type (car (cadr exc)))
+              (message (cadr (cadr exc)))
+              (src-file (caddr (cadr exc)))
+              (src-line (cadddr (cadr exc)))
+              (src-col (cadddr (cdr (cadr exc))))
+              (stack (cadddr (cddr (cadr exc))))
+              (retval ""))
           (set! retval
             (string-append
               retval
-              (format
-                "  File \"~a\", line ~a, col ~a~%"
-                src-file
-                src-line
-                src-col))))
-      (string-append
-        retval
-        (format "~a: ~a~%" error-type message)))))
+              (format "~%Traceback (most recent call last):~%")))
+          (while
+            (not (null? stack))
+            (set! retval
+              (string-append retval (format-exception-line (car stack))))
+            (set! stack (cdr stack)))
+          (if (not (eq? src-file 'none))
+              (set! retval
+                (string-append
+                  retval
+                  (format
+                    "  File \"~a\", line ~a, col ~a~%"
+                    src-file
+                    src-line
+                    src-col))))
+          (string-append
+            retval
+            (format "~a: ~a~%" error-type message)))
+        (let ((retval (format
+                        "~%Traceback (most recent call last):~%")))
+          (string-append
+            retval
+            (format "Raised Exception: ~a~%" (cadr exc)))))))
 
 (define format-exception-line
   (lambda (line)

@@ -6842,42 +6842,50 @@
 
 (define get-traceback-string
   (lambda (exc)
-    (let ((error-type 'undefined)
-          (message 'undefined)
-          (src-file 'undefined)
-          (src-line 'undefined)
-          (src-col 'undefined)
-          (stack 'undefined)
-          (retval 'undefined))
-      (set! retval "")
-      (set! stack (cadddr (cddr (cadr exc))))
-      (set! src-col (cadddr (cdr (cadr exc))))
-      (set! src-line (cadddr (cadr exc)))
-      (set! src-file (caddr (cadr exc)))
-      (set! message (cadr (cadr exc)))
-      (set! error-type (car (cadr exc)))
-      (set! retval
-        (string-append
-          retval
-          (format "~%Traceback (most recent call last):~%")))
-      (while
-        (not (null? stack))
-        (set! retval
-          (string-append retval (format-exception-line (car stack))))
-        (set! stack (cdr stack)))
-      (if (not (eq? src-file 'none))
+    (if (list? (cadr exc))
+        (let ((error-type 'undefined)
+              (message 'undefined)
+              (src-file 'undefined)
+              (src-line 'undefined)
+              (src-col 'undefined)
+              (stack 'undefined)
+              (retval 'undefined))
+          (set! retval "")
+          (set! stack (cadddr (cddr (cadr exc))))
+          (set! src-col (cadddr (cdr (cadr exc))))
+          (set! src-line (cadddr (cadr exc)))
+          (set! src-file (caddr (cadr exc)))
+          (set! message (cadr (cadr exc)))
+          (set! error-type (car (cadr exc)))
           (set! retval
             (string-append
               retval
-              (format
-                "  File \"~a\", line ~a, col ~a~%"
-                src-file
-                src-line
-                src-col))))
-      (return*
-        (string-append
-          retval
-          (format "~a: ~a~%" error-type message))))))
+              (format "~%Traceback (most recent call last):~%")))
+          (while
+            (not (null? stack))
+            (set! retval
+              (string-append retval (format-exception-line (car stack))))
+            (set! stack (cdr stack)))
+          (if (not (eq? src-file 'none))
+              (set! retval
+                (string-append
+                  retval
+                  (format
+                    "  File \"~a\", line ~a, col ~a~%"
+                    src-file
+                    src-line
+                    src-col))))
+          (return*
+            (string-append
+              retval
+              (format "~a: ~a~%" error-type message))))
+        (let ((retval 'undefined))
+          (set! retval
+            (format "~%Traceback (most recent call last):~%"))
+          (return*
+            (string-append
+              retval
+              (format "Raised Exception: ~a~%" (cadr exc))))))))
 
 (define format-exception-line
   (lambda (line)
