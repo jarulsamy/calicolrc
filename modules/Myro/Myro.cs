@@ -1819,7 +1819,15 @@ public static class Myro
 	public static Graphics.Line penUp ()
 	{
 	    if (robot != null) 
-		return robot.penUp ();
+		return robot.penUp (null);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+
+	public static Graphics.Line penUp (object fillColor)
+	{
+	    if (robot != null) 
+		return robot.penUp (fillColor);
 	    else
 		throw new Exception("Robot has not been initialized");
 	}
@@ -3838,6 +3846,11 @@ public static class Myro
 		}
 
 		public virtual Graphics.Line penUp ()
+		{
+		  return null;
+		}
+
+		public virtual Graphics.Line penUp (object fillColor)
 		{
 		  return null;
 		}

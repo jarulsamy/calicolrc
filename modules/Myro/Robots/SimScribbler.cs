@@ -373,9 +373,9 @@ public class SimScribbler : Myro.Robot
 			frame.penDown ();
 		}
 
-		public override Graphics.Line penUp ()
+		public override Graphics.Line penUp (object fillColor)
 		{ 
-			return frame.penUp ();
+			return frame.penUp (fillColor);
 		}
 
 
