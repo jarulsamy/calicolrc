@@ -110,7 +110,7 @@ MAIN FEATURES
 """
 
     def add_complete(self, matches, token):
-        # from the environment:
+        # from the language environment:
         slist = calico.scheme.execute_string_rm("(dir)")
         if not calico.scheme.exception_q(slist):
             for item in slist:
@@ -123,6 +123,20 @@ MAIN FEATURES
                      "try", "catch", "finally", "raise", "choose"]:
             if item.startswith(token):
                 matches.append(item)
+        # add items from calico.scheme.ENVIRONMENT
+        for item in calico.scheme.ENVIRONMENT:
+            if item.startswith(token) and token not in matches:
+                matches.append(item)
+        # add properties and attributes if token is "numpy.ar"
+        if "." in token:
+            components, partial = token.rsplit(".", 1)
+            slist = calico.scheme.execute_string_rm("(dir %s)" % components)
+            if not calico.scheme.exception_q(slist):
+                for item in slist:
+                    item_str = str(item)
+                    if item_str.startswith(partial):
+                        matches.append(components + "." + item_str)
+        # done with language-specific completitions
 
     def do_inspect(self, code, cursor_pos, detail_level=0):
         # Object introspection
@@ -146,7 +160,7 @@ MAIN FEATURES
         """
         Set a variable in the kernel's enviroment.
         """
-        pass
+        calico.scheme.ENVIRONMENT[name] = value
 
     def get_help_on(self, expr, level):
         result = calico.scheme.execute_string_rm("(help %s)" % expr)
