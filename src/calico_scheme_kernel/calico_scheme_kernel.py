@@ -1,6 +1,6 @@
 from __future__ import print_function
 
-from calico import MagicKernel
+from jupyter_kernel import MagicKernel
 import calico.scheme
 import os
 import logging
@@ -109,53 +109,20 @@ MAIN FEATURES
   magic %cd command can be used to go to any entry in that list.
 """
 
-    def get_complete(self, code, start, end):
-        token = ""
-        current = end - 1
-        while current >= 0:
-            # go backwards until we find beginning of token:
-            if code[current] in ["(", " ", ")", "\n", "\t", '"', ]:
-                return (token, current + 1, end)
-            token = code[current] + token
-            current -= 1
-        return (token, start, end)
-
-    def do_complete(self, code, cursor_pos):
-        # Code completion
-        # Parameters:	
-        # code (str) – The code already present
-        # cursor_pos (int) – The position in the code where completion is requested
-        token, start, end = self.get_complete(code, 0, cursor_pos)
-        content = {
-            'matches' : [],
-            'cursor_start' : start,
-            'cursor_end' : end,
-            'metadata' : {},
-            'status' : 'ok'
-        }
-        start = cursor_pos - len(code)
+    def add_complete(self, matches, token):
         # from the environment:
         slist = calico.scheme.execute_string_rm("(dir)")
         if not calico.scheme.exception_q(slist):
             for item in slist:
                 item_str = str(item)
                 if item_str.startswith(token):
-                    content["matches"].append(item_str)
+                    matches.append(item_str)
         # special forms and constants:
         for item in ["define", "define!", "func", "callback", "if",
                      "help", "define-syntax", "begin", "lambda", "trace-lambda",
                      "try", "catch", "finally", "raise", "choose"]:
             if item.startswith(token):
-                content["matches"].append(item)
-        # from magics:
-        if code.startswith("%"):
-            for magic in self.magics.values():
-                for help_line in magic.help_lines:
-                    item = help_line.split("-", 1)[0].strip().split(" ", 1)[0]
-                    if item.startswith(token):
-                        content["matches"].append(item)
-        content["matches"] = sorted(content["matches"])
-        return content
+                matches.append(item)
 
     def do_inspect(self, code, cursor_pos, detail_level=0):
         # Object introspection
@@ -182,15 +149,32 @@ MAIN FEATURES
         pass
 
     def get_help_on(self, expr, level):
-        if expr.startswith("%"):
-            magic = expr.strip().split("%")[-1]
-            return "\n".join(self.magics[magic].help_lines)
+        result = calico.scheme.execute_string_rm("(help %s)" % expr)
+        if not calico.scheme.exception_q(result):
+            return result
+        elif expr in ["define", "define!", "func", "callback", "if",
+                     "help", "define-syntax", "begin", "lambda", "trace-lambda",
+                     "try", "catch", "finally", "raise", "choose"]:
+            help_text = {
+                "define": "(define NAME [DOCSTRING] VALUE) define a global variable (special form)", 
+                "define!": "(define! NAME [DOCSTRING] VALUE) define a variable in the host system (special form)", 
+                "func": "(func PROCEDURE) for wrapping Scheme procedures as a system function (special form)", 
+                "callback": "(callback PROCEDURE) returns a host system function for system callbacks (special form)", 
+                "if": "(if TEXT-EXPR TRUE-EXPR FALSE-EXPR) (special form)",
+                "help": "(help ITEM) (special form)", 
+                "define-syntax": "(define-syntax NAME NAME-TEST ...) (special form)", 
+                "begin": "(begin EXPR...) (special form)", 
+                "lambda": "(lambda (VAR...) EXPR...) or (lambda VAR EXPR...) (special form)", 
+                "trace-lambda": "(trace-lambda NAME (VAR...) EXPR...) or (trace-lambda NAME VAR EXPR...) (special form)",
+                "try": "(try EXPR (catch EXCEPTION NAME ...)...) (special form)", 
+                "catch": "(try EXPR (catch EXCEPTION NAME ...) ...) (special form)", 
+                "finally": "(try EXPR (catch EXCEPTION NAME ...)... (finally ...)) (special form)", 
+                "raise": "(raise EXCEPTION) (special form)", 
+                "choose": "Use (choose ITEM...) to setup non-deterministic interpreter, or use (choose) to go to next choice (special form)"
+            }
+            return help_text[expr]
         else:
-            result = calico.scheme.execute_string_rm("(help %s)" % expr)
-            if not calico.scheme.exception_q(result):
-                return result
-            else:
-                return "No available help on '%s'" % expr
+            return "No available help on '%s'" % expr
 
     def repr(self, item):
         if isinstance(item, list): # a scheme vector
