@@ -1,6 +1,3 @@
-from .magickernel import MagicKernel
-from .magic import Magic
 
-__all__ = ['Magic', 'MagicKernel', 'scheme', 'graphics']
+__all__ = ['scheme', 'graphics']
 
-del magic, magickernel
