@@ -90,6 +90,12 @@ class Symbol(object):
         # So that EmptyList will be treated as []
         return 0
 
+    def __getattr__(self, attr):
+        if hasattr(self.name, attr):
+            return getattr(self.name, attr)
+        else:
+            raise AttributeError
+
 SYMBOLS = {}
 CHARS = {}
 
@@ -954,7 +960,7 @@ def import_native(libraries, environment):
     return reverse(retval)
 
 def dlr_proc_q(item):
-    return callable(item) or hasattr(item, "MoveNext")
+    return (callable(item) and not isinstance(item, cons)) or hasattr(item, "MoveNext")
 
 def dlr_env_contains(item):
     return item.name in ENVIRONMENT
