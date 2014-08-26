@@ -60,6 +60,7 @@
 (define-native set-global-value! (lambda (var x) #f))
 (define-native set-global-docstring! (lambda (var x) #f))
 (define-native import-native (lambda ignore #f))
+(define-native import-as-native (lambda ignore #f))
 (define-native iterator? (lambda ignore #f))
 (define-native get_type (lambda (x) 'unknown))
 (define-native char->string (lambda (c) (string c)))
@@ -2048,6 +2049,11 @@
   (lambda-proc (args env2 info handler fail k2)
     (k2 (import-native args env2) fail)))
 
+;; import
+(define import-as-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (k2 (import-as-native (car args) (cadr args) env2) fail)))
+
 ;; not
 (define not-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -2437,7 +2443,8 @@
 	    (list 'symbol? symbol?-prim "(symbol? ITEM): return #t if ITEM is a symbol, #f otherwise")
 	    (list 'unparse unparse-prim "(unparse AST): ")    
 	    (list 'unparse-procedure unparse-procedure-prim "(unparse-procedure ...): ")  ;; unparse should be in CPS
-	    (list 'import import-prim "(import MODULE): import a host-system module; MODULE is a string")
+	    (list 'import import-prim "(import MODULE...): import host-system modules; MODULEs are strings")
+	    (list 'import-as import-as-prim "(import-as MODULE NAME): import a host-system module; MODULE is a string, and NAME is a symbol")
 	    (list 'use-stack-trace use-stack-trace-prim "(use-stack-trace BOOLEAN): set stack-trace usage on/off")
 	    (list 'vector vector-prim "(vector [ITEMS]...): return ITEMs as a vector")
 	    (list 'vector-ref vector-ref-prim "(vector-ref VECTOR INDEX): ")

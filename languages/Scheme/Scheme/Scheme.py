@@ -951,13 +951,20 @@ def apply_with_keywords(*args):
     pass
 
 def import_native(libraries, environment):
-    retval = symbol_emptylist
+    env = {}
     for library in libraries:
-        lib = __import__(library)
-        sym = make_symbol(library)
-        set_global_value_b(sym, lib)
-        retval = cons(sym, retval)
-    return reverse(retval)
+        exec ("import %s" % library) in env
+    ENVIRONMENT.update(env)
+    return List(*[make_symbol(name) for name in env.keys() if not name.startswith("_")])
+
+def import_as_native(library, name, environment):
+    env = {}
+    if name == make_symbol("*"):
+        exec ("from %s import *" % library) in env
+    else:
+        exec ("import %s as %s" % (library, name)) in env
+    ENVIRONMENT.update(env)
+    return List(*[make_symbol(name) for name in env.keys() if not name.startswith("_")])
 
 def dlr_proc_q(item):
     return (callable(item) and not isinstance(item, cons)) or hasattr(item, "MoveNext")
