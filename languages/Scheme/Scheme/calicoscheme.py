@@ -64,9 +64,13 @@ class Char(object):
     def __gt__(self, other):
         return isinstance(other, Char) and self.char > other.char
     def __str__(self):
+        if self.char == " ":
+            return "#\\space"
+        elif self.char == "\n":
+            return "#\\newline"
         return "#\\%s" % self.char
     def __repr__(self):
-        return "#\\%s" % self.char
+        return str(self)
 
 class Symbol(object):
     def __init__(self, name):
@@ -137,6 +141,12 @@ class cons(object):
         if current != symbol_emptylist:
             retval += " . " + make_safe(current)
         return "(%s)" % retval
+
+    def __call__(self, *args, **kwargs):
+        if self.car is symbol_procedure:
+            return dlr_func(self)(*args, **kwargs)
+        else:
+            raise Exception("not a procedure")
 
     def __iter__(self):
         cp = cons(self.car, self.cdr)
@@ -785,7 +795,6 @@ def box(item):
     return List(item)
 
 def ready_to_eval(text):
-    print("ready_to_eval: %s" % repr(text))
     if text:
         lines = text.split("\n")
         if len(lines) > 0 and lines[-1].strip() == "":

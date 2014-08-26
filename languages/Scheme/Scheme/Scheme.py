@@ -134,6 +134,12 @@ class cons(object):
             retval += " . " + make_safe(current)
         return "(%s)" % retval
 
+    def __call__(self, *args, **kwargs):
+        if self.car is symbol_procedure:
+            return dlr_func(self)(*args, **kwargs)
+        else:
+            raise Exception("not a procedure")
+
     def __iter__(self):
         cp = cons(self.car, self.cdr)
         cp.current = cp
