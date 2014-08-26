@@ -213,8 +213,7 @@ define( function () {
 	var link = document.createElement("link");
 	link.type = "text/css";
 	link.rel = "stylesheet";
-	var version = IPython.version.substring(0, 1);
-	var path = (version === "2") ? '/nbextensions/calico-cell-tools.css' : '../nbextensions/calico-cell-tools.css';
+	var path = 'nbextensions/calico-cell-tools.css';
 	link.href = require.toUrl(path);
 	document.getElementsByTagName("head")[0].appendChild(link);
     };
