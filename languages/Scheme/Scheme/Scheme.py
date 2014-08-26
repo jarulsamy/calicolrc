@@ -56,9 +56,13 @@ class Char(object):
     def __gt__(self, other):
         return isinstance(other, Char) and self.char > other.char
     def __str__(self):
+        if self.char == " ":
+            return "#\\space"
+        elif self.char == "\n":
+            return "#\\newline"
         return "#\\%s" % self.char
     def __repr__(self):
-        return "#\\%s" % self.char
+        return str(self)
 
 class Symbol(object):
     def __init__(self, name):
