@@ -13,7 +13,7 @@ setup(name='calico',
       author='Douglas Blank',
       author_email='doug.blank@gmail.com',
       url="https://bitbucket.org/ipre/calico/src/master/src/",
-      packages=['calico'],
+      packages=['calico', 'calico.widgets'],
       classifiers = [
           'Framework :: IPython',
           'License :: OSI Approved :: BSD License',
