@@ -3,6 +3,10 @@ from io import BytesIO
 from IPython.core import display
 from PIL import Image
 
+from .camera import Camera
+
+__all__ = ['Camera']
+
 def display_pil_image(im):
    """Displayhook function for PIL Images, rendered as PNG."""
 
@@ -15,5 +19,8 @@ def display_pil_image(im):
 
 
 # register display func with PNG formatter:
-png_formatter = get_ipython().display_formatter.formatters['image/png']
-dpi = png_formatter.for_type(Image.Image, display_pil_image)
+try:
+   png_formatter = get_ipython().display_formatter.formatters['image/png']
+   dpi = png_formatter.for_type(Image.Image, display_pil_image)
+except:
+   pass # not in an IPython client
