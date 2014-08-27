@@ -115,17 +115,17 @@ MAIN FEATURES
         if not calico.scheme.exception_q(slist):
             for item in slist:
                 item_str = str(item)
-                if item_str.startswith(token):
+                if item_str.startswith(token) and item_str not in matches:
                     matches.append(item_str)
         # special forms and constants:
         for item in ["define", "define!", "func", "callback", "if",
                      "help", "define-syntax", "begin", "lambda", "trace-lambda",
                      "try", "catch", "finally", "raise", "choose"]:
-            if item.startswith(token):
+            if item.startswith(token) and item not in matches:
                 matches.append(item)
         # add items from calico.scheme.ENVIRONMENT
         for item in calico.scheme.ENVIRONMENT:
-            if item.startswith(token) and token not in matches:
+            if item.startswith(token) and item not in matches:
                 matches.append(item)
         # add properties and attributes if token is "numpy.ar"
         if "." in token:
@@ -134,7 +134,7 @@ MAIN FEATURES
             if not calico.scheme.exception_q(slist):
                 for item in slist:
                     item_str = str(item)
-                    if item_str.startswith(partial):
+                    if item_str.startswith(partial) and item_str not in matches:
                         matches.append(components + "." + item_str)
         # done with language-specific completitions
 
