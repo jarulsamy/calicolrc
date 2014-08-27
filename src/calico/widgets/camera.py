@@ -1,6 +1,12 @@
 from IPython.html.widgets import DOMWidget
 from IPython.utils.traitlets import Unicode, Bytes, Instance
-from IPython.display import display, Javascript
+from IPython.display import Javascript
+
+try:
+    import jupyter_kernel
+    display = jupyter_kernel.get_jupyter().Display
+except:
+    from IPython.display import display
 
 import base64
 from PIL import Image
