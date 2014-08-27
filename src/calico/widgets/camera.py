@@ -13,7 +13,7 @@ class Camera(DOMWidget):
     _view_name = Unicode('CameraView', sync=True)
     image_uri = Unicode('', sync=True)
     image_array = Instance(ndarray)
-    image = Instance(Image.Image)
+    ##image = Instance(Image.Image)
 
     def __init__(self, *args, **kwargs):
         super(Camera, self).__init__(*args, **kwargs)
@@ -21,9 +21,14 @@ class Camera(DOMWidget):
         time.sleep(.1)
 
     def _image_uri_changed(self, name, new):
-        head, data = new.split(',', 1)
-        self.image = Image.open(StringIO.StringIO(base64.b64decode(data)))
-        self.image_array = array(self.image)
+        head, self.data = new.split(',', 1)
+
+    def get_image(self):
+        return Image.open(StringIO.StringIO(base64.b64decode(self.data)))
+
+    def get_array(self):
+        im = self.get_image()
+        self.image_array = array(im)
 
     def get_javascript(self):
         return """   require(["widgets/js/widget"], function(WidgetManager){
@@ -90,6 +95,5 @@ class Camera(DOMWidget):
 		
 		});"""
 
-
-	def click():
+	def click(self):
 	    display(Javascript("document.getElementById('picture_button').click();"))
