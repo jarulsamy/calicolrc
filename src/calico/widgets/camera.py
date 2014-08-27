@@ -17,6 +17,7 @@ class Camera(DOMWidget):
 
     def __init__(self, *args, **kwargs):
         super(Camera, self).__init__(*args, **kwargs)
+        self.data = None
         display(Javascript(self.get_javascript()))
         time.sleep(.1)
 
