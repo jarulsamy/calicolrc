@@ -198,8 +198,15 @@ MAIN FEATURES
             retval = repr(item)
             if retval.startswith("#"):
                 return retval
-            items = " ".join(map(self.repr, item))
-            return "(%s)" % items
+            retval = []
+            current = item
+            while isinstance(current, calico.scheme.cons): 
+                retval.append(self.repr(current.car))
+                current = current.cdr
+            retval = " ".join(retval)
+            if current != calico.scheme.symbol_emptylist:
+                retval += " . " + self.repr(current)
+            return "(%s)" % retval
         elif isinstance(item, str):
             retval = repr(item)
             if retval.startswith("'"):
