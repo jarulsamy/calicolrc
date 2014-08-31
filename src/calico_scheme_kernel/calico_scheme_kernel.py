@@ -138,16 +138,6 @@ MAIN FEATURES
                         matches.append(components + "." + item_str)
         # done with language-specific completitions
 
-    def do_inspect(self, code, cursor_pos, detail_level=0):
-        # Object introspection
-        content = {'status': 'aborted', 'data': {}, 'found': False}
-        docstring = "Help!"
-        if docstring:
-            content["data"] = self.formatter(docstring)
-            content["status"] = "ok"
-            content["found"] = True
-        return content
-
     def help_patterns(self):
         # Longest first:
         return [
