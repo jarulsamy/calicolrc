@@ -140,11 +140,12 @@ MAIN FEATURES
 
     def do_inspect(self, code, cursor_pos, detail_level=0):
         # Object introspection
-        content = {'status': 'aborted', 'data': dict(), 'metadata': dict()}
+        content = {'status': 'aborted', 'data': {}, 'found': False}
         docstring = "Help!"
         if docstring:
             content["data"] = self.formatter(docstring)
             content["status"] = "ok"
+            content["found"] = True
         return content
 
     def help_patterns(self):
@@ -162,7 +163,7 @@ MAIN FEATURES
         """
         calico.scheme.ENVIRONMENT[name] = value
 
-    def get_help_on(self, expr, level):
+    def _get_help_on(self, expr, level=0):
         result = calico.scheme.execute_string_rm("(help %s)" % expr)
         if not calico.scheme.exception_q(result):
             return result
