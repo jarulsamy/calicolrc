@@ -138,7 +138,7 @@ MAIN FEATURES
                         matches.append(components + "." + item_str)
         # done with language-specific completitions
 
-    def help_patterns(self):
+    def _help_patterns(self):
         # Longest first:
         return [
             ("^\?\?(.*)$", 2,
