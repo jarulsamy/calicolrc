@@ -1962,7 +1962,7 @@
                        env
                        (list cvar)
                        (list exception)
-                       (list "try-catch handler"))))
+                       (list ""))))
         (eval-sequence cexps new-env handler fail k)))))
 
 (define+
@@ -1987,7 +1987,7 @@
                        env
                        (list cvar)
                        (list exception)
-                       (list "try-catch-finally handler"))))
+                       (list ""))))
         (let ((catch-handler (try-finally-handler
                                fexps
                                env
@@ -3776,15 +3776,6 @@
   <proc-128>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
-      (apply-cont2
-        k2
-        (import-as-native (car args) (cadr args) env2)
-        fail))))
-
-(define+
-  <proc-129>
-  (lambda (args env2 info handler fail k2 fields)
-    (let ()
       (cond
         ((not (length-one? args))
          (runtime-error
@@ -3795,36 +3786,36 @@
         (else (apply-cont2 k2 (not (true? (car args))) fail))))))
 
 (define+
-  <proc-130>
+  <proc-129>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (apply printf args)
       (apply-cont2 k2 void-value fail))))
 
 (define+
-  <proc-131>
+  <proc-130>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (apply vector_native args) fail))))
 
 (define+
-  <proc-132>
+  <proc-131>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (vector-set! (car args) (cadr args) (caddr args))
       (apply-cont2 k2 void-value fail))))
 
 (define+
-  <proc-133>
+  <proc-132>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (apply vector-ref args) fail))))
 
 (define+
-  <proc-134>
+  <proc-133>
   (lambda (args env2 info handler fail k2 fields)
     (let () (apply-cont2 k2 (apply make-vector args) fail))))
 
 (define+
-  <proc-135>
+  <proc-134>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3842,7 +3833,7 @@
            (runtime-error message info handler fail)))))))
 
 (define+
-  <proc-136>
+  <proc-135>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3855,7 +3846,7 @@
         (else (apply-cont2 k2 (apply list-ref args) fail))))))
 
 (define+
-  <proc-137>
+  <proc-136>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3876,7 +3867,7 @@
            fail))))))
 
 (define+
-  <proc-138>
+  <proc-137>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3890,7 +3881,7 @@
            fail))))))
 
 (define+
-  <proc-139>
+  <proc-138>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3907,7 +3898,7 @@
            fail))))))
 
 (define+
-  <proc-140>
+  <proc-139>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3924,7 +3915,7 @@
            fail))))))
 
 (define+
-  <proc-141>
+  <proc-140>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3937,7 +3928,7 @@
         (else (apply-cont2 k2 (apply eqv? args) fail))))))
 
 (define+
-  <proc-142>
+  <proc-141>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3950,7 +3941,7 @@
         (else (apply-cont2 k2 (apply vector? args) fail))))))
 
 (define+
-  <proc-143>
+  <proc-142>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3963,7 +3954,7 @@
         (else (apply-cont2 k2 (apply atom? args) fail))))))
 
 (define+
-  <proc-144>
+  <proc-143>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3976,7 +3967,7 @@
         (else (apply-cont2 k2 (apply iter? args) fail))))))
 
 (define+
-  <proc-145>
+  <proc-144>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -3989,7 +3980,7 @@
         (else (apply-cont2 k2 (apply list? args) fail))))))
 
 (define+
-  <proc-146>
+  <proc-145>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4002,7 +3993,7 @@
         (else (apply-cont2 k2 (apply procedure? args) fail))))))
 
 (define+
-  <proc-147>
+  <proc-146>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4015,7 +4006,7 @@
         (else (apply-cont2 k2 (apply string<? args) fail))))))
 
 (define+
-  <proc-148>
+  <proc-147>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4028,7 +4019,7 @@
         (else (apply-cont2 k2 (apply float args) fail))))))
 
 (define+
-  <proc-149>
+  <proc-148>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4041,7 +4032,7 @@
         (else (apply-cont2 k2 (apply globals args) fail))))))
 
 (define+
-  <proc-150>
+  <proc-149>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4054,7 +4045,7 @@
         (else (apply-cont2 k2 (apply int args) fail))))))
 
 (define+
-  <proc-151>
+  <proc-150>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4068,7 +4059,7 @@
          (apply-cont2 k2 (apply apply-with-keywords args) fail))))))
 
 (define+
-  <proc-152>
+  <proc-151>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4081,13 +4072,13 @@
         (else (apply-cont2 k2 (apply assq args) fail))))))
 
 (define+
-  <proc-153>
+  <proc-152>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond (else (apply-cont2 k2 (apply dict args) fail))))))
 
 (define+
-  <proc-154>
+  <proc-153>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4100,7 +4091,7 @@
         (else (apply-cont2 k2 (apply property args) fail))))))
 
 (define+
-  <proc-155>
+  <proc-154>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4113,7 +4104,7 @@
         (else (apply-cont2 k2 (apply / args) fail))))))
 
 (define+
-  <proc-156>
+  <proc-155>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4127,7 +4118,7 @@
          (apply-cont2 k2 (apply reset-toplevel-env args) fail))))))
 
 (define+
-  <proc-157>
+  <proc-156>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4140,7 +4131,7 @@
         (else (apply-cont2 k2 (apply sort args) fail))))))
 
 (define+
-  <proc-158>
+  <proc-157>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4153,7 +4144,7 @@
         (else (apply-cont2 k2 (apply string-append args) fail))))))
 
 (define+
-  <proc-159>
+  <proc-158>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4166,7 +4157,7 @@
         (else (apply-cont2 k2 (apply string-split args) fail))))))
 
 (define+
-  <proc-160>
+  <proc-159>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4179,7 +4170,7 @@
         (else (apply-cont2 k2 (apply make-symbol args) fail))))))
 
 (define+
-  <proc-161>
+  <proc-160>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (cond
@@ -4192,13 +4183,13 @@
         (else (apply-cont2 k2 (apply type args) fail))))))
 
 (define+
-  <proc-162>
+  <proc-161>
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (apply-cont2 k2 (apply use-lexical-address args) fail))))
 
 (define+
-  <proc-163>
+  <proc-162>
   (lambda (args env2 info handler fail k2 fields)
     (let ((external-function-object (car fields)))
       (apply-cont2
@@ -6013,40 +6004,34 @@
 
 (define get-traceback-string
   (lambda (exc)
-    (if (list? (cadr exc))
-        (let ((error-type (car (cadr exc)))
-              (message (cadr (cadr exc)))
-              (src-file (caddr (cadr exc)))
-              (src-line (cadddr (cadr exc)))
-              (src-col (cadddr (cdr (cadr exc))))
-              (stack (cadddr (cddr (cadr exc))))
-              (retval ""))
+    (let ((error-type (car (cadr exc)))
+          (message (cadr (cadr exc)))
+          (src-file (caddr (cadr exc)))
+          (src-line (cadddr (cadr exc)))
+          (src-col (cadddr (cdr (cadr exc))))
+          (stack (cadddr (cddr (cadr exc))))
+          (retval ""))
+      (set! retval
+        (string-append
+          retval
+          (format "~%Traceback (most recent call last):~%")))
+      (while
+        (not (null? stack))
+        (set! retval
+          (string-append retval (format-exception-line (car stack))))
+        (set! stack (cdr stack)))
+      (if (not (eq? src-file 'none))
           (set! retval
             (string-append
               retval
-              (format "~%Traceback (most recent call last):~%")))
-          (while
-            (not (null? stack))
-            (set! retval
-              (string-append retval (format-exception-line (car stack))))
-            (set! stack (cdr stack)))
-          (if (not (eq? src-file 'none))
-              (set! retval
-                (string-append
-                  retval
-                  (format
-                    "  File \"~a\", line ~a, col ~a~%"
-                    src-file
-                    src-line
-                    src-col))))
-          (string-append
-            retval
-            (format "~a: ~a~%" error-type message)))
-        (let ((retval (format
-                        "~%Traceback (most recent call last):~%")))
-          (string-append
-            retval
-            (format "Raised Exception: ~a~%" (cadr exc)))))))
+              (format
+                "  File \"~a\", line ~a, col ~a~%"
+                src-file
+                src-line
+                src-col))))
+      (string-append
+        retval
+        (format "~a: ~a~%" error-type message)))))
 
 (define format-exception-line
   (lambda (line)
@@ -6813,542 +6798,173 @@
 
 (define make-toplevel-env
   (lambda ()
-    (let ((primitives (list
-                       (list
-                         '*
-                         times-prim
-                         "(* ...): multiplication procedure; multiplies all arguments")
-                       (list
-                         '+
-                         plus-prim
-                         "(+ ...): addition procedure; adds all arguments")
-                       (list
-                         '-
-                         minus-prim
-                         "(- ...): subtraction procedure; subtracts all arguments")
-                       (list
-                         '/
-                         divide-prim
-                         "(/ ...): division procedure; divides all arguments")
-                       (list
-                         'div
-                         quotient-prim
-                         "(div arg0 arg1): quotient procedure for rationals/ints; divides arg0 by arg1 (aliases // and quotient)")
-                       (list
-                         '%
-                         modulo-prim
-                         "(% arg0 arg1): modulo procedure for two arguments (aliases mod and modulo)")
-                       (list
-                         'mod
-                         modulo-prim
-                         "(mod arg0 arg1): modulo procedure for two arguments (aliases % and modulo)")
-                       (list
-                         'modulo
-                         modulo-prim
-                         "(modulo arg0 arg1): modulo procedure for two arguments (aliases mod and %)")
-                       (list
-                         '//
-                         quotient-prim
-                         "(// arg0 arg1): quotient procedure for rationals/ints; divides arg0 by arg1 (aliases div and quotient)")
-                       (list
-                         'quotient
-                         quotient-prim
-                         "(quotient arg0 arg1): quotient procedure for rationals/ints; divides arg0 by arg1 (aliases // and div)")
-                       (list
-                         '<
-                         lt-prim
-                         "(< arg0 arg1): less-than procedure for two arguments")
-                       (list
-                         '<=
-                         lt-or-eq-prim
-                         "(<= arg0 arg1): less-than or equal procedure for two arguments")
-                       (list
-                         '=
-                         equal-sign-prim
-                         "(= arg0 arg1): numeric equality procedure for two arguments")
-                       (list
-                         '>
-                         gt-prim
-                         "(> arg0 arg1): greater-than procedure for two arguments")
-                       (list
-                         '>=
-                         gt-or-eq-prim
-                         "(>= arg0 arg1): greater-than or equal procedure for two arguments")
-                       (list
-                         'abort
-                         abort-prim
-                         "(abort) : aborts processing and returns to top level")
-                       (list
-                         'abs
-                         abs-prim
-                         "(abs value): absolute value procedure")
-                       (list
-                         'append
-                         append-prim
-                         "(append ...): append lists together into a single list")
-                       (list
-                         'apply
-                         apply-prim
-                         "(apply PROCEDURE '(args...)): apply the PROCEDURE to the args")
-                       (list
-                         'assv
-                         assv-prim
-                         "(assv KEY ((ITEM VALUE) ...)): look for KEY in ITEMs; return matching (ITEM VALUE) or #f if not found")
-                       (list
-                         'boolean?
-                         boolean?-prim
-                         "(boolean? ITEM): return #t if ITEM is a boolean value")
-                       (list
-                         'caddr
-                         caddr-prim
-                         "(caddr ITEM): return the (car (cdr (cdr ITEM)))")
-                       (list
-                         'cadr
-                         cadr-prim
-                         "(cadr ITEM): return the (car (cdr ITEM))")
+    (let ((primitives (list (list '* times-prim "") (list '+ plus-prim "")
+                       (list '- minus-prim "") (list '/ divide-prim "")
+                       (list 'div quotient-prim "")
+                       (list '% modulo-prim "") (list 'mod modulo-prim "")
+                       (list 'modulo modulo-prim "")
+                       (list '// quotient-prim "")
+                       (list 'quotient quotient-prim "")
+                       (list '< lt-prim "") (list '<= lt-or-eq-prim "")
+                       (list '= equal-sign-prim "") (list '> gt-prim "")
+                       (list '>= gt-or-eq-prim "")
+                       (list 'abort abort-prim "") (list 'abs abs-prim "")
+                       (list 'append append-prim "")
+                       (list 'apply apply-prim "")
+                       (list 'assv assv-prim "")
+                       (list 'boolean? boolean?-prim "")
+                       (list 'caddr caddr-prim "")
+                       (list 'cadr cadr-prim "")
                        (list
                          'call-with-current-continuation
                          call/cc-prim
-                         "(call-with-current-continuation ...): ")
-                       (list 'call/cc call/cc-prim "(call/cc ...): ")
+                         "")
+                       (list 'call/cc call/cc-prim "")
                        (list
                          'car
                          car-prim
                          "(car LIST) returns the first element of LIST")
-                       (list
-                         'cdr
-                         cdr-prim
-                         "(cdr LIST) returns rest of LIST after (car LIST)")
-                       (list 'caaaar caaaar-prim "caaaar ...): ")
-                       (list 'caaadr caaadr-prim "(caaadr ...): ")
-                       (list 'caaar caaar-prim "(caaar ...): ")
-                       (list 'caadar caadar-prim "(caadar ...): ")
-                       (list 'caaddr caaddr-prim "(caaddr ...): ")
-                       (list 'caadr caadr-prim "(caadr ...): ")
-                       (list 'caar caar-prim "(caar ...): ")
-                       (list 'cadaar cadaar-prim "(cadaar ...): ")
-                       (list 'cadadr cadadr-prim "(cadadr ...): ")
-                       (list 'cadar cadar-prim "(cadar ...): ")
-                       (list 'caddar caddar-prim "(caddar ...): ")
-                       (list 'cadddr cadddr-prim "(cadddr ...): ")
-                       (list 'cdaaar cdaaar-prim "(cdaaar ...): ")
-                       (list 'cdaadr cdaadr-prim "(cdaadr ...): ")
-                       (list 'cdaar cdaar-prim "(cdaar ...): ")
-                       (list 'cdadar cdadar-prim "(cdadar ...): ")
-                       (list 'cdaddr cdaddr-prim "(cdaddr ...): ")
-                       (list 'cdadr cdadr-prim "(cdadr ...): ")
-                       (list 'cdar cdar-prim "(cdar ...): ")
-                       (list 'cddaar cddaar-prim "(cddaar ...): ")
-                       (list 'cddadr cddadr-prim "(cddadr ...): ")
-                       (list 'cddar cddar-prim "(cddar ...): ")
-                       (list 'cdddar cdddar-prim "(cdddar ...): ")
-                       (list 'cddddr cddddr-prim "(cddddr ...): ")
-                       (list 'cdddr cdddr-prim "(cdddr ...): ")
-                       (list 'cddr cddr-prim "(cddr ...): ")
-                       (list
-                         'char?
-                         char?-prim
-                         "(char? ITEM): return #t if ITEM is a character, #f otherwise")
-                       (list
-                         'char=?
-                         char=?-prim
-                         "(char=? CHAR1 CHAR2): return #t if CHAR1 has the same values as CHAR2, #f otherwise")
-                       (list
-                         'char-whitespace?
-                         char-whitespace?-prim
-                         "(char-whitespace? CHAR): return #t if CHAR is a whitespace character, #f otherwise")
-                       (list
-                         'char-alphabetic?
-                         char-alphabetic?-prim
-                         "(char-alphabetic? CHAR): return #t if CHAR is an alphabetic character, #f otherwise")
-                       (list
-                         'char-numeric?
-                         char-numeric?-prim
-                         "(char-numeric? CHAR): return #t if CHAR is a whitespace character, #f otherwise")
-                       (list
-                         'char->integer
-                         char->integer-prim
-                         "(char->integer CHAR): return associated number of CHAR ")
-                       (list
-                         'cons
-                         cons-prim
-                         "(cons ITEM1 ITEM2): return a list with ITEM1 as car and ITEM2 as cdr (ITEM2 is typically a list)")
-                       (list
-                         'current-time
-                         current-time-prim
-                         "(current-time): returns the current time as number of seconds since 1970-1-1")
-                       (list
-                         'cut
-                         cut-prim
-                         "(cut ARGS...): return to toplevel with ARGS")
-                       (list
-                         'dir
-                         dir-prim
-                         "(dir [ITEM]): return items in environment, or, if ITEM is given, the items in module")
-                       (list
-                         'display
-                         display-prim
-                         "(display ITEM): display the ITEM as output")
+                       (list 'cdr cdr-prim "")
+                       (list 'caaaar caaaar-prim "")
+                       (list 'caaadr caaadr-prim "")
+                       (list 'caaar caaar-prim "")
+                       (list 'caadar caadar-prim "")
+                       (list 'caaddr caaddr-prim "")
+                       (list 'caadr caadr-prim "")
+                       (list 'caar caar-prim "")
+                       (list 'cadaar cadaar-prim "")
+                       (list 'cadadr cadadr-prim "")
+                       (list 'cadar cadar-prim "")
+                       (list 'caddar caddar-prim "")
+                       (list 'cadddr cadddr-prim "")
+                       (list 'cdaaar cdaaar-prim "")
+                       (list 'cdaadr cdaadr-prim "")
+                       (list 'cdaar cdaar-prim "")
+                       (list 'cdadar cdadar-prim "")
+                       (list 'cdaddr cdaddr-prim "")
+                       (list 'cdadr cdadr-prim "")
+                       (list 'cdar cdar-prim "")
+                       (list 'cddaar cddaar-prim "")
+                       (list 'cddadr cddadr-prim "")
+                       (list 'cddar cddar-prim "")
+                       (list 'cdddar cdddar-prim "")
+                       (list 'cddddr cddddr-prim "")
+                       (list 'cdddr cdddr-prim "")
+                       (list 'cddr cddr-prim "")
+                       (list 'char? char?-prim "")
+                       (list 'char=? char=?-prim "")
+                       (list 'char-whitespace? char-whitespace?-prim "")
+                       (list 'char-alphabetic? char-alphabetic?-prim "")
+                       (list 'char-numeric? char-numeric?-prim "")
+                       (list 'char->integer char->integer-prim "")
+                       (list 'cons cons-prim "")
+                       (list 'current-time current-time-prim "")
+                       (list 'cut cut-prim "") (list 'dir dir-prim "")
+                       (list 'display display-prim "")
                        (list
                          'current-environment
                          current-environment-prim
-                         "(current-environment): returns the current environment")
-                       (list
-                         'eq?
-                         eq?-prim
-                         "(eq? ITEM1 ITEM2): return #t if ITEM1 is eq to ITEM2, #f otherwise")
-                       (list
-                         'equal?
-                         equal?-prim
-                         "(equal? ITEM1 ITEM2): return #t if ITEM1 is equal to ITEM2, #f otherwise")
-                       (list
-                         'error
-                         error-prim
-                         "(error NAME MESSAGE): create an exception in NAME with MESSAGE")
-                       (list
-                         'eval
-                         eval-prim
-                         "(eval LIST): evaluates the LIST as a Scheme expression")
-                       (list
-                         'eval-ast
-                         eval-ast-prim
-                         "(eval-ast AST): evaluates the Abstract Syntax Tree as a Scheme expression (see parse and parse-string)")
-                       (list 'exit exit-prim "(exit): ")
-                       (list
-                         'for-each
-                         for-each-prim
-                         "(for-each PROCEDURE LIST): apply PROCEDURE to each item in LIST, but don't return results")
-                       (list
-                         'format
-                         format-prim
-                         "(format STRING ITEM ...): format the string with ITEMS as arguments")
-                       (list 'get get-prim "(get ...): ")
-                       (list
-                         'get-stack-trace
-                         get-stack-trace-prim
-                         "(get-stack-trace): return the current stack trace")
-                       (list
-                         'load-as
-                         load-as-prim
-                         "(load-as FILENAME MODULE-NAME): load the filename, putting items in MODULE-NAME namespace")
-                       (list
-                         'integer->char
-                         integer->char-prim
-                         "(integer->char INTEGER): return the assocated character of INTEGER")
-                       (list
-                         'length
-                         length-prim
-                         "(length LIST): returns the number of elements in top level of LIST")
-                       (list
-                         'list
-                         list-prim
-                         "(list ITEM ...): returns a list composed of all of the items")
-                       (list
-                         'list->vector
-                         list->vector-prim
-                         "(list->vector LIST): returns the LIST as a vector")
-                       (list
-                         'list->string
-                         list->string-prim
-                         "(list->string LIST): returns the LIST as a string")
-                       (list
-                         'list-ref
-                         list-ref-prim
-                         "(list-ref LIST INDEX): returns the item in LIST at INDEX (zero-based)")
-                       (list
-                         'load
-                         load-prim
-                         "(load FILENAME...): loads the given FILENAMEs")
-                       (list
-                         'min
-                         min-prim
-                         "(min ...): returns the minimum value from the list of values")
-                       (list
-                         'max
-                         max-prim
-                         "(max ...): returns the maximum value from the list of values")
-                       (list
-                         'make-set
-                         make-set-prim
-                         "(make-set LIST): returns a list of unique items from LIST")
-                       (list
-                         'make-vector
-                         make-vector-prim
-                         "(make-vector LIST): returns a vector from LIST")
-                       (list
-                         'map
-                         map-prim
-                         "(map PROCEDURE LIST...): apply PROCEDURE to each element of LIST, and return return results")
-                       (list
-                         'member
-                         member-prim
-                         "(member ITEM LIST): return #t if MEMBER in top level of LIST")
-                       (list 'memq memq-prim "(memq ...): ")
-                       (list 'memv memv-prim "(memv ...): ")
-                       (list
-                         'newline
-                         newline-prim
-                         "(newline): displays a new line in output")
-                       (list
-                         'not
-                         not-prim
-                         "(not ITEM): returns the boolean not of ITEM; ITEM is only #t when #t, otherwise #f")
-                       (list
-                         'null?
-                         null?-prim
-                         "(null? ITEM): return #t if ITEM is empty list, #f otherwise")
-                       (list
-                         'number->string
-                         number->string-prim
-                         "(number->string NUMBER): return NUMBER as a string")
-                       (list
-                         'number?
-                         number?-prim
-                         "(number? ITEM): return #t if ITEM is a number, #f otherwise")
-                       (list 'pair? pair?-prim "(pair? ITEM): ")
-                       (list
-                         'parse
-                         parse-prim
-                         "(parse LIST): parse a list; returns Abstract Syntax Tree (AST)")
-                       (list
-                         'parse-string
-                         parse-string-prim
-                         "(parse-string STRING): parse a string; returns Abstract Syntax Tree (AST)")
-                       (list 'print print-prim "(print ITEM): ")
-                       (list
-                         'printf
-                         printf-prim
-                         "(printf FORMAT ARGS...): ")
-                       (list
-                         'range
-                         range-prim
-                         "(range END), (range START END), or (RANGE START END STEP): (all integers)")
-                       (list
-                         'read-string
-                         read-string-prim
-                         "(read-string ...): ")
-                       (list 'require require-prim "(require ...): ")
-                       (list 'reverse reverse-prim "(reverse LIST): ")
-                       (list
-                         'set-car!
-                         set-car!-prim
-                         "(set-car! LIST ITEM): set the car of LIST to be ITEM")
-                       (list
-                         'set-cdr!
-                         set-cdr!-prim
-                         "(set-cdr! LIST ITEM): set the car of LIST to be ITEM (which is typically a list)")
-                       (list
-                         'snoc
-                         snoc-prim
-                         "(snoc ITEM LIST): cons the ITEM onto the end of LIST")
-                       (list
-                         'rac
-                         rac-prim
-                         "(rac LIST): return the last item of LIST")
-                       (list
-                         'rdc
-                         rdc-prim
-                         "(rdc LIST): return everything but last item in LIST")
-                       (list
-                         'sqrt
-                         sqrt-prim
-                         "(sqrt NUMBER): return the square root of NUMBER")
-                       (list
-                         'odd?
-                         odd?-prim
-                         "(odd? NUMBER): returns #t if NUMBER is even, #f otherwise")
-                       (list
-                         'even?
-                         even?-prim
-                         "(even? NUMBER): returns #t if NUMBER is odd, #f otherwise")
-                       (list
-                         'remainder
-                         remainder-prim
-                         "(remainder NUMBER1 NUMBER2): returns the remainder after dividing NUMBER1 by NUMBER2")
-                       (list
-                         'string
-                         string-prim
-                         "(string ITEM): returns ITEM as a string")
-                       (list
-                         'string-length
-                         string-length-prim
-                         "(string-length STRING): returns the length of a string")
-                       (list
-                         'string-ref
-                         string-ref-prim
-                         "(string-ref STRING INDEX): return the character of STRING at position INDEX")
-                       (list
-                         'string?
-                         string?-prim
-                         "(string? ITEM): return #t if ITEM is a string, #f otherwise")
-                       (list
-                         'string->number
-                         string->number-prim
-                         "(string->number STRING): return STRING as a number")
-                       (list
-                         'string=?
-                         string=?-prim
-                         "(string=? STRING1 STRING2): return #t if STRING1 is the same as STRING2, #f otherwise")
-                       (list
-                         'substring
-                         substring-prim
-                         "(substring STRING START END): return the substring of STRING starting with position START and ending before END")
-                       (list
-                         'symbol?
-                         symbol?-prim
-                         "(symbol? ITEM): return #t if ITEM is a symbol, #f otherwise")
-                       (list 'unparse unparse-prim "(unparse AST): ")
-                       (list
-                         'unparse-procedure
-                         unparse-procedure-prim
-                         "(unparse-procedure ...): ")
-                       (list
-                         'import
-                         import-prim
-                         "(import MODULE...): import host-system modules; MODULEs are strings")
-                       (list
-                         'import-as
-                         import-as-prim
-                         "(import-as MODULE NAME): import a host-system module; MODULE is a string, and NAME is a symbol")
-                       (list
-                         'use-stack-trace
-                         use-stack-trace-prim
-                         "(use-stack-trace BOOLEAN): set stack-trace usage on/off")
-                       (list
-                         'vector
-                         vector-prim
-                         "(vector [ITEMS]...): return ITEMs as a vector")
-                       (list
-                         'vector-ref
-                         vector-ref-prim
-                         "(vector-ref VECTOR INDEX): ")
-                       (list
-                         'vector-set!
-                         vector-set!-prim
-                         "(vector-set! VECTOR INDEX VALUE): ")
-                       (list
-                         'void
-                         void-prim
-                         "(void): The null value symbol")
-                       (list
-                         'zero?
-                         zero?-prim
-                         "(zero? NUMBER): return #t if NUMBER is equal to zero, #f otherwise")
-                       (list
-                         'current-directory
-                         current-directory-prim
-                         "(current-directory [PATH]): get the current directory, or set it if PATH is given (alias cd)")
-                       (list
-                         'cd
-                         current-directory-prim
-                         "(cd [PATH]): get the current directory, or set it if PATH is given (alias current-directory)")
-                       (list
-                         'round
-                         round-prim
-                         "(round NUMBER): round NUMBER to the nearest integer (may return float)")
-                       (list
-                         'char->string
-                         char->string-prim
-                         "(char->string CHAR): ")
-                       (list
-                         'string->list
-                         string->list-prim
-                         "(string->list STRING): string STRING as a list of characters")
-                       (list
-                         'string->symbol
-                         string->symbol-prim
-                         "(string->symbol STRING): return STRING as a symbol")
-                       (list
-                         'symbol->string
-                         symbol->string-prim
-                         "(symbol->string SYMBOL): return SYMBOL as a string")
-                       (list
-                         'vector->list
-                         vector->list-prim
-                         "(vector->list VECTOR): return VECTOR as a list")
-                       (list
-                         'eqv?
-                         eqv?-prim
-                         "(eqv? ITEM1 ITEM2): return #t if ITEM1 and ITEM2 have the same value")
-                       (list
-                         'vector?
-                         vector?-prim
-                         "(vector? ITEM): return #t if ITEM is a vector, #f otherwise")
-                       (list
-                         'atom?
-                         atom?-prim
-                         "(atom? ITEM): return #t if ITEM is a atom, #f otherwise")
-                       (list
-                         'iter?
-                         iter?-prim
-                         "(iter? ITEM): return #t if ITEM is a iterator, #f otherwise")
-                       (list
-                         'list?
-                         list?-prim
-                         "(list? ITEM): return #t if ITEM is a list, #f otherwise")
-                       (list
-                         'procedure?
-                         procedure?-prim
-                         "(procedure? ITEM): return #t if ITEM is a procedure, #f otherwise")
-                       (list
-                         'string<?
-                         string<?-prim
-                         "(string<? STRING1 STRING2): compare two strings to see if STRING1 is less than STRING2")
-                       (list
-                         'float
-                         float-prim
-                         "(float NUMBER): return NUMBER as a floating point value")
-                       (list
-                         'globals
-                         globals-prim
-                         "(globals): get global environment")
-                       (list
-                         'int
-                         int-prim
-                         "(int NUMBER): return NUMBER as an integer")
+                         "")
+                       (list 'eq? eq?-prim "")
+                       (list 'equal? equal?-prim "")
+                       (list 'error error-prim "")
+                       (list 'eval eval-prim "")
+                       (list 'eval-ast eval-ast-prim "")
+                       (list 'exit exit-prim "")
+                       (list 'for-each for-each-prim "")
+                       (list 'format format-prim "")
+                       (list 'get get-prim "")
+                       (list 'get-stack-trace get-stack-trace-prim "")
+                       (list 'load-as load-as-prim "")
+                       (list 'integer->char integer->char-prim "")
+                       (list 'length length-prim "")
+                       (list 'list list-prim "")
+                       (list 'list->vector list->vector-prim "")
+                       (list 'list->string list->string-prim "")
+                       (list 'list-ref list-ref-prim "")
+                       (list 'load load-prim "") (list 'min min-prim "")
+                       (list 'max max-prim "")
+                       (list 'make-set make-set-prim "")
+                       (list 'make-vector make-vector-prim "")
+                       (list 'map map-prim "")
+                       (list 'member member-prim "")
+                       (list 'memq memq-prim "") (list 'memv memv-prim "")
+                       (list 'newline newline-prim "")
+                       (list 'not not-prim "") (list 'null? null?-prim "")
+                       (list 'number->string number->string-prim "")
+                       (list 'number? number?-prim "")
+                       (list 'pair? pair?-prim "")
+                       (list 'parse parse-prim "")
+                       (list 'parse-string parse-string-prim "")
+                       (list 'print print-prim "")
+                       (list 'printf printf-prim "")
+                       (list 'range range-prim "")
+                       (list 'read-string read-string-prim "")
+                       (list 'require require-prim "")
+                       (list 'reverse reverse-prim "")
+                       (list 'set-car! set-car!-prim "")
+                       (list 'set-cdr! set-cdr!-prim "")
+                       (list 'snoc snoc-prim "") (list 'rac rac-prim "")
+                       (list 'rdc rdc-prim "") (list 'sqrt sqrt-prim "")
+                       (list 'odd? odd?-prim "")
+                       (list 'even? even?-prim "")
+                       (list 'remainder remainder-prim "")
+                       (list 'string string-prim "")
+                       (list 'string-length string-length-prim "")
+                       (list 'string-ref string-ref-prim "")
+                       (list 'string? string?-prim "")
+                       (list 'string->number string->number-prim "")
+                       (list 'string=? string=?-prim "")
+                       (list 'substring substring-prim "")
+                       (list 'symbol? symbol?-prim "")
+                       (list 'unparse unparse-prim "")
+                       (list 'unparse-procedure unparse-procedure-prim "")
+                       (list 'import import-prim "")
+                       (list 'use-stack-trace use-stack-trace-prim "")
+                       (list 'vector vector-prim "")
+                       (list 'vector-ref vector-ref-prim "")
+                       (list 'vector-set! vector-set!-prim "")
+                       (list 'void void-prim "")
+                       (list 'zero? zero?-prim "")
+                       (list 'current-directory current-directory-prim "")
+                       (list 'cd current-directory-prim "")
+                       (list 'round round-prim "")
+                       (list 'char->string char->string-prim "")
+                       (list 'string->list string->list-prim "")
+                       (list 'string->symbol string->symbol-prim "")
+                       (list 'symbol->string symbol->string-prim "")
+                       (list 'vector->list vector->list-prim "")
+                       (list 'eqv? eqv?-prim "")
+                       (list 'vector? vector?-prim "")
+                       (list 'atom? atom?-prim "")
+                       (list 'iter? iter?-prim "")
+                       (list 'list? list?-prim "")
+                       (list 'procedure? procedure?-prim "")
+                       (list 'string<? string<?-prim "")
+                       (list 'float float-prim "")
+                       (list 'globals globals-prim "")
+                       (list 'int int-prim "")
                        (list
                          'apply-with-keywords
                          apply-with-keywords-prim
-                         "(apply-with-keywords PROCEDURE ...): ")
-                       (list 'assq assq-prim "(assq ...): ")
-                       (list 'dict dict-prim "(dict ...): ")
-                       (list 'property property-prim "(property ...): ")
-                       (list
-                         'rational
-                         rational-prim
-                         "(rational NUMERATOR DENOMINTAOR): return a rational number")
+                         "")
+                       (list 'assq assq-prim "") (list 'dict dict-prim "")
+                       (list 'property property-prim "")
+                       (list 'rational rational-prim "")
                        (list
                          'reset-toplevel-env
                          reset-toplevel-env-prim
-                         "(reset-toplevel-env): reset the toplevel environment")
-                       (list
-                         'sort
-                         sort-prim
-                         "(sort PROCEDURE LIST): sort the list using PROCEDURE to compare items")
-                       (list
-                         'string-append
-                         string-append-prim
-                         "(string-append STRING1 STRING2): append two strings together")
-                       (list
-                         'string-split
-                         string-split-prim
-                         "(string-split STRING CHAR): return a list with substrings of STRING where split by CHAR")
-                       (list
-                         'symbol
-                         symbol-prim
-                         "(symbol STRING): turn STRING into a symbol")
-                       (list
-                         'typeof
-                         typeof-prim
-                         "(typeof ITEM): returns type of ITEM")
+                         "")
+                       (list 'sort sort-prim "")
+                       (list 'string-append string-append-prim "")
+                       (list 'string-split string-split-prim "")
+                       (list 'symbol symbol-prim "")
+                       (list 'typeof typeof-prim "")
                        (list
                          'use-lexical-address
                          use-lexical-address-prim
-                         "(use-lexical-address [BOOLEAN]): get lexical-address setting, or set it on/off if BOOLEAN is given")
-                       (list
-                         'use-tracing
-                         use-tracing-prim
-                         "(use-tracing [BOOLEAN]): get tracing setting, or set it on/off if BOOLEAN is given"))))
+                         "")
+                       (list 'use-tracing use-tracing-prim ""))))
       (make-initial-env-extended
         (map car primitives)
         (map cadr primitives)
@@ -7361,7 +6977,7 @@
 
 (define make-external-proc
   (lambda (external-function-object)
-    (make-proc <proc-163> external-function-object)))
+    (make-proc <proc-162> external-function-object)))
 
 (define pattern?
   (lambda (x)
@@ -7654,8 +7270,6 @@
 (define-native set-global-docstring! (lambda (var x) #f))
 
 (define-native import-native (lambda ignore #f))
-
-(define-native import-as-native (lambda ignore #f))
 
 (define-native iterator? (lambda ignore #f))
 
@@ -7963,79 +7577,77 @@
 
 (define import-prim (make-proc <proc-127>))
 
-(define import-as-prim (make-proc <proc-128>))
+(define not-prim (make-proc <proc-128>))
 
-(define not-prim (make-proc <proc-129>))
+(define printf-prim (make-proc <proc-129>))
 
-(define printf-prim (make-proc <proc-130>))
-
-(define vector-prim (make-proc <proc-131>))
+(define vector-prim (make-proc <proc-130>))
 
 (define-native
   vector_native
   (lambda args (apply vector args)))
 
-(define vector-set!-prim (make-proc <proc-132>))
+(define vector-set!-prim (make-proc <proc-131>))
 
-(define vector-ref-prim (make-proc <proc-133>))
+(define vector-ref-prim (make-proc <proc-132>))
 
-(define make-vector-prim (make-proc <proc-134>))
+(define make-vector-prim (make-proc <proc-133>))
 
-(define error-prim (make-proc <proc-135>))
+(define error-prim (make-proc <proc-134>))
 
-(define list-ref-prim (make-proc <proc-136>))
+(define list-ref-prim (make-proc <proc-135>))
 
-(define current-directory-prim (make-proc <proc-137>))
+(define current-directory-prim (make-proc <proc-136>))
 
-(define round-prim (make-proc <proc-138>))
+(define round-prim (make-proc <proc-137>))
 
-(define use-stack-trace-prim (make-proc <proc-139>))
+(define use-stack-trace-prim (make-proc <proc-138>))
 
-(define use-tracing-prim (make-proc <proc-140>))
+(define use-tracing-prim (make-proc <proc-139>))
 
-(define eqv?-prim (make-proc <proc-141>))
+(define eqv?-prim (make-proc <proc-140>))
 
-(define vector?-prim (make-proc <proc-142>))
+(define vector?-prim (make-proc <proc-141>))
 
-(define atom?-prim (make-proc <proc-143>))
+(define atom?-prim (make-proc <proc-142>))
 
-(define iter?-prim (make-proc <proc-144>))
+(define iter?-prim (make-proc <proc-143>))
 
-(define list?-prim (make-proc <proc-145>))
+(define list?-prim (make-proc <proc-144>))
 
-(define procedure?-prim (make-proc <proc-146>))
+(define procedure?-prim (make-proc <proc-145>))
 
-(define string<?-prim (make-proc <proc-147>))
+(define string<?-prim (make-proc <proc-146>))
 
-(define float-prim (make-proc <proc-148>))
+(define float-prim (make-proc <proc-147>))
 
-(define globals-prim (make-proc <proc-149>))
+(define globals-prim (make-proc <proc-148>))
 
-(define int-prim (make-proc <proc-150>))
+(define int-prim (make-proc <proc-149>))
 
-(define apply-with-keywords-prim (make-proc <proc-151>))
+(define apply-with-keywords-prim (make-proc <proc-150>))
 
-(define assq-prim (make-proc <proc-152>))
+(define assq-prim (make-proc <proc-151>))
 
-(define dict-prim (make-proc <proc-153>))
+(define dict-prim (make-proc <proc-152>))
 
-(define property-prim (make-proc <proc-154>))
+(define property-prim (make-proc <proc-153>))
 
-(define rational-prim (make-proc <proc-155>))
+(define rational-prim (make-proc <proc-154>))
 
-(define reset-toplevel-env-prim (make-proc <proc-156>))
+(define reset-toplevel-env-prim (make-proc <proc-155>))
 
-(define sort-prim (make-proc <proc-157>))
+(define sort-prim (make-proc <proc-156>))
 
-(define string-append-prim (make-proc <proc-158>))
+(define string-append-prim (make-proc <proc-157>))
 
-(define string-split-prim (make-proc <proc-159>))
+(define string-split-prim (make-proc <proc-158>))
 
-(define symbol-prim (make-proc <proc-160>))
+(define symbol-prim (make-proc <proc-159>))
 
-(define typeof-prim (make-proc <proc-161>))
+(define typeof-prim (make-proc <proc-160>))
 
-(define use-lexical-address-prim (make-proc <proc-162>))
+(define use-lexical-address-prim (make-proc <proc-161>))
 
 (define-native
   make-initial-env-extended

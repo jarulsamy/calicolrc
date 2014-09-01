@@ -1228,13 +1228,19 @@ public static class Myro
 	      wait(1.0); // give it time to get started before trying to read sensors, etc
 	  } else {
 		if (Myro.robot != null)
-		  Myro.robot.reinit (port, baud);
+		  {
+		    //System.Console.WriteLine("test1");
+		  Myro.robot.reinit (port, baud);	
+		  //System.Console.WriteLine(Myro.robot);	    
+		  }
+
 		else {
+		    //System.Console.WriteLine("test2");
 		  // defaults to Scribbler in this interface
 		  Myro.robot = (Robot)makeRobot ("Scribbler", port, baud);
 		}
 	  }
-	}
+    }
   
 	[method: JigsawTab(null)]
 	public static Type[] getTypesOfArgs (object [] objects)
@@ -1305,6 +1311,7 @@ public static class Myro
 			  robot = constructor.Invoke (args);
 			} catch{
                 //System.Console.WriteLine ("Failure; skipping robot '{0}': {1}", f.Name, e.Message);
+                //System.Console.WriteLine ("Failure; skipping robot '{0}'", f.Name);
 			  continue;
 			}
             Myro.robot = (Robot)robot;
@@ -1514,6 +1521,20 @@ public static class Myro
 		  window.step (.1);
 	      }
 	  }
+
+	  public void step(double stepTime) {
+	      if (window.isRealized()) {
+		  lock (robots) {
+		      foreach (Robot robot in robots) {
+			  robot.update_simulation ();
+		      }
+		      foreach (Robot robot in robots) {
+			  robot.update (); // handle any requests
+		      }
+		  }
+		  window.step (stepTime);
+	      }
+	  }
 	    
 	  public void simulate(double duration=0.01, double stepTime=0.01) {
 	      double timeLapsed = 0.0;
@@ -1526,6 +1547,9 @@ public static class Myro
 		      foreach (Robot robot in robots) {
 			  robot.update_simulation ();
 		      }
+		      //foreach (Robot robot in robots) {
+			//robot.update ();
+		      //}
 		  }
 	      }
 	      // now update the shapes from physics:
@@ -1823,15 +1847,15 @@ public static class Myro
 	    else
 		throw new Exception("Robot has not been initialized");
 	}
-
-	public static Graphics.Line penUp (object fillColor)
+  
+  public static Graphics.Line penUp (string fillColor)
 	{
 	    if (robot != null) 
 		return robot.penUp (fillColor);
 	    else
 		throw new Exception("Robot has not been initialized");
 	}
-  
+
 	[method: JigsawTab("M/Advanced 3")]
 	public static void togglecam ()
 	{
@@ -3317,11 +3341,84 @@ public static class Myro
 	}
 
 	[method: JigsawTab("M/Misc")]
-	public static void wait (double seconds)
-    {
-	if (seconds > 0) 
+  public static void wait (double seconds)
+  {
+      
+    if (seconds > 0) 
+      {
+
+	if(Myro.simulation!=null)
+	  {
+	    Myro.simulation.thread.Suspend();
+	    double stepTime=0.1;
+	    while(seconds > 0)
+	      {
+		seconds = seconds - stepTime;
+		Myro.simulation.step(stepTime);
+	      }
+	    
+	    Myro.simulation.thread.Resume();
+
+	  }
+	else
+	  {
 	    Thread.Sleep ((int)(seconds * 1000));
-    }
+	  }       
+      }
+  }
+
+  //Code cutouts:
+  //System.Console.WriteLine("got here");
+    //stops the main loop
+    //Myro.simulation.stop();
+    //Myro.simulation.thread.Abort();
+
+    //System.Console.WriteLine("test1");
+    //updates the robot
+    //should I also update all the shapes?
+    //while (Myro.simulation.window.isRealized()) {
+      //lock (Myro.simulation.robots) {
+	//foreach (Robot robot in Myro.simulation.robots) {
+	  //robot.update ();
+	//}
+      //}
+    //}
+    //System.Console.WriteLine("test2");
+    //Thread.Sleep(100);
+    
+    //advances the simulation, updates the robots
+    //in simulations, updates the physics shapes,
+    //advances the window time, and updates the window
+    //Myro.simulation.simulate(seconds);
+    //System.Console.WriteLine("test3");
+    //restarts the main loop
+
+    
+    //Sometimes the thread doesn't want to restart
+    //Myro.simulation.run=true;
+    
+    //while(!Myro.simulation.run)
+      //{
+	
+	////Myro.simulation.stop();
+	//System.Console.WriteLine("resuming");
+	//Myro.simulation.setup();
+	//System.Console.WriteLine(Myro.simulation.thread);
+	//System.Console.WriteLine(Myro.simulation.thread.IsAlive);
+
+      //}
+
+
+    //System.Console.WriteLine("resuming");
+    //System.Console.WriteLine(Myro.simulation.run);
+    //System.Console.WriteLine("test4");
+    //Myro.simulation.run = false;
+    //Myro.simulation.simulate(seconds);
+    //Myro.simulation.run = true;
+    //double start = currentTime();
+    //while(start+seconds>currentTime()){ }
+
+    
 
 	[method: JigsawTab("M/Misc")]
 	public static double currentTime ()
@@ -3849,11 +3946,11 @@ public static class Myro
 		{
 		  return null;
 		}
-
-		public virtual Graphics.Line penUp (object fillColor)
+		public virtual Graphics.Line penUp (string fillColor)
 		{
 		  return null;
 		}
+
 	  
 	       //arduino
 	       public virtual void pinMode (int port, int mode)

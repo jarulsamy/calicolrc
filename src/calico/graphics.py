@@ -220,7 +220,7 @@ class Rectangle(Shape):
         return self.canvas
 
     def _add(self, drawing):
-        drawing.add(drawing.rect(insert=self.start, size=self.size, rx=self.rx, ry=self.ry, **self.extra))
+        drawing.rect(insert=self.start, size=self.size, rx=self.rx, ry=self.ry, **self.extra)
 
 class Ellipse(Shape):
     def __init__(self, center=(0,0), radii=(1,1), **extra):
@@ -244,7 +244,7 @@ class Ellipse(Shape):
         return self.canvas
 
     def _add(self, drawing):
-        drawing.add(drawing.ellipse(center=self.center, r=self.radii, **self.extra))
+        drawing.ellipse(center=self.center, r=self.radii, **self.extra)
 
 class Polyline(Shape):
     def __init__(self, points=[], **extra):
@@ -265,7 +265,7 @@ class Polyline(Shape):
         return self.canvas
 
     def _add(self, drawing):
-        drawing.add(drawing.polyline(points=self.points, **self.extra))
+        drawing.polyline(points=self.points, **self.extra)
 
 class Polygon(Shape):
     def __init__(self, points=[], **extra):
@@ -292,7 +292,7 @@ class Polygon(Shape):
         return self.canvas
 
     def _add(self, drawing):
-        drawing.add(drawing.polygon(points=self.points, **self.extra))
+        drawing.polygon(points=self.points, **self.extra)
 
 class Picture(Shape):
     def __init__(self, href, start=None, size=None, **extra):
@@ -311,7 +311,7 @@ class Picture(Shape):
         return self.canvas
 
     def _add(self, drawing):
-        drawing.add(drawing.image(self.href, insert=self.start, size=self.size, **self.extra))
+        drawing.image(self.href, insert=self.start, size=self.size, **self.extra)
 
 #g(**extra) # Group
 #symbol(**extra)

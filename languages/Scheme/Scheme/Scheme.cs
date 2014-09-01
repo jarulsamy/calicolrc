@@ -1284,12 +1284,6 @@ public class Scheme {
         throw new Exception(String.Format("no such external type '{0}'", type));
   }
 
-  public static object import_as_native(object module, object name, object env) {
-      object retval = list();
-      // FIXME: not implemented!
-      return retval;
-  }
-
   public static object import_native(object args, object env) {
       // Works with Python Types
       // implements "using"
