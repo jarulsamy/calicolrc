@@ -153,7 +153,7 @@ MAIN FEATURES
         """
         calico.scheme.ENVIRONMENT[name] = value
 
-    def _get_help_on(self, expr, level=0):
+    def get_kernel_help_on(self, expr, level=0):
         result = calico.scheme.execute_string_rm("(help %s)" % expr)
         if not calico.scheme.exception_q(result):
             return result
