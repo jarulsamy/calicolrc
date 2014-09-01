@@ -5,7 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using HidSharp;
-
+//using Numerics.BigInteger;// Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;
+//using System.Numerics;
 /*
 Command/Response Format:
 

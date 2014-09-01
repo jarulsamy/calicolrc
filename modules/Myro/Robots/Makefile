@@ -109,6 +109,7 @@ Finch.dll: Finch.cs
 		-r:System.Drawing \
 		-pkg:gtk-sharp-2.0 \
 		-out:Finch.dll \
+		-r:System.Numerics \
 		-target:library \
 		$^ 
 
