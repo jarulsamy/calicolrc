@@ -996,7 +996,9 @@ define( function () {
     */
     
     var load_ipython_extension = function () {
-	require(['/nbextensions/bibtex.js']);
+	var version = IPython.version.substring(0, 1);
+	var path = (version === "2") ? '/nbextensions/bibtex.js' : '../../nbextensions/bibtex.js';
+	require([path]);
 	// Put a button on the toolbar:
 	if (!IPython.toolbar) {
 	    $([IPython.events]).on("app_initialized.NotebookApp", add_toolbar_buttons);

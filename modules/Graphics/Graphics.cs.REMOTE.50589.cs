@@ -3252,11 +3252,9 @@ public static class Graphics
 	        {
 		    return penUp(false, fillColor);
 		}
-	  //testing
     
 	        public Line penUp (bool getLine, object fillColor)
 		{
-		  System.Console.WriteLine("pen");
 		  if (pen.down) {
 		    if (getLine) {
 			  pen._down = false;

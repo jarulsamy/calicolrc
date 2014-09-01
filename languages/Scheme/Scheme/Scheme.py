@@ -56,9 +56,13 @@ class Char(object):
     def __gt__(self, other):
         return isinstance(other, Char) and self.char > other.char
     def __str__(self):
+        if self.char == " ":
+            return "#\\space"
+        elif self.char == "\n":
+            return "#\\newline"
         return "#\\%s" % self.char
     def __repr__(self):
-        return "#\\%s" % self.char
+        return str(self)
 
 class Symbol(object):
     def __init__(self, name):
@@ -85,6 +89,12 @@ class Symbol(object):
     def __len__(self):
         # So that EmptyList will be treated as []
         return 0
+
+    def __getattr__(self, attr):
+        if hasattr(self.name, attr):
+            return getattr(self.name, attr)
+        else:
+            raise AttributeError
 
 SYMBOLS = {}
 CHARS = {}
@@ -129,6 +139,12 @@ class cons(object):
         if current != symbol_emptylist:
             retval += " . " + make_safe(current)
         return "(%s)" % retval
+
+    def __call__(self, *args, **kwargs):
+        if self.car is symbol_procedure:
+            return dlr_func(self)(*args, **kwargs)
+        else:
+            raise Exception("not a procedure")
 
     def __iter__(self):
         cp = cons(self.car, self.cdr)
@@ -371,9 +387,11 @@ def cdddar(lyst):
 
 def set_car_b(cell, item):
     cell.car = item
+    return void_value
 
 def set_cdr_b(cell, item):
     cell.cdr = item
+    return void_value
 
 def list_tail(lyst, pos):
     if pos < 0:
@@ -570,15 +588,18 @@ def multiply(*args):
     return reduce(operator.mul, args, 1)
 
 def divide(*args):
-    if len(args) == 0:
-        return 1
-    elif len(args) == 1:
-        return fractions.Fraction(1, args[0])
-    else:
-        current = fractions.Fraction(args[0], args[1])
-        for arg in args[2:]:
-            current = fractions.Fraction(current, arg)
-        return current
+    try:
+        if len(args) == 0:
+            return 1
+        elif len(args) == 1:
+            return fractions.Fraction(1, args[0])
+        else:
+            current = fractions.Fraction(args[0], args[1])
+            for arg in args[2:]:
+                current = fractions.Fraction(current, arg)
+            return current
+    except:
+        return reduce(operator.div, args)
 
 def Equal(o1, o2):
     if boolean_q(o1) or boolean_q(o2):
@@ -772,17 +793,21 @@ def box(item):
     return List(item)
 
 def ready_to_eval(text):
-    lines = text.split()
-    if lines[-1].strip() == "":
-      return True ## force it
-    ## else, only if valid parse
-    return try_parse(text)
+    if text:
+        lines = text.split("\n")
+        if len(lines) > 0 and lines[-1].strip() == "":
+            return True ## force it
+        ## else, only if valid parse
+        return try_parse(text)
+    return True
 
 # native:
 def read_multiline(prompt):
     retval = ""
     while True:
         try:
+            if retval:
+                retval += "\n"
             retval += raw_input(prompt) ## Python 2
             prompt = "... "
         except EOFError:
@@ -926,16 +951,23 @@ def apply_with_keywords(*args):
     pass
 
 def import_native(libraries, environment):
-    retval = symbol_emptylist
+    env = {}
     for library in libraries:
-        lib = __import__(library)
-        sym = make_symbol(library)
-        set_global_value_b(sym, lib)
-        retval = cons(sym, retval)
-    return reverse(retval)
+        exec ("import %s" % library) in env
+    ENVIRONMENT.update(env)
+    return List(*[make_symbol(name) for name in env.keys() if not name.startswith("_")])
+
+def import_as_native(library, name, environment):
+    env = {}
+    if name == make_symbol("*"):
+        exec ("from %s import *" % library) in env
+    else:
+        exec ("import %s as %s" % (library, name)) in env
+    ENVIRONMENT.update(env)
+    return List(*[make_symbol(name) for name in env.keys() if not name.startswith("_")])
 
 def dlr_proc_q(item):
-    return callable(item) or hasattr(item, "MoveNext")
+    return (callable(item) and not isinstance(item, cons)) or hasattr(item, "MoveNext")
 
 def dlr_env_contains(item):
     return item.name in ENVIRONMENT

@@ -7,13 +7,13 @@ if svem_flag in sys.argv:
     sys.argv.remove(svem_flag)
 
 setup(name='calico',
-      version='0.2.8',
+      version='0.3.1',
       description='Tools for Python and IPython',
       long_description="Tools for IPython, and Scheme for Python",
       author='Douglas Blank',
       author_email='doug.blank@gmail.com',
       url="https://bitbucket.org/ipre/calico/src/master/src/",
-      packages=['calico', 'calico.magics'],
+      packages=['calico', 'calico.widgets'],
       classifiers = [
           'Framework :: IPython',
           'License :: OSI Approved :: BSD License',

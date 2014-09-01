@@ -3248,15 +3248,13 @@ public static class Graphics
 		    return penUp(false, null);
 		}
 
-	        public Line penUp (object fillColor)
+	        public Line penUp (Color fillColor)
 	        {
 		    return penUp(false, fillColor);
 		}
-	  //testing
     
-	        public Line penUp (bool getLine, object fillColor)
+	        public Line penUp (bool getLine, Color fillColor)
 		{
-		  System.Console.WriteLine("pen");
 		  if (pen.down) {
 		    if (getLine) {
 			  pen._down = false;
@@ -3264,10 +3262,8 @@ public static class Graphics
 			  line.color = pen.color;
 			  if (fillColor == null)
 			      line.fill = null;
-			  else if (fillColor is Color)
-			      line.fill = (Color)fillColor;
-			  else if (fillColor is String)
-			      line.fill = new Color((string)fillColor);
+			  else
+			      line.fill = fillColor;
 			  return line;
 		    } else {
 			  if (window != null) {
@@ -3276,10 +3272,8 @@ public static class Graphics
 			    line.color = pen.color;
 			    if (fillColor == null)
 				line.fill = null;
-			    else if (fillColor is Color)
-				line.fill = (Color)fillColor;
-			    else if (fillColor is String)
-				line.fill = new Color((string)fillColor);
+			    else
+				line.fill = fillColor;
 			    line.draw(window);
 			  }
 			  return null;
