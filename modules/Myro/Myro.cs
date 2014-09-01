@@ -1807,7 +1807,7 @@ public static class Myro
 	}
   
 	[method: JigsawTab("M/Actions")]
-	public static void penDown (string color)
+	public static void penDown (object color)
 	{
 	    if (robot != null) 
 		robot.penDown (color);
@@ -3840,7 +3840,7 @@ public static class Myro
 			penDown ("black");
 		}
 
-		public virtual void penDown (string color)
+		public virtual void penDown (object color)
 		{
 			ask (String.Format ("Please put a {0} pen in the robot.", color));
 		}

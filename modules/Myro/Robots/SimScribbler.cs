@@ -367,10 +367,25 @@ public class SimScribbler : Myro.Robot
 			//
 		}
 
-		public override void penDown (string color)
+	  
+		public override void penDown (object color)
 		{ 
-			frame.outline = new Graphics.Color (color);
-			frame.penDown ();
+		  if(color is String)
+		    {
+		      frame.outline = new Graphics.Color((string)color);
+		      frame.setPenColor(new Graphics.Color((string)color));
+		      
+		    }
+		  else if(color is Graphics.Color)
+		    {
+		      frame.outline = (Graphics.Color)color;
+		      frame.setPenColor((Graphics.Color)color);
+		    }
+		  else
+		    {
+		      throw new Exception("Invalid color string or color object");
+		    }
+		  frame.penDown ();
 		}
 
 		public override Graphics.Line penUp (object fillColor)
