@@ -195,8 +195,8 @@ public class Scribbler: Myro.Robot
                 if (port == null) 
                     need_port = false;
                 else if (serial.PortName.Equals (port) && serial.BaudRate == baud) {
-                    //need_port = false;
-                    uninit();
+                    need_port = false;
+                    //uninit();
                     serial.Open();
                 } else {
                     // It exists, but wrong port/baud, so close it:
