@@ -109,7 +109,8 @@ MAIN FEATURES
   magic %cd command can be used to go to any entry in that list.
 """
 
-    def add_complete(self, matches, token):
+    def get_completions(self, token):
+        matches = []
         # from the language environment:
         slist = calico.scheme.execute_string_rm("(dir)")
         if not calico.scheme.exception_q(slist):
@@ -137,8 +138,9 @@ MAIN FEATURES
                     if item_str.startswith(partial) and item_str not in matches:
                         matches.append(components + "." + item_str)
         # done with language-specific completitions
+        return matches
 
-    def _help_patterns(self):
+    def help_patterns(self):
         # Longest first:
         return [
             ("^\?\?(.*)$", 2,
@@ -152,6 +154,13 @@ MAIN FEATURES
         Set a variable in the kernel's enviroment.
         """
         calico.scheme.ENVIRONMENT[name] = value
+
+    def get_variable(self, name):
+        """
+        Get a variable in the kernel's enviroment.
+        """
+        if name in calico.scheme.ENVIRONMENT:
+            return calico.scheme.ENVIRONMENT[name]
 
     def get_kernel_help_on(self, expr, level=0):
         result = calico.scheme.execute_string_rm("(help %s)" % expr)
