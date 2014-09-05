@@ -207,7 +207,7 @@ MAIN FEATURES
             if current != calico.scheme.symbol_emptylist:
                 retval += " . " + self.repr(current)
             return "(%s)" % retval
-        elif isinstance(item, str):
+        elif isinstance(item, (str, unicode)):
             retval = repr(item)
             if retval.startswith("'"):
                 retval = retval.replace('"', '\\"')
