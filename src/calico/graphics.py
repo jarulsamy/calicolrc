@@ -25,10 +25,16 @@ class Canvas(object):
         self.size = size
         self.extras = extras
         self.shapes = []
+        self.viewbox = None
 
     def _render(self):
         canvas = svgwrite.Drawing(self.filename, self.size, **self.extras)
+        if self.viewbox:
+            canvas.viewbox(*self.viewbox)
         return canvas
+
+    def viewbox(self, xmin, ymin, width, height):
+        self.viewbox = (xmin, ymin, width, height)
 
     def save(self, filename=None):
         canvas = self._render()
