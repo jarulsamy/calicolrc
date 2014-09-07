@@ -109,7 +109,8 @@ MAIN FEATURES
   magic %cd command can be used to go to any entry in that list.
 """
 
-    def get_completions(self, token):
+    def get_completions(self, info):
+        token = info["code"]
         matches = []
         # from the language environment:
         slist = calico.scheme.execute_string_rm("(dir)")
@@ -162,7 +163,8 @@ MAIN FEATURES
         if name in calico.scheme.ENVIRONMENT:
             return calico.scheme.ENVIRONMENT[name]
 
-    def get_kernel_help_on(self, expr, level=0):
+    def get_kernel_help_on(self, info, level=0):
+        expr = info["code"]
         result = calico.scheme.execute_string_rm("(help %s)" % expr)
         if not calico.scheme.exception_q(result):
             return result
