@@ -93,11 +93,14 @@ require(["http://cs.brynmawr.edu/gxk2013/examples/tools/alphaChannels/processing
     def get_completions(self, token):
         return [command for command in self.keywords if command.startswith(token)]
 
-    def get_kernel_help_on(self, expr, level=0):
+    def get_kernel_help_on(self, expr, level=0, none_on_fail=False):
+        expr = info["code"]
         if expr in self.keywords:
             return "See http://processingjs.org/reference/%s_/" % expr
+        elif none_on_fail:
+            return None
         else:
-            return "Sorry, no available help for '%s'"
+            return "Sorry, no available help for '%s'" % expr
 
 
 if __name__ == '__main__': 

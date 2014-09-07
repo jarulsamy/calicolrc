@@ -335,8 +335,12 @@ Example Queries:
         keywords = ["cont", "continue", "dump", "is", "trace=0", "trace=1", "cut", "fail"]
         return [word for word in keywords if word.startswith(token)]
 
-    def get_kernel_help_on(self, expr, level=0):
-        return "Sorry, no available help for '%s'"
+    def get_kernel_help_on(self, info, level=0, none_on_fail=False):
+        expr = info["code"]
+        if none_on_fail:
+            return None
+        else:
+            return "Sorry, no available help for '%s'" % expr
 
 
 if __name__ == '__main__': 
