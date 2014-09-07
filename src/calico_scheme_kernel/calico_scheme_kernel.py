@@ -12,6 +12,8 @@ class CalicoSchemeKernel(MagicKernel):
     language_version = '3.0'
     banner = "Calico Scheme"
 
+    magic_suffixes = {}
+
     def __init__(self, *args, **kwargs):
         super(CalicoSchemeKernel, self).__init__(*args, **kwargs)
         self.log.setLevel(logging.INFO)
