@@ -143,15 +143,6 @@ MAIN FEATURES
         # done with language-specific completitions
         return matches
 
-    def help_patterns(self):
-        # Longest first:
-        return [
-            ("^\?\?(.*)$", 2,
-             "??item - get detailed help on item"), # "??code"
-            ("^\?(.*)$", 1, 
-             "?item - get help on item"),   # "?code"
-        ]
-        
     def set_variable(self, name, value):
         """
         Set a variable in the kernel's enviroment.
@@ -165,7 +156,7 @@ MAIN FEATURES
         if name in calico.scheme.ENVIRONMENT:
             return calico.scheme.ENVIRONMENT[name]
 
-    def get_kernel_help_on(self, info, level=0):
+    def get_kernel_help_on(self, info, level=0, none_on_fail=False):
         expr = info["code"]
         result = calico.scheme.execute_string_rm("(help %s)" % expr)
         if not calico.scheme.exception_q(result):
@@ -191,6 +182,8 @@ MAIN FEATURES
                 "choose": "Use (choose ITEM...) to setup non-deterministic interpreter, or use (choose) to go to next choice (special form)"
             }
             return help_text[expr]
+        elif none_on_fail:
+            return None
         else:
             return "No available help on '%s'" % expr
 
