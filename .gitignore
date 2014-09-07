@@ -1,7 +1,4 @@
+*.dll
 *~
-*.ipynb_checkpoints*
-mono/
-*.userprefs
-*.pyc
 .DS_STORE
-frameworks/
+

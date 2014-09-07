@@ -5,6 +5,7 @@ using System.IO.Ports;
 using System.Threading;
 using System;
 using Microsoft.Xna.Framework; // Vector2, Matrix
+//using System.Math.Cos;
 
 public class SimScribbler : Myro.Robot
 	{
@@ -1082,7 +1083,43 @@ public class SimScribbler : Myro.Robot
 
 		public object _getLine (params object [] position)
 		{
-			return Graphics.PyList (0, 0);
+		  
+		 	//Location of sensors in body coordinates with zero rotation
+		  	//Zero rotation is the robot facing to the right
+			double [] IR_Loc1 = new double[2] {-12,-1.05};
+			double [] IR_Loc2 = new double[2] {-12, 1.05};
+		  
+		  	//current position and rotation of robot
+			double [] loc = new double[2]{frame.center.x, frame.center.y};
+		    
+		    double theta = frame.body.Rotation;
+
+		    //rotates and translates body coordinates to world coordinates
+		double [] newIR_Loc1 = new double[2] { Math.Cos(theta)*IR_Loc1[0] - Math.Sin(theta)*IR_Loc1[1] + loc[0], 
+			Math.Sin(theta)*IR_Loc1[0] + Math.Cos(theta)*IR_Loc1[1] + loc[1] };
+
+		double [] newIR_Loc2 = new double[2] { Math.Cos(theta)*IR_Loc2[0] - Math.Sin(theta)*IR_Loc2[1] + loc[0], 
+			Math.Sin(theta)*IR_Loc2[0] + Math.Cos(theta)*IR_Loc2[1] + loc[1] };
+		  
+		int leftSensor = 0;
+		int rightSensor = 0;
+		bool isRobot = false;
+		foreach (Graphics.Shape s in simulation.window.canvas.shapes) 
+		      {
+			if(s==frame)
+			  isRobot=true;
+			if(!isRobot)
+			  {				    
+			    if(s.hit((double)newIR_Loc1[0],(double)newIR_Loc1[1]))
+			      leftSensor = 1;
+			    if(s.hit((double)newIR_Loc2[0],(double)newIR_Loc2[1]))
+			      rightSensor = 1;
+			    isRobot = false;
+			  }
+		      }
+		      	
+		return Graphics.PyList(leftSensor,rightSensor);
+
 		}
     
 		public object _getLocation ()

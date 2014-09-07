@@ -3257,7 +3257,6 @@ public static class Graphics
     
 	        public Line penUp (bool getLine, string fillColor)
 		{
-		  System.Console.WriteLine("pen");
 		  if (pen.down) {
 		    if (getLine) {
 			  pen._down = false;

@@ -1373,6 +1373,8 @@ public static class Myro
 		public List<Graphics.Shape> lights = new List<Graphics.Shape> ();
 		public Graphics.Color groundColor = new Graphics.Color (24, 155, 28);
 	        public bool run = true;
+	  public bool isRandom = true;
+	  public bool fastSim = false;
 	    
 		public Simulation (string title, int width, int height, Graphics.Color color)
 		{
@@ -1592,7 +1594,7 @@ public static class Myro
 			    robot.update ();
 			}
 		    }
-		    window.step (.1);
+		    window.step (0.1);
 		}
 	    }
 
@@ -3339,18 +3341,38 @@ public static class Myro
 			return items [pos];
 		}
 	}
-
+	[method: JigsawTab("M/Misc")]
+  public static void setSimSpeed(string speed="normal")
+  {
+    if(speed == "fast" || speed == "Fast")
+      Myro.simulation.fastSim = true;
+    else
+      Myro.simulation.fastSim = false;
+  }  
+	[method: JigsawTab("M/Misc")]
+  public static void setSimRandom(bool value=true)
+  {
+    Myro.simulation.isRandom = value;
+  }
+  
 	[method: JigsawTab("M/Misc")]
   public static void wait (double seconds)
   {
       
+    double stepTime;
     if (seconds > 0) 
       {
 
-	if(Myro.simulation!=null)
+	if(Myro.simulation!=null && !Myro.simulation.isRandom)
 	  {
 	    Myro.simulation.thread.Suspend();
-	    double stepTime=0.1;
+	    if(Myro.simulation.fastSim)
+	      {
+		stepTime=0.01;		
+		seconds = seconds/10;
+	      }
+	    else
+	      stepTime=0.1;
 	    while(seconds > 0)
 	      {
 		seconds = seconds - stepTime;
@@ -4736,6 +4758,22 @@ public static class Myro
 	    public static void savePicture (IList pictures, string filename)
         {
 	    Graphics.savePicture (pictures, filename);
+	}
+	[method: JigsawTab("M/Picture")]
+	public static void saveWindow (string filename, object window=null)
+	{
+		if (window == null)			
+			window = Graphics.getWindow ();
+		else if (window is string)
+			window = Graphics.getWindow ((string)window);
+		//else
+			//window = (Graphics.WindowClass)window;	
+		if (!filename.EndsWith (".png") && !filename.EndsWith (".jpeg")) {	
+			System.Console.WriteLine ("Warning: Filename must end in '.png' or '.jpeg'.");
+			System.Console.WriteLine ("Saving to '.png' as default.");
+			filename = filename + ".png";
+		}
+		Graphics.savePicture (Graphics.makePicture ((Graphics.WindowClass)window), (string)filename);
 	}
 
         [method: JigsawTab(null)]
