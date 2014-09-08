@@ -1,6 +1,7 @@
 from jupyter_kernel import MagicKernel
 from IPython.display import HTML
 import sys
+import re
 
 class ProcessingKernel(MagicKernel):
     implementation = 'Processing'
@@ -90,13 +91,24 @@ require(["http://cs.brynmawr.edu/gxk2013/examples/tools/alphaChannels/processing
         html = HTML(code)
         self.Display(html)
 
-    def get_completions(self, token):
+    def get_completions(self, info):
+        token = info["code"]
         return [command for command in self.keywords if command.startswith(token)]
 
-    def get_kernel_help_on(self, expr, level=0, none_on_fail=False):
+    def get_kernel_help_on(self, info, level=0, none_on_fail=False):
         expr = info["code"]
         if expr in self.keywords:
-            return "See http://processingjs.org/reference/%s_/" % expr
+            url = "http://processingjs.org/reference/%s_/" % expr
+            try:
+                import html2text
+                import urllib
+            except:
+                return url
+            html = urllib.urlopen(url).read()
+            visible_text = html2text.html2text(html)
+            pattern = re.compile("(.*?)### ", re.DOTALL)
+            visible_text = re.sub(pattern, "### ", visible_text, 1)
+            return visible_text
         elif none_on_fail:
             return None
         else:

@@ -324,7 +324,8 @@ Example Queries:
         else:
             self.Error("Ask a question first.")
 
-    def get_completions(self, token):
+    def get_completions(self, info):
+        token = info["code"]
         keywords = ["cont", "continue", "dump", "is", "trace=0", "trace=1", "cut", "fail"]
         return [word for word in keywords if word.startswith(token)]
 
