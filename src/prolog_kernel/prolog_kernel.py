@@ -249,6 +249,8 @@ class PrologKernel(MagicKernel):
     banner = "Prolog kernel - evaluates Prolog programs"
     search = None
 
+    magic_suffixes = {}
+
     def get_usage(self):
         return """This is the Prolog kernel.
 
@@ -271,15 +273,6 @@ Example Queries:
     sibling(sally, erica)?
     father_child(Father, Child)?
 """
-
-    def help_patterns(self):
-        # Longest first:
-        return [
-            ("^\?\?(.*)$", 2,
-             "??item - get detailed help on item"), # "??code"
-            ("^\?(.*)$", 1, 
-             "?item - get help on item"),   # "?code"
-        ]
 
     def do_execute_direct(self, code):
         global print_function
