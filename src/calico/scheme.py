@@ -99,7 +99,9 @@ class Symbol(object):
         return 0
 
     def __getattr__(self, attr):
-        if hasattr(self.name, attr):
+        if attr == "name":
+            return self.__getattribute__("name")
+        elif hasattr(self.name, attr):
             return getattr(self.name, attr)
         else:
             raise AttributeError
