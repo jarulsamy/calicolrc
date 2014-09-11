@@ -9,15 +9,19 @@ class GoogleChart(object):
         self.options = options
         GoogleChart.id += 1
         
+    def _toList(self, row):
+        return [item for item in row]
+
     def _arrayToDataTable(self):
         nCols = 0
-        if len(self.data) > 0 and isinstance(self.data[0], (list, tuple)):
-            nCols = len(self.data[0])
-        else:
-            nCols = 1
+        if len(self.data) > 0:
+            try:
+                nCols = len(self.data[0])
+            except:
+                nCols = 1
 
-        if self.keys != []: 
-            table = [self.keys]
+        if len(self.keys) != 0: 
+            table = [self._toList(self.keys)]
         elif nCols == 1:
             table = [[''] * (nCols + 1)]
         else:
@@ -31,7 +35,7 @@ class GoogleChart(object):
                 else:
                     table.append([t] + [row])
             else:
-                table.append(row)
+                table.append(self._toList(row))
             t += 1
         return table
         
