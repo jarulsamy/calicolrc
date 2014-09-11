@@ -2657,6 +2657,9 @@
 (define-native float (lambda (n) (exact->inexact n)))
 (define-native int (lambda (n) (inexact->exact n)))
 (define-native iter? (lambda (x) #f))
+(define-native contains-native (lambda (dict x) #f))
+(define-native getitem-native (lambda (dict x) 'unknown))
+(define-native setitem-native (lambda (dict x value) 'unknown))
 
 (define use-lexical-address
   (lambda args
@@ -4772,6 +4775,18 @@
       (runtime-error "incorrect number of arguments to iter?" info handler fail))
      (else (k2 (apply iter? args) fail)))))
 
+(define contains-prim
+  (lambda-proc (args env2 info handler fail k2)
+       (k2 (apply contains-native args) fail)))
+
+(define getitem-prim
+  (lambda-proc (args env2 info handler fail k2)
+       (k2 (apply getitem-native args) fail)))
+
+(define setitem-prim
+  (lambda-proc (args env2 info handler fail k2)
+       (k2 (apply setitem-native args) fail)))
+
 (define list?-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
@@ -5061,6 +5076,9 @@
  	    (list 'apply-with-keywords apply-with-keywords-prim "(apply-with-keywords PROCEDURE ...): ")
  	    (list 'assq assq-prim "(assq ...): ")
  	    (list 'dict dict-prim "(dict ...): ")
+ 	    (list 'contains contains-prim "(contains DICTIONARY ITEM): returns #t if DICTIONARY contains ITEM")
+ 	    (list 'getitem getitem-prim "(getitem DICTIONARY ITEM): returns the VALUE of DICTIONARY[ITEM]")
+ 	    (list 'setitem setitem-prim "(setitem DICTIONARY ITEM VALUE): sets and returns DICTIONARY[ITEM] with VALUE")
  	    (list 'property property-prim "(property ...): ")
  	    (list 'rational rational-prim "(rational NUMERATOR DENOMINTAOR): return a rational number")
  	    (list 'reset-toplevel-env reset-toplevel-env-prim "(reset-toplevel-env): reset the toplevel environment")

@@ -726,6 +726,7 @@ public class PJScheme:Scheme
                        "caaar", "caadr", "cadar", "caddr" , "cdaar", "cdadr", "cddar", "cdddr",
                        "caaaar", "caaadr", "caadar", "caaddr" , "cadaar", "cadadr", "caddar", "cadddr",
                        "cdaaar", "cdaadr", "cdadar", "cdaddr" , "cddaar", "cddadr", "cdddar", "cddddr",
+                       "contains-native", "getitem-native", "setitem-native"
                    ] or 
             "?" in name):
             return self.fix_name(name) + "_proc"

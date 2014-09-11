@@ -478,6 +478,9 @@ public class Scheme {
                                                                 1, 1);
     public static Proc use_lexical_address_proc = new Proc("use-lexical-address", (Procedure1Bool)PJScheme.use_lexical_address, -1, 2);
     public static Proc dict_proc = new Proc("dict", (Procedure1)dict, 1, 1);
+    public static Proc contains_native_proc = new Proc("contains", (Procedure2)contains_native, 2, 1);
+    public static Proc getitem_native_proc = new Proc("getitem", (Procedure2)getitem_native, 2, 1);
+    public static Proc setitem_native_proc = new Proc("setitem", (Procedure3)setitem_native, 3, 1);
     public static Proc property_proc = new Proc("property", (Procedure1)property, 1, 1);
     public static Proc reset_toplevel_env_proc = new Proc("reset-toplevel-env", (Procedure0Void)reset_toplevel_env, 0, 0);
     public static Proc string_split_proc = new Proc("string-split", (Procedure2)string_split, 2, 1);
@@ -3566,5 +3569,18 @@ public class Scheme {
 
     public static object help(object obj) {
 	return "No available help for host-system item.";
+    }
+    
+    public static object contains_native(object obj, object item) {
+	return ((IDictionary)obj).Contains(item);
+    }
+
+    public static object getitem_native(object obj, object item) {
+	return ((IDictionary)obj)[item];
+    }
+
+    public static object setitem_native(object obj, object item, object value) {
+	((IDictionary)obj)[item] = value;
+	return value;
     }
 }

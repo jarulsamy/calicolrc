@@ -1052,5 +1052,15 @@ def load_native(filename):
     GLOBALS['pc'] = load_files
     trampoline()
 
+def getitem_native(dictionary, item):
+    return dictionary[item]
+
+def setitem_native(dictionary, item, value):
+    dictionary[item] = value
+    return value
+
+def contains_native(dictionary, item):
+    return item in dictionary
+
 # end of Scheme.py
 #############################################################
