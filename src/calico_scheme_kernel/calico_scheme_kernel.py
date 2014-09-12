@@ -192,18 +192,22 @@ MAIN FEATURES
             items = " ".join(map(self.repr, item))
             return "#%d(%s)" % (len(item), items)
         elif isinstance(item, calico.scheme.cons): # a scheme list
-            retval = repr(item)
-            if retval.startswith("#"):
-                return retval
-            retval = []
-            current = item
-            while isinstance(current, calico.scheme.cons): 
-                retval.append(self.repr(current.car))
-                current = current.cdr
-            retval = " ".join(retval)
-            if current != calico.scheme.symbol_emptylist:
-                retval += " . " + self.repr(current)
-            return "(%s)" % retval
+            if isinstance(item.car, calico.scheme.Symbol):
+                if item.car.name == "procedure":
+                    return "#<procedure>"
+                elif item.car.name == "environment":
+                    return "#<environment>"
+            else: # a pair
+                retval = []
+                current = item
+                while isinstance(current, calico.scheme.cons): 
+                    retval.append(self.repr(current.car))
+                    current = current.cdr
+                retval = " ".join(retval)
+                if not (isinstance(current, calico.scheme.Symbol) and 
+                        current.name == "()"):
+                    retval += " . " + self.repr(current)
+                return "(%s)" % retval
         elif isinstance(item, (str, unicode)):
             retval = repr(item)
             if retval.startswith("'"):
