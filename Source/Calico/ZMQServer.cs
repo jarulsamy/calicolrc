@@ -813,7 +813,7 @@ public static class ZMQServer {
 				    IDictionary<string, object> m_parent_header, 
 				    IDictionary<string, object> m_metadata, 
 				    IDictionary<string, object> m_content) {
-	    throw new Exception(this.ToString() + ": unknown msg_type: " + m_header["msg_type"]);
+	    //throw new Exception(this.ToString() + ": unknown msg_type: " + m_header["msg_type"]);
 	}
 
 	public void stop() {
@@ -990,7 +990,7 @@ public static class ZMQServer {
 		    session.request_quit = true;
 		}
 	    } else {
-		throw new Exception("ShellChannel: unknown msg_type: " + msg_type);
+		//throw new Exception("ShellChannel: unknown msg_type: " + msg_type);
 	    }
 	}
 
@@ -1246,7 +1246,7 @@ public static class ZMQServer {
 	    if (msg_type == "shutdown_request") {
 		session.request_quit = true;
 	    } else {
-		throw new Exception("ControlChannel: unknown msg_type: " + msg_type);
+		//throw new Exception("ControlChannel: unknown msg_type: " + msg_type);
 	    }
 	}
     }
@@ -1274,7 +1274,7 @@ public static class ZMQServer {
 	    if (msg_type == "input_reply") {
 		SetState("ready", m_content["value"].ToString());
 	    } else {
-		throw new Exception("StdInChannel: unknown msg_type: " + msg_type);
+		//throw new Exception("StdInChannel: unknown msg_type: " + msg_type);
 	    }
 	}
     }
