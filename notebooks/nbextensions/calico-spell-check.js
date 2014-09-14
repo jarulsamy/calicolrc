@@ -8,12 +8,13 @@
  *
  **/
 
-define( function () {
+define(["require", "nbextensions/typo/typo"], function (require) {
 
     function toggle_spell_check() {
 	// Toggle on/off spelling checking on for markdown and heading cells
 	// toggle it!
 	var spelling_mode = (IPython.MarkdownCell.options_default.cm_config.mode == document.original_markdown_mode);
+	//console.log(spelling_mode);
 	// Change defaults for new cells:
 	IPython.MarkdownCell.options_default.cm_config.mode = (spelling_mode ? "spell-check-markdown" : document.original_markdown_mode);
 	IPython.HeadingCell.options_default.cm_config = {"mode": (spelling_mode ? "spell-check-heading" : document.original_heading_mode)};
@@ -33,7 +34,7 @@ define( function () {
 	var link = document.createElement("link");
 	link.type = "text/css";
 	link.rel = "stylesheet";
-	var path = 'nbextensions/calico-spell-check.css';
+	var path = './calico-spell-check.css';
 	link.href = require.toUrl(path);
 	document.getElementsByTagName("head")[0].appendChild(link);
     };
@@ -45,6 +46,11 @@ define( function () {
     };
 	
     var load_ipython_extension = function () {
+	if (!IPython.MarkdownCell) {
+	    $([IPython.events]).on("app_initialized.NotebookApp", load_ipython_extension);
+	    return;
+	}
+
 	// Load the CSS for spelling errors (red wavy line under misspelled word):
 	load_css();
 
@@ -87,18 +93,16 @@ define( function () {
 	CodeMirror.defineMode("spell-check-heading", makeOverlay(document.original_heading_mode));
 
 	// Load dictionary:
-	var path = 'nbextensions/typo/typo.js';
-	require([path], function() {
-	    var lang = "en_US";
-	    var dict_path = 'nbextensions/typo/dictionaries';
-	    document.dictionary = new Typo(lang, undefined, undefined, 
-					   {"platform": "web", 
-					    "dictionaryPath": dict_path});
-	});
+	var lang = "en_US";
+	var dict_path = require.toUrl("./typo/dictionaries");
+	document.dictionary = new Typo(lang, undefined, undefined, 
+				       {"platform": "web", 
+					"dictionaryPath": dict_path});
 
 	// Put a button on the toolbar:
 	if (!IPython.toolbar) {
-	    $([IPython.events]).on("app_initialized.NotebookApp", add_toolbar_buttons);
+	    $([IPython.events]).on("app_initialized.NotebookApp", 
+				   add_toolbar_buttons);
 	    return;
 	} else {
 	    add_toolbar_buttons();

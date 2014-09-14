@@ -8,7 +8,7 @@
  *
  **/
 
-define( function () {
+define(["require", "nbextensions/bibtex"], function (require) {
 
     function move_section_down(event, index) {
         var i = IPython.notebook.index_or_selected(index);
@@ -996,11 +996,10 @@ define( function () {
     */
     
     var load_ipython_extension = function () {
-	var path = 'nbextensions/bibtex.js';
-	require([path]);
 	// Put a button on the toolbar:
 	if (!IPython.toolbar) {
-	    $([IPython.events]).on("app_initialized.NotebookApp", add_toolbar_buttons);
+	    $([IPython.events]).on("app_initialized.NotebookApp", 
+				   add_toolbar_buttons);
 	    return;
 	} else {
 	    add_toolbar_buttons();

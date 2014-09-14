@@ -8,6 +8,7 @@
  *
  **/
 
-IPython.load_extensions("calico-spell-check", 
-			"calico-document-tools", 
-			"calico-cell-tools");
+IPython.load_extensions("calico-spell-check",
+			"calico-document-tools",
+			"calico-cell-tools"
+		       );

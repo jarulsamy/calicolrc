@@ -8,7 +8,7 @@
  *
  **/
 
-define( function () {
+define(["require"], function (require) {
 
     function toggle_columns(evt, input_cell) {
 	// Toggle code cells into two columns
@@ -213,7 +213,7 @@ define( function () {
 	var link = document.createElement("link");
 	link.type = "text/css";
 	link.rel = "stylesheet";
-	var path = 'nbextensions/calico-cell-tools.css';
+	var path = './calico-cell-tools.css';
 	link.href = require.toUrl(path);
 	document.getElementsByTagName("head")[0].appendChild(link);
     };
