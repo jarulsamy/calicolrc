@@ -469,7 +469,7 @@ public static class ZMQServer {
 	public void send_multipart(Channel channel, 
 				   IList<string> identities, 
 				   IList<string> parts) {
-	    session.calico.stdout.WriteLine("send: {0}", parts[2]);
+	    //session.calico.stdout.WriteLine("send: {0}", parts[2]);
 	    int count = 0;
 	    foreach (string msg in identities) {
 		channel.socket.SendMore(msg, Encoding.UTF8);
@@ -917,7 +917,7 @@ public static class ZMQServer {
 				     IDictionary<string, object> m_content) {
 	    // Shell handler
 	    string msg_type = m_header["msg_type"].ToString();
-	    session.calico.stdout.WriteLine("on_recv: {0}", msg_type);
+	    //session.calico.stdout.WriteLine("on_recv: {0}", msg_type);
 	    if (msg_type == "execute_request") {
 		var header = session.Header("status", m_header["session"].ToString());
 		var metadata = pack();
