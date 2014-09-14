@@ -127,10 +127,13 @@ class cons(object):
         self.cdr = cdr
 
     def __repr__(self):
-        if self.car is symbol_procedure:
-            return "#<procedure>"
-        elif self.car is symbol_environment:
-            return "#<environment>"
+        # Written to not deal with exact same
+        # atoms, so will work with unpickled objs
+        if isinstance(self.car, Symbol):
+            if self.car.name == "procedure":
+                return "#<procedure>"
+            elif self.car.name == "environment":
+                return "#<environment>"
         retval = ""
         current = self
         while isinstance(current, cons):
@@ -138,7 +141,7 @@ class cons(object):
                 retval += " "
             retval += make_safe(current.car)
             current = current.cdr
-        if current != symbol_emptylist:
+        if not (isinstance(current, Symbol) and current.name == "()"):
             retval += " . " + make_safe(current)
         return "(%s)" % retval
 
