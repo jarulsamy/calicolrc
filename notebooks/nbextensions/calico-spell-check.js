@@ -13,18 +13,18 @@ define( function () {
     function toggle_spell_check() {
 	// Toggle on/off spelling checking on for markdown and heading cells
 	// toggle it!
-	var spelling_mode = (IPython.MarkdownCell.options_default.cm_config.mode == "gfm");
+	var spelling_mode = (IPython.MarkdownCell.options_default.cm_config.mode == document.original_markdown_mode);
 	// Change defaults for new cells:
-	IPython.MarkdownCell.options_default.cm_config.mode = (spelling_mode ? "spell-check-gfm" : "gfm");
-	IPython.HeadingCell.options_default.cm_config = {"mode": (spelling_mode ? "spell-check-mixedhtml" : "mixedhtml")};
+	IPython.MarkdownCell.options_default.cm_config.mode = (spelling_mode ? "spell-check-markdown" : document.original_markdown_mode);
+	IPython.HeadingCell.options_default.cm_config = {"mode": (spelling_mode ? "spell-check-heading" : document.original_heading_mode)};
 	// And change any existing markdown cells:
 	var cells = IPython.notebook.get_cells();
 	for (var i = 0; i < cells.length; i++) {
             var cell = cells[i];
             if (cell.cell_type == "markdown") {
-		IPython.notebook.get_cell(i).code_mirror.setOption('mode', (spelling_mode ? "spell-check-gfm" : "gfm"));
+		IPython.notebook.get_cell(i).code_mirror.setOption('mode', (spelling_mode ? "spell-check-markdown" : document.original_markdown_mode));
 	    } else if (cell.cell_type == "heading") {
-		IPython.notebook.get_cell(i).code_mirror.setOption('mode', (spelling_mode ? "spell-check-mixedhtml" : "mixedhtml"));
+		IPython.notebook.get_cell(i).code_mirror.setOption('mode', (spelling_mode ? "spell-check-heading" : document.original_heading_mode));
 	    }
 	}
     }
@@ -33,8 +33,7 @@ define( function () {
 	var link = document.createElement("link");
 	link.type = "text/css";
 	link.rel = "stylesheet";
-	var version = IPython.version.substring(0, 1);
-	var path = (version === "2") ? '/nbextensions/calico-spell-check.css' : '../../nbextensions/calico-spell-check.css';
+	var path = 'nbextensions/calico-spell-check.css';
 	link.href = require.toUrl(path);
 	document.getElementsByTagName("head")[0].appendChild(link);
     };
@@ -80,17 +79,18 @@ define( function () {
 		return CodeMirror.overlayMode(CodeMirror.getMode(config, mode), spellOverlay, {"opaque": true});
 	    }
 	}
+
+	document.original_markdown_mode = IPython.MarkdownCell.options_default.cm_config.mode;
+	document.original_heading_mode = IPython.HeadingCell.options_default.cm_config.mode;
 	
-	CodeMirror.defineMode("spell-check-gfm", makeOverlay("gfm"));
-	CodeMirror.defineMode("spell-check-mixedhtml", makeOverlay("mixedhtml"));
+	CodeMirror.defineMode("spell-check-markdown", makeOverlay(document.original_markdown_mode));
+	CodeMirror.defineMode("spell-check-heading", makeOverlay(document.original_heading_mode));
 
 	// Load dictionary:
-	var version = IPython.version.substring(0, 1);
-	var path = (version === "2") ? '/nbextensions/typo/typo.js' : '../../nbextensions/typo/typo.js';
+	var path = 'nbextensions/typo/typo.js';
 	require([path], function() {
 	    var lang = "en_US";
-	    var dict_version = IPython.version.substring(0, 1);
-	    var dict_path = (version === "2") ? '/nbextensions/typo/dictionaries' : '../../nbextensions/typo/dictionaries';
+	    var dict_path = 'nbextensions/typo/dictionaries';
 	    document.dictionary = new Typo(lang, undefined, undefined, 
 					   {"platform": "web", 
 					    "dictionaryPath": dict_path});
