@@ -3300,6 +3300,12 @@
            info
            handler
            fail))
+        ((not (all-numeric? args))
+         (runtime-error
+           "attempt to apply = on non-numeric argument"
+           info
+           handler
+           fail))
         (else (apply-cont2 k2 (apply = args) fail))))))
 
 (define+

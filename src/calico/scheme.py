@@ -3991,10 +3991,14 @@ def b_proc_90_d():
         GLOBALS['msg_reg'] = "incorrect number of arguments to ="
         GLOBALS['pc'] = runtime_error
     else:
-        GLOBALS['value2_reg'] = fail_reg
-        GLOBALS['value1_reg'] = Apply(Equal, args_reg)
-        GLOBALS['k_reg'] = k2_reg
-        GLOBALS['pc'] = apply_cont2
+        if true_q(not(all_numeric_q(args_reg))):
+            GLOBALS['msg_reg'] = "attempt to apply = on non-numeric argument"
+            GLOBALS['pc'] = runtime_error
+        else:
+            GLOBALS['value2_reg'] = fail_reg
+            GLOBALS['value1_reg'] = Apply(Equal, args_reg)
+            GLOBALS['k_reg'] = k2_reg
+            GLOBALS['pc'] = apply_cont2
 
 def b_proc_91_d():
     if true_q(not(length_one_q(args_reg))):

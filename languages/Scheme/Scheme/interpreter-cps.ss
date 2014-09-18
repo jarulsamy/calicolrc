@@ -1526,6 +1526,8 @@
     (cond
       ((not (length-at-least? 2 args))
        (runtime-error "incorrect number of arguments to =" info handler fail))
+      ((not (all-numeric? args))
+       (runtime-error "attempt to apply = on non-numeric argument" info handler fail))
       (else (k2 (apply = args) fail)))))
 
 ;; abs

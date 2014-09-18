@@ -3492,10 +3492,15 @@ public class PJScheme:Scheme
             msg_reg = "incorrect number of arguments to =";
             pc = runtime_error;
         } else {
-            value2_reg = fail_reg;
-            value1_reg = apply(Equal_proc, args_reg);
-            k_reg = k2_reg;
-            pc = apply_cont2;
+            if (true_q((! true_q(all_numeric_q(args_reg))))) {
+                msg_reg = "attempt to apply = on non-numeric argument";
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(Equal_proc, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
         }
     }
     

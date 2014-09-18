@@ -3397,11 +3397,15 @@
         (begin
           (set! msg_reg "incorrect number of arguments to =")
           (set! pc runtime-error))
-        (begin
-          (set! value2_reg fail_reg)
-          (set! value1_reg (apply = args_reg))
-          (set! k_reg k2_reg)
-          (set! pc apply-cont2)))))
+        (if (not (all-numeric? args_reg))
+            (begin
+              (set! msg_reg "attempt to apply = on non-numeric argument")
+              (set! pc runtime-error))
+            (begin
+              (set! value2_reg fail_reg)
+              (set! value1_reg (apply = args_reg))
+              (set! k_reg k2_reg)
+              (set! pc apply-cont2))))))
 
 (define <proc-91>
   (lambda ()
