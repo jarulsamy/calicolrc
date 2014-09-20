@@ -21,6 +21,7 @@ public class SimScribbler : Myro.Robot
 		public PythonDictionary readings = new PythonDictionary ();
 		public List<Graphics.Shape> light_sensors = new List<Graphics.Shape> ();
 		public bool show_sensors = false;
+	  public double [] blobRLE = { 0,254,51,136,190,254};
 		string _forwardness = "fluke-forward";
 
 		public SimScribbler (Myro.Simulation simulation)
@@ -408,7 +409,7 @@ public class SimScribbler : Myro.Robot
 			// Add a delegate to the queue, which will execute when appropriate
 			queue.Add(delegate {
 				try {
-				    pic = _takePicture();
+				    pic = _takePicture(mode);
 				} catch (Exception e) {
 				    exception = e;
 				}
@@ -497,7 +498,7 @@ public class SimScribbler : Myro.Robot
 					high = (int)(zero - (shape.z * 192 * g)); // distance above ground, 0 to 1
 					low = (int)(high - (shape.zHeight * 192 * g)); // height of shape, 0 to 1
 					for (h = low; h < high; h++) {
-					    column[h] = new Graphics.Color (shape.color.red * g, 
+					  column[h] = new Graphics.Color (shape.color.red * g, 
 									    shape.color.green * g, 
 									    shape.color.blue * g);
 					}
@@ -513,9 +514,125 @@ public class SimScribbler : Myro.Robot
 			    }
 			});
 		    ev.WaitOne ();
+		    //Does a thresholdhing based on the value sin blobRLE
+		    if(mode=="blob")
+		      {
+			for(int i =0;i<picture.width;i++)
+			  {
+			    for(int j=0;j<picture.height;j++)
+			      {
+				PythonTuple rgb = picture.getPixel (i, j).getRGB ();
+				List yuv = Myro.rgb2yuv ((int)rgb [0], (int)rgb [1], (int)rgb [2]);
+				if( (int)yuv[0] >= blobRLE[0] && (int)yuv[0] <= blobRLE[1] &&  
+				    (int)yuv[1] >= blobRLE[2] && (int)yuv[1] <= blobRLE[3]  &&
+				    (int)yuv[2] >= blobRLE[4] && (int)yuv[2]<= blobRLE[5])
+				  {
+				    picture.setRGB(i,j,0,0,0);				    
+				  }
+				else
+				  picture.setRGB(i,j,255,255,255);
+			      }
+			  }
+		      }
 		    return picture;
 	        }
     
+
+	  public PythonTuple set_blob_yuv (Graphics.Picture picture, int x1, int y1, int x2, int y2)
+	  {
+	    int [] xs = new int[2]; //[x1,x2];
+	    int [] ys = new int[2]; //[y1,y2];
+	    xs [0] = Math.Min (x1, x2);
+	    xs [1] = Math.Max (x1, x2);
+	    ys [0] = Math.Min (y1, y2);
+	    ys [1] = Math.Max (y1, y2);
+	    
+	    //set up variables to hold counts and accumulations:
+	    double totalY = 0.0;
+	    double totalU = 0.0;
+	    double totalV = 0.0;
+	    
+	    List ySamples = new List ();
+	    List uSamples = new List ();
+	    List vSamples = new List ();
+	    
+	    for (int i=xs[0]; i < xs[1]; i++) {
+	      for (int j=ys[0]; j < ys[1]; j++) {
+                PythonTuple rgb = picture.getPixel (i, j).getRGB ();
+                List yuv = Myro.rgb2yuv ((int)rgb [0], (int)rgb [1], (int)rgb [2]);
+                totalY = totalY + (int)yuv [0];
+                totalU = totalU + (int)yuv [1];
+                totalV = totalV + (int)yuv [2];
+                ySamples.append ((int)yuv [0]);
+                uSamples.append ((int)yuv [1]);
+                vSamples.append ((int)yuv [2]);
+	      }
+	    }
+	    
+	    int count = ySamples.Count;
+	    double yMean = totalY / count;
+	    double uMean = totalU / count;
+	    double vMean = totalV / count;
+	    
+	    // The standard deviation of a random variable with a normal 
+	    // distribution is the root-mean-square (RMS) deviation of its 
+	    // values from their mean.
+	    double sY = 0.0;
+	    double sU = 0.0;
+	    double sV = 0.0;
+	    
+	    for (int i=0; i < count; i ++) {
+	      sY = sY + ((int)ySamples [i] - yMean) * ((int)ySamples [i] - yMean);
+	      sU = sU + ((int)uSamples [i] - uMean) * ((int)uSamples [i] - uMean);
+	      sV = sV + ((int)vSamples [i] - vMean) * ((int)vSamples [i] - vMean);
+	    }
+	    
+	    sY = Math.Sqrt (sY / count);
+	    sU = Math.Sqrt (sU / count);
+	    sV = Math.Sqrt (sV / count);
+	    
+	    // Select the U/V bounding box based upon stdMod stdDev
+	    // from the mean, with approripate
+	    // min/max values to fit in an 8 bit register.
+	    //
+	    double stdMod = 3.0;
+	    
+	    int minU = (int)Math.Max (0, (uMean - sU * stdMod));
+	    int maxU = (int)Math.Min (255, (uMean + sU * stdMod));
+	    int minV = (int)Math.Max (0, (vMean - sV * stdMod));
+	    int maxV = (int)Math.Min (255, (vMean + sV * stdMod));
+	    
+	    // Note that we use the default values for
+	    // several parameters, most importantly the Y value
+	    // defaults to a range of 0-254
+	    conf_rle (0, 254, minU, maxU, minV, maxV);
+	    
+	    // Return a tupal of parameters suitable for the configureBlob
+	    // function, to be shown to the user.
+	    
+	    return Graphics.PyTuple (0, 254, minU, maxU, minV, maxV);
+	    
+	  }
+	  public override void configureBlob (int y_low, int y_high, int u_low, int u_high, int v_low, int v_high)
+	  {
+	    conf_rle(y_low, y_high, u_low, u_high, v_low, v_high);
+	    //return Graphics.PyTuple(y_low,y_high,u_low,u_high,v_low,v_high);
+	  }
+	  
+	  public void conf_rle (int y_low=0, int y_high=254,
+				int u_low=51, int u_high=136,
+				int v_low=190, int v_high=254, int delay = 90, int smooth_thresh = 4)
+	  {
+	    blobRLE[0]=y_low;
+	    blobRLE[1]=y_high;
+	    blobRLE[2]=u_low;
+	    blobRLE[3]=u_high;
+	    blobRLE[4]=v_low;
+	    blobRLE[5]=v_high;
+	  }
+
+
+
 		public override void setup ()
 		{
 		    Console.WriteLine ("You are using:");
