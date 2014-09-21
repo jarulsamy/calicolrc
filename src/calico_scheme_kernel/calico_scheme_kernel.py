@@ -231,6 +231,9 @@ MAIN FEATURES
             retval = None
         return retval
 
+    def do_function_direct(self, function_name, arg):
+        return self.do_execute_direct("(%s %s)" % (function_name, arg))
+
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
     IPKernelApp.launch_instance(kernel_class=CalicoSchemeKernel)
