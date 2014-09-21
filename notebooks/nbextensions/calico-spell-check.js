@@ -42,6 +42,8 @@ define(["require", "nbextensions/typo/typo"], function (require) {
     var typo_check = function(word) {
 	// Put your specific method of checking the spell of words here:
 	// remove beginning or ending single quote
+	if (/^\d+$/.test(word)) // all numbers?
+	    return true;
 	return document.dictionary.check(word.replace(/(^')|('$)/g, ""));
     };
 	
