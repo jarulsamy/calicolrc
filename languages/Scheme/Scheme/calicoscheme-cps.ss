@@ -2022,7 +2022,70 @@
 	    define-datatype-transformer^
 	    cases-transformer^
 	    )
-      (list "" "" "" "" "" "" "" "" "" ""))))
+      (list (string-append "(and ...) - short-circuiting `and` macro\n"
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (and)\n"
+			   "    Out [1]: #t\n"
+			   "    In  [2]: (and #t #f)\n"
+			   "    Out [2]: #f\n"
+			   )
+	    (string-append "(or ...) - short-circuiting `or` macro" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (or)\n"
+			   "    Out [1]: #f\n"
+			   "    In  [2]: (or #t #f)\n"
+			   "    Out [2]: #t\n"
+			   )
+	    (string-append "(cond (TEST RETURN)...) - conditional evaluation macro" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (cond ((= 1 2) 3)(else 4))\n"
+			   "    Out [1]: 4\n"
+			   )
+	    (string-append "(let ((VAR VALUE)...)...) - local variable macro" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (let ((x 3)) x)\n"
+			   "    Out [1]: 3\n"
+			   )
+	    (string-append "(letrec ((VAR VALUE)...)...) - recursive local variable macro" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [*]: (letrec ((loop (lambda () (loop)))) (loop))\n"
+			   )
+	    (string-append "(let* ((VAR VALUE)...)...) - cascading local variable macro" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (let* ((a 1)(b a)(c b)) c)\n"
+			   "    Out [1]: 1\n"
+			   )
+	    (string-append "(case THING (ITEM RETURN)...)) - case macro"  
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (case 1 (1 2)(3 4))\n"
+			   "    Out [1]: 2\n"
+			   )
+	    (string-append "(record-case ) - record-case macro for define-datatype" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (record-case ddtype (subtype (part...) return)...)\n"
+			   )
+	    (string-append "(define-datatype NAME NAME? (TYPE (PART TEST))...) - defines new datatypes and support functions (macro)" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (define-datatype e e?)\n"
+			   "    In  [1]: (e? 1)\n"
+			   "    Out [1]: #f\n"
+			   )
+	    (string-append "(cases ...) - cases macro for a more flexible case"
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (cases 1 ((1 2) 3))\n"
+			   "    Out [1]: 3\n"
+			   )
+	    ))))
 
 (define macro-env 'undefined)
 

@@ -703,8 +703,8 @@ def int_(number):
 
 ### Strings:
 
-def string_append(s1, s2):
-    return str(s1) + str(s2)
+def string_append(*args):
+    return "".join(args)
 
 def string_ref(string, pos):
     return make_char(string[pos])

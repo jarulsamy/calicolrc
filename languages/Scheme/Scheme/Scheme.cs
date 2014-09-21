@@ -2788,6 +2788,60 @@ public class Scheme {
       return text.Append(obj2.ToString()).ToString();
   }
 
+  public static object string_append(object obj1, 
+				     object obj2,
+				     object obj3) {
+      System.Text.StringBuilder text = new System.Text.StringBuilder(obj1.ToString());
+      return text.Append(obj2.ToString()).Append(obj3.ToString()).ToString();
+  }
+
+  public static object string_append(object obj1, 
+				     object obj2,
+				     object obj3,
+				     object obj4) {
+      System.Text.StringBuilder text = new System.Text.StringBuilder(obj1.ToString());
+      return text.Append(obj2.ToString()).Append(obj3.ToString()).Append(obj4.ToString()).ToString();
+  }
+
+  public static object string_append(object obj1, 
+				     object obj2,
+				     object obj3,
+				     object obj4,
+				     object obj5) {
+      System.Text.StringBuilder text = new System.Text.StringBuilder(obj1.ToString());
+      return text.Append(obj2.ToString()).Append(obj3.ToString()).Append(obj4.ToString()).Append(obj5.ToString()).ToString();
+  }
+
+  public static object string_append(object obj1, 
+				     object obj2,
+				     object obj3,
+				     object obj4,
+				     object obj5,
+				     object obj6) {
+      System.Text.StringBuilder text = new System.Text.StringBuilder(obj1.ToString());
+      return text.Append(obj2.ToString())
+	  .Append(obj3.ToString())
+	  .Append(obj4.ToString())
+	  .Append(obj5.ToString())
+	  .Append(obj6.ToString()).ToString();
+  }
+
+  public static object string_append(object obj1, 
+				     object obj2,
+				     object obj3,
+				     object obj4,
+				     object obj5,
+				     object obj6,
+				     object obj7) {
+      System.Text.StringBuilder text = new System.Text.StringBuilder(obj1.ToString());
+      return text.Append(obj2.ToString())
+	  .Append(obj3.ToString())
+	  .Append(obj4.ToString())
+	  .Append(obj5.ToString())
+	  .Append(obj6.ToString())
+	  .Append(obj7.ToString()).ToString();
+  }
+
   public static object assq(object x, object ls) {
       object current = ls;
       while (! null_q(current)) {
