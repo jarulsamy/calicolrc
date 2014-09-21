@@ -704,7 +704,7 @@ def int_(number):
 ### Strings:
 
 def string_append(*args):
-    return "".join(args)
+    return "".join([str(arg) for arg in args])
 
 def string_ref(string, pos):
     return make_char(string[pos])
