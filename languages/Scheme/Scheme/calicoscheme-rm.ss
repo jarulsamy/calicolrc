@@ -2409,9 +2409,16 @@
     (let ((proc 'undefined) (proc-args 'undefined))
       (set! proc-args (cadr args_reg))
       (set! proc (car args_reg))
-      (set! args_reg proc-args)
-      (set! proc_reg proc)
-      (set! pc apply-proc))))
+      (if (dlr-proc? proc)
+          (begin
+            (set! value2_reg fail_reg)
+            (set! value1_reg (dlr-apply proc proc-args))
+            (set! k_reg k2_reg)
+            (set! pc apply-cont2))
+          (begin
+            (set! args_reg proc-args)
+            (set! proc_reg proc)
+            (set! pc apply-proc))))))
 
 (define <proc-18>
   (lambda ()

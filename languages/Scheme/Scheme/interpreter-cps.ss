@@ -836,7 +836,9 @@
   (lambda-proc (args env2 info handler fail k2)
     (let ((proc (car args))
 	  (proc-args (cadr args)))
-      (proc proc-args env2 info handler fail k2))))
+      (if (dlr-proc? proc)
+	  (k2 (dlr-apply proc proc-args) fail)
+	  (proc proc-args env2 info handler fail k2)))))
 
 ;; sqrt
 (define sqrt-prim

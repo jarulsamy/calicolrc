@@ -2247,7 +2247,9 @@
   (lambda (args env2 info handler fail k2 fields)
     (let ()
       (let ((proc (car args)) (proc-args (cadr args)))
-        (apply-proc proc proc-args env2 info handler fail k2)))))
+        (if (dlr-proc? proc)
+            (apply-cont2 k2 (dlr-apply proc proc-args) fail)
+            (apply-proc proc proc-args env2 info handler fail k2))))))
 
 (define+
   <proc-18>

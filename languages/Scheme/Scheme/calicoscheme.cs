@@ -2513,9 +2513,16 @@ public class PJScheme:Scheme
         object proc_args = symbol_undefined;
         proc_args = cadr(args_reg);
         proc = car(args_reg);
-        args_reg = proc_args;
-        proc_reg = proc;
-        pc = apply_proc;
+        if (true_q(dlr_proc_q(proc))) {
+            value2_reg = fail_reg;
+            value1_reg = dlr_apply(proc, proc_args);
+            k_reg = k2_reg;
+            pc = apply_cont2;
+        } else {
+            args_reg = proc_args;
+            proc_reg = proc;
+            pc = apply_proc;
+        }
     }
     
     public static void b_proc_18_d() {

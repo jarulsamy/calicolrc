@@ -3177,9 +3177,15 @@ def b_proc_17_d():
     proc_args = symbol_undefined
     proc_args = cadr(args_reg)
     proc = car(args_reg)
-    GLOBALS['args_reg'] = proc_args
-    GLOBALS['proc_reg'] = proc
-    GLOBALS['pc'] = apply_proc
+    if true_q(dlr_proc_q(proc)):
+        GLOBALS['value2_reg'] = fail_reg
+        GLOBALS['value1_reg'] = dlr_apply(proc, proc_args)
+        GLOBALS['k_reg'] = k2_reg
+        GLOBALS['pc'] = apply_cont2
+    else:
+        GLOBALS['args_reg'] = proc_args
+        GLOBALS['proc_reg'] = proc
+        GLOBALS['pc'] = apply_proc
 
 def b_proc_18_d():
     if true_q(not(length_one_q(args_reg))):
