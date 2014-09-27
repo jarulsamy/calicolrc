@@ -787,6 +787,8 @@ def trampoline():
         while pc:
             try:
                 pc()
+            except DebugException:
+                raise
             except KeyboardInterrupt:
                 exception_reg = make_exception("KeyboardInterrupt", "Keyboard interrupt", symbol_none, symbol_none, symbol_none)
                 pc = apply_handler2            
@@ -6937,12 +6939,24 @@ def initialize_globals():
 def make_debugging_k(exp, k):
     return make_cont2(b_cont2_51_d, exp, k)
 
+class DebugException(Exception):
+    """
+    Exception for use in GUI
+    """
+    def __init__(self, data):
+        super(DebugException, self).__init__()
+        self.data = data
+
 def highlight_expression(exp):
-    printf("call: ~s~%", aunparse(exp))
     info = symbol_undefined
     info = rac(exp)
     if true_q(not((info) is (symbol_none))):
-        printf("['~a', line ~a, col ~a]~%", get_srcfile(info), get_start_line(info), get_start_char(info))
+        if GLOBALS.get("TRACE_GUI", False):
+            GLOBALS["TRACE_GUI_COUNT"] += 1
+            if GLOBALS["TRACE_GUI_COUNT"] % 2 == 1:
+                raise DebugException([get_start_line(info), get_start_char(info), get_end_line(info), get_end_char(info)])
+        else:
+            printf("call: ~s~%", aunparse(exp))
 
 def handle_debug_info(exp, result):
     printf("~s => ~a~%", aunparse(exp), make_safe(result))

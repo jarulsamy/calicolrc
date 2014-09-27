@@ -234,6 +234,39 @@ MAIN FEATURES
     def do_function_direct(self, function_name, arg):
         return self.do_execute_direct("(%s %s)" % (function_name, arg))
 
+    def initialize_debug(self, code):
+        self.original_debug_code = code
+        self.running = True
+        calico.scheme._startracing_on_q_star = True
+        calico.scheme.GLOBALS["TRACE_GUI"] = True
+        calico.scheme.GLOBALS["TRACE_GUI_COUNT"] = 0
+        try:
+            retval = calico.scheme.execute_string_rm(code)
+        except calico.scheme.DebugException as e:
+            retval = "[%s, %s, %s, %s]" % (e.data[0], e.data[1], e.data[2], e.data[3])
+        except:
+            return "Unhandled Error: " + code
+        return retval
+
+    def do_execute_meta(self, code):
+        if code == "reset":
+            return self.initialize_debug(self.original_debug_code)
+        elif code == "step":
+            if not self.running:
+                calico.scheme._startracing_on_q_star = False
+                calico.scheme.GLOBALS["TRACE_GUI"] = False
+                raise StopIteration()
+            try:
+                calico.scheme.m()
+                retval = calico.scheme.trampoline()
+            except calico.scheme.DebugException as e:
+                if calico.scheme.pc:
+                    return "[%s, %s, %s, %s]" % (e.data[0], e.data[1], e.data[2], e.data[3])
+                else:
+                    self.running = False
+            except:
+                return "Unhandled Error: " + code
+
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
     IPKernelApp.launch_instance(kernel_class=CalicoSchemeKernel)
