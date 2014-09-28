@@ -8,7 +8,13 @@
  *
  **/
 
-IPython.load_extensions("calico-spell-check",
-			"calico-document-tools",
-			"calico-cell-tools"
-		       );
+require(["base/js/events"], function (events) {
+    events.on("app_initialized.NotebookApp", function () {
+	IPython.load_extensions("calico-spell-check",
+				"calico-document-tools",
+				"calico-cell-tools"
+			       );
+	
+    });
+});
+

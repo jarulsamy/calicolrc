@@ -153,6 +153,11 @@ MAIN FEATURES
         """
         Get a variable in the kernel's enviroment.
         """
+        # first save all registers:
+        #env = calico.scheme.GLOBALS.copy()
+        #value = calico.scheme.execute_string_rm(name)
+        #calico.scheme.GLOBALS = env
+        #return calico.scheme.value
         if name in calico.scheme.ENVIRONMENT:
             return calico.scheme.ENVIRONMENT[name]
 
@@ -243,7 +248,7 @@ MAIN FEATURES
         try:
             retval = calico.scheme.execute_string_rm(code)
         except calico.scheme.DebugException as e:
-            retval = "[%s, %s, %s, %s]" % (e.data[0], e.data[1], e.data[2], e.data[3])
+            retval = "highlight: [%s, %s, %s, %s]" % (e.data[0], e.data[1], e.data[2], e.data[3])
         except:
             return "Unhandled Error: " + code
         return retval
@@ -251,6 +256,10 @@ MAIN FEATURES
     def do_execute_meta(self, code):
         if code == "reset":
             return self.initialize_debug(self.original_debug_code)
+        elif code == "stop":
+            self.running = False
+            calico.scheme._startracing_on_q_star = False
+            calico.scheme.GLOBALS["TRACE_GUI"] = False
         elif code == "step":
             if not self.running:
                 calico.scheme._startracing_on_q_star = False
@@ -261,11 +270,16 @@ MAIN FEATURES
                 retval = calico.scheme.trampoline()
             except calico.scheme.DebugException as e:
                 if calico.scheme.pc:
-                    return "[%s, %s, %s, %s]" % (e.data[0], e.data[1], e.data[2], e.data[3])
+                    return "highlight: [%s, %s, %s, %s]" % (e.data[0], e.data[1], e.data[2], e.data[3])
                 else:
                     self.running = False
             except:
                 return "Unhandled Error: " + code
+        elif code.startswith("inspect "):
+            variable = code[8:].strip()
+            return "%s => %s" % (variable, self.repr(self.get_variable(variable)))
+        else:
+            return None
 
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
