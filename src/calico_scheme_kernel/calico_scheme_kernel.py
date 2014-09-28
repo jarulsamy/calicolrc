@@ -153,11 +153,29 @@ MAIN FEATURES
         """
         Get a variable in the kernel's enviroment.
         """
-        # first save all registers:
-        #env = calico.scheme.GLOBALS.copy()
-        #value = calico.scheme.execute_string_rm(name)
-        #calico.scheme.GLOBALS = env
-        #return calico.scheme.value
+        # search through the local env, if one
+        reg_env = calico.scheme.GLOBALS["env_reg"]
+        if reg_env:
+            def get_index(item, ls):
+                pos = 0
+                while ls != calico.scheme.Symbol("()"):
+                    if item == ls.car:
+                        return pos
+                    ls = ls.cdr
+                return None
+            symbol_name = calico.scheme.Symbol(name)
+            # car 'environment
+            # cadr frame: (vector of vars, names)
+            current_frame = reg_env = reg_env.cdr
+            while current_frame != calico.scheme.Symbol("()"):
+                if not hasattr(current_frame, "car"): break
+                values = current_frame.car.car # vector of bindings (val . docstring)
+                names = current_frame.car.cdr.car # list
+                if symbol_name in names:
+                    index = get_index(symbol_name, names)
+                    return values[index].car
+                current_frame = current_frame.cdr
+        # if not found, search through ENVIRONMENT:
         if name in calico.scheme.ENVIRONMENT:
             return calico.scheme.ENVIRONMENT[name]
 
