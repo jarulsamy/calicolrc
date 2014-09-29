@@ -17,6 +17,9 @@ class CalicoSchemeKernel(MagicKernel):
     def __init__(self, *args, **kwargs):
         super(CalicoSchemeKernel, self).__init__(*args, **kwargs)
         self.log.setLevel(logging.INFO)
+        calico.scheme.ENVIRONMENT["raw_input"] = self.raw_input
+        calico.scheme.ENVIRONMENT["read"] = self.raw_input
+        calico.scheme.ENVIRONMENT["input"] = self.raw_input
 
     def get_usage(self):
         return """Calico Scheme 
