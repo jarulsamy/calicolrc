@@ -242,6 +242,11 @@ MAIN FEATURES
             return '#t' if item else '#f'
         return repr(item)
 
+    def do_execute_file(self, filename):
+        # for the %run FILENAME magic
+        calico.scheme.execute_file_rm(filename);
+        return None
+
     def do_execute_direct(self, code):
         try:
             retval = calico.scheme.execute_string_rm(code)
