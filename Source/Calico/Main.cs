@@ -173,6 +173,10 @@ namespace Calico {
 	    }
 	}
 
+	public static string propercase(string text) {
+	    return text.Substring(0,1).ToUpper() + text.Substring(1).ToLower();
+	}
+
         [STAThread]
         public static void Main(string[] args) {
             System.Console.WriteLine(_("Loading Calico version {0}..."), Version);
@@ -223,9 +227,27 @@ namespace Calico {
 		System.Console.WriteLine(_("    Looking for languages in \"{0}\"..."), 
 					 System.IO.Path.Combine(path, "..", "languages"));
 	    }
+
+	    string lang_string = "";
+	    bool lang_only = false;
+	    foreach (string arg in args) { 
+		if (arg == "--only") {
+		    lang_only = true;
+		} else if (arg.StartsWith("--lang=")) {
+		    lang_string = arg.Split('=')[1];
+		    break;
+		}
+	    }
+
 	    foreach (DirectoryInfo d in dir.GetDirectories("*")) {
 		foreach (FileInfo f in d.GetFiles("Calico*.dll")) {
-		    LoadLanguage(f, languages);
+		    if (lang_only) {
+			if (f.Name == string.Format("Calico{0}.dll", propercase(lang_string))) {
+			    LoadLanguage(f, languages);
+			}
+		    } else {
+			LoadLanguage(f, languages);
+		    }
 		}
 	    }
             // Now, let's load engines
@@ -237,7 +259,13 @@ namespace Calico {
 	    // Load Calico languages that depend on other Calico languages:
 	    foreach (DirectoryInfo d in dir.GetDirectories("*")) {
 		foreach (FileInfo f in d.GetFiles("Calico*.py")) { // FIXME: allow other languages
-		    LoadLanguageSecondary(f, languages, "python", config, path, manager);
+		    if (lang_only) {
+			if (f.Name == string.Format("Calico{0}.py", propercase(lang_string))) {
+			    LoadLanguageSecondary(f, languages, "python", config, path, manager);
+			}
+		    } else {
+			LoadLanguageSecondary(f, languages, "python", config, path, manager);
+		    }
 		}
 	    }
 	    string local_lang_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
@@ -249,7 +277,13 @@ namespace Calico {
 	    if (dir.Exists) {
 		foreach (DirectoryInfo d in dir.GetDirectories("*")) {
 		    foreach (FileInfo f in d.GetFiles("Calico*.py")) { // FIXME: allow other languages
-			LoadLanguageSecondary(f, languages, "python", config, path, manager);
+			if (lang_only) {
+			    if (f.Name == string.Format("Calico{0}.py", propercase(lang_string))) {
+				LoadLanguageSecondary(f, languages, "python", config, path, manager);
+			    }
+			} else {
+			    LoadLanguageSecondary(f, languages, "python", config, path, manager);
+			}
 		    }
 		}
 	    }
