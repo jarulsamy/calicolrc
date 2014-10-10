@@ -6876,8 +6876,12 @@ def read_eval_print_loop_rm():
         result = execute_rm(input_, symbol_stdin)
     return symbol_goodbye
 
-def execute_string_rm(input_):
-    return execute_rm(input_, symbol_stdin)
+def execute_string_rm(input_, source=None):
+    if source is None:
+        source = symbol_stdin
+    else:
+        source = make_symbol(source)
+    return execute_rm(input_, source)
 
 def execute_file_rm(filename):
     return execute_rm(read_content(filename), filename)
