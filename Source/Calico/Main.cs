@@ -235,7 +235,6 @@ namespace Calico {
 		    lang_only = true;
 		} else if (arg.StartsWith("--lang=")) {
 		    lang_string = arg.Split('=')[1];
-		    break;
 		}
 	    }
 
