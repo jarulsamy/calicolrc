@@ -1332,6 +1332,16 @@ namespace Calico {
 	    }
 	}
 
+        public void TrySetCurrentLanguage(string language) {
+	    string lang = FindLanguage(language);
+	    if (lang != null) {
+		ActivateLanguage(lang, CurrentLanguage);
+	    } else {
+		throw new Exception("unknown language: " + language);
+	    }
+	}
+
+
         public void SetLanguage(string language) {
 	    if (language == null)
 		return;

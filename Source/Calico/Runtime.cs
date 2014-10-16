@@ -68,7 +68,7 @@ namespace Calico {
                 if (arg.StartsWith("--")) {
 		    if (arg.StartsWith("--lang=")) {
 			string [] parts = arg.Split('=');
-			CurrentLanguage = parts[1];
+			TrySetCurrentLanguage(parts[1]);
 		    }
                 } else {
                     CurrentLanguage = manager.GetLanguageFromExtension(arg);
@@ -316,7 +316,7 @@ namespace Calico {
                 if (arg.StartsWith("--")) {
 		    if (arg.StartsWith("--lang=")) {
 			string [] parts = arg.Split('=');
-			CurrentLanguage = parts[1];
+			TrySetCurrentLanguage(parts[1]);
 		    }
 		} else {
                     CurrentLanguage = manager.GetLanguageFromExtension(arg);
@@ -374,7 +374,7 @@ namespace Calico {
                 if (arg.StartsWith("--")) {
 		    if (arg.StartsWith("--lang=")) {
 			string [] parts = arg.Split('=');
-			CurrentLanguage = parts[1];
+			TrySetCurrentLanguage(parts[1]);
 		    } else if (arg == "--profile-dir") {
 			if ((i + 1) < args.Length && !args[i + 1].StartsWith("--")) {
 			    i++;
