@@ -375,8 +375,12 @@ namespace Calico {
 		    if (arg.StartsWith("--lang=")) {
 			string [] parts = arg.Split('=');
 			CurrentLanguage = parts[1];
+		    } else if (arg == "--profile-dir") {
+			if ((i + 1) < args.Length && !args[i + 1].StartsWith("--")) {
+			    i++;
+			}
 		    } else if (arg == "--server") {
-			if (i + 1 < args.Length && !args[i + 1].StartsWith("--")) {
+			if ((i + 1) < args.Length && !args[i + 1].StartsWith("--")) {
 			    config_file = args[i + 1];
 			    i++;
 			}

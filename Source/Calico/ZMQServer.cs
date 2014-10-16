@@ -469,7 +469,8 @@ public static class ZMQServer {
 	public void send_multipart(Channel channel, 
 				   IList<string> identities, 
 				   IList<string> parts) {
-	    //session.calico.stdout.WriteLine("send: {0}", parts[2]);
+	    if (session.calico.Debug)
+		session.calico.stdout.WriteLine("send: {0}", parts[2]);
 	    int count = 0;
 	    foreach (string msg in identities) {
 		channel.socket.SendMore(msg, Encoding.UTF8);
@@ -917,7 +918,8 @@ public static class ZMQServer {
 				     IDictionary<string, object> m_content) {
 	    // Shell handler
 	    string msg_type = m_header["msg_type"].ToString();
-	    //session.calico.stdout.WriteLine("on_recv: {0}", msg_type);
+	    if (session.calico.Debug)
+		session.calico.stdout.WriteLine("on_recv: {0}", msg_type);
 	    if (msg_type == "execute_request") {
 		var header = session.Header("status", m_header["session"].ToString());
 		var metadata = pack();
@@ -932,18 +934,33 @@ public static class ZMQServer {
 		// ---------------------------------------------------
 		string code = m_content["code"].ToString().Trim();
 		// Execute in background, and report results
-		ExecuteInBackground(code, identities, m_header, execution_count);
-		execution_count += 1;
+		if (code.Contains("_usage.page_guiref")) {
+		    header = session.Header("execute_reply", m_header["session"].ToString());
+		    content = pack("status", "ok", 
+				   "execution_count", execution_count,
+				   "user_variables", pack(),
+				   "payload", new List<object>(),
+				   "user_expressions", pack());
+		    metadata = pack("dependencies_met", true,
+				    "engine", session.engine_identity,
+				    "status", "ok",
+				    "started", now());
+		    session.send(session.shell_channel, list(m_header["session"]), header, m_header, metadata, content); // ok
+		} else {
+		    ExecuteInBackground(code, identities, m_header, execution_count);
+		    execution_count += 1;
+		}
 	    } else if (msg_type == "kernel_info_request") {
 		if (session.starting) {
-		    session.send(session.iopub_channel, session.route("status"), session.Header("status", session.session_id), 
-			 pack(), pack(), pack("execution_state", "starting"));
+		    session.send(session.iopub_channel, session.route("status"), 
+				 session.Header("status", session.session_id), 
+				 pack(), pack(), pack("execution_state", "starting"));
 		    session.starting = false;
 		}
 		var header = session.Header("kernel_info_reply", m_header["session"].ToString());
 		var metadata = pack();
 		var content = pack("protocol_version", new List<int>() {4, 1},
-				   "ipython_version", new List<object>() {2, 0, 0, ""},
+				   "ipython_version", new List<object>() {3, 0, 0, ""},
 				   "language_version", new List<int>() {3, 0, 2},
 				   "language", "calico");
 		session.send(session.shell_channel, list(m_header["session"]), header, m_header, metadata, content); // ok
