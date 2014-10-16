@@ -89,7 +89,12 @@ define(["require", "nbextensions/typo/typo"], function (require) {
 	}
 
 	document.original_markdown_mode = IPython.MarkdownCell.options_default.cm_config.mode;
-	document.original_heading_mode = IPython.HeadingCell.options_default.cm_config.mode;
+	// Version 2.x didn't have a cm_config for headding cells:
+	if (IPython.HeadingCell.options_default.cm_config) {
+	    document.original_heading_mode = IPython.HeadingCell.options_default.cm_config.mode;
+	} else {
+	    document.original_heading_mode = "gfm";
+	}
 	
 	CodeMirror.defineMode("spell-check-markdown", makeOverlay(document.original_markdown_mode));
 	CodeMirror.defineMode("spell-check-heading", makeOverlay(document.original_heading_mode));
