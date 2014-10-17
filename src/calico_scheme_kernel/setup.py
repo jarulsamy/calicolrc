@@ -22,8 +22,11 @@ class install_with_kernelspec(install):
         if install_in_system:
             destdir = KernelSpecManager().kernel_dirs[0]
             # make sure that it exists
-            os.mkdir(destdir)
+            if not os.path.exists(destdir):
+                os.mkdir(destdir)
             destdir = os.path.join(destdir, 'calico_scheme_kernel')
+            if not os.path.exists(destdir):
+                os.mkdir(destdir)
         else:
             destdir = os.path.join(KernelSpecManager().user_kernel_dir, 
                                    'calico_scheme_kernel')
