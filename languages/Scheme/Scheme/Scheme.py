@@ -46,6 +46,14 @@ ENVIRONMENT["DEBUG"] = False
 
 GLOBALS = globals()
 
+class DebugException(Exception):
+    """
+    Exception for use in GUI
+    """
+    def __init__(self, data):
+        super(DebugException, self).__init__()
+        self.data = data
+
 class Char(object):
     def __init__(self, c):
         self.char = c
@@ -779,6 +787,8 @@ def trampoline():
         while pc:
             try:
                 pc()
+            except DebugException:
+                raise
             except KeyboardInterrupt:
                 exception_reg = make_exception("KeyboardInterrupt", "Keyboard interrupt", symbol_none, symbol_none, symbol_none)
                 pc = apply_handler2            
@@ -1064,6 +1074,17 @@ def setitem_native(dictionary, item, value):
 
 def contains_native(dictionary, item):
     return item in dictionary
+
+def highlight_expression(exp):
+    info = symbol_undefined
+    info = rac(exp)
+    if true_q(not((info) is (symbol_none))):
+        if GLOBALS.get("TRACE_GUI", False):
+            GLOBALS["TRACE_GUI_COUNT"] += 1
+            if GLOBALS["TRACE_GUI_COUNT"] % 2 == 1:
+                raise DebugException([get_start_line(info), get_start_char(info), get_end_line(info), get_end_char(info)])
+        else:
+            printf("call: ~s~%", aunparse(exp))
 
 # end of Scheme.py
 #############################################################

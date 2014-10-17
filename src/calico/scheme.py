@@ -54,6 +54,14 @@ ENVIRONMENT["DEBUG"] = False
 
 GLOBALS = globals()
 
+class DebugException(Exception):
+    """
+    Exception for use in GUI
+    """
+    def __init__(self, data):
+        super(DebugException, self).__init__()
+        self.data = data
+
 class Char(object):
     def __init__(self, c):
         self.char = c
@@ -1074,6 +1082,17 @@ def setitem_native(dictionary, item, value):
 
 def contains_native(dictionary, item):
     return item in dictionary
+
+def highlight_expression(exp):
+    info = symbol_undefined
+    info = rac(exp)
+    if true_q(not((info) is (symbol_none))):
+        if GLOBALS.get("TRACE_GUI", False):
+            GLOBALS["TRACE_GUI_COUNT"] += 1
+            if GLOBALS["TRACE_GUI_COUNT"] % 2 == 1:
+                raise DebugException([get_start_line(info), get_start_char(info), get_end_line(info), get_end_char(info)])
+        else:
+            printf("call: ~s~%", aunparse(exp))
 
 # end of Scheme.py
 #############################################################
@@ -6876,12 +6895,11 @@ def read_eval_print_loop_rm():
         result = execute_rm(input_, symbol_stdin)
     return symbol_goodbye
 
-def execute_string_rm(input_, source=None):
-    if source is None:
-        source = symbol_stdin
-    else:
-        source = make_symbol(source)
+def execute_string_top(input_, source):
     return execute_rm(input_, source)
+
+def execute_string_rm(input_):
+    return execute_rm(input_, symbol_stdin)
 
 def execute_file_rm(filename):
     return execute_rm(read_content(filename), filename)
@@ -6942,25 +6960,6 @@ def initialize_globals():
 
 def make_debugging_k(exp, k):
     return make_cont2(b_cont2_51_d, exp, k)
-
-class DebugException(Exception):
-    """
-    Exception for use in GUI
-    """
-    def __init__(self, data):
-        super(DebugException, self).__init__()
-        self.data = data
-
-def highlight_expression(exp):
-    info = symbol_undefined
-    info = rac(exp)
-    if true_q(not((info) is (symbol_none))):
-        if GLOBALS.get("TRACE_GUI", False):
-            GLOBALS["TRACE_GUI_COUNT"] += 1
-            if GLOBALS["TRACE_GUI_COUNT"] % 2 == 1:
-                raise DebugException([get_start_line(info), get_start_char(info), get_end_line(info), get_end_char(info)])
-        else:
-            printf("call: ~s~%", aunparse(exp))
 
 def handle_debug_info(exp, result):
     printf("~s => ~a~%", aunparse(exp), make_safe(result))

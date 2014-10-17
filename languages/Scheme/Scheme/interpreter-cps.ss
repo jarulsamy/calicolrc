@@ -245,6 +245,11 @@
 ;;----------------------------------------------------------------------------
 ;; used only by scheme RM and C# RM code
 
+(define execute-string-top
+  (lambda (input source)
+    ;; source is input symbol, aka 'stdin
+    (execute-rm input source)))
+
 (define execute-string-rm
   (lambda (input)
     (execute-rm input 'stdin)))

@@ -6991,6 +6991,10 @@ public class PJScheme:Scheme
         return symbol_goodbye;
     }
     
+    public static object execute_string_top(object input_, object source) {
+        return execute_rm(input_, source);
+    }
+    
     public static object execute_string_rm(object input_) {
         return execute_rm(input_, symbol_stdin);
     }

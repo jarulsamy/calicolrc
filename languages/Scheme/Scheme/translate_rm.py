@@ -39,7 +39,7 @@ class Translator(object):
             "init-cont", "init-cont2", "init-cont3", "init-cont4",
             "init-handler", "init-handler2", "init-fail",
             "make-cont", "make-cont2", "make-cont3", "make-cont4", "make-macro", "make-proc",
-            "make-fail", "make-handler", "make-handler2"
+            "make-fail", "make-handler", "make-handler2",
         ] + self.overrides()
 
     def overrides(self):
@@ -426,6 +426,9 @@ class PythonTranslator(Translator):
             self.process_return(expr, indent)
         else: # must be a function call
             self.Print(indent, self.process_app(expr))
+
+    def to_ignore(self):
+        return super(PythonTranslator, self).to_ignore() + ["highlight-expression"]
                 
     def translate(self, filename):
         self.fp = open(filename, "w")

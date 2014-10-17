@@ -6186,6 +6186,9 @@
           (set! result (execute-rm input 'stdin)))
         'goodbye))))
 
+(define execute-string-top
+  (lambda (input source) (execute-rm input source)))
+
 (define execute-string-rm
   (lambda (input) (execute-rm input 'stdin)))
 

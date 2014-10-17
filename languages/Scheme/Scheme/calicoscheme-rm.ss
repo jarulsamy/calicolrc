@@ -7013,6 +7013,9 @@
           (set! result (execute-rm input 'stdin)))
         (return* 'goodbye)))))
 
+(define execute-string-top
+  (lambda (input source) (return* (execute-rm input source))))
+
 (define execute-string-rm
   (lambda (input) (return* (execute-rm input 'stdin))))
 

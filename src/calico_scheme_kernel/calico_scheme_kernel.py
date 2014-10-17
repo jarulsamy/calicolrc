@@ -252,7 +252,7 @@ MAIN FEATURES
 
     def do_execute_direct(self, code):
         try:
-            retval = calico.scheme.execute_string_rm(code, "In [%s]" % self.execution_count)
+            retval = calico.scheme.execute_string_top(code, "In [%s]" % self.execution_count)
         except:
             return "Unhandled Error: " + code
         if calico.scheme.exception_q(retval):
