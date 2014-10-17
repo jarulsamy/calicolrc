@@ -47,14 +47,14 @@ else:
     install_in_system = False
 
 setup(name='calico_scheme_kernel',
-      version='0.2.5',
+      version='0.2.6',
       description='A Scheme kernel for IPython',
       url="https://bitbucket.org/ipre/calico/src/master/src/calico_scheme_kernel/",
       long_description="A Scheme kernel for IPython",
       author='Douglas Blank',
       author_email='doug.blank@gmail.com',
       py_modules=['calico_scheme_kernel'],
-      install_requires=["jupyter_kernel"],
+      install_requires=["metakernel"],
       cmdclass={'install': install_with_kernelspec},
       classifiers = [
           'Framework :: IPython',
