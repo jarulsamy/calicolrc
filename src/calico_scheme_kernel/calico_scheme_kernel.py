@@ -1,18 +1,26 @@
 from __future__ import print_function
 
-from jupyter_kernel import MagicKernel
+from metakernel import MetaKernel
 import calico.scheme
 import os
 import logging
 
-class CalicoSchemeKernel(MagicKernel):
-    implementation = 'Scheme'
+class CalicoSchemeKernel(MetaKernel):
+    implementation = 'scheme'
     implementation_version = '1.0'
     language = 'scheme'
     language_version = '3.0'
     banner = "Calico Scheme"
+    language_info = {
+        'mimetype': 'text/x-scheme',
+        'codemirror_mode': {'name': 'scheme'},
+        'pygments_lexer': 'scheme',
+    }
 
-    magic_suffixes = {}
+    identifier_regex = r'[\w\.][\w\.\?\!]*'
+    function_call_regex = r'\(([\w\.][\w\.\?\!]*)[^\)\()]*\Z'
+    magic_prefixes = dict(magic='%', shell='!', help='?')
+    help_suffix = None
 
     def __init__(self, *args, **kwargs):
         super(CalicoSchemeKernel, self).__init__(*args, **kwargs)
@@ -306,6 +314,14 @@ MAIN FEATURES
             return "%s => %s" % (variable, self.repr(self.get_variable(variable)))
         else:
             return None
+
+    def do_is_complete(self, code):
+        # status: 'complete', 'incomplete', 'invalid', or 'unknown'
+        if calico.ready_to_eval(code):
+            return {'status' : 'complete'}
+        else:
+            return {'status' : 'incomplete',
+                    'indent': ' ' * 4}
 
 if __name__ == '__main__':
     from IPython.kernel.zmq.kernelapp import IPKernelApp
