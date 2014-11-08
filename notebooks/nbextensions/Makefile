@@ -4,6 +4,7 @@ all: calico-spell-check-1.0.zip calico-cell-tools-1.0.zip calico-document-tools-
 calico-spell-check-1.0.zip: calico-spell-check.js calico-spell-check.css
 	zip -r calico-spell-check-1.0.zip calico-spell-check.js \
 					calico-spell-check.css \
+					words.json \
 					typo \
 					-x "*\.git*" "*\.ipynb_checkpoints*" 
 

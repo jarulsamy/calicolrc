@@ -17,7 +17,9 @@ define(["require", "nbextensions/typo/typo"], function (require) {
 	//console.log(spelling_mode);
 	// Change defaults for new cells:
 	IPython.MarkdownCell.options_default.cm_config.mode = (spelling_mode ? "spell-check-markdown" : document.original_markdown_mode);
-	IPython.HeadingCell.options_default.cm_config = {"mode": (spelling_mode ? "spell-check-heading" : document.original_heading_mode)};
+	if (document.original_heading_mode !== undefined) {
+	    IPython.HeadingCell.options_default.cm_config = {"mode": (spelling_mode ? "spell-check-heading" : document.original_heading_mode)};
+	}
 	// And change any existing markdown cells:
 	var cells = IPython.notebook.get_cells();
 	for (var i = 0; i < cells.length; i++) {
@@ -42,9 +44,8 @@ define(["require", "nbextensions/typo/typo"], function (require) {
     var typo_check = function(word) {
 	// Put your specific method of checking the spell of words here:
 	// remove beginning or ending single quote
-	if (/^\d+$/.test(word)) // all numbers?
-	    return true;
-	return document.dictionary.check(word.replace(/(^')|('$)/g, ""));
+	return (document.dictionary.check(word.replace(/(^')|('$)/g, "")) || 
+		(document.dictionary_words !== undefined && document.dictionary_words.hasOwnProperty(word)));
     };
 	
     var load_ipython_extension = function () {
@@ -55,6 +56,10 @@ define(["require", "nbextensions/typo/typo"], function (require) {
 
 	// Load the CSS for spelling errors (red wavy line under misspelled word):
 	load_css();
+
+	$.getJSON(require.toUrl("./words.json"), function(json) {
+	    document.dictionary_words = json;
+	});
 
 	var makeOverlay = function(mode) {
 	    return function(config, parserConfig) {
@@ -89,15 +94,12 @@ define(["require", "nbextensions/typo/typo"], function (require) {
 	}
 
 	document.original_markdown_mode = IPython.MarkdownCell.options_default.cm_config.mode;
-	// Version 2.x didn't have a cm_config for headding cells:
-	if (IPython.HeadingCell.options_default.cm_config) {
-	    document.original_heading_mode = IPython.HeadingCell.options_default.cm_config.mode;
-	} else {
-	    document.original_heading_mode = "gfm";
-	}
-	
 	CodeMirror.defineMode("spell-check-markdown", makeOverlay(document.original_markdown_mode));
-	CodeMirror.defineMode("spell-check-heading", makeOverlay(document.original_heading_mode));
+
+	if (IPython.HeadingCell !== undefined && IPython.HeadingCell.options_default.cm_config !== undefined) {
+	    document.original_heading_mode = IPython.HeadingCell.options_default.cm_config.mode;
+	    CodeMirror.defineMode("spell-check-heading", makeOverlay(document.original_heading_mode));
+	}
 
 	// Load dictionary:
 	var lang = "en_US";
