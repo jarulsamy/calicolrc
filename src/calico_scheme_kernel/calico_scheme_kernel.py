@@ -17,14 +17,14 @@ class CalicoSchemeKernel(MetaKernel):
         'pygments_lexer': 'scheme',
     }
 
-    identifier_regex = r'[\w\.][\w\.\?\!]*'
-    function_call_regex = r'\(([\w\.][\w\.\?\!]*)[^\)\()]*\Z'
+    identifier_regex = r'[\w\.][\w\.\?\!\-\>\<]*'
+    function_call_regex = r'\(([\w\.][\w\.\?\!\-\>\>]*)[^\)\()]*\Z'
     magic_prefixes = dict(magic='%', shell='!', help='?')
     help_suffix = None
 
     def __init__(self, *args, **kwargs):
         super(CalicoSchemeKernel, self).__init__(*args, **kwargs)
-        self.log.setLevel(logging.INFO)
+        #self.log.setLevel(logging.INFO)
         calico.scheme.ENVIRONMENT["raw_input"] = self.raw_input
         calico.scheme.ENVIRONMENT["read"] = self.raw_input
         calico.scheme.ENVIRONMENT["input"] = self.raw_input
@@ -123,7 +123,8 @@ MAIN FEATURES
 """
 
     def get_completions(self, info):
-        token = info["code"]
+        self.log.debug("get_completitons: info = %s" % info)
+        token = info["help_obj"]
         matches = []
         # from the language environment:
         slist = calico.scheme.execute_string_rm("(dir)")
@@ -227,6 +228,7 @@ MAIN FEATURES
             return "#%d(%s)" % (len(item), items)
         elif isinstance(item, calico.scheme.cons): # a scheme list
             if isinstance(item.car, calico.scheme.Symbol):
+                ## HACK: fix me; represent procedues and environments as objs?
                 if item.car.name == "procedure":
                     return "#<procedure>"
                 elif item.car.name == "environment":
@@ -235,6 +237,12 @@ MAIN FEATURES
                 retval = []
                 current = item
                 while isinstance(current, calico.scheme.cons): 
+                    ## HACK: fix me; represent procedues and environments as objs?
+                    if hasattr(current.car, "name"):
+                        if current.car.name == "procedure":
+                             return "(%s)" % ((" ".join(retval)) + " . #<procedure>")
+                        elif current.car.name == "environment":
+                             return "(%s)" % ((" ".join(retval)) + " . #<environment>")
                     retval.append(self.repr(current.car))
                     current = current.cdr
                 retval = " ".join(retval)
