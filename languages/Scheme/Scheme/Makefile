@@ -11,6 +11,7 @@ PJScheme.exe: calicoscheme.cs Scheme.cs calicoscheme-rm.ss Makefile ObjectType.c
 calicoscheme.py: calicoscheme-rm.ss translate_rm.py Scheme.py Makefile
 	python translate_rm.py "calicoscheme-rm.ss" "calicoscheme.py"
 	cp calicoscheme.py ../../../src/calico/scheme.py
+	cp calicoscheme.py ~/calysto/calysto/language/scheme.py
 
 calicoscheme.cs: calicoscheme-rm.ss translate_rm.py Scheme.cs Makefile
 	python translate_rm.py "calicoscheme-rm.ss" "calicoscheme.cs"

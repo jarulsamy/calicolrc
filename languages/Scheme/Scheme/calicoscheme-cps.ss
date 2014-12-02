@@ -2713,6 +2713,7 @@
 (define-native set-global-docstring! (lambda (var x) #f))
 (define-native import-native (lambda ignore #f))
 (define-native import-as-native (lambda ignore #f))
+(define-native import-from-native (lambda ignore #f))
 (define-native iterator? (lambda ignore #f))
 (define-native get_type (lambda (x) 'unknown))
 (define-native char->string (lambda (c) (string c)))
@@ -3554,9 +3555,12 @@
 
 ;; substring
 (define substring-prim 
+  ;; (substring "string" start)
   ;; (substring "string" start stop)
   (lambda-proc (args env2 info handler fail k2)
-     (k2 (substring (car args) (cadr args) (caddr args)) fail))) 
+     (if (= (length args) 3)
+	 (k2 (substring (car args) (cadr args) (caddr args)) fail)
+	 (k2 (substring (car args) (cadr args) (string-length (car args))) fail))))
 
 ;; number->string
 (define number->string-prim 
@@ -4713,10 +4717,15 @@
   (lambda-proc (args env2 info handler fail k2)
     (k2 (import-native args env2) fail)))
 
-;; import
+;; import-as
 (define import-as-prim
   (lambda-proc (args env2 info handler fail k2)
     (k2 (import-as-native (car args) (cadr args) env2) fail)))
+
+;; import
+(define import-from-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (k2 (import-from-native (car args) (cdr args) env2) fail)))
 
 ;; not
 (define not-prim
@@ -5115,12 +5124,13 @@
 	    (list 'string? string?-prim "(string? ITEM): return #t if ITEM is a string, #f otherwise")
 	    (list 'string->number string->number-prim "(string->number STRING): return STRING as a number")
 	    (list 'string=? string=?-prim "(string=? STRING1 STRING2): return #t if STRING1 is the same as STRING2, #f otherwise")
-	    (list 'substring substring-prim "(substring STRING START END): return the substring of STRING starting with position START and ending before END")
+	    (list 'substring substring-prim "(substring STRING START [END]): return the substring of STRING starting with position START and ending before END. If END is not provided, it defaults to the length of the STRING")
 	    (list 'symbol? symbol?-prim "(symbol? ITEM): return #t if ITEM is a symbol, #f otherwise")
 	    (list 'unparse unparse-prim "(unparse AST): ")    
 	    (list 'unparse-procedure unparse-procedure-prim "(unparse-procedure ...): ")  ;; unparse should be in CPS
 	    (list 'import import-prim "(import MODULE...): import host-system modules; MODULEs are strings")
-	    (list 'import-as import-as-prim "(import-as MODULE NAME): import a host-system module; MODULE is a string, and NAME is a symbol")
+	    (list 'import-as import-as-prim "(import-as MODULE NAME): import a host-system module; MODULE is a string, and NAME is a symbol or string. Use * for NAME to import into toplevel environment")
+	    (list 'import-from import-from-prim "(import-from MODULE NAME...): import from host-system module; MODULE is a string, and NAME is a symbol or string")
 	    (list 'use-stack-trace use-stack-trace-prim "(use-stack-trace BOOLEAN): set stack-trace usage on/off")
 	    (list 'vector vector-prim "(vector [ITEMS]...): return ITEMs as a vector")
 	    (list 'vector-ref vector-ref-prim "(vector-ref VECTOR INDEX): ")

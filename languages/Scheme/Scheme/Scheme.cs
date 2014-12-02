@@ -1293,6 +1293,12 @@ public class Scheme {
       return retval;
   }
 
+  public static object import_from_native(object module, object name_list, object env) {
+      object retval = list();
+      // FIXME: not implemented!
+      return retval;
+  }
+
   public static object import_native(object args, object env) {
       // Works with Python Types
       // implements "using"

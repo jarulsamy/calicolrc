@@ -974,10 +974,16 @@ def import_native(libraries, environment):
 
 def import_as_native(library, name, environment):
     env = {}
-    if name == make_symbol("*"):
+    if name == make_symbol("*") or name == "*":
         exec ("from %s import *" % library) in env
     else:
         exec ("import %s as %s" % (library, name)) in env
+    ENVIRONMENT.update(env)
+    return List(*[make_symbol(name) for name in env.keys() if not name.startswith("_")])
+
+def import_from_native(library, name_list, environment):
+    env = {}
+    exec ("from %s import %s" % (library, ", ".join([str(name) for name in name_list]))) in env
     ENVIRONMENT.update(env)
     return List(*[make_symbol(name) for name in env.keys() if not name.startswith("_")])
 
