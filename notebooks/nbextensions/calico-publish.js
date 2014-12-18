@@ -8,7 +8,7 @@
  *
  **/
 
-define(["require", "nbextensions/typo/typo"], function (require) {
+define(["require"], function (require) {
 
     function publish_notebook() {
 	IPython.notebook.kernel.execute('"""%%python \n\
