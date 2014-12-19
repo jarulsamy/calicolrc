@@ -12,6 +12,8 @@ define(["require"], function (require) {
     function publish_notebook() {
 	// http://jupyter.cs.brynmawr.edu/user/dblank/notebooks/Calico/notebooks/BrainScrew/BrainScrew%20Examples.ipynb
 	var base_url = document.URL.substr(0,document.URL.indexOf('/notebooks/'));
+	var user = document.URL.substr(document.URL.indexOf('/user/'), 
+				       document.URL.indexOf('/notebooks/'));
 	base_url = base_url.replace("/user/", "/hub/");
 	// BrainScrew%20Examples.ipynb
 	var filename = document.URL.substr(document.URL.lastIndexOf('/') + 1);
@@ -22,7 +24,9 @@ define(["require"], function (require) {
 	var path = document.URL.substr(document.URL.indexOf('/notebooks/') + 1);
 	var folder = document.URL.substr(document.URL.indexOf('/notebooks/'));
 	path = folder.substr(0, folder.lastIndexOf('/'));
-	if (confirm("You want to publish this notebook?")) {
+	if (confirm("You want to publish this notebook?\n" + 
+		    '"/home/' + user + '/' + path + '/' + filename + '" to \n' +
+		    '"~/Public/' + path + '/' + filename + '"')) {
 	    IPython.notebook.kernel.execute('"""%%python \n\
 \n\
 import os \n\
@@ -46,9 +50,9 @@ def publish(src, dst): \n\
     shutil.copyfile(src, dst) \n\
     os.chmod(dst, stat.S_IRUSR | stat.S_IWUSR | stat.S_IROTH | stat.S_IRGRP) \n\
 \n\
-publish("' + path + "/" + filename + '", "~/Public/' + path + "/" + filename + '")"""');
+publish("/home/' + user + '/' + path + '/' + filename + '", "~/Public/' + path + '/' + filename + '")"""');
 	    alert("Your notebook is available at:\n" +
-		  base_url + path + "/" + filename);
+		  base_url + '/public/' + path + "/" + filename);
 	}
     };
 
