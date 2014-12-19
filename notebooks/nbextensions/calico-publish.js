@@ -9,9 +9,21 @@
  **/
 
 define(["require"], function (require) {
-
     function publish_notebook() {
-	IPython.notebook.kernel.execute('"""%%python \n\
+	// http://jupyter.cs.brynmawr.edu/user/dblank/notebooks/Calico/notebooks/BrainScrew/BrainScrew%20Examples.ipynb
+	var base_url = document.URL.substr(0,document.URL.indexOf('/notebooks/'));
+	base_url = base_url.replace("/user/", "/hub/");
+	// BrainScrew%20Examples.ipynb
+	var filename = document.URL.substr(document.URL.lastIndexOf('/') + 1);
+	if (filename.indexOf('?') > 0) {
+	    filename = filename.substr(0, filename.indexOf('?'));
+	}
+	// Calico/notebooks/BrainScrew/BrainScrew%20Examples.ipynb
+	var path = document.URL.substr(document.URL.indexOf('/notebooks/') + 1);
+	var folder = document.URL.substr(document.URL.indexOf('/notebooks/'));
+	path = folder.substr(0, folder.lastIndexOf('/'));
+	if (confirm("You want to publish this notebook?")) {
+	    IPython.notebook.kernel.execute('"""%%python \n\
 \n\
 import os \n\
 import shutil \n\
@@ -34,13 +46,11 @@ def publish(src, dst): \n\
     shutil.copyfile(src, dst) \n\
     os.chmod(dst, stat.S_IRUSR | stat.S_IWUSR | stat.S_IROTH | stat.S_IRGRP) \n\
 \n\
-\n\
-\n\
-source = "Untitled.ipynb" \n\
-dst = "~/Public/Untitled.ipynb" \n\
-\n\
-publish(source, dst)"""');
-    }
+publish("' + path + "/" + filename + '", "~/Public/' + path + "/" + filename + '")"""');
+	    alert("Your notebook is available at:\n" +
+		  base_url + path + "/" + filename);
+	}
+    };
 
     var load_ipython_extension = function () {
 	// Put a button on the toolbar:
@@ -61,12 +71,11 @@ publish(source, dst)"""');
 		'label'   : 'Publish this notebook',
 		'icon'    : (version === "2") ? 'icon-link' : 'fa-link',
 		'callback': publish_notebook
-	    }      
+	    }
 	]);
-    }
+    };
     
     return {
         load_ipython_extension : load_ipython_extension,
     };
 });
-
