@@ -23,6 +23,9 @@ define(["require"], function (require) {
 	// Calico/notebooks/BrainScrew/BrainScrew%20Examples.ipynb
 	var path = document.URL.substr(document.URL.indexOf('/notebooks/') + 11);
 	path = path.substr(0, path.lastIndexOf('/'));
+	if (path !== "") {
+	    path = path + "/";
+	}
 	// Replaces spaces:
 	user = user.replace(/%20/g, " ");
 	path = path.replace(/%20/g, " ");
