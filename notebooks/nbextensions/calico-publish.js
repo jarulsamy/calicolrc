@@ -14,7 +14,7 @@ define(["require"], function (require) {
 	var base_url = document.URL.substr(0,document.URL.indexOf('/notebooks/'));
 	var user = document.URL.substr(document.URL.indexOf('/user/') + 6);
 	user = user.substr(0, user.indexOf('/notebooks/'));
-	base_url = base_url.replace("/user/", "/hub/");
+	base_url = base_url.replace(/\/user\//g, "/hub/");
 	// BrainScrew%20Examples.ipynb
 	var filename = document.URL.substr(document.URL.lastIndexOf('/') + 1);
 	if (filename.indexOf('?') > 0) {
@@ -24,9 +24,9 @@ define(["require"], function (require) {
 	var path = document.URL.substr(document.URL.indexOf('/notebooks/') + 11);
 	path = path.substr(0, path.lastIndexOf('/'));
 	// Replaces spaces:
-	user = user.replace("%20", " ");
-	path = path.replace("%20", " ");
-	filename = filename.replace("%20", " ");
+	user = user.replace(/%20/g, " ");
+	path = path.replace(/%20/g, " ");
+	filename = filename.replace(/%20/g, " ");
 	if (confirm("You want to publish this notebook?\n" + 
 		    'user: "' + user + '"\n' +
 		    'path: "' + path + '"\n' +
@@ -59,7 +59,7 @@ def publish(src, dst): \n\
 \n\
 publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filename + '")"""');
 	    alert("Your notebook is available at:\n" +
-		  base_url + '/public/' + path.replace(" ", "%20") + filename.replace(" ", "%20"));
+		  base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20"));
 	}
     };
 
