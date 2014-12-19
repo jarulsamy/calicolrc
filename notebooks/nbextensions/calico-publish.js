@@ -34,6 +34,13 @@ define(["require"], function (require) {
 		    'base_url: "' + base_url + '"\n' +
 		    '"/home/' + user + '/' + path + filename + '" to \n' +
 		    '"~/Public/' + path + filename + '"')) {
+
+
+	    function handle_output(out){
+		console.log(out);
+	    }
+
+	    var callbacks = { 'iopub' : {'output' : handle_output}};
 	    IPython.notebook.kernel.execute('"""%%python \n\
 \n\
 import os \n\
@@ -57,7 +64,8 @@ def publish(src, dst): \n\
     shutil.copyfile(src, dst) \n\
     os.chmod(dst, stat.S_IRUSR | stat.S_IWUSR | stat.S_IROTH | stat.S_IRGRP) \n\
 \n\
-publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filename + '")"""');
+publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filename + '")"""',
+					    callbacks, {silent: false});
 	    alert("Your notebook is available at:\n" +
 		  base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20"));
 	}
