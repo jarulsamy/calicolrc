@@ -13,7 +13,7 @@ define(["require"], function (require) {
 	// http://jupyter.cs.brynmawr.edu/user/dblank/notebooks/Calico/notebooks/BrainScrew/BrainScrew%20Examples.ipynb
 	var base_url = document.URL.substr(0,document.URL.indexOf('/notebooks/'));
 	var user = document.URL.substr(document.URL.indexOf('/user/') + 6);
-	user = user.substr(0, document.URL.indexOf('/notebooks/'));
+	user = user.substr(0, user.indexOf('/notebooks/'));
 	base_url = base_url.replace("/user/", "/hub/");
 	// BrainScrew%20Examples.ipynb
 	var filename = document.URL.substr(document.URL.lastIndexOf('/') + 1);
@@ -22,14 +22,14 @@ define(["require"], function (require) {
 	}
 	// Calico/notebooks/BrainScrew/BrainScrew%20Examples.ipynb
 	var path = document.URL.substr(document.URL.indexOf('/notebooks/') + 11);
-	path = path.substr(0, path.lastIndexOf('/') + 1);
+	path = path.substr(0, path.lastIndexOf('/'));
 	if (confirm("You want to publish this notebook?\n" + 
 		    'user: "' + user + '"\n' +
 		    'path: "' + path + '"\n' +
 		    'filename: "' + filename + '"\n' +
 		    'base_url: "' + base_url + '"\n' +
-		    '"/home/' + user + '/' + path + '/' + filename + '" to \n' +
-		    '"~/Public/' + path + '/' + filename + '"')) {
+		    '"/home/' + user + '/' + path + filename + '" to \n' +
+		    '"~/Public/' + path + filename + '"')) {
 	    IPython.notebook.kernel.execute('"""%%python \n\
 \n\
 import os \n\
@@ -53,9 +53,9 @@ def publish(src, dst): \n\
     shutil.copyfile(src, dst) \n\
     os.chmod(dst, stat.S_IRUSR | stat.S_IWUSR | stat.S_IROTH | stat.S_IRGRP) \n\
 \n\
-publish("/home/' + user + '/' + path + '/' + filename + '", "~/Public/' + path + '/' + filename + '")"""');
+publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filename + '")"""');
 	    alert("Your notebook is available at:\n" +
-		  base_url + '/public/' + path + "/" + filename);
+		  base_url + '/public/' + path + filename);
 	}
     };
 
