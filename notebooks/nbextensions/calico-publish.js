@@ -23,6 +23,10 @@ define(["require"], function (require) {
 	// Calico/notebooks/BrainScrew/BrainScrew%20Examples.ipynb
 	var path = document.URL.substr(document.URL.indexOf('/notebooks/') + 11);
 	path = path.substr(0, path.lastIndexOf('/'));
+	// Replaces spaces:
+	user = user.replace("%20", " ");
+	path = path.replace("%20", " ");
+	filename = filename.replace("%20", " ");
 	if (confirm("You want to publish this notebook?\n" + 
 		    'user: "' + user + '"\n' +
 		    'path: "' + path + '"\n' +
@@ -55,7 +59,7 @@ def publish(src, dst): \n\
 \n\
 publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filename + '")"""');
 	    alert("Your notebook is available at:\n" +
-		  base_url + '/public/' + path + filename);
+		  base_url + '/public/' + path.replace(" ", "%20") + filename.replace(" ", "%20"));
 	}
     };
 
