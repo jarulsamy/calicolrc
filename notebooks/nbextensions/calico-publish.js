@@ -13,7 +13,7 @@ define(["require"], function (require) {
 	// http://jupyter.cs.brynmawr.edu/user/dblank/notebooks/Calico/notebooks/BrainScrew/BrainScrew%20Examples.ipynb
 	var base_url = document.URL.substr(0,document.URL.indexOf('/notebooks/'));
 	var user = document.URL.substr(document.URL.indexOf('/user/') + 6, 
-				       document.URL.indexOf('/notebooks/') - 11);
+				       document.URL.indexOf('/notebooks/'));
 	base_url = base_url.replace("/user/", "/hub/");
 	// BrainScrew%20Examples.ipynb
 	var filename = document.URL.substr(document.URL.lastIndexOf('/') + 1);
