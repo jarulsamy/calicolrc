@@ -28,13 +28,8 @@ define(["require"], function (require) {
 	path = path.replace(/%20/g, " ");
 	filename = filename.replace(/%20/g, " ");
 	if (confirm("You want to publish this notebook?\n" + 
-		    'user: "' + user + '"\n' +
-		    'path: "' + path + '"\n' +
-		    'filename: "' + filename + '"\n' +
-		    'base_url: "' + base_url + '"\n' +
-		    '"/home/' + user + '/' + path + filename + '" to \n' +
+		    'Copies "/home/' + user + '/' + path + filename + '" to \n' +
 		    '"~/Public/' + path + filename + '"')) {
-
 
 	    function handle_output(out){
 		console.log(out);
