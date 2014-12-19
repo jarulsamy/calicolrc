@@ -20,6 +20,9 @@ define(["require"], function (require) {
 	if (filename.indexOf('?') > 0) {
 	    filename = filename.substr(0, filename.indexOf('?'));
 	}
+	if (filename.indexOf('#') > 0) {
+	    filename = filename.substr(0, filename.indexOf('#'));
+	}
 	// Calico/notebooks/BrainScrew/BrainScrew%20Examples.ipynb
 	var path = document.URL.substr(document.URL.indexOf('/notebooks/') + 11);
 	path = path.substr(0, path.lastIndexOf('/'));
