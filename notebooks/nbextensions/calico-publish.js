@@ -25,6 +25,10 @@ define(["require"], function (require) {
 	var folder = document.URL.substr(document.URL.indexOf('/notebooks/'));
 	path = folder.substr(0, folder.lastIndexOf('/'));
 	if (confirm("You want to publish this notebook?\n" + 
+		    'user: "' + user + '"\n' +
+		    'path: "' + path + '"\n' +
+		    'filename: "' + filename + '"\n' +
+		    'base_url: "' + base_url + '"\n' +
 		    '"/home/' + user + '/' + path + '/' + filename + '" to \n' +
 		    '"~/Public/' + path + '/' + filename + '"')) {
 	    IPython.notebook.kernel.execute('"""%%python \n\
