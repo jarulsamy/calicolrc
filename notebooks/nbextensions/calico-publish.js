@@ -12,8 +12,8 @@ define(["require"], function (require) {
     function publish_notebook() {
 	// http://jupyter.cs.brynmawr.edu/user/dblank/notebooks/Calico/notebooks/BrainScrew/BrainScrew%20Examples.ipynb
 	var base_url = document.URL.substr(0,document.URL.indexOf('/notebooks/'));
-	var user = document.URL.substr(document.URL.indexOf('/user/') + 6, 
-				       document.URL.indexOf('/notebooks/'));
+	var user = document.URL.substr(document.URL.indexOf('/user/') + 6);
+	user = user.substr(0, document.URL.indexOf('/notebooks/'));
 	base_url = base_url.replace("/user/", "/hub/");
 	// BrainScrew%20Examples.ipynb
 	var filename = document.URL.substr(document.URL.lastIndexOf('/') + 1);
@@ -22,8 +22,7 @@ define(["require"], function (require) {
 	}
 	// Calico/notebooks/BrainScrew/BrainScrew%20Examples.ipynb
 	var path = document.URL.substr(document.URL.indexOf('/notebooks/') + 11);
-	var folder = document.URL.substr(document.URL.indexOf('/notebooks/') + 11);
-	path = folder.substr(0, folder.lastIndexOf('/'));
+	path = path.substr(0, path.lastIndexOf('/') + 1);
 	if (confirm("You want to publish this notebook?\n" + 
 		    'user: "' + user + '"\n' +
 		    'path: "' + path + '"\n' +
