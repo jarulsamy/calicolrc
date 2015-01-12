@@ -183,6 +183,18 @@ namespace Calico {
             if (((IList<string>)args).Contains("--verbose")) {
                 verbose = true;
             }
+	    string lang_string = "";
+	    bool lang_only = false;
+	    string display_name = "";
+	    foreach (string arg in args) { 
+		if (arg == "--only") {
+		    lang_only = true;
+		} else if (arg.StartsWith("--lang=")) {
+		    lang_string = arg.Split('=')[1];
+		} else if (arg.StartsWith("--display-name=")) {
+		    display_name = arg.Split('=')[1];
+		}
+	    }
             // Setup config
             string config_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
             if (verbose) {
@@ -216,6 +228,9 @@ namespace Calico {
             } else if (((IList<string>)args).Contains("--create-profile")) {
 		create_profile(args, path, GetIPythonPath());
                 System.Environment.Exit(0);
+            } else if (((IList<string>)args).Contains("--create-kernelspec")) {
+		create_kernelspec(lang_string, display_name, args, path, GetIPythonPath());
+                System.Environment.Exit(0);
             } else if (((IList<string>)args).Contains("--version")) {
                 Print("Calico Project, version {0} on {1}", Version, System.Environment.OSVersion.VersionString);
                 Print("  " + _("Using Mono runtime version {0}"), MonoRuntimeVersion);
@@ -227,23 +242,14 @@ namespace Calico {
 		System.Console.WriteLine(_("    Looking for languages in \"{0}\"..."), 
 					 System.IO.Path.Combine(path, "..", "languages"));
 	    }
-
-	    string lang_string = "";
-	    bool lang_only = false;
-	    foreach (string arg in args) { 
-		if (arg == "--only") {
-		    lang_only = true;
-		} else if (arg.StartsWith("--lang=")) {
-		    lang_string = arg.Split('=')[1];
-		}
-	    }
-
 	    foreach (DirectoryInfo d in dir.GetDirectories("*")) {
 		foreach (FileInfo f in d.GetFiles("Calico*.dll")) {
 		    if (lang_only) {
-			if (f.Name == string.Format("Calico{0}.dll", propercase(lang_string))) {
+			if ((f.Name == string.Format("Calico{0}.dll", propercase(lang_string))) ||
+			    (f.Name == "CalicoPython.dll")) {
 			    LoadLanguage(f, languages);
 			}
+			// else skip
 		    } else {
 			LoadLanguage(f, languages);
 		    }
@@ -461,6 +467,89 @@ namespace Calico {
             }
         }
 
+	public static void create_kernelspec(string kernelname, string display_name, string[] args, string path, string ipython_base) {
+	    string kernelspec_name;
+	    if (kernelname != "") {
+		kernelspec_name = "calico_" + kernelname;
+		if (display_name == "") 
+		    kernelname = "Calico " + propercase(kernelname);
+		else
+		    kernelname = display_name;
+	    } else {
+		kernelspec_name = "calico";
+		if (display_name == "")
+		    kernelname = "Calico";
+		else
+		    kernelname = display_name;
+	    }
+	    // Copy the /notebooks/kernelspec/* to $(ipython locate)/kernels/calico.../
+	    // Next, get destination:
+	    string ipython_path = System.IO.Path.Combine(ipython_base, "kernels", kernelspec_name);
+	    // Now, copy logos:
+	    DirectoryCopy(System.IO.Path.Combine(path, "..", "notebooks", "kernelspecs"), ipython_path, false);
+	    // Now, create kernel.json
+	    string ipython_config = "";
+	    string lang_string = "";
+	    foreach (string arg in args) { 
+		if (arg.StartsWith("--lang=")) {
+		    lang_string = String.Format("      \"{0}\", \n", arg);
+		    break;
+		}
+	    }
+	    if (System.Environment.OSVersion.Platform.ToString().Contains("Win")) {
+		string executable_path = System.IO.Path.Combine(path, "Calico.exe");
+		ipython_config = String.Format(
+					       "{{\n" + 
+					       " \"display_name\": \"{2}\",\n" +
+					       " \"env\" = {{\"MONO_PATH\": \"{0}\\..\\mono\\lib\\4.0;{0}\\..\\mono\\lib\\gtk-sharp-2.0;{0};{0}\\..\\mono\\lib\\2.0;{0}\\..\\mono\\lib\\3.5;{0}\\windows\", \n" +
+					       "            \"PATH\": \"c:\\Python27\\Scripts\" \n}}\n" +
+					       "\"argv\" = [\n" +
+					       "      \"{0}\\..\\mono\\bin\\mono.exe\", \"{1}\", \n", path, executable_path, kernelname) +
+		    (((IList<string>)args).Contains("--nographics") ? "     \"--nographics\",\n" : "") +
+		    (((IList<string>)args).Contains("--only") ? "     \"--only\",\n" : "") +
+		    lang_string +												     
+		    ("     \"--server\", \"{connection_file}\"]\n}}\n");
+	    } else { // Linux, Mac OSX, etc
+		string executable_path = System.IO.Path.Combine(path, "Calico.exe");
+		string oslib_path;
+		string ld_lib_path;
+		string oslib;
+		if (System.IO.Directory.Exists("/Applications")) {
+		    oslib = "mac";
+		    ld_lib_path = "/Library/Frameworks/Mono.framework/Libraries/";
+		} else {
+		    oslib = "linux";
+		    ld_lib_path = "";
+		}
+		oslib_path = System.IO.Path.Combine(path, oslib);
+		ipython_config = String.Format(
+					       "{{\n" +
+					       " \"display_name\": \"{4}\",\n" +
+					       " \"env\": {{\n" + 
+					       "      \"LD_LIBRARY_PATH\": \"{1}{2}\", \n" +
+					       "      \"MONO_PATH\": \"{2}\"\n" + 
+					       "  }}, \n" +
+					       " \"argv\": [" +
+					       "\"mono\", \"{3}\", ", 
+					       oslib, // {0}
+					       ld_lib_path, // {1}
+					       oslib_path, // {2}
+					       executable_path, // {3}
+					       kernelname // {4}
+					       ) + 
+		    // rest:
+		    (((IList<string>)args).Contains("--nographics") ? " \"--nographics\", " : "") +
+		    (((IList<string>)args).Contains("--only") ? " \"--only\", " : "") +
+		    lang_string +												     
+		    ("      \"--server\", \"{connection_file}\"]\n}\n");
+	    }
+	    string filename = System.IO.Path.Combine(ipython_path, "kernel.json");
+	    System.Console.WriteLine("    Creating kernelspec: \"{0}\"...", filename);
+	    System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
+	    sw.Write(ipython_config);
+	    sw.Close();
+	}
+
 	public static void create_profile(string[] args, string path, string ipython_base) {
 		// Copy the /notebooks/profile to $(ipython locate)
 		// First, make a default profile:
@@ -560,23 +649,26 @@ namespace Calico {
             Print("  " + _("Using Mono runtime version {0}"), MonoRuntimeVersion);
             Print("----------------------------------------------------------------------------");
             Print(_("Start calico with the following options:"));
-            Print(_("  StartCalico                    Standard GUI"));
-            Print(_("  StartCalico FILENAME:LINE ...  Edits FILENAMEs, positioned on LINEs"));
-            Print(_("  StartCalico --lang=LANGUAGE    Sets default language (python, etc.)"));
-            Print(_("  StartCalico --exec FILENAMEs   Run FILENAMEs"));
-            Print(_("  StartCalico --repl FILENAMEs   Run FILENAMEs and starts read-eval-print loop"));
-            Print(_("  StartCalico   --nographics     Don't run with graphics (with --exec, --repl)"));
-	    Print(_("  StartCalico   --noquit         Don't quit after executing file with --exec"));
-	    Print(_("  StartCalico --nomodules        Does not load the modules from modules/*.dll"));
-            Print(_("  StartCalico --version          Displays the version number ({0})"), Version);
-            Print(_("  StartCalico --verbose          Displays detailed information (for debugging)"));
-            Print(_("  StartCalico --debug            Calico output goes to console rather than GUI"));
-            Print(_("  StartCalico --debug-handler    Calico will not catch system errors"));
-            Print(_("  StartCalico --reset            Resets config settings to factory defaults"));
-            Print(_("  StartCalico --create-profile   Create a new profile for IPython (overwrites)"));
-            Print(_("  StartCalico --check-profile    Create profile for IPython, if it doesn't exist"));
-            Print(_("  StartCalico --server [FILE]    Used as a backend language kernel for IPython"));
-            Print(_("  StartCalico --help             Displays this message"));
+            Print(_("  StartCalico                     Standard GUI"));
+            Print(_("  StartCalico FILENAME:LINE ...   Edit FILENAMEs, positioned on LINEs"));
+            Print(_("  StartCalico --lang=LANGUAGE     Set default language (python, etc.)"));
+            Print(_("  StartCalico   --only            Load only this language, skipping others"));	    
+            Print(_("  StartCalico --exec FILENAMEs    Run FILENAMEs"));
+            Print(_("  StartCalico --repl FILENAMEs    Run FILENAMEs and starts read-eval-print loop"));
+            Print(_("  StartCalico   --nographics      Don't run with graphics (with --exec, --repl)"));
+	    Print(_("  StartCalico   --noquit          Don't quit after executing file with --exec"));
+	    Print(_("  StartCalico --nomodules         Does not load the modules from modules/*.dll"));
+            Print(_("  StartCalico --version           Display the version number ({0})"), Version);
+            Print(_("  StartCalico --verbose           Display detailed information (for debugging)"));
+            Print(_("  StartCalico --debug             Calico output goes to console rather than GUI"));
+            Print(_("  StartCalico --debug-handler     Calico will not catch system errors"));
+            Print(_("  StartCalico --reset             Reset config settings to factory defaults"));
+            Print(_("  StartCalico --create-kernelspec Create a kernelspec for Jupyter (overwrites)"));
+            Print(_("  StartCalico   --display-name=\"\" Display name to use with kernelspec"));
+            Print(_("  StartCalico --create-profile    Create a profile for IPython 2 (overwrites)"));
+            Print(_("  StartCalico --check-profile     Check to see if profile for IPython 2 exists"));
+            Print(_("  StartCalico --server [FILE]     Use as language kernel for IPython/Jupyter"));
+            Print(_("  StartCalico --help              Display this message"));
             Print("");
         }
     }
