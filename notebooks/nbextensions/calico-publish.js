@@ -49,21 +49,7 @@ define(["require"], function (require) {
 			body: body,
 			buttons: { 
 			    'Publish': function() {
-				function handle_output(out){
-				    console.log(out);
-				    var body = $('<div/>');
-				    body.append($('<h4/>').text('Your notebook is now publically available at:'));
-				    var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
-				    var link = $('<a/>').attr('href', url);
-				    link.text(url);
-				    body.append($('<p/>').html(link));
-				    dialog.modal({
-					title: 'Shared Notebook',
-					body: body,
-					buttons: { 'OK': {} }
-				    });
-				};
-				var callbacks = { 'iopub' : {'output' : handle_output}};
+				$( this ).dialog( "close" );
 				IPython.notebook.kernel.execute('%%python \n\
 \n\
 import os \n\
@@ -87,10 +73,20 @@ def publish(src, dst): \n\
     shutil.copyfile(src, dst) \n\
     os.chmod(dst, stat.S_IRUSR | stat.S_IWUSR | stat.S_IROTH | stat.S_IRGRP) \n\
 \n\
-publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filename + '")',
-								callbacks, {silent: false});
-
-				$( this ).dialog( "close" );
+publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filename + '")');
+				
+				// FIXME: Go ahead and assume it worked?
+				var body = $('<div/>');
+				body.append($('<h4/>').text('Your notebook is now publically available at:'));
+				var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
+				var link = $('<a/>').attr('href', url);
+				link.text(url);
+				body.append($('<p/>').html(link));
+				dialog.modal({
+				    title: 'Shared Notebook',
+				    body: body,
+				    buttons: { 'OK': {} }
+				});
 			    }, // publish function
 			    'Cancel': function() {
 				$( this ).dialog( "close" );
