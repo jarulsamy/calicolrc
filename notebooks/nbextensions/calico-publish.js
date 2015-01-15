@@ -41,9 +41,9 @@ define(["require"], function (require) {
 		    var body = $('<div/>');
 		    body.append($('<h4/>').text("You want to publish this notebook?"));
 		    body.append($('<p/>').text("Copies:"));
-		    body.append($('<p/>').html(%('<b/>').text("/home/" + user + '/' + path + filename)));
+		    body.append($('<p/>').html($('<b/>').text("/home/" + user + '/' + path + filename)));
 		    body.append($('<p/>').text("to:"));
-		    body.append($('<p/>').html(%('<b/>').text("~/Public/" + path + filename)));
+		    body.append($('<p/>').html($('<b/>').text("~/Public/" + path + filename)));
 		    var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
 		    var link = $('<a/>').attr('href', url);
 		    link.text(url);
