@@ -46,9 +46,11 @@ define(["require"], function (require) {
 		    body.append($('<p/>').html($('<b/>').text("~/Public/" + path + filename)));
 		    dialog.modal({
 			title: 'Publish a Notebook',
+			modal: true;
 			body: body,
-			buttons: { 
-			    'Publish': function() {
+			buttons: {
+			    'Publish': { class: "btn-primary",
+					 click: function() {
 				console.log("in publish button function 1");
 				IPython.notebook.kernel.execute('%%python \n\
 \n\
@@ -84,14 +86,18 @@ publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filen
 				link.text(url);
 				body.append($('<p/>').html(link));
 				console.log("in publish button function 3");
-				dialog.modal({
+				dialog({
 				    title: 'Shared Notebook',
+				    modal = true;
 				    body: body,
-				    buttons: { 'OK': {} }
+				    buttons: { 
+					'OK': {}
+				    }
 				});
-			    }, // publish function
-			    'Cancel': function() {
-			    }
+				return false;
+			    } // function
+			}, // publish button
+			    'Cancel': {}
 		        } // buttons
 		    }); // Dialog.modal
 		}); // require
