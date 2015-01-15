@@ -49,7 +49,6 @@ define(["require"], function (require) {
 			body: body,
 			buttons: { 
 			    'Publish': function() {
-				$( this ).dialog( "close" );
 				IPython.notebook.kernel.execute('%%python \n\
 \n\
 import os \n\
@@ -89,7 +88,6 @@ publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filen
 				});
 			    }, // publish function
 			    'Cancel': function() {
-				$( this ).dialog( "close" );
 			    }
 		        } // buttons
 		    }); // Dialog.modal
