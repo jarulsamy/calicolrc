@@ -52,8 +52,7 @@ define(["require"], function (require) {
 			title: 'Publish a Notebook',
 			body: body,
 			buttons: { 
-			    'Publish': {
-				
+			     'Publish': function() {
 				function handle_output(out){
 				    console.log(out);
 				}
@@ -84,27 +83,28 @@ def publish(src, dst): \n\
 \n\
 publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filename + '")',
 								callbacks, {silent: false});
-				require(['jquery',
-					 'base/js/dialog'
-					], function ($, dialog) {
-					    var body = $('<div/>');
-					    body.append($('<h4/>').text('Your notebook is now publically available at:'));
-					    var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
-					    var link = $('<a/>').attr('href', url);
-					    link.text(url);
-					    body.append($('<p/>').html(link));
-					    dialog.modal({
-						title: 'Shared Notebook',
-						body: body,
-						buttons: { 'OK': {} }
-					    });
-					});
-				} // Publish
-			    } // buttons
-			}); Dialog.modal
+
+				 var body = $('<div/>');
+				 body.append($('<h4/>').text('Your notebook is now publically available at:'));
+				 var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
+				 var link = $('<a/>').attr('href', url);
+				 link.text(url);
+				 body.append($('<p/>').html(link));
+				 dialog.modal({
+				     title: 'Shared Notebook',
+				     body: body,
+				     buttons: { 'OK': {} }
+				 });
+				 $( this ).dialog( "close" );
+			     }, // publish function
+			    'Cancel': function() {
+				$( this ).dialog( "close" );
+			    }
+		        } // buttons
+		    }); // Dialog.modal
 		}); // require
     }
-    
+
     var load_ipython_extension = function () {
 	// Put a button on the toolbar:
 	if (!IPython.toolbar) {
