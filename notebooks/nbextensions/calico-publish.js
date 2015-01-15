@@ -46,7 +46,6 @@ define(["require"], function (require) {
 		    body.append($('<p/>').html($('<b/>').text("~/Public/" + path + filename)));
 		    dialog.modal({
 			title: 'Publish a Notebook',
-			modal: true;
 			body: body,
 			buttons: {
 			    'Publish': { class: "btn-primary",
@@ -86,9 +85,8 @@ publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filen
 				link.text(url);
 				body.append($('<p/>').html(link));
 				console.log("in publish button function 3");
-				dialog({
+				dialog.modal({
 				    title: 'Shared Notebook',
-				    modal = true;
 				    body: body,
 				    buttons: { 
 					'OK': {}
