@@ -36,11 +36,11 @@ define(["require"], function (require) {
 	if (confirm("You want to publish this notebook?\n" + 
 		    'Copies "/home/' + user + '/' + path + filename + '" to \n' +
 		    '"~/Public/' + path + filename + '"')) {
-
+	    
 	    function handle_output(out){
 		console.log(out);
 	    }
-
+	    
 	    var callbacks = { 'iopub' : {'output' : handle_output}};
 	    IPython.notebook.kernel.execute('%%python \n\
 \n\
@@ -67,11 +67,23 @@ def publish(src, dst): \n\
 \n\
 publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filename + '")',
 					    callbacks, {silent: false});
-	    alert("Your notebook is available at:\n" +
-		  base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20"));
+	    
+	    define(['jquery',
+		    'base/js/dialog'
+		   ], function ($, dialog) {
+		       var body = $('<div/>');
+		       body.append($('<h4/>').text('Your notebook is now available:'));
+		       body.append($('<p/>').html($('<a/>').attr('href', base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20"))));
+		       dialog.modal({
+			   title: 'Shared Notebook',
+			   body: body,
+			   
+			   buttons: { 'OK': {} }
+		       });
+		   });
 	}
     };
-
+    
     var load_ipython_extension = function () {
 	// Put a button on the toolbar:
 	if (!IPython.toolbar) {
