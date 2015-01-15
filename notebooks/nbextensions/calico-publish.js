@@ -49,7 +49,7 @@ define(["require"], function (require) {
 			body: body,
 			buttons: { 
 			    'Publish': function() {
-				log.console("in publish button function 1");
+				console.log("in publish button function 1");
 				IPython.notebook.kernel.execute('%%python \n\
 \n\
 import os \n\
@@ -75,7 +75,7 @@ def publish(src, dst): \n\
 \n\
 publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filename + '")');
 				
-				log.console("in publish button function 2");
+				console.log("in publish button function 2");
 				// FIXME: Go ahead and assume it worked?
 				var body = $('<div/>');
 				body.append($('<h4/>').text('Your notebook is now publically available at:'));
@@ -83,7 +83,7 @@ publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filen
 				var link = $('<a/>').attr('href', url);
 				link.text(url);
 				body.append($('<p/>').html(link));
-				log.console("in publish button function 3");
+				console.log("in publish button function 3");
 				dialog.modal({
 				    title: 'Shared Notebook',
 				    body: body,
@@ -95,7 +95,7 @@ publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filen
 		        } // buttons
 		    }); // Dialog.modal
 		}); // require
-	log.console("in publish button function 4");
+	console.log("in publish button function 4");
     }
 
     var load_ipython_extension = function () {
