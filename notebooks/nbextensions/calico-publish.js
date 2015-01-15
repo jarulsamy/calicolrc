@@ -44,19 +44,25 @@ define(["require"], function (require) {
 		    body.append($('<p/>').html($('<b/>').text("/home/" + user + '/' + path + filename)));
 		    body.append($('<p/>').text("to:"));
 		    body.append($('<p/>').html($('<b/>').text("~/Public/" + path + filename)));
-		    var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
-		    var link = $('<a/>').attr('href', url);
-		    link.text(url);
-		    body.append($('<p/>').html(link));
 		    dialog.modal({
 			title: 'Publish a Notebook',
 			body: body,
 			buttons: { 
-			     'Publish': function() {
+			    'Publish': function() {
 				function handle_output(out){
 				    console.log(out);
-				}
-	    
+				    var body = $('<div/>');
+				    body.append($('<h4/>').text('Your notebook is now publically available at:'));
+				    var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
+				    var link = $('<a/>').attr('href', url);
+				    link.text(url);
+				    body.append($('<p/>').html(link));
+				    dialog.modal({
+					title: 'Shared Notebook',
+					body: body,
+					buttons: { 'OK': {} }
+				    });
+				};
 				var callbacks = { 'iopub' : {'output' : handle_output}};
 				IPython.notebook.kernel.execute('%%python \n\
 \n\
@@ -84,19 +90,8 @@ def publish(src, dst): \n\
 publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filename + '")',
 								callbacks, {silent: false});
 
-				 var body = $('<div/>');
-				 body.append($('<h4/>').text('Your notebook is now publically available at:'));
-				 var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
-				 var link = $('<a/>').attr('href', url);
-				 link.text(url);
-				 body.append($('<p/>').html(link));
-				 dialog.modal({
-				     title: 'Shared Notebook',
-				     body: body,
-				     buttons: { 'OK': {} }
-				 });
-				 $( this ).dialog( "close" );
-			     }, // publish function
+				$( this ).dialog( "close" );
+			    }, // publish function
 			    'Cancel': function() {
 				$( this ).dialog( "close" );
 			    }
