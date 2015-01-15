@@ -50,7 +50,22 @@ define(["require"], function (require) {
 			buttons: {
 			    'Publish': { class: "btn-primary",
 					 click: function() {
-				console.log("in publish button function 1");
+			        function handle_output(out) {
+				    var body = $('<div/>');
+				    body.append($('<h4/>').text('Your notebook is now publically available at:'));
+				    var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
+				    var link = $('<a/>').attr('href', url);
+				    link.text(url);
+				    body.append($('<p/>').html(link));
+				    dialog.modal({
+					title: 'Shared Notebook',
+					body: body,
+					buttons: { 
+					    'OK': {}
+					}
+				    });
+				}
+			        var callbacks = { 'iopub' : {'output' : handle_output}};
 				IPython.notebook.kernel.execute('%%python \n\
 \n\
 import os \n\
@@ -73,33 +88,18 @@ def publish(src, dst): \n\
             raise \n\
     shutil.copyfile(src, dst) \n\
     os.chmod(dst, stat.S_IRUSR | stat.S_IWUSR | stat.S_IROTH | stat.S_IRGRP) \n\
+    print("Ok") \n\
 \n\
-publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filename + '")');
+publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filename + '")',
+							       callbacks, {silent: false});
 				
-				console.log("in publish button function 2");
-				// FIXME: Go ahead and assume it worked?
-				var body = $('<div/>');
-				body.append($('<h4/>').text('Your notebook is now publically available at:'));
-				var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
-				var link = $('<a/>').attr('href', url);
-				link.text(url);
-				body.append($('<p/>').html(link));
-				console.log("in publish button function 3");
-				dialog.modal({
-				    title: 'Shared Notebook',
-				    body: body,
-				    buttons: { 
-					'OK': {}
-				    }
-				});
-				return false;
+				return true;
 			    } // function
 			}, // publish button
 			    'Cancel': {}
 		        } // buttons
 		    }); // Dialog.modal
 		}); // require
-	console.log("in publish button function 4");
     }
 
     var load_ipython_extension = function () {
