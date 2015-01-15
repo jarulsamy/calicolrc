@@ -33,16 +33,33 @@ define(["require"], function (require) {
 	user = user.replace(/%20/g, " ");
 	path = path.replace(/%20/g, " ");
 	filename = filename.replace(/%20/g, " ");
-	if (confirm("You want to publish this notebook?\n" + 
-		    'Copies "/home/' + user + '/' + path + filename + '" to \n' +
-		    '"~/Public/' + path + filename + '"')) {
+
+
+	require(['jquery',
+		 'base/js/dialog'
+		], function ($, dialog) {
+		    var body = $('<div/>');
+		    body.append($('<h4/>').text("You want to publish this notebook?"));
+		    body.append($('<p/>').text("Copies:"));
+		    body.append($('<p/>').html(%('<b/>').text("/home/" + user + '/' + path + filename)));
+		    body.append($('<p/>').text("to:"));
+		    body.append($('<p/>').html(%('<b/>').text("~/Public/" + path + filename)));
+		    var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
+		    var link = $('<a/>').attr('href', url);
+		    link.text(url);
+		    body.append($('<p/>').html(link));
+		    dialog.modal({
+			title: 'Publish a Notebook',
+			body: body,
+			buttons: { 
+			    'Publish': {
+				
+				function handle_output(out){
+				    console.log(out);
+				}
 	    
-	    function handle_output(out){
-		console.log(out);
-	    }
-	    
-	    var callbacks = { 'iopub' : {'output' : handle_output}};
-	    IPython.notebook.kernel.execute('%%python \n\
+				var callbacks = { 'iopub' : {'output' : handle_output}};
+				IPython.notebook.kernel.execute('%%python \n\
 \n\
 import os \n\
 import shutil \n\
@@ -66,23 +83,27 @@ def publish(src, dst): \n\
     os.chmod(dst, stat.S_IRUSR | stat.S_IWUSR | stat.S_IROTH | stat.S_IRGRP) \n\
 \n\
 publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filename + '")',
-					    callbacks, {silent: false});
-	    
-	    define(['jquery',
-		    'base/js/dialog'
-		   ], function ($, dialog) {
-		       var body = $('<div/>');
-		       body.append($('<h4/>').text('Your notebook is now available:'));
-		       body.append($('<p/>').html($('<a/>').attr('href', base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20"))));
-		       dialog.modal({
-			   title: 'Shared Notebook',
-			   body: body,
-			   
-			   buttons: { 'OK': {} }
-		       });
-		   });
-	}
-    };
+								callbacks, {silent: false});
+				require(['jquery',
+					 'base/js/dialog'
+					], function ($, dialog) {
+					    var body = $('<div/>');
+					    body.append($('<h4/>').text('Your notebook is now publically available at:'));
+					    var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
+					    var link = $('<a/>').attr('href', url);
+					    link.text(url);
+					    body.append($('<p/>').html(link));
+					    dialog.modal({
+						title: 'Shared Notebook',
+						body: body,
+						buttons: { 'OK': {} }
+					    });
+					});
+				} // Publish
+			    } // buttons
+			}); Dialog.modal
+		}); // require
+    }
     
     var load_ipython_extension = function () {
 	// Put a button on the toolbar:
@@ -94,7 +115,7 @@ publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filen
 	    add_toolbar_buttons();
 	}
     };
-
+    
     var add_toolbar_buttons = function () {
 	var version = IPython.version.substring(0, 1);
 	IPython.toolbar.add_buttons_group([
