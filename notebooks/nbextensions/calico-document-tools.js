@@ -37,7 +37,6 @@ define(["require"], function (require) {
 		var lines = text.split(/\n/g);
 		if (lines.length > 1) {
 		    // possibly break up
-		    // if we break up the cell we are in, then ???
 		    var state = "ok";
 		    var current = "";
 		    var cell_texts = [];
@@ -46,18 +45,22 @@ define(["require"], function (require) {
 			if (state === "ok") {
 			    if (line.indexOf('```') === 0) {
 				state = "block";
-				if (current !== "") {
+				if (current.trim() !== "") {
 				    cell_texts.push(current);
 				}
-				current = line + "\n";
+				if (line.trim() !== "") 
+				    if (current !== "")
+					current = "\n" + line;
 			    } else if (line.indexOf('#') === 0) {
-				if (current !== "") {
+				if (current.trim() !== "") {
 				    cell_texts.push(current);
 				}
 				current = "";
 				cell_texts.push(line);
 			    } else {
-				current += line + "\n";
+				if (line.trim() !== "") 
+				    if (current !== "")
+					current += "\n" + line;
 			    }
 			} else { // in block
 			    if (line.indexOf('```') === 0) {
@@ -71,7 +74,7 @@ define(["require"], function (require) {
 			}
 		    } // for
 		    // anything left over:
-		    if (current !== "") {
+		    if (current.trim() !== "") {
 			cell_texts.push(current);
 		    }
 		    if (cell_texts.length > 1) {
@@ -104,7 +107,7 @@ define(["require"], function (require) {
 	if (ip_version() === 2)
 	    return (cell.cell_type === "heading");
 	else 
-	    return cell.get_text().indexOf("#") === 0
+	    return (cell.cell_type === "markdown" && cell.get_text().indexOf("#") === 0)
     }
 
     function get_heading_text(cell) {
@@ -321,6 +324,7 @@ define(["require"], function (require) {
     function section_label() {
 	// Label headings with numbers, or toggle them off
 	// If there is a table of contents, re-do it
+	break_into_sections();
 	var cells = IPython.notebook.get_cells();
 	var levels = [0,0,0,0,0,0];
 	var current_level = 1;
@@ -525,6 +529,7 @@ define(["require"], function (require) {
     }
     
     function table_of_contents() {
+	break_into_sections();
 	// Create and/or replace Table of Contents
 	var cells = IPython.notebook.get_cells();
 	var toc_cell = find_cell("markdown", "#+Table of Contents");

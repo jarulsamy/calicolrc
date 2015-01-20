@@ -51,19 +51,21 @@ define(["require"], function (require) {
 			    'Publish': { class: "btn-primary",
 					 click: function() {
 			        function handle_output(out) {
-				    var body = $('<div/>');
-				    body.append($('<h4/>').text('Your notebook is now publically available at:'));
-				    var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
-				    var link = $('<a/>').attr('href', url);
-				    link.text(url);
-				    body.append($('<p/>').html(link));
-				    dialog.modal({
-					title: 'Shared Notebook',
-					body: body,
-					buttons: { 
-					    'OK': {}
-					}
-				    });
+				    if ((out.content.name === "stdout") && (out.content.text.indexOf("Ok") !== -1)) {
+					var body = $('<div/>');
+					body.append($('<h4/>').text('Your notebook is now publically available at:'));
+					var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
+					var link = $('<a target="_blank"/>').attr('href', url);
+					link.text(url);
+					body.append($('<p/>').html(link));
+					dialog.modal({
+					    title: 'Shared Notebook',
+					    body: body,
+					    buttons: { 
+						'OK': {}
+					    }
+					});
+				    }
 				}
 			        var callbacks = { 'iopub' : {'output' : handle_output}};
 				IPython.notebook.kernel.execute('%%python \n\
