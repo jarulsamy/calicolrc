@@ -8,7 +8,7 @@
  *
  **/
 
-define(["require", "nbextensions/typo/typo"], function (require) {
+define(["require"], function (require) {
 
     function toggle_spell_check() {
 	// Toggle on/off spelling checking on for markdown and heading cells
@@ -102,11 +102,14 @@ define(["require", "nbextensions/typo/typo"], function (require) {
 	}
 
 	// Load dictionary:
-	var lang = "en_US";
-	var dict_path = require.toUrl("./typo/dictionaries");
-	document.dictionary = new Typo(lang, undefined, undefined, 
-				       {"platform": "web", 
-					"dictionaryPath": dict_path});
+	require(["nbextensions/typo/typo"], function () {
+	    var lang = "en_US";
+	    var dict_path = require.toUrl("./typo/dictionaries/");
+	    dict_path = dict_path.substr(0, dict_path.lastIndexOf("/"));
+	    document.dictionary = new Typo(lang, undefined, undefined, 
+					   {"platform": "web", 
+					    "dictionaryPath": dict_path});
+	});
 
 	// Put a button on the toolbar:
 	if (!IPython.toolbar) {

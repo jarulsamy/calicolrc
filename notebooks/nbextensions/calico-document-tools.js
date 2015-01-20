@@ -8,32 +8,192 @@
  *
  **/
 
-define(["require", "nbextensions/bibtex"], function (require) {
+define(["require"], function (require) {
 
-    function move_section_down(event, index) {
+    function ip_version() {
+	if (IPython.version[0] === "2")
+	    return 2;
+	else if (IPython.version[0] === "3")
+	    return 3;
+	else
+	    throw "IPython version not supported";
+    }
+
+    function break_into_sections(index) {
+	if (ip_version() === 2)
+	    return 0;
+	var cells = IPython.notebook.get_cells();
+	var count = 0; // count below index, or -1
+	// go in reverse order to keep index accurate
+	for (var i = cells.length - 1; i > -1; i--) {
+	    var cell = cells[i];
+	    // consider it for breaking:
+	    if (cell.cell_type === "markdown") {
+		var text = cell.get_text();
+		if (text.match(/^#+Table of Contents/)) 
+		    continue;
+		if (text.match(/^#+References/)) 
+		    continue;
+		var lines = text.split(/\n/g);
+		if (lines.length > 1) {
+		    // possibly break up
+		    // if we break up the cell we are in, then ???
+		    var state = "ok";
+		    var current = "";
+		    var cell_texts = [];
+		    for (var line_no in lines) {
+			var line = lines[line_no];
+			if (state === "ok") {
+			    if (line.indexOf('```') === 0) {
+				state = "block";
+				if (current !== "") {
+				    cell_texts.push(current);
+				}
+				current = line + "\n";
+			    } else if (line.indexOf('#') === 0) {
+				if (current !== "") {
+				    cell_texts.push(current);
+				}
+				current = "";
+				cell_texts.push(line);
+			    } else {
+				current += line + "\n";
+			    }
+			} else { // in block
+			    if (line.indexOf('```') === 0) {
+				state = "ok";
+				current = line + "\n";
+				cell_texts.push(current);
+				current = "";
+			    } else {
+				current += line + "\n";
+			    }
+			}
+		    } // for
+		    // anything left over:
+		    if (current !== "") {
+			cell_texts.push(current);
+		    }
+		    if (cell_texts.length > 1) {
+			var current_cell = IPython.notebook.get_cell(i);
+			var added = 0;
+			for (var j = 0; j < cell_texts.length; j++) {
+			    if (cell_texts[j].trim() !== "") {
+				if (added === 0) {
+				    current_cell.set_text(cell_texts[j]);
+				} else {
+				    if (i === index) {
+					count = -1; // nope, can't do it
+				    } else if (i < index && count !== -1) {
+					count++;
+				    }
+				    var new_cell = IPython.notebook.insert_cell_below("markdown", i + added - 1);
+				    new_cell.set_text(cell_texts[j]);
+				}
+				added++;
+			    }
+			}
+		    }
+		}
+	    }
+	}
+	return count;
+    }
+
+    function is_heading(cell) {
+	if (ip_version() === 2)
+	    return (cell.cell_type === "heading");
+	else 
+	    return cell.get_text().indexOf("#") === 0
+    }
+
+    function get_heading_text(cell) {
+	if (ip_version() === 2)
+	    return cell.get_text();
+	else if (cell.get_text().indexOf("######") === 0)
+	    return cell.get_text().substring(6).trim();
+	else if (cell.get_text().indexOf("#####") === 0)
+	    return cell.get_text().substring(5).trim();
+	else if (cell.get_text().indexOf("####") === 0)
+	    return cell.get_text().substring(4).trim();
+	else if (cell.get_text().indexOf("###") === 0)
+	    return cell.get_text().substring(3).trim();
+	else if (cell.get_text().indexOf("##") === 0)
+	    return cell.get_text().substring(2).trim();
+	else if (cell.get_text().indexOf("#") === 0)
+	    return cell.get_text().substring(1).trim();
+	else return "";
+    }
+
+    function repeat(pattern, count) {
+	if (count < 1) return '';
+	var result = '';
+	while (count > 1) {
+            if (count & 1) result += pattern;
+            count >>= 1, pattern += pattern;
+	}
+	return result + pattern;
+    }
+
+    function set_heading_text(cell, text) {
+	if (ip_version() === 2)
+	    cell.set_text(text);
+	else {
+	    var level = get_level(cell);
+	    cell.set_text( repeat("#", level) + " " + text)
+	}
+    }
+
+    function get_level(cell) {
+	if (ip_version() === 2)
+	    return cell.level;
+	else if (cell.get_text().indexOf("######") === 0)
+	    return 6;
+	else if (cell.get_text().indexOf("#####") === 0)
+	    return 5;
+	else if (cell.get_text().indexOf("####") === 0)
+	    return 4;
+	else if (cell.get_text().indexOf("###") === 0)
+	    return 3;
+	else if (cell.get_text().indexOf("##") === 0)
+	    return 2;
+	else if (cell.get_text().indexOf("#") === 0)
+	    return 1;
+	else return 0;
+    }
+
+    function move_section_down(event) {
+	var index = IPython.notebook.get_selected_index();
+	var index_offset = break_into_sections(index);
+	if (index_offset === -1) {
+	    alert("The cell you were on was split. Please reselect cell and move again.");
+	    return;
+	} else {
+	    index += index_offset;
+	}
         var i = IPython.notebook.index_or_selected(index);
 	var max_pos = IPython.notebook.get_cells().length - 1
         if (IPython.notebook.is_valid_cell_index(i) && i < max_pos) {
 	    var curr_section = IPython.notebook.get_cell(i);
-	    if (curr_section.cell_type != "heading") {
+	    if (! is_heading(curr_section)) {
 		// Just one cell to move:
 		IPython.notebook.move_cell_down(i);
 	    } else {
 		// move an entire section
 		// find same level below this section, next_section
-		var next_section = get_index_level_below(curr_section.level, i);
+		var next_section = get_index_level_below(get_level(curr_section), i);
 		if (next_section == undefined) {
 		    return;
 		}
 		// get last cell in section:
-		next_section = get_last_cell_index_in_section(curr_section.level, next_section);
+		next_section = get_last_cell_index_in_section(get_level(curr_section), next_section);
 		// detach all in curr_section
 		var detach = [IPython.notebook.get_cell_element(i)];
 		var current = i + 1;
 		while (IPython.notebook.is_valid_cell_index(current)) {
 		    // part of section?
 		    var cell = IPython.notebook.get_cell(current);
-		    if (cell.cell_type == "heading" && cell.level <= curr_section.level) {
+		    if (is_heading(cell) && get_level(cell) <= get_level(curr_section)) {
 			break;
 		    } else {
 			detach.push(IPython.notebook.get_cell_element(current));
@@ -64,17 +224,25 @@ define(["require", "nbextensions/bibtex"], function (require) {
         }
     }
     
-    function move_section_up(event, index) {
+    function move_section_up(event) {
+	var index = IPython.notebook.get_selected_index();
+	var index_offset = break_into_sections(index);
+	if (index_offset === -1) {
+	    alert("The cell you were on was split. Please reselect cell and move again.");
+	    return;
+	} else {
+	    index += index_offset;
+	}
         var i = IPython.notebook.index_or_selected(index);
         if (IPython.notebook.is_valid_cell_index(i) && i > 0) {
 	    var curr_section = IPython.notebook.get_cell(i);
-	    if (curr_section.cell_type != "heading") {
+	    if (!is_heading(curr_section)) {
 		// Just one cell to move:
 		IPython.notebook.move_cell_up(i);
 	    } else {
 		// move an entire section
 		// find same level above this section, prev_section
-		var prev_section = get_index_level_above(curr_section.level, i);
+		var prev_section = get_index_level_above(get_level(curr_section), i);
 		if (prev_section == undefined) {
 		    return;
 		}
@@ -84,7 +252,7 @@ define(["require", "nbextensions/bibtex"], function (require) {
 		while (IPython.notebook.is_valid_cell_index(current)) {
 		    // part of section?
 		    var cell = IPython.notebook.get_cell(current);
-		    if (cell.cell_type == "heading" && cell.level <= curr_section.level) {
+		    if (is_heading(cell) && get_level(cell) <= get_level(curr_section)) {
 			break;
 		    } else {
 			detach.push(IPython.notebook.get_cell_element(current));
@@ -118,7 +286,7 @@ define(["require", "nbextensions/bibtex"], function (require) {
 	var current = index;
         while (IPython.notebook.is_valid_cell_index(current + 1)) {
 	    var cell = IPython.notebook.get_cell(current + 1);
-	    if (cell.cell_type == "heading" && cell.level <= level) {
+	    if (is_heading(cell) && get_level(cell) <= level) {
 		return current;
 	    }
 	    current++;
@@ -130,7 +298,7 @@ define(["require", "nbextensions/bibtex"], function (require) {
 	var current = current = index - 1;
         while (IPython.notebook.is_valid_cell_index(current)) {
 	    var cell = IPython.notebook.get_cell(current);
-	    if (cell.cell_type == "heading" && cell.level <= level) {
+	    if (is_heading(cell) && get_level(cell) <= level) {
 		return current;
 	    }
 	    current--;
@@ -142,7 +310,7 @@ define(["require", "nbextensions/bibtex"], function (require) {
 	var current = current = index + 1;
         while (IPython.notebook.is_valid_cell_index(current)) {
 	    var cell = IPython.notebook.get_cell(current);
-	    if (cell.cell_type == "heading" && cell.level <= level) {
+	    if (is_heading(cell) && get_level(cell) <= level) {
 		return current;
 	    }
 	    current++;
@@ -163,8 +331,12 @@ define(["require", "nbextensions/bibtex"], function (require) {
 	
 	for (var i = 0; i < cells.length; i++) {
 	    var cell = cells[i];
-	    if (cell.cell_type == "heading") {
-		var level = cell.level;
+	    if (is_heading(cell)) {
+		if (cell.get_text().match(/^#+Table of Contents/)) 
+		    continue;
+		if (cell.get_text().match(/^#+References/)) 
+		    continue;
+		var level = get_level(cell);
 		
 		if (level >= current_level) { //just keep incrementing
 		    current_level = level;
@@ -222,7 +394,7 @@ define(["require", "nbextensions/bibtex"], function (require) {
 		    }
 		}
 		
-		var heading_text = cell.get_text();
+		var heading_text = get_heading_text(cell);
 		var old_header = heading_text;
 		var re = /(?:\d*\.*)*\s*(.*)/;
 		var match = heading_text.match(re);
@@ -240,7 +412,7 @@ define(["require", "nbextensions/bibtex"], function (require) {
 		
 		cell.unrender();
 		heading_text = heading_text.trim();
-		cell.set_text(heading_text);
+		set_heading_text(cell, heading_text);
 		cell.render();
 	    }
 	}
@@ -252,8 +424,12 @@ define(["require", "nbextensions/bibtex"], function (require) {
 	if (remove_numbering) {
 	    for (var i = 0; i < cells.length; i++) {
 		var cell = cells[i];
-		if (cell.cell_type == "heading") {
-		    var heading_text = cell.get_text();
+		if (is_heading(cell)) {
+		    if (cell.get_text().match(/^#+Table of Contents/)) 
+			continue;
+		    if (cell.get_text().match(/^#+References/)) 
+			continue;
+		    var heading_text = get_heading_text(cell);
 		    old_header = heading_text;
 		    var re = /(?:\d*\.*)*\s*(.*)/;
 		    var match = heading_text.match(re);
@@ -261,7 +437,7 @@ define(["require", "nbextensions/bibtex"], function (require) {
 			heading_text = match[1];
 		    }
 		    cell.unrender();
-		    cell.set_text(heading_text);
+		    set_heading_text(cell, heading_text);
 		    cell.render();
 		    replace_links(old_header, heading_text);
 		}
@@ -276,7 +452,7 @@ define(["require", "nbextensions/bibtex"], function (require) {
 		var cell_text = cell.get_text();
 		var match = cell_text.match(/^#+Table of Contents/);
 		if (match) {
-		    table_of_contents(match[0]);
+		    table_of_contents();
 		    break;
 		}
 	    }
@@ -364,18 +540,21 @@ define(["require", "nbextensions/bibtex"], function (require) {
 	var prev_lev = 0;
 	for (var i = 0; i < cells.length; i++) {
 	    var cell = cells[i];
-	    if (cell.cell_type == "heading") {
-		
-		if (cell.level - prev_lev > 1) { //Skipped levels. Enter Dummy levels
-		    for (var x = 0; x < ((cell.level - prev_lev) - 1); x++) {
+	    if (is_heading(cell)) {
+		if (cell.get_text().match(/^#+Table of Contents/)) 
+		    continue;
+		if (cell.get_text().match(/^#+References/)) 
+		    continue;
+		if (get_level(cell) - prev_lev > 1) { //Skipped levels. Enter Dummy levels
+		    for (var x = 0; x < ((get_level(cell) - prev_lev) - 1); x++) {
 			for (var y = 0; y < (prev_lev + x); y++) {
 			    toc_text += "\t";
 			}
 			toc_text += "* &nbsp;\n";
 		    }
 		}
-		var cell_text = cell.get_text();
-		for (var j = 0; j < cell.level -1; j++) { //Loop to add the proper amount of tabs based on header level
+		var cell_text = get_heading_text(cell);
+		for (var j = 0; j < get_level(cell) -1; j++) { //Loop to add the proper amount of tabs based on header level
 		    toc_text += "\t";
 		}
 		toc_text += "* [";
@@ -387,7 +566,7 @@ define(["require", "nbextensions/bibtex"], function (require) {
 		link_text = link_text.replace(/ /g, "-"); //Replace all spaces with dashes to create links
 		toc_text += link_text;
 		toc_text += ")\n";
-		prev_lev = cell.level;
+		prev_lev = get_level(cell);
 	    }
 	}
 	toc_cell.unrender();
@@ -597,11 +776,10 @@ define(["require", "nbextensions/bibtex"], function (require) {
     }
     
     function parse_bibtex(string) {
-	var parser = new BibtexParser();
-	parser.setInput(string);
-	parser.bibtex();
+	document.bibtex_parser.setInput(string);
+	document.bibtex_parser.bibtex();
 	// {KEY: {AUTHOR:..., BIB_KEY:...}}
-	return parser.getEntries();
+	return document.bibtex_parser.getEntries();
     }
     
     function read_bibliography() {
@@ -1038,6 +1216,10 @@ define(["require", "nbextensions/bibtex"], function (require) {
 	]);
     };
     
+    require(["nbextensions/bibtex"], function () {
+	document.bibtex_parser = new BibtexParser();
+    });
+
     return {
         load_ipython_extension : load_ipython_extension,
     };
