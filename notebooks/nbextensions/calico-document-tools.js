@@ -48,9 +48,12 @@ define(["require"], function (require) {
 				if (current.trim() !== "") {
 				    cell_texts.push(current);
 				}
-				if (line.trim() !== "") 
-				    if (current !== "")
-					current = "\n" + line;
+				if (line.trim() !== "") {
+				    if (current !== "") {
+					current += "\n";
+				    }
+				    current += line;
+				}
 			    } else if (line.indexOf('#') === 0) {
 				if (current.trim() !== "") {
 				    cell_texts.push(current);
@@ -58,9 +61,12 @@ define(["require"], function (require) {
 				current = "";
 				cell_texts.push(line);
 			    } else {
-				if (line.trim() !== "") 
-				    if (current !== "")
-					current += "\n" + line;
+				if (line.trim() !== "") {
+				    if (current !== "") {
+					current += "\n";
+				    }
+				    current += line;
+				}
 			    }
 			} else { // in block
 			    if (line.indexOf('```') === 0) {
