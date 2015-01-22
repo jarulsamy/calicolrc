@@ -34,8 +34,27 @@ define(["require"], function (require) {
 	path = path.replace(/%20/g, " ");
 	filename = filename.replace(/%20/g, " ");
 
-
-	require(['jquery',
+	if (path.indexOf("Public/") !== -1) {
+	    path = path.replace("Public/", "");
+	    require(['jquery',
+		 'base/js/dialog'
+		], function ($, dialog) {
+		    var body = $('<div/>');
+		    body.append($('<h4/>').text('Your notebook is publically available at:'));
+		    var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
+		    var link = $('<a target="_blank"/>').attr('href', url);
+		    link.text(url);
+		    body.append($('<p/>').html(link));
+		    dialog.modal({
+			title: 'Shared Notebook',
+			body: body,
+			buttons: { 
+			    'OK': {}
+			}
+		    });
+		});
+	} else {
+	    require(['jquery',
 		 'base/js/dialog'
 		], function ($, dialog) {
 		    var body = $('<div/>');
@@ -102,6 +121,7 @@ publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filen
 		        } // buttons
 		    }); // Dialog.modal
 		}); // require
+          } // if/else
     }
 
     var load_ipython_extension = function () {
