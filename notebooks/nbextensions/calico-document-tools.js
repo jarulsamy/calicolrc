@@ -44,35 +44,23 @@ define(["require"], function (require) {
 			var line = lines[line_no];
 			if (state === "ok") {
 			    if (line.indexOf('```') === 0) {
-				state = "block";
-				if (current.trim() !== "") {
-				    cell_texts.push(current);
-				}
-				if (line.trim() !== "") {
-				    if (current !== "") {
-					current += "\n";
-				    }
-				    current += line;
-				}
+                                // set state to fence: allows for longer fences
+				state = line.substr(0, line.search("[^`]"));
+				current += line + "\n";
 			    } else if (line.indexOf('#') === 0) {
-				if (current.trim() !== "") {
-				    cell_texts.push(current);
+				if (current !== "") {
+				    cell_texts.push(current.trim());
 				}
 				current = "";
 				cell_texts.push(line);
 			    } else {
-				if (line.trim() !== "") {
-				    if (current !== "") {
-					current += "\n";
-				    }
-				    current += line;
-				}
+			        current += line + "\n";
 			    }
 			} else { // in block
-			    if (line.indexOf('```') === 0) {
+			    if (line.indexOf(state) === 0) {
 				state = "ok";
-				current = line + "\n";
-				cell_texts.push(current);
+				current += line + "\n";
+				cell_texts.push(current.trim());
 				current = "";
 			    } else {
 				current += line + "\n";
@@ -81,7 +69,7 @@ define(["require"], function (require) {
 		    } // for
 		    // anything left over:
 		    if (current.trim() !== "") {
-			cell_texts.push(current);
+			cell_texts.push(current.trim());
 		    }
 		    if (cell_texts.length > 1) {
 			var current_cell = IPython.notebook.get_cell(i);
@@ -98,6 +86,8 @@ define(["require"], function (require) {
 				    }
 				    var new_cell = IPython.notebook.insert_cell_below("markdown", i + added - 1);
 				    new_cell.set_text(cell_texts[j]);
+                                    new_cell.render();
+                                    new_cell.code_mirror.refresh();
 				}
 				added++;
 			    }
