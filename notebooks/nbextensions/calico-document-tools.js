@@ -27,6 +27,7 @@ define(["require"], function (require) {
 	// go in reverse order to keep index accurate
 	for (var i = cells.length - 1; i > -1; i--) {
 	    var cell = cells[i];
+	    var rendered = cell.rendered;
 	    // consider it for breaking:
 	    if (cell.cell_type === "markdown") {
 		var text = cell.get_text();
@@ -78,6 +79,9 @@ define(["require"], function (require) {
 			    if (cell_texts[j].trim() !== "") {
 				if (added === 0) {
 				    current_cell.set_text(cell_texts[j]);
+				    if (rendered) {
+					current_cell.render();
+				    }					
 				} else {
 				    if (i === index) {
 					count = -1; // nope, can't do it
@@ -86,8 +90,9 @@ define(["require"], function (require) {
 				    }
 				    var new_cell = IPython.notebook.insert_cell_below("markdown", i + added - 1);
 				    new_cell.set_text(cell_texts[j]);
-                                    new_cell.render();
-                                    new_cell.code_mirror.refresh();
+                                    if (rendered) {
+					new_cell.render();
+				    }
 				}
 				added++;
 			    }
@@ -135,12 +140,17 @@ define(["require"], function (require) {
     }
 
     function set_heading_text(cell, text) {
+        var rendered = cell.rendered;
+        cell.unrender();
 	if (ip_version() === 2)
 	    cell.set_text(text);
 	else {
 	    var level = get_level(cell);
 	    cell.set_text( repeat("#", level) + " " + text)
 	}
+        if (rendered) {
+            cell.render();
+        }
     }
 
     function get_level(cell) {
@@ -410,10 +420,8 @@ define(["require"], function (require) {
 		    replace_links(old_header, heading_text);
 		}
 		
-		cell.unrender();
 		heading_text = heading_text.trim();
 		set_heading_text(cell, heading_text);
-		cell.render();
 	    }
 	}
 	
@@ -436,9 +444,7 @@ define(["require"], function (require) {
 		    if (match) {
 			heading_text = match[1];
 		    }
-		    cell.unrender();
 		    set_heading_text(cell, heading_text);
-		    cell.render();
 		    replace_links(old_header, heading_text);
 		}
 	    }
