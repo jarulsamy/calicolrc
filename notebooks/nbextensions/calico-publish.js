@@ -111,7 +111,7 @@ def publish(src, dst): \n\
     os.chmod(dst, stat.S_IRUSR | stat.S_IWUSR | stat.S_IROTH | stat.S_IRGRP) \n\
     print("Ok") \n\
 \n\
-publish("/home/' + user + '/' + path + filename + '", "~/Public/' + path + filename + '")',
+publish("/home/' + user + '/' + path + filename + '", "~/Public/' + filename + '")',
 							       callbacks, {silent: false});
 				
 				return true;
