@@ -62,7 +62,7 @@ define(["require"], function (require) {
 		    body.append($('<p/>').text("Copies:"));
 		    body.append($('<p/>').html($('<b/>').text("/home/" + user + '/' + path + filename)));
 		    body.append($('<p/>').text("to:"));
-		    body.append($('<p/>').html($('<b/>').text("~/Public/" + path + filename)));
+		    body.append($('<p/>').html($('<b/>').text("~/Public/" + filename)));
 		    dialog.modal({
 			title: 'Publish a Notebook',
 			body: body,
@@ -73,7 +73,7 @@ define(["require"], function (require) {
 				    if ((out.content.name === "stdout") && (out.content.text.indexOf("Ok") !== -1)) {
 					var body = $('<div/>');
 					body.append($('<h4/>').text('Your notebook is now publically available at:'));
-					var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
+					var url = base_url + '/public/' + filename.replace(/ /g, "%20");
 					var link = $('<a target="_blank"/>').attr('href', url);
 					link.text(url);
 					body.append($('<p/>').html(link));
