@@ -46,7 +46,8 @@ define(["require"], function (require) {
 			if (state === "ok") {
 			    if (line.indexOf('```') === 0) {
                                 // set state to fence: allows for longer fences
-				state = line.substr(0, line.search("[^`]"));
+				state = line.substr(
+				    0, Math.max(3, line.search("[^`]")));
 				current += line + "\n";
 			    } else if (line.indexOf('#') === 0) {
 				if (current !== "") {
