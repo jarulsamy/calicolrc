@@ -79,6 +79,9 @@ define(["require"], function (require) {
 							if (filename.indexOf('?') !== -1) {
 							    filename = filename.substr(0, filename.indexOf("?"));
 							}
+							if (filename.indexOf('#') !== -1) {
+							    filename = filename.substr(0, filename.indexOf("#"));
+							}
 							var user;
 							if (document.URL.indexOf('/user/') !== -1) {
 							    user = document.URL.substr(document.URL.indexOf('/user/') + 6);
