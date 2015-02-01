@@ -566,7 +566,7 @@ public static class ZMQServer {
 	    dict["date"] = now();
 	    dict["msg_id"] = msg_id();
 	    dict["username"] = "kernel";
-	    dict["session"] = session_id;
+	    dict["session"] = engine_identity;
 	    dict["msg_type"] = msg_type;
 	    return dict;
 	}
@@ -576,7 +576,7 @@ public static class ZMQServer {
 	    dict["date"] = now();
 	    dict["msg_id"] = msg_id();
 	    dict["username"] = "kernel";
-	    dict["session"] = session_id;
+	    dict["session"] = engine_identity;
 	    dict["msg_type"] = msg_type;
 	    return dict;
 	}
@@ -782,7 +782,8 @@ public static class ZMQServer {
 		try {
 		    message = socket.Receive(Encoding.UTF8);
 		    while (message != "<IDS|MSG>") {
-			identities.Add(message);
+			if (message.Length > 1)
+			    identities.Add(message);
 			message = socket.Receive(Encoding.UTF8);
 		    }
 		    signature = socket.Receive(Encoding.UTF8);
@@ -981,7 +982,7 @@ public static class ZMQServer {
 		session.send(session.shell_channel, list(m_header["session"]), header, m_header, meta, content);
 	    } else if (msg_type == "complete_request") {
 		// content: {"text":"","line":"x.he","block":null,"cursor_pos":4}']
-		string to_match = m_content["line"].ToString();
+		string to_match = m_content["code"].ToString();
 		// ask language to complete to_match
 		var tc = session.calico.GetTabCompletion(to_match);
 		// return:
