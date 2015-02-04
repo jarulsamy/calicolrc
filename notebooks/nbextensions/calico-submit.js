@@ -22,7 +22,7 @@ define(["require"], function (require) {
 			    'Submit': { class: "btn-primary",
 					 click: function() {
 			        function handle_output(out) {
-				    if ((out.content.name === "stdout")) {
+				    if ((out.content.name === "stdout" && out.content.text.trim() !== "")) {
 					// get possible submits
 					var json_text = out.content.text;
 					var submissions = JSON.parse(json_text);
@@ -74,14 +74,9 @@ define(["require"], function (require) {
 						    click: function() {
 							// http://jupyter.cs.brynmawr.edu/user/dblank/notebooks/tests%20for%20reading%20Submissions.ipynb
 							// http://localhost:8888/notebooks/Untitled29.ipynb?kernel_name=python3
-							var filename = document.URL.substr(document.URL.indexOf('/notebooks/') + 10);
-							filename = filename.replace(/%20/g, " ");
-							if (filename.indexOf('?') !== -1) {
-							    filename = filename.substr(0, filename.indexOf("?"));
-							}
-							if (filename.indexOf('#') !== -1) {
-							    filename = filename.substr(0, filename.indexOf("#"));
-							}
+							var filename = '/' + IPython.notebook.notebook_path;
+							// handle double quotes, any other escape chars
+							filename = filename.replace(/"/g, '\\"');
 							var user;
 							if (document.URL.indexOf('/user/') !== -1) {
 							    user = document.URL.substr(document.URL.indexOf('/user/') + 6);
@@ -93,12 +88,30 @@ define(["require"], function (require) {
 							var assignment = document.getElementById("assignment").value;
 							console.log('"/home/' + user + filename + '"');
 							console.log('"/home/' + instructor + '/Submissions/' + assignment + '/' + user + '.ipynb"');
+							function handle_result(out) {
+							    if ((out.content.name === "stdout" && out.content.text.trim() !== "")) {
+								var result = out.content.text;
+								var body = $('<div/>');
+								body.append($('<h4/>').text('Results'));
+								body.append($('<p/>').text(result));
+								dialog.modal({
+								    title: 'Submit Notebook Results',
+								    body: body,
+								    buttons: { 
+									'OK': {}
+									}
+								    });
+								}
+							    };
+							var callbacks = { 'iopub' : {'output' : handle_result}};
 							IPython.notebook.kernel.execute('%%python \n\
 import shutil \n\
 src = "/home/' + user + filename + '"\n\
 dst = "/home/' + instructor + '/Submissions/' + assignment + '/' + user + '.ipynb"\n\
-shutil.copyfile(src, dst)');
-							}
+shutil.copyfile(src, dst) \n\
+print("Your submission was received.")',
+											callbacks, {silent: false});
+						    }
 						},
 						'Cancel': {}
 					    }
