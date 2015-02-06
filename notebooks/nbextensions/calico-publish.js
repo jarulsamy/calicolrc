@@ -16,24 +16,12 @@ define(["require"], function (require) {
 	user = user.substr(0, user.indexOf('/notebooks/'));
 	base_url = base_url.replace(/\/user\//g, "/hub/");
 	// BrainScrew%20Examples.ipynb
-	var filename = document.URL.substr(document.URL.lastIndexOf('/') + 1);
-	if (filename.indexOf('?') > 0) {
-	    filename = filename.substr(0, filename.indexOf('?'));
-	}
-	if (filename.indexOf('#') > 0) {
-	    filename = filename.substr(0, filename.indexOf('#'));
-	}
-	// Calico/notebooks/BrainScrew/BrainScrew%20Examples.ipynb
-	var path = document.URL.substr(document.URL.indexOf('/notebooks/') + 11);
+	var path = IPython.notebook.notebook_path;
+	path = path.replace(/"/g, '\\"');
+	var filename = path.substr(path.lastIndexOf('/') + 1);
 	path = path.substr(0, path.lastIndexOf('/'));
-	if (path !== "") {
-	    path = path + "/";
-	}
-	// Replaces spaces:
-	user = user.replace(/%20/g, " ");
-	path = path.replace(/%20/g, " ");
-	filename = filename.replace(/%20/g, " ");
-
+	console.log('/home/' + user + '/' + path + filename);
+	console.log('~/Public/' + filename);
 	if (path.indexOf("Public/") !== -1) {
 	    path = path.replace("Public/", "");
 	    require(['jquery',
