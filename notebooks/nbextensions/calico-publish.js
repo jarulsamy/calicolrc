@@ -20,16 +20,16 @@ define(["require"], function (require) {
 	path = path.replace(/"/g, '\\"');
 	var filename = path.substr(path.lastIndexOf('/') + 1);
 	path = path.substr(0, path.lastIndexOf('/'));
-	console.log('/home/' + user + '/' + path + filename);
+	console.log('/home/' + user + '/' + path + '/' + filename);
 	console.log('~/Public/' + filename);
-	if (path.indexOf("Public/") !== -1) {
-	    path = path.replace("Public/", "");
+	if (path.indexOf("Public") !== -1) {
+	    path = path.replace("Public", "");
 	    require(['jquery',
 		 'base/js/dialog'
 		], function ($, dialog) {
 		    var body = $('<div/>');
 		    body.append($('<h4/>').text('Your notebook is publically available at:'));
-		    var url = base_url + '/public/' + path.replace(/ /g, "%20") + filename.replace(/ /g, "%20");
+		    var url = base_url + '/public/' + path.replace(/ /g, "%20") + '/' + filename.replace(/ /g, "%20");
 		    var link = $('<a target="_blank"/>').attr('href', url);
 		    link.text(url);
 		    body.append($('<p/>').html(link));
@@ -48,7 +48,7 @@ define(["require"], function (require) {
 		    var body = $('<div/>');
 		    body.append($('<h4/>').text("You want to publish this notebook?"));
 		    body.append($('<p/>').text("Copies:"));
-		    body.append($('<p/>').html($('<b/>').text("/home/" + user + '/' + path + filename)));
+		    body.append($('<p/>').html($('<b/>').text("/home/" + user + '/' + path + '/' + filename)));
 		    body.append($('<p/>').text("to:"));
 		    body.append($('<p/>').html($('<b/>').text("~/Public/" + filename)));
 		    dialog.modal({
@@ -99,7 +99,7 @@ def publish(src, dst): \n\
     os.chmod(dst, stat.S_IRUSR | stat.S_IWUSR | stat.S_IROTH | stat.S_IRGRP) \n\
     print("Ok") \n\
 \n\
-publish("/home/' + user + '/' + path + filename + '", "~/Public/' + filename + '")',
+publish("/home/' + user + '/' + path + '/' + filename + '", "~/Public/' + filename + '")',
 							       callbacks, {silent: false});
 				
 				return true;
