@@ -806,8 +806,16 @@ define(["require"], function (require) {
 	    $.ajaxSetup({ "async": false });
 	    $.getJSON("/api/notebooks/Bibliography.ipynb", function(data) {
 		var index;
-		for (index in data.content.worksheets[0].cells) {
-		    var cell = data.content.worksheets[0].cells[index];
+		var cells;
+		if (data.content.worksheets != undefined) {
+		    // We must be in a notebook of version < 4
+		    cells = data.content.worksheets[0].cells;
+		} else {
+		    // We must be in a notebook of version >= 4
+		    cells = data.content.cells;
+		}
+		for (index in cells) {
+		    var cell = cells[index];
                     var json;
 		    var cell_text;
 		    if (cell.cell_type == "markdown") {
@@ -819,16 +827,20 @@ define(["require"], function (require) {
 		    } else {
 			continue;
 		    }
-                    if (cell_text.match(/^<!--bibtex/)) {
-			cell_text = cell_text.replace(/^<!--bibtex/, "");
-			cell_text = cell_text.replace(/-->s*$/, "");
-			json = parse_bibtex(cell_text);
-                    } else if (cell_text.match(/^<!--json/)) {
-			json = parse_json(cell_text);
-                    } else {
-			// skip this cell
+		    if (cell_text != undefined) { // May have been an empty cell
+			if (cell_text.match(/^<!--bibtex/)) {
+			    cell_text = cell_text.replace(/^<!--bibtex/, "");
+			    cell_text = cell_text.replace(/-->\s*$/, "");
+			    json = parse_bibtex(cell_text);
+			} else if (cell_text.match(/^<!--json/)) {
+			    json = parse_json(cell_text);
+			} else {
+			    // skip this cell
+			    continue;
+			}
+		    } else {
 			continue;
-                    }
+		    }
                     // json is a dict keyed by KEY
                     $.extend(document.bibliography, json);
 		}
