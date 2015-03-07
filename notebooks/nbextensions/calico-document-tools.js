@@ -738,8 +738,11 @@ define(["require"], function (require) {
 		    references += "[^](#ref-" +  refs + ") "
 		}
 		references += ("</sup>" + tex2html(cite["AUTHOR"]) + ". " + 
-			       cite["YEAR"] + ". _" + tex2html(cite["TITLE"]) + "_." + 
-			       "\n\n");
+			       cite["YEAR"] + ". _" + tex2html(cite["TITLE"]) + "_.");
+		if (cite["URL"] != undefined) {
+		    references += " [URL](" + cite["URL"].replace(/^"/,"").replace(/"$/,"") + ")";
+		}
+		references += "\n\n";
 	    }
 	}
 	reference_cell.unrender();
