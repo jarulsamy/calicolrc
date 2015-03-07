@@ -39,6 +39,7 @@ function BibtexParser() {
   
 
   this.setInput = function(t) {
+    this.pos = 0;
     this.input = t || "";
   }
   
