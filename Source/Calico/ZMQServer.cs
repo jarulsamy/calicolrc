@@ -965,23 +965,13 @@ public static class ZMQServer {
 		    execution_count += 1;
 		}
 	    } else if (msg_type == "kernel_info_request") {
-		if (session.starting) {
-		    session.send(session.iopub_channel, session.route("status"), 
-				 session.Header("status"), 
-				 pack(), pack(), pack("execution_state", "starting"));
-		    session.starting = false;
-		}
 		var header = session.Header("kernel_info_reply");
 		var metadata = pack();
 		var content = pack("protocol_version", new List<int>() {4, 0},
 				   "ipython_version", new List<object>() {1, 1, 0, ""},
 				   "language_version", new List<int>() {3, 0, 0},
-				   "language", "java");
+				   "language", session.calico.CurrentLanguage);
 		session.send(session.shell_channel, identities, header, m_header, metadata, content); // ok
-		header = session.Header("status");
-		metadata = pack();
-		content = pack("execution_state", "idle");
-		session.send(session.iopub_channel, session.route("status"), header, m_header, metadata, content);
 	    } else if (msg_type == "history_request") {
 		// FIXME: handle history_request
 		var header = session.Header("history_reply");
@@ -999,7 +989,7 @@ public static class ZMQServer {
 		session.send(session.shell_channel, bslist(m_header["session"].ToString()), header, m_header, meta, content);
 	    } else if (msg_type == "complete_request") {
 		// content: {"text":"","line":"x.he","block":null,"cursor_pos":4}']
-		string to_match = m_content["code"].ToString();
+		string to_match = m_content["text"].ToString();
 		// ask language to complete to_match
 		var tc = session.calico.GetTabCompletion(to_match);
 		// return:
