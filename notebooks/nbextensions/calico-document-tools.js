@@ -500,6 +500,7 @@ define(["require"], function (require) {
 		link_text = link_text.replace(/\(/g, "%28"); //Replace left parentheses with their encoding
 		link_text = link_text.replace(/\)/g, "%29"); //Replace right parentheses with their encoding
 		link_text = link_text.replace(/ /g, "-"); //Replace all spaces with dashes to create links
+		link_text = link_text.replace(/`/g, ""); //Remove backticks
 		
 		var match = cell_text.match(re);
 		if (match) {
@@ -572,6 +573,7 @@ define(["require"], function (require) {
 		link_text = link_text.replace(/\(/g, "%28"); //Replace left parentheses with their encoding
 		link_text = link_text.replace(/\)/g, "%29"); //Replace right parentheses with their encoding
 		link_text = link_text.replace(/ /g, "-"); //Replace all spaces with dashes to create links
+		link_text = link_text.replace(/`/g, ""); //Remove backticks
 		toc_text += link_text;
 		toc_text += ")\n";
 		prev_lev = get_level(cell);
@@ -1239,7 +1241,7 @@ define(["require"], function (require) {
 	]);
     };
     
-    require(["nbextensions/bibtex"], function () {
+    require(["./bibtex"], function () {
 	document.bibtex_parser = new BibtexParser();
     });
 
