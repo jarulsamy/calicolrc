@@ -5812,6 +5812,32 @@ public static class Graphics
 		    _pixbuf = _pixbuf.AddAlpha (true, Convert.ToByte(red), Convert.ToByte(green), Convert.ToByte(blue)); 
 		}
 
+		public override void addToPhysics ()
+		{ // Picture
+		    world = window._canvas.world;
+		    lock(world) {
+			float MeterInPixels = 64.0f;
+			// from x,y to meters of window
+			// arbitrary:
+			Vector2 position = new Vector2 (((float)x) / MeterInPixels, 
+							((float)y) / MeterInPixels);
+			body = FarseerPhysics.Factories.BodyFactory.CreateRectangle (
+				     world,
+				     (float)(width / MeterInPixels), // radius in meters
+				     (float)(height / MeterInPixels), // radius in meters
+				     _density, // density
+				     position);                        // center
+			// Give it some bounce and friction
+			body.BodyType = _bodyType;
+			body.IsStatic = (_bodyType == FarseerPhysics.Dynamics.BodyType.Static);
+			body.Restitution = _bounce;
+			body.Rotation = (float)_rotation;
+			body.Friction = _friction;
+			body.UserData = this; // point back to this shape
+			body.FixtureList [0].UserData = this; // point back to this shape
+		    }
+		}
+
 	} // -- end of Picture class
 
 
