@@ -6,7 +6,7 @@ rectangle = Rectangle((0,400),(500,500))
 rectangle.draw(win) 
 rectangle.bodyType="static"
 
-monkey=Picture("monkey.png") 
+monkey=Picture("../../../images/monkey.png") 
 monkey.rotate(10)
 monkey.draw(win)
 
