@@ -4,7 +4,7 @@
 //  Author:
 //       Douglas S. Blank <dblank@cs.brynmawr.edu>
 // 
-//  Copyright (c) 2011-2014 The Calico Project
+//  Copyright (c) 2011-2015 The Calico Project
 // 
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ using System.Threading;
 
 namespace Calico {
     class MainClass {
-        public static string Version = "3.1.1";
+        public static string Version = "4.0.0";
         public static bool verbose = false;
 
        /*
