@@ -3,7 +3,6 @@
 from Processing import *
 
 window(400, 400)
-
 # Get pixel colors from window
 loadPixels()
 

@@ -18,7 +18,8 @@ def draw():
     ellipse(mouseX() + dX, mouseY() + dY, 5, 5)
     ellipse(mouseX() - dX, mouseY() - dY, 5, 5)
     redraw()
+    print("test")
 
-frameRate(10)
+frameRate(20)
 onLoop += draw
 loop()

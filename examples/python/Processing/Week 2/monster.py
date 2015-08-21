@@ -14,6 +14,7 @@ smooth()
 fill(0)
 arc(107, 200, 14, 160, PI, 2*PI)
 arc(293, 200, 14, 165, PI, 2*PI)
+
 # Face is made up of four quads, so we will use arcs to draw them
 # Quad1
 ellipseMode(CENTER)
@@ -48,3 +49,4 @@ ellipse(260, 190, 4, 4)
 # Mouth
 ellipse(195, 230, 30, 15)
 ellipse(205, 227, 30, 20)
+

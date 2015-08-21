@@ -1101,7 +1101,7 @@ public class Scribbler: Myro.Robot
         int old = serial.ReadTimeout; // milliseconds
 
         if (isFluke2()){ // image functions can take a long time
-            serial.ReadTimeout = 15000; // milliseconds
+            serial.ReadTimeout = 1000; // milliseconds
         }
 
 	write (Scribbler.GET_BLOB);
@@ -1651,7 +1651,7 @@ public class Scribbler: Myro.Robot
         int oldtimeout = serial.ReadTimeout; // milliseconds
 
         if (isFluke2()){ // images can take a long time
-            serial.ReadTimeout = 15000; // milliseconds
+            serial.ReadTimeout = 1000; // milliseconds
         }
         Graphics.Picture p = null;
 
