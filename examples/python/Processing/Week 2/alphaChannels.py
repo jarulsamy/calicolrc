@@ -4,6 +4,7 @@ from Processing import *
 import math
 
 window(500, 500)
+
 smooth()
 
 w = width()

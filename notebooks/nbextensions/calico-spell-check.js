@@ -33,9 +33,7 @@ define( function () {
 	var link = document.createElement("link");
 	link.type = "text/css";
 	link.rel = "stylesheet";
-	var version = IPython.version.substring(0, 1);
-	var path = (version === "2") ? '/nbextensions/calico-spell-check.css' : '../../nbextensions/calico-spell-check.css';
-	link.href = require.toUrl(path);
+	link.href = require.toUrl("/nbextensions/calico-spell-check.css");
 	document.getElementsByTagName("head")[0].appendChild(link);
     };
 
@@ -85,15 +83,11 @@ define( function () {
 	CodeMirror.defineMode("spell-check-mixedhtml", makeOverlay("mixedhtml"));
 
 	// Load dictionary:
-	var version = IPython.version.substring(0, 1);
-	var path = (version === "2") ? '/nbextensions/typo/typo.js' : '../../nbextensions/typo/typo.js';
-	require([path], function() {
+	require(['/nbextensions/typo/typo.js'], function() {
 	    var lang = "en_US";
-	    var dict_version = IPython.version.substring(0, 1);
-	    var dict_path = (version === "2") ? '/nbextensions/typo/dictionaries' : '../../nbextensions/typo/dictionaries';
 	    document.dictionary = new Typo(lang, undefined, undefined, 
 					   {"platform": "web", 
-					    "dictionaryPath": dict_path});
+					    "dictionaryPath": "/nbextensions/typo/dictionaries"});
 	});
 
 	// Put a button on the toolbar:

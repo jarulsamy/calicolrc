@@ -5,6 +5,7 @@ import math
 win = Window("Angry Blocks", 800, 300)
 win.mode = "physics"
 
+
 for x in range(5):
     for y in range(5 - x):
         #if y % 2 == 1:
@@ -71,6 +72,8 @@ def mouseDown(obj, event):
         mouseMove(obj, event)
 
 def resetCallback(obj, event):
+    ball.move(10,0)
+    win.step()
     ball.body.ResetDynamics()
     ball.moveTo(50, 270)
 

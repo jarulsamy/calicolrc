@@ -111,8 +111,10 @@ public static class Myro
 
 	public static Robot robot;
 	public static Simulation simulation;
+        public static LevelObject gameLevel;
         public static Senses sense;
         public static Joystick joyclass;
+        public static BlobObject blobObject;
 	public static int gui_thread_id = -1;
         public static Thread update_entries_thread;
 	public static string Revision = "$Revision$";
@@ -782,6 +784,8 @@ public static class Myro
 			idle = 0;
 		}
 
+
+
 	        public void update_entries_loop ()
 	        {
 		    while (idle == 1) {
@@ -1228,13 +1232,19 @@ public static class Myro
 	      wait(1.0); // give it time to get started before trying to read sensors, etc
 	  } else {
 		if (Myro.robot != null)
-		  Myro.robot.reinit (port, baud);
+		  {
+		    //System.Console.WriteLine("test1");
+		  Myro.robot.reinit (port, baud);	
+		  //System.Console.WriteLine(Myro.robot);	    
+		  }
+
 		else {
+		    //System.Console.WriteLine("test2");
 		  // defaults to Scribbler in this interface
 		  Myro.robot = (Robot)makeRobot ("Scribbler", port, baud);
 		}
 	  }
-	}
+    }
   
 	[method: JigsawTab(null)]
 	public static Type[] getTypesOfArgs (object [] objects)
@@ -1305,6 +1315,7 @@ public static class Myro
 			  robot = constructor.Invoke (args);
 			} catch{
                 //System.Console.WriteLine ("Failure; skipping robot '{0}': {1}", f.Name, e.Message);
+                //System.Console.WriteLine ("Failure; skipping robot '{0}'", f.Name);
 			  continue;
 			}
             Myro.robot = (Robot)robot;
@@ -1358,6 +1369,15 @@ public static class Myro
     }
 
 
+        public class LevelObject
+	{
+	  public LevelObject(string title,int width,int height,int robotX,int robotY,int robotT,int endX, int endY,string backPic,string forePic,bool fog)
+	  {
+	    Myro.gameLevel=this;
+	    //Just an empty object that I can use for inheritance
+	  }
+	}
+
 	public class Simulation
 	{
 		public Graphics.WindowClass window;
@@ -1366,7 +1386,11 @@ public static class Myro
 		public List<Graphics.Shape> lights = new List<Graphics.Shape> ();
 		public Graphics.Color groundColor = new Graphics.Color (24, 155, 28);
 	        public bool run = true;
-	    
+	        public bool isRandom = false;
+	        public bool fast = true;
+	        public double simStep=0.1;
+	        public Func<object> userThread=null;
+
 		public Simulation (string title, int width, int height, Graphics.Color color)
 		{
 		    // Force destruction here, so we can wait till it gets started:
@@ -1511,7 +1535,21 @@ public static class Myro
 			  robot.update (); // handle any requests
 		      }
 		  }
-		  window.step (.1);
+		  window.step (simStep);
+	      }
+	  }
+
+	  public void step(double stepTime) {
+	      if (window.isRealized()) {
+		  lock (robots) {
+		      foreach (Robot robot in robots) {
+			  robot.update_simulation ();
+		      }
+		      foreach (Robot robot in robots) {
+			  robot.update (); // handle any requests
+		      }
+		  }
+		  window.step (stepTime);
 	      }
 	  }
 	    
@@ -1526,6 +1564,9 @@ public static class Myro
 		      foreach (Robot robot in robots) {
 			  robot.update_simulation ();
 		      }
+		      //foreach (Robot robot in robots) {
+			//robot.update ();
+		      //}
 		  }
 	      }
 	      // now update the shapes from physics:
@@ -1568,7 +1609,11 @@ public static class Myro
 			    robot.update ();
 			}
 		    }
-		    window.step (.1);
+		    window.step (simStep);
+
+		    //way to add a user defined thread to the mix. RV
+		    if(userThread != null)
+		      userThread();
 		}
 	    }
 
@@ -1823,15 +1868,15 @@ public static class Myro
 	    else
 		throw new Exception("Robot has not been initialized");
 	}
-
-	public static Graphics.Line penUp (object fillColor)
+  
+  public static Graphics.Line penUp (string fillColor)
 	{
 	    if (robot != null) 
 		return robot.penUp (fillColor);
 	    else
 		throw new Exception("Robot has not been initialized");
 	}
-  
+
 	[method: JigsawTab("M/Advanced 3")]
 	public static void togglecam ()
 	{
@@ -2168,6 +2213,20 @@ public static class Myro
 	    else
 		throw new Exception("Robot has not been initialized");
 	}
+	[method: JigsawTab("M/Misc")]
+	public static void setOptionSim (string key, object value)
+	{
+	  if(key=="fast")
+	    {
+	      Myro.simulation.fast=(bool)value;
+	      
+	    }
+	  else if(key=="random")
+	    {
+	      Myro.simulation.isRandom=(bool)value;
+	    }
+	}
+
 
 	[method: JigsawTab("M/Robot")]
 	public static void reinit (string port, int baud)
@@ -2744,7 +2803,7 @@ public static class Myro
 	}
 
        [method: JigsawTab("M/Advanced 1")]
-	public static void setBeginPath (int speed=7)
+	public static void setBeginPath (int speed)
 	{
 	    if (robot != null) {
 		robot.setBeginPath (speed);
@@ -2838,6 +2897,12 @@ public static class Myro
 	{
 		return (int)(Random.random () * (end - start + 1) + start);
 	}
+        [method: JigsawTab(null)]
+	public static double randfloat (double start, double end)
+	{
+		return (Random.random () * (end - start + 1) + start);
+	}
+
 
 	[method: JigsawTab("M/Misc")]
 	public static bool heads ()
@@ -3250,6 +3315,150 @@ public static class Myro
 	    }
 	}
 
+
+	[method: JigsawTab("M/Senses")]
+	public static BlobObject configureBlobObject (string size="small")
+	{
+	    if (blobObject != null && isRealized(blobObject.window)) {
+		InvokeBlocking( delegate {
+			blobObject.window.Destroy();
+		    });
+	    }
+	    blobObject = new BlobObject (size);
+	    return blobObject;
+	}
+
+
+  //TODO Use set_blob_yuv instead of configureBlob
+  //create yuv_values object and make it public
+  //figure out why this doesn't work with simulated robot
+  //add message to user to drag over area
+  public class BlobObject
+  {
+    public Graphics.WindowClass window;
+    Graphics.Polygon selection = new Graphics.Polygon (new Graphics.Point (0, 0), new Graphics.Point (1, 0),
+						     new Graphics.Point (1, 1), new Graphics.Point (0, 1));
+    public Graphics.Picture sampleImage=null;
+    Graphics.Picture blobImage= null;
+    
+    public double x1, y1, x2, y2;
+    string state = "up";
+    Graphics.Button takeImageButton;// = new Gtk.Button ("New Image");
+    Graphics.Button closeWindowButton;// = new Gtk.Button ("Quit");
+    
+    //double center_x, center_y;
+    //int radius = 175;
+
+    public BlobObject(string size)
+    {
+
+      int panelHeight=25;
+      if (window != null && window.isRealized())
+	return;
+
+      //it would be better if I could just query the robot's imagewidth and imageheight (robot.imagewidth)
+      //currently those fields are private. Might make them public in the future
+      if(size=="small")
+	window = makeWindow ("Blob Object Configuration", 2*427, 266+panelHeight);
+      else //size="large"
+	window = makeWindow ("Blob Object Configuration", 2*1280, 800+panelHeight);
+
+      takeImageButton= new Graphics.Button(new Graphics.Point(0,window.height-panelHeight),"Take Image");
+      closeWindowButton= new Graphics.Button(new Graphics.Point(80,window.height-panelHeight),"Close Window");
+
+      Invoke( delegate {
+	  window.ButtonPressEvent += onMouseDown;
+	  window.ButtonReleaseEvent += onMouseUp;
+	  window.MotionNotifyEvent += onMouseMove;
+	  takeImageButton.Clicked += takeImage;//connect("click",takeImage);
+	  closeWindowButton.Clicked += closeWindow;//connect("click",closeWindow);
+	  
+	});
+
+      takeImageButton.draw(window);
+      closeWindowButton.draw(window);
+
+      selection.draw(window);
+      selection.setWidth(0);
+      selection.color=makeColor(255,255,0,64);
+
+      //essentially blocks until window is destroyed
+      while(window.isRealized()){
+      
+    }
+
+
+    }
+    void takeImage(object obj, System.EventArgs args)
+    {
+      if(getRobot()!=null)
+	{
+	  sampleImage = robot.takePicture ("jpeg");
+	  sampleImage.draw(window);
+	}
+      //selection rectangle is ontop of this image
+      selection.stackOnTop();
+ 
+    }
+    void closeWindow(object obj, System.EventArgs args)
+    {
+      window.Destroy();
+    }
+	    
+    void onMouseUp (object obj, Gtk.ButtonReleaseEventArgs args)
+    {
+      if(sampleImage != null)
+	{
+	  
+	
+	  state = "up";
+	  
+	  x2 = args.Event.X;
+	  y2 = args.Event.Y;
+	  
+	  if (getRobot () != null) {
+	    //set_blob_yuv(pic,x1,y1,x2,y2);
+	    configureBlob(sampleImage,(int)x1,(int)y1,(int)x2,(int)y2);
+	    blobImage = takePicture("blob");
+	    blobImage.drawAt(window,new Graphics.Point(sampleImage.x+sampleImage.width,sampleImage.y) );
+	  }
+	}
+
+      //resets selection window back to the upper left corner
+      selection.set_points(new Graphics.Point(0,0), new Graphics.Point(1,0), new Graphics.Point(1,1), new Graphics.Point(0,1));
+      window.QueueDraw ();
+    }
+    
+    void onMouseDown (object obj, Gtk.ButtonPressEventArgs args)
+    {
+
+      if(sampleImage != null)
+	{
+	  x1 = args.Event.X;
+	  y1 = args.Event.Y;
+	  selection.set_points(new Graphics.Point(x1,y1), 
+			       new Graphics.Point(x1+1,y1), 
+			       new Graphics.Point(x1+1,y1+1), 
+			       new Graphics.Point(x1,y1+1));
+	  window.QueueDraw ();
+	  state="down";
+	}
+    }
+    
+    void onMouseMove (object obj, Gtk.MotionNotifyEventArgs args)
+    {
+      if (state == "down" && sampleImage != null) {
+	x2 = args.Event.X;
+	y2 = args.Event.Y;
+	
+	selection.set_points(new Graphics.Point(x1,y1), new Graphics.Point(x2,y1), new Graphics.Point(x2,y2), new Graphics.Point(x1,y2));
+	window.QueueDraw ();
+
+      }
+    }
+  }
+
+
 	[method: JigsawTab("M/Senses")]
 	public static string askQuestion (string question)
 	{
@@ -3315,13 +3524,129 @@ public static class Myro
 			return items [pos];
 		}
 	}
-
+  //wrote the setOptionSim to replace these two functions
+  //leaving them in for now for backwards compatability
+  //need to remove sooner or later. RV 12/12/14
 	[method: JigsawTab("M/Misc")]
-	public static void wait (double seconds)
-    {
-	if (seconds > 0) 
+  public static void setSimSpeed(string speed="normal")
+  {
+    if(speed == "fast" || speed == "Fast")
+      Myro.simulation.fast = true;
+    else
+      Myro.simulation.fast = false;
+  }  
+	[method: JigsawTab("M/Misc")]
+  public static void setSimRandom(bool value=true)
+  {
+    Myro.simulation.isRandom = value;
+  }
+
+  
+	[method: JigsawTab("M/Misc")]
+  public static void wait (double seconds)
+  {
+    
+    if (seconds > 0) 
+      {	
+	if(Myro.simulation!=null && Myro.simulation.window.isRealized())
+	  {
+	    double startTime=Myro.simulation.window.time;
+
+	    if (Myro.simulation.isRandom)
+	      seconds = seconds +randfloat(-0.01,0.01);
+	    
+	    if (Myro.simulation.fast)
+	      Myro.simulation.simStep=0.05;
+	    
+	    while ( (Myro.simulation.window.time-startTime) < (seconds/20)) //Myro.simulation.simStep))
+	      {
+		
+	      }
+	    //return simStep back to normal value
+	    Myro.simulation.simStep=0.1;
+	    
+	  }
+	else
+	  {
 	    Thread.Sleep ((int)(seconds * 1000));
-    }
+	  }       
+
+	  
+      }
+    
+  }
+  //Code cutouts:
+
+	    /*
+	    Myro.simulation.thread.Suspend();
+	    
+	    if(-Myro.simulation.fastSim)
+	      {
+		stepTime=0.01;		
+		seconds = seconds/10;
+	      }
+	    else
+	      stepTime=0.1;
+	    while(seconds > 0)
+	      {
+		seconds = seconds - stepTime;
+		Myro.simulation.step(stepTime);
+	      }
+	    
+	    Myro.simulation.thread.Resume();
+           */
+
+  //System.Console.WriteLine("got here");
+    //stops the main loop
+    //Myro.simulation.stop();
+    //Myro.simulation.thread.Abort();
+
+    //System.Console.WriteLine("test1");
+    //updates the robot
+    //should I also update all the shapes?
+    //while (Myro.simulation.window.isRealized()) {
+      //lock (Myro.simulation.robots) {
+	//foreach (Robot robot in Myro.simulation.robots) {
+	  //robot.update ();
+	//}
+      //}
+    //}
+    //System.Console.WriteLine("test2");
+    //Thread.Sleep(100);
+    
+    //advances the simulation, updates the robots
+    //in simulations, updates the physics shapes,
+    //advances the window time, and updates the window
+    //Myro.simulation.simulate(seconds);
+    //System.Console.WriteLine("test3");
+    //restarts the main loop
+
+    
+    //Sometimes the thread doesn't want to restart
+    //Myro.simulation.run=true;
+    
+    //while(!Myro.simulation.run)
+      //{
+	
+	////Myro.simulation.stop();
+	//System.Console.WriteLine("resuming");
+	//Myro.simulation.setup();
+	//System.Console.WriteLine(Myro.simulation.thread);
+	//System.Console.WriteLine(Myro.simulation.thread.IsAlive);
+
+      //}
+
+
+    //System.Console.WriteLine("resuming");
+    //System.Console.WriteLine(Myro.simulation.run);
+    //System.Console.WriteLine("test4");
+    //Myro.simulation.run = false;
+    //Myro.simulation.simulate(seconds);
+    //Myro.simulation.run = true;
+    //double start = currentTime();
+    //while(start+seconds>currentTime()){ }
+
+    
 
 	[method: JigsawTab("M/Misc")]
 	public static double currentTime ()
@@ -3849,11 +4174,11 @@ public static class Myro
 		{
 		  return null;
 		}
-
-		public virtual Graphics.Line penUp (object fillColor)
+		public virtual Graphics.Line penUp (string fillColor)
 		{
 		  return null;
 		}
+
 	  
 	       //arduino
 	       public virtual void pinMode (int port, int mode)
@@ -4640,6 +4965,22 @@ public static class Myro
         {
 	    Graphics.savePicture (pictures, filename);
 	}
+	[method: JigsawTab("M/Picture")]
+	public static void saveWindow (string filename, object window=null)
+	{
+		if (window == null)			
+			window = Graphics.getWindow ();
+		else if (window is string)
+			window = Graphics.getWindow ((string)window);
+		//else
+			//window = (Graphics.WindowClass)window;	
+		if (!filename.EndsWith (".png") && !filename.EndsWith (".jpeg")) {	
+			System.Console.WriteLine ("Warning: Filename must end in '.png' or '.jpeg'.");
+			System.Console.WriteLine ("Saving to '.png' as default.");
+			filename = filename + ".png";
+		}
+		Graphics.savePicture (Graphics.makePicture ((Graphics.WindowClass)window), (string)filename);
+	}
 
         [method: JigsawTab(null)]
 	public static object Vector (int x, int y)
@@ -4777,6 +5118,12 @@ public static class Myro
 	{
 		return Myro.simulation;
 	}
+	[method: JigsawTab("M/Robot")]
+	public static LevelObject getLevelObject ()
+	{
+		return Myro.gameLevel;
+	}
+  
 
 	[method: JigsawTab("M/Graphics")]
 	public static PythonTuple getMouse ()
@@ -4813,6 +5160,15 @@ public static class Myro
 	{
 		return Graphics.getKeyPressed (key);
 	}
+
+  public static BlobObject getBlobObject()
+  {
+    return Myro.blobObject;
+  }
+  public static void setBlobObject(BlobObject obj)
+  {
+    configureBlob(obj.sampleImage , (int)obj.x1 , (int)obj.y1 ,(int)obj.x2 ,(int)obj.y2 );
+  }
 
 	[method: JigsawTab("M/Graphics")]
 	public static void run ()

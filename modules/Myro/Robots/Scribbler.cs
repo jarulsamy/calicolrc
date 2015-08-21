@@ -1101,7 +1101,7 @@ public class Scribbler: Myro.Robot
         int old = serial.ReadTimeout; // milliseconds
 
         if (isFluke2()){ // image functions can take a long time
-            serial.ReadTimeout = 15000; // milliseconds
+            serial.ReadTimeout = 1000; // milliseconds
         }
 
 	write (Scribbler.GET_BLOB);
@@ -1651,13 +1651,16 @@ public class Scribbler: Myro.Robot
         int oldtimeout = serial.ReadTimeout; // milliseconds
 
         if (isFluke2()){ // images can take a long time
-            serial.ReadTimeout = 15000; // milliseconds
+            serial.ReadTimeout = 1000; // milliseconds
         }
         Graphics.Picture p = null;
+
         if (mode == "color") {
-            byte [] a = grab_array_yuv ();
-            if (a.Length == (width * height * 3))
-                p = new Graphics.Picture (width, height, a);
+	
+	  byte [] a = grab_array_yuv ();
+	  if (a.Length == (width * height * 3))
+	    p = new Graphics.Picture (width, height, a);
+
         } else if (mode == "jpeg") {
             byte [] buffer = grab_jpeg_color (1);
             System.IO.MemoryStream ms = new System.IO.MemoryStream (buffer);
@@ -1688,6 +1691,11 @@ public class Scribbler: Myro.Robot
             byte [] a = grab_gray_array ();
             conf_gray_window (0, 2, 0, imagewidth/2, imageheight-1, 1, 1);
             p = new Graphics.Picture (width, height, a, 1);
+        } else if (mode == "normal") {
+            conf_window (0, 0, 0, imagewidth-1, imageheight-1, 1, 1);
+            byte [] a = grab_normal_array ();
+            conf_gray_window (0, 2, 0, imagewidth/2, imageheight-1, 1, 1);
+            p = new Graphics.Picture (width, height, a);
         } else if (mode == "blob") {
             byte [] a = grab_blob_array (); 
             p = new Graphics.Picture (width, height, a);
@@ -1775,14 +1783,20 @@ public class Scribbler: Myro.Robot
         // compressed (0=fast,
         // 1=reg)
         byte [] jpeg;
+
         lock (this) { // lock robot
+	  	//double time1 = Myro.currentTime();
             if (color_header == null) {
                 write (Scribbler.GET_JPEG_COLOR_HEADER);
                 color_header = read_jpeg_header ();
             }
+	    //System.Console.WriteLine(time1-Myro.currentTime());
+	    //double time2 = Myro.currentTime();
             write (GET_JPEG_COLOR_SCAN);
             write ((byte)mode);
             jpeg = buffer_add (color_header, read_jpeg_scan ());
+	    //System.Console.WriteLine(time2-Myro.currentTime());
+	    //double time2 = Myro.currentTime();
         }
         return jpeg;
     }
@@ -1802,7 +1816,64 @@ public class Scribbler: Myro.Robot
         }
         return jpeg;
     }
+  /*  
+    public byte [] read_jpeg_scan ()
+    {
+        byte [] bytes = new byte[250000]; // kjo hack fluke 2
+        byte last_byte = 0;
+        int count = 0;
+	int n;
+        lock (serial) {
+	  while (true && count < bytes.Length) {
+	      //n = serial.Read (bytes, count, 10000);  
 
+	      //if( (bytes[count+n-14] == 0xff) && (bytes[count+n-13]==0xd9) )
+		//{
+		  //count+=(n-13);
+		  //break;
+		//}
+		  
+	      //count+=n;
+	      
+	      
+	      if(count<10000)
+		{
+		  n = serial.Read (bytes, count, 10000); 
+		  count += n;
+			      
+		}
+	      else
+		{
+		  n = serial.Read (bytes, count, 1);  
+		  if ((last_byte == 0xff) && (bytes [count] == 0xd9)) {
+		    // End-of-image marker
+		    break;
+		    //System.Console.WriteLine(count);
+		    //System.Console.WriteLine(n);
+		    //for(int i =0;i<n;i++)
+		    //showSystem.Console.WriteLine(bytes[count+i]);
+		    
+		    //if ((last_byte == 0xff) && (bytes [count] == 0xd9)) {
+		  }
+		    last_byte = bytes [count];
+		    count += n;
+		    
+		  
+
+		}
+
+	       
+  
+	  }
+        }
+	//System.Console.WriteLine(count);
+        read_uint32 ();   // Start
+        read_uint32 ();   // Read
+        read_uint32 ();   // Compress
+        return bytes.Slice (0, count);
+    }
+  */
+    
     public byte [] read_jpeg_scan ()
     {
         byte [] bytes = new byte[250000]; // kjo hack fluke 2
@@ -1812,19 +1883,19 @@ public class Scribbler: Myro.Robot
             while (true && count < bytes.Length) {
                 int n = serial.Read (bytes, count, 1);
                 if ((last_byte == 0xff) && (bytes [count] == 0xd9)) {
-                    // End-of-image marker
                     break;
                 }
                 last_byte = bytes [count];
                 count += n;
             }
         }
+	
         read_uint32 ();   // Start
         read_uint32 ();   // Read
         read_uint32 ();   // Compress
         return bytes.Slice (0, count);
     }
-
+    
     public int read_uint32 ()
     {
         byte [] buf = read (4);
@@ -1866,10 +1937,10 @@ public class Scribbler: Myro.Robot
                 counter = counter * 3;
                 
                 if (inside) {
-                    val = 0;
+                    val = 255;
                     inside = false;
                 } else {
-                    val = 255;
+                    val = 0;
                     inside = true;
                 }
             }
@@ -1890,7 +1961,83 @@ public class Scribbler: Myro.Robot
             write ((byte)0);
             line = read (size);
         }
+
         return quadrupleSize (line, width);
+    }
+    public byte [] grab_normal_array ()
+    {
+        byte [] line;
+        int width = imagewidth;
+        int height = imageheight;
+
+        int size = width * height; 
+        byte [] buffer = new byte [size * 3];
+        int vy, vu, y1v, y1u, uy, uv, y2u, y2v;
+        int Y = 0, U = 0, V = 0;
+        lock (this) { // lock robot
+            write (Scribbler.GET_RLE);
+            //write ((byte)0);
+            line = read (size);
+        }
+	/*
+        //start = 0);
+        //create the image from the YUV layer
+        for (int j=0; j < width*height; j++) {
+            if (j % width >= 3) {
+                // go to the left for values
+                vy = -1;
+                vu = -2;
+                y1v = -1;
+                y1u = -3;
+                uy = -1;
+                uv = -2;
+                y2u = -1;
+                y2v = -3;
+            } else {
+                // go to the right for other values
+                vy = 1;
+                vu = 2;
+                y1v = 3;
+                y1u = 1;
+                uy = 1;
+                uv = 2;
+                y2u = 3;
+                y2v = 1;
+            }
+            //   0123 0123 0123
+            if ((j % 4) == 0) { //3 #2   VYUY VYUY VYUY
+                V = line [j];
+                Y = line [j + vy];
+                U = line [j + vu];
+            } else if ((j % 4) == 1) { //0 #3
+                Y = line [j];
+                V = line [j + y1v];
+                U = line [j + y1u];
+            } else if ((j % 4) == 2) { //1 #0
+                U = line [j];
+                Y = line [j + uy];
+                V = line [j + uv];
+            } else if ((j % 4) == 3) { //2 #1
+                Y = line [j];
+                U = line [j + y2u];
+                V = line [j + y2v];
+            }
+	    
+            U = U - 128;
+            V = V - 128;
+	    
+            // Y = Y;
+            buffer [3*j + 0] = (byte)Math.Max (Math.Min (Y + 1.13983 * V, 255), 0);
+            buffer [3*j + 1] = (byte)Math.Max (Math.Min (Y - 0.39466 * U - 0.58060 * V, 255), 0);
+            buffer [3*j + 2] = (byte)Math.Max (Math.Min (Y + 2.03211 * U, 255), 0);            
+
+
+
+        } 
+        return buffer;
+	*/
+	return line;
+        //return quadrupleSize (line, width);
     }
 
     public byte [] quadrupleSize (byte [] line, int width)
@@ -1941,6 +2088,7 @@ public class Scribbler: Myro.Robot
         if (size == "small")
         {
             sizecode = 71;
+	    //sizecode = 25;
             //imagewidth = 256;
             //imageheight = 192;
             imagewidth = 427;
@@ -1967,6 +2115,22 @@ public class Scribbler: Myro.Robot
         setupBrightWindows();
     }
 
+  public int getImageWidth()
+  {
+    return imagewidth;
+  }
+  public int getImageHeight()
+  {
+    return imageheight;
+  }
+  public void setImageWidth(int w)
+  {
+    imagewidth=w;
+  }
+  public void setImageHeight(int h)
+  {
+    imageheight=h;
+  }
      public override void servo(int id, int value)
     {
         if (!flukeIsAtLeast("3.0.9")) return;
@@ -2071,12 +2235,12 @@ public class Scribbler: Myro.Robot
 
     public override void manualCamera(int gain=0x00, int brightness=0x80, int exposure=0x41)
     {
-        if (isFluke2())
-        {
-            set_cam_param(0x0D, 0x41);
-        }
-        else
-        {
+        //if (isFluke2())
+        //{
+        //    set_cam_param(0x0D, 0x41);
+        //}
+        //else
+        //{
             
             set_cam_param(CAM_COMA, CAM_COMA_WHITE_BALANCE_OFF);
             set_cam_param(CAM_COMB,
@@ -2084,7 +2248,7 @@ public class Scribbler: Myro.Robot
             set_cam_param(0x00, gain);
             set_cam_param(0x06, brightness);
             set_cam_param(0x10, exposure);
-        }
+        //}
     }
 
     public override  void autoCamera()
@@ -2219,11 +2383,14 @@ public class Scribbler: Myro.Robot
 	public override void configureBlob (int y_low, int y_high, int u_low, int u_high, int v_low, int v_high)
     {
         conf_rle(y_low, y_high, u_low, u_high, v_low, v_high);
+	//return Graphics.PyTuple(y_low,y_high,u_low,u_high,v_low,v_high);
     }
 
 	public override void configureBlob (Graphics.Picture p, int x1, int y1, int x2, int y2)
     {
-        set_blob_yuv(p, x1, y1, x2, y2);
+      PythonTuple values = set_blob_yuv(p, x1, y1, x2, y2);
+      conf_rle((int)values[0],(int)values[1],(int)values[2],(int)values[3],(int)values[4],(int)values[5]);
+      //return values;
     }
 
     public void conf_rle (int y_low=0, int y_high=254,

@@ -214,4 +214,4 @@ curveVertex(178, 193)
 endShape(CLOSE)
 line(200, 192, 205, 226)
 
-redraw()
+#redraw()

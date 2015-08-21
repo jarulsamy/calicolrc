@@ -10,6 +10,7 @@ fill(0)
 ellipseMode(CENTER)
 ellipse(200, 160, 60, 80)
 
+
 # eyes
 fill(255, 255, 0)
 ellipse(185, 130, 5, 5)
@@ -56,3 +57,5 @@ ellipse(252, 212, 8, 8)
 ellipse(232, 222, 8, 8)
 
 save("lady.png")
+
+

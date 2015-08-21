@@ -1,3 +1,4 @@
+
 /*
 Calico - Scripting Environment
 
@@ -2683,7 +2684,7 @@ public static class Graphics
 		    "'angle', 'distance', 'friction', 'gear', 'line', 'prismatic', 'pully', 'revolute', 'slider', or 'weld'"));
 		}
 		joints.Add(other);
-		if (joint_type != "angle") {
+		if (joint_type == "angle") {
 		    // CreateAngleJoint 
 		    return FarseerPhysics.Factories.
 			JointFactory.
@@ -2691,13 +2692,27 @@ public static class Graphics
 					 world, // world
 					 this.body.FixtureList[0].Body, // body1
 					 other.body.FixtureList[0].Body); // body2
-		} else if (joint_type != "distance") {
+		} else if (joint_type == "distance") {
 		    // CreateDistanceJoint
 		    //var body1 = this.body.FixtureList[0].Body;
 		    //var body2 = other.body.FixtureList[0].Body;
 		    //Vector2 sep1 = body2.Position - body1.Position;	
 		    //Vector2 sep2 = body1.Position - body2.Position;
-
+		  
+		  if(args.Length==4)
+		  {  
+		  
+		    return FarseerPhysics.Factories.JointFactory.CreateDistanceJoint(
+					    world, // world 
+					    this.body.FixtureList[0].Body, // body1
+					    other.body.FixtureList[0].Body, // body2
+					    new Vector2(args[0],args[1]),
+					    new Vector2(args[2],args[3]));
+		  }
+		  else
+		    {
+		      
+		    
 		    return FarseerPhysics.Factories.
 			JointFactory.
 			CreateDistanceJoint( 
@@ -2706,6 +2721,7 @@ public static class Graphics
 					    other.body.FixtureList[0].Body, // body2
 					    Vector2.Zero,
 					    Vector2.Zero);
+		    }
 		                            //Vector2.Multiply(sep1, .5f),  // anchor 1
 		                            //Vector2.Multiply(sep2, .5f));  // anchor 2
 		    //} else if (joint_type != "fixed-angle") {
@@ -2718,7 +2734,8 @@ public static class Graphics
 		    // CreateFixedPrismaticJoint
 		    //} else if (joint_type != "fixed-revolute") {
 		    // CreateFixedRevoluteJoint
-		} else if (joint_type != "friction") {
+		    
+		} else if (joint_type == "friction") {
 		    // CreateFrictionJoint
 		    return FarseerPhysics.Factories.
 			JointFactory.
@@ -2730,7 +2747,7 @@ public static class Graphics
 					    Vector2.Zero);  // axis
 		    //} else if (joint_type != "gear") {
 		    // CreateGearJoint
-		} else if (joint_type != "line") {
+		} else if (joint_type == "line") {
 		    // CreateLineJoint 
 		    return FarseerPhysics.Factories.
 			JointFactory.
@@ -2740,7 +2757,7 @@ public static class Graphics
 					other.body.FixtureList[0].Body, // body2
 					Vector2.Zero,  // anchor 2
 					Vector2.Zero);  // axis
-		} else if (joint_type != "prismatic") {
+		} else if (joint_type == "prismatic") {
 		    // CreatePrismaticJoint
 		    return FarseerPhysics.Factories.
 			JointFactory.
@@ -2750,7 +2767,7 @@ public static class Graphics
 					     other.body.FixtureList[0].Body, // body2
 					     Vector2.Zero,  // anchor 2
 					     Vector2.Zero);  // axis
-		} else if (joint_type != "pulley") {
+		} else if (joint_type == "pulley") {
 		    // CreatePulleyJoint
 		    return FarseerPhysics.Factories.
 			JointFactory.
@@ -2762,7 +2779,7 @@ public static class Graphics
 					  Vector2.Zero, // anchorA, 
 					  Vector2.Zero, // anchorB, 
 					  args[0]); // float ratio
-		} else if (joint_type != "revolute") {
+		} else if (joint_type == "revolute") {
 		    // CreateRevoluteJoint
 		    return FarseerPhysics.Factories.
 			JointFactory.
@@ -2771,7 +2788,7 @@ public static class Graphics
 					    this.body.FixtureList[0].Body, // body1
 					    other.body.FixtureList[0].Body, // body2
 					    Vector2.Zero);  // anchor1
-		} else if (joint_type != "slider") {
+		} else if (joint_type == "slider") {
 		    // CreateSliderJoint
 		    return FarseerPhysics.Factories.
 			JointFactory.
@@ -2783,13 +2800,31 @@ public static class Graphics
 					  Vector2.Zero,  // anchor2
 					  args[0],  // min distance
 					  args[1]); // max distance
-		} else if (joint_type != "weld") {
+		} else if (joint_type == "weld") {
 		    // CreateWeldJoint
 		    //var body1 = this.body.FixtureList[0].Body;
 		    //var body2 = other.body.FixtureList[0].Body;
 		    //Vector2 sep1 = body2.Position - body1.Position;	
 		    //Vector2 sep2 = body1.Position - body2.Position;
 
+		  if(args.Length==4)
+		  {  
+		  
+
+		    return FarseerPhysics.Factories.
+			JointFactory.
+			CreateWeldJoint( 
+					    world, // world
+					    this.body.FixtureList[0].Body, // body1
+					    other.body.FixtureList[0].Body, // body2
+					    new Vector2(args[0],args[1]),
+					    new Vector2(args[2],args[3]));
+
+
+		  }
+		  else
+		    {
+		      
 		    return FarseerPhysics.Factories.
 			JointFactory.
 			CreateWeldJoint( 
@@ -2798,6 +2833,9 @@ public static class Graphics
 					    other.body.FixtureList[0].Body, // body2
 					    Vector2.Zero,  // anchor 1
 					    Vector2.Zero);  // anchor 2
+		    }
+
+
 		}
 		return null;
 	    }
@@ -3248,12 +3286,13 @@ public static class Graphics
 		    return penUp(false, null);
 		}
 
-	        public Line penUp (object fillColor)
+	        public Line penUp (string fillColor)
 	        {
 		    return penUp(false, fillColor);
 		}
+	  //testing
     
-	        public Line penUp (bool getLine, object fillColor)
+	        public Line penUp (bool getLine, string fillColor)
 		{
 		  if (pen.down) {
 		    if (getLine) {
@@ -3262,10 +3301,8 @@ public static class Graphics
 			  line.color = pen.color;
 			  if (fillColor == null)
 			      line.fill = null;
-			  else if (fillColor is Color)
-			      line.fill = (Color)fillColor;
-			  else if (fillColor is String)
-			      line.fill = new Color((string)fillColor);
+			  else
+			    line.fill =new Color(fillColor);
 			  return line;
 		    } else {
 			  if (window != null) {
@@ -3274,10 +3311,8 @@ public static class Graphics
 			    line.color = pen.color;
 			    if (fillColor == null)
 				line.fill = null;
-			    else if (fillColor is Color)
-				line.fill = (Color)fillColor;
-			    else if (fillColor is String)
-				line.fill = new Color((string)fillColor);
+			    else
+			      line.fill = new Color(fillColor);
 			    line.draw(window);
 			  }
 			  return null;
@@ -4054,8 +4089,9 @@ public static class Graphics
 			g.Color = _fill._cairo;
 		    else
 			g.Color = new Cairo.Color (0, 0, 0); // default color when none given
-
-		    g.SelectFontFace(fontFace, FontSlant.Normal, FontWeight.Normal);
+		    
+		    //g.SelectFontFace(fontFace, FontSlant.Normal, FontWeight.Normal);
+		    g.SelectFontFace(fontFace, fontSlant, fontWeight);
 		    g.SetFontSize(fontSize);
 		    Point p = new Point (0, 0);
 		    double line_offset = 0;
@@ -4239,6 +4275,11 @@ public static class Graphics
 	    }
 
 	    public override void render (Cairo.Context g) {
+
+	        //Added by RV at suggestion of JH.
+	      //All other overrides contain this line
+		if (!visible)
+		  return;
 		int _textYOffset = (int)this.fontSize;  
 		double x = center.x;
 		double y = center.y;

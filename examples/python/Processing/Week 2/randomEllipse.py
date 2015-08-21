@@ -1,8 +1,9 @@
 from Processing import *
+from Graphics import *
 
 window(300, 300)
 smooth()
-frameRate(1)
+frameRate(32)
 
 def draw():
     fill(random(255), random(255), random(255))
