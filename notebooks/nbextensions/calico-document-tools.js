@@ -15,6 +15,8 @@ define(["require"], function (require) {
 	    return 2;
 	else if (IPython.version[0] === "3")
 	    return 3;
+	else if (IPython.version[0] === "4")
+	    return 4;
 	else
 	    throw "IPython version not supported";
     }
