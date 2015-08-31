@@ -15,6 +15,8 @@ define(["require"], function (require) {
 	    return 2;
 	else if (IPython.version[0] === "3")
 	    return 3;
+	else if (IPython.version[0] === "4")
+	    return 4;
 	else
 	    throw "IPython version not supported";
     }
@@ -31,9 +33,9 @@ define(["require"], function (require) {
 	    // consider it for breaking:
 	    if (cell.cell_type === "markdown") {
 		var text = cell.get_text();
-		if (text.match(/^#+Table of Contents/)) 
+		if (text.match(/^#+ *Table of Contents/))
 		    continue;
-		if (text.match(/^#+References/)) 
+		if (text.match(/^#+ *References/))
 		    continue;
 		var lines = text.split(/\n/g);
 		if (lines.length > 1) {
@@ -106,10 +108,13 @@ define(["require"], function (require) {
     }
 
     function is_heading(cell) {
-	if (ip_version() === 2)
+	var ip = ip_version();
+	if (ip === 2)
 	    return (cell.cell_type === "heading");
-	else 
+	else if (ip == 3)
 	    return (cell.cell_type === "markdown" && cell.get_text().indexOf("#") === 0)
+	else
+	    return (cell.cell_type === "markdown" && cell.get_text().match(/^#+ /))
     }
 
     function get_heading_text(cell) {
@@ -343,9 +348,9 @@ define(["require"], function (require) {
 	for (var i = 0; i < cells.length; i++) {
 	    var cell = cells[i];
 	    if (is_heading(cell)) {
-		if (cell.get_text().match(/^#+Table of Contents/)) 
+		if (cell.get_text().match(/^#+ *Table of Contents/))
 		    continue;
-		if (cell.get_text().match(/^#+References/)) 
+		if (cell.get_text().match(/^#+ *References/))
 		    continue;
 		var level = get_level(cell);
 		
@@ -434,9 +439,9 @@ define(["require"], function (require) {
 	    for (var i = 0; i < cells.length; i++) {
 		var cell = cells[i];
 		if (is_heading(cell)) {
-		    if (cell.get_text().match(/^#+Table of Contents/)) 
+		    if (cell.get_text().match(/^#+ *Table of Contents/))
 			continue;
-		    if (cell.get_text().match(/^#+References/)) 
+		    if (cell.get_text().match(/^#+ *References/))
 			continue;
 		    var heading_text = get_heading_text(cell);
 		    old_header = heading_text;
@@ -457,7 +462,7 @@ define(["require"], function (require) {
             var cell = cells[i];
             if (cell.cell_type == "markdown") {
 		var cell_text = cell.get_text();
-		var match = cell_text.match(/^#+Table of Contents/);
+		var match = cell_text.match(/^#+ *Table of Contents/);
 		if (match) {
 		    table_of_contents();
 		    break;
@@ -475,7 +480,7 @@ define(["require"], function (require) {
             if (cell.cell_type == "markdown") {
 		var cell_text = cell.get_text();
 		// Skip over table of contents:
-		if (cell_text.match(/^#+Table of Contents/)) {
+		if (cell_text.match(/^#+ *Table of Contents/)) {
 		    continue;
 		}
 		var re_string = old_header;
@@ -536,23 +541,23 @@ define(["require"], function (require) {
 	break_into_sections();
 	// Create and/or replace Table of Contents
 	var cells = IPython.notebook.get_cells();
-	var toc_cell = find_cell("markdown", "#+Table of Contents");
+	var toc_cell = find_cell("markdown", "#+ *Table of Contents");
 	// Default to top-level heading
-	var toc_text = "#Table of Contents\n";
+	var toc_text = "# Table of Contents\n";
 	if (toc_cell == undefined) {
 	    //Create a new markdown cell at the top of the Notebook
 	    toc_cell = IPython.notebook.select(0).insert_cell_above("markdown"); 
 	} else {
 	    // already exists:
-	    toc_text = toc_cell.get_text().match(/^#+Table of Contents/)[0] + "\n";
+	    toc_text = toc_cell.get_text().match(/^#+ *Table of Contents/)[0] + "\n";
 	}
 	var prev_lev = 0;
 	for (var i = 0; i < cells.length; i++) {
 	    var cell = cells[i];
 	    if (is_heading(cell)) {
-		if (cell.get_text().match(/^#+Table of Contents/)) 
+		if (cell.get_text().match(/^#+ *Table of Contents/))
 		    continue;
-		if (cell.get_text().match(/^#+References/)) 
+		if (cell.get_text().match(/^#+ *References/))
 		    continue;
 		if (get_level(cell) - prev_lev > 1) { //Skipped levels. Enter Dummy levels
 		    for (var x = 0; x < ((get_level(cell) - prev_lev) - 1); x++) {
@@ -719,15 +724,15 @@ define(["require"], function (require) {
     
     function create_reference_section(citations) {
 	// If there is a References section, replace it:
-	var reference_cell = find_cell("markdown", "#+References");
+	var reference_cell = find_cell("markdown", "#+ *References");
 	var cells = IPython.notebook.get_cells();
 	// default to top-level heading:
-	var references = "#References\n\n";
+	var references = "# References\n\n";
 	if (reference_cell == undefined) {
             reference_cell = IPython.notebook.select(cells.length-1).insert_cell_below("markdown");
 	} else {
 	    // already exists:
-	    references = reference_cell.get_text().match("#+References")[0] + "\n\n";
+	    references = reference_cell.get_text().match("#+ *References")[0] + "\n\n";
 	}
 	var citation;
 	for (citation in citations) {
