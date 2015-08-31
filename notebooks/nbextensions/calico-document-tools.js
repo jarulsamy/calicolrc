@@ -108,10 +108,13 @@ define(["require"], function (require) {
     }
 
     function is_heading(cell) {
-	if (ip_version() === 2)
+	var ip = ip_version();
+	if (ip === 2)
 	    return (cell.cell_type === "heading");
-	else 
+	else if (ip == 3)
 	    return (cell.cell_type === "markdown" && cell.get_text().indexOf("#") === 0)
+	else
+	    return (cell.cell_type === "markdown" && cell.get_text().match(/^#+ /))
     }
 
     function get_heading_text(cell) {
