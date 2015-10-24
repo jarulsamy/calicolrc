@@ -1947,6 +1947,9 @@
       (cons (vector->list (car arg-list)) (listify (cdr arg-list))))
      ((string? (car arg-list))
       (cons (string->list (car arg-list)) (listify (cdr arg-list))))
+     ;; FIXME: to match calysto_scheme/calysto_scheme/scheme.py
+     ;;((iter? (car arg-list))
+     ;; (cons (vector->list (iter (car arg-list))) (listify (cdr arg-list))))
      (else (error 'map "cannot use object type '~a' in map" 
 		  (get_type (car arg-list))))))) ;; get_type is defined in C#
 

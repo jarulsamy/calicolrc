@@ -246,9 +246,9 @@
     (verify 5
       (div 10 2))
     (verify "division by zero"
-      (try (div 10 0) (catch e e)))
+      (try (div 10 0) (catch e (cadr e))))
     (verify "division by zero"
-      (try (let ((x (try (div 10 0)))) x) (catch e e)))
+      (try (let ((x (try (div 10 0)))) x) (catch e (cadr e))))
     (verify 5
       (let ((x (try (div 10 2) (catch e -1)))) x))
     (verify -1
