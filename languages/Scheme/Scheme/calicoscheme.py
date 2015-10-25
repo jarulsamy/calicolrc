@@ -518,6 +518,9 @@ def all_numeric_q(ls):
             return False
     return True
 
+def list_native(iterable):
+    return list(iterable)
+
 ### Questions:
 
 def even_q(n):
@@ -7705,7 +7708,10 @@ def listify(arg_list):
                 if true_q(string_q(car(arg_list))):
                     return cons(string_to_list(car(arg_list)), listify(cdr(arg_list)))
                 else:
-                    raise Exception("symbol_Map: " + format("cannot use object type '~a' in map", *[get_type(car(arg_list))]))
+                    if true_q(iter_q(car(arg_list))):
+                        return cons(vector_to_list(list_native(car(arg_list))), listify(cdr(arg_list)))
+                    else:
+                        raise Exception("symbol_Map: " + format("cannot use object type '~a' in map", *[get_type(car(arg_list))]))
 
 def iterate():
     iterator = symbol_undefined

@@ -6841,6 +6841,10 @@
        (cons
          (string->list (car arg-list))
          (listify (cdr arg-list))))
+      ((iter? (car arg-list))
+       (cons
+         (vector->list (list-native (car arg-list)))
+         (listify (cdr arg-list))))
       (else
        (error 'map
          "cannot use object type '~a' in map"
@@ -7824,6 +7828,8 @@
 (define-native
   setitem-native
   (lambda (dict x value) 'unknown))
+
+(define-native list-native (lambda (v) v))
 
 (define-native
   read-multiline

@@ -510,6 +510,9 @@ def all_numeric_q(ls):
             return False
     return True
 
+def list_native(iterable):
+    return list(iterable)
+
 ### Questions:
 
 def even_q(n):
