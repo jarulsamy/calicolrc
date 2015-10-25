@@ -91,6 +91,10 @@
     (var symbol?)
     (var-info source-info?)
     (info source-info?))
+  (association-aexp
+    (var symbol?)
+    (exp aexpression?)
+    (info source-info?))
   (assign-aexp
     (var symbol?)
     (rhs-exp aexpression?)
@@ -238,6 +242,14 @@
 	   (symbol?^ (car^ asexp))
 	   (eq?^ (car^ asexp) keyword)))))
 
+(define-native tagged2-list^
+  (lambda (keyword op len)
+    (lambda (asexp)
+      (and (list?^ asexp)
+	   (op (length^ asexp) len)
+	   (symbol?^ (car^ asexp))
+	   (eq?^ (cadr^ asexp) keyword)))))
+
 (define quote?^ (tagged-list^ 'quote = 2))
 (define quasiquote?^ (tagged-list^ 'quasiquote = 2))
 (define unquote?^ (tagged-list^ 'unquote >= 2))  ;; >= for alan bawden's qq-expand algorithm
@@ -245,6 +257,7 @@
 (define if-then?^ (tagged-list^ 'if = 3))
 (define if-else?^ (tagged-list^ 'if = 4))
 (define help?^ (tagged-list^ 'help = 2))
+(define association?^ (tagged2-list^ ': = 3))
 (define assignment?^ (tagged-list^ 'set! = 3))
 (define func?^ (tagged-list^ 'func = 2))
 (define callback?^ (tagged-list^ 'callback = 2))
@@ -320,6 +333,11 @@
 	   (lambda-cont2 (v fail)
 	     (let ((var-info (get-source-info (cadr^ adatum))))
 	       (k (assign-aexp (untag-atom^ (cadr^ adatum)) v var-info info) fail)))))
+	((association?^ adatum)
+	 (aparse (caddr^ adatum) senv handler fail
+	   (lambda-cont2 (v fail)
+	     (let ((var-info (get-source-info (cadr^ adatum))))
+	       (k (association-aexp (untag-atom^ (car^ adatum)) v var-info info) fail)))))
 	((func?^ adatum)
 	 (aparse (cadr^ adatum) senv handler fail
 	   (lambda-cont2 (e fail)

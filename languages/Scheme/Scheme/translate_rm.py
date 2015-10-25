@@ -113,7 +113,8 @@ class Translator(object):
             name = "b_" + name[1:-1] + "_d"
         for pattern in [("->", "_to_"), (">", "to_"), ("<", "LessThan"), ("*", "_star"),
                         ("=", "_is_"), ("-", "_"), ("?", "_q"), ("!", "_b"), ("/", "_"),
-                        (".", "dot"), ("+", "plus"), ("%" "percent"), ("^", "_hat")]:
+                        (".", "dot"), ("+", "plus"), ("%" "percent"), ("^", "_hat"),
+                        (":", "colon")]:
             name = name.replace(pattern[0], pattern[1])
         return name
 

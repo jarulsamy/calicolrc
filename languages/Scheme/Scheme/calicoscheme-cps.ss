@@ -1240,6 +1240,10 @@
     (var symbol?)
     (var-info source-info?)
     (info source-info?))
+  (association-aexp
+    (var symbol?)
+    (exp aexpression?)
+    (info source-info?))
   (assign-aexp
     (var symbol?)
     (rhs-exp aexpression?)
@@ -1387,6 +1391,14 @@
 	   (symbol?^ (car^ asexp))
 	   (eq?^ (car^ asexp) keyword)))))
 
+(define-native tagged2-list^
+  (lambda (keyword op len)
+    (lambda (asexp)
+      (and (list?^ asexp)
+	   (op (length^ asexp) len)
+	   (symbol?^ (car^ asexp))
+	   (eq?^ (cadr^ asexp) keyword)))))
+
 (define quote?^ (tagged-list^ 'quote = 2))
 (define quasiquote?^ (tagged-list^ 'quasiquote = 2))
 (define unquote?^ (tagged-list^ 'unquote >= 2))  ;; >= for alan bawden's qq-expand algorithm
@@ -1394,6 +1406,7 @@
 (define if-then?^ (tagged-list^ 'if = 3))
 (define if-else?^ (tagged-list^ 'if = 4))
 (define help?^ (tagged-list^ 'help = 2))
+(define association?^ (tagged2-list^ ': = 3))
 (define assignment?^ (tagged-list^ 'set! = 3))
 (define func?^ (tagged-list^ 'func = 2))
 (define callback?^ (tagged-list^ 'callback = 2))
@@ -1469,6 +1482,11 @@
 	   (lambda-cont2 (v fail)
 	     (let ((var-info (get-source-info (cadr^ adatum))))
 	       (k (assign-aexp (untag-atom^ (cadr^ adatum)) v var-info info) fail)))))
+	((association?^ adatum)
+	 (aparse (caddr^ adatum) senv handler fail
+	   (lambda-cont2 (v fail)
+	     (let ((var-info (get-source-info (cadr^ adatum))))
+	       (k (association-aexp (untag-atom^ (car^ adatum)) v var-info info) fail)))))
 	((func?^ adatum)
 	 (aparse (cadr^ adatum) senv handler fail
 	   (lambda-cont2 (e fail)
@@ -3061,6 +3079,10 @@
 		(k (help (get-external-member dlr-obj components)) fail))
 	      (lambda-cont2 (binding fail)
 		(k (binding-docstring binding) fail))))
+      (association-aexp (var exp info)
+	(m exp env handler fail
+	  (lambda-cont2 (value fail)
+	     (k (association var value) fail))))
       (assign-aexp (var rhs-exp var-info info)
 	(m rhs-exp env handler fail
 	  (lambda-cont2 (rhs-value fail)
@@ -3266,6 +3288,10 @@
     (cond 
      ((= n 0) '())
      (else (cons "" (make-empty-docstrings (- n 1)))))))
+
+(define association
+  (lambda (var value)
+    (list var ': value)))
 
 (define closure
   (lambda (formals bodies env)
@@ -4599,6 +4625,9 @@
       (cons (vector->list (car arg-list)) (listify (cdr arg-list))))
      ((string? (car arg-list))
       (cons (string->list (car arg-list)) (listify (cdr arg-list))))
+     ;; FIXME: to match calysto_scheme/calysto_scheme/scheme.py
+     ;;((iter? (car arg-list))
+     ;; (cons (vector->list (iter (car arg-list))) (listify (cdr arg-list))))
      (else (error 'map "cannot use object type '~a' in map" 
 		  (get_type (car arg-list))))))) ;; get_type is defined in C#
 
@@ -5193,6 +5222,7 @@
   (lambda (external-function-object)
     (lambda-proc (args env2 info handler fail k2)
       (k2 (apply* external-function-object args) fail))))
+
 (load "transformer-macros.ss")
 
 ;; Unification pattern-matcher

@@ -791,6 +791,14 @@ def tagged_list_hat(keyword, op, length):
                 eq_q_hat(car_hat(asexp), keyword))
     return tagged_list
 
+def tagged2_list_hat(keyword, op, length):
+    def tagged2_list(asexp):
+        return (list_q_hat(asexp) and
+                op(length_hat(asexp), length) and
+                symbol_q_hat(car_hat(asexp)) and 
+                eq_q_hat(cadr_hat(asexp), keyword))
+    return tagged2_list
+
 ### Misc:
 
 def error(function, message):

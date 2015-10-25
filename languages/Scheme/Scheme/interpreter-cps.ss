@@ -409,6 +409,10 @@
 		(k (help (get-external-member dlr-obj components)) fail))
 	      (lambda-cont2 (binding fail)
 		(k (binding-docstring binding) fail))))
+      (association-aexp (var exp info)
+	(m exp env handler fail
+	  (lambda-cont2 (value fail)
+	     (k (association var value) fail))))
       (assign-aexp (var rhs-exp var-info info)
 	(m rhs-exp env handler fail
 	  (lambda-cont2 (rhs-value fail)
@@ -614,6 +618,10 @@
     (cond 
      ((= n 0) '())
      (else (cons "" (make-empty-docstrings (- n 1)))))))
+
+(define association
+  (lambda (var value)
+    (list var ': value)))
 
 (define closure
   (lambda (formals bodies env)
@@ -2544,3 +2552,4 @@
   (lambda (external-function-object)
     (lambda-proc (args env2 info handler fail k2)
       (k2 (apply* external-function-object args) fail))))
+

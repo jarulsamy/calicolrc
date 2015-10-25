@@ -14,6 +14,8 @@
   (lambda args (return* (cons 'if-aexp args))))
 (define help-aexp
   (lambda args (return* (cons 'help-aexp args))))
+(define association-aexp
+  (lambda args (return* (cons 'association-aexp args))))
 (define assign-aexp
   (lambda args (return* (cons 'assign-aexp args))))
 (define func-aexp
@@ -484,7 +486,7 @@
            right-pattern handler fail k)
     (if value_reg
         (begin
-          (set! k2_reg (make-cont2 <cont2-46> fail k))
+          (set! k2_reg (make-cont2 <cont2-47> fail k))
           (set! ap_reg right-apattern)
           (set! s_reg value_reg)
           (set! pattern_reg right-pattern)
@@ -615,7 +617,7 @@
 
 (define <cont-41>
   (lambda (args handler fail k2)
-    (set! k_reg (make-cont2 <cont2-74> args handler k2))
+    (set! k_reg (make-cont2 <cont2-76> args handler k2))
     (set! fail_reg fail)
     (set! handler_reg handler)
     (set! senv_reg (initial-contours (cadr args)))
@@ -624,7 +626,7 @@
 
 (define <cont-42>
   (lambda (handler fail k2)
-    (set! k_reg (make-cont2 <cont2-75> handler k2))
+    (set! k_reg (make-cont2 <cont2-77> handler k2))
     (set! fail_reg fail)
     (set! handler_reg handler)
     (set! senv_reg (initial-contours toplevel-env))
@@ -738,7 +740,7 @@
           (set! pc apply-cont))
         (begin
           (set! k2_reg
-            (make-cont2 <cont2-98> apair2 pair2 value_reg k))
+            (make-cont2 <cont2-100> apair2 pair2 value_reg k))
           (set! ap_reg (cdr^ apair1))
           (set! s_reg value_reg)
           (set! pattern_reg (cdr pair1))
@@ -954,6 +956,19 @@
     (let ((var-info 'undefined))
       (set! var-info (get-source-info (cadr^ adatum)))
       (set! value1_reg
+        (association-aexp
+          (untag-atom^ (car^ adatum))
+          value1_reg
+          var-info
+          info))
+      (set! k_reg k)
+      (set! pc apply-cont2))))
+
+(define <cont2-26>
+  (lambda (adatum info k)
+    (let ((var-info 'undefined))
+      (set! var-info (get-source-info (cadr^ adatum)))
+      (set! value1_reg
         (assign-aexp
           (untag-atom^ (cadr^ adatum))
           value1_reg
@@ -962,25 +977,25 @@
       (set! k_reg k)
       (set! pc apply-cont2))))
 
-(define <cont2-26>
+(define <cont2-27>
   (lambda (v1 v2 info k)
     (set! value1_reg (if-aexp v1 v2 value1_reg info))
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-27>
+(define <cont2-28>
   (lambda (adatum senv v1 info handler k)
-    (set! k_reg (make-cont2 <cont2-26> v1 value1_reg info k))
+    (set! k_reg (make-cont2 <cont2-27> v1 value1_reg info k))
     (set! fail_reg value2_reg)
     (set! handler_reg handler)
     (set! senv_reg senv)
     (set! adatum_reg (cadddr^ adatum))
     (set! pc aparse)))
 
-(define <cont2-28>
+(define <cont2-29>
   (lambda (adatum senv info handler k)
     (set! k_reg
-      (make-cont2 <cont2-27> adatum senv value1_reg info handler
+      (make-cont2 <cont2-28> adatum senv value1_reg info handler
         k))
     (set! fail_reg value2_reg)
     (set! handler_reg handler)
@@ -988,23 +1003,23 @@
     (set! adatum_reg (caddr^ adatum))
     (set! pc aparse)))
 
-(define <cont2-29>
+(define <cont2-30>
   (lambda (v1 info k)
     (set! value1_reg
       (if-aexp v1 value1_reg (lit-aexp #f 'none) info))
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-30>
+(define <cont2-31>
   (lambda (adatum senv info handler k)
-    (set! k_reg (make-cont2 <cont2-29> value1_reg info k))
+    (set! k_reg (make-cont2 <cont2-30> value1_reg info k))
     (set! fail_reg value2_reg)
     (set! handler_reg handler)
     (set! senv_reg senv)
     (set! adatum_reg (caddr^ adatum))
     (set! pc aparse)))
 
-(define <cont2-31>
+(define <cont2-32>
   (lambda (senv handler k)
     (set! k_reg k)
     (set! fail_reg value2_reg)
@@ -1013,30 +1028,30 @@
     (set! adatum_reg value1_reg)
     (set! pc aparse)))
 
-(define <cont2-32>
+(define <cont2-33>
   (lambda (a k)
     (set! value1_reg (cons a value1_reg))
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-33>
+(define <cont2-34>
   (lambda (adatum-list senv handler k)
-    (set! k_reg (make-cont2 <cont2-32> value1_reg k))
+    (set! k_reg (make-cont2 <cont2-33> value1_reg k))
     (set! fail_reg value2_reg)
     (set! handler_reg handler)
     (set! senv_reg senv)
     (set! adatum-list_reg (cdr^ adatum-list))
     (set! pc aparse-all)))
 
-(define <cont2-34>
+(define <cont2-35>
   (lambda (v1 k)
     (set! value1_reg (cons v1 value1_reg))
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-35>
+(define <cont2-36>
   (lambda (senv src tokens-left handler k)
-    (set! k_reg (make-cont2 <cont2-34> value1_reg k))
+    (set! k_reg (make-cont2 <cont2-35> value1_reg k))
     (set! fail_reg value2_reg)
     (set! handler_reg handler)
     (set! senv_reg senv)
@@ -1044,7 +1059,7 @@
     (set! tokens_reg tokens-left)
     (set! pc aparse-sexps)))
 
-(define <cont2-36>
+(define <cont2-37>
   (lambda (bodies k)
     (set! value_reg
       (append
@@ -1055,7 +1070,7 @@
     (set! k_reg k)
     (set! pc apply-cont)))
 
-(define <cont2-37>
+(define <cont2-38>
   (lambda (procs vars k2)
     (set! value2_reg
       (cons
@@ -1072,7 +1087,7 @@
     (set! k_reg k2)
     (set! pc apply-cont2)))
 
-(define <cont2-38>
+(define <cont2-39>
   (lambda (exp k)
     (set! value_reg
       (append
@@ -1084,7 +1099,7 @@
     (set! k_reg k)
     (set! pc apply-cont)))
 
-(define <cont2-39>
+(define <cont2-40>
   (lambda (clauses var k2)
     (let ((clause 'undefined))
       (set! clause (car^ clauses))
@@ -1153,7 +1168,7 @@
                 (set! k_reg k2)
                 (set! pc apply-cont2)))))))
 
-(define <cont2-40>
+(define <cont2-41>
   (lambda (clauses var k2)
     (let ((clause 'undefined))
       (set! clause (car^ clauses))
@@ -1234,7 +1249,7 @@
                 (set! k_reg k2)
                 (set! pc apply-cont2)))))))
 
-(define <cont2-41>
+(define <cont2-42>
   (lambda (type-tester-name k)
     (let ((tester-def 'undefined))
       (set! tester-def
@@ -1272,21 +1287,21 @@
       (set! k_reg k)
       (set! pc apply-cont))))
 
-(define <cont2-42>
+(define <cont2-43>
   (lambda (def name k2)
     (set! value2_reg (cons def value2_reg))
     (set! value1_reg (cons name value1_reg))
     (set! k_reg k2)
     (set! pc apply-cont2)))
 
-(define <cont2-43>
+(define <cont2-44>
   (lambda (variants k2)
     (set! k2_reg
-      (make-cont2 <cont2-42> value2_reg value1_reg k2))
+      (make-cont2 <cont2-43> value2_reg value1_reg k2))
     (set! variants_reg (cdr^ variants))
     (set! pc make-dd-variant-constructors^)))
 
-(define <cont2-44>
+(define <cont2-45>
   (lambda (exp type-name type-tester-name k)
     (set! value_reg
       (append
@@ -1317,7 +1332,7 @@
     (set! k_reg k)
     (set! pc apply-cont)))
 
-(define <cont2-45>
+(define <cont2-46>
   (lambda (macro-keyword k)
     (set! value1_reg
       (replace-info
@@ -1326,20 +1341,20 @@
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-46>
+(define <cont2-47>
   (lambda (fail k)
     (set! value1_reg value2_reg)
     (set! value2_reg fail)
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-47>
+(define <cont2-48>
   (lambda ()
     (set! *last-fail* value2_reg)
     (set! final_reg value1_reg)
     (set! pc pc-halt-signal)))
 
-(define <cont2-48>
+(define <cont2-49>
   (lambda ()
     (set! k_reg REP-k)
     (set! fail_reg value2_reg)
@@ -1348,12 +1363,12 @@
     (set! exp_reg value1_reg)
     (set! pc m)))
 
-(define <cont2-49>
+(define <cont2-50>
   (lambda () (set! final_reg #t) (set! pc pc-halt-signal)))
 
-(define <cont2-50>
+(define <cont2-51>
   (lambda ()
-    (set! k_reg (make-cont2 <cont2-49>))
+    (set! k_reg (make-cont2 <cont2-50>))
     (set! fail_reg value2_reg)
     (set! handler_reg try-parse-handler)
     (set! senv_reg (initial-contours toplevel-env))
@@ -1361,19 +1376,19 @@
     (set! tokens_reg value1_reg)
     (set! pc aparse-sexps)))
 
-(define <cont2-51>
+(define <cont2-52>
   (lambda (exp k)
     (handle-debug-info exp value1_reg)
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-52>
+(define <cont2-53>
   (lambda (exp k)
     (pop-stack-trace! exp)
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-53>
+(define <cont2-54>
   (lambda (args exp env info handler k)
     (if *use-stack-trace* (push-stack-trace! exp))
     (if (dlr-proc? value1_reg)
@@ -1386,7 +1401,7 @@
         (if (procedure-object? value1_reg)
             (if *use-stack-trace*
                 (begin
-                  (set! k2_reg (make-cont2 <cont2-52> exp k))
+                  (set! k2_reg (make-cont2 <cont2-53> exp k))
                   (set! fail_reg value2_reg)
                   (set! handler_reg handler)
                   (set! info_reg info)
@@ -1411,39 +1426,39 @@
                 (format "attempt to apply non-procedure '~a'" value1_reg))
               (set! pc runtime-error))))))
 
-(define <cont2-54>
+(define <cont2-55>
   (lambda (exp operator env info handler k)
     (set! k_reg
-      (make-cont2 <cont2-53> value1_reg exp env info handler k))
+      (make-cont2 <cont2-54> value1_reg exp env info handler k))
     (set! fail_reg value2_reg)
     (set! handler_reg handler)
     (set! env_reg env)
     (set! exp_reg operator)
     (set! pc m)))
 
-(define <cont2-55>
+(define <cont2-56>
   (lambda (handler)
     (set! fail_reg value2_reg)
     (set! exception_reg value1_reg)
     (set! handler_reg handler)
     (set! pc apply-handler2)))
 
-(define <cont2-56>
+(define <cont2-57>
   (lambda (v k)
     (set! value1_reg v)
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-57>
+(define <cont2-58>
   (lambda (fexps env handler k)
-    (set! k_reg (make-cont2 <cont2-56> value1_reg k))
+    (set! k_reg (make-cont2 <cont2-57> value1_reg k))
     (set! fail_reg value2_reg)
     (set! handler_reg handler)
     (set! env_reg env)
     (set! exps_reg fexps)
     (set! pc eval-sequence)))
 
-(define <cont2-58>
+(define <cont2-59>
   (lambda (aclauses clauses k)
     (set-binding-value!
       value1_reg
@@ -1452,7 +1467,7 @@
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-59>
+(define <cont2-60>
   (lambda (docstring var k)
     (if (procedure-object? value1_reg)
         (set-global-value! var (dlr-func value1_reg))
@@ -1462,7 +1477,7 @@
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-60>
+(define <cont2-61>
   (lambda (docstring rhs-value k)
     (set-binding-value! value1_reg rhs-value)
     (set-binding-docstring! value1_reg docstring)
@@ -1470,16 +1485,16 @@
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-61>
+(define <cont2-62>
   (lambda (docstring var env handler k)
-    (set! k_reg (make-cont2 <cont2-60> docstring value1_reg k))
+    (set! k_reg (make-cont2 <cont2-61> docstring value1_reg k))
     (set! fail_reg value2_reg)
     (set! handler_reg handler)
     (set! env_reg env)
     (set! var_reg var)
     (set! pc lookup-binding-in-first-frame)))
 
-(define <cont2-62>
+(define <cont2-63>
   (lambda (rhs-value k)
     (let ((old-value 'undefined))
       (set! old-value (binding-value value1_reg))
@@ -1492,7 +1507,7 @@
         (set! k_reg k)
         (set! pc apply-cont2)))))
 
-(define <cont2-63>
+(define <cont2-64>
   (lambda (rhs-value k)
     (let ((old-value 'undefined))
       (set! old-value (dlr-env-lookup value1_reg))
@@ -1505,11 +1520,11 @@
         (set! k_reg k)
         (set! pc apply-cont2)))))
 
-(define <cont2-64>
+(define <cont2-65>
   (lambda (var var-info env handler k)
-    (set! sk_reg (make-cont2 <cont2-62> value1_reg k))
+    (set! sk_reg (make-cont2 <cont2-63> value1_reg k))
     (set! dk_reg (make-cont3 <cont3-4> value1_reg k))
-    (set! gk_reg (make-cont2 <cont2-63> value1_reg k))
+    (set! gk_reg (make-cont2 <cont2-64> value1_reg k))
     (set! fail_reg value2_reg)
     (set! handler_reg handler)
     (set! var-info_reg var-info)
@@ -1517,19 +1532,25 @@
     (set! var_reg var)
     (set! pc lookup-variable)))
 
-(define <cont2-65>
+(define <cont2-66>
+  (lambda (var k)
+    (set! value1_reg (association var value1_reg))
+    (set! k_reg k)
+    (set! pc apply-cont2)))
+
+(define <cont2-67>
   (lambda (k)
     (set! value1_reg (binding-docstring value1_reg))
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-66>
+(define <cont2-68>
   (lambda (k)
     (set! value1_reg (help (dlr-env-lookup value1_reg)))
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-67>
+(define <cont2-69>
   (lambda (else-exp then-exp env handler k)
     (if value1_reg
         (begin
@@ -1547,28 +1568,28 @@
           (set! exp_reg else-exp)
           (set! pc m)))))
 
-(define <cont2-68>
+(define <cont2-70>
   (lambda (k)
     (set! value1_reg (callback value1_reg))
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-69>
+(define <cont2-71>
   (lambda (k)
     (set! value1_reg (dlr-func value1_reg))
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-70>
+(define <cont2-72>
   (lambda (exps env handler k)
-    (set! k_reg (make-cont2 <cont2-34> value1_reg k))
+    (set! k_reg (make-cont2 <cont2-35> value1_reg k))
     (set! fail_reg value2_reg)
     (set! handler_reg handler)
     (set! env_reg env)
     (set! exps_reg (cdr exps))
     (set! pc m*)))
 
-(define <cont2-71>
+(define <cont2-73>
   (lambda (exps env handler k)
     (set! k_reg k)
     (set! fail_reg value2_reg)
@@ -1577,14 +1598,14 @@
     (set! exps_reg (cdr exps))
     (set! pc eval-sequence)))
 
-(define <cont2-72>
+(define <cont2-74>
   (lambda (e handler)
     (set! fail_reg value2_reg)
     (set! exception_reg e)
     (set! handler_reg handler)
     (set! pc apply-handler2)))
 
-(define <cont2-73>
+(define <cont2-75>
   (lambda (trace-depth k2)
     (set! trace-depth (- trace-depth 1))
     (printf
@@ -1594,7 +1615,7 @@
     (set! k_reg k2)
     (set! pc apply-cont2)))
 
-(define <cont2-74>
+(define <cont2-76>
   (lambda (args handler k2)
     (set! k_reg k2)
     (set! fail_reg value2_reg)
@@ -1603,7 +1624,7 @@
     (set! exp_reg value1_reg)
     (set! pc m)))
 
-(define <cont2-75>
+(define <cont2-77>
   (lambda (handler k2)
     (set! k_reg k2)
     (set! fail_reg value2_reg)
@@ -1612,7 +1633,7 @@
     (set! exp_reg value1_reg)
     (set! pc m)))
 
-(define <cont2-76>
+(define <cont2-78>
   (lambda (handler k2)
     (set! k_reg (make-cont4 <cont4-11> handler k2))
     (set! fail_reg value2_reg)
@@ -1621,7 +1642,7 @@
     (set! tokens_reg value1_reg)
     (set! pc read-sexp)))
 
-(define <cont2-77>
+(define <cont2-79>
   (lambda (handler k2)
     (set! k_reg (make-cont4 <cont4-12> handler k2))
     (set! fail_reg value2_reg)
@@ -1630,7 +1651,7 @@
     (set! tokens_reg value1_reg)
     (set! pc read-sexp)))
 
-(define <cont2-78>
+(define <cont2-80>
   (lambda (k)
     (if (null? load-stack)
         (printf "WARNING: empty load-stack encountered!\n")
@@ -1639,9 +1660,9 @@
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-79>
+(define <cont2-81>
   (lambda (filename env2 handler k)
-    (set! k_reg (make-cont2 <cont2-78> k))
+    (set! k_reg (make-cont2 <cont2-80> k))
     (set! fail_reg value2_reg)
     (set! handler_reg handler)
     (set! env2_reg env2)
@@ -1649,7 +1670,7 @@
     (set! tokens_reg value1_reg)
     (set! pc read-and-eval-asexps)))
 
-(define <cont2-80>
+(define <cont2-82>
   (lambda (src tokens-left env2 handler k)
     (if (token-type? (first tokens-left) 'end-marker)
         (begin (set! k_reg k) (set! pc apply-cont2))
@@ -1662,17 +1683,17 @@
           (set! tokens_reg tokens-left)
           (set! pc read-and-eval-asexps)))))
 
-(define <cont2-81>
+(define <cont2-83>
   (lambda (src tokens-left env2 handler k)
     (set! k_reg
-      (make-cont2 <cont2-80> src tokens-left env2 handler k))
+      (make-cont2 <cont2-82> src tokens-left env2 handler k))
     (set! fail_reg value2_reg)
     (set! handler_reg handler)
     (set! env_reg env2)
     (set! exp_reg value1_reg)
     (set! pc m)))
 
-(define <cont2-82>
+(define <cont2-84>
   (lambda (filenames env2 info handler k)
     (set! k_reg k)
     (set! fail_reg value2_reg)
@@ -1682,7 +1703,7 @@
     (set! filenames_reg (cdr filenames))
     (set! pc load-files)))
 
-(define <cont2-83>
+(define <cont2-85>
   (lambda (lst k2)
     (if (member (car lst) value1_reg)
         (begin (set! k_reg k2) (set! pc apply-cont2))
@@ -1691,7 +1712,7 @@
           (set! k_reg k2)
           (set! pc apply-cont2)))))
 
-(define <cont2-84>
+(define <cont2-86>
   (lambda (filename handler k2)
     (let ((module 'undefined))
       (set! module (make-toplevel-env))
@@ -1704,7 +1725,7 @@
       (set! filename_reg filename)
       (set! pc load-file))))
 
-(define <cont2-85>
+(define <cont2-87>
   (lambda (args sym info handler k)
     (if (null? (cdr args))
         (begin (set! k_reg k) (set! pc apply-cont2))
@@ -1724,13 +1745,13 @@
               (set! args_reg (cdr args))
               (set! pc get-primitive))))))
 
-(define <cont2-86>
+(define <cont2-88>
   (lambda (ls1 k2)
     (set! value1_reg (cons (car ls1) value1_reg))
     (set! k_reg k2)
     (set! pc apply-cont2)))
 
-(define <cont2-87>
+(define <cont2-89>
   (lambda (lists k2)
     (set! k2_reg k2)
     (set! fail_reg value2_reg)
@@ -1738,7 +1759,7 @@
     (set! ls1_reg (car lists))
     (set! pc append2)))
 
-(define <cont2-88>
+(define <cont2-90>
   (lambda (iterator proc env handler k)
     (set! k_reg k)
     (set! fail_reg value2_reg)
@@ -1748,9 +1769,9 @@
     (set! proc_reg proc)
     (set! pc iterate-continue)))
 
-(define <cont2-89>
+(define <cont2-91>
   (lambda (iterator proc env handler k)
-    (set! k_reg (make-cont2 <cont2-34> value1_reg k))
+    (set! k_reg (make-cont2 <cont2-35> value1_reg k))
     (set! fail_reg value2_reg)
     (set! handler_reg handler)
     (set! env_reg env)
@@ -1758,9 +1779,9 @@
     (set! proc_reg proc)
     (set! pc iterate-collect-continue)))
 
-(define <cont2-90>
+(define <cont2-92>
   (lambda (list1 proc env handler k)
-    (set! k_reg (make-cont2 <cont2-34> value1_reg k))
+    (set! k_reg (make-cont2 <cont2-35> value1_reg k))
     (set! fail_reg value2_reg)
     (set! handler_reg handler)
     (set! env_reg env)
@@ -1768,16 +1789,16 @@
     (set! proc_reg proc)
     (set! pc map1)))
 
-(define <cont2-91>
+(define <cont2-93>
   (lambda (list1 proc k)
     (set! value1_reg
       (cons (dlr-apply proc (list (car list1))) value1_reg))
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-92>
+(define <cont2-94>
   (lambda (list1 list2 proc env handler k)
-    (set! k_reg (make-cont2 <cont2-34> value1_reg k))
+    (set! k_reg (make-cont2 <cont2-35> value1_reg k))
     (set! fail_reg value2_reg)
     (set! handler_reg handler)
     (set! env_reg env)
@@ -1786,7 +1807,7 @@
     (set! proc_reg proc)
     (set! pc map2)))
 
-(define <cont2-93>
+(define <cont2-95>
   (lambda (list1 list2 proc k)
     (set! value1_reg
       (cons
@@ -1795,9 +1816,9 @@
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-94>
+(define <cont2-96>
   (lambda (lists proc env handler k)
-    (set! k_reg (make-cont2 <cont2-34> value1_reg k))
+    (set! k_reg (make-cont2 <cont2-35> value1_reg k))
     (set! fail_reg value2_reg)
     (set! handler_reg handler)
     (set! env_reg env)
@@ -1805,14 +1826,14 @@
     (set! proc_reg proc)
     (set! pc mapN)))
 
-(define <cont2-95>
+(define <cont2-97>
   (lambda (lists proc k)
     (set! value1_reg
       (cons (dlr-apply proc (map car lists)) value1_reg))
     (set! k_reg k)
     (set! pc apply-cont2)))
 
-(define <cont2-96>
+(define <cont2-98>
   (lambda (arg-list proc env handler k)
     (set! k_reg k)
     (set! fail_reg value2_reg)
@@ -1822,7 +1843,7 @@
     (set! proc_reg proc)
     (set! pc for-each-primitive)))
 
-(define <cont2-97>
+(define <cont2-99>
   (lambda (new-acdr1 new-cdr1 s-car k)
     (set! k_reg (make-cont <cont-50> s-car k))
     (set! ap2_reg value2_reg)
@@ -1831,32 +1852,32 @@
     (set! p1_reg new-cdr1)
     (set! pc unify-patterns^)))
 
-(define <cont2-98>
+(define <cont2-100>
   (lambda (apair2 pair2 s-car k)
     (set! k2_reg
-      (make-cont2 <cont2-97> value2_reg value1_reg s-car k))
+      (make-cont2 <cont2-99> value2_reg value1_reg s-car k))
     (set! ap_reg (cdr^ apair2))
     (set! s_reg s-car)
     (set! pattern_reg (cdr pair2))
     (set! pc instantiate^)))
 
-(define <cont2-99>
+(define <cont2-101>
   (lambda (a aa ap k2)
     (set! value2_reg (cons^ aa value2_reg (get-source-info ap)))
     (set! value1_reg (cons a value1_reg))
     (set! k_reg k2)
     (set! pc apply-cont2)))
 
-(define <cont2-100>
+(define <cont2-102>
   (lambda (ap pattern s k2)
     (set! k2_reg
-      (make-cont2 <cont2-99> value1_reg value2_reg ap k2))
+      (make-cont2 <cont2-101> value1_reg value2_reg ap k2))
     (set! ap_reg (cdr^ ap))
     (set! s_reg s)
     (set! pattern_reg (cdr pattern))
     (set! pc instantiate^)))
 
-(define <cont2-101>
+(define <cont2-103>
   (lambda (s2 k2)
     (set! k2_reg k2)
     (set! ap_reg value2_reg)
@@ -2008,7 +2029,7 @@
 (define <cont4-9>
   (lambda (senv src handler k)
     (set! k_reg
-      (make-cont2 <cont2-35> senv src value3_reg handler k))
+      (make-cont2 <cont2-36> senv src value3_reg handler k))
     (set! fail_reg value4_reg)
     (set! handler_reg handler)
     (set! senv_reg senv)
@@ -2018,7 +2039,7 @@
 (define <cont4-10>
   (lambda ()
     (set! *tokens-left* value3_reg)
-    (set! k_reg (make-cont2 <cont2-48>))
+    (set! k_reg (make-cont2 <cont2-49>))
     (set! fail_reg value4_reg)
     (set! handler_reg REP-handler)
     (set! senv_reg (initial-contours toplevel-env))
@@ -2061,7 +2082,7 @@
 (define <cont4-13>
   (lambda (src env2 handler k)
     (set! k_reg
-      (make-cont2 <cont2-81> src value3_reg env2 handler k))
+      (make-cont2 <cont2-83> src value3_reg env2 handler k))
     (set! fail_reg value4_reg)
     (set! handler_reg handler)
     (set! senv_reg (initial-contours env2))
@@ -2157,7 +2178,7 @@
 
 (define <handler2-5>
   (lambda (fexps env handler)
-    (set! k_reg (make-cont2 <cont2-72> exception_reg handler))
+    (set! k_reg (make-cont2 <cont2-74> exception_reg handler))
     (set! handler_reg handler)
     (set! env_reg env)
     (set! exps_reg fexps)
@@ -2174,7 +2195,7 @@
           (list "try-catch-finally handler")))
       (let ((catch-handler 'undefined))
         (set! catch-handler (try-finally-handler fexps env handler))
-        (set! k_reg (make-cont2 <cont2-57> fexps env handler k))
+        (set! k_reg (make-cont2 <cont2-58> fexps env handler k))
         (set! handler_reg catch-handler)
         (set! env_reg new-env)
         (set! exps_reg cexps)
@@ -2234,7 +2255,7 @@
             (make-trace-depth-string trace-depth)
             (cons name args_reg))
           (set! trace-depth (+ trace-depth 1))
-          (set! k_reg (make-cont2 <cont2-73> trace-depth k2_reg))
+          (set! k_reg (make-cont2 <cont2-75> trace-depth k2_reg))
           (set! env_reg
             (extend
               env
@@ -2265,7 +2286,7 @@
             (make-trace-depth-string trace-depth)
             (cons name args_reg))
           (set! trace-depth (+ trace-depth 1))
-          (set! k_reg (make-cont2 <cont2-73> trace-depth k2_reg))
+          (set! k_reg (make-cont2 <cont2-75> trace-depth k2_reg))
           (set! env_reg new-env)
           (set! exps_reg bodies)
           (set! pc eval-sequence))
@@ -2392,14 +2413,14 @@
 
 (define <proc-15>
   (lambda ()
-    (set! k_reg (make-cont2 <cont2-76> handler_reg k2_reg))
+    (set! k_reg (make-cont2 <cont2-78> handler_reg k2_reg))
     (set! src_reg 'stdin)
     (set! input_reg (car args_reg))
     (set! pc scan-input)))
 
 (define <proc-16>
   (lambda ()
-    (set! k_reg (make-cont2 <cont2-77> handler_reg k2_reg))
+    (set! k_reg (make-cont2 <cont2-79> handler_reg k2_reg))
     (set! src_reg 'stdin)
     (set! input_reg (car args_reg))
     (set! pc scan-input)))
@@ -3563,7 +3584,7 @@
           (set! module-name (cadr args_reg))
           (set! filename (car args_reg))
           (set! k_reg
-            (make-cont2 <cont2-84> filename handler_reg k2_reg))
+            (make-cont2 <cont2-86> filename handler_reg k2_reg))
           (set! env_reg env2_reg)
           (set! var_reg module-name)
           (set! pc lookup-binding-in-first-frame)))))
@@ -4410,7 +4431,7 @@
       (set! vars (map^ car^ decls))
       (set! procs (map^ cadr^ decls))
       (set! bodies (cddr^ datum_reg))
-      (set! k2_reg (make-cont2 <cont2-36> bodies k_reg))
+      (set! k2_reg (make-cont2 <cont2-37> bodies k_reg))
       (set! procs_reg procs)
       (set! vars_reg vars)
       (set! pc create-letrec-assignments^))))
@@ -4669,7 +4690,7 @@
     (let ((exp 'undefined) (clauses 'undefined))
       (set! clauses (cddr^ datum_reg))
       (set! exp (cadr^ datum_reg))
-      (set! k2_reg (make-cont2 <cont2-38> exp k_reg))
+      (set! k2_reg (make-cont2 <cont2-39> exp k_reg))
       (set! clauses_reg clauses)
       (set! var_reg 'r)
       (set! pc case-clauses->cond-clauses^))))
@@ -4679,7 +4700,7 @@
     (let ((exp 'undefined) (clauses 'undefined))
       (set! clauses (cddr^ datum_reg))
       (set! exp (cadr^ datum_reg))
-      (set! k2_reg (make-cont2 <cont2-38> exp k_reg))
+      (set! k2_reg (make-cont2 <cont2-39> exp k_reg))
       (set! clauses_reg clauses)
       (set! var_reg 'r)
       (set! pc record-case-clauses->cond-clauses^))))
@@ -4702,7 +4723,7 @@
             (set! pc amacro-error))
           (let ((variants 'undefined))
             (set! variants (cdddr^ datum_reg))
-            (set! k2_reg (make-cont2 <cont2-41> type-tester-name k_reg))
+            (set! k2_reg (make-cont2 <cont2-42> type-tester-name k_reg))
             (set! variants_reg variants)
             (set! pc make-dd-variant-constructors^))))))
 
@@ -4719,7 +4740,7 @@
       (set! exp (caddr^ datum_reg))
       (set! clauses (cdddr^ datum_reg))
       (set! k2_reg
-        (make-cont2 <cont2-44> exp type-name type-tester-name
+        (make-cont2 <cont2-45> exp type-name type-tester-name
           k_reg))
       (set! clauses_reg clauses)
       (set! var_reg 'r)
@@ -6128,19 +6149,19 @@
                                   (if (syntactic-sugar?^ adatum_reg)
                                       (begin
                                         (set! k_reg
-                                          (make-cont2 <cont2-31> senv_reg handler_reg k_reg))
+                                          (make-cont2 <cont2-32> senv_reg handler_reg k_reg))
                                         (set! pc expand-once^))
                                       (if (if-then?^ adatum_reg)
                                           (begin
                                             (set! k_reg
-                                              (make-cont2 <cont2-30> adatum_reg senv_reg info handler_reg
+                                              (make-cont2 <cont2-31> adatum_reg senv_reg info handler_reg
                                                 k_reg))
                                             (set! adatum_reg (cadr^ adatum_reg))
                                             (set! pc aparse))
                                           (if (if-else?^ adatum_reg)
                                               (begin
                                                 (set! k_reg
-                                                  (make-cont2 <cont2-28> adatum_reg senv_reg info handler_reg
+                                                  (make-cont2 <cont2-29> adatum_reg senv_reg info handler_reg
                                                     k_reg))
                                                 (set! adatum_reg (cadr^ adatum_reg))
                                                 (set! pc aparse))
@@ -6153,43 +6174,25 @@
                                                     (set! pc apply-cont2))
                                                   (if (assignment?^ adatum_reg)
                                                       (begin
-                                                        (set! k_reg (make-cont2 <cont2-25> adatum_reg info k_reg))
+                                                        (set! k_reg (make-cont2 <cont2-26> adatum_reg info k_reg))
                                                         (set! adatum_reg (caddr^ adatum_reg))
                                                         (set! pc aparse))
-                                                      (if (func?^ adatum_reg)
+                                                      (if (association?^ adatum_reg)
                                                           (begin
-                                                            (set! k_reg (make-cont2 <cont2-24> info k_reg))
-                                                            (set! adatum_reg (cadr^ adatum_reg))
+                                                            (set! k_reg (make-cont2 <cont2-25> adatum_reg info k_reg))
+                                                            (set! adatum_reg (caddr^ adatum_reg))
                                                             (set! pc aparse))
-                                                          (if (callback?^ adatum_reg)
+                                                          (if (func?^ adatum_reg)
                                                               (begin
-                                                                (set! k_reg (make-cont2 <cont2-23> info k_reg))
+                                                                (set! k_reg (make-cont2 <cont2-24> info k_reg))
                                                                 (set! adatum_reg (cadr^ adatum_reg))
                                                                 (set! pc aparse))
-                                                              (if (define?^ adatum_reg)
-                                                                  (if (mit-style-define?^ adatum_reg)
-                                                                      (begin
-                                                                        (set! k_reg
-                                                                          (make-cont <cont-16> senv_reg info handler_reg fail_reg
-                                                                            k_reg))
-                                                                        (set! datum_reg adatum_reg)
-                                                                        (set! macro_reg mit-define-transformer^)
-                                                                        (set! pc apply-macro))
-                                                                      (if (= (length^ adatum_reg) 3)
-                                                                          (begin
-                                                                            (set! k_reg (make-cont2 <cont2-22> adatum_reg info k_reg))
-                                                                            (set! adatum_reg (caddr^ adatum_reg))
-                                                                            (set! pc aparse))
-                                                                          (if (and (= (length^ adatum_reg) 4)
-                                                                                   (string?^ (caddr^ adatum_reg)))
-                                                                              (begin
-                                                                                (set! k_reg (make-cont2 <cont2-21> adatum_reg info k_reg))
-                                                                                (set! adatum_reg (cadddr^ adatum_reg))
-                                                                                (set! pc aparse))
-                                                                              (begin
-                                                                                (set! msg_reg "bad concrete syntax:")
-                                                                                (set! pc aparse-error)))))
-                                                                  (if (define!?^ adatum_reg)
+                                                              (if (callback?^ adatum_reg)
+                                                                  (begin
+                                                                    (set! k_reg (make-cont2 <cont2-23> info k_reg))
+                                                                    (set! adatum_reg (cadr^ adatum_reg))
+                                                                    (set! pc aparse))
+                                                                  (if (define?^ adatum_reg)
                                                                       (if (mit-style-define?^ adatum_reg)
                                                                           (begin
                                                                             (set! k_reg
@@ -6200,106 +6203,129 @@
                                                                             (set! pc apply-macro))
                                                                           (if (= (length^ adatum_reg) 3)
                                                                               (begin
-                                                                                (set! k_reg (make-cont2 <cont2-20> adatum_reg info k_reg))
+                                                                                (set! k_reg (make-cont2 <cont2-22> adatum_reg info k_reg))
                                                                                 (set! adatum_reg (caddr^ adatum_reg))
                                                                                 (set! pc aparse))
                                                                               (if (and (= (length^ adatum_reg) 4)
                                                                                        (string?^ (caddr^ adatum_reg)))
                                                                                   (begin
-                                                                                    (set! k_reg (make-cont2 <cont2-19> adatum_reg info k_reg))
+                                                                                    (set! k_reg (make-cont2 <cont2-21> adatum_reg info k_reg))
                                                                                     (set! adatum_reg (cadddr^ adatum_reg))
                                                                                     (set! pc aparse))
                                                                                   (begin
                                                                                     (set! msg_reg "bad concrete syntax:")
                                                                                     (set! pc aparse-error)))))
-                                                                      (if (define-syntax?^ adatum_reg)
-                                                                          (let ((name 'undefined) (aclauses 'undefined))
-                                                                            (set! aclauses (cddr^ adatum_reg))
-                                                                            (set! name (define-var^ adatum_reg))
-                                                                            (set! k_reg
-                                                                              (make-cont <cont-14> aclauses name info fail_reg k_reg))
-                                                                            (set! x_reg aclauses)
-                                                                            (set! pc unannotate-cps))
-                                                                          (if (begin?^ adatum_reg)
-                                                                              (if (null?^ (cdr^ adatum_reg))
+                                                                      (if (define!?^ adatum_reg)
+                                                                          (if (mit-style-define?^ adatum_reg)
+                                                                              (begin
+                                                                                (set! k_reg
+                                                                                  (make-cont <cont-16> senv_reg info handler_reg fail_reg
+                                                                                    k_reg))
+                                                                                (set! datum_reg adatum_reg)
+                                                                                (set! macro_reg mit-define-transformer^)
+                                                                                (set! pc apply-macro))
+                                                                              (if (= (length^ adatum_reg) 3)
                                                                                   (begin
-                                                                                    (set! msg_reg "bad concrete syntax:")
-                                                                                    (set! pc aparse-error))
-                                                                                  (if (null?^ (cddr^ adatum_reg))
+                                                                                    (set! k_reg (make-cont2 <cont2-20> adatum_reg info k_reg))
+                                                                                    (set! adatum_reg (caddr^ adatum_reg))
+                                                                                    (set! pc aparse))
+                                                                                  (if (and (= (length^ adatum_reg) 4)
+                                                                                           (string?^ (caddr^ adatum_reg)))
                                                                                       (begin
-                                                                                        (set! adatum_reg (cadr^ adatum_reg))
+                                                                                        (set! k_reg (make-cont2 <cont2-19> adatum_reg info k_reg))
+                                                                                        (set! adatum_reg (cadddr^ adatum_reg))
                                                                                         (set! pc aparse))
                                                                                       (begin
-                                                                                        (set! k_reg (make-cont2 <cont2-18> info k_reg))
-                                                                                        (set! adatum-list_reg (cdr^ adatum_reg))
-                                                                                        (set! pc aparse-all))))
-                                                                              (if (lambda?^ adatum_reg)
-                                                                                  (begin
-                                                                                    (set! k_reg
-                                                                                      (make-cont <cont-13> adatum_reg senv_reg info handler_reg
-                                                                                        fail_reg k_reg))
-                                                                                    (set! x_reg (cadr^ adatum_reg))
-                                                                                    (set! pc unannotate-cps))
-                                                                                  (if (trace-lambda?^ adatum_reg)
+                                                                                        (set! msg_reg "bad concrete syntax:")
+                                                                                        (set! pc aparse-error)))))
+                                                                          (if (define-syntax?^ adatum_reg)
+                                                                              (let ((name 'undefined) (aclauses 'undefined))
+                                                                                (set! aclauses (cddr^ adatum_reg))
+                                                                                (set! name (define-var^ adatum_reg))
+                                                                                (set! k_reg
+                                                                                  (make-cont <cont-14> aclauses name info fail_reg k_reg))
+                                                                                (set! x_reg aclauses)
+                                                                                (set! pc unannotate-cps))
+                                                                              (if (begin?^ adatum_reg)
+                                                                                  (if (null?^ (cdr^ adatum_reg))
+                                                                                      (begin
+                                                                                        (set! msg_reg "bad concrete syntax:")
+                                                                                        (set! pc aparse-error))
+                                                                                      (if (null?^ (cddr^ adatum_reg))
+                                                                                          (begin
+                                                                                            (set! adatum_reg (cadr^ adatum_reg))
+                                                                                            (set! pc aparse))
+                                                                                          (begin
+                                                                                            (set! k_reg (make-cont2 <cont2-18> info k_reg))
+                                                                                            (set! adatum-list_reg (cdr^ adatum_reg))
+                                                                                            (set! pc aparse-all))))
+                                                                                  (if (lambda?^ adatum_reg)
                                                                                       (begin
                                                                                         (set! k_reg
-                                                                                          (make-cont <cont-12> adatum_reg senv_reg info handler_reg
+                                                                                          (make-cont <cont-13> adatum_reg senv_reg info handler_reg
                                                                                             fail_reg k_reg))
-                                                                                        (set! x_reg (caddr^ adatum_reg))
+                                                                                        (set! x_reg (cadr^ adatum_reg))
                                                                                         (set! pc unannotate-cps))
-                                                                                      (if (try?^ adatum_reg)
-                                                                                          (if (= (length^ adatum_reg) 2)
-                                                                                              (begin
-                                                                                                (set! adatum_reg (try-body^ adatum_reg))
-                                                                                                (set! pc aparse))
-                                                                                              (if (and (= (length^ adatum_reg) 3)
-                                                                                                       (catch?^ (caddr^ adatum_reg)))
+                                                                                      (if (trace-lambda?^ adatum_reg)
+                                                                                          (begin
+                                                                                            (set! k_reg
+                                                                                              (make-cont <cont-12> adatum_reg senv_reg info handler_reg
+                                                                                                fail_reg k_reg))
+                                                                                            (set! x_reg (caddr^ adatum_reg))
+                                                                                            (set! pc unannotate-cps))
+                                                                                          (if (try?^ adatum_reg)
+                                                                                              (if (= (length^ adatum_reg) 2)
                                                                                                   (begin
-                                                                                                    (set! k_reg
-                                                                                                      (make-cont2 <cont2-15> adatum_reg senv_reg info handler_reg
-                                                                                                        k_reg))
                                                                                                     (set! adatum_reg (try-body^ adatum_reg))
                                                                                                     (set! pc aparse))
                                                                                                   (if (and (= (length^ adatum_reg) 3)
-                                                                                                           (finally?^ (caddr^ adatum_reg)))
+                                                                                                           (catch?^ (caddr^ adatum_reg)))
                                                                                                       (begin
                                                                                                         (set! k_reg
-                                                                                                          (make-cont2 <cont2-13> adatum_reg senv_reg info handler_reg
+                                                                                                          (make-cont2 <cont2-15> adatum_reg senv_reg info handler_reg
                                                                                                             k_reg))
                                                                                                         (set! adatum_reg (try-body^ adatum_reg))
                                                                                                         (set! pc aparse))
-                                                                                                      (if (and (= (length^ adatum_reg) 4)
-                                                                                                               (catch?^ (caddr^ adatum_reg))
-                                                                                                               (finally?^ (cadddr^ adatum_reg)))
+                                                                                                      (if (and (= (length^ adatum_reg) 3)
+                                                                                                               (finally?^ (caddr^ adatum_reg)))
                                                                                                           (begin
                                                                                                             (set! k_reg
-                                                                                                              (make-cont2 <cont2-11> adatum_reg senv_reg info handler_reg
+                                                                                                              (make-cont2 <cont2-13> adatum_reg senv_reg info handler_reg
                                                                                                                 k_reg))
                                                                                                             (set! adatum_reg (try-body^ adatum_reg))
                                                                                                             (set! pc aparse))
-                                                                                                          (begin
-                                                                                                            (set! msg_reg "bad try syntax:")
-                                                                                                            (set! pc aparse-error))))))
-                                                                                          (if (raise?^ adatum_reg)
-                                                                                              (begin
-                                                                                                (set! k_reg (make-cont2 <cont2-8> info k_reg))
-                                                                                                (set! adatum_reg (cadr^ adatum_reg))
-                                                                                                (set! pc aparse))
-                                                                                              (if (choose?^ adatum_reg)
+                                                                                                          (if (and (= (length^ adatum_reg) 4)
+                                                                                                                   (catch?^ (caddr^ adatum_reg))
+                                                                                                                   (finally?^ (cadddr^ adatum_reg)))
+                                                                                                              (begin
+                                                                                                                (set! k_reg
+                                                                                                                  (make-cont2 <cont2-11> adatum_reg senv_reg info handler_reg
+                                                                                                                    k_reg))
+                                                                                                                (set! adatum_reg (try-body^ adatum_reg))
+                                                                                                                (set! pc aparse))
+                                                                                                              (begin
+                                                                                                                (set! msg_reg "bad try syntax:")
+                                                                                                                (set! pc aparse-error))))))
+                                                                                              (if (raise?^ adatum_reg)
                                                                                                   (begin
-                                                                                                    (set! k_reg (make-cont2 <cont2-7> info k_reg))
-                                                                                                    (set! adatum-list_reg (cdr^ adatum_reg))
-                                                                                                    (set! pc aparse-all))
-                                                                                                  (if (application?^ adatum_reg)
+                                                                                                    (set! k_reg (make-cont2 <cont2-8> info k_reg))
+                                                                                                    (set! adatum_reg (cadr^ adatum_reg))
+                                                                                                    (set! pc aparse))
+                                                                                                  (if (choose?^ adatum_reg)
                                                                                                       (begin
-                                                                                                        (set! k_reg
-                                                                                                          (make-cont2 <cont2-6> adatum_reg senv_reg info handler_reg
-                                                                                                            k_reg))
-                                                                                                        (set! adatum_reg (car^ adatum_reg))
-                                                                                                        (set! pc aparse))
-                                                                                                      (begin
-                                                                                                        (set! msg_reg "bad concrete syntax:")
-                                                                                                        (set! pc aparse-error)))))))))))))))))))))))))))))
+                                                                                                        (set! k_reg (make-cont2 <cont2-7> info k_reg))
+                                                                                                        (set! adatum-list_reg (cdr^ adatum_reg))
+                                                                                                        (set! pc aparse-all))
+                                                                                                      (if (application?^ adatum_reg)
+                                                                                                          (begin
+                                                                                                            (set! k_reg
+                                                                                                              (make-cont2 <cont2-6> adatum_reg senv_reg info handler_reg
+                                                                                                                k_reg))
+                                                                                                            (set! adatum_reg (car^ adatum_reg))
+                                                                                                            (set! pc aparse))
+                                                                                                          (begin
+                                                                                                            (set! msg_reg "bad concrete syntax:")
+                                                                                                            (set! pc aparse-error))))))))))))))))))))))))))))))
 
 (define*
   aparse-all
@@ -6311,7 +6337,7 @@
           (set! pc apply-cont2))
         (begin
           (set! k_reg
-            (make-cont2 <cont2-33> adatum-list_reg senv_reg handler_reg
+            (make-cont2 <cont2-34> adatum-list_reg senv_reg handler_reg
               k_reg))
           (set! adatum_reg (car^ adatum-list_reg))
           (set! pc aparse)))))
@@ -6382,7 +6408,7 @@
           (set! pc apply-cont2))
         (begin
           (set! k2_reg
-            (make-cont2 <cont2-37> procs_reg vars_reg k2_reg))
+            (make-cont2 <cont2-38> procs_reg vars_reg k2_reg))
           (set! procs_reg (cdr^ procs_reg))
           (set! vars_reg (cdr^ vars_reg))
           (set! pc create-letrec-assignments^)))))
@@ -6433,7 +6459,7 @@
           (set! pc apply-cont2))
         (begin
           (set! k2_reg
-            (make-cont2 <cont2-39> clauses_reg var_reg k2_reg))
+            (make-cont2 <cont2-40> clauses_reg var_reg k2_reg))
           (set! clauses_reg (cdr^ clauses_reg))
           (set! pc case-clauses->cond-clauses^)))))
 
@@ -6448,7 +6474,7 @@
           (set! pc apply-cont2))
         (begin
           (set! k2_reg
-            (make-cont2 <cont2-40> clauses_reg var_reg k2_reg))
+            (make-cont2 <cont2-41> clauses_reg var_reg k2_reg))
           (set! clauses_reg (cdr^ clauses_reg))
           (set! pc record-case-clauses->cond-clauses^)))))
 
@@ -6462,7 +6488,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2))
         (begin
-          (set! k2_reg (make-cont2 <cont2-43> variants_reg k2_reg))
+          (set! k2_reg (make-cont2 <cont2-44> variants_reg k2_reg))
           (set! variant_reg (car^ variants_reg))
           (set! pc make-dd-variant-constructor^)))))
 
@@ -6601,7 +6627,7 @@
         (set! macro (get-first-frame-value macro-keyword macro-env))
         (if (pattern-macro? macro)
             (begin
-              (set! k_reg (make-cont2 <cont2-45> macro-keyword k_reg))
+              (set! k_reg (make-cont2 <cont2-46> macro-keyword k_reg))
               (set! aclauses_reg (macro-aclauses macro))
               (set! clauses_reg (macro-clauses macro))
               (set! pc process-macro-clauses^))
@@ -7085,7 +7111,7 @@
 (define try-parse
   (lambda (input)
     (set! load-stack '())
-    (set! k_reg (make-cont2 <cont2-50>))
+    (set! k_reg (make-cont2 <cont2-51>))
     (set! fail_reg *last-fail*)
     (set! handler_reg try-parse-handler)
     (set! src_reg 'stdin)
@@ -7102,7 +7128,7 @@
     (set! *last-fail* REP-fail)))
 
 (define make-debugging-k
-  (lambda (exp k) (return* (make-cont2 <cont2-51> exp k))))
+  (lambda (exp k) (return* (make-cont2 <cont2-52> exp k))))
 
 (define highlight-expression
   (lambda (exp)
@@ -7178,13 +7204,13 @@
                   (if (eq? (car exp_reg) 'func-aexp)
                       (let ((exp 'undefined))
                         (set! exp (list-ref exp_reg 1))
-                        (set! k_reg (make-cont2 <cont2-69> k))
+                        (set! k_reg (make-cont2 <cont2-71> k))
                         (set! exp_reg exp)
                         (set! pc m))
                       (if (eq? (car exp_reg) 'callback-aexp)
                           (let ((exp 'undefined))
                             (set! exp (list-ref exp_reg 1))
-                            (set! k_reg (make-cont2 <cont2-68> k))
+                            (set! k_reg (make-cont2 <cont2-70> k))
                             (set! exp_reg exp)
                             (set! pc m))
                           (if (eq? (car exp_reg) 'if-aexp)
@@ -7195,7 +7221,7 @@
                                 (set! then-exp (list-ref exp_reg 2))
                                 (set! test-exp (list-ref exp_reg 1))
                                 (set! k_reg
-                                  (make-cont2 <cont2-67> else-exp then-exp env_reg handler_reg
+                                  (make-cont2 <cont2-69> else-exp then-exp env_reg handler_reg
                                     k))
                                 (set! exp_reg test-exp)
                                 (set! pc m))
@@ -7203,177 +7229,184 @@
                                   (let ((var 'undefined) (var-info 'undefined))
                                     (set! var-info (list-ref exp_reg 2))
                                     (set! var (list-ref exp_reg 1))
-                                    (set! sk_reg (make-cont2 <cont2-65> k))
+                                    (set! sk_reg (make-cont2 <cont2-67> k))
                                     (set! dk_reg (make-cont3 <cont3-5> k))
-                                    (set! gk_reg (make-cont2 <cont2-66> k))
+                                    (set! gk_reg (make-cont2 <cont2-68> k))
                                     (set! var-info_reg var-info)
                                     (set! var_reg var)
                                     (set! pc lookup-variable))
-                                  (if (eq? (car exp_reg) 'assign-aexp)
-                                      (let ((var 'undefined)
-                                            (rhs-exp 'undefined)
-                                            (var-info 'undefined))
-                                        (set! var-info (list-ref exp_reg 3))
-                                        (set! rhs-exp (list-ref exp_reg 2))
+                                  (if (eq? (car exp_reg) 'association-aexp)
+                                      (let ((var 'undefined) (exp 'undefined))
+                                        (set! exp (list-ref exp_reg 2))
                                         (set! var (list-ref exp_reg 1))
-                                        (set! k_reg
-                                          (make-cont2 <cont2-64> var var-info env_reg handler_reg k))
-                                        (set! exp_reg rhs-exp)
+                                        (set! k_reg (make-cont2 <cont2-66> var k))
+                                        (set! exp_reg exp)
                                         (set! pc m))
-                                      (if (eq? (car exp_reg) 'define-aexp)
+                                      (if (eq? (car exp_reg) 'assign-aexp)
                                           (let ((var 'undefined)
-                                                (docstring 'undefined)
-                                                (rhs-exp 'undefined))
-                                            (set! rhs-exp (list-ref exp_reg 3))
-                                            (set! docstring (list-ref exp_reg 2))
+                                                (rhs-exp 'undefined)
+                                                (var-info 'undefined))
+                                            (set! var-info (list-ref exp_reg 3))
+                                            (set! rhs-exp (list-ref exp_reg 2))
                                             (set! var (list-ref exp_reg 1))
                                             (set! k_reg
-                                              (make-cont2 <cont2-61> docstring var env_reg handler_reg k))
+                                              (make-cont2 <cont2-65> var var-info env_reg handler_reg k))
                                             (set! exp_reg rhs-exp)
                                             (set! pc m))
-                                          (if (eq? (car exp_reg) 'define!-aexp)
+                                          (if (eq? (car exp_reg) 'define-aexp)
                                               (let ((var 'undefined)
                                                     (docstring 'undefined)
                                                     (rhs-exp 'undefined))
                                                 (set! rhs-exp (list-ref exp_reg 3))
                                                 (set! docstring (list-ref exp_reg 2))
                                                 (set! var (list-ref exp_reg 1))
-                                                (set! k_reg (make-cont2 <cont2-59> docstring var k))
+                                                (set! k_reg
+                                                  (make-cont2 <cont2-62> docstring var env_reg handler_reg k))
                                                 (set! exp_reg rhs-exp)
                                                 (set! pc m))
-                                              (if (eq? (car exp_reg) 'define-syntax-aexp)
-                                                  (let ((name 'undefined)
-                                                        (clauses 'undefined)
-                                                        (aclauses 'undefined))
-                                                    (set! aclauses (list-ref exp_reg 3))
-                                                    (set! clauses (list-ref exp_reg 2))
-                                                    (set! name (list-ref exp_reg 1))
-                                                    (set! k_reg (make-cont2 <cont2-58> aclauses clauses k))
-                                                    (set! env_reg macro-env)
-                                                    (set! var_reg name)
-                                                    (set! pc lookup-binding-in-first-frame))
-                                                  (if (eq? (car exp_reg) 'begin-aexp)
-                                                      (let ((exps 'undefined))
-                                                        (set! exps (list-ref exp_reg 1))
-                                                        (set! k_reg k)
-                                                        (set! exps_reg exps)
-                                                        (set! pc eval-sequence))
-                                                      (if (eq? (car exp_reg) 'lambda-aexp)
-                                                          (let ((formals 'undefined) (bodies 'undefined))
-                                                            (set! bodies (list-ref exp_reg 2))
-                                                            (set! formals (list-ref exp_reg 1))
-                                                            (set! value2_reg fail_reg)
-                                                            (set! value1_reg (closure formals bodies env_reg))
+                                              (if (eq? (car exp_reg) 'define!-aexp)
+                                                  (let ((var 'undefined)
+                                                        (docstring 'undefined)
+                                                        (rhs-exp 'undefined))
+                                                    (set! rhs-exp (list-ref exp_reg 3))
+                                                    (set! docstring (list-ref exp_reg 2))
+                                                    (set! var (list-ref exp_reg 1))
+                                                    (set! k_reg (make-cont2 <cont2-60> docstring var k))
+                                                    (set! exp_reg rhs-exp)
+                                                    (set! pc m))
+                                                  (if (eq? (car exp_reg) 'define-syntax-aexp)
+                                                      (let ((name 'undefined)
+                                                            (clauses 'undefined)
+                                                            (aclauses 'undefined))
+                                                        (set! aclauses (list-ref exp_reg 3))
+                                                        (set! clauses (list-ref exp_reg 2))
+                                                        (set! name (list-ref exp_reg 1))
+                                                        (set! k_reg (make-cont2 <cont2-59> aclauses clauses k))
+                                                        (set! env_reg macro-env)
+                                                        (set! var_reg name)
+                                                        (set! pc lookup-binding-in-first-frame))
+                                                      (if (eq? (car exp_reg) 'begin-aexp)
+                                                          (let ((exps 'undefined))
+                                                            (set! exps (list-ref exp_reg 1))
                                                             (set! k_reg k)
-                                                            (set! pc apply-cont2))
-                                                          (if (eq? (car exp_reg) 'mu-lambda-aexp)
-                                                              (let ((formals 'undefined)
-                                                                    (runt 'undefined)
-                                                                    (bodies 'undefined))
-                                                                (set! bodies (list-ref exp_reg 3))
-                                                                (set! runt (list-ref exp_reg 2))
+                                                            (set! exps_reg exps)
+                                                            (set! pc eval-sequence))
+                                                          (if (eq? (car exp_reg) 'lambda-aexp)
+                                                              (let ((formals 'undefined) (bodies 'undefined))
+                                                                (set! bodies (list-ref exp_reg 2))
                                                                 (set! formals (list-ref exp_reg 1))
                                                                 (set! value2_reg fail_reg)
-                                                                (set! value1_reg (mu-closure formals runt bodies env_reg))
+                                                                (set! value1_reg (closure formals bodies env_reg))
                                                                 (set! k_reg k)
                                                                 (set! pc apply-cont2))
-                                                              (if (eq? (car exp_reg) 'trace-lambda-aexp)
-                                                                  (let ((name 'undefined)
-                                                                        (formals 'undefined)
+                                                              (if (eq? (car exp_reg) 'mu-lambda-aexp)
+                                                                  (let ((formals 'undefined)
+                                                                        (runt 'undefined)
                                                                         (bodies 'undefined))
                                                                     (set! bodies (list-ref exp_reg 3))
-                                                                    (set! formals (list-ref exp_reg 2))
-                                                                    (set! name (list-ref exp_reg 1))
+                                                                    (set! runt (list-ref exp_reg 2))
+                                                                    (set! formals (list-ref exp_reg 1))
                                                                     (set! value2_reg fail_reg)
-                                                                    (set! value1_reg
-                                                                      (trace-closure name formals bodies env_reg))
+                                                                    (set! value1_reg (mu-closure formals runt bodies env_reg))
                                                                     (set! k_reg k)
                                                                     (set! pc apply-cont2))
-                                                                  (if (eq? (car exp_reg) 'mu-trace-lambda-aexp)
+                                                                  (if (eq? (car exp_reg) 'trace-lambda-aexp)
                                                                       (let ((name 'undefined)
                                                                             (formals 'undefined)
-                                                                            (runt 'undefined)
                                                                             (bodies 'undefined))
-                                                                        (set! bodies (list-ref exp_reg 4))
-                                                                        (set! runt (list-ref exp_reg 3))
+                                                                        (set! bodies (list-ref exp_reg 3))
                                                                         (set! formals (list-ref exp_reg 2))
                                                                         (set! name (list-ref exp_reg 1))
                                                                         (set! value2_reg fail_reg)
                                                                         (set! value1_reg
-                                                                          (mu-trace-closure name formals runt bodies env_reg))
+                                                                          (trace-closure name formals bodies env_reg))
                                                                         (set! k_reg k)
                                                                         (set! pc apply-cont2))
-                                                                      (if (eq? (car exp_reg) 'try-catch-aexp)
-                                                                          (let ((body 'undefined)
-                                                                                (cvar 'undefined)
-                                                                                (cexps 'undefined))
-                                                                            (set! cexps (list-ref exp_reg 3))
-                                                                            (set! cvar (list-ref exp_reg 2))
-                                                                            (set! body (list-ref exp_reg 1))
-                                                                            (let ((new-handler 'undefined))
-                                                                              (set! new-handler
-                                                                                (try-catch-handler cvar cexps env_reg handler_reg k))
-                                                                              (set! k_reg k)
-                                                                              (set! handler_reg new-handler)
-                                                                              (set! exp_reg body)
-                                                                              (set! pc m)))
-                                                                          (if (eq? (car exp_reg) 'try-finally-aexp)
-                                                                              (let ((body 'undefined) (fexps 'undefined))
-                                                                                (set! fexps (list-ref exp_reg 2))
+                                                                      (if (eq? (car exp_reg) 'mu-trace-lambda-aexp)
+                                                                          (let ((name 'undefined)
+                                                                                (formals 'undefined)
+                                                                                (runt 'undefined)
+                                                                                (bodies 'undefined))
+                                                                            (set! bodies (list-ref exp_reg 4))
+                                                                            (set! runt (list-ref exp_reg 3))
+                                                                            (set! formals (list-ref exp_reg 2))
+                                                                            (set! name (list-ref exp_reg 1))
+                                                                            (set! value2_reg fail_reg)
+                                                                            (set! value1_reg
+                                                                              (mu-trace-closure name formals runt bodies env_reg))
+                                                                            (set! k_reg k)
+                                                                            (set! pc apply-cont2))
+                                                                          (if (eq? (car exp_reg) 'try-catch-aexp)
+                                                                              (let ((body 'undefined)
+                                                                                    (cvar 'undefined)
+                                                                                    (cexps 'undefined))
+                                                                                (set! cexps (list-ref exp_reg 3))
+                                                                                (set! cvar (list-ref exp_reg 2))
                                                                                 (set! body (list-ref exp_reg 1))
                                                                                 (let ((new-handler 'undefined))
                                                                                   (set! new-handler
-                                                                                    (try-finally-handler fexps env_reg handler_reg))
-                                                                                  (set! k_reg
-                                                                                    (make-cont2 <cont2-57> fexps env_reg handler_reg k))
+                                                                                    (try-catch-handler cvar cexps env_reg handler_reg k))
+                                                                                  (set! k_reg k)
                                                                                   (set! handler_reg new-handler)
                                                                                   (set! exp_reg body)
                                                                                   (set! pc m)))
-                                                                              (if (eq? (car exp_reg) 'try-catch-finally-aexp)
-                                                                                  (let ((body 'undefined)
-                                                                                        (cvar 'undefined)
-                                                                                        (cexps 'undefined)
-                                                                                        (fexps 'undefined))
-                                                                                    (set! fexps (list-ref exp_reg 4))
-                                                                                    (set! cexps (list-ref exp_reg 3))
-                                                                                    (set! cvar (list-ref exp_reg 2))
+                                                                              (if (eq? (car exp_reg) 'try-finally-aexp)
+                                                                                  (let ((body 'undefined) (fexps 'undefined))
+                                                                                    (set! fexps (list-ref exp_reg 2))
                                                                                     (set! body (list-ref exp_reg 1))
                                                                                     (let ((new-handler 'undefined))
                                                                                       (set! new-handler
-                                                                                        (try-catch-finally-handler cvar cexps fexps env_reg
-                                                                                          handler_reg k))
+                                                                                        (try-finally-handler fexps env_reg handler_reg))
                                                                                       (set! k_reg
-                                                                                        (make-cont2 <cont2-57> fexps env_reg handler_reg k))
+                                                                                        (make-cont2 <cont2-58> fexps env_reg handler_reg k))
                                                                                       (set! handler_reg new-handler)
                                                                                       (set! exp_reg body)
                                                                                       (set! pc m)))
-                                                                                  (if (eq? (car exp_reg) 'raise-aexp)
-                                                                                      (let ((exp 'undefined))
-                                                                                        (set! exp (list-ref exp_reg 1))
-                                                                                        (set! k_reg (make-cont2 <cont2-55> handler_reg))
-                                                                                        (set! exp_reg exp)
-                                                                                        (set! pc m))
-                                                                                      (if (eq? (car exp_reg) 'choose-aexp)
-                                                                                          (let ((exps 'undefined))
-                                                                                            (set! exps (list-ref exp_reg 1))
-                                                                                            (set! k_reg k)
-                                                                                            (set! exps_reg exps)
-                                                                                            (set! pc eval-choices))
-                                                                                          (if (eq? (car exp_reg) 'app-aexp)
-                                                                                              (let ((operator 'undefined)
-                                                                                                    (operands 'undefined)
-                                                                                                    (info 'undefined))
-                                                                                                (set! info (list-ref exp_reg 3))
-                                                                                                (set! operands (list-ref exp_reg 2))
-                                                                                                (set! operator (list-ref exp_reg 1))
-                                                                                                (set! k_reg
-                                                                                                  (make-cont2 <cont2-54> exp_reg operator env_reg info
-                                                                                                    handler_reg k))
-                                                                                                (set! exps_reg operands)
-                                                                                                (set! pc m*))
-                                                                                              (error 'm
-                                                                                                "bad abstract syntax: '~s'"
-                                                                                                exp_reg))))))))))))))))))))))))))
+                                                                                  (if (eq? (car exp_reg) 'try-catch-finally-aexp)
+                                                                                      (let ((body 'undefined)
+                                                                                            (cvar 'undefined)
+                                                                                            (cexps 'undefined)
+                                                                                            (fexps 'undefined))
+                                                                                        (set! fexps (list-ref exp_reg 4))
+                                                                                        (set! cexps (list-ref exp_reg 3))
+                                                                                        (set! cvar (list-ref exp_reg 2))
+                                                                                        (set! body (list-ref exp_reg 1))
+                                                                                        (let ((new-handler 'undefined))
+                                                                                          (set! new-handler
+                                                                                            (try-catch-finally-handler cvar cexps fexps env_reg
+                                                                                              handler_reg k))
+                                                                                          (set! k_reg
+                                                                                            (make-cont2 <cont2-58> fexps env_reg handler_reg k))
+                                                                                          (set! handler_reg new-handler)
+                                                                                          (set! exp_reg body)
+                                                                                          (set! pc m)))
+                                                                                      (if (eq? (car exp_reg) 'raise-aexp)
+                                                                                          (let ((exp 'undefined))
+                                                                                            (set! exp (list-ref exp_reg 1))
+                                                                                            (set! k_reg (make-cont2 <cont2-56> handler_reg))
+                                                                                            (set! exp_reg exp)
+                                                                                            (set! pc m))
+                                                                                          (if (eq? (car exp_reg) 'choose-aexp)
+                                                                                              (let ((exps 'undefined))
+                                                                                                (set! exps (list-ref exp_reg 1))
+                                                                                                (set! k_reg k)
+                                                                                                (set! exps_reg exps)
+                                                                                                (set! pc eval-choices))
+                                                                                              (if (eq? (car exp_reg) 'app-aexp)
+                                                                                                  (let ((operator 'undefined)
+                                                                                                        (operands 'undefined)
+                                                                                                        (info 'undefined))
+                                                                                                    (set! info (list-ref exp_reg 3))
+                                                                                                    (set! operands (list-ref exp_reg 2))
+                                                                                                    (set! operator (list-ref exp_reg 1))
+                                                                                                    (set! k_reg
+                                                                                                      (make-cont2 <cont2-55> exp_reg operator env_reg info
+                                                                                                        handler_reg k))
+                                                                                                    (set! exps_reg operands)
+                                                                                                    (set! pc m*))
+                                                                                                  (error 'm
+                                                                                                    "bad abstract syntax: '~s'"
+                                                                                                    exp_reg)))))))))))))))))))))))))))
 
 (define make-exception
   (lambda (exception message source line column)
@@ -7470,7 +7503,7 @@
           (set! pc apply-cont2))
         (begin
           (set! k_reg
-            (make-cont2 <cont2-70> exps_reg env_reg handler_reg k_reg))
+            (make-cont2 <cont2-72> exps_reg env_reg handler_reg k_reg))
           (set! exp_reg (car exps_reg))
           (set! pc m)))))
 
@@ -7481,7 +7514,7 @@
         (begin (set! exp_reg (car exps_reg)) (set! pc m))
         (begin
           (set! k_reg
-            (make-cont2 <cont2-71> exps_reg env_reg handler_reg k_reg))
+            (make-cont2 <cont2-73> exps_reg env_reg handler_reg k_reg))
           (set! exp_reg (car exps_reg))
           (set! pc m)))))
 
@@ -7518,6 +7551,9 @@
     (if (= n 0)
         (return* '())
         (return* (cons "" (make-empty-docstrings (- n 1)))))))
+
+(define association
+  (lambda (var value) (return* (list var ': value))))
 
 (define closure
   (lambda (formals bodies env)
@@ -7656,7 +7692,7 @@
                 (begin
                   (set! load-stack (cons filename_reg load-stack))
                   (set! k_reg
-                    (make-cont2 <cont2-79> filename_reg env2_reg handler_reg
+                    (make-cont2 <cont2-81> filename_reg env2_reg handler_reg
                       k_reg))
                   (set! src_reg filename_reg)
                   (set! input_reg (read-content filename_reg))
@@ -7685,7 +7721,7 @@
           (set! pc apply-cont2))
         (begin
           (set! k_reg
-            (make-cont2 <cont2-82> filenames_reg env2_reg info_reg
+            (make-cont2 <cont2-84> filenames_reg env2_reg info_reg
               handler_reg k_reg))
           (set! filename_reg (car filenames_reg))
           (set! pc load-file)))))
@@ -7719,7 +7755,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2))
         (begin
-          (set! k2_reg (make-cont2 <cont2-83> lst_reg k2_reg))
+          (set! k2_reg (make-cont2 <cont2-85> lst_reg k2_reg))
           (set! lst_reg (cdr lst_reg))
           (set! pc make-set)))))
 
@@ -7791,7 +7827,7 @@
     (let ((sym 'undefined))
       (set! sym (car args_reg))
       (set! k_reg
-        (make-cont2 <cont2-85> args_reg sym info_reg handler_reg
+        (make-cont2 <cont2-87> args_reg sym info_reg handler_reg
           k_reg))
       (set! var-info_reg 'none)
       (set! var_reg sym)
@@ -7807,7 +7843,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2))
         (begin
-          (set! k2_reg (make-cont2 <cont2-86> ls1_reg k2_reg))
+          (set! k2_reg (make-cont2 <cont2-88> ls1_reg k2_reg))
           (set! ls1_reg (cdr ls1_reg))
           (set! pc append2)))))
 
@@ -7834,7 +7870,7 @@
                       (car lists_reg)))
                   (set! pc runtime-error))
                 (begin
-                  (set! k2_reg (make-cont2 <cont2-87> lists_reg k2_reg))
+                  (set! k2_reg (make-cont2 <cont2-89> lists_reg k2_reg))
                   (set! lists_reg (cdr lists_reg))
                   (set! pc append-all)))))))
 
@@ -7941,7 +7977,7 @@
             (set! pc apply-cont2))
           (begin
             (set! k2_reg
-              (make-cont2 <cont2-88> iterator_reg proc_reg env_reg
+              (make-cont2 <cont2-90> iterator_reg proc_reg env_reg
                 handler_reg k_reg))
             (set! info_reg 'none)
             (set! env2_reg env_reg)
@@ -7968,7 +8004,7 @@
             (set! pc apply-cont2))
           (begin
             (set! k2_reg
-              (make-cont2 <cont2-89> iterator_reg proc_reg env_reg
+              (make-cont2 <cont2-91> iterator_reg proc_reg env_reg
                 handler_reg k_reg))
             (set! info_reg 'none)
             (set! env2_reg env_reg)
@@ -7986,12 +8022,12 @@
         (if (dlr-proc? proc_reg)
             (begin
               (set! k_reg
-                (make-cont2 <cont2-91> list1_reg proc_reg k_reg))
+                (make-cont2 <cont2-93> list1_reg proc_reg k_reg))
               (set! list1_reg (cdr list1_reg))
               (set! pc map1))
             (begin
               (set! k2_reg
-                (make-cont2 <cont2-90> list1_reg proc_reg env_reg
+                (make-cont2 <cont2-92> list1_reg proc_reg env_reg
                   handler_reg k_reg))
               (set! info_reg 'none)
               (set! env2_reg env_reg)
@@ -8009,13 +8045,13 @@
         (if (dlr-proc? proc_reg)
             (begin
               (set! k_reg
-                (make-cont2 <cont2-93> list1_reg list2_reg proc_reg k_reg))
+                (make-cont2 <cont2-95> list1_reg list2_reg proc_reg k_reg))
               (set! list2_reg (cdr list2_reg))
               (set! list1_reg (cdr list1_reg))
               (set! pc map2))
             (begin
               (set! k2_reg
-                (make-cont2 <cont2-92> list1_reg list2_reg proc_reg env_reg
+                (make-cont2 <cont2-94> list1_reg list2_reg proc_reg env_reg
                   handler_reg k_reg))
               (set! info_reg 'none)
               (set! env2_reg env_reg)
@@ -8033,12 +8069,12 @@
         (if (dlr-proc? proc_reg)
             (begin
               (set! k_reg
-                (make-cont2 <cont2-95> lists_reg proc_reg k_reg))
+                (make-cont2 <cont2-97> lists_reg proc_reg k_reg))
               (set! lists_reg (map cdr lists_reg))
               (set! pc mapN))
             (begin
               (set! k2_reg
-                (make-cont2 <cont2-94> lists_reg proc_reg env_reg
+                (make-cont2 <cont2-96> lists_reg proc_reg env_reg
                   handler_reg k_reg))
               (set! info_reg 'none)
               (set! env2_reg env_reg)
@@ -8066,7 +8102,7 @@
                     (set! pc for-each-primitive))
                   (begin
                     (set! k2_reg
-                      (make-cont2 <cont2-96> arg-list proc_reg env_reg handler_reg
+                      (make-cont2 <cont2-98> arg-list proc_reg env_reg handler_reg
                         k_reg))
                     (set! info_reg 'none)
                     (set! env2_reg env_reg)
@@ -8735,7 +8771,7 @@
             (if (pair? pattern_reg)
                 (begin
                   (set! k2_reg
-                    (make-cont2 <cont2-100> ap_reg pattern_reg s_reg k2_reg))
+                    (make-cont2 <cont2-102> ap_reg pattern_reg s_reg k2_reg))
                   (set! ap_reg (car^ ap_reg))
                   (set! pattern_reg (car pattern_reg))
                   (set! pc instantiate^))
@@ -8777,7 +8813,7 @@
                   (let ((s1 'undefined) (s2 'undefined))
                     (set! s2 (list-ref temp_1 2))
                     (set! s1 (list-ref temp_1 1))
-                    (set! k2_reg (make-cont2 <cont2-101> s2 k2_reg))
+                    (set! k2_reg (make-cont2 <cont2-103> s2 k2_reg))
                     (set! s_reg s1)
                     (set! pc apply-sub^))
                   (error 'apply-sub^ "bad substitution: ~a" s_reg)))))))
@@ -8879,6 +8915,15 @@
            (symbol?^ (car^ asexp))
            (eq?^ (car^ asexp) keyword)))))
 
+(define-native
+  tagged2-list^
+  (lambda (keyword op len)
+    (lambda (asexp)
+      (and (list?^ asexp)
+           (op (length^ asexp) len)
+           (symbol?^ (car^ asexp))
+           (eq?^ (cadr^ asexp) keyword)))))
+
 (define quote?^ (tagged-list^ 'quote = 2))
 
 (define quasiquote?^ (tagged-list^ 'quasiquote = 2))
@@ -8893,6 +8938,8 @@
 (define if-else?^ (tagged-list^ 'if = 4))
 
 (define help?^ (tagged-list^ 'help = 2))
+
+(define association?^ (tagged2-list^ ': = 3))
 
 (define assignment?^ (tagged-list^ 'set! = 3))
 
@@ -8963,7 +9010,7 @@
 
 (define macro-env 'undefined)
 
-(define REP-k (make-cont2 <cont2-47>))
+(define REP-k (make-cont2 <cont2-48>))
 
 (define REP-handler (make-handler2 <handler2-2>))
 
