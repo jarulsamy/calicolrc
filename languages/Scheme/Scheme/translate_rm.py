@@ -723,7 +723,7 @@ public class PJScheme:Scheme
                        "safe-print", "modulo", "vector_native", "car^", "cadr^", "string->symbol",
                        "make-binding", "aunparse", "format-stack-trace", "get-variables-from-frame",
                        "vector->list", "char->string", "string->list", "symbol->string", 
-                       "float", "int", "globals", "apply-with-keywords", "assq", "dict", "property",
+                       "float", "int", "globals", "assq", "dict", "property",
                        "reset-toplevel-env", "sort", "string-append", "string-split", "make-symbol",
                        "type", "use-lexical-address", "min", "max",
                        "caar", "cadr", "cdar", "cddr" , 

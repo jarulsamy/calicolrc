@@ -1000,10 +1000,6 @@ def assq(x, ls):
 
 ### External env interface:
 
-def apply_with_keywords(*args):
-    # FIXME: when this interface is enabled
-    pass
-
 def import_native(libraries, environment):
     env = {}
     for library in libraries:

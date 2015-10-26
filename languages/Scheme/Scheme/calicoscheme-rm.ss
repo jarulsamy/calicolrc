@@ -2210,89 +2210,117 @@
 
 (define <proc-1>
   (lambda (bodies formals env)
-    (if (= (length args_reg) (length formals))
-        (begin
-          (set! k_reg k2_reg)
-          (set! env_reg
-            (extend
-              env
-              formals
-              args_reg
-              (make-empty-docstrings (length args_reg))))
-          (set! exps_reg bodies)
-          (set! pc eval-sequence))
-        (begin
-          (set! msg_reg
-            "incorrect number of arguments in application")
-          (set! pc runtime-error)))))
+    (let ((formals-and-args 'undefined)
+          (new-formals 'undefined)
+          (new-args 'undefined))
+      (set! formals-and-args
+        (process-formals-and-args formals args_reg))
+      (set! new-formals (car formals-and-args))
+      (set! new-args (cdr formals-and-args))
+      (if (= (length new-args) (length new-formals))
+          (begin
+            (set! k_reg k2_reg)
+            (set! env_reg
+              (extend
+                env
+                new-formals
+                new-args
+                (make-empty-docstrings (length new-args))))
+            (set! exps_reg bodies)
+            (set! pc eval-sequence))
+          (begin
+            (set! msg_reg
+              "incorrect number of arguments in application")
+            (set! pc runtime-error))))))
 
 (define <proc-2>
   (lambda (bodies formals runt env)
-    (if (>= (length args_reg) (length formals))
-        (let ((new-env 'undefined))
-          (set! new-env
-            (extend
-              env
-              (cons runt formals)
-              (cons
-                (list-tail args_reg (length formals))
-                (list-head args_reg (length formals)))
-              (make-empty-docstrings (+ 1 (length formals)))))
-          (set! k_reg k2_reg)
-          (set! env_reg new-env)
-          (set! exps_reg bodies)
-          (set! pc eval-sequence))
-        (begin
-          (set! msg_reg "not enough arguments in application")
-          (set! pc runtime-error)))))
+    (let ((formals-and-args 'undefined)
+          (new-formals 'undefined)
+          (new-args 'undefined))
+      (set! formals-and-args
+        (process-formals-and-args formals args_reg))
+      (set! new-formals (car formals-and-args))
+      (set! new-args (cdr formals-and-args))
+      (if (>= (length new-args) (length new-formals))
+          (let ((new-env 'undefined))
+            (set! new-env
+              (extend
+                env
+                (cons runt new-formals)
+                (cons
+                  (list-tail new-args (length new-formals))
+                  (list-head new-args (length new-formals)))
+                (make-empty-docstrings (+ 1 (length new-formals)))))
+            (set! k_reg k2_reg)
+            (set! env_reg new-env)
+            (set! exps_reg bodies)
+            (set! pc eval-sequence))
+          (begin
+            (set! msg_reg "not enough arguments in application")
+            (set! pc runtime-error))))))
 
 (define <proc-3>
   (lambda (bodies name trace-depth formals env)
-    (if (= (length args_reg) (length formals))
-        (begin
-          (printf
-            "~acall: ~s~%"
-            (make-trace-depth-string trace-depth)
-            (cons name args_reg))
-          (set! trace-depth (+ trace-depth 1))
-          (set! k_reg (make-cont2 <cont2-75> trace-depth k2_reg))
-          (set! env_reg
-            (extend
-              env
-              formals
-              args_reg
-              (make-empty-docstrings (length formals))))
-          (set! exps_reg bodies)
-          (set! pc eval-sequence))
-        (begin
-          (set! msg_reg
-            "incorrect number of arguments in application")
-          (set! pc runtime-error)))))
+    (let ((formals-and-args 'undefined)
+          (new-formals 'undefined)
+          (new-args 'undefined))
+      (set! new-args (cdr formals-and-args))
+      (set! new-formals (car formals-and-args))
+      (set! formals-and-args
+        (process-formals-and-args formals args_reg))
+      (if (= (length new-args) (length new-formals))
+          (begin
+            (printf
+              "~acall: ~s~%"
+              (make-trace-depth-string trace-depth)
+              (cons name new-args))
+            (set! trace-depth (+ trace-depth 1))
+            (set! k_reg (make-cont2 <cont2-75> trace-depth k2_reg))
+            (set! env_reg
+              (extend
+                env
+                new-formals
+                new-args
+                (make-empty-docstrings (length new-formals))))
+            (set! exps_reg bodies)
+            (set! pc eval-sequence))
+          (begin
+            (set! msg_reg
+              "incorrect number of arguments in application")
+            (set! pc runtime-error))))))
 
 (define <proc-4>
   (lambda (bodies name trace-depth formals runt env)
-    (if (>= (length args_reg) (length formals))
-        (let ((new-env 'undefined))
-          (set! new-env
-            (extend
-              env
-              (cons runt formals)
-              (cons
-                (list-tail args_reg (length formals))
-                (list-head args_reg (length formals)))
-              (make-empty-docstrings (+ 1 (length formals)))))
-          (printf
-            "~acall: ~s~%"
-            (make-trace-depth-string trace-depth)
-            (cons name args_reg))
-          (set! trace-depth (+ trace-depth 1))
-          (set! k_reg (make-cont2 <cont2-75> trace-depth k2_reg))
-          (set! env_reg new-env)
-          (set! exps_reg bodies)
-          (set! pc eval-sequence))
-        (begin
-          (set! msg_reg "not enough arguments in application")
-          (set! pc runtime-error)))))
+    (let ((formals-and-args 'undefined)
+          (new-formals 'undefined)
+          (new-args 'undefined))
+      (set! new-args (cdr formals-and-args))
+      (set! new-formals (car formals-and-args))
+      (set! formals-and-args
+        (process-formals-and-args formals args_reg))
+      (if (>= (length args_reg) (length new-formals))
+          (let ((new-env 'undefined))
+            (set! new-env
+              (extend
+                env
+                (cons runt new-formals)
+                (cons
+                  (list-tail new-args (length new-formals))
+                  (list-head new-args (length new-formals)))
+                (make-empty-docstrings (+ 1 (length new-formals)))))
+            (printf
+              "~acall: ~s~%"
+              (make-trace-depth-string trace-depth)
+              (cons name new-args))
+            (set! trace-depth (+ trace-depth 1))
+            (set! k_reg (make-cont2 <cont2-75> trace-depth k2_reg))
+            (set! env_reg new-env)
+            (set! exps_reg bodies)
+            (set! pc eval-sequence))
+          (begin
+            (set! msg_reg "not enough arguments in application")
+            (set! pc runtime-error))))))
 
 (define <proc-5>
   (lambda ()
@@ -4229,19 +4257,6 @@
 
 (define <proc-155>
   (lambda ()
-    (if (not (length-at-least? 1 args_reg))
-        (begin
-          (set! msg_reg
-            "incorrect number of arguments to apply-with-keywords")
-          (set! pc runtime-error))
-        (begin
-          (set! value2_reg fail_reg)
-          (set! value1_reg (apply apply-with-keywords args_reg))
-          (set! k_reg k2_reg)
-          (set! pc apply-cont2)))))
-
-(define <proc-156>
-  (lambda ()
     (if (not (length-two? args_reg))
         (begin
           (set! msg_reg "incorrect number of arguments to assq")
@@ -4252,14 +4267,14 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-157>
+(define <proc-156>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (apply dict args_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-158>
+(define <proc-157>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -4271,7 +4286,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-159>
+(define <proc-158>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -4283,7 +4298,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-160>
+(define <proc-159>
   (lambda ()
     (if (not (null? args_reg))
         (begin
@@ -4296,7 +4311,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-161>
+(define <proc-160>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -4308,7 +4323,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-162>
+(define <proc-161>
   (lambda ()
     (if (not (length-at-least? 2 args_reg))
         (begin
@@ -4321,7 +4336,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-163>
+(define <proc-162>
   (lambda ()
     (if (not (length-two? args_reg))
         (begin
@@ -4334,7 +4349,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-164>
+(define <proc-163>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -4346,7 +4361,7 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-165>
+(define <proc-164>
   (lambda ()
     (if (not (length-one? args_reg))
         (begin
@@ -4358,14 +4373,14 @@
           (set! k_reg k2_reg)
           (set! pc apply-cont2)))))
 
-(define <proc-166>
+(define <proc-165>
   (lambda ()
     (set! value2_reg fail_reg)
     (set! value1_reg (apply use-lexical-address args_reg))
     (set! k_reg k2_reg)
     (set! pc apply-cont2)))
 
-(define <proc-167>
+(define <proc-166>
   (lambda (external-function-object)
     (set! value2_reg fail_reg)
     (set! value1_reg (apply* external-function-object args_reg))
@@ -8603,10 +8618,6 @@
            'int
            int-prim
            "(int NUMBER): return NUMBER as an integer")
-         (list
-           'apply-with-keywords
-           apply-with-keywords-prim
-           "(apply-with-keywords PROCEDURE ...): ")
          (list 'assq assq-prim "(assq ...): ")
          (list 'dict dict-prim "(dict ...): ")
          (list
@@ -8671,7 +8682,199 @@
 
 (define make-external-proc
   (lambda (external-function-object)
-    (return* (make-proc <proc-167> external-function-object))))
+    (return* (make-proc <proc-166> external-function-object))))
+
+(define process-formals-and-args
+  (lambda (params vals)
+    (let ((positional-vals 'undefined)
+          (assocs 'undefined)
+          (extra-args 'undefined)
+          (extra-kwargs 'undefined))
+      (set! extra-kwargs (get-extra-kwargs params))
+      (set! extra-args (get-extra-args params))
+      (set! assocs (get-all-keyword-associations vals))
+      (set! positional-vals (get-all-positional-values vals))
+      (return*
+        (process-params-by-pos params params positional-vals assocs
+          extra-args extra-kwargs '())))))
+
+(define process-params-by-pos
+  (lambda (oparams params positional-vals assocs extra-args
+           extra-kwargs bindings)
+    (if (null? positional-vals)
+        (return*
+          (process-params-by-kw oparams assocs extra-args extra-kwargs
+            bindings))
+        (if (null? params)
+            (return*
+              (process-params-by-kw oparams assocs extra-args extra-kwargs
+                bindings))
+            (let ((var 'undefined) (val 'undefined))
+              (set! val (car positional-vals))
+              (set! var (get-next-var params))
+              (return*
+                (process-params-by-pos oparams (cdr params) (cdr positional-vals) assocs
+                  extra-args extra-kwargs
+                  (cons (list var val) bindings))))))))
+
+(define process-params-by-kw
+  (lambda (params assocs extra-args extra-kwargs bindings)
+    (if (null? assocs)
+        (return*
+          (cons
+            (clean-up-params params)
+            (clean-up-bindings bindings params '())))
+        (return*
+          (process-params-by-kw params (cdr assocs) extra-args extra-kwargs
+            (cons (list (caar assocs) (caddar assocs)) bindings))))))
+
+(define clean-up-params
+  (lambda (params)
+    (if (null? params)
+        (return* '())
+        (if (not (pair? params))
+            (if (symbol? params)
+                (return* params)
+                (if (association? params) (return* (car params))))
+            (if (symbol? (car params))
+                (return* (cons (car params) (clean-up-params (cdr params))))
+                (if (association? (car params))
+                    (return*
+                      (cons (caar params) (clean-up-params (cdr params))))
+                    (error 'clean-up-params "invalid parameter type")))))))
+
+(define clean-up-bindings
+  (lambda (bindings params args)
+    (if (null? params)
+        (return* args)
+        (if (symbol? (car params))
+            (let ((symbol 'undefined) (val 'undefined))
+              (set! symbol (car params))
+              (set! val (assq symbol bindings))
+              (if val
+                  (return*
+                    (clean-up-bindings
+                      bindings
+                      (cdr params)
+                      (cons (cadr val) args)))
+                  (error 'clean-up-bindings "no value for ~a" symbol)))
+            (if (association? (car params))
+                (let ((symbol 'undefined) (val 'undefined))
+                  (set! symbol (caar params))
+                  (set! val (assq symbol bindings))
+                  (if val
+                      (return*
+                        (clean-up-bindings
+                          bindings
+                          (cdr params)
+                          (cons (cadr val) args)))
+                      (return*
+                        (clean-up-bindings
+                          bindings
+                          (cdr params)
+                          (cons (caddr params) args))))))))))
+
+(define get-extra-args
+  (lambda (params)
+    (if (null? params)
+        (return* #f)
+        (if (association? (car params))
+            (if (eq? (caddr (car params)) '*)
+                (return* (list (caar params) '()))
+                (return* (get-extra-args (cdr params))))
+            (return* (get-extra-args (cdr params)))))))
+
+(define get-extra-kwargs
+  (lambda (params)
+    (if (null? params)
+        (return* #f)
+        (if (association? (car params))
+            (if (eq? (caddr (car params)) '**)
+                (return* (list (caar params) '()))
+                (return* (get-extra-kwargs (cdr params))))
+            (return* (get-extra-kwargs (cdr params)))))))
+
+(define get-next-var
+  (lambda (params)
+    (if (symbol? (car params))
+        (return* (car params))
+        (if (association? (car params))
+            (return* (caar params))
+            (error 'get-next-var
+              "unknown variable type in parameters")))))
+
+(define association?
+  (lambda (x)
+    (return*
+      (and (list? x) (= (length x) 3) (eq? (cadr x) ':)))))
+
+(define association-pattern?
+  (lambda (pattern x)
+    (if (not (and (list? x) (= (length x) 3) (eq? (cadr x) ':)))
+        (return* #f)
+        (if (and (eq? (car pattern) '_) (eq? (caddr pattern) '_))
+            (return* #t)
+            (if (and (eq? (car pattern) '_)
+                     (eq? (caddr pattern) (caddr x)))
+                (return* #t)
+                (if (and (eq? (car pattern) (car x))
+                         (eq? (caddr pattern) '_))
+                    (return* #t)
+                    (return* #f)))))))
+
+(define get-*-association-values
+  (lambda (vals)
+    (if (null? vals)
+        (return* '())
+        (if (association-pattern? (list '* ': '_) (car vals))
+            (return* (caddar vals))
+            (return* (get-*-association-values (cdr vals)))))))
+
+(define get-positional-values
+  (lambda (vals)
+    (if (null? vals)
+        (return* '())
+        (if (association-pattern? (list '_ ': '_) (car vals))
+            (return* '())
+            (return*
+              (cons (car vals) (get-positional-values (cdr vals))))))))
+
+(define get-all-positional-values
+  (lambda (vals)
+    (return*
+      (append
+        (get-positional-values vals)
+        (get-*-association-values vals)))))
+
+(define make-associations
+  (lambda (dict)
+    (if (null? dict)
+        (return* '())
+        (let ((keyword 'undefined) (value 'undefined))
+          (set! value (cadar dict))
+          (set! keyword (caar dict))
+          (return*
+            (cons
+              (list keyword ': value)
+              (make-associations (cdr dict))))))))
+
+(define get-all-keyword-associations
+  (lambda (vals)
+    (if (null? vals)
+        (return* '())
+        (if (association-pattern? (list '* ': '_) (car vals))
+            (return* (get-all-keyword-associations (cdr vals)))
+            (if (association-pattern? (list '** ': '_) (car vals))
+                (let ((dict 'undefined))
+                  (set! dict (caddar vals))
+                  (return*
+                    (append
+                      (make-associations dict)
+                      (get-all-keyword-associations (cdr vals)))))
+                (if (association-pattern? (list '_ ': '_) (car vals))
+                    (return*
+                      (cons (car vals) (get-all-keyword-associations (cdr vals))))
+                    (return* (get-all-keyword-associations (cdr vals)))))))))
 
 (define pattern?
   (lambda (x)
@@ -9434,29 +9637,27 @@
 
 (define int-prim (make-proc <proc-154>))
 
-(define apply-with-keywords-prim (make-proc <proc-155>))
+(define assq-prim (make-proc <proc-155>))
 
-(define assq-prim (make-proc <proc-156>))
+(define dict-prim (make-proc <proc-156>))
 
-(define dict-prim (make-proc <proc-157>))
+(define property-prim (make-proc <proc-157>))
 
-(define property-prim (make-proc <proc-158>))
+(define rational-prim (make-proc <proc-158>))
 
-(define rational-prim (make-proc <proc-159>))
+(define reset-toplevel-env-prim (make-proc <proc-159>))
 
-(define reset-toplevel-env-prim (make-proc <proc-160>))
+(define sort-prim (make-proc <proc-160>))
 
-(define sort-prim (make-proc <proc-161>))
+(define string-append-prim (make-proc <proc-161>))
 
-(define string-append-prim (make-proc <proc-162>))
+(define string-split-prim (make-proc <proc-162>))
 
-(define string-split-prim (make-proc <proc-163>))
+(define symbol-prim (make-proc <proc-163>))
 
-(define symbol-prim (make-proc <proc-164>))
+(define typeof-prim (make-proc <proc-164>))
 
-(define typeof-prim (make-proc <proc-165>))
-
-(define use-lexical-address-prim (make-proc <proc-166>))
+(define use-lexical-address-prim (make-proc <proc-165>))
 
 (define-native
   make-initial-env-extended

@@ -3297,22 +3297,28 @@
 (define closure
   (lambda (formals bodies env)
     (lambda-proc (args env2 info handler fail k2)
-      (if (= (length args) (length formals))
-	(eval-sequence bodies (extend env formals args (make-empty-docstrings (length args))) handler fail k2)
-	(runtime-error "incorrect number of arguments in application" info handler fail)))))
+      (let* ((formals-and-args (process-formals-and-args formals args))
+	     (new-formals (car formals-and-args))
+	     (new-args (cdr formals-and-args)))
+	(if (= (length new-args) (length new-formals))
+	    (eval-sequence bodies (extend env new-formals new-args (make-empty-docstrings (length new-args))) handler fail k2)
+	    (runtime-error "incorrect number of arguments in application" info handler fail))))))
 
 (define mu-closure
   (lambda (formals runt bodies env)
     (lambda-proc (args env2 info handler fail k2)
-      (if (>= (length args) (length formals))
-	(let ((new-env
-		(extend env
-		  (cons runt formals)
-		  (cons (list-tail args (length formals))
-			(list-head args (length formals)))
-		  (make-empty-docstrings (+ 1 (length formals))))))
-	  (eval-sequence bodies new-env handler fail k2))
-	(runtime-error "not enough arguments in application" info handler fail)))))
+      (let* ((formals-and-args (process-formals-and-args formals args))
+	     (new-formals (car formals-and-args))
+	     (new-args (cdr formals-and-args)))
+	(if (>= (length new-args) (length new-formals))
+	    (let ((new-env
+		   (extend env
+			   (cons runt new-formals)
+			   (cons (list-tail new-args (length new-formals))
+				 (list-head new-args (length new-formals)))
+			   (make-empty-docstrings (+ 1 (length new-formals))))))
+	      (eval-sequence bodies new-env handler fail k2))
+	    (runtime-error "not enough arguments in application" info handler fail))))))
 
 (define make-trace-depth-string
   (lambda (level)
@@ -3324,17 +3330,20 @@
   (lambda (name formals bodies env)
     (let ((trace-depth 0))
       (lambda-proc (args env2 info handler fail k2)
-	(if (= (length args) (length formals))
-	  (begin
-	    (printf "~acall: ~s~%" (make-trace-depth-string trace-depth) (cons name args))
-	    ;;(printf "k: ~a\n" (make-safe-continuation k2))
-	    (set! trace-depth (+ trace-depth 1))
-	    (eval-sequence bodies (extend env formals args (make-empty-docstrings (length formals))) handler fail 
-	      (lambda-cont2 (v fail)
-		(set! trace-depth (- trace-depth 1))
-		(printf "~areturn: ~s~%" (make-trace-depth-string trace-depth) v)
-		(k2 v fail))))
-	  (runtime-error "incorrect number of arguments in application" info handler fail))))))
+      (let ((formals-and-args (process-formals-and-args formals args))
+	    (new-formals (car formals-and-args))
+	    (new-args (cdr formals-and-args)))
+	(if (= (length new-args) (length new-formals))
+	    (begin
+	      (printf "~acall: ~s~%" (make-trace-depth-string trace-depth) (cons name new-args))
+	      ;;(printf "k: ~a\n" (make-safe-continuation k2))
+	      (set! trace-depth (+ trace-depth 1))
+	      (eval-sequence bodies (extend env new-formals new-args (make-empty-docstrings (length new-formals))) handler fail 
+	        (lambda-cont2 (v fail)
+ 	          (set! trace-depth (- trace-depth 1))
+		  (printf "~areturn: ~s~%" (make-trace-depth-string trace-depth) v)
+		  (k2 v fail))))
+	    (runtime-error "incorrect number of arguments in application" info handler fail)))))))
 
 ;; experimental
 (define-native make-safe-continuation
@@ -3356,21 +3365,24 @@
   (lambda (name formals runt bodies env)
     (let ((trace-depth 0))
       (lambda-proc (args env2 info handler fail k2)
-	(if (>= (length args) (length formals))
-	  (let ((new-env
-		  (extend env
-		    (cons runt formals)
-		    (cons (list-tail args (length formals))
-			  (list-head args (length formals)))
-		    (make-empty-docstrings (+ 1 (length formals))))))
-	    (printf "~acall: ~s~%" (make-trace-depth-string trace-depth) (cons name args))
-	    (set! trace-depth (+ trace-depth 1))
-	    (eval-sequence bodies new-env handler fail
-	      (lambda-cont2 (v fail)
-		(set! trace-depth (- trace-depth 1))
-		(printf "~areturn: ~s~%" (make-trace-depth-string trace-depth) v)
-		(k2 v fail))))
-	  (runtime-error "not enough arguments in application" info handler fail))))))
+        (let ((formals-and-args (process-formals-and-args formals args))
+	      (new-formals (car formals-and-args))
+	      (new-args (cdr formals-and-args)))
+	  (if (>= (length args) (length new-formals))
+	      (let ((new-env
+		     (extend env
+			     (cons runt new-formals)
+			     (cons (list-tail new-args (length new-formals))
+				   (list-head new-args (length new-formals)))
+			     (make-empty-docstrings (+ 1 (length new-formals))))))
+		(printf "~acall: ~s~%" (make-trace-depth-string trace-depth) (cons name new-args))
+		(set! trace-depth (+ trace-depth 1))
+		(eval-sequence bodies new-env handler fail
+		  (lambda-cont2 (v fail)
+		     (set! trace-depth (- trace-depth 1))
+		     (printf "~areturn: ~s~%" (make-trace-depth-string trace-depth) v)
+		     (k2 v fail))))
+	      (runtime-error "not enough arguments in application" info handler fail)))))))
 
 ;;----------------------------------------------------------------------------
 ;; Primitives
@@ -4939,13 +4951,6 @@
        (runtime-error "incorrect number of arguments to int" info handler fail))
       (else (k2 (apply int args) fail)))))
 
-(define apply-with-keywords-prim
-  (lambda-proc (args env2 info handler fail k2)
-    (cond
-      ((not (length-at-least? 1 args))
-       (runtime-error "incorrect number of arguments to apply-with-keywords" info handler fail))
-      (else (k2 (apply apply-with-keywords args) fail)))))
-
 (define assq-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
@@ -5184,7 +5189,6 @@
  	    (list 'float float-prim "(float NUMBER): return NUMBER as a floating point value")
  	    (list 'globals globals-prim "(globals): get global environment")
  	    (list 'int int-prim "(int NUMBER): return NUMBER as an integer")
- 	    (list 'apply-with-keywords apply-with-keywords-prim "(apply-with-keywords PROCEDURE ...): ")
  	    (list 'assq assq-prim "(assq ...): ")
  	    (list 'dict dict-prim "(dict ...): ")
  	    (list 'contains contains-prim "(contains DICTIONARY ITEM): returns #t if DICTIONARY contains ITEM")
@@ -5222,6 +5226,171 @@
   (lambda (external-function-object)
     (lambda-proc (args env2 info handler fail k2)
       (k2 (apply* external-function-object args) fail))))
+
+;; Named parameters and varargs:
+
+(define process-formals-and-args
+  (lambda (params vals)
+    ;; params, perhaps an improper list composed of:
+    ;;    var - x
+    ;;    var with default value - (x : 7)
+    ;;    extra args - (args : *)
+    ;;    extra kwargs - (kwargs : **)
+    ;; vals, list composed of:
+    ;;    value - 42
+    ;;    named values - (x : 42)
+    ;;    list of args - (* : [1 2 3])
+    ;;    dict of named values (** : (dict ...))
+    (let ((positional-vals (get-all-positional-values vals))
+	  (assocs (get-all-keyword-associations vals))
+	  (extra-args (get-extra-args params))
+	  (extra-kwargs (get-extra-kwargs params)))
+      (process-params-by-pos params params positional-vals assocs extra-args extra-kwargs '()))))
+
+(define process-params-by-pos
+  (lambda (oparams params positional-vals assocs extra-args extra-kwargs bindings)
+    ;; params
+    ;; positional-vals (1 2 3)
+    ;; assocs ((x : 1) ...)
+    ;; extra-args: (symbol : list) or #f
+    ;; extra-kwargs: (symbol : dict) or #f
+    ;; return params and args, stripped of associations
+    (cond
+     ((null? positional-vals) 
+      (process-params-by-kw oparams assocs extra-args extra-kwargs bindings))
+     ((null? params) 
+      (process-params-by-kw oparams assocs extra-args extra-kwargs bindings))
+     (else
+      (let ((var (get-next-var params))
+	    (val (car positional-vals)))
+	(process-params-by-pos oparams (cdr params) (cdr positional-vals) 
+			       assocs extra-args extra-kwargs 
+			       (cons (list var val) bindings)))))))
+
+(define process-params-by-kw 
+  (lambda (params assocs extra-args extra-kwargs bindings)
+    (cond
+     ((null? assocs)
+      (cons (clean-up-params params) (clean-up-bindings bindings params '())))
+     (else
+      (process-params-by-kw params (cdr assocs) extra-args extra-kwargs 
+			    (cons (list (caar assocs) (caddar assocs)) bindings))))))
+
+(define clean-up-params
+  (lambda (params)
+    ;; params could be improper list
+    ;; just return names
+    (cond
+     ((null? params) '())
+     ((not (pair? params))
+      (cond
+       ((symbol? params) params)
+       ((association? params) (car params))))
+     ((symbol? (car params))
+      (cons (car params) (clean-up-params (cdr params))))
+     ((association? (car params))
+      (cons (caar params) (clean-up-params (cdr params))))
+     (else
+      (error 'clean-up-params "invalid parameter type")))))
+
+(define clean-up-bindings
+  (lambda (bindings params args)
+    ;; return values (or get from default
+    (cond
+     ((null? params) args)
+     ((symbol? (car params))
+      (let* ((symbol (car params))
+	     (val (assq symbol bindings)))
+	(if val
+	    (clean-up-bindings bindings (cdr params)
+			       (cons (cadr val) args))
+	    (error 'clean-up-bindings "no value for ~a" symbol))))
+     ((association? (car params))
+      (let* ((symbol (caar params))
+	     (val (assq symbol bindings)))
+	(if val
+	    (clean-up-bindings bindings (cdr params)
+			       (cons (cadr val) args))
+	    (clean-up-bindings bindings (cdr params)
+			       (cons (caddr params) args))))))))
+
+(define get-extra-args
+  (lambda (params)
+    (cond
+      ((null? params) #f)
+      ((association? (car params))
+       (if (eq? (caddr (car params)) '*)
+	   (list (caar params) '()) ;; return symbol/list
+	   (get-extra-args (cdr params))))
+      (else (get-extra-args (cdr params))))))
+
+(define get-extra-kwargs
+  (lambda (params)
+    (cond
+      ((null? params) #f)
+      ((association? (car params))
+       (if (eq? (caddr (car params)) '**)
+	   (list (caar params) '()) ;; return symbol/dict
+	   (get-extra-kwargs (cdr params))))
+      (else (get-extra-kwargs (cdr params))))))
+
+(define get-next-var
+  (lambda (params)
+    (cond
+     ((symbol? (car params)) (car params))
+     ((association? (car params)) (caar params))
+     (else (error 'get-next-var "unknown variable type in parameters")))))
+
+(define association?
+  (lambda (x)
+    (and (list? x) (= (length x) 3) (eq? (cadr x) ':))))
+
+(define association-pattern?
+  (lambda (pattern x)
+    (cond
+      ((not (and (list? x) (= (length x) 3) (eq? (cadr x) ':))) #f)
+      ((and (eq? (car pattern) '_) (eq? (caddr pattern) '_)) #t)
+      ((and (eq? (car pattern) '_) (eq? (caddr pattern) (caddr x))) #t)
+      ((and (eq? (car pattern) (car x)) (eq? (caddr pattern) '_)) #t)
+      (else #f))))
+
+(define get-*-association-values
+  (lambda (vals)
+    (cond
+      ((null? vals) '())
+      ((association-pattern? '(* : _) (car vals)) (caddar vals))
+      (else (get-*-association-values (cdr vals))))))
+
+(define get-positional-values
+  (lambda (vals)
+    (cond
+      ((null? vals) '())
+      ((association-pattern? '(_ : _) (car vals)) '())
+      (else (cons (car vals) (get-positional-values (cdr vals)))))))
+
+(define get-all-positional-values
+  (lambda (vals)
+    (append (get-positional-values vals) (get-*-association-values vals))))
+
+(define make-associations
+  (lambda (dict)
+    (cond
+      ((null? dict) '())
+      (else (let ((keyword (caar dict))
+		  (value (cadar dict)))
+	      (cons (list keyword ': value) (make-associations (cdr dict))))))))
+
+(define get-all-keyword-associations
+  (lambda (vals)
+    (cond
+      ((null? vals) '())
+      ((association-pattern? '(* : _) (car vals)) (get-all-keyword-associations (cdr vals)))
+      ((association-pattern? '(** : _) (car vals))
+       (let ((dict (caddar vals)))
+	 (append (make-associations dict) (get-all-keyword-associations (cdr vals)))))
+      ((association-pattern? '(_ : _) (car vals))
+       (cons (car vals) (get-all-keyword-associations (cdr vals))))
+      (else (get-all-keyword-associations (cdr vals))))))
 
 (load "transformer-macros.ss")
 
