@@ -1067,6 +1067,7 @@ def get_external_member(obj, components):
     return retval
 
 def dlr_apply(f, args):
+    ## FIXME: Handle named params, and (* : ...), (** : ...)
     largs = list_to_vector(args)
     return f(*largs)
 

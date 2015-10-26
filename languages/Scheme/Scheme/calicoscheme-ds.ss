@@ -7503,13 +7503,7 @@
     (make-proc <proc-166> external-function-object)))
 
 (define process-formals-and-args
-  (lambda (params vals)
-    (let ((positional-vals (get-all-positional-values vals))
-          (assocs (get-all-keyword-associations vals))
-          (extra-args (get-extra-args params))
-          (extra-kwargs (get-extra-kwargs params)))
-      (process-params-by-pos params params positional-vals assocs
-        extra-args extra-kwargs '()))))
+  (lambda (params vals) (cons params vals)))
 
 (define process-params-by-pos
   (lambda (oparams params positional-vals assocs extra-args
@@ -7517,10 +7511,13 @@
     (cond
       ((null? positional-vals)
        (process-params-by-kw oparams assocs extra-args extra-kwargs
-         bindings))
+         bindings #f))
+      ((not (pair? params))
+       (process-params-by-kw oparams assocs extra-args extra-kwargs
+         (cons (list (cdr params) positional-vals) bindings) #f))
       ((null? params)
        (process-params-by-kw oparams assocs extra-args extra-kwargs
-         bindings))
+         bindings positional-vals))
       (else
        (let ((var (get-next-var params))
              (val (car positional-vals)))
@@ -7528,15 +7525,17 @@
            extra-args extra-kwargs (cons (list var val) bindings)))))))
 
 (define process-params-by-kw
-  (lambda (params assocs extra-args extra-kwargs bindings)
+  (lambda (params assocs extra-args extra-kwargs bindings
+           rest)
     (cond
       ((null? assocs)
        (cons
          (clean-up-params params)
-         (clean-up-bindings bindings params '())))
+         (clean-up-bindings bindings params rest '())))
       (else
        (process-params-by-kw params (cdr assocs) extra-args extra-kwargs
-         (cons (list (caar assocs) (caddar assocs)) bindings))))))
+         (cons (list (caar assocs) (caddar assocs)) bindings)
+         rest)))))
 
 (define clean-up-params
   (lambda (params)
@@ -7553,7 +7552,7 @@
       (else (error 'clean-up-params "invalid parameter type")))))
 
 (define clean-up-bindings
-  (lambda (bindings params args)
+  (lambda (bindings params rest args)
     (cond
       ((null? params) args)
       ((symbol? (car params))
@@ -7562,6 +7561,7 @@
              (clean-up-bindings
                bindings
                (cdr params)
+               rest
                (cons (cadr val) args))
              (error 'clean-up-bindings "no value for ~a" symbol))))
       ((association? (car params))
@@ -7570,10 +7570,12 @@
              (clean-up-bindings
                bindings
                (cdr params)
+               rest
                (cons (cadr val) args))
              (clean-up-bindings
                bindings
                (cdr params)
+               rest
                (cons (caddr params) args))))))))
 
 (define get-extra-args

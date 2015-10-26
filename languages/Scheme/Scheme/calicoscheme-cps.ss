@@ -5229,6 +5229,13 @@
 
 ;; Named parameters and varargs:
 
+;; 1. First we gather positional, kwargs, a place for extra
+;;    args, extra kwargs
+;; 2. Go through positional, and assign
+;; 3. Go through kwargs and assign
+;; 4. Go through bindings, use default if one
+;; 5. Return params and args in proper order, no associations (clean-up)
+
 (define process-formals-and-args
   (lambda (params vals)
     ;; params, perhaps an improper list composed of:
@@ -5241,15 +5248,16 @@
     ;;    named values - (x : 42)
     ;;    list of args - (* : [1 2 3])
     ;;    dict of named values (** : (dict ...))
-    (let ((positional-vals (get-all-positional-values vals))
-	  (assocs (get-all-keyword-associations vals))
-	  (extra-args (get-extra-args params))
-	  (extra-kwargs (get-extra-kwargs params)))
-      (process-params-by-pos params params positional-vals assocs extra-args extra-kwargs '()))))
+    (cons params vals)))
+    ;; (let ((positional-vals (get-all-positional-values vals))
+    ;; 	  (assocs (get-all-keyword-associations vals))
+    ;; 	  (extra-args (get-extra-args params))
+    ;; 	  (extra-kwargs (get-extra-kwargs params)))
+    ;;   (process-params-by-pos params params positional-vals assocs extra-args extra-kwargs '()))))
 
 (define process-params-by-pos
   (lambda (oparams params positional-vals assocs extra-args extra-kwargs bindings)
-    ;; params
+    ;; params, perhaps an improper list (gets rest)
     ;; positional-vals (1 2 3)
     ;; assocs ((x : 1) ...)
     ;; extra-args: (symbol : list) or #f
@@ -5257,9 +5265,12 @@
     ;; return params and args, stripped of associations
     (cond
      ((null? positional-vals) 
-      (process-params-by-kw oparams assocs extra-args extra-kwargs bindings))
-     ((null? params) 
-      (process-params-by-kw oparams assocs extra-args extra-kwargs bindings))
+      (process-params-by-kw oparams assocs extra-args extra-kwargs bindings #f))
+     ((not (pair? params)) ;; rest
+      (process-params-by-kw oparams assocs extra-args extra-kwargs 
+			    (cons (list (cdr params) positional-vals) bindings) #f))
+     ((null? params) ;; Maybe extra positional-vals as rest
+      (process-params-by-kw oparams assocs extra-args extra-kwargs bindings positional-vals))
      (else
       (let ((var (get-next-var params))
 	    (val (car positional-vals)))
@@ -5268,13 +5279,13 @@
 			       (cons (list var val) bindings)))))))
 
 (define process-params-by-kw 
-  (lambda (params assocs extra-args extra-kwargs bindings)
+  (lambda (params assocs extra-args extra-kwargs bindings rest)
     (cond
      ((null? assocs)
-      (cons (clean-up-params params) (clean-up-bindings bindings params '())))
+      (cons (clean-up-params params) (clean-up-bindings bindings params rest '())))
      (else
       (process-params-by-kw params (cdr assocs) extra-args extra-kwargs 
-			    (cons (list (caar assocs) (caddar assocs)) bindings))))))
+			    (cons (list (caar assocs) (caddar assocs)) bindings) rest)))))
 
 (define clean-up-params
   (lambda (params)
@@ -5294,24 +5305,25 @@
       (error 'clean-up-params "invalid parameter type")))))
 
 (define clean-up-bindings
-  (lambda (bindings params args)
-    ;; return values (or get from default
+  (lambda (bindings params rest args)
+    ;; return values (or get from default if not specified)
+    ;; params can be improper list
     (cond
      ((null? params) args)
      ((symbol? (car params))
       (let* ((symbol (car params))
 	     (val (assq symbol bindings)))
 	(if val
-	    (clean-up-bindings bindings (cdr params)
+	    (clean-up-bindings bindings (cdr params) rest
 			       (cons (cadr val) args))
 	    (error 'clean-up-bindings "no value for ~a" symbol))))
      ((association? (car params))
       (let* ((symbol (caar params))
 	     (val (assq symbol bindings)))
 	(if val
-	    (clean-up-bindings bindings (cdr params)
+	    (clean-up-bindings bindings (cdr params) rest
 			       (cons (cadr val) args))
-	    (clean-up-bindings bindings (cdr params)
+	    (clean-up-bindings bindings (cdr params) rest
 			       (cons (caddr params) args))))))))
 
 (define get-extra-args

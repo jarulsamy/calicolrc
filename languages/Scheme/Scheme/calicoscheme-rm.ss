@@ -8685,18 +8685,7 @@
     (return* (make-proc <proc-166> external-function-object))))
 
 (define process-formals-and-args
-  (lambda (params vals)
-    (let ((positional-vals 'undefined)
-          (assocs 'undefined)
-          (extra-args 'undefined)
-          (extra-kwargs 'undefined))
-      (set! extra-kwargs (get-extra-kwargs params))
-      (set! extra-args (get-extra-args params))
-      (set! assocs (get-all-keyword-associations vals))
-      (set! positional-vals (get-all-positional-values vals))
-      (return*
-        (process-params-by-pos params params positional-vals assocs
-          extra-args extra-kwargs '())))))
+  (lambda (params vals) (return* (cons params vals))))
 
 (define process-params-by-pos
   (lambda (oparams params positional-vals assocs extra-args
@@ -8704,29 +8693,35 @@
     (if (null? positional-vals)
         (return*
           (process-params-by-kw oparams assocs extra-args extra-kwargs
-            bindings))
-        (if (null? params)
+            bindings #f))
+        (if (not (pair? params))
             (return*
               (process-params-by-kw oparams assocs extra-args extra-kwargs
-                bindings))
-            (let ((var 'undefined) (val 'undefined))
-              (set! val (car positional-vals))
-              (set! var (get-next-var params))
-              (return*
-                (process-params-by-pos oparams (cdr params) (cdr positional-vals) assocs
-                  extra-args extra-kwargs
-                  (cons (list var val) bindings))))))))
+                (cons (list (cdr params) positional-vals) bindings) #f))
+            (if (null? params)
+                (return*
+                  (process-params-by-kw oparams assocs extra-args extra-kwargs
+                    bindings positional-vals))
+                (let ((var 'undefined) (val 'undefined))
+                  (set! val (car positional-vals))
+                  (set! var (get-next-var params))
+                  (return*
+                    (process-params-by-pos oparams (cdr params) (cdr positional-vals) assocs
+                      extra-args extra-kwargs
+                      (cons (list var val) bindings)))))))))
 
 (define process-params-by-kw
-  (lambda (params assocs extra-args extra-kwargs bindings)
+  (lambda (params assocs extra-args extra-kwargs bindings
+           rest)
     (if (null? assocs)
         (return*
           (cons
             (clean-up-params params)
-            (clean-up-bindings bindings params '())))
+            (clean-up-bindings bindings params rest '())))
         (return*
           (process-params-by-kw params (cdr assocs) extra-args extra-kwargs
-            (cons (list (caar assocs) (caddar assocs)) bindings))))))
+            (cons (list (caar assocs) (caddar assocs)) bindings)
+            rest)))))
 
 (define clean-up-params
   (lambda (params)
@@ -8744,7 +8739,7 @@
                     (error 'clean-up-params "invalid parameter type")))))))
 
 (define clean-up-bindings
-  (lambda (bindings params args)
+  (lambda (bindings params rest args)
     (if (null? params)
         (return* args)
         (if (symbol? (car params))
@@ -8756,6 +8751,7 @@
                     (clean-up-bindings
                       bindings
                       (cdr params)
+                      rest
                       (cons (cadr val) args)))
                   (error 'clean-up-bindings "no value for ~a" symbol)))
             (if (association? (car params))
@@ -8767,11 +8763,13 @@
                         (clean-up-bindings
                           bindings
                           (cdr params)
+                          rest
                           (cons (cadr val) args)))
                       (return*
                         (clean-up-bindings
                           bindings
                           (cdr params)
+                          rest
                           (cons (caddr params) args))))))))))
 
 (define get-extra-args

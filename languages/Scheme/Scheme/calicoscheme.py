@@ -1075,6 +1075,7 @@ def get_external_member(obj, components):
     return retval
 
 def dlr_apply(f, args):
+    ## FIXME: Handle named params, and (* : ...), (** : ...)
     largs = list_to_vector(args)
     return f(*largs)
 
@@ -7855,34 +7856,29 @@ def make_external_proc(external_function_object):
     return make_proc(b_proc_166_d, external_function_object)
 
 def process_formals_and_args(params, vals):
-    positional_vals = symbol_undefined
-    assocs = symbol_undefined
-    extra_args = symbol_undefined
-    extra_kwargs = symbol_undefined
-    extra_kwargs = get_extra_kwargs(params)
-    extra_args = get_extra_args(params)
-    assocs = get_all_keyword_associations(vals)
-    positional_vals = get_all_positional_values(vals)
-    return process_params_by_pos(params, params, positional_vals, assocs, extra_args, extra_kwargs, symbol_emptylist)
+    return cons(params, vals)
 
 def process_params_by_pos(oparams, params, positional_vals, assocs, extra_args, extra_kwargs, bindings):
     if true_q(null_q(positional_vals)):
-        return process_params_by_kw(oparams, assocs, extra_args, extra_kwargs, bindings)
+        return process_params_by_kw(oparams, assocs, extra_args, extra_kwargs, bindings, False)
     else:
-        if true_q(null_q(params)):
-            return process_params_by_kw(oparams, assocs, extra_args, extra_kwargs, bindings)
+        if true_q(not(pair_q(params))):
+            return process_params_by_kw(oparams, assocs, extra_args, extra_kwargs, cons(List(cdr(params), positional_vals), bindings), False)
         else:
-            var = symbol_undefined
-            val = symbol_undefined
-            val = car(positional_vals)
-            var = get_next_var(params)
-            return process_params_by_pos(oparams, cdr(params), cdr(positional_vals), assocs, extra_args, extra_kwargs, cons(List(var, val), bindings))
+            if true_q(null_q(params)):
+                return process_params_by_kw(oparams, assocs, extra_args, extra_kwargs, bindings, positional_vals)
+            else:
+                var = symbol_undefined
+                val = symbol_undefined
+                val = car(positional_vals)
+                var = get_next_var(params)
+                return process_params_by_pos(oparams, cdr(params), cdr(positional_vals), assocs, extra_args, extra_kwargs, cons(List(var, val), bindings))
 
-def process_params_by_kw(params, assocs, extra_args, extra_kwargs, bindings):
+def process_params_by_kw(params, assocs, extra_args, extra_kwargs, bindings, rest):
     if true_q(null_q(assocs)):
-        return cons(clean_up_params(params), clean_up_bindings(bindings, params, symbol_emptylist))
+        return cons(clean_up_params(params), clean_up_bindings(bindings, params, rest, symbol_emptylist))
     else:
-        return process_params_by_kw(params, cdr(assocs), extra_args, extra_kwargs, cons(List(caar(assocs), caddar(assocs)), bindings))
+        return process_params_by_kw(params, cdr(assocs), extra_args, extra_kwargs, cons(List(caar(assocs), caddar(assocs)), bindings), rest)
 
 def clean_up_params(params):
     if true_q(null_q(params)):
@@ -7903,7 +7899,7 @@ def clean_up_params(params):
                 else:
                     raise Exception("symbol_clean_up_params: " + format("invalid parameter type", *[]))
 
-def clean_up_bindings(bindings, params, args):
+def clean_up_bindings(bindings, params, rest, args):
     if true_q(null_q(params)):
         return args
     else:
@@ -7913,7 +7909,7 @@ def clean_up_bindings(bindings, params, args):
             symbol = car(params)
             val = assq(symbol, bindings)
             if true_q(val):
-                return clean_up_bindings(bindings, cdr(params), cons(cadr(val), args))
+                return clean_up_bindings(bindings, cdr(params), rest, cons(cadr(val), args))
             else:
                 raise Exception("symbol_clean_up_bindings: " + format("no value for ~a", *[symbol]))
         else:
@@ -7923,9 +7919,9 @@ def clean_up_bindings(bindings, params, args):
                 symbol = caar(params)
                 val = assq(symbol, bindings)
                 if true_q(val):
-                    return clean_up_bindings(bindings, cdr(params), cons(cadr(val), args))
+                    return clean_up_bindings(bindings, cdr(params), rest, cons(cadr(val), args))
                 else:
-                    return clean_up_bindings(bindings, cdr(params), cons(caddr(params), args))
+                    return clean_up_bindings(bindings, cdr(params), rest, cons(caddr(params), args))
 
 def get_extra_args(params):
     if true_q(null_q(params)):
