@@ -1981,8 +1981,13 @@ del _invoke, _
             text = text.Replace('\u2032', '\'');
             text = text.Replace('\u2033', '\"');
             // And then replace the rest with '':
-            byte[] bytes = Encoding.Convert(Encoding.UTF8, Encoding.GetEncoding(Encoding.ASCII.EncodingName, new EncoderReplacementFallback(string.Empty), new DecoderExceptionFallback()), Encoding.UTF8.GetBytes(text));
-            return Encoding.ASCII.GetString(bytes);
+	    ASCIIEncoding ascii = new ASCIIEncoding();
+	    Encoding encoder = ASCIIEncoding.GetEncoding("us-ascii", 
+						 new EncoderReplacementFallback(string.Empty), 
+						 new DecoderExceptionFallback());
+	    //encoder.Fallback = new EncoderReplacementFallback(string.Empty);
+	    byte[] bytes = encoder.GetBytes(text);
+	    return ascii.GetString(bytes); 
         }
 
         protected virtual void OnPasteActionActivated(object sender, System.EventArgs e) {
