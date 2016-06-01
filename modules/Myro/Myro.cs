@@ -1,3 +1,4 @@
+//test build
 /*
 Calico - Scripting Environment
 
@@ -1371,11 +1372,17 @@ public static class Myro
 
         public class LevelObject
 	{
-	  public LevelObject(string title,int width,int height,int robotX,int robotY,int robotT,int endX, int endY,string backPic,string forePic,bool fog)
+	  public LevelObject()
 	  {
 	    Myro.gameLevel=this;
 	    //Just an empty object that I can use for inheritance
 	  }
+
+	  //public LevelObject(string title,int width,int height,int robotX,int robotY,int robotT,int endX, int endY,string backPic,string forePic,bool fog)
+	  //{
+	    //Myro.gameLevel=this;
+	    //Just an empty object that I can use for inheritance
+	  //}
 	}
 
 	public class Simulation
@@ -3557,8 +3564,8 @@ public static class Myro
 	    
 	    if (Myro.simulation.fast)
 	      Myro.simulation.simStep=0.05;
-	    
-	    while ( (Myro.simulation.window.time-startTime) < (seconds/20)) //Myro.simulation.simStep))
+	    //0.00001
+	    while ( (Myro.simulation.window.time-startTime+0.00001) < (seconds/20)) //Myro.simulation.simStep))
 	      {
 		
 	      }
@@ -3726,10 +3733,10 @@ public static class Myro
   
 	public class Robot
 	{
-		public double _lastTranslate = 0;
-		public double _lastRotate = 0;
-
-	        [method: JigsawTab(null)]
+	  public double _lastTranslate = 0;
+	  public double _lastRotate = 0;
+      	  public bool pauseRobot=false;
+	  [method: JigsawTab(null)]
 	        public static bool is_string(object thing) {
 		    if (thing is string)
 			return true;
@@ -4231,9 +4238,18 @@ public static class Myro
 
 		public void move (double translate, double rotate)
 		{
-		    _lastTranslate = translate;
-		    _lastRotate = rotate;
-		    adjustSpeed ();
+		  if(pauseRobot)
+		    {
+		      _lastTranslate = 0;
+		      _lastRotate = 0;
+		    }
+		  else
+		    {
+		      _lastTranslate = translate;
+		      _lastRotate = rotate;
+		    }
+		  adjustSpeed();
+		      
 		}
 
 	        public void move (double translate, double rotate, double interval)

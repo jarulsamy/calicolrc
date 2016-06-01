@@ -3626,7 +3626,7 @@ del _invoke, _
             //Console.WriteLine("Input: {0}", args);
         }
   
-        protected void ResetShell() {
+        public void ResetShell() {
             manager.Setup(path);
             manager.Start(path);
             manager.SetCalico(this);

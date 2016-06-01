@@ -404,37 +404,23 @@ public class SimScribbler : Myro.Robot
 		{ 
 			//
 		}
-<<<<<<< HEAD
 
-	  
-		public override void penDown (object color)
-		{ 
-		  if(color is String)
-		    {
-		      frame.outline = new Graphics.Color((string)color);
-		      frame.setPenColor(new Graphics.Color((string)color));
-		      
-		    }
-		  else if(color is Graphics.Color)
-		    {
-		      frame.outline = (Graphics.Color)color;
-		      frame.setPenColor((Graphics.Color)color);
-		    }
-		  else
-		    {
-		      throw new Exception("Invalid color string or color object");
-		    }
-		  frame.penDown ();
-=======
-		public override void penDown (string color)
-		 {
-			frame.outline = new Graphics.Color (color);
-			frame.setPenColor(new Graphics.Color(color));
-			frame.penDown ();
->>>>>>> testing
-		}
+		//public override void penDown (string color)
+		 //{
+		//	frame.outline = new Graphics.Color (color);
+		//	frame.setPenColor(new Graphics.Color(color));
+		//	frame.penDown ();
+	  ///
+		//}
 
-	  //
+		//public override void penDown (object color)
+		 //{
+		  // frame.outline = color;
+		  // frame.setPenColor(color);
+		  // frame.penDown ();
+	         //
+		//}
+
 		public override Graphics.Line penUp ()
 		{ 
 			return penUp (null);
@@ -1341,8 +1327,8 @@ public class SimScribbler : Myro.Robot
 		  */
 		 	//Location of sensors in body coordinates with zero rotation
 		  	//Zero rotation is the robot facing to the right
-			double [] IR_Loc1 = new double[2] {-12,1.25};
-			double [] IR_Loc2 = new double[2] {-12,-1.25};
+		  double [] IR_Loc1 = new double[2] {-12,2.25};//1.25};
+		  double [] IR_Loc2 = new double[2] {-12,-2.25};//-1.25};
 		  
 		  	//current position and rotation of robot
 			double [] loc = new double[2]{frame.center.x, frame.center.y};
@@ -1363,22 +1349,42 @@ public class SimScribbler : Myro.Robot
 		int leftSensor = 0;
 		int rightSensor = 0;
 		bool isRobot = false;
+		PythonTuple values;
+		Graphics.Picture p;
 		foreach (Graphics.Shape s in simulation.window.canvas.shapes) 
 		      {
 			if(s==frame)
 			  isRobot=true;
-			if(!isRobot)
+			if(!isRobot && s is Graphics.Picture)
 			  {				    
-			    if(s.hit((double)newIR_Loc1[0],(double)newIR_Loc1[1]))
-			      leftSensor = 1;
-			    if(s.hit((double)newIR_Loc2[0],(double)newIR_Loc2[1]))
-			      rightSensor = 1;
+			    p = (Graphics.Picture)s;
+			    //System.Console.WriteLine(s.tag);			    
+			    if(p.hit((double)newIR_Loc1[0],(double)newIR_Loc1[1]) && p.tag=="Line")			      
+			      {
+
+				values=p.getRGBA((int)newIR_Loc1[0],(int)newIR_Loc1[1]);
+				//values=(Graphics.Picture)s.getRGBA((double)newIR_Loc1[0],(double)newIR_Loc1[1]);
+				if((int)values [0]==0 && (int)values [1]==0 && (int)values [2]==0 && (int)values [3]==255)
+				  leftSensor = 1;				  
+			      }
+
+			    if(p.hit((double)newIR_Loc2[0],(double)newIR_Loc2[1]) && p.tag=="Line")
+			      {
+				values=p.getRGBA((int)newIR_Loc2[0],(int)newIR_Loc2[1]);
+				//System.Console.WriteLine(s.getRGBA((double)newIR_Loc1[0],(double)newIR_Loc1[1]));
+				//values=s.getRGBA((double)newIR_Loc2[0],(double)newIR_Loc2[1]);
+				if((int)values [0]==0 && (int)values [1]==0 && (int)values [2]==0 && (int)values [3]==255)
+				  rightSensor=1;
+
+
+			      }
+			      
 			    isRobot = false;
 
 			  }
 		}
 		      	
-		return Graphics.PyList(leftSensor,rightSensor);
+		return Graphics.PyList(rightSensor,leftSensor);
 
                  		    
 

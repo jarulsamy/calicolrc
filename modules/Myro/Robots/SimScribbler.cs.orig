@@ -5,6 +5,7 @@ using System.IO.Ports;
 using System.Threading;
 using System;
 using Microsoft.Xna.Framework; // Vector2, Matrix
+//using System.Math.Cos;
 
 public class SimScribbler : Myro.Robot
 	{
@@ -20,6 +21,7 @@ public class SimScribbler : Myro.Robot
 		public PythonDictionary readings = new PythonDictionary ();
 		public List<Graphics.Shape> light_sensors = new List<Graphics.Shape> ();
 		public bool show_sensors = false;
+	  public double [] blobRLE = { 0,254,51,136,190,254};
 		string _forwardness = "fluke-forward";
 
 		public SimScribbler (Myro.Simulation simulation)
@@ -143,7 +145,7 @@ public class SimScribbler : Myro.Robot
 			line.draw (frame);
 			sensors ["obstacle-right"] = line;
 
-			ir_range = 25;
+			ir_range = 50;
 			// sensors getIR("right")
 			v2 = Graphics.VectorRotate (Graphics.Vector (ir_range, 0), -180 * Math.PI / 180);
 			line = new Graphics.Line (new Graphics.Point (-25, -12), 
@@ -177,6 +179,42 @@ public class SimScribbler : Myro.Robot
 			pie.draw (line);
 			line.draw (frame);
 			sensors ["ir-left"] = line;
+
+			ir_range = 5;
+			// sensors getLine("right")
+			v2 = Graphics.VectorRotate (Graphics.Vector (ir_range, 0), -180 * Math.PI / 180);
+			line = new Graphics.Line (new Graphics.Point (-12, -1.25), 
+			       new Graphics.Point (-12 + v2.X, -1.25 + v2.Y));
+			line.outline = new Graphics.Color (0, 0, 255, 64);
+			line.visible = false;
+			// Visualization of sensor
+			pie = new Graphics.Pie (line.points [0],
+			     ir_range, -5, 5);
+			pie.rotate (180);
+			pie.fill = new Graphics.Color (0, 0, 255, 64);
+			// FIXME: outline can't be null
+			pie.outline = new Graphics.Color (0, 0, 255, 64);
+			pie.draw (line);
+			line.draw (frame);
+			sensors ["line-right"] = line;
+
+			// sensors getLine("left")
+			v2 = Graphics.VectorRotate (Graphics.Vector (ir_range, 0), -180 * Math.PI / 180);
+			line = new Graphics.Line (new Graphics.Point (-12, 1.25), 
+			       new Graphics.Point (-12 + v2.X, 1.25 + v2.Y));
+			line.outline = new Graphics.Color (0, 0, 255, 64);
+			line.visible = false;
+			// Visualization of sensor
+			pie = new Graphics.Pie (line.points [0],
+			     ir_range, -5, 5);
+			pie.rotate (180);
+			pie.fill = new Graphics.Color (0, 0, 255, 64);
+			// FIXME: outline can't be null
+			pie.outline = new Graphics.Color (0, 0, 255, 64);
+			pie.draw (line);
+			line.draw (frame);
+			sensors ["line-left"] = line;
+
 
 			// Just the fill, to see outline of bounding box:
 			frame.fill = null;
@@ -366,23 +404,40 @@ public class SimScribbler : Myro.Robot
 		{ 
 			//
 		}
+<<<<<<< HEAD
+
+	  
+		public override void penDown (object color)
+		{ 
+		  if(color is String)
+		    {
+		      frame.outline = new Graphics.Color((string)color);
+		      frame.setPenColor(new Graphics.Color((string)color));
+		      
+		    }
+		  else if(color is Graphics.Color)
+		    {
+		      frame.outline = (Graphics.Color)color;
+		      frame.setPenColor((Graphics.Color)color);
+		    }
+		  else
+		    {
+		      throw new Exception("Invalid color string or color object");
+		    }
+		  frame.penDown ();
+=======
 		public override void penDown (string color)
 		 {
 			frame.outline = new Graphics.Color (color);
 			frame.setPenColor(new Graphics.Color(color));
 			frame.penDown ();
+>>>>>>> testing
 		}
 
-<<<<<<< HEAD
 	  //
 		public override Graphics.Line penUp ()
 		{ 
 			return penUp (null);
-=======
-		public override Graphics.Line penUp (object fillColor)
-		{ 
-			return frame.penUp (fillColor);
->>>>>>> upstream/master
 		}
 
 		public override Graphics.Line penUp (string fillColor)
@@ -413,7 +468,7 @@ public class SimScribbler : Myro.Robot
 			// Add a delegate to the queue, which will execute when appropriate
 			queue.Add(delegate {
 				try {
-				    pic = _takePicture();
+				    pic = _takePicture(mode);
 				} catch (Exception e) {
 				    exception = e;
 				}
@@ -502,7 +557,7 @@ public class SimScribbler : Myro.Robot
 					high = (int)(zero - (shape.z * 192 * g)); // distance above ground, 0 to 1
 					low = (int)(high - (shape.zHeight * 192 * g)); // height of shape, 0 to 1
 					for (h = low; h < high; h++) {
-					    column[h] = new Graphics.Color (shape.color.red * g, 
+					  column[h] = new Graphics.Color (shape.color.red * g, 
 									    shape.color.green * g, 
 									    shape.color.blue * g);
 					}
@@ -518,9 +573,125 @@ public class SimScribbler : Myro.Robot
 			    }
 			});
 		    ev.WaitOne ();
+		    //Does a thresholdhing based on the value sin blobRLE
+		    if(mode=="blob")
+		      {
+			for(int i =0;i<picture.width;i++)
+			  {
+			    for(int j=0;j<picture.height;j++)
+			      {
+				PythonTuple rgb = picture.getPixel (i, j).getRGB ();
+				List yuv = Myro.rgb2yuv ((int)rgb [0], (int)rgb [1], (int)rgb [2]);
+				if( (int)yuv[0] >= blobRLE[0] && (int)yuv[0] <= blobRLE[1] &&  
+				    (int)yuv[1] >= blobRLE[2] && (int)yuv[1] <= blobRLE[3]  &&
+				    (int)yuv[2] >= blobRLE[4] && (int)yuv[2]<= blobRLE[5])
+				  {
+				    picture.setRGB(i,j,0,0,0);				    
+				  }
+				else
+				  picture.setRGB(i,j,255,255,255);
+			      }
+			  }
+		      }
 		    return picture;
 	        }
     
+
+	  public PythonTuple set_blob_yuv (Graphics.Picture picture, int x1, int y1, int x2, int y2)
+	  {
+	    int [] xs = new int[2]; //[x1,x2];
+	    int [] ys = new int[2]; //[y1,y2];
+	    xs [0] = Math.Min (x1, x2);
+	    xs [1] = Math.Max (x1, x2);
+	    ys [0] = Math.Min (y1, y2);
+	    ys [1] = Math.Max (y1, y2);
+	    
+	    //set up variables to hold counts and accumulations:
+	    double totalY = 0.0;
+	    double totalU = 0.0;
+	    double totalV = 0.0;
+	    
+	    List ySamples = new List ();
+	    List uSamples = new List ();
+	    List vSamples = new List ();
+	    
+	    for (int i=xs[0]; i < xs[1]; i++) {
+	      for (int j=ys[0]; j < ys[1]; j++) {
+                PythonTuple rgb = picture.getPixel (i, j).getRGB ();
+                List yuv = Myro.rgb2yuv ((int)rgb [0], (int)rgb [1], (int)rgb [2]);
+                totalY = totalY + (int)yuv [0];
+                totalU = totalU + (int)yuv [1];
+                totalV = totalV + (int)yuv [2];
+                ySamples.append ((int)yuv [0]);
+                uSamples.append ((int)yuv [1]);
+                vSamples.append ((int)yuv [2]);
+	      }
+	    }
+	    
+	    int count = ySamples.Count;
+	    double yMean = totalY / count;
+	    double uMean = totalU / count;
+	    double vMean = totalV / count;
+	    
+	    // The standard deviation of a random variable with a normal 
+	    // distribution is the root-mean-square (RMS) deviation of its 
+	    // values from their mean.
+	    double sY = 0.0;
+	    double sU = 0.0;
+	    double sV = 0.0;
+	    
+	    for (int i=0; i < count; i ++) {
+	      sY = sY + ((int)ySamples [i] - yMean) * ((int)ySamples [i] - yMean);
+	      sU = sU + ((int)uSamples [i] - uMean) * ((int)uSamples [i] - uMean);
+	      sV = sV + ((int)vSamples [i] - vMean) * ((int)vSamples [i] - vMean);
+	    }
+	    
+	    sY = Math.Sqrt (sY / count);
+	    sU = Math.Sqrt (sU / count);
+	    sV = Math.Sqrt (sV / count);
+	    
+	    // Select the U/V bounding box based upon stdMod stdDev
+	    // from the mean, with approripate
+	    // min/max values to fit in an 8 bit register.
+	    //
+	    double stdMod = 3.0;
+	    
+	    int minU = (int)Math.Max (0, (uMean - sU * stdMod));
+	    int maxU = (int)Math.Min (255, (uMean + sU * stdMod));
+	    int minV = (int)Math.Max (0, (vMean - sV * stdMod));
+	    int maxV = (int)Math.Min (255, (vMean + sV * stdMod));
+	    
+	    // Note that we use the default values for
+	    // several parameters, most importantly the Y value
+	    // defaults to a range of 0-254
+	    conf_rle (0, 254, minU, maxU, minV, maxV);
+	    
+	    // Return a tupal of parameters suitable for the configureBlob
+	    // function, to be shown to the user.
+	    
+	    return Graphics.PyTuple (0, 254, minU, maxU, minV, maxV);
+	    
+	  }
+	  public override void configureBlob (int y_low, int y_high, int u_low, int u_high, int v_low, int v_high)
+	  {
+	    conf_rle(y_low, y_high, u_low, u_high, v_low, v_high);
+	    //return Graphics.PyTuple(y_low,y_high,u_low,u_high,v_low,v_high);
+	  }
+	  
+	  public void conf_rle (int y_low=0, int y_high=254,
+				int u_low=51, int u_high=136,
+				int v_low=190, int v_high=254, int delay = 90, int smooth_thresh = 4)
+	  {
+	    blobRLE[0]=y_low;
+	    blobRLE[1]=y_high;
+	    blobRLE[2]=u_low;
+	    blobRLE[3]=u_high;
+	    blobRLE[4]=v_low;
+	    blobRLE[5]=v_high;
+	  }
+
+
+
 		public override void setup ()
 		{
 		    Console.WriteLine ("You are using:");
@@ -686,54 +857,86 @@ public class SimScribbler : Myro.Robot
 		    return retval;
 	        }
 
-		public object _getDistance (params object [] positions)
-		{
-			string key = null; 
-			List retval = new List ();
-			if (positions.Length == 0)
-			  positions = new object[2] {0, 1};
-			else if ((positions.Length == 1) && (positions [0] is string) && ((string)(positions [0]) == "all"))
-				positions = new object[2] {0, 1};
-			foreach (object position in positions) {
-			    if (position is int) {
-				if (System.Convert.ToInt32(position) == 0) {
-				    key = "distance-left";
-				} else if (System.Convert.ToInt32(position) == 1) {
-				    key = "distance-right";
-				} else {
-				    throw new Exception ("invalid position in getDistance()");
-				}
-			    } else if (position is double) {
-				if (System.Convert.ToDouble(position) == 0) {
-				    key = "distance-left";
-				} else if (System.Convert.ToDouble(position) == 1) {
-				    key = "distance-right";
-				} else {
-				    throw new Exception ("invalid position in getDistance()");
-				}
-			    } else if (position is string) {
-				if (((string)position) == "left") {
-				    key = "distance-left";
-				} else if (((string)position) == "right") {
-				    key = "distance-right";
-				} else {
-				    throw new Exception ("invalid position in getDistance()");
-				}
-			    } else {
-				throw new Exception ("invalid position in getDistance()");
-			    }
-			    if (readings.Contains (key)) {
-				retval.append (readings [key]);
-			    } else {
-				retval.append (0);
-			    }
-			}
-			if (retval.Count == 1)
-			    return retval [0];
-			else 
-			    return retval;
+	  public object _getDistance (params object [] positions)
+	  {
+	    
+	    
+	    string key = null; 
+	    List retval = new List ();
+	    
+	    if (positions.Length == 0)
+	      positions = new object[2] {0, 1};
+	    else if ((positions.Length == 1) && (positions [0] is string) && ((string)(positions [0]) == "all"))
+	      positions = new object[2] {0, 1};
+	    foreach (object position in positions) {
+	      if (position is int) {
+		if (System.Convert.ToInt32(position) == 0) {
+		  //key = "distance-left";
+		  key = "ir-left";
+		} else if (System.Convert.ToInt32(position) == 1) {
+		  //key = "distance-right";
+		  key = "ir-right";
+		} else {
+		  throw new Exception ("invalid position in getDistance()");
 		}
+	      } else if (position is double) {
+		if (System.Convert.ToDouble(position) == 0) {
+		  //key = "distance-left";
+		  key = "ir-left";
+		} else if (System.Convert.ToDouble(position) == 1) {
+		  //key = "distance-right";
+		  key = "ir-right";
+		} else {
+		  throw new Exception ("invalid position in getDistance()");
+		}
+	      } else if (position is string) {
+		if (((string)position) == "left") {
+		  //key = "distance-left";
+		  key = "ir-left";
+		} else if (((string)position) == "right") {
+		  //key = "distance-right";
+		  key = "ir-right";
+		} else {
+		  throw new Exception ("invalid position in getDistance()");
+		}
+	      } else {
+		throw new Exception ("invalid position in getDistance()");
+	      }
+	      //if (readings.Contains (key)) {
+	      //	retval.append (readings [key]);
+	      //    } else {
+	      //retval.append (0);
+	      // }
+	      // ---- now get the data
+	      if (readings.Contains (key)) {
+
+		// distance is a percentage of length of line (300)
+		float percent = (float)(readings [key]);
+
+		//double x_in = (percent * 300.0) / 50.0; // scribbler bodies
+		//// 6400: 0-3 scribbler bodies 1920: 3-5 scribbler bodies 0: >5 scribbler bodies.
+		//// body is 50 pixels
 		
+		//// coefficients
+		//double a = 6.3999999999999927E+03;
+		//double b = -1.8133333333333314E+03;
+		//double c = 1.0666666666666652E+02;
+		//double value = Math.Max(a + b * x_in + c * Math.Pow(x_in, 2.0), 0);
+		
+		retval.append (100*percent);//(float)value);
+	      } else {
+		retval.append (99);
+		
+	      }
+	    }
+	    if (retval.Count == 1)
+	      return retval [0];
+	    else 
+	      return retval;
+	    	    
+	  }
+
+	  
 		public override object getLight (params object [] positions) {
 		    object retval = null;
 		    ManualResetEvent ev = new ManualResetEvent(false);
@@ -836,54 +1039,54 @@ public class SimScribbler : Myro.Robot
 		    return retval;
 	        }
 
-		public object _getIR (params object [] positions)
-		{
-			string key = null; 
-			List retval = new List ();
-			if (positions.Length == 0)
-				positions = new object[2] {0, 1};
-			else if ((positions.Length == 1) && (positions [0] is string) && ((string)(positions [0]) == "all"))
-				positions = new object[2] {0, 1};
-				foreach (object position in positions) {
-					if (position is int) {
-						if (System.Convert.ToInt32(position) == 0) {
-							key = "ir-left";
-						} else if (System.Convert.ToInt32(position) == 1) {
-							key = "ir-right";
-						} else {
-							throw new Exception ("invalid position in getIR()");
-						}
-					} else if (position is double) {
-						if (System.Convert.ToDouble(position) == 0) {
-							key = "ir-left";
-						} else if (System.Convert.ToDouble(position) == 1) {
-							key = "ir-right";
-						} else {
-							throw new Exception ("invalid position in getIR()");
-						}
-					} else if (position is string) {
-						if (((string)position) == "left") {
-							key = "ir-left";
-						} else if (((string)position) == "right") {
-							key = "ir-right";
-						} else {
-							throw new Exception ("invalid position in getIR()");
-						}
-					} else {
-						throw new Exception ("invalid position in getIR()");
-					}
-					if (readings.Contains (key)) {
-						retval.append (0);
-					} else {
-						retval.append (1);
-					}
-			}
-			if (retval.Count == 1)
-				return retval [0];
-			else 
-				return retval;
+	  public object _getIR (params object [] positions)
+	  {
+	    string key = null; 
+	    List retval = new List ();
+	    if (positions.Length == 0)
+	      positions = new object[2] {0, 1};
+	    else if ((positions.Length == 1) && (positions [0] is string) && ((string)(positions [0]) == "all"))
+	      positions = new object[2] {0, 1};
+	    foreach (object position in positions) {
+	      if (position is int) {
+		if (System.Convert.ToInt32(position) == 0) {
+		  key = "ir-left";
+		} else if (System.Convert.ToInt32(position) == 1) {
+		  key = "ir-right";
+		} else {
+		  throw new Exception ("invalid position in getIR()");
 		}
-
+	      } else if (position is double) {
+		if (System.Convert.ToDouble(position) == 0) {
+		  key = "ir-left";
+		} else if (System.Convert.ToDouble(position) == 1) {
+		  key = "ir-right";
+		} else {
+		  throw new Exception ("invalid position in getIR()");
+		}
+	      } else if (position is string) {
+		if (((string)position) == "left") {
+		  key = "ir-left";
+		} else if (((string)position) == "right") {
+		  key = "ir-right";
+		} else {
+		  throw new Exception ("invalid position in getIR()");
+		}
+	      } else {
+		throw new Exception ("invalid position in getIR()");
+	      }
+	      if (readings.Contains (key)) {
+		retval.append (0);
+	      } else {
+		retval.append (1);
+	      }
+	    }
+	    if (retval.Count == 1)
+	      return retval [0];
+	    else 
+	      return retval;
+	  }
+	  
 		public override object getBright (string window) {
 		    object retval = null;
 		    ManualResetEvent ev = new ManualResetEvent(false);
@@ -1086,9 +1289,99 @@ public class SimScribbler : Myro.Robot
 
 		}
 
-		public object _getLine (params object [] position)
+		public object _getLine (params object [] positions)
 		{
-			return Graphics.PyList (0, 0);
+		  /*
+		  
+		  string key = null; 
+		  List retval = new List ();
+		  if (positions.Length == 0)
+		    positions = new object[2] {0, 1};
+		  else if ((positions.Length == 1) && (positions [0] is string) && ((string)(positions [0]) == "all"))
+		    positions = new object[2] {0, 1};
+		  foreach (object position in positions) {
+		    if (position is int) {
+		      if (System.Convert.ToInt32(position) == 0) {
+			key = "line-left";
+		      } else if (System.Convert.ToInt32(position) == 1) {
+			key = "line-right";
+		      } else {
+			throw new Exception ("invalid position in getLine()");
+		      }
+		    } else if (position is double) {
+		      if (System.Convert.ToDouble(position) == 0) {
+			key = "line-left";
+		      } else if (System.Convert.ToDouble(position) == 1) {
+			key = "line-right";
+		      } else {
+			throw new Exception ("invalid position in getLine()");
+		      }
+		    } else if (position is string) {
+		      if (((string)position) == "left") {
+			key = "line-left";
+		      } else if (((string)position) == "right") {
+			key = "line-right";
+		      } else {
+			throw new Exception ("invalid position in getLine()");
+		      }
+		    } else {
+		      throw new Exception ("invalid position in getLine()");
+		    }
+		    if (readings.Contains (key)) {
+		      retval.append (0);
+		    } else {
+		      retval.append (1);
+		    }
+		  }
+		  if (retval.Count == 1)
+		    return retval [0];
+		  else 
+		    return retval;
+		  
+		  */
+		 	//Location of sensors in body coordinates with zero rotation
+		  	//Zero rotation is the robot facing to the right
+			double [] IR_Loc1 = new double[2] {-12,1.25};
+			double [] IR_Loc2 = new double[2] {-12,-1.25};
+		  
+		  	//current position and rotation of robot
+			double [] loc = new double[2]{frame.center.x, frame.center.y};
+		    
+		    double theta = frame.body.Rotation;
+
+		    //rotates and translates body coordinates to world coordinates
+		double [] newIR_Loc1 = new double[2] { Math.Cos(theta)*IR_Loc1[0] - Math.Sin(theta)*IR_Loc1[1] + loc[0], 
+			Math.Sin(theta)*IR_Loc1[0] + Math.Cos(theta)*IR_Loc1[1] + loc[1] };
+
+		double [] newIR_Loc2 = new double[2] { Math.Cos(theta)*IR_Loc2[0] - Math.Sin(theta)*IR_Loc2[1] + loc[0], 
+			Math.Sin(theta)*IR_Loc2[0] + Math.Cos(theta)*IR_Loc2[1] + loc[1] };
+
+		  //newIR_Loc1[1]);
+		//System.Console.WriteLine(newIR_Loc2[0],newIR_Loc2[1]);
+
+
+		int leftSensor = 0;
+		int rightSensor = 0;
+		bool isRobot = false;
+		foreach (Graphics.Shape s in simulation.window.canvas.shapes) 
+		      {
+			if(s==frame)
+			  isRobot=true;
+			if(!isRobot)
+			  {				    
+			    if(s.hit((double)newIR_Loc1[0],(double)newIR_Loc1[1]))
+			      leftSensor = 1;
+			    if(s.hit((double)newIR_Loc2[0],(double)newIR_Loc2[1]))
+			      rightSensor = 1;
+			    isRobot = false;
+
+			  }
+		}
+		      	
+		return Graphics.PyList(leftSensor,rightSensor);
+
+                 		    
+
 		}
     
 		public object _getLocation ()

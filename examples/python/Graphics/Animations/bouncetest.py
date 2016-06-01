@@ -22,4 +22,6 @@ ground.draw(win)
 ground.bodyType = "static"
 ground.color = Color("green")
 
-win.run()
+while True:
+    win.step()
+#win.run()
