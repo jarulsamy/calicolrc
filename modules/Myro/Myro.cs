@@ -3562,15 +3562,15 @@ public static class Myro
 	    if (Myro.simulation.isRandom)
 	      seconds = seconds +randfloat(-0.01,0.01);
 	    
-	    if (Myro.simulation.fast)
-	      Myro.simulation.simStep=0.05;
+	    //if (Myro.simulation.fast)
+	    //  Myro.simulation.simStep=0.05;
 	    //0.00001
 	    while ( (Myro.simulation.window.time-startTime+0.00001) < (seconds/20)) //Myro.simulation.simStep))
 	      {
 		
 	      }
 	    //return simStep back to normal value
-	    Myro.simulation.simStep=0.1;
+	    //Myro.simulation.simStep=0.1;
 	    
 	  }
 	else
