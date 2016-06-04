@@ -2128,20 +2128,34 @@ public static class Graphics
                     }
                 }
             }
+
+            //JH: Patching the framerate limiter start
             // and now the update
             DateTime now = DateTime.Now;
             // diff is TimeSpan, converted to seconds:
             double diff = (now - last_update).TotalMilliseconds / 1000.0;
-            while (diff < step_time) { // seconds
+            double remain = step_time - diff; //JH: calculate the remaining time
+            while (remain > 0) { // seconds   //JH: spin on remaining time
                 //System.Console.Write(".");
-                if (diff > 0) {
-                    Thread.Sleep ((int)(diff / 2 * 1000)); // 2 times per diff
-                }
+                //System.Console.Write("spinning...");
+                if (remain > 0.01) {
+                    //JH: wait based on the remaining time!
+                    //JH: Previous bug made it such that the longer the update took, the longer you would have to wait!
+                    //System.Console.Write("sleeping...");
+                    Thread.Sleep ((int)(remain / 2 * 1000));
+                } //Else just spin-lock
                 //System.Console.Write("+");
+
+                //JH: Recalculate the differences
                 now = DateTime.Now;
                 diff = (now - last_update).TotalMilliseconds / 1000.0;
+                remain = step_time - diff;
             }
+            //System.Console.Write("Waited: ");
+            //System.Console.Write(diff.ToString());
+            //System.Console.Write("\n");
             last_update = DateTime.Now;
+            //JH: Patching the framerate limiter end
 
             if (mode == "bitmapmanual") {
                 using (Cairo.Context g = new Cairo.Context(_canvas.finalsurface)) {
