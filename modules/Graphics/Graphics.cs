@@ -3038,6 +3038,37 @@ public static class Graphics
             return getScreenPoint (points [2]);
         }
 
+        //JH: Helper function start for fixing the 'click' not corresponding to screen coordinates
+        private void _setTransformation(Cairo.Context g){
+            if(drawn_on_shape != null){
+                drawn_on_shape._setTransformation(g);
+            }
+            Point temp = screen_coord (center);
+            g.Translate (temp.x, temp.y);
+            g.Rotate (_rotation);
+            g.Scale (_scaleFactor, _scaleFactor);
+        }
+
+        private Point _getTrueScreenPoint (IList iterable)
+        {
+            // p is relative to center, rotate, and scale; returns
+            // screen coordinate of p
+            double px = 0, py = 0;
+            InvokeBlocking (delegate {
+                using (Cairo.ImageSurface draw = new Cairo.ImageSurface (Cairo.Format.Argb32, 70, 150)){
+                    using (Cairo.Context g = new Cairo.Context(draw)) {
+                        _setTransformation(g);
+                        px = System.Convert.ToDouble (iterable [0]);
+                        py = System.Convert.ToDouble (iterable [1]);
+                        g.UserToDevice (ref px, ref py);
+                    }
+                }
+            });
+            //System.Console.Write("Screen point: " + px.ToString() + ", " + py.ToString() + "\n");
+            return new Point (px, py);
+        }
+        //JH:Helper functions end
+
         public Point getScreenPoint (IList iterable)
         {
             // p is relative to center, rotate, and scale; returns
@@ -3055,10 +3086,10 @@ public static class Graphics
                         py = System.Convert.ToDouble (iterable [1]);
                         g.UserToDevice (ref px, ref py);
                     }
-                    }
-                });
+                }
+            });
             return new Point (px, py);
-            }
+       }
 
             public Point getCenter ()
             {
@@ -3183,20 +3214,41 @@ public static class Graphics
                 double xinters;
                 Point p1, p2;
                 if (points != null) {
-                    p1 = points [0];
+                    //JH: Fixing hit to actually work on screen coordinates
+                    //JH: Old code
+                    //p1 = points [0];
+                    //JH: New code start
+                    p1 = _getTrueScreenPoint(points [0]);
+                    //JH: New code end
                     for (int i=1; i<=points.Length; i++) {
-                        p2 = points [i % points.Length];
-                        if (p.y > (Math.Min (p1.y, p2.y) + center.y)) {
-                            if (p.y <= (Math.Max (p1.y, p2.y) + center.y)) {
-                                if (p.x <= (Math.Max (p1.x, p2.x) + center.x)) {
+                        //JH: Fixing hit to actually work on screen coordinates
+                        //JH: Old code
+                        //p2 = points [i % points.Length];
+                        //if (p.y > (Math.Min (p1.y, p2.y) + center.y)) {
+                        //    if (p.y <= (Math.Max (p1.y, p2.y) + center.y)) {
+                        //        if (p.x <= (Math.Max (p1.x, p2.x) + center.x)) {
+                        //            if (p1.y != p2.y) {
+                        //                xinters = (p.y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x + center.x;
+                        //                if (p1.x == p2.x || p.x <= xinters)
+                        //                    counter++;
+                        //            }
+                        //        }
+                        //    }
+                        //}
+                        //JH: New code start
+                        p2 = _getTrueScreenPoint(points [i % points.Length]);
+                        if (p.y > (Math.Min (p1.y, p2.y))) {
+                            if (p.y <= (Math.Max (p1.y, p2.y))) {
+                                if (p.x <= (Math.Max (p1.x, p2.x))) {
                                     if (p1.y != p2.y) {
-                                        xinters = (p.y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x + center.x;
+                                        xinters = (p.y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x;
                                         if (p1.x == p2.x || p.x <= xinters)
                                             counter++;
                                     }
                                 }
                             }
                         }
+                        //JH: New code end
                         p1 = p2;
                     }
                     return (counter % 2 != 0); // hit?
