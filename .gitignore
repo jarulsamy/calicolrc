@@ -1,4 +1,9 @@
 *.dll
+*.exe
+*.exe.mdb
+experimental
+mymake.sh
+Calico.csproj.FilesWrittenAbsolute.txt
 *~
 .DS_STORE
 
