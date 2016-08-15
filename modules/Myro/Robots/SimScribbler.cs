@@ -183,10 +183,11 @@ public class SimScribbler : Myro.Robot
 			ir_range = 5;
 			// sensors getLine("right")
 			v2 = Graphics.VectorRotate (Graphics.Vector (ir_range, 0), -180 * Math.PI / 180);
-			line = new Graphics.Line (new Graphics.Point (-12, -1.25), 
-			       new Graphics.Point (-12 + v2.X, -1.25 + v2.Y));
+			line = new Graphics.Line (new Graphics.Point (-12, -5.00), 
+			       new Graphics.Point (-12 + v2.X, -5.00 + v2.Y));
 			line.outline = new Graphics.Color (0, 0, 255, 64);
 			line.visible = false;
+			line.border=3;
 			// Visualization of sensor
 			pie = new Graphics.Pie (line.points [0],
 			     ir_range, -5, 5);
@@ -200,10 +201,11 @@ public class SimScribbler : Myro.Robot
 
 			// sensors getLine("left")
 			v2 = Graphics.VectorRotate (Graphics.Vector (ir_range, 0), -180 * Math.PI / 180);
-			line = new Graphics.Line (new Graphics.Point (-12, 1.25), 
-			       new Graphics.Point (-12 + v2.X, 1.25 + v2.Y));
+			line = new Graphics.Line (new Graphics.Point (-12, 5.00), 
+			       new Graphics.Point (-12 + v2.X, 5.00 + v2.Y));
 			line.outline = new Graphics.Color (0, 0, 255, 64);
 			line.visible = false;
+			line.border=3;
 			// Visualization of sensor
 			pie = new Graphics.Pie (line.points [0],
 			     ir_range, -5, 5);
@@ -1277,8 +1279,7 @@ public class SimScribbler : Myro.Robot
 
 		public object _getLine (params object [] positions)
 		{
-		  /*
-		  
+		    
 		  string key = null; 
 		  List retval = new List ();
 		  if (positions.Length == 0)
@@ -1323,8 +1324,16 @@ public class SimScribbler : Myro.Robot
 		    return retval [0];
 		  else 
 		    return retval;
-		  
-		  */
+		}
+		      	
+	  //return Graphics.PyList(rightSensor,leftSensor);
+	  
+          
+	  
+		//}    
+
+
+		  /*
 		 	//Location of sensors in body coordinates with zero rotation
 		  	//Zero rotation is the robot facing to the right
 		  double [] IR_Loc1 = new double[2] {-12,2.25};//1.25};
@@ -1382,14 +1391,8 @@ public class SimScribbler : Myro.Robot
 			    isRobot = false;
 
 			  }
-		}
-		      	
-		return Graphics.PyList(rightSensor,leftSensor);
+			  */
 
-                 		    
-
-		}
-    
 		public object _getLocation ()
 		{
 			return Graphics.PyList (frame.center.x, frame.center.y);
@@ -1495,14 +1498,37 @@ public class SimScribbler : Myro.Robot
 			    Graphics.Line line = (Graphics.Line)kvp.Value;
 			    p1 = this.frame.getScreenPoint (line.getP1 ());
 			    p2 = this.frame.getScreenPoint (line.getP2 ());
-			    simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
+
+			    if(key=="line-right" || key=="line-left")
+			      {
+				List< FarseerPhysics.Dynamics.Fixture > fixtureList =
+				  simulation.window.canvas.world.TestPointAll (Graphics.Vector (((float)p1.x) / MeterInPixels,((float)p1.y) / MeterInPixels));
+
+				if(fixtureList != null)
+				  {
+				    foreach (FarseerPhysics.Dynamics.Fixture fixture in fixtureList) 
+				      {
+					if(fixture.IsSensor && fixture.UserData is Graphics.Shape)
+					  {
+					    Graphics.Shape s=(Graphics.Shape)fixture.UserData;
+					    if(s.tag=="line")
+					      this.readings[key]=1;
+					  }
+				      }
+				  }
+			      }
+			    else
+			      {
+				simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
 				    this.readings [key] = hit;
 				    return 1; 
-				}, 
-				Graphics.Vector (((float)p1.x) / MeterInPixels, 
-						 ((float)p1.y) / MeterInPixels), 
-				Graphics.Vector (((float)p2.x) / MeterInPixels, 
-						 ((float)p2.y) / MeterInPixels));
+				  }, 
+				  Graphics.Vector (((float)p1.x) / MeterInPixels, 
+						   ((float)p1.y) / MeterInPixels), 
+				  Graphics.Vector (((float)p2.x) / MeterInPixels, 
+						   ((float)p2.y) / MeterInPixels));
+				
+			      }
 			}
 			foreach (Graphics.Shape light in simulation.lights) {
 			    foreach (Graphics.Shape light_sensor in this.light_sensors) {

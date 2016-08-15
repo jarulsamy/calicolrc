@@ -176,7 +176,8 @@ namespace Calico {
         public Microsoft.Scripting.CompilerOptions compiler_options;
         public Microsoft.Scripting.Hosting.ScriptEngine engine;
         public Microsoft.Scripting.Hosting.ScriptScope scope;
- 
+        public Func<object,string, System.Exception > OnErrorCallback=null; 
+
         public DLREngine(LanguageManager manager) : base(manager) {
         }
 
@@ -445,6 +446,23 @@ namespace Calico {
 			} catch (Exception e) {
 			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
 			  PrintLine(eo.FormatException(e));
+			  
+			  try
+			    {
+			      if(OnErrorCallback != null)
+				{
+				  //Don't know if we need this. Being extra cautious. RV, JH, LRC
+				  //Invoke (delegate{OnErrorCallback();});
+				  OnErrorCallback(e,text);
+				}
+			    }
+			  catch (Exception f)
+			    {
+			      Console.Error.WriteLine ("Error in OnErrorCallback function for syntax Error.");
+			      Console.Error.WriteLine (f.Message);
+
+			    }
+			  
 			  return false;
 			}
 		  }
@@ -467,6 +485,22 @@ namespace Calico {
 			} else {
 			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
 			  PrintLine(eo.FormatException(e));
+			  
+			  try
+			    {
+			      if(OnErrorCallback != null)
+				{
+				  OnErrorCallback(e,text);
+				}
+			    }
+			  catch (Exception f)
+			    {
+			      Console.Error.WriteLine ("Error in OnErrorCallback function for runtime Error.");
+			      Console.Error.WriteLine (f.Message);
+
+			    }
+                          
+
 			}
 			return false;
 		  }
