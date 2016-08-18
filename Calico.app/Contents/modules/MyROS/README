@@ -1,0 +1,37 @@
+BUILDING rosjava.dll
+
+
+download rosjava
+
+./gradlew install
+tests will fail, that'sok
+
+cd rosjava_tutorial_pubsub
+
+../gradlew installApp
+
+
+Now create a monster jar file
+cd rosjava_tutorial_pubsub/build/install/rosjava_tutorial_pubsub/lib
+mkdir tmp
+
+cd tmp
+for x in ../*.jar; do    
+    jar -xvf $x
+done
+
+jar -cvf ros.jar .
+mv ros.jar ..
+cd ..
+
+
+That's fine for Calico. For processing a few things need to be deleted
+before creating the jar.
+
+rm -rf org/apache/commons/lang/enum #processing gets confused
+rm std_msgs/String.class #processing again, renamed to SString
+
+
+Then ikvm the jar file:
+
+mono bin/ikvmc.exe -target:library ros.jar

@@ -1,0 +1,4 @@
+/home/dblank/Desktop/wwahammy-csharp-sqlite-ca3c79393adf/Community.CsharpSqlite.shell/bin/Debug/C#-SQLite3.exe.mdb
+/home/dblank/Desktop/wwahammy-csharp-sqlite-ca3c79393adf/Community.CsharpSqlite.shell/bin/Debug/C#-SQLite3.exe
+/home/dblank/Desktop/wwahammy-csharp-sqlite-ca3c79393adf/Community.CsharpSqlite.shell/obj/Debug/C#-SQLite3.exe
+/home/dblank/Desktop/wwahammy-csharp-sqlite-ca3c79393adf/Community.CsharpSqlite.shell/obj/Debug/C#-SQLite3.exe.mdb

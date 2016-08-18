@@ -1,0 +1,31 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|x86" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Jigsaw\Jigsaw.cs">
+    <Files>
+      <File FileName="Jigsaw\Jigsaw.cs" Line="72" Column="42" />
+      <File FileName="Jigsaw\StatementBlocks.cs" Line="291" Column="13" />
+      <File FileName="Jigsaw\ControlBlocks.cs" Line="1910" Column="13" />
+      <File FileName="Jigsaw\IOBlocks.cs" Line="379" Column="7" />
+      <File FileName="Jigsaw\ProcedureBlocks.cs" Line="515" Column="13" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State expanded="True">
+          <Node name="Jigsaw" expanded="True">
+            <Node name="Jigsaw.cs" selected="True" />
+          </Node>
+        </State>
+      </Pad>
+      <Pad Id="ClassPad">
+        <State expanded="True" selected="True" />
+      </Pad>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State />
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

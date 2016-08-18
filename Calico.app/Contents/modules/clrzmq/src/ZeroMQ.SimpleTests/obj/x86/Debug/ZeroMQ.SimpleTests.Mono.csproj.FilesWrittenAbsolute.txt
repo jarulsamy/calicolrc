@@ -1,0 +1,4 @@
+/home/dblank/Desktop/IPython/clrzmq/src/ZeroMQ.SimpleTests/bin/Debug/ZeroMQ.SimpleTests.exe.mdb
+/home/dblank/Desktop/IPython/clrzmq/src/ZeroMQ.SimpleTests/bin/Debug/ZeroMQ.SimpleTests.exe
+/home/dblank/Desktop/IPython/clrzmq/src/ZeroMQ.SimpleTests/obj/x86/Debug/ZeroMQ.SimpleTests.exe
+/home/dblank/Desktop/IPython/clrzmq/src/ZeroMQ.SimpleTests/obj/x86/Debug/ZeroMQ.SimpleTests.exe.mdb

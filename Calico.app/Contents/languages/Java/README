@@ -1,0 +1,6 @@
+Java support is enabled through ikvm. We are using ikvm-7.2.4630.5:
+
+Also we are building ikvm with .Net 3.5 to work around a networking
+bug with .Net 4.0 on Windows & Mac OS X.
+
+nant -t:mono-3.5
