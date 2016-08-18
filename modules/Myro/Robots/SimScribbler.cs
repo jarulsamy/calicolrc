@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework; // Vector2, Matrix
 
 public class SimScribbler : Myro.Robot
 	{
-		public Graphics.Rectangle frame;
+		public Graphics.Circle frame;
 		public Myro.Simulation simulation;
 		public double velocity = 0;
 		public List<Action> queue = new List<Action>();
@@ -21,14 +21,15 @@ public class SimScribbler : Myro.Robot
 		public PythonDictionary readings = new PythonDictionary ();
 		public List<Graphics.Shape> light_sensors = new List<Graphics.Shape> ();
 		public bool show_sensors = false;
-	  public double [] blobRLE = { 0,254,51,136,190,254};
+        public double [] blobRLE = { 0,254,51,136,190,254};
 		string _forwardness = "fluke-forward";
 
 		public SimScribbler (Myro.Simulation simulation)
 		{
 			this.simulation = simulation;
-			frame = new Graphics.Rectangle (new Graphics.Point (320 - 23, 240 - 23),
-				     new Graphics.Point (320 + 23, 240 + 23));
+			//frame = new Graphics.Rectangle (new Graphics.Point (320 - 23, 240 - 23),
+			//	     new Graphics.Point (320 + 23, 240 + 23));
+			frame = new Graphics.Circle (new Graphics.Point (320, 240), 23);
 			frame.pen.minDistance = 10; // minimum distance from last point
 			// Draw a body:
 			Graphics.Polygon body = new Graphics.Polygon ();
