@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework; // Vector2, Matrix
 
 public class SimScribbler : Myro.Robot
 	{
-		public Graphics.Rectangle frame;
+	        public Graphics.Rectangle frame;
 		public Myro.Simulation simulation;
 		public double velocity = 0;
 		public List<Action> queue = new List<Action>();
@@ -28,7 +28,9 @@ public class SimScribbler : Myro.Robot
 		{
 			this.simulation = simulation;
 			frame = new Graphics.Rectangle (new Graphics.Point (320 - 23, 240 - 23),
-				     new Graphics.Point (320 + 23, 240 + 23));
+							new Graphics.Point (320 + 23, 240 + 23));
+
+
 			frame.pen.minDistance = 10; // minimum distance from last point
 			// Draw a body:
 			Graphics.Polygon body = new Graphics.Polygon ();
