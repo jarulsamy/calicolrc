@@ -4316,6 +4316,28 @@ public static class Graphics
                 });
             }
         }
+        
+  public class TextBox: Rectangle
+  {
+    public Text textObject;
+    
+    public TextBox (IList iterable1, IList iterable2, string text) : base(iterable1, iterable2)
+    {
+      
+      this.textObject=new Text(new int[] { 0,0},text);
+      //this.textObject.setXJustification("center");
+      //this.textObject.setYJustification("top");
+      this.textObject.fill=new Color("black");
+      this.textObject.draw(this);
+    }
+    public void setText(string text)
+    {
+      this.textObject.setText(text);
+    }
+    
+    
+    
+  }
 
         public class SpeechBubble : Text {
             public Point anchor;

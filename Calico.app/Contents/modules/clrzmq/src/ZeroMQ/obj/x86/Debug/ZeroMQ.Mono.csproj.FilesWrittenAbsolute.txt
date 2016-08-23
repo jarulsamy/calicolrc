@@ -1,4 +1,0 @@
-/home/dblank/Desktop/IPython/clrzmq/src/ZeroMQ/bin/Debug/clrzmq.dll.mdb
-/home/dblank/Desktop/IPython/clrzmq/src/ZeroMQ/bin/Debug/clrzmq.dll
-/home/dblank/Desktop/IPython/clrzmq/src/ZeroMQ/obj/x86/Debug/clrzmq.dll
-/home/dblank/Desktop/IPython/clrzmq/src/ZeroMQ/obj/x86/Debug/clrzmq.dll.mdb

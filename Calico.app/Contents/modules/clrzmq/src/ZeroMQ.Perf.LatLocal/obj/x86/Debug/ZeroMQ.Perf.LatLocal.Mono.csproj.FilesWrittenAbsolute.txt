@@ -1,2 +1,0 @@
-/home/dblank/Desktop/IPython/clrzmq/perf/local_lat.exe
-/home/dblank/Desktop/IPython/clrzmq/src/ZeroMQ.Perf.LatLocal/obj/x86/Debug/local_lat.exe
