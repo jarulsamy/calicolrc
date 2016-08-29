@@ -1199,8 +1199,9 @@ public static class Myro
 	}
 
 	[method: JigsawTab(null)]
-	public static void init (string robot_type, string port)
+	public static void init (string port, string robot_type)
 	{
+	  initialize(port,38400,robot_type);
 	}
 
 	[method: JigsawTab("M/Robot")]
@@ -1215,8 +1216,9 @@ public static class Myro
 		initialize (port, baud);
 	}
 
+
 	[method: JigsawTab(null)]
-	public static void initialize (string port, int baud=38400)
+  public static void initialize (string port, int baud=38400, string robot_type="Scribbler")
     {
 	  // assumes a single robot will be used
 	  if (port == null) {
@@ -1242,7 +1244,9 @@ public static class Myro
 		else {
 		    //System.Console.WriteLine("test2");
 		  // defaults to Scribbler in this interface
-		  Myro.robot = (Robot)makeRobot ("Scribbler", port, baud);
+
+		  //Myro.robot = (Robot)makeRobot ("Scribbler", port, baud);
+		  Myro.robot = (Robot)makeRobot (robot_type, port, baud);
 		}
 	  }
     }
@@ -2707,7 +2711,7 @@ public static class Myro
 	    throw new Exception("Robot has not been initialized");
 	}
     }
-    
+
     [method: JigsawTab(null)]
     public static void enablePanNetworking()
     {
@@ -3858,6 +3862,12 @@ public static class Myro
 		{
 			return null;
 		}
+
+
+		public virtual object getButton (params object [] position)
+		{
+			return null;
+		}
     
 		public virtual object getLight (params object [] position)
 		{
@@ -3903,6 +3913,11 @@ public static class Myro
 		{
 			return null;
 		}
+	  public virtual List getServo(int id)
+	  {
+	    //Test
+	    return null;
+	  }
     
 		public virtual object get (string sensor="all")
 		{
@@ -3956,6 +3971,10 @@ public static class Myro
         {
         }
         
+	  public virtual void setServo(int id,float degree)
+	  {
+	  }
+	  
         public virtual void enablePanNetworking()
         {
         }
@@ -4030,6 +4049,9 @@ public static class Myro
 		{
 			
 		}
+	  public virtual void special (string type, int value=0)
+	  {
+	  }
 		public virtual void setEndPath ()
 		{
 		}
