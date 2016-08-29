@@ -1,5 +1,5 @@
 
-all: Scribbler.dll SimScribbler.dll SimPioneer.dll NxtRobot.dll \
+all: Bioloid.dll Scribbler.dll SimScribbler.dll SimPioneer.dll NxtRobot.dll \
 	Finch.dll Hummingbird.dll ROSRobot.dll ROSARDrone.dll Arduino.dll\
 
 Arduino.dll: Arduino.cs 
@@ -164,6 +164,20 @@ Scribbler.dll: Scribbler.cs ../Myro.cs
 		-r:System.Numerics \
 		Scribbler.cs \
 		-out:Scribbler.dll \
+		-target:library
+
+Bioloid.dll: Bioloid.cs ../Myro.cs
+	dmcs -sdk:4 -r:../../../bin/IronPython.dll \
+		-r:../../Myro.dll \
+		-r:../../../bin/Calico.exe \
+		-r:../../Graphics.dll \
+		-r:../../../bin/IronPython.dll \
+		-r:../../../bin/Microsoft.Scripting.dll \
+		-r:../../../bin/Microsoft.Dynamic.dll \
+		-r:System.Drawing \
+		-r:System.Numerics \
+		Bioloid.cs \
+		-out:Bioloid.dll \
 		-target:library
 
 SimScribbler.dll: SimScribbler.cs ../Myro.cs
