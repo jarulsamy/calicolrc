@@ -1790,7 +1790,43 @@ public static class Myro
 	    else
 		throw new Exception("Robot has not been initialized");
 	}
-  
+   
+	[method: JigsawTab("M/Movement")]
+	public static void setServo (int id, float degree)
+	{
+	    if (robot != null) 
+		robot.setServo (id, degree);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+    
+	[method: JigsawTab("M/Movement")]
+	public static List getServo (int id)
+	{
+	    if (robot != null) 
+		return robot.getServo (id);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+   
+	[method: JigsawTab("M/Movement")]
+	public static object getButton (params object [] position)
+	{
+	    if (robot != null) 
+		return robot.getButton (position);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+   
+	[method: JigsawTab("M/Movement")]
+	public static void special (string type)
+	{
+	    if (robot != null) 
+		robot.special(type);
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
+ 
 	[method: JigsawTab("M/Movement")]
 	public static void translate (double power)
 	{
@@ -4050,7 +4086,7 @@ public static class Myro
 		{
 			
 		}
-	  public virtual void special (string type, int value=0)
+	  public virtual void special (string type)
 	  {
 	  }
 		public virtual void setEndPath ()

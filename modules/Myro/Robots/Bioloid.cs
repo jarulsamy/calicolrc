@@ -432,7 +432,7 @@ public class Bioloid: Myro.Robot
       id=0;
     if(id>=1 && id<19)
       {
-	flush();
+	//flush();
 	float ratio=1024/(float)360;
 	int value=(int)(ratio*degree);
 	write_packet((byte)(id+13), (byte)(value & 31),(byte)((value>>5) & 31));
@@ -453,7 +453,7 @@ public class Bioloid: Myro.Robot
   }
 
   
-  public override void special(string type,int value)
+  public override void special(string type)
   {
     type = type.ToLower ();
     
@@ -489,7 +489,7 @@ public class Bioloid: Myro.Robot
     
     if(id>=1 && id<19)
       {
-	flush();
+	//flush();
 	write_packet(Bioloid.GET_SERVO,(byte)(id+13));
 	List values=ReadMessage();
 	return values;
@@ -819,9 +819,11 @@ public class Bioloid: Myro.Robot
             // DiscardInBuffer() is causing trouble on Mac OSX - doesn't clear buffer
             //serial.DiscardInBuffer();
             //serial.DiscardOutBuffer();
+            serial.ReadTimeout = 100;
             while (true) {
                 try {
                     serial.Read (bytes, 0, 1);
+                    //Console.WriteLine(bytes[0]);
                 } catch {
                     // timeout, default is one second
                     // no data, so we're done
@@ -830,6 +832,8 @@ public class Bioloid: Myro.Robot
                 //serial.DiscardInBuffer();
                 //serial.DiscardOutBuffer();
             }
+            
+            serial.ReadTimeout = 1000;
         }
     }
 
