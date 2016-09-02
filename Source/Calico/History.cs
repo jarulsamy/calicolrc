@@ -173,5 +173,11 @@ namespace Calico {
             }
             return false;
         }
+      public void clear()
+      {
+	history.Clear();
+	history.Add("");
+	position=0;
+      }
     }
 }

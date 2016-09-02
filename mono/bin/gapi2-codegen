@@ -1,0 +1,2 @@
+#!/bin/sh
+ C:/PROGRA~2/MONO-2~1.8/lib/gtk-sharp-2.0/gapi_codegen.exe "$@"

@@ -43,3 +43,12 @@
 /Users/robyvelez/Programming/LRC_Calico/Calico/Calico/bin/Calico.exe
 /Users/robyvelez/Programming/LRC_Calico/Calico/Calico/Source/Calico/obj/x86/Debug/Calico.exe
 /Users/robyvelez/Programming/LRC_Calico/Calico/Calico/Source/Calico/obj/x86/Debug/Calico.exe.mdb
+/Users/robyvelez/Programming/LRC/Calico/Calico/Source/Calico/obj/x86/Debug/.NETFramework,Version=v4.0.AssemblyAttribute.cs
+/Users/robyvelez/Programming/LRC/Calico/Calico/Source/Calico/obj/x86/Debug/Calico.gtk-gui.gui.stetic
+/Users/robyvelez/Programming/LRC/Calico/Calico/Source/Calico/obj/x86/Debug/Calico.abstract-butterfly-icon.gif
+/Users/robyvelez/Programming/LRC/Calico/Calico/Source/Calico/obj/x86/Debug/Calico.icon-1.png
+/Users/robyvelez/Programming/LRC/Calico/Calico/Source/Calico/obj/x86/Debug/Calico.icon-2.png
+/Users/robyvelez/Programming/LRC/Calico/Calico/bin/Calico.exe.mdb
+/Users/robyvelez/Programming/LRC/Calico/Calico/bin/Calico.exe
+/Users/robyvelez/Programming/LRC/Calico/Calico/Source/Calico/obj/x86/Debug/Calico.exe
+/Users/robyvelez/Programming/LRC/Calico/Calico/Source/Calico/obj/x86/Debug/Calico.exe.mdb
