@@ -1,6 +1,6 @@
 
 all: Bioloid.dll Scribbler.dll SimScribbler.dll SimPioneer.dll NxtRobot.dll \
-	Finch.dll Hummingbird.dll ROSRobot.dll ROSARDrone.dll Arduino.dll\
+	Finch.dll Hummingbird.dll Arduino.dll SimScribblerRounded.dll \
 
 Arduino.dll: Arduino.cs 
 	MONO_PATH=../../bin:../../../languages/Java/lib dmcs -sdk:4 \
@@ -194,6 +194,22 @@ SimScribbler.dll: SimScribbler.cs ../Myro.cs
 		-r:System.Numerics \
 		SimScribbler.cs \
 		-out:SimScribbler.dll \
+		-target:library
+
+SimScribblerRounded.dll: SimScribblerRounded.cs ../Myro.cs
+	dmcs -sdk:4 -r:../../../bin/IronPython.dll \
+		-r:../../Myro.dll \
+		-r:../../../bin/Calico.exe \
+		-r:../../Graphics.dll \
+		-r:../../../bin/IronPython.dll \
+		-r:../../../bin/Microsoft.Scripting.dll \
+		-r:../../../bin/Microsoft.Dynamic.dll \
+		-r:../../FarseerPhysics.dll \
+		-r:System.Drawing \
+		-pkg:gtk-sharp-2.0 \
+		-r:System.Numerics \
+		SimScribblerRounded.cs \
+		-out:SimScribblerRounded.dll \
 		-target:library
 
 SimPioneer.dll: SimPioneer.cs ../Myro.cs
