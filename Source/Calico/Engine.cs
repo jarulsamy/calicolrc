@@ -418,6 +418,21 @@ namespace Calico {
 		  return Execute(text, true);
         }
 		
+
+      public void FormatError(Exception e, string text,int type)
+      {
+	Console.WriteLine("Oops it looks like you have an error of the form ");
+	Console.WriteLine(e.GetType());
+	Console.WriteLine("You entered ");
+	Console.WriteLine(text);
+	Console.WriteLine("Did you mean BLANK?");
+	
+	Console.WriteLine("Called from ");
+	Console.WriteLine(type);
+	
+	
+
+      }
         public override bool Execute(string text, bool ok) {
 		  // This is called by RunInBackground() in the MainWindow
 		  //manager.calico.last_error = ""
@@ -446,6 +461,7 @@ namespace Calico {
 			} catch (Exception e) {
 			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
 			  PrintLine(eo.FormatException(e));
+			  //FormatError(e,text,1);
 			  
 			  try
 			    {
@@ -484,8 +500,8 @@ namespace Calico {
 			  PrintLine("[Script stopped----------]");
 			} else {
 			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-			  PrintLine(eo.FormatException(e));
-			  
+			  PrexcintLine(eo.FormatException(e));
+			  //FormatError(e,text,2);
 			  try
 			    {
 			      if(OnErrorCallback != null)
