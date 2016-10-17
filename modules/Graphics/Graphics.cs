@@ -2119,7 +2119,9 @@ public static class Graphics
             _canvas.need_to_draw_surface = true;
 
             if (mode == "physics") {
-                _canvas.world.Step ((float)simulationStepTime); 
+                lock(_canvas.world){
+                    _canvas.world.Step ((float)simulationStepTime);
+                }
                 time += simulationStepTime; 
                 // update the sprites
                 lock (_canvas.shapes) {
