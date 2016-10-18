@@ -38,6 +38,7 @@ namespace CalicoPython
 			languageSetup = IronPython.Hosting.Python.CreateLanguageSetup (null);
 			// Set LanguageSetup options here:
 			languageSetup.Options ["FullFrames"] = true; // for debugging
+			languageSetup.Options ["ExceptionDetail"] = true; // for rich detail
 			languageSetup.Options ["MaxRecursion"] = 1000; // for debugging
 			scriptRuntimeSetup.LanguageSetups.Add (languageSetup); // add to local
 			// Create a Python-only scope:
