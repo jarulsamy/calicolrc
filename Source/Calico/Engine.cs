@@ -319,7 +319,15 @@ namespace Calico {
 		compiledCode = null;
 	    } catch (Exception e) {
 		Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-		PrintLine(eo.FormatException(e));
+		try
+		  {
+		    PrintLine(eo.FormatException(e));
+		  }
+		catch
+		  {
+		    PrintLine(e.ToString());
+		  }
+
 		return null;
 	    }
 	    try {
@@ -349,7 +357,14 @@ namespace Calico {
 			}
 		    } catch (Exception e) {
 			Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-			PrintLine(eo.FormatException(e));
+			try
+			  {
+			    PrintLine(eo.FormatException(e));
+			  }
+			catch
+			  {
+			    PrintLine(e.ToString());
+			  }
 			return null;
 		    }
 		}
@@ -371,7 +386,14 @@ namespace Calico {
 		aborted = true;
 	    } catch (Exception e) {
 		Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-		PrintLine(eo.FormatException(e));
+		try
+		  {
+		    PrintLine(eo.FormatException(e));
+		  }
+		catch
+		  {
+		    PrintLine(e.ToString());
+		  }
 	    }
 	    if (aborted) {
 		System.Console.Error.WriteLine("Running script aborted!");
@@ -444,7 +466,15 @@ namespace Calico {
 			  }
 			} catch (Exception e) {
 			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-			  PrintLine(eo.FormatException(e));
+			  try
+			    {
+			      PrintLine(eo.FormatException(e));
+			    }
+			  catch
+			    {
+			      PrintLine(e.ToString());
+			    }
+
 			  return false;
 			}
 		  }
@@ -466,7 +496,15 @@ namespace Calico {
 			  PrintLine("[Script stopped----------]");
 			} else {
 			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-			  PrintLine(eo.FormatException(e));
+			  try
+			    {
+			      PrintLine(eo.FormatException(e));
+			    }
+			  catch
+			    {
+			      PrintLine(e.ToString());
+			    }
+
 			}
 			return false;
 		  }
@@ -491,7 +529,15 @@ namespace Calico {
 			}
 		  } catch (Exception e) {
 			Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-			PrintLine(eo.FormatException(e));
+			try
+			    {
+			      PrintLine(eo.FormatException(e));
+			    }
+			  catch
+			    {
+			      PrintLine(e.ToString());
+			    }
+
 			return false;
 		  }
 		  ConfigureTrace();
@@ -513,7 +559,15 @@ namespace Calico {
 			  PrintLine("[Script stopped----------]");
 			} else {
 			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-			  PrintLine(eo.FormatException(e));
+			  try
+			    {
+			      PrintLine(eo.FormatException(e));
+			    }
+			  catch
+			    {
+			      PrintLine(e.ToString());
+			    }
+
 			}
 			return false;
 		  }

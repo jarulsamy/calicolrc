@@ -1,0 +1,5 @@
+/home/keithohara/calico/languages/Python/obj/x86/Debug/.NETFramework,Version=v4.0.AssemblyAttribute.cs
+/home/keithohara/calico/languages/Python/CalicoPython.dll.mdb
+/home/keithohara/calico/languages/Python/CalicoPython.dll
+/home/keithohara/calico/languages/Python/obj/x86/Debug/CalicoPython.dll
+/home/keithohara/calico/languages/Python/obj/x86/Debug/CalicoPython.dll.mdb

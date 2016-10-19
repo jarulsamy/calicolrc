@@ -25,3 +25,12 @@
 /Users/douglasblank/Calico/Source/Calico/obj/x86/Debug/Calico.exe
 /Users/douglasblank/Calico/Source/Calico/obj/x86/Debug/Calico.exe.mdb
 /Users/keithohara/calico/Source/Calico/obj/x86/Debug/.NETFramework,Version=v4.0.AssemblyAttribute.cs
+/home/keithohara/calico/Source/Calico/obj/x86/Debug/.NETFramework,Version=v4.0.AssemblyAttribute.cs
+/home/keithohara/calico/Source/Calico/obj/x86/Debug/Calico.gtk-gui.gui.stetic
+/home/keithohara/calico/Source/Calico/obj/x86/Debug/Calico.abstract-butterfly-icon.gif
+/home/keithohara/calico/Source/Calico/obj/x86/Debug/Calico.icon-1.png
+/home/keithohara/calico/Source/Calico/obj/x86/Debug/Calico.icon-2.png
+/home/keithohara/calico/bin/Calico.exe.mdb
+/home/keithohara/calico/bin/Calico.exe
+/home/keithohara/calico/Source/Calico/obj/x86/Debug/Calico.exe
+/home/keithohara/calico/Source/Calico/obj/x86/Debug/Calico.exe.mdb
