@@ -763,7 +763,7 @@ public static class Graphics
     }
 
     [method: JigsawTab("G/Misc")]
-    public static void wait (double seconds)
+    public static void waitSeconds (double seconds)
     {
         if (seconds > 0) 
             Thread.Sleep ((int)(seconds * 1000));
@@ -2119,7 +2119,9 @@ public static class Graphics
             _canvas.need_to_draw_surface = true;
 
             if (mode == "physics") {
-                _canvas.world.Step ((float)simulationStepTime); 
+                lock(_canvas.world){
+                    _canvas.world.Step ((float)simulationStepTime);
+                }
                 time += simulationStepTime; 
                 // update the sprites
                 lock (_canvas.shapes) {
@@ -3584,7 +3586,7 @@ public static class Graphics
                         if (window != null) {
                             window.update();
                         }
-                        wait(updateTime);
+                        waitSeconds(updateTime);
                     }
                 }
                 //in case we are not at an integer coordinate
@@ -3603,7 +3605,7 @@ public static class Graphics
                         if (window != null) {
                             window.update();
                         }
-                        wait(updateTime);
+                        waitSeconds(updateTime);
                     }
                 }
                 //in case we are not at an integer coordinate
@@ -9685,7 +9687,7 @@ outer_loop : while ((c = iter.NextPixel()) != EOF)
                         window.step();
                     }
                     previous = shape;
-                    wait(delay);
+                    waitSeconds(delay);
                 }
             }
 
@@ -9703,7 +9705,7 @@ outer_loop : while ((c = iter.NextPixel()) != EOF)
                         window.step();
                     }
                     previous = shape;
-                    wait(delay);
+                    waitSeconds(delay);
                 }
             }
 
@@ -9733,7 +9735,7 @@ outer_loop : while ((c = iter.NextPixel()) != EOF)
                     if (window != null) {
                         shape.window.step();
                     }
-                    wait(delay);
+                    waitSeconds(delay);
                 }
                 //in case we are not at an integer coordinate
                 this.moveTo(x, y);

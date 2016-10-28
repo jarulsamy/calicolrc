@@ -22,9 +22,20 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Diagnostics; // StackTrace
+using System.Reflection; // MethodBase
+using System.Text; // String builder
+
+// One of these contains ExceptionHelpers
+using Microsoft.Scripting;
+using Microsoft.Scripting.Actions;
+using Microsoft.Scripting.Generation;
+using Microsoft.Scripting.Interpreter;
+using Microsoft.Scripting.Runtime;
+using Microsoft.Scripting.Utils;
+
 
 namespace Calico {
-
     public class Engine {
         public LanguageManager manager;
         public MainWindow calico;
@@ -312,72 +323,72 @@ namespace Calico {
                 PrintLine("Please activate and restart Calico to use this language.");
                 return null;
             }
-	    Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.AutoDetect;
-	    Microsoft.Scripting.Hosting.ScriptSource source;
-	    Microsoft.Scripting.Hosting.CompiledCode compiledCode;
-	    try {
-		source = engine.CreateScriptSourceFromString(text, sctype);
-		compiledCode = null;
-	    } catch (Exception e) {
-		Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-		PrintLine(eo.FormatException(e));
-		return null;
-	    }
-	    try {
-		if (compiler_options != null) {
-		    compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
-		} else {
-		    compiledCode = source.Compile();
-		}
-	    } catch {
-		// let's try to Execute, before giving up:
-		try { 
-		    sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
-		    source = engine.CreateScriptSourceFromString(text, sctype);
-		    if (compiler_options != null) {
-			compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
-		    } else {
-			compiledCode = source.Compile();
-		    }		 
-		} catch {
-		    try {
-			sctype = Microsoft.Scripting.SourceCodeKind.Statements;
-			source = engine.CreateScriptSourceFromString(text, sctype);
-			if (compiler_options != null) {
-			    compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
-			} else {
-			    compiledCode = source.Compile();
-			}
-		    } catch (Exception e) {
-			Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-			PrintLine(eo.FormatException(e));
-			return null;
-		    }
-		}
-	    }
-	    object retval = null;
-	    bool aborted = false;
-	    try {
-		if (manager != null && manager.UseSharedScope)
-		    retval = compiledCode.Execute(manager.scope);
-		else
-		    retval = compiledCode.Execute(scope);
-	    } catch (System.Threading.ThreadAbortException) {
-		System.Threading.Thread.Sleep(100);
-		try {
-		    System.Threading.Thread.ResetAbort();
-		} catch {
-		    // pass
-		}
-		aborted = true;
-	    } catch (Exception e) {
-		Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-		PrintLine(eo.FormatException(e));
-	    }
-	    if (aborted) {
-		System.Console.Error.WriteLine("Running script aborted!");
-	    }
-	    return retval;
+            Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.AutoDetect;
+            Microsoft.Scripting.Hosting.ScriptSource source;
+            Microsoft.Scripting.Hosting.CompiledCode compiledCode;
+            try {
+                source = engine.CreateScriptSourceFromString(text, sctype);
+                compiledCode = null;
+            } catch (Exception e) {
+                Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+                PrintLine(eo.FormatException(e));
+                return null;
+            }
+            try {
+                if (compiler_options != null) {
+                    compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
+                } else {
+                    compiledCode = source.Compile();
+                }
+            } catch {
+                // let's try to Execute, before giving up:
+                try { 
+                    sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
+                    source = engine.CreateScriptSourceFromString(text, sctype);
+                    if (compiler_options != null) {
+                        compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
+                    } else {
+                        compiledCode = source.Compile();
+                    }		 
+                } catch {
+                    try {
+                        sctype = Microsoft.Scripting.SourceCodeKind.Statements;
+                        source = engine.CreateScriptSourceFromString(text, sctype);
+                        if (compiler_options != null) {
+                            compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
+                        } else {
+                            compiledCode = source.Compile();
+                        }
+                    } catch (Exception e) {
+                        Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+                        PrintLine(eo.FormatException(e));
+                        return null;
+                    }
+                }
+            }
+            object retval = null;
+            bool aborted = false;
+            try {
+                if (manager != null && manager.UseSharedScope)
+                    retval = compiledCode.Execute(manager.scope);
+                else
+                    retval = compiledCode.Execute(scope);
+            } catch (System.Threading.ThreadAbortException) {
+                System.Threading.Thread.Sleep(100);
+                try {
+                    System.Threading.Thread.ResetAbort();
+                } catch {
+                    // pass
+                }
+                aborted = true;
+            } catch (Exception e) {
+                Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+                PrintLine(eo.FormatException(e));
+            }
+            if (aborted) {
+                System.Console.Error.WriteLine("Running script aborted!");
+            }
+            return retval;
         }
 
         public object TryEvaluate(string text) {
@@ -418,21 +429,6 @@ namespace Calico {
 		  return Execute(text, true);
         }
 		
-
-      public void FormatError(Exception e, string text,int type)
-      {
-	Console.WriteLine("Oops it looks like you have an error of the form ");
-	Console.WriteLine(e.GetType());
-	Console.WriteLine("You entered ");
-	Console.WriteLine(text);
-	Console.WriteLine("Did you mean BLANK?");
-	
-	Console.WriteLine("Called from ");
-	Console.WriteLine(type);
-	
-	
-
-      }
         public override bool Execute(string text, bool ok) {
 		  // This is called by RunInBackground() in the MainWindow
 		  //manager.calico.last_error = ""
@@ -460,9 +456,7 @@ namespace Calico {
 			  }
 			} catch (Exception e) {
 			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-
 			  PrintLine(eo.FormatException(e));
-			  //FormatError(e,text,1);
 			  
 			  try
 			    {
@@ -500,11 +494,34 @@ namespace Calico {
 			if (e.Message.Contains("Thread was being aborted")) {
 			  PrintLine("[Script stopped----------]");
 			} else {
-			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+              // Code copied from: /IronPython_Main/Languages/IronPython/IronPython/Runtime/Exceptions/PythonExceptions.cs
+              //StackTrace outermostTrace = new StackTrace(e);
+              //IList<StackTrace> otherTraces = ExceptionHelpers.GetExceptionStackTraces(e) ?? new List<StackTrace>();
+              //List<StackFrame> clrFrames = new List<StackFrame>();
 
-			  //if(e==null)
-			    //Console.WriteLine("Exception is null.");
-			  //Console.WriteLine(eo.FormatException(e));
+              //// Print other traces
+              //PrintLine("Printing other traces");
+              //foreach (StackTrace trace in otherTraces) {
+              //    clrFrames.AddRange(trace.GetFrames() ?? new StackFrame[0]);
+              //    PrintLine("Current frame count: "+ clrFrames.Count.ToString());
+              //}
+              //clrFrames.AddRange(outermostTrace.GetFrames() ?? new StackFrame[0]);
+              //PrintLine("Printing outermost frames");
+              //PrintLine(clrFrames.Count.ToString());
+
+              //foreach (StackFrame clrFrame in clrFrames) {
+              //    PrintLine("Stack frame: " + clrFrame.ToString());
+              //    MethodBase method = clrFrame.GetMethod();
+              //    if(method == null){
+              //        PrintLine("Found the null method");
+              //    }
+              //}
+
+              //PrintLine("");
+              //PrintLine(e.ToString());
+
+              //Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+			  PrintLine(FormatException(e));
 			  
 			  PrintLine(e.ToString());
 			  ////FormatError(e,text,2);
@@ -652,5 +669,92 @@ namespace Calico {
 	    }
 	    return retval;
 	}
+
+    // JH: This may make it easier to try different solution to the FormatException issue
+    public string FormatException(Exception exception) {
+        Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+        string result = "";
+        try{
+            result = eo.FormatException(exception);
+        } catch(ArgumentNullException newExeption) {
+            result = FormatStackTraces(exception);
+            result += exception.Message;
+        }
+        return result;
     }
+
+
+    private string FormatStackTraces(Exception e) {
+        StringBuilder result = new StringBuilder();
+        result.AppendLine("Traceback (most recent call last):");
+        DynamicStackFrame[] dfs = GetDynamicStackFrames(e);
+        for (int i = 0; i < dfs.Length; ++i) {
+            DynamicStackFrame frame = dfs[i];
+            result.AppendFormat("  at {0} in {1}, line {2}\n", frame.GetMethodName(), frame.GetFileName(), frame.GetFileLineNumber());
+        }
+
+        return result.ToString();
+    }
+
+
+    private static DynamicStackFrame[] GetDynamicStackFrames(Exception e) {
+        List<DynamicStackFrame> frames = GetFrameList(e);
+
+        if (frames == null) {
+            return new DynamicStackFrame[0];
+        }
+
+        frames = new List<DynamicStackFrame>(frames);
+        List<DynamicStackFrame> res = new List<DynamicStackFrame>();
+
+        // merge .NET frames w/ any dynamic frames that we have
+        try {
+            StackTrace outermostTrace = new StackTrace(e);
+            IList<StackTrace> otherTraces = ExceptionHelpers.GetExceptionStackTraces(e) ?? new List<StackTrace>();
+            List<StackFrame> clrFrames = new List<StackFrame>();
+
+            foreach (StackTrace trace in otherTraces) {
+                clrFrames.AddRange(trace.GetFrames() ?? new StackFrame[0]); // rare, sometimes GetFrames returns null
+            }
+            clrFrames.AddRange(outermostTrace.GetFrames() ?? new StackFrame[0]);    // rare, sometimes GetFrames returns null
+
+            int lastFound = 0;
+            foreach (StackFrame clrFrame in clrFrames) { // JH: removed the call to GroupStackFrames, which caused the crash 
+                MethodBase method = clrFrame.GetMethod();
+                if(method == null) continue; // JH: Added robustness; prevents crashing when the contains null objects
+
+                for (int j = lastFound; j < frames.Count; j++) {
+                    MethodBase other = frames[j].GetMethod();
+                    if(other == null) continue; // JH: Added robustness; prevents crashing when the contains null objects
+                    // method info's don't always compare equal, check based
+                    // upon name/module/declaring type which will always be a correct
+                    // check for dynamic methods.
+                    if (MethodsMatch(method, other)) {
+                        res.Add(frames[j]);
+                        frames.RemoveAt(j);
+                        lastFound = j;
+                        break;
+                    }
+                }
+            }
+        } catch (MemberAccessException) {
+            // can't access new StackTrace(e) due to security
+        }
+
+        // add any remaining frames we couldn't find
+        res.AddRange(frames);
+        return res.ToArray();
+    }
+
+    private static List<DynamicStackFrame> GetFrameList(Exception e) {
+        return e.Data[typeof(DynamicStackFrame)] as List<DynamicStackFrame>;
+    }
+
+    private static bool MethodsMatch(MethodBase method, MethodBase other) {
+            return (method.Module == other.Module &&
+                    method.DeclaringType == other.DeclaringType &&
+                    method.Name == other.Name);
+    }
+    }
+
 }
