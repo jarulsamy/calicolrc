@@ -76,7 +76,7 @@ namespace Calico {
             this.history = history;
             if (history.Count == 0 || GetCode(history[Last]) != "") {
                 history.Add("");
-            }ls
+            }
             position = history.Count - 1;
         }
 

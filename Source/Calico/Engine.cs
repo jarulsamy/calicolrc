@@ -460,6 +460,7 @@ namespace Calico {
 			  }
 			} catch (Exception e) {
 			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+
 			  PrintLine(eo.FormatException(e));
 			  //FormatError(e,text,1);
 			  
@@ -500,8 +501,13 @@ namespace Calico {
 			  PrintLine("[Script stopped----------]");
 			} else {
 			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-			  PrexcintLine(eo.FormatException(e));
-			  //FormatError(e,text,2);
+
+			  //if(e==null)
+			    //Console.WriteLine("Exception is null.");
+			  //Console.WriteLine(eo.FormatException(e));
+			  
+			  PrintLine(e.ToString());
+			  ////FormatError(e,text,2);
 			  try
 			    {
 			      if(OnErrorCallback != null)

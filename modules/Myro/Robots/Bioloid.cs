@@ -54,11 +54,14 @@ public class Bioloid: Myro.Robot
   
   //Size of outgoing packet 
   //that encapsulates a single byte/value
-  static byte OUT_PACKET_LENGTH = 6;
+  static byte PACKET_LENGTH = 6;
+  static byte IN_MESSAGE_LENGTH = 8;
+  static byte OUT_MESSAGE_LENGTH = 1;
+  
   //Size of incoming packet where 
   //each packet is an individual number  
-  static byte IN_PACKET_LENGTH = 8;
-  static byte PACKET_LENGTH = 8;
+  //static byte IN_PACKET_LENGTH = 6;
+  //static byte PACKET_LENGTH = 8;
 
 
 
@@ -158,7 +161,7 @@ public class Bioloid: Myro.Robot
       Console.WriteLine ("Able to talk to Bioloid.");
     else
       {
-	Console.WriteLine ("Unable to talk to Bioloid. Disconnecting serial communication.");
+	Console.WriteLine ("Unable to talk to Bioloid. Is the robot in 'PLAY' mode and did you hit start? \nDisconnecting serial communication.");
 	uninit();
       }
     
@@ -168,12 +171,12 @@ public class Bioloid: Myro.Robot
 	
 	// only ask to beep if there is a robot attached.
 	stop ();
-	setLED("foo",true);
+	setLEDAux(true);
 	beep (.1, 1);
 	beep (.1, 2);
-	beep (.1, 3);
-	beep (.1, 4);
-	beep (.1, 5);
+	//beep (.1, 3);
+	//beep (.1, 4);
+	//beep (.1, 5);
 	Console.WriteLine ("Hello, my name is Scorponok.");
       }
   }
@@ -193,13 +196,15 @@ public class Bioloid: Myro.Robot
     // echoed correctly (spaces) from the scribbler
     lock (this) 
       {//locks the robot
-	write_packet(Bioloid.HANDSHAKE1);
+	//write_packet(Bioloid.HANDSHAKE1);
 	lock (serial) 
 	  {
 	    try 
 	      {
 		//retval = ReadMessage();	      
-		retInt=(int)ReadMessage()[0];
+		//retInt=getByte(Bioloid.HANDSHAKE1,1);
+		retInt=(int)sendAndReceiveData(1,Bioloid.HANDSHAKE1)[0];//ReadMessage()[0];
+
 	      }
 	    catch 
 	      {
@@ -217,7 +222,9 @@ public class Bioloid: Myro.Robot
 	    //Complete the handshake by telling the robot
 	    //that we've received it's message
 	    lock(this)
-	      write_packet(Bioloid.HANDSHAKE3);
+	      {
+		write_packet(Bioloid.HANDSHAKE3);
+	      }
 	    lock(serial) serial.ReadTimeout = old;
 	    return true;
 	  }
@@ -262,16 +269,73 @@ public class Bioloid: Myro.Robot
     return ints;
   }
   
+  /*
   byte [] GetBytes (byte value, int bytes)
   {
-    byte [] retval = null;
+    byte [] retval = new byte[bytes];
     lock (this) { // lock robot
       write_packet (value);
       read (Bioloid.PACKET_LENGTH); // read the echo
-      retval = read (bytes);
+      retval = fitlerBytes(read (Bioloid.PACKET_LENTH*bytes));
+    }
+
+    return retval;
+  }
+
+  
+  int [] filterBytes(byte[] temp,int bytes)
+  {
+    int [] retval=new int[bytes];
+    byte lbyte;
+    byte hbyte;
+    for(int i=0;i<bytes;i++)
+      {
+	lbyte=temp[i*Biolod.PACKET_LENGTH+2];
+	hbyte=temp[i*Biolod.PACKET_LENGTH+4];
+	retval[i]=(int)((hbyte << 8) | lbyte);
+      }
+    return retval;
+  }
+*/
+
+  public List sendAndReceiveData (int bytes, params byte [] value)
+  {
+    List retval = new List ();
+    byte [] retvalBytes;
+    byte lbyte;
+    byte hbyte;
+    lock (this) { // lock robot
+      write_packet (value);
+      retvalBytes = read (Bioloid.PACKET_LENGTH*bytes);
+      
+    }
+
+    for(int i=0;i<bytes;i++)
+      {
+	lbyte=retvalBytes[i*Bioloid.PACKET_LENGTH+2];
+	hbyte=retvalBytes[i*Bioloid.PACKET_LENGTH+4];
+	retval.append ((int)((hbyte << 8) | lbyte));
+      }
+    return retval;
+
+  }
+  /*
+
+  List GetByte (byte[] value, int bytes)
+  {
+    List retval = new List ();
+    byte [] retvalBytes;
+    lock (this) { // lock robot
+      write_packet (value);
+      read (Bioloid.PACKET_LENGTH); // read the echo
+      retvalBytes = filterBytes(read (bytes));
+    }
+    for (int p = 0; p < retvalBytes.Length; p += 1) {
+      retval.append ((int)retvalBytes [p]);
     }
     return retval;
   }
+
   
   List GetInt (byte[] value, int bytes)
   {
@@ -291,6 +355,7 @@ public class Bioloid: Myro.Robot
     }
     return retval;
   }
+*/
   
   List GetWord (byte value, int bytes)
   {
@@ -309,20 +374,6 @@ public class Bioloid: Myro.Robot
   
   
   
-  List GetByte (byte[] value, int bytes)
-  {
-    List retval = new List ();
-    byte [] retvalBytes;
-    lock (this) { // lock robot
-      write_packet (value);
-      read (Bioloid.PACKET_LENGTH); // read the echo
-      retvalBytes = read (bytes);
-    }
-    for (int p = 0; p < retvalBytes.Length; p += 1) {
-      retval.append ((int)retvalBytes [p]);
-    }
-    return retval;
-  }
   
   
   public override void adjustSpeed ()
@@ -334,7 +385,11 @@ public class Bioloid: Myro.Robot
       else if(_lastTranslate != 0)
 	{
 	  if(_lastTranslate>0)
-	    write_packet(Bioloid.FORWARD);
+	    {
+	      write_packet(Bioloid.FORWARD);
+
+	    }
+
 	  else
 	    write_packet(Bioloid.BACKWARD);
 	  
@@ -342,9 +397,9 @@ public class Bioloid: Myro.Robot
       else
 	{
 	  if(_lastRotate<0)
-	    write_packet(Bioloid.TURNLEFT);
-	  else
 	    write_packet(Bioloid.TURNRIGHT);
+	  else
+	    write_packet(Bioloid.TURNLEFT);
 	  
 	}
   }
@@ -417,7 +472,7 @@ public class Bioloid: Myro.Robot
   }
   
   
-  public override void setLED (string position, object value)
+  public override void setLEDAux (object value)
   {
     if((bool)value)
       write_packet (Bioloid.SET_LED, 1);
@@ -447,7 +502,7 @@ public class Bioloid: Myro.Robot
     
     if(id>=1 && id<19)
       {
-	flush();
+	//flush();
 	write_packet((byte)(id+13), (byte)(value & 31),(byte)((value>>5) & 31));
       }
   }
@@ -472,12 +527,12 @@ public class Bioloid: Myro.Robot
   
   public override object getDistance (params object [] position)
   {
-    return get("distance");
+    return (int)get("distance");
   }
   
   public override object getButton (params object [] position)
   {
-    return get("button");
+    return (int)get("button");
   }
 
   public override List getServo(int id)
@@ -490,8 +545,16 @@ public class Bioloid: Myro.Robot
     if(id>=1 && id<19)
       {
 	//flush();
-	write_packet(Bioloid.GET_SERVO,(byte)(id+13));
-	List values=ReadMessage();
+	//write_packet(Bioloid.GET_SERVO,(byte)(id+13));
+	//List values=ReadMessage();
+	//Is moving
+	//Current position
+	//Load
+	//Temperature
+	//Torque - On/Off
+	//Voltage
+	//LED
+	List values=sendAndReceiveData(7,Bioloid.GET_SERVO,(byte)(id+13) );
 	return values;
       }
     return null;
@@ -500,6 +563,14 @@ public class Bioloid: Myro.Robot
   public override int getMicrophone()
   {
     return (int)get("mic");
+  }
+  public override int getOverLoad()
+  {
+    return (int)get("overload");
+  }
+  public override void reset()
+  {
+      write_packet(11);    
   }
   public override object get (string sensor="all")
   {
@@ -514,28 +585,36 @@ public class Bioloid: Myro.Robot
     object retval = null;
     sensor = sensor.ToLower ();
     
-    write_packet(Bioloid.GET_ALL);
-    List values=ReadMessage();
+    //write_packet(Bioloid.GET_ALL);
+    List values=sendAndReceiveData(4,Bioloid.GET_ALL);
+    //ReadMessage();
     if (sensor == "distance") 
       {
-	return values[1];
+	return values[0];
       }
     else if (sensor == "mic")
       {
-	return values[2];
+	return values[1];
 	
       }
     else if (sensor == "button")
       {
+	return values[2];
+	
+      }
+    else if (sensor == "overload")
+      {
 	return values[3];
 	
       }
+
     else if (sensor == "all") 
       {
 	
 	return dict ("distance", list ((int)values[1]),
 		     "mic", list ((int)values[2]),
-		     "button", list ((int)values[3]));
+		     "button", list ((int)values[3]),
+		     "overload", list ((int)values[4]));
       }
     else
       {
@@ -599,7 +678,7 @@ public class Bioloid: Myro.Robot
     byte b = 0;
     int counter = 0;
 
-    for(int i=0;i<Bioloid.IN_PACKET_LENGTH;i++)
+    for(int i=0;i<Bioloid.PACKET_LENGTH;i++)
       {
 	for (int j=0; j < 5; j++) 
 	  {
@@ -679,6 +758,24 @@ public class Bioloid: Myro.Robot
         return buffer;
     }
 
+  public int read_tx_5byte()
+  {
+    byte check1=read_byte();
+    byte check2=read_byte();
+    byte lbyte=read_byte();
+    byte lowNeg=read_byte();
+    byte hbyte=read_byte();
+    byte highNeg=read_byte();
+    
+    //lbyte+lowNeg should equal 255, same for hbyte and highNeg
+    //in the future need to check this condition and do something with it
+    //return (int)((hbyte << 8) | lbyte);
+
+    //Right now assume the sent data is smaller than a byte
+    return lbyte;
+    
+  }
+
     public byte [] try_read (int bytes)
     {
         byte[] buffer = new byte[bytes];
@@ -730,7 +827,7 @@ public class Bioloid: Myro.Robot
     {
       int packetInt=0;
       int servoPosition=0;
-      byte [] packetByte= new byte[Bioloid.OUT_PACKET_LENGTH]; 
+      byte [] packetByte= new byte[Bioloid.PACKET_LENGTH]; 
       byte upper=0;
       byte lower=0;
 
@@ -767,7 +864,7 @@ public class Bioloid: Myro.Robot
 	    {
 	      try 
 		{
-		  serial.Write (packetByte, 0, Bioloid.OUT_PACKET_LENGTH);		  
+		  serial.Write (packetByte, 0, Bioloid.PACKET_LENGTH);		  
 		}
 	      catch 
 		{
@@ -776,6 +873,7 @@ public class Bioloid: Myro.Robot
             }
 	}
 	
+      read (Bioloid.PACKET_LENGTH); // read the echo
     }
 
   //Simple test to see if I can send a properly formatted value to the bioloid
