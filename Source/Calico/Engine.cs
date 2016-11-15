@@ -527,6 +527,8 @@ namespace Calico {
               //Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
 			  PrintLine(FormatException(e));
 			  
+			  PrintLine(e.ToString());
+			  ////FormatError(e,text,2);
 			  try
 			    {
 			      if(OnErrorCallback != null)

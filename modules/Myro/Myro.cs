@@ -1808,6 +1808,15 @@ public static class Myro
 	    else
 		throw new Exception("Robot has not been initialized");
 	}
+
+	[method: JigsawTab("M/Movement")]
+	public static int getOverLoad ()
+	{
+	    if (robot != null) 
+		return robot.getOverLoad ();
+	    else
+		throw new Exception("Robot has not been initialized");
+	}
    
 	[method: JigsawTab("M/Movement")]
 	public static object getButton (params object [] position)
@@ -2607,6 +2616,16 @@ public static class Myro
 	    }
 	}
 
+	[method: JigsawTab("M/Actions")]
+	public static void setLEDAux (object value)
+	{
+	    if (robot != null) {
+		robot.setLEDAux (value);
+	    } else {
+		throw new Exception("Robot has not been initialized");
+	    }
+	}
+  
 	[method: JigsawTab("M/Actions")]
 	public static void setEchoMode (int value)
 	{
@@ -3955,7 +3974,13 @@ public static class Myro
 	    //Test
 	    return null;
 	  }
+	  public virtual int getOverLoad()
+	  {
+	    //Test
+	    return -1;
+	  }
     
+
 		public virtual object get (string sensor="all")
 		{
 			return null;
@@ -4117,6 +4142,10 @@ public static class Myro
 		public virtual void setLEDBack (object value)
 		{
 		}
+	  public virtual void setLEDAux(object value)
+	  {
+	    
+	  }
     
 		public virtual void setEchoMode (int value)
 		{
