@@ -123,6 +123,7 @@ namespace Calico {
         public System.IO.TextWriter stderr = System.Console.Error;
         public CustomStream cstdout;
         public CustomStream cstderr;
+        public IList<string> persistentPaths = new List<string>();
 
         public bool toolSwapped {
             get {
@@ -1429,6 +1430,38 @@ namespace Calico {
             return true;
         }
 
+	public void Dock(Gtk.ScrolledWindow window, string notebookName = "editor"){
+	  Invoke(delegate {
+	      //Gtk.Widget window = new Gtk.ScrolledWindow();
+
+	      Gtk.HBox tab_widget = new Gtk.HBox();
+	      Gtk.Label tab_label = new Gtk.Label();
+	      ((Gtk.HBox)tab_widget).Add(tab_label);
+	      
+	      Gtk.Button close_button = new Gtk.Button();
+	      Gtk.Image img = new Gtk.Image();
+	      close_button.Relief = Gtk.ReliefStyle.None;
+	      img = new Gtk.Image(Gtk.Stock.Close, Gtk.IconSize.Menu);
+	      close_button.Add(img);
+	      ((Gtk.HBox)tab_widget).Add(close_button);
+	      tab_label.TooltipText = "It would be a miracle if I saw this text!";
+	      tab_widget.ShowAll();
+	      tab_label.Text = "hi!";
+	      window.ShowAll();
+
+	      Gtk.Notebook notebook = selectNotebook(notebookName);
+	      int page_num = notebook.AppendPage(window, tab_widget);
+    
+	      notebook.SetTabReorderable(window, true);
+	      notebook.SetTabDetachable(window, true);                
+	      notebook.CurrentPage = page_num;
+	    }
+	    );
+	  //close_button.Clicked += delegate {
+	  //  TryToClose(page);
+	  //};
+	}
+
         public bool Open(string filename, string language) {
             // First, check for filename:N format:
             int lineno = 0;
@@ -1554,6 +1587,7 @@ namespace Calico {
             });
             ev.WaitOne();
         }
+
 
         public Document MakeDocument(string filename, string language) {
             Document document;
@@ -1742,13 +1776,13 @@ namespace Calico {
                 executeThread.Abort(new Microsoft.Scripting.KeyboardInterruptException(""));
                 executeThread = null;
                 manager["python"].engine.Execute(@"
-                        def _invoke():
-                        if _.robot:
-                        _.robot.flush()
-                        _.robot.stop()
-                        import Myro as _
-                        _.InvokeBlocking(_invoke)
-                        del _invoke, _
+def _invoke():
+  if _.robot:
+    _.robot.flush()
+    _.robot.stop()
+import Myro as _
+_.InvokeBlocking(_invoke)
+del _invoke, _
                         ");
             }
         }
@@ -2631,13 +2665,13 @@ namespace Calico {
                         //executeThread.Join(); don't really care, do we, if it completes?
                         executeThread = null;
                         manager ["python"].engine.Execute(@"
-                                def _invoke():
-                                if _.robot:
-                                _.robot.flush()
-                                _.robot.stop()
-                                import Myro as _
-                                _.InvokeBlocking(_invoke)
-                                del _invoke, _
+def _invoke():
+  if _.robot:
+    _.robot.flush()
+    _.robot.stop()
+import Myro as _
+_.InvokeBlocking(_invoke)
+del _invoke, _
                                 ");
                     }
                     Invoke(OnStopRunning);
@@ -2679,6 +2713,7 @@ namespace Calico {
                         System.IO.Directory.SetCurrentDirectory(dir);
                         }
                         if (CurrentLanguage != null && filename != null) {
+			    Invoke(OnStartRunning);
                             manager [CurrentLanguage].engine.ExecuteFile(filename); // not in GUI thread
                             Invoke(OnStopRunning);
                         }
@@ -3638,6 +3673,9 @@ namespace Calico {
                         public void ResetShell() {
                             manager.Setup(path);
                             manager.Start(path);
+			    foreach(string path in persistentPaths){
+			      manager.AddPath(path);
+			    }
                             manager.SetCalico(this);
                             configureIO();
 

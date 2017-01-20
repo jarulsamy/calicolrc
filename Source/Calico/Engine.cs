@@ -177,6 +177,10 @@ namespace Calico {
 		    {"ismagic", null}
 		};
 	}
+
+	public virtual void AddPath(string path){
+
+	}	
     }
     
     public class DLREngine : Engine {

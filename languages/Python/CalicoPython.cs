@@ -28,8 +28,9 @@ namespace CalicoPython
 	public class CalicoPythonEngine : DLREngine
 	{
 	
-	        static string trace_filename = null;
-	        static bool trace_pause = false;
+        static string trace_filename = null;
+        static bool trace_pause = false;
+        public IronPython.Runtime.PythonDictionary persistentVariables =  new IronPython.Runtime.PythonDictionary();
 
 		public CalicoPythonEngine (LanguageManager manager) : base(manager)
 		{
@@ -68,6 +69,12 @@ namespace CalicoPython
 			}
 			engine.SetSearchPaths (paths);
 		}
+
+		public override void AddPath(string path){
+		  ICollection<string > paths = engine.GetSearchPaths ();
+		  paths.Add (Path.GetFullPath(path));
+		  engine.SetSearchPaths (paths);
+		}	
 		
 		public override Microsoft.Scripting.Hosting.CompiledCode SetDLRSpecificCompilerOptions(
 					  Microsoft.Scripting.Hosting.ScriptSource source, 

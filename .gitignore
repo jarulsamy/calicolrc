@@ -1,9 +1,10 @@
 *.dll
 *.exe
 *.exe.mdb
+*.dll.mdb
 experimental
 mymake.sh
-Calico.csproj.FilesWrittenAbsolute.txt
+*.csproj.FilesWrittenAbsolute.txt
 *~
 .DS_STORE
 
