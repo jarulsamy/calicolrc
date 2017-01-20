@@ -1321,8 +1321,17 @@ def getpager():
     """Decide what method to use for paging through text."""
     if type(sys.stdout) is not types.FileType:
         return plainpager
-    if not sys.stdin.isatty() or not sys.stdout.isatty():
+    #JH: Hack to make this work with ironpython which, when asked
+    #isatty() will throw a SystemError: GetConsoleMode
+    try:
+        if not sys.stdin.isatty() or not sys.stdout.isatty():
+            return plainpager
+    except SystemError:
         return plainpager
+    #JH: Hack end
+    #JH: Original code:
+    #if not sys.stdin.isatty() or not sys.stdout.isatty():
+    #   return plainpager
     if 'PAGER' in os.environ:
         if sys.platform == 'win32': # pipes completely broken in Windows
             return lambda text: tempfilepager(plain(text), os.environ['PAGER'])

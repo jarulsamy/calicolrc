@@ -1524,14 +1524,29 @@ public class SimScribbler : Myro.Robot
 			      }
 			    else
 			      {
-				simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {  
-				    this.readings [key] = hit;
+				//this.readings [key] = 1.0;
+				float currentValue = 1.0f;
+				simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {
+				    //Console.WriteLine("Raycast result:");
+				    //Console.WriteLine(key);
+				    //Console.WriteLine(hit);
+				    //float currentReading = this.readings[key];
+				    if(hit < currentValue){
+				      currentValue = hit;
+				    }
+				    //if(hit < (float)(this.readings[key])){
+				    //  this.readings [key] = hit;
+				    //}
 				    return 1; 
 				  }, 
 				  Graphics.Vector (((float)p1.x) / MeterInPixels, 
 						   ((float)p1.y) / MeterInPixels), 
 				  Graphics.Vector (((float)p2.x) / MeterInPixels, 
 						   ((float)p2.y) / MeterInPixels));
+				//Console.WriteLine("Raycast final result:");
+				//Console.WriteLine(key);
+				//Console.WriteLine(currentValue);
+				this.readings [key] = currentValue;
 				
 			      }
 			}

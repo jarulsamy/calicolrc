@@ -1,6 +1,6 @@
-Calico.app: make-macpack
+Calico.app:
 	rm -rf Calico.app
-	macpack -m:console -a:bin/Calico.exe \
+	macpack -m:console -a:calico.exe \
 		-n:Calico \
 		-r:/Library/Frameworks/Mono.framework/Versions/Current/lib \
 		-r:bin/Antlr3.Runtime.dll \

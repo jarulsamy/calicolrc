@@ -1,8 +1,11 @@
 
 all: ../Graphics.dll ../Shapes.dll
 
-../Graphics.dll: Graphics.cs 
-	MONO_PATH=../../bin dmcs -sdk:4 -target:library \
+../Graphviz4Net.dll: Graphviz4Net.Core/bin/Release/Graphviz4Net.dll
+	cp Graphviz4Net.Core/bin/Release/Graphviz4Net.dll ../Graphviz4Net.dll
+
+../Graphics.dll: Graphics.cs ../Graphviz4Net.dll
+	MONO_PATH=../../bin dmcs -debug -sdk:4 -target:library \
 		Graphics.cs  \
 		-lib:../../bin \
 		-lib:../ \
@@ -20,7 +23,7 @@ all: ../Graphics.dll ../Shapes.dll
 		-pkg:gtk-dotnet-2.0 \
 		-out:../Graphics.dll
 
-../Shapes.dll: Shapes.cs Graphics.cs 
+../Shapes.dll: Shapes.cs ../Graphics.dll 
 	MONO_PATH=../../bin dmcs -sdk:4 -target:library \
 		Shapes.cs  \
 		-lib:../../bin \

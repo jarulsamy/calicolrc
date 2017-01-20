@@ -1,5 +1,6 @@
 BUILD=2.0.0-alpha
-MONO_PATH=bin:/usr/lib/cli/pango-sharp-2.0:/usr/lib/mono/2.0/:/usr/lib/mono/gtk-sharp-2.0/:/usr/lib/cli/gtk-sharp-2.0/:/usr/lib/cli/gdk-sharp-2.0/:/usr/lib/cli/glib-sharp-2.0
+MONO_PATH=bin:/usr/lib/cli/pango-sharp-2.0:/usr/lib/mono/2.0/:/usr/lib/mono/gtk-sharp-2.0/:/usr/lib/cli/gtk-sharp-2.0/:/usr/lib/cli/gdk-sharp-2.0/:/usr/lib/cli/glib-sharp-2.0:/Users/joost/Programs/calicolrc/modules/Physics/bin/Debug
+LD_LIBRARY_PATH=/Users/joost/Programs/calicolrc/modules/Physics/bin/Debug/
 
 all: 	bin/Calico.exe \
 	modules/Graphics.dll \
@@ -28,7 +29,13 @@ languages/Jigsaw/CalicoJigsaw.dll: languages/Jigsaw/CalicoJigsaw.cs languages/Ji
 languages/Jigsaw/Jigsaw.exe: 
 	cd languages/Jigsaw && xbuild Jigsaw.sln
 
-modules/Graphics.dll: modules/Graphics/Graphics.cs modules/FarseerPhysics.dll 
+modules/Events.dll: modules/Events/Events.cs
+	cd modules/Events && make
+
+modules/JigsawAttributes.dll: languages/Jigsaw/Jigsaw/JigsawAttributes.dll
+	cp languages/Jigsaw/Jigsaw/JigsawAttributes.dll modules/JigsawAttributes.dll
+
+modules/Graphics.dll: modules/Graphics/Graphics.cs modules/FarseerPhysics.dll modules/JigsawAttributes.dll modules/Events.dll 
 	cd modules/Graphics && make
 
 modules/Shapes.dll: modules/Graphics/Graphics.cs modules/Graphics/Shapes.cs 
@@ -37,7 +44,7 @@ modules/Shapes.dll: modules/Graphics/Graphics.cs modules/Graphics/Shapes.cs
 modules/Reflection.dll: modules/Reflection/Reflection.cs 
 	cd modules/Reflection && make
 
-modules/Myro.dll: modules/Myro/Myro.cs modules/Graphics.dll modules/FarseerPhysics.dll
+modules/Myro.dll: modules/Myro/Myro.cs modules/Graphics.dll modules/FarseerPhysics.dll 
 	cd modules/Myro && make
 
 modules/Conx.dll: modules/Conx/Conx.cs
@@ -57,17 +64,23 @@ modules/Kinect.dll: modules/Kinnect/Kinnect.cs
 
 modules/FarseerPhysics.dll: 
 	cd modules/Physics && xbuild "Farseer Physics.csproj"
+	cp modules/Physics/bin/Release/FarseerPhysics.dll modules
 
+# JH: This Makefile is unable to rebuild most modules
+# SO IT SHOULD NOT DELETE THEM!
+# Also, the find command doesn't work
+# rm -f modules/*.dll
+# rm -rf `find | grep "~$$"`
 clean:
-	rm -f modules/*.dll
 	rm -f bin/Calico.exe
 	rm -f languages/Calico*.dll
 	rm -f Calico-*.zip
-	rm -rf `find | grep "~$$"`
 
-build: clean-build all 
-	cd ..; zip -r trunk/Calico-$(BUILD).zip trunk/* -x \*/.svn/\* \*~ 
-	scp Calico-$(BUILD).zip dblank@myro.roboteducation.org:html/download/unstable/
+# JH: I have 100% confidance that accidentaly calling make build
+# Would result in absolute disaster, so I removed it.
+#build: clean-build all 
+#	cd ..; zip -r trunk/Calico-$(BUILD).zip trunk/* -x \*/.svn/\* \*~ 
+#	scp Calico-$(BUILD).zip dblank@myro.roboteducation.org:html/download/unstable/
 
 .MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) ctags-recursive \
 	install-am install-strip tags-recursive

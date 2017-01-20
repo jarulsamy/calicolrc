@@ -1308,6 +1308,1031 @@ public static class Graphics
         }
     }
 
+    //******************************************************//
+    //JH: Huge experiment start                             //
+    //******************************************************//
+    public class DockableWindowClass : Gtk.ScrolledWindow
+    {
+        internal Canvas _canvas;
+        public Gtk.Widget widget;
+        internal bool _dirty = false;
+        private bool timer_running = false;
+        private DateTime last_update = new DateTime (2000, 1, 1);
+        internal double _update_interval = .1; // how often, in seconds, to update
+        public List onClickCallbacks = new List ();
+        public List onMouseMovementCallbacks = new List ();
+        public List onMouseUpCallbacks = new List ();
+        public List onKeyPressCallbacks = new List ();
+        public List onKeyReleaseCallbacks = new List ();
+	public List onConfigureCallbacks = new List ();
+        public PythonTuple _lastClick;
+        public string _lastKey = "";
+        public string _mouseState = "up";
+        public bool _keyState = false;
+        public Dictionary<string, bool> _keyStates;
+        ManualResetEvent _lastClickFlag = new ManualResetEvent (false);
+        public double time = 0.0;
+        public double simulationStepTime = 0.01;
+        public string state = "init";
+        public bool requestStop = false;
+        Gtk.ScrolledWindow _scrolledWindow = null;
+        public int _cacheHeight;
+        public int _cacheWidth;
+        public bool HandleKeyPressOnShape = false;
+        public bool HandleKeyReleaseOnShape = false;
+
+        public DockableWindowClass (string title, Gtk.Widget widget) : base()
+        {
+            this.widget = widget;
+            Add(widget);
+            DeleteEvent += OnDelete;
+            if (gui_thread_id != -1)
+                ShowAll();
+        }
+
+        public DockableWindowClass (string title="Calico Graphics",
+                int width=300, 
+                int height=300) : base()
+        {
+            _canvas = new Canvas ("auto", width, height);
+            _cacheWidth = width;
+            _cacheHeight = height;
+            
+	    //JH: These do not exist in ScrolledWindow
+            //AllowGrow = true;
+            //AllowShrink = true;
+
+            _keyStates = new Dictionary<string, bool>();
+
+	    //JH: This does not exist
+            //SetDefaultSize (width, height);
+            AddEvents ((int)Gdk.EventMask.ButtonPressMask);
+            AddEvents ((int)Gdk.EventMask.ButtonReleaseMask);
+            AddEvents ((int)Gdk.EventMask.PointerMotionMask);
+            AddEvents ((int)Gdk.EventMask.KeyReleaseMask);
+            AddEvents ((int)Gdk.EventMask.KeyPressMask);
+            // ------------------------------------------
+            ButtonPressEvent += HandleClickCallbacks;
+            ButtonReleaseEvent += HandleMouseUpCallbacks;
+            ButtonPressEvent += saveLastClick;
+            ButtonReleaseEvent += updateMouseState;
+            MotionNotifyEvent += HandleMouseMovementCallbacks;
+            KeyPressEvent += HandleKeyPressCallbacks;
+            KeyReleaseEvent += HandleKeyReleaseCallbacks;
+            // ------------------------------------------
+            //ConfigureEvent += configureEventBefore;
+            DeleteEvent += OnDelete;
+            Add(_canvas);
+            if (gui_thread_id != -1)
+                ShowAll ();
+        }
+
+        /*
+           new public void BeginResizeDrag (Gdk.WindowEdge edge, int button, int root_x, int root_y, uint timestamp) {
+           base.BeginResizeDrag(edge, button, root_x, root_y, timestamp);
+           _cacheWidth = width;
+           _cacheHeight = height;
+           }
+           */
+	protected override bool OnConfigureEvent(Gdk.EventConfigure args)
+	{
+	  base.OnConfigureEvent(args);
+	  foreach (Func<Gdk.EventConfigure,object> function in onConfigureCallbacks) {
+	    try {
+	      Invoke (delegate {
+		  Func<Gdk.EventConfigure,object > f = (Func<Gdk.EventConfigure,object>)function;
+		  f (args);
+		});
+	    } catch (Exception e) {
+	      Console.Error.WriteLine ("Error in OnConfigureEvent function");
+	      Console.Error.WriteLine (e.Message);
+	    }        
+	  }
+	  return true;
+	}
+
+        public string title {
+            get {
+                string retval = "";
+                InvokeBlocking( delegate {
+		    //JH: Title does not exist
+		    //retval = Title;
+                    retval = "not available";
+                });
+                return retval;
+            }
+            set {
+                InvokeBlocking( delegate {
+		    //JH: Title does not exist
+                    //Title = value;
+                });
+            }
+        }
+
+        public bool isRealized() {
+            bool retval = false;
+            InvokeBlocking( delegate {
+                retval = IsRealized;
+            });
+            return retval;
+        }
+
+        public bool isVisible() {
+            bool retval = false;
+            InvokeBlocking( delegate {
+                retval = Visible;
+            });
+            return retval;
+        }
+
+        public void removeTagged(String tag) {
+            List to_remove = new List ();
+            lock (_canvas.shapes) {
+                foreach (Shape shape in _canvas.shapes) {
+                    if (shape.tag == tag)
+                        to_remove.Add (shape);
+                }
+                foreach (Shape shape in to_remove) {
+                    _canvas.shapes.Remove (shape);
+                }
+            }
+        }
+
+        public void saveToSVG(string filename) {
+            canvas.saveToSVG(filename);
+        }
+
+        public Calico.Representation toSVG() {
+            return canvas.toSVG();
+        }
+
+        public void addScrollbars(int width, int height) {
+            InvokeBlocking( delegate {
+                if (Child == _canvas) {
+                    Remove(_canvas);
+                    _scrolledWindow = new Gtk.ScrolledWindow();
+                    Add(_scrolledWindow);
+                    _scrolledWindow.Add (_canvas);
+                    _canvas.resize(width, height);
+                    _scrolledWindow.Show();
+                } else {
+                    _canvas.resize(width, height);
+                }
+            });
+        }
+
+        public void reset ()
+        {
+            reset (true);
+        }
+
+        public void reset (bool redraw)
+        {
+            Invoke (delegate {
+                /* bad, causes lock up in IPython... don't know why
+                   _canvas.surface = new Cairo.ImageSurface (Cairo.Format.Argb32, width, height);
+                   _canvas.need_to_draw_surface = false;
+                   */
+                mode = "auto";
+                //Resize (width, height); // removed because of scrollbar issue
+                timer_running = false;
+                last_update = new DateTime (2000, 1, 1);
+                _update_interval = .1; // how often, in seconds, to update
+                onClickCallbacks = new List ();
+                onMouseMovementCallbacks = new List ();
+                onMouseUpCallbacks = new List ();
+                onKeyPressCallbacks = new List ();
+                onKeyReleaseCallbacks = new List ();
+		onConfigureCallbacks = new List ();
+
+                // clear listeners:
+                clearListeners();
+                _lastKey = "";
+                _mouseState = "up";
+                _keyState = false;
+                _keyStates = new Dictionary<string, bool>();
+                time = 0.0;
+                simulationStepTime = 0.01;
+                state = "init";
+                lock (_canvas.shapes)
+                    _canvas.shapes.Clear ();
+                foreach (Gtk.Widget child in _canvas.Children) {
+                    _canvas.Remove (child);
+                }
+                Gdk.Color bg = new Gdk.Color (242, 241, 240);
+                _canvas.ModifyBg (Gtk.StateType.Normal, bg);
+                if (redraw)
+                    QueueDraw();
+            });
+        }
+
+        public void resetBlocking(bool redraw)
+        {
+            InvokeBlocking (delegate {
+                /* bad, causes lock up in IPython... don't know why
+                   _canvas.surface = new Cairo.ImageSurface (Cairo.Format.Argb32, width, height);
+                   _canvas.need_to_draw_surface = false;
+                   */
+                mode = "auto";
+                //Resize (width, height); // removed because of scrollbar issue
+                timer_running = false;
+                last_update = new DateTime (2000, 1, 1);
+                _update_interval = .1; // how often, in seconds, to update
+                onClickCallbacks = new List ();
+                onMouseMovementCallbacks = new List ();
+                onMouseUpCallbacks = new List ();
+                onKeyPressCallbacks = new List ();
+                onKeyReleaseCallbacks = new List ();
+		onConfigureCallbacks = new List ();
+
+                // clear listeners:
+                clearListeners();
+                _lastKey = "";
+                _mouseState = "up";
+                _keyState = false;
+                _keyStates = new Dictionary<string, bool>();
+                time = 0.0;
+                simulationStepTime = 0.01;
+                state = "init";
+                lock (_canvas.shapes)
+                    _canvas.shapes.Clear ();
+                foreach (Gtk.Widget child in _canvas.Children) {
+                    _canvas.Remove (child);
+                }
+                Gdk.Color bg = new Gdk.Color (242, 241, 240);
+                _canvas.ModifyBg (Gtk.StateType.Normal, bg);
+                if (redraw)
+                    QueueDraw();
+            });
+        }
+
+        public Gtk.ScrolledWindow ScrolledWindow {
+            get { return _scrolledWindow; }
+        }
+
+        public Microsoft.Xna.Framework.Vector2 gravity {
+            get {
+                return canvas.world.Gravity;
+            }
+            set {
+                canvas.world.Gravity = value;
+            }
+        }
+
+        public void close ()
+        {
+            Invoke (delegate { 
+                Hide ();
+            });
+        }
+
+        public void setBackground (Color color)
+        {
+            Invoke( delegate {
+                _canvas.setBackground(color);
+            });
+        }
+
+        public Gdk.Drawable getDrawable ()
+        {
+            return GdkWindow;
+        }
+
+        private void OnDelete (object obj, Gtk.DeleteEventArgs args)
+        {
+	  //JH: Title does not exist
+          //  _windows.Remove (Title);
+        }
+
+        public int getWidth ()
+        {
+            int _width = 0, _height = 0;
+            InvokeBlocking( delegate {
+		//JH: GetSize does not exist
+                //this.GetSize (out _width, out _height);
+            });
+            return _width;
+        }
+
+        public int _getWidth ()
+        {
+            int _width = 0, _height = 0;
+	    //JH: GetSize does not exist
+            //this.GetSize (out _width, out _height);
+            return _width;
+        }
+
+        public int getHeight ()
+        {
+            int _width = 0, _height = 0;
+            InvokeBlocking( delegate {
+		//JH: GetSize does not exist
+                //this.GetSize (out _width, out _height);
+            });
+            return _height;
+        }
+
+        public int _getHeight ()
+        {
+            int _width = 0, _height = 0;
+	    //JH: GetSize does not exist
+            //this.GetSize (out _width, out _height);
+            return _height;
+        }
+
+        public GraphicsRepresentation draw (Shape shape)
+        {
+            shape.draw (this);
+            return new GraphicsRepresentation(this);
+        }
+
+        public GraphicsRepresentation drawAt (Shape shape, IList iterable)
+        {
+            shape.moveTo(System.Convert.ToDouble(iterable[0]), 
+                    System.Convert.ToDouble(iterable[1]));
+            shape.draw (this);
+            return new GraphicsRepresentation(this);
+        }
+
+        public void undraw (Shape shape)
+        {
+            shape.undraw ();
+        }
+
+        public void stackOnTop (Shape shape)
+        {
+            // last drawn is on top
+            if (_canvas.shapes.Contains (shape)) {
+                Invoke( delegate {
+                    lock (_canvas.shapes) {
+                        _canvas.shapes.Remove (shape);
+                        _canvas.shapes.Insert (_canvas.shapes.Count, shape);
+                    }
+                });
+                QueueDraw ();
+            }
+        }
+
+        public void stackOnBottom (Shape shape)
+        {
+            // first drawn is on bottom
+            if (_canvas.shapes.Contains (shape)) {
+                Invoke( delegate {
+                    lock (_canvas.shapes) {
+                        _canvas.shapes.Remove (shape);
+                        _canvas.shapes.Insert (0, shape);
+                    }
+                    QueueDraw ();
+                });
+            } else {
+                throw new Exception ("shape not drawn on window");
+            }
+        }
+
+        void saveLastClick (object obj, Gtk.ButtonPressEventArgs args)
+        {
+            _mouseState = "down";
+            _lastClick = PyTuple (args.Event.X, args.Event.Y);
+            _lastClickFlag.Set ();
+        }
+
+        void updateMouseState (object obj, Gtk.ButtonReleaseEventArgs args)
+        {
+            _mouseState = "up";
+        }
+
+        private void HandleMouseMovementCallbacks (object obj,
+                Gtk.MotionNotifyEventArgs args)
+        {
+            Event evt = new Event (args);
+            foreach (Func<object,Event,object> function in onMouseMovementCallbacks) {
+                try {
+                    Invoke (delegate {
+                        Func<object,Event,object > f = (Func<object,Event,object>)function;
+                        f (obj, evt);
+                    });
+                } catch (Exception e) {
+                    Console.Error.WriteLine ("Error in onMouseMove function");
+                    Console.Error.WriteLine (e.Message);
+                }        
+            }
+        }
+
+        public void clearListeners() {
+            MotionNotifyEvent -= HandleMouseMovementOnShape;
+            ButtonPressEvent -= HandleClickOnShape;
+            ButtonReleaseEvent -= HandleMouseUpOnShape;
+            HandleKeyPressOnShape = false;
+            HandleKeyReleaseOnShape = false;
+        }
+
+        public void listen(string evt) {
+            if (evt == "mouse-motion") {
+                // remove if already there:
+                MotionNotifyEvent -= HandleMouseMovementOnShape;
+                MotionNotifyEvent += HandleMouseMovementOnShape;
+            } else if (evt == "mouse-press") {
+                // remove if already there:
+                ButtonPressEvent -= HandleClickOnShape;
+                ButtonPressEvent += HandleClickOnShape;
+            } else if (evt == "mouse-release") {
+                // remove if already there:
+                ButtonReleaseEvent -= HandleMouseUpOnShape;
+                ButtonReleaseEvent += HandleMouseUpOnShape;
+            } else if (evt == "key-press") {
+                HandleKeyPressOnShape = true;
+            } else if (evt == "key-release") {
+                HandleKeyReleaseOnShape = true;
+            } else {
+                throw new Exception(String.Format("invalid event '{0}': use 'mouse-motion', 'mouse-press', 'mouse-release', 'key-press', or 'key-release'.", evt));
+            }
+        }
+
+        public void HandleMouseMovementOnShape (object obj,
+                Gtk.MotionNotifyEventArgs args)
+        {
+            lock (canvas.shapes) {
+                foreach (Shape shape in canvas.shapes) {
+                    if (shape.hit(args.Event.X, args.Event.Y)) {
+                        Event evt = new Event (args);
+                        evt.obj = shape;
+                        EventsManager.publish(evt);
+                    }
+                }
+            }
+        }
+
+        public void HandleClickOnShape (object obj, Gtk.ButtonPressEventArgs args)
+        {
+            lock (canvas.shapes) {
+                foreach (Shape shape in canvas.shapes) {
+                    if (shape.hit(args.Event.X, args.Event.Y)) {
+                        Event evt = new Event (args);
+                        evt.obj = shape;
+                        EventsManager.publish(evt);
+                    }
+                }
+            }
+        }
+
+        public void HandleMouseUpOnShape (object obj,
+                Gtk.ButtonReleaseEventArgs args) {
+            lock (canvas.shapes) {
+                foreach (Shape shape in canvas.shapes) {
+                    if (shape.hit(args.Event.X, args.Event.Y)) {
+                        Event evt = new Event (args);
+                        evt.obj = shape;
+                        EventsManager.publish(evt);
+                    }
+                }
+            }
+        }
+
+        private void HandleClickCallbacks (object obj,
+                Gtk.ButtonPressEventArgs args)
+        {
+            Event evt = new Event (args);
+            foreach (Func<object,Event,object> function in onClickCallbacks) {
+                try {
+                    Invoke (delegate {
+                        Func<object,Event,object > f = (Func<object,Event,object>)function;
+                        f (obj, evt);
+                    });
+                } catch (Exception e) {
+                    Console.Error.WriteLine ("Error in onMouseDown function");
+                    Console.Error.WriteLine (e.Message);
+                }        
+            }
+        }
+
+        private void HandleMouseUpCallbacks (object obj,
+                Gtk.ButtonReleaseEventArgs args)
+        {
+            Event evt = new Event (args);
+            foreach (Func<object,Event,object> function in onMouseUpCallbacks) {
+                try {
+                    Invoke (delegate {
+                        Func<object,Event,object > f = (Func<object,Event,object>)function;
+                        f (obj, evt);
+                    });
+                } catch (Exception e) {
+                    Console.Error.WriteLine ("Error in onMouseUp function");
+                    Console.Error.WriteLine (e.Message);
+                }        
+            }
+        }
+
+        [GLib.ConnectBefore]
+        private void HandleKeyPressCallbacks (object obj,
+                Gtk.KeyPressEventArgs args)
+        {
+            _lastKey = args.Event.Key.ToString ();
+            _keyState = true;
+            _keyStates[_lastKey] = true;
+            if (HandleKeyPressOnShape){
+                lock (canvas.shapes) {
+                    foreach (Shape shape in canvas.shapes) {
+                        Event evt = new Event (args);
+                        evt.obj = shape;
+                        EventsManager.publish(evt);
+                    }
+                }
+            }
+            Event evt2 = new Event (args);
+            foreach (Func<object,Event,object> function in onKeyPressCallbacks) {
+                try {
+                    Invoke (delegate {
+                        Func<object,Event,object > f = (Func<object,Event,object>)function;
+                        f (obj, evt2);
+                    });
+                } catch (Exception e) {
+                    Console.Error.WriteLine ("Error in onKeypress function");
+                    Console.Error.WriteLine (e.Message);
+                }        
+            }
+	    args.RetVal = true;
+        }
+
+        private void HandleKeyReleaseCallbacks (object obj,
+                Gtk.KeyReleaseEventArgs args)
+        {
+            _keyState = false;
+            string lastKey = args.Event.Key.ToString ();
+            _keyStates[lastKey] = false;
+            if (HandleKeyReleaseOnShape){
+                lock (canvas.shapes) {
+                    foreach (Shape shape in canvas.shapes) {
+                        Event evt = new Event (args);
+                        evt.obj = shape;
+                        EventsManager.publish(evt);
+                    }
+                }
+            }
+            Event evt2 = new Event (args);
+            foreach (Func<object,Event,object> function in onKeyReleaseCallbacks) {
+                try {
+                    Invoke (delegate {
+                        Func<object,Event,object > f = (Func<object,Event,object>)function;
+                        f (obj, evt2);
+                    });
+                } catch (Exception e) {
+                    Console.Error.WriteLine ("Error in onKeyRelease function");
+                    Console.Error.WriteLine (e.Message);
+                }        
+            }
+        }
+
+        public void onClick (Func<object,Event,object> function)
+        {
+            onClickCallbacks.Add (function);
+        }
+
+        public void onMouseDown (Func<object,Event,object> function)
+        {
+            onClickCallbacks.Add (function);
+        }
+
+        public void onConfigure (Func<Gdk.EventConfigure,object> function)
+        {
+            onConfigureCallbacks.Add (function);
+        }
+
+        public void run (Func<object> function)
+        {
+            try {
+                // FIXME: Understand why:
+                // This does not like a Gtk Application Invoke here
+                function ();
+            } catch (Exception e) {
+                if (!e.Message.Contains ("Thread was being aborted")) {
+                    Console.Error.WriteLine ("Error in run function");
+                    Console.Error.WriteLine (e.Message);
+                }
+            }
+        }
+
+        public void run () {
+            run(.01);
+        }
+
+        public void run (double step_time)
+        {
+            requestStop = false;
+            while (! requestStop) {
+                try {
+                    step (step_time);
+                } catch {
+                    requestStop = true;
+                }
+            }
+        }
+
+        public void onMouseUp (Func<object,Event,object> function)
+        {
+            onMouseUpCallbacks.Add (function);
+        }
+
+        public void onMouseMovement (Func<object,Event,object> function)
+        {
+            onMouseMovementCallbacks.Add (function);
+        }
+
+        public void onKeyPress (Func<object,Event,object> function)
+        {
+            onKeyPressCallbacks.Add (function);
+        }
+
+        public void onKeyRelease (Func<object,Event,object> function)
+        {
+            onKeyReleaseCallbacks.Add (function);
+        }
+
+        public double updateInterval {
+            get {
+                return _update_interval;
+            }
+            set {
+                _update_interval = value;
+            }
+        }
+
+        public double getUpdateInterval ()
+        {
+            return updateInterval;
+        }
+        public void setUpdateInterval (double u)
+        {
+            updateInterval = u;
+        }
+
+        public int height {
+            get {
+                int _width = 0, _height = 0;
+                InvokeBlocking( delegate {
+                    if (Child == _canvas || Child == widget) {
+		      //JH: GetSize does not exit
+                      //this.GetSize (out _width, out _height);
+                    } else { // scrollbars
+                        _height = _canvas.height;
+                    }
+                });
+                return _height;
+            }
+        }
+
+        public int _height {
+            get {
+                int _width = 0, _height = 0;
+                if (Child == _canvas || Child == widget) {
+		  //JH: GetSize does not exit
+		  //this.GetSize (out _width, out _height);
+                } else { // scrollbars
+                    _height = _canvas.height;
+                }
+                return _height;
+            }
+        }
+
+        public int width {
+            get {
+                int _width = 0, _height = 0;
+                InvokeBlocking( delegate {
+                    if (Child == _canvas || Child == widget) {
+		      //JH: GetSize does not exit
+                      //this.GetSize (out _width, out _height);
+                    } else { // scrollbars
+                        _width = _canvas.width;
+                    }
+                });
+                return _width;
+            }
+        }
+
+        public int _width {
+            get {
+                int _width = 0, _height = 0;
+                if (Child == _canvas || Child == widget) {
+		  //JH: GetSize does not exit
+                  //  this.GetSize (out _width, out _height);
+                } else { // scrollbars
+                    _width = _canvas.width;
+                }
+                return _width;
+            }
+        }
+
+        public Canvas getCanvas ()
+        {
+            return _canvas;
+        }
+
+        public Canvas canvas {
+            get {
+                return _canvas;
+            }
+        }
+
+        public PythonTuple getMouse ()
+        {
+            _lastClickFlag.Reset();
+            _lastClickFlag.WaitOne ();
+            return _lastClick;
+        }
+
+        public PythonTuple getMouseNow ()
+        {
+            int x = 0, y = 0;
+            InvokeBlocking (delegate { 
+                GetPointer (out x, out y);
+            });
+            return PyTuple (x, y);
+        }
+
+        public string getMouseState ()
+        {
+            return _mouseState;
+        }
+
+        public string getLastKey ()
+        {
+            string lk = _lastKey;
+            //_lastKey = ""; //consume the event
+            return lk;
+        }
+
+        public bool getKeyPressed ()
+        {
+            return _keyState;
+        }
+
+        public bool getKeyPressed (string key)
+        {
+            return _keyStates.ContainsKey(key) ? _keyStates[key]: false;
+        }
+
+        public new void Show ()
+        {
+            Invoke (delegate { 
+                DateTime now = DateTime.Now;
+                last_update = now;
+                _dirty = false;
+                if (gui_thread_id != -1)
+                base.Show (); 
+            });
+        }
+
+        public new void ShowAll ()
+        {
+            Invoke (delegate { 
+                DateTime now = DateTime.Now;
+                last_update = now;
+                _dirty = false;
+                if (gui_thread_id != -1)
+                base.ShowAll (); 
+            });
+        }
+
+        public new void Resize (int width, int height)
+        {
+            _canvas.resize (width, height);
+            Invoke (delegate {
+		//JH: Resize does not exist
+                //base.Resize (width, height);
+            });
+        }
+
+        public void need_to_redraw ()
+        { 
+            _dirty = true;
+            DateTime now = DateTime.Now;
+            // diff is TimeSpan
+            if ((now - last_update).TotalMilliseconds < (updateInterval * 1000)) {
+                // pass, too soon!
+                // but we need to make sure that someone checks
+                // in the future. 
+                if (timer_running) {
+                    // already one running!
+                    // we'll just wait
+                } else {
+                    // let's spawn one to check in 100 ms or so
+                    timer_running = true;
+                    GLib.Timeout.Add ((uint)(updateInterval * 1000), 
+                            new GLib.TimeoutHandler (_redraw_now));
+                }
+            } else { // it is not too soon
+                if (timer_running) {
+                    // no need to start another
+                } else {
+                    // let's spawn one to check in 100 ms or so
+                    timer_running = true;
+                    GLib.Timeout.Add ((uint)(updateInterval * 1000), 
+                            new GLib.TimeoutHandler (_redraw_now));
+                }
+            }
+        }
+
+        private bool _redraw_now ()
+        {
+            DateTime now = DateTime.Now;
+            if (_dirty) {
+                last_update = now;
+                _dirty = false;
+                QueueDraw (); // gtk
+            }
+            timer_running = false;
+            return false; // return true to try again
+        }
+
+        public void setMode(String mode) {
+            this.mode = mode;
+        }
+
+        public string getMode ()
+        {
+            return _canvas.mode;
+        }
+
+        public string mode {
+            get {
+                return _canvas.mode;
+            }
+            set {
+                if (value == "auto" || value == "manual" || value == "physics" || 
+                        value == "bitmap" || value == "bitmapmanual" || value == "physicsmanual")
+                    canvas.mode = value;
+                else
+                    throw new Exception ("window mode must be 'auto', 'manual', 'bitmap', 'bitmapmanual', 'physicsmanual', or 'physics'");
+            }
+        }
+
+        public void updateNow ()
+        { // Window
+            need_to_redraw ();
+            // Manual call to update, let's update then:
+            while (Gtk.Application.EventsPending())
+                Gtk.Application.RunIteration ();
+        }
+
+        public void update ()
+        { // Window
+            if (mode == "manual" || mode == "bitmapmanual" || mode == "physicsmanual") {
+                _canvas.need_to_draw_surface = true;
+                Invoke( delegate {
+                    QueueDraw ();
+                });
+            } else {
+                need_to_redraw ();
+            }
+        }
+
+        public void step ()
+        { // Window
+            step (0);
+        }
+
+        public void step (double step_time)
+        { // Window, in seconds
+            // Same as update, but will make sure it 
+            // doesn't update too fast.
+            // handle physics
+            if (_canvas == null) {
+                requestStop = true;
+                return;
+            }
+            // kjo
+            _canvas.need_to_draw_surface = true;
+
+            if (mode == "physics" || mode == "physicsmanual") {
+                lock(_canvas.world){
+                    _canvas.world.Step ((float)simulationStepTime);
+                }
+                time += simulationStepTime; 
+                // update the sprites
+                lock (_canvas.shapes) {
+                    foreach (Shape shape in _canvas.shapes) {
+                        shape.updateFromPhysics ();
+                    }
+                }
+            }
+
+            //JH: Patching the framerate limiter start
+            // and now the update
+            DateTime now = DateTime.Now;
+            // diff is TimeSpan, converted to seconds:
+            double diff = (now - last_update).TotalMilliseconds / 1000.0;
+            double remain = step_time - diff; //JH: calculate the remaining time
+            while (remain > 0) { // seconds   //JH: spin on remaining time
+                //System.Console.Write(".");
+                //System.Console.Write("spinning...");
+                if (remain > 0.01) {
+                    //JH: wait based on the remaining time!
+                    //JH: Previous bug made it such that the longer the update took, the longer you would have to wait!
+                    //System.Console.Write("sleeping...");
+                    Thread.Sleep ((int)(remain / 2 * 1000));
+                } //Else just spin-lock
+                //System.Console.Write("+");
+
+                //JH: Recalculate the differences
+                now = DateTime.Now;
+                diff = (now - last_update).TotalMilliseconds / 1000.0;
+                remain = step_time - diff;
+            }
+            //System.Console.Write("Waited: ");
+            //System.Console.Write(diff.ToString());
+            //System.Console.Write("\n");
+            last_update = DateTime.Now;
+            //JH: Patching the framerate limiter end
+
+            if (mode == "bitmapmanual") {
+                using (Cairo.Context g = new Cairo.Context(_canvas.finalsurface)) {
+                    g.Save ();
+                    g.Operator = Cairo.Operator.Source;
+                    g.SetSourceSurface (_canvas.surface, 0, 0);
+                    g.Paint ();
+                    g.Restore ();
+                }      
+            }      
+
+            _dirty = false;
+            InvokeBlocking (delegate { 
+                try {
+                    QueueDraw ();
+                    GdkWindow.ProcessUpdates (true);
+                    //System.Console.Write("!");
+                } catch {
+                    requestStop = true;
+                }
+            });
+        }
+
+        public void refresh()
+        { // Window, in seconds
+            // Same as update, but will make sure it 
+            // doesn't update too fast.
+            // handle physics
+            // kjo
+            _canvas.need_to_draw_surface = true;
+
+            if (mode == "physics" || mode == "physicsmanual") {
+                // update the sprites
+                lock (_canvas.shapes) {
+                    foreach (Shape shape in _canvas.shapes) {
+                        shape.updateFromPhysics ();
+                    }
+                }
+            }
+            if (mode == "bitmapmanual") {
+                using (Cairo.Context g = new Cairo.Context(_canvas.finalsurface)) {
+                    g.Save ();
+                    g.Operator = Cairo.Operator.Source;
+                    g.SetSourceSurface (_canvas.surface, 0, 0);
+                    g.Paint ();
+                    g.Restore ();
+                }      
+            }      
+
+            _dirty = false;
+            InvokeBlocking (delegate { 
+                try {
+                    QueueDraw ();
+                    GdkWindow.ProcessUpdates (true);
+                    //System.Console.Write("!");
+                } catch {
+                    requestStop = true;
+                }
+            });
+        }
+
+        public override string ToString ()
+        {
+	  //JH: Title does not exist
+          //  return String.Format ("<Window (title='{0}',width={1},height={2})>", 
+          //          Title, width, height);
+	  return String.Format ("<Window (title='{0}',width={1},height={2})>", 
+				"not available", width, height);
+        }
+        public string __repr__ ()
+        {
+            return ToString();
+        }
+
+        public IDictionary<string, string> GetRepresentations() {
+            IDictionary<string, string> retval = new Picture (this).GetRepresentations();
+            retval["text/plain"] =  this.ToString();
+            IDictionary<string, string> svg_rep = toSVG().GetRepresentations();
+            foreach(KeyValuePair<string,string> kvp in (IDictionary<string,string>)svg_rep) {
+                retval[kvp.Key] = kvp.Value;
+            }
+            return retval;
+        }
+    }
+
+    //**********************************************************//
+    //JH: Huge experiment end                                   //
+    //**********************************************************//
+
+
+
     public class WindowClass : Gtk.Window
     {
         internal Canvas _canvas;
@@ -1321,6 +2346,7 @@ public static class Graphics
         public List onMouseUpCallbacks = new List ();
         public List onKeyPressCallbacks = new List ();
         public List onKeyReleaseCallbacks = new List ();
+	public List onConfigureCallbacks = new List ();
         public PythonTuple _lastClick;
         public string _lastKey = "";
         public string _mouseState = "up";
@@ -1386,6 +2412,22 @@ public static class Graphics
            _cacheHeight = height;
            }
            */
+	protected override bool OnConfigureEvent(Gdk.EventConfigure args)
+	{
+	  base.OnConfigureEvent(args);
+	  foreach (Func<Gdk.EventConfigure,object> function in onConfigureCallbacks) {
+	    try {
+	      Invoke (delegate {
+		  Func<Gdk.EventConfigure,object > f = (Func<Gdk.EventConfigure,object>)function;
+		  f (args);
+		});
+	    } catch (Exception e) {
+	      Console.Error.WriteLine ("Error in OnConfigureEvent function");
+	      Console.Error.WriteLine (e.Message);
+	    }        
+	  }
+	  return true;
+	}
 
         public string title {
             get {
@@ -1476,6 +2518,47 @@ public static class Graphics
                 onMouseUpCallbacks = new List ();
                 onKeyPressCallbacks = new List ();
                 onKeyReleaseCallbacks = new List ();
+		onConfigureCallbacks = new List ();
+
+                // clear listeners:
+                clearListeners();
+                _lastKey = "";
+                _mouseState = "up";
+                _keyState = false;
+                _keyStates = new Dictionary<string, bool>();
+                time = 0.0;
+                simulationStepTime = 0.01;
+                state = "init";
+                lock (_canvas.shapes)
+                    _canvas.shapes.Clear ();
+                foreach (Gtk.Widget child in _canvas.Children) {
+                    _canvas.Remove (child);
+                }
+                Gdk.Color bg = new Gdk.Color (242, 241, 240);
+                _canvas.ModifyBg (Gtk.StateType.Normal, bg);
+                if (redraw)
+                    QueueDraw();
+            });
+        }
+
+        public void resetBlocking(bool redraw)
+        {
+            InvokeBlocking (delegate {
+                /* bad, causes lock up in IPython... don't know why
+                   _canvas.surface = new Cairo.ImageSurface (Cairo.Format.Argb32, width, height);
+                   _canvas.need_to_draw_surface = false;
+                   */
+                mode = "auto";
+                //Resize (width, height); // removed because of scrollbar issue
+                timer_running = false;
+                last_update = new DateTime (2000, 1, 1);
+                _update_interval = .1; // how often, in seconds, to update
+                onClickCallbacks = new List ();
+                onMouseMovementCallbacks = new List ();
+                onMouseUpCallbacks = new List ();
+                onKeyPressCallbacks = new List ();
+                onKeyReleaseCallbacks = new List ();
+		onConfigureCallbacks = new List ();
 
                 // clear listeners:
                 clearListeners();
@@ -1818,6 +2901,11 @@ public static class Graphics
             onClickCallbacks.Add (function);
         }
 
+        public void onConfigure (Func<Gdk.EventConfigure,object> function)
+        {
+            onConfigureCallbacks.Add (function);
+        }
+
         public void run (Func<object> function)
         {
             try {
@@ -2074,10 +3162,10 @@ public static class Graphics
             }
             set {
                 if (value == "auto" || value == "manual" || value == "physics" || 
-                        value == "bitmap" || value == "bitmapmanual")
+		    value == "bitmap" || value == "bitmapmanual" || value == "physicsmanual")
                     canvas.mode = value;
                 else
-                    throw new Exception ("window mode must be 'auto', 'manual', 'bitmap', 'bitmapmanual', or 'physics'");
+                    throw new Exception ("window mode must be 'auto', 'manual', 'bitmap', 'bitmapmanual', 'physicsmanual', or 'physics'");
             }
         }
 
@@ -2091,7 +3179,7 @@ public static class Graphics
 
         public void update ()
         { // Window
-            if (mode == "manual" || mode == "bitmapmanual") {
+            if (mode == "manual" || mode == "bitmapmanual" || mode == "physicsmanual") {
                 _canvas.need_to_draw_surface = true;
                 Invoke( delegate {
                     QueueDraw ();
@@ -2118,7 +3206,7 @@ public static class Graphics
             // kjo
             _canvas.need_to_draw_surface = true;
 
-            if (mode == "physics") {
+            if (mode == "physics" || mode == "physicsmanual") {
                 lock(_canvas.world){
                     _canvas.world.Step ((float)simulationStepTime);
                 }
@@ -2189,7 +3277,7 @@ public static class Graphics
             // kjo
             _canvas.need_to_draw_surface = true;
 
-            if (mode == "physics") {
+            if (mode == "physics" || mode == "physicsmanual") {
                 // update the sprites
                 lock (_canvas.shapes) {
                     foreach (Shape shape in _canvas.shapes) {
@@ -2489,15 +3577,15 @@ public static class Graphics
             }
             set {
                 if (value == "manual" || value == "auto" || value == "physics" || 
-                        value == "bitmap" || value == "bitmapmanual") {
+                        value == "bitmap" || value == "bitmapmanual" || value == "physicsmanual") {
                     _mode = value;
 
-                    if (value == "physics")
+                    if (value == "physics" || value == "physicsmanual")
                         initPhysics ();
                     resetSurfaces ();
 
                 } else
-                    throw new Exception ("canvas mode must be 'manual', 'auto', 'bitmap', 'bitmapmanual' or 'physics'");
+                    throw new Exception ("canvas mode must be 'manual', 'auto', 'bitmap', 'bitmapmanual', 'physicsmanual' or 'physics'");
             }
         }
 
@@ -2617,6 +3705,11 @@ public static class Graphics
         public Point center;
         public string tag;
         public WindowClass window;
+
+	//JH: This is part of the great experiment
+	public DockableWindowClass dockableWindow;
+
+
         public Shape drawn_on_shape = null;
         internal double _rotation; // internally radians
         internal double _scaleFactor; // percent
@@ -2660,6 +3753,18 @@ public static class Graphics
             _density = 1.0f;
             _bodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
         }
+
+	//JH: This is part of the great experiment
+	public Canvas getCanvas(){
+	  if(window != null){
+	    return window._canvas;
+	  } else if(dockableWindow != null){
+	    return dockableWindow._canvas;
+	  } else {
+	    return null;
+	  }
+	}
+
 
         // FIXME: points are in relative to center coordinates
         // FIXME: set x,y of points should go from screen_coords to relative
@@ -3090,7 +4195,7 @@ public static class Graphics
             g.Scale (_scaleFactor, _scaleFactor);
         }
 
-        private Point _getTrueScreenPoint (IList iterable)
+        public Point getTrueScreenPoint (IList iterable)
         {
             // p is relative to center, rotate, and scale; returns
             // screen coordinate of p
@@ -3245,6 +4350,12 @@ public static class Graphics
                             window.getMode () == "physics")
                         window.update ();
                     // else, manually call step()
+                } else if (dockableWindow is DockableWindowClass) {
+                    if (dockableWindow.getMode () == "auto" ||
+                            dockableWindow.getMode () == "bitmap" || 
+                            dockableWindow.getMode () == "physics")
+                        dockableWindow.update ();
+                    // else, manually call step()
                 }
             }
 
@@ -3259,7 +4370,7 @@ public static class Graphics
                     //JH: Old code
                     //p1 = points [0];
                     //JH: New code start
-                    p1 = _getTrueScreenPoint(points [0]);
+                    p1 = getTrueScreenPoint(points [0]);
                     //JH: New code end
                     for (int i=1; i<=points.Length; i++) {
                         //JH: Fixing hit to actually work on screen coordinates
@@ -3277,7 +4388,7 @@ public static class Graphics
                         //    }
                         //}
                         //JH: New code start
-                        p2 = _getTrueScreenPoint(points [i % points.Length]);
+                        p2 = getTrueScreenPoint(points [i % points.Length]);
                         if (p.y > (Math.Min (p1.y, p2.y))) {
                             if (p.y <= (Math.Max (p1.y, p2.y))) {
                                 if (p.x <= (Math.Max (p1.x, p2.x))) {
@@ -3717,6 +4828,43 @@ public static class Graphics
                 draw(win);
                 return new GraphicsRepresentation(win);
             }
+
+	    //JH: Part of the great experiment
+            public GraphicsRepresentation draw (DockableWindowClass win)
+            { // Shape
+                InvokeBlocking( delegate {
+                    // Add this shape to the Canvas list.
+                    if (win.IsRealized) {
+                        if (win.mode == "bitmap" || win.mode == "bitmapmanual") {
+                            win.canvas.need_to_draw_surface = true;
+                            using (Cairo.Context g = new Cairo.Context(win.canvas.surface)) {
+                                render (g);
+                            }
+                        } else {
+                            lock (win.getCanvas().shapes) {
+                                if (! win.getCanvas ().shapes.Contains (this)) {
+                                    win.getCanvas ().shapes.Add (this);
+                                    //System.Console.Error.WriteLine("Added to win!");
+                                }
+                            }
+                            // Make sure each subshape is associated with this window
+                            // so QueueDraw will redraw:
+                            lock (shapes) {
+                                foreach (Shape shape in shapes) {
+                                    shape.dockableWindow = win;
+                                }
+                            }
+                        }
+                        dockableWindow = win;
+                        if (win.getCanvas().world != null) {
+                            addToPhysics ();
+                        }
+                        QueueDraw ();
+                    }
+                });
+                return new GraphicsRepresentation(win);
+            }
+	    //JH: part of the greate experiment
 
             public GraphicsRepresentation draw (WindowClass win)
             { // Shape
@@ -4207,11 +5355,17 @@ public static class Graphics
                 double total_height = 0.0;
                 double max_width = 0.0;
                 foreach (string line in text.Split('\n')) {
-                    TextExtents te = g.TextExtents(line);
-                    if (total_height != 0.0)
-                        total_height += te.Height * .5;
-                    total_height += te.Height;
-                    max_width = Math.Max(te.Width, max_width);
+		  //JH: Experiment which might make the text look better
+		  if (total_height != 0.0)
+		    total_height += fontSize*0.25; //Line skip
+		  total_height += fontSize;
+
+		  //JH: Pre-experiment code commented out below
+                    /* TextExtents te = g.TextExtents(line); */
+                    /* if (total_height != 0.0) */
+                    /*     total_height += te.Height * .5; */
+                    /* total_height += te.Height; */
+                    /* max_width = Math.Max(te.Width, max_width); */
                 }
                 // Draw the text:
                 foreach (string line in text.Split('\n')) {
@@ -4226,14 +5380,24 @@ public static class Graphics
                     if (yJustification == "center") {
                         p.y = points [0].y - total_height / 2 - te.YBearing;
                     } else if (yJustification == "bottom") {
-                        p.y = points [0].y - total_height + te.Height;
+		      //JH: Experiment which might make the text look better
+		      p.y = points [0].y - total_height + fontSize;
+		      //JH: Pre-experiment code commented out below
+		      /* p.y = points [0].y - total_height + te.Height; */		      
                     } else if (yJustification == "top") {
-                        p.y = points [0].y + te.Height;
+		      //JH: Experiment which might make the text look better
+		      p.y = points [0].y + fontSize;
+		      //JH: Pre-experiment code commented out below
+		      //p.y = points [0].y + te.Height;
+	
                     }
                     temp = screen_coord (p);
                     g.MoveTo (temp.x, temp.y - line_offset);
                     g.ShowText(line);
-                    line_offset += te.YBearing * 1.5;
+		    //JH: Experiment which might make the text look better
+		    line_offset += fontSize * -1.25;
+		    //JH: Pre-experiment code commented out below
+                    /* line_offset += te.YBearing * 1.5; */
                 }
                 foreach (Shape shape in shapes) {
                     shape.render (g);
@@ -4920,6 +6084,58 @@ public static class Graphics
                     _cacheHeight = _pixbuf.Height;
                 });
             }
+
+	    //JH: This is part of the big experiment
+            public Picture (DockableWindowClass dockableWindow) : this(true)
+            {
+	      Canvas canvas = dockableWindow.canvas;
+                InvokeBlocking (delegate {                    
+                    int w = canvas.width;
+                    int h = canvas.height;
+                    Gdk.Pixmap pixmap = new Gdk.Pixmap(null, w, h, 24);
+                    using (Cairo.Context g = Gdk.CairoHelper.Create(pixmap))
+                {        
+                    // draw background                                                    
+                    Rectangle background = new Rectangle(new Point(0,0), new Point(w, h));
+                    if (canvas.background_color != null) {
+                        background.color = canvas.background_color;
+                    }
+                    else {
+                        // default background of white?
+                        background.color = new Color(255, 255, 255, 255);
+                    }
+                background.render(g);
+
+                if (canvas.mode == "bitmap" || canvas.mode == "bitmapauto"){
+                    Cairo.ImageSurface surface = canvas.finalsurface;
+                    g.SetSourceSurface(surface, 0, 0);
+                    g.Paint();                        
+                }
+                else{
+                    foreach (Shape shape in canvas.shapes) {
+                        shape.render (g);
+                    }                                                
+                }
+                }
+
+                Gdk.Colormap colormap = pixmap.Colormap;
+
+                _pixbuf = Gdk.Pixbuf.FromDrawable(pixmap, colormap,
+                        0, 0, 0, 0, w, h);
+
+                if (!_pixbuf.HasAlpha) {
+                    _pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
+                }
+                set_points (new Point (0, 0), 
+                        new Point (_pixbuf.Width, 0),
+                        new Point (_pixbuf.Width, _pixbuf.Height), 
+                        new Point (0, _pixbuf.Height));         
+                _cacheWidth = _pixbuf.Width;
+                _cacheHeight = _pixbuf.Height;
+                //if (on_mac()) swap_red_blue();
+                });
+            }
+	    //JH: This is part of the big experiment
 
             public Picture (Gtk.Window gtk_window) : this(true)
             {
@@ -7240,6 +8456,11 @@ public static class Graphics
 
         public class Frame : Shape
         {
+            public Frame()
+            {
+                // Only used by ClippedFrame, since we don't want to create useless points.
+            }
+
             public Frame (int x, int y)
             {
                 set_points (new Point (x, y));
@@ -7248,6 +8469,60 @@ public static class Graphics
             public Frame (IList iterable)
             {
                 set_points (new Point (iterable));
+            }
+
+            public override void updateFromPhysics(){
+                foreach(Shape shape in shapes) {
+                    shape.updateFromPhysics();
+                }
+            }
+
+        }
+
+
+        public class ClippedFrame : Frame
+        {
+            public ClippedFrame (IList iterable1, IList iterable2)
+            {
+	      points = new Point[4];
+	      points[0] = new Point (iterable1 [0], iterable1 [1]);
+	      points[1] = new Point (iterable2 [0], iterable1 [1]);
+	      points[2] = new Point (iterable2 [0], iterable2 [1]);
+	      points[3] = new Point (iterable1 [0], iterable2 [1]);
+                /* set_points (new Point (iterable1 [0], iterable1 [1]), */
+                /*         new Point (iterable2 [0], iterable1 [1]), */
+                /*         new Point (iterable2 [0], iterable2 [1]), */
+                /*         new Point (iterable1 [0], iterable2 [1])); */
+            }
+
+            public double width {
+                get { return points[2].x - points[0].x;}
+            }
+
+            public double height {
+                get { return points[2].y - points[0].y;}
+            }
+
+
+            public override void render(Cairo.Context context){
+                context.Save();
+		Point temp;
+		temp = screen_coord (center);
+                context.Translate (temp.x, temp.y);
+                context.Rotate (_rotation);
+                context.Scale (_scaleFactor, _scaleFactor);
+                context.NewPath();
+                context.MoveTo(points[0].x, points[0].y);
+                for(int i=1; i<points.Length; ++i){
+                    context.LineTo(points[i].x, points[i].y);
+                }
+                context.Clip();
+		foreach (Shape shape in shapes) {
+                    shape.render (context);
+                    shape.updateGlobalPosition (context);
+                }
+                //base.render(context);
+                context.Restore();
             }
         }
 
@@ -9578,9 +10853,11 @@ outer_loop : while ((c = iter.NextPixel()) != EOF)
             public void addCostume(string cname, Shape shape) {
                 // if not pre-existing, adds a new costume name and costume, or
                 // if costume name already exists, adds a new frame
-                if (this.shape != null) {
-                    this.shape.undraw();
-                }
+
+	        // JH: Do not undraw, that is highly inefficient
+                //if (this.shape != null) {
+                //    this.shape.undraw();
+                //}
                 this.shape = shape;
                 shape.draw(this);
                 costume = cname;
@@ -9592,9 +10869,11 @@ outer_loop : while ((c = iter.NextPixel()) != EOF)
 
             public void addFrame(Shape shape) {
                 // adds a new frame to the current costume
-                if (this.shape != null) {
-                    this.shape.undraw();
-                }
+
+	        // JH: Do not undraw, that is highly inefficient
+                //if (this.shape != null) {
+                //    this.shape.undraw();
+                //}
                 this.shape = shape;
                 this.shape.x = 0;
                 this.shape.y = 0;
@@ -9640,12 +10919,16 @@ outer_loop : while ((c = iter.NextPixel()) != EOF)
                 } else {
                     costume = name;
                     frame = 0;
-                    shape.undraw();
+		    // JH: do not undraw
+                    //shape.undraw();
                     shape = costumes[name][frame];
-                    if (window != null) {
-                        shape.draw(this);
-                        window.step();
-                    }
+
+		    // JH: do not draw either
+		    // Also, don't step the window here
+                    //if (window != null) {
+                    //    shape.draw(this);
+                    //    window.step();
+                    //}
                 }
             }
 
@@ -9815,6 +11098,10 @@ outer_loop : while ((c = iter.NextPixel()) != EOF)
 
         public class GraphicsRepresentation {
             WindowClass window = null;
+
+	    //JH: part of the great experiment
+	    DockableWindowClass dockableWindow = null;
+
             Canvas canvas = null;
             Shape shape = null;
             string text = null;
@@ -9825,6 +11112,12 @@ outer_loop : while ((c = iter.NextPixel()) != EOF)
             public GraphicsRepresentation(WindowClass window) {
                 this.window = window;
             }
+
+	    //JH: part of the great experiment
+	    public GraphicsRepresentation(DockableWindowClass window) {
+                this.dockableWindow = window;
+            }
+	    //JH: part of the great experiment
 
             public GraphicsRepresentation(string text) {
                 this.text = text;

@@ -66,6 +66,18 @@ namespace Calico {
 
         }
 
+	public void AddPath(string path){
+            foreach (string language in getLanguages()) {
+                if (languages[language].engine != null) {
+                    try {
+                        languages[language].engine.AddPath(path);
+                    } catch (Exception e) {
+                        Console.Error.WriteLine("Failed to set path for language: {0} {1}", language, e.Message);
+                    }
+                }
+            }
+	}
+
         public Language this[string name] {
             get {return languages[name];}
             set {languages[name] = value;}
