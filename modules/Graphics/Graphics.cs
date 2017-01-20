@@ -2864,24 +2864,63 @@ public static class Graphics
 
         public void connect (string signal, Func<object,Event,object> function)
         {
-            if (signal == "click") {
+            if (signal == "click") 
+	      {
                 window.onMouseDown (delegate (object obj, Event evt) {
                     if (hit (evt.x, evt.y)) {
-                        try {
-                            Invoke (delegate {
-                                function (obj, evt);
-                            });
-                        } catch (Exception e) {
-                            Console.Error.WriteLine ("Error in connect('click') function");
-                            Console.Error.WriteLine (e.Message);
-                        }        
-                        return true;
+		      try {
+			Invoke (delegate {
+			    function (obj, evt);
+			  });
+		      } catch (Exception e) {
+			Console.Error.WriteLine ("Error in connect('click') function");
+			Console.Error.WriteLine (e.Message);
+		      }        
+		      return true;
                     }
                     return false;
-                });
-            } else {
+		  });
+	      } 
+            else if (signal == "release") 
+	      {
+                window.onMouseUp (delegate (object obj, Event evt) {
+                    if (hit (evt.x, evt.y)) {
+		      try {
+			Invoke (delegate {
+			    function (obj, evt);
+			  });
+		      } catch (Exception e) {
+			Console.Error.WriteLine ("Error in connect('release') function");
+			Console.Error.WriteLine (e.Message);
+		      }        
+		      return true;
+                    }
+                    return false;
+		  });
+	      } 
+            else if (signal == "move") 
+	      {
+                window.onMouseMovement (delegate (object obj, Event evt) {
+                    if (hit (evt.x, evt.y)) {
+		      try {
+			Invoke (delegate {
+			    function (obj, evt);
+			  });
+		      } catch (Exception e) {
+			Console.Error.WriteLine ("Error in connect('move') function");
+			Console.Error.WriteLine (e.Message);
+		      }        
+		      return true;
+                    }
+                    return false;
+		  });
+	      } 
+
+
+	    else 
+	      {
                 throw new Exception ("invalid signal for this object");
-            }
+	      }
         }
 
         public double bounce {
@@ -4076,6 +4115,7 @@ public static class Graphics
             {
                 _fontFace = fontFace;
             }
+
 
             public string getXJustification()
             {
