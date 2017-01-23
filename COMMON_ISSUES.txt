@@ -1,0 +1,73 @@
+#####################################################
+#### File does not contain valid metadata error #####
+#####################################################
+
+To fix an error that states:
+
+error CS0009: Metadata file `/Library/Frameworks/Mono.framework/Libraries/pkgconfig/../../lib/mono/gtk-sharp-2.0/pango-sharp.dll' does not contain valid metadata
+
+Or something similar, you can get some extra error information by trying to install the package into the GAC with:
+
+gacutil -i /Library/Frameworks/Mono.framework/Libraries/pkgconfig/../../lib/mono/gtk-sharp-2.0/pango-sharp.dll
+(Note: this does try to install the library, so if there are no errors, you may end up with an installed library)
+
+If the error is something like:
+
+joost-mb-v1:calicolrc joost$ gacutil -i /Library/Frameworks/Mono.framework/Libraries/pkgconfig/../../lib/mono/gtk-sharp-2.0/pango-sharp.dll
+
+Unhandled Exception:
+System.IO.DirectoryNotFoundException: Could not find a part of the path "/Library/Frameworks/Mono.framework/lib/mono/gtk-sharp-2.0/pango-sharp.dll".
+  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) <0x1a2b6e0 + 0x0021d> in <filename unknown>:0 
+  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share) <0x1a2b290 + 0x00051> in <filename unknown>:0 
+  at (wrapper remoting-invoke-with-check) System.IO.FileStream:.ctor (string,System.IO.FileMode,System.IO.FileAccess,System.IO.FileShare)
+  at System.IO.File.OpenRead (System.String path) <0x1a28770 + 0x0004c> in <filename unknown>:0 
+  at Mono.Security.StrongName.Verify (System.String fileName) <0x6d4798 + 0x00017> in <filename unknown>:0 
+  at Mono.Tools.Driver.VerifyStrongName (System.Reflection.AssemblyName an, System.String assemblyFile) <0x6d3028 + 0x000c3> in <filename unknown>:0 
+  at Mono.Tools.Driver.Install (Boolean check_refs, System.String name, System.String package, System.String gacdir, System.String link_gacdir, System.String libdir, System.String link_libdir) <0x6d1cf0 + 0x001c7> in <filename unknown>:0 
+  at Mono.Tools.Driver.Main (System.String[] args) <0x6caec8 + 0x0070f> in <filename unknown>:0 
+[ERROR] FATAL UNHANDLED EXCEPTION: System.IO.DirectoryNotFoundException: Could not find a part of the path "/Library/Frameworks/Mono.framework/lib/mono/gtk-sharp-2.0/pango-sharp.dll".
+  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share, Int32 bufferSize, Boolean anonymous, FileOptions options) <0x1a2b6e0 + 0x0021d> in <filename unknown>:0 
+  at System.IO.FileStream..ctor (System.String path, FileMode mode, FileAccess access, FileShare share) <0x1a2b290 + 0x00051> in <filename unknown>:0 
+  at (wrapper remoting-invoke-with-check) System.IO.FileStream:.ctor (string,System.IO.FileMode,System.IO.FileAccess,System.IO.FileShare)
+  at System.IO.File.OpenRead (System.String path) <0x1a28770 + 0x0004c> in <filename unknown>:0 
+  at Mono.Security.StrongName.Verify (System.String fileName) <0x6d4798 + 0x00017> in <filename unknown>:0 
+  at Mono.Tools.Driver.VerifyStrongName (System.Reflection.AssemblyName an, System.String assemblyFile) <0x6d3028 + 0x000c3> in <filename unknown>:0 
+  at Mono.Tools.Driver.Install (Boolean check_refs, System.String name, System.String package, System.String gacdir, System.String link_gacdir, System.String libdir, System.String link_libdir) <0x6d1cf0 + 0x001c7> in <filename unknown>:0 
+  at Mono.Tools.Driver.Main (System.String[] args) <0x6caec8 + 0x0070f> in <filename unknown>:0 
+
+You can fix it by creating a symlink to the directory that mono is looking for:
+
+sudo ln -s /Library/Frameworks/Mono.framework/Versions/4.4.2/lib /Library/Frameworks/Mono.framework/lib
+
+
+######################################################
+####### Libraries that calico will not rebuild #######
+######################################################
+
+Here is a handy list to check them out:
+
+modules/AForge.Imaging.dll modules/AForge.Math.dll modules/AForge.Video.dll modules/AForge.Vision.dll modules/AForge.dll modules/Accord.Controls.dll modules/Accord.Imaging.dll modules/Accord.MachineLearning.dll modules/Accord.Math.dll modules/Accord.Neuro.dll modules/Accord.Statistics.dll modules/Accord.Vision.dll modules/Accord.dll modules/Common.dll modules/Csv.dll modules/DataStructures.dll modules/Florence.GtkSharp.dll modules/Florence.dll modules/Games.dll modules/IronPython.SQLite.dll modules/Kinect.dll modules/Math.dll modules/MathNet.Iridium.dll modules/MathNet.Numerics.FSharp.dll modules/MathNet.Numerics.dll modules/Microsoft.Dynamic.dll modules/MyROS.dll modules/Myro/Robots/ROSARDrone.dll modules/Myro/Robots/ROSRobot.dll modules/Processing.dll modules/Reflection.dll modules/Rhyduino.dll modules/SQL.dll
+
+
+######################################################
+########### DLR Languages fail to load ###############
+######################################################
+
+If you get the following error messages when starting calico:
+
+No DLR languages were loaded
+Failure; skipping language file 'CalicoBasic.py': Object reference not set to an instance of an object
+Failure; skipping language file 'CalicoBoo.py': Object reference not set to an instance of an object
+Failure; skipping language file 'CalicoBrainScrew.py': Object reference not set to an instance of an object
+Failure; skipping language file 'CalicoConsole.py': Object reference not set to an instance of an object
+Failure; skipping language file 'CalicoImages.py': Object reference not set to an instance of an object
+Failure; skipping language file 'CalicoJava.py': Object reference not set to an instance of an object
+Failure; skipping language file 'CalicoLC3.py': Object reference not set to an instance of an object
+Failure; skipping language file 'CalicoLogo.py': Object reference not set to an instance of an object
+Failure; skipping language file 'CalicoLua.py': Object reference not set to an instance of an object
+
+There may be a problem with the python dll, or the calico config file.
+
+Try fixing the error by:
+ - Going into languages/Python and running make
+ - Running calico with the --reset option
