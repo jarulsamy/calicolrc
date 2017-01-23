@@ -47,7 +47,8 @@ namespace Calico {
             // In case it needs it for DLR languages
             scriptRuntimeSetup = new Microsoft.Scripting.Hosting.ScriptRuntimeSetup();
             foreach (string language in getLanguages()) {
-                if (languages[language].engine != null) {
+	      
+	      if (languages[language].engine != null) {
                     try {
                         languages[language].engine.Setup(path);
                     } catch (Exception e) {
@@ -60,8 +61,9 @@ namespace Calico {
             try {
                 scriptRuntime = new Microsoft.Scripting.Hosting.ScriptRuntime(scriptRuntimeSetup);
                 scope = scriptRuntime.CreateScope();
-            } catch {
-                Console.Error.WriteLine("No DLR languages were loaded.");
+            } catch (Exception e) {
+	      //Console.Error.WriteLine("No DLR languages were loaded.");
+	      Console.Error.WriteLine("No DLR languages were loaded 3: {0} ", e.Message);
             }
 
         }
