@@ -5227,6 +5227,12 @@ public static class Myro
 	{
 		return Myro.gameLevel;
 	}
+	[method: JigsawTab("M/Robot")]
+
+	public static void clearLevelObject ()
+	{
+	  Myro.gameLevel = null;
+	}
   
 
 	[method: JigsawTab("M/Graphics")]
