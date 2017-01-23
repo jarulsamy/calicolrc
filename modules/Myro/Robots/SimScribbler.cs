@@ -1524,6 +1524,7 @@ public class SimScribbler : Myro.Robot
 			      }
 			    else
 			      {
+				// JH: Fixed the get distance function
 				//this.readings [key] = 1.0;
 				float currentValue = 1.0f;
 				simulation.window.canvas.world.RayCast ((fixture, v1, v2, hit) => {
@@ -1546,7 +1547,9 @@ public class SimScribbler : Myro.Robot
 				//Console.WriteLine("Raycast final result:");
 				//Console.WriteLine(key);
 				//Console.WriteLine(currentValue);
-				this.readings [key] = currentValue;
+				if(currentValue < 1.0f){
+				  this.readings [key] = currentValue;
+				}
 				
 			      }
 			}
