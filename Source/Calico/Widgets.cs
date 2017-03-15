@@ -1237,11 +1237,15 @@ public static class Widgets {
 		height = Convert.ToInt32(options["height"]);
 	    var gdata = new Dictionary<string, string>();
 	    gdata["text/plain"] = "<Chart available for viewing in notebook>";
+	    try
+	      {
+
 	    gdata["text/html"] =String.Format(
        @"
         <div id=""chart_div_{3}"" style=""height: {4}px;""></div>
+        <script type=""text/javascript"" src=""https://www.gstatic.com/charts/loader.js""></script>
         <script type=""text/javascript"">
-        require(['https://www.google.com/jsapi'], function () {{
+       
         function drawChart() {{                
           var data = google.visualization.arrayToDataTable([{1}]);  
           var chart = new google.visualization.{5}(document.getElementById('chart_div_{0}'));
@@ -1252,11 +1256,16 @@ public static class Widgets {
                 document.chart_uri['chart_{0}'] = chart.getImageURI();
           }});
           chart.draw(data, {2});
-         }}
-		google.load('visualization', '1.0', {{'callback': drawChart, 'packages':['corechart']}});
-        }});
+        }}
+
+        google.charts.load('current', {{packages: ['corechart']}});
+        google.charts.setOnLoadCallback(drawChart);
         </script>",
        id, table, ToJSON(options), id, height, type);
+	      }catch (Exception e)
+	      {
+		System.Console.Error.WriteLine(e.ToString());
+	      }
 	    return gdata;
 	}
 	public void display() {
