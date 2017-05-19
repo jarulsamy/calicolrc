@@ -1333,7 +1333,15 @@ namespace Calico {
             }
         }
 
-<<<<<<< HEAD
+    public void TrySetCurrentLanguage(string language) {
+        string lang = FindLanguage(language);
+        if (lang != null) {
+            ActivateLanguage(lang, CurrentLanguage);
+	    } else {
+            throw new Exception("unknown language: " + language);
+	    }
+	}
+
         public void ActivateLanguage(string language, string backup) {
             StartLanguage(language);
             if (manager[CurrentLanguage].engine == null) {
@@ -1346,21 +1354,6 @@ namespace Calico {
         public void SetLanguage(string language) {
             if (language == null)
                 return;
-=======
-        public void TrySetCurrentLanguage(string language) {
-	    string lang = FindLanguage(language);
-	    if (lang != null) {
-		ActivateLanguage(lang, CurrentLanguage);
-	    } else {
-		throw new Exception("unknown language: " + language);
-	    }
-	}
-
-
-        public void SetLanguage(string language) {
-	    if (language == null)
-		return;
->>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
             CurrentLanguage = language;
             if (manager.languages.ContainsKey(language) && manager.languages [language].IsTextLanguage) {
                 ShellLanguage = language;
