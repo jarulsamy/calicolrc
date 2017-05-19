@@ -1277,9 +1277,15 @@ public static class Graphics
         }
     } // end of Color
 
+    public class ColorStop
+    {
+	public Color color;
+	public double offset;    
+    }
+
     public class Gradient
     {
-        public string gtype;
+	public string gtype;
         public Color c1, c2;
         public Point p1, p2;
         public double radius1, radius2;
@@ -2347,6 +2353,7 @@ public static class Graphics
         public List onKeyPressCallbacks = new List ();
         public List onKeyReleaseCallbacks = new List ();
 	public List onConfigureCallbacks = new List ();
+	public List onDeleteCallbacks = new List ();
         public PythonTuple _lastClick;
         public string _lastKey = "";
         public string _mouseState = "up";
@@ -2427,6 +2434,24 @@ public static class Graphics
 	    }        
 	  }
 	  return true;
+	}
+
+	protected override bool OnDeleteEvent(Gdk.Event args)
+	{
+	  base.OnDeleteEvent(args);
+	  foreach (Func<Gdk.Event,object> function in onDeleteCallbacks) {
+	    try {
+	      Invoke (delegate {
+		  Func<Gdk.Event,object > f = (Func<Gdk.Event,object>)function;
+		  f (args);
+		});
+	    } catch (Exception e) {
+	      Console.Error.WriteLine ("Error in OnDeleteEvent function");
+	      Console.Error.WriteLine (e.Message);
+	    }        
+	  }
+	  //Console.Error.WriteLine ("Launching on-delete event");
+	  return false;
 	}
 
         public string title {
@@ -2519,6 +2544,7 @@ public static class Graphics
                 onKeyPressCallbacks = new List ();
                 onKeyReleaseCallbacks = new List ();
 		onConfigureCallbacks = new List ();
+		onDeleteCallbacks = new List ();
 
                 // clear listeners:
                 clearListeners();
@@ -2559,6 +2585,7 @@ public static class Graphics
                 onKeyPressCallbacks = new List ();
                 onKeyReleaseCallbacks = new List ();
 		onConfigureCallbacks = new List ();
+		onDeleteCallbacks = new List ();
 
                 // clear listeners:
                 clearListeners();
@@ -2904,6 +2931,11 @@ public static class Graphics
         public void onConfigure (Func<Gdk.EventConfigure,object> function)
         {
             onConfigureCallbacks.Add (function);
+        }
+
+	public void onDelete (Func<Gdk.Event,object> function)
+        {
+            onDeleteCallbacks.Add (function);
         }
 
         public void run (Func<object> function)
@@ -6634,15 +6666,15 @@ public static class Graphics
                     while (q.Count > 0) {
                         Point n = q.Pop();
                         if (getColor((int)n.x, (int)n.y).Equals(target)) {
-                            setColor((int)n.x, (int)n.y, color);
-                            if (n.x > 0)
-                    q.Push(new Point(n.x - 1, n.y));
-                if (n.x < width)
-                    q.Push(new Point(n.x + 1, n.y));
-                if (n.y > 0)
-                    q.Push(new Point(n.x, n.y - 1));
-                if (n.x < height)
-                    q.Push(new Point(n.x, n.y + 1));
+			  setColor((int)n.x, (int)n.y, color);
+			  if (n.x > 0)
+			    q.Push(new Point(n.x - 1, n.y));
+			  if (n.x < width)
+			    q.Push(new Point(n.x + 1, n.y));
+			  if (n.y > 0)
+			    q.Push(new Point(n.x, n.y - 1));
+			  if (n.x < height)
+			    q.Push(new Point(n.x, n.y + 1));
                         }
                     }
                 });
@@ -8458,7 +8490,8 @@ public static class Graphics
         {
             public Frame()
             {
-                // Only used by ClippedFrame, since we don't want to create useless points.
+	        // Only used by ClippedFrame, since we don't want to create
+	        // useless points.
             }
 
             public Frame (int x, int y)
@@ -8482,6 +8515,8 @@ public static class Graphics
 
         public class ClippedFrame : Frame
         {
+	    public bool clip = true;
+	      
             public ClippedFrame (IList iterable1, IList iterable2)
             {
 	      points = new Point[4];
@@ -8493,6 +8528,8 @@ public static class Graphics
                 /*         new Point (iterable2 [0], iterable1 [1]), */
                 /*         new Point (iterable2 [0], iterable2 [1]), */
                 /*         new Point (iterable1 [0], iterable2 [1])); */
+	      _fill = null;
+	      _outline = null;
             }
 
             public double width {
@@ -8505,9 +8542,10 @@ public static class Graphics
 
 
             public override void render(Cairo.Context context){
-                context.Save();
-		Point temp;
+	        Point temp;
 		temp = screen_coord (center);
+		
+                context.Save();
                 context.Translate (temp.x, temp.y);
                 context.Rotate (_rotation);
                 context.Scale (_scaleFactor, _scaleFactor);
@@ -8516,13 +8554,61 @@ public static class Graphics
                 for(int i=1; i<points.Length; ++i){
                     context.LineTo(points[i].x, points[i].y);
                 }
-                context.Clip();
+		context.ClosePath ();
+		if (clip){
+		  context.ClipPreserve();
+		}
+		if (gradient != null) {
+		  Cairo.Gradient pat;
+		  if (gradient.gtype == "linear")
+		    pat = new Cairo.LinearGradient (gradient.p1.x,
+						    gradient.p1.y, 
+						    gradient.p2.x, 
+						    gradient.p2.y);
+		  else
+		    pat = new Cairo.RadialGradient (gradient.p1.x,
+						    gradient.p1.y, 
+						    gradient.radius1,
+						    gradient.p2.x, 
+						    gradient.p2.y,
+						    gradient.radius2);
+		  
+		  pat.AddColorStop (0, gradient.c1.getCairo ());
+		  pat.AddColorStop (1, gradient.c2.getCairo ());
+		  context.Pattern = pat;
+		  context.FillPreserve ();
+		} else if (_fill != null) {
+		  context.Color = _fill.getCairo ();
+		  context.FillPreserve ();
+		}
+		context.NewPath();
+		
 		foreach (Shape shape in shapes) {
                     shape.render (context);
                     shape.updateGlobalPosition (context);
                 }
                 //base.render(context);
                 context.Restore();
+
+		// Because we don't want the border of the clipped frame to be
+		// clipped, while we still want to respect any previous applied
+		// clips, we have draw the frame completely seperately.
+		if (_outline != null) {
+		  context.Save();
+		  context.Translate (temp.x, temp.y);
+		  context.Rotate (_rotation);
+		  context.Scale (_scaleFactor, _scaleFactor);
+		  context.NewPath();
+		  context.MoveTo(points[0].x, points[0].y);
+		  for(int i=1; i<points.Length; ++i){
+		    context.LineTo(points[i].x, points[i].y);
+		  }
+		  context.ClosePath ();
+		  context.LineWidth = border;
+		  context.Color = _outline.getCairo ();
+		  context.Stroke ();
+		  context.Restore();
+		}
             }
         }
 

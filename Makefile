@@ -1,6 +1,5 @@
 BUILD=2.0.0-alpha
-MONO_PATH=bin:/usr/lib/cli/pango-sharp-2.0:/usr/lib/mono/2.0/:/usr/lib/mono/gtk-sharp-2.0/:/usr/lib/cli/gtk-sharp-2.0/:/usr/lib/cli/gdk-sharp-2.0/:/usr/lib/cli/glib-sharp-2.0:/Users/joost/Programs/calicolrc/modules/Physics/bin/Debug
-LD_LIBRARY_PATH=/Users/joost/Programs/calicolrc/modules/Physics/bin/Debug/
+MONO_PATH=bin:/usr/lib/cli/pango-sharp-2.0:/usr/lib/mono/2.0/:/usr/lib/mono/gtk-sharp-2.0/:/usr/lib/cli/gtk-sharp-2.0/:/usr/lib/cli/gdk-sharp-2.0/:/usr/lib/cli/glib-sharp-2.0
 
 all: 	bin/Calico.exe \
 	modules/Graphics.dll \
@@ -15,7 +14,7 @@ bin/Calico.exe: Source/Calico/AssemblyInfo.cs  Source/Calico/Language.cs \
 	Source/Calico/Document.cs      Source/Calico/Main.cs \
 	Source/Calico/Engine.cs        Source/Calico/MainWindow.cs \
 	Source/Calico/History.cs       Source/Calico/TabCompletion.cs 
-	cd Source && xbuild Calico.sln
+	cd Source && xbuild Calico.sln /property:Configuration="Release"
 
 languages/Python/CalicoPython.dll: languages/Python/CalicoPython.cs
 	cd languages/Python && make
@@ -72,6 +71,7 @@ modules/FarseerPhysics.dll:
 # rm -f modules/*.dll
 # rm -rf `find | grep "~$$"`
 clean:
+	rm -r Source/Calico/obj
 	rm -f bin/Calico.exe
 	rm -f languages/Calico*.dll
 	rm -f Calico-*.zip

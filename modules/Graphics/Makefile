@@ -4,8 +4,10 @@ all: ../Graphics.dll ../Shapes.dll
 ../Graphviz4Net.dll: Graphviz4Net.Core/bin/Release/Graphviz4Net.dll
 	cp Graphviz4Net.Core/bin/Release/Graphviz4Net.dll ../Graphviz4Net.dll
 
+# For the debug configuration
+# MONO_PATH=../../bin dmcs -debug -sdk:4 -target:library 
 ../Graphics.dll: Graphics.cs ../Graphviz4Net.dll
-	MONO_PATH=../../bin dmcs -debug -sdk:4 -target:library \
+	MONO_PATH=../../bin mcs -sdk:4 -target:library \
 		Graphics.cs  \
 		-lib:../../bin \
 		-lib:../ \
@@ -24,7 +26,7 @@ all: ../Graphics.dll ../Shapes.dll
 		-out:../Graphics.dll
 
 ../Shapes.dll: Shapes.cs ../Graphics.dll 
-	MONO_PATH=../../bin dmcs -sdk:4 -target:library \
+	MONO_PATH=../../bin mcs -sdk:4 -target:library \
 		Shapes.cs  \
 		-lib:../../bin \
 		-lib:../ \

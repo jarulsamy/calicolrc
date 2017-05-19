@@ -1,5 +1,5 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug|x86" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Release|x86" />
   <MonoDevelop.Ide.Workbench ActiveDocument="../modules/Myro/Myro.cs">
     <Files>
       <File FileName="../modules/Myro/Robots/SimScribbler.cs" Line="1107" Column="3" />
