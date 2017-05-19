@@ -91,6 +91,10 @@
     (var symbol?)
     (var-info source-info?)
     (info source-info?))
+  (association-aexp
+    (var symbol?)
+    (exp aexpression?)
+    (info source-info?))
   (assign-aexp
     (var symbol?)
     (rhs-exp aexpression?)
@@ -238,6 +242,14 @@
 	   (symbol?^ (car^ asexp))
 	   (eq?^ (car^ asexp) keyword)))))
 
+(define-native tagged2-list^
+  (lambda (keyword op len)
+    (lambda (asexp)
+      (and (list?^ asexp)
+	   (op (length^ asexp) len)
+	   (symbol?^ (car^ asexp))
+	   (eq?^ (cadr^ asexp) keyword)))))
+
 (define quote?^ (tagged-list^ 'quote = 2))
 (define quasiquote?^ (tagged-list^ 'quasiquote = 2))
 (define unquote?^ (tagged-list^ 'unquote >= 2))  ;; >= for alan bawden's qq-expand algorithm
@@ -245,6 +257,7 @@
 (define if-then?^ (tagged-list^ 'if = 3))
 (define if-else?^ (tagged-list^ 'if = 4))
 (define help?^ (tagged-list^ 'help = 2))
+(define association?^ (tagged2-list^ ': = 3))
 (define assignment?^ (tagged-list^ 'set! = 3))
 (define func?^ (tagged-list^ 'func = 2))
 (define callback?^ (tagged-list^ 'callback = 2))
@@ -320,6 +333,11 @@
 	   (lambda-cont2 (v fail)
 	     (let ((var-info (get-source-info (cadr^ adatum))))
 	       (k (assign-aexp (untag-atom^ (cadr^ adatum)) v var-info info) fail)))))
+	((association?^ adatum)
+	 (aparse (caddr^ adatum) senv handler fail
+	   (lambda-cont2 (v fail)
+	     (let ((var-info (get-source-info (cadr^ adatum))))
+	       (k (association-aexp (untag-atom^ (car^ adatum)) v var-info info) fail)))))
 	((func?^ adatum)
 	 (aparse (cadr^ adatum) senv handler fail
 	   (lambda-cont2 (e fail)
@@ -873,7 +891,70 @@
 	    define-datatype-transformer^
 	    cases-transformer^
 	    )
-      (list "" "" "" "" "" "" "" "" "" ""))))
+      (list (string-append "(and ...) - short-circuiting `and` macro\n"
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (and)\n"
+			   "    Out [1]: #t\n"
+			   "    In  [2]: (and #t #f)\n"
+			   "    Out [2]: #f\n"
+			   )
+	    (string-append "(or ...) - short-circuiting `or` macro" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (or)\n"
+			   "    Out [1]: #f\n"
+			   "    In  [2]: (or #t #f)\n"
+			   "    Out [2]: #t\n"
+			   )
+	    (string-append "(cond (TEST RETURN)...) - conditional evaluation macro" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (cond ((= 1 2) 3)(else 4))\n"
+			   "    Out [1]: 4\n"
+			   )
+	    (string-append "(let ((VAR VALUE)...)...) - local variable macro" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (let ((x 3)) x)\n"
+			   "    Out [1]: 3\n"
+			   )
+	    (string-append "(letrec ((VAR VALUE)...)...) - recursive local variable macro" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [*]: (letrec ((loop (lambda () (loop)))) (loop))\n"
+			   )
+	    (string-append "(let* ((VAR VALUE)...)...) - cascading local variable macro" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (let* ((a 1)(b a)(c b)) c)\n"
+			   "    Out [1]: 1\n"
+			   )
+	    (string-append "(case THING (ITEM RETURN)...)) - case macro"  
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (case 1 (1 2)(3 4))\n"
+			   "    Out [1]: 2\n"
+			   )
+	    (string-append "(record-case ) - record-case macro for define-datatype" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (record-case ddtype (subtype (part...) return)...)\n"
+			   )
+	    (string-append "(define-datatype NAME NAME? (TYPE (PART TEST))...) - defines new datatypes and support functions (macro)" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (define-datatype e e?)\n"
+			   "    In  [1]: (e? 1)\n"
+			   "    Out [1]: #f\n"
+			   )
+	    (string-append "(cases ...) - cases macro for a more flexible case"
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (cases 1 ((1 2) 3))\n"
+			   "    Out [1]: 3\n"
+			   )
+	    ))))
 
 (define macro-env 'undefined)
 

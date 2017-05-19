@@ -143,6 +143,7 @@ public class PJScheme:Scheme
     public static object symbol_lexical_address_aexp = make_symbol("lexical-address-aexp");
     public static object symbol_if_aexp = make_symbol("if-aexp");
     public static object symbol_help_aexp = make_symbol("help-aexp");
+    public static object symbol_association_aexp = make_symbol("association-aexp");
     public static object symbol_assign_aexp = make_symbol("assign-aexp");
     public static object symbol_func_aexp = make_symbol("func-aexp");
     public static object symbol_callback_aexp = make_symbol("callback-aexp");
@@ -395,6 +396,11 @@ public class PJScheme:Scheme
     public static object symbol_unparse = make_symbol("unparse");
     public static object symbol_unparse_procedure = make_symbol("unparse-procedure");
     public static object symbol_import = make_symbol("import");
+<<<<<<< HEAD
+=======
+    public static object symbol_import_as = make_symbol("import-as");
+    public static object symbol_import_from = make_symbol("import-from");
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
     public static object symbol_use_stack_trace = make_symbol("use-stack-trace");
     public static object symbol_vector = make_symbol("vector");
     public static object symbol_vector_ref = make_symbol("vector-ref");
@@ -422,6 +428,9 @@ public class PJScheme:Scheme
     public static object symbol_apply_with_keywords = make_symbol("apply-with-keywords");
     public static object symbol_assq = make_symbol("assq");
     public static object symbol_dict = make_symbol("dict");
+    public static object symbol_contains = make_symbol("contains");
+    public static object symbol_getitem = make_symbol("getitem");
+    public static object symbol_setitem = make_symbol("setitem");
     public static object symbol_reset_toplevel_env = make_symbol("reset-toplevel-env");
     public static object symbol_sort = make_symbol("sort");
     public static object symbol_string_append = make_symbol("string-append");
@@ -430,6 +439,13 @@ public class PJScheme:Scheme
     public static object symbol_typeof = make_symbol("typeof");
     public static object symbol_use_lexical_address = make_symbol("use-lexical-address");
     public static object symbol_use_tracing = make_symbol("use-tracing");
+    public static object symbol__ = make_symbol("_");
+    public static object symbol_: = make_symbol(":");
+    public static object symbol__star_star = make_symbol("**");
+    public static object symbol_get_bindings_from_parameters_and_values = make_symbol("get-bindings-from-parameters-and-values");
+    public static object symbol_fill_in_defaults = make_symbol("fill-in-defaults");
+    public static object symbol_add_keyword_values = make_symbol("add-keyword-values");
+    public static object symbol_matchup = make_symbol("matchup");
     public static object symbol_empty = make_symbol("empty");
     public static object symbol_instantiate_hat = make_symbol("instantiate^");
     public static object symbol_substitution = make_symbol("substitution");
@@ -437,6 +453,7 @@ public class PJScheme:Scheme
     public static object symbol_atom = make_symbol("atom");
     public static object symbol_pair = make_symbol("pair");
     public static object symbol_help = make_symbol("help");
+    public static object symbol_association = make_symbol("association");
     public static object symbol_b__q_q_q_d = make_symbol("<???>");
     public static object symbol_b_fail_d = make_symbol("<fail>");
     public static object symbol_b_handler_d = make_symbol("<handler>");
@@ -468,6 +485,11 @@ public class PJScheme:Scheme
     public static object help_aexp(params object [] t_args) {
         object args = sList(t_args);
         return cons(symbol_help_aexp, args);
+    }
+    
+    public static object association_aexp(params object [] t_args) {
+        object args = sList(t_args);
+        return cons(symbol_association_aexp, args);
     }
     
     public static object assign_aexp(params object [] t_args) {
@@ -897,7 +919,7 @@ public class PJScheme:Scheme
     
     public static void b_cont_28_d(object aclauses, object adatum, object clauses, object right_apattern, object right_pattern, object handler, object fail, object k) {
         if (true_q(value_reg)) {
-            k2_reg = make_cont2("cont2", 46, fail, k);
+            k2_reg = make_cont2("cont2", 47, fail, k);
             ap_reg = right_apattern;
             s_reg = value_reg;
             pattern_reg = right_pattern;
@@ -992,7 +1014,7 @@ public class PJScheme:Scheme
     }
     
     public static void b_cont_41_d(object args, object handler, object fail, object k2) {
-        k_reg = make_cont2("cont2", 74, args, handler, k2);
+        k_reg = make_cont2("cont2", 75, args, handler, k2);
         fail_reg = fail;
         handler_reg = handler;
         senv_reg = initial_contours(cadr(args));
@@ -1001,7 +1023,7 @@ public class PJScheme:Scheme
     }
     
     public static void b_cont_42_d(object handler, object fail, object k2) {
-        k_reg = make_cont2("cont2", 75, handler, k2);
+        k_reg = make_cont2("cont2", 76, handler, k2);
         fail_reg = fail;
         handler_reg = handler;
         senv_reg = initial_contours(toplevel_env);
@@ -1113,7 +1135,7 @@ public class PJScheme:Scheme
             k_reg = k;
             pc = apply_cont;
         } else {
-            k2_reg = make_cont2("cont2", 98, apair2, pair2, value_reg, k);
+            k2_reg = make_cont2("cont2", 99, apair2, pair2, value_reg, k);
             ap_reg = cdr_hat(apair1);
             s_reg = value_reg;
             pattern_reg = cdr(pair1);
@@ -1302,19 +1324,27 @@ public class PJScheme:Scheme
     public static void b_cont2_25_d(object adatum, object info, object k) {
         object var_info = symbol_undefined;
         var_info = get_source_info(cadr_hat(adatum));
+        value1_reg = association_aexp(untag_atom_hat(cadr_hat(adatum)), value1_reg, var_info, info);
+        k_reg = k;
+        pc = apply_cont2;
+    }
+    
+    public static void b_cont2_26_d(object adatum, object info, object k) {
+        object var_info = symbol_undefined;
+        var_info = get_source_info(cadr_hat(adatum));
         value1_reg = assign_aexp(untag_atom_hat(cadr_hat(adatum)), value1_reg, var_info, info);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_26_d(object v1, object v2, object info, object k) {
+    public static void b_cont2_27_d(object v1, object v2, object info, object k) {
         value1_reg = if_aexp(v1, v2, value1_reg, info);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_27_d(object adatum, object senv, object v1, object info, object handler, object k) {
-        k_reg = make_cont2("cont2", 26, v1, value1_reg, info, k);
+    public static void b_cont2_28_d(object adatum, object senv, object v1, object info, object handler, object k) {
+        k_reg = make_cont2("cont2", 27, v1, value1_reg, info, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         senv_reg = senv;
@@ -1322,8 +1352,8 @@ public class PJScheme:Scheme
         pc = aparse;
     }
     
-    public static void b_cont2_28_d(object adatum, object senv, object info, object handler, object k) {
-        k_reg = make_cont2("cont2", 27, adatum, senv, value1_reg, info, handler, k);
+    public static void b_cont2_29_d(object adatum, object senv, object info, object handler, object k) {
+        k_reg = make_cont2("cont2", 28, adatum, senv, value1_reg, info, handler, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         senv_reg = senv;
@@ -1331,14 +1361,14 @@ public class PJScheme:Scheme
         pc = aparse;
     }
     
-    public static void b_cont2_29_d(object v1, object info, object k) {
+    public static void b_cont2_30_d(object v1, object info, object k) {
         value1_reg = if_aexp(v1, value1_reg, lit_aexp(false, symbol_none), info);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_30_d(object adatum, object senv, object info, object handler, object k) {
-        k_reg = make_cont2("cont2", 29, value1_reg, info, k);
+    public static void b_cont2_31_d(object adatum, object senv, object info, object handler, object k) {
+        k_reg = make_cont2("cont2", 30, value1_reg, info, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         senv_reg = senv;
@@ -1346,7 +1376,7 @@ public class PJScheme:Scheme
         pc = aparse;
     }
     
-    public static void b_cont2_31_d(object senv, object handler, object k) {
+    public static void b_cont2_32_d(object senv, object handler, object k) {
         k_reg = k;
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1355,14 +1385,14 @@ public class PJScheme:Scheme
         pc = aparse;
     }
     
-    public static void b_cont2_32_d(object a, object k) {
+    public static void b_cont2_33_d(object a, object k) {
         value1_reg = cons(a, value1_reg);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_33_d(object adatum_list, object senv, object handler, object k) {
-        k_reg = make_cont2("cont2", 32, value1_reg, k);
+    public static void b_cont2_34_d(object adatum_list, object senv, object handler, object k) {
+        k_reg = make_cont2("cont2", 33, value1_reg, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         senv_reg = senv;
@@ -1370,14 +1400,14 @@ public class PJScheme:Scheme
         pc = aparse_all;
     }
     
-    public static void b_cont2_34_d(object v1, object k) {
+    public static void b_cont2_35_d(object v1, object k) {
         value1_reg = cons(v1, value1_reg);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_35_d(object senv, object src, object tokens_left, object handler, object k) {
-        k_reg = make_cont2("cont2", 34, value1_reg, k);
+    public static void b_cont2_36_d(object senv, object src, object tokens_left, object handler, object k) {
+        k_reg = make_cont2("cont2", 35, value1_reg, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         senv_reg = senv;
@@ -1386,26 +1416,26 @@ public class PJScheme:Scheme
         pc = aparse_sexps;
     }
     
-    public static void b_cont2_36_d(object bodies, object k) {
+    public static void b_cont2_37_d(object bodies, object k) {
         value_reg = append(sList(symbol_let), append(sList(value1_reg), append(value2_reg, at_hat(bodies))));
         k_reg = k;
         pc = apply_cont;
     }
     
-    public static void b_cont2_37_d(object procs, object vars, object k2) {
+    public static void b_cont2_38_d(object procs, object vars, object k2) {
         value2_reg = cons(append(sList(symbol_set_b), append(sList(car_hat(vars)), sList(car_hat(procs)))), value2_reg);
         value1_reg = cons(append(sList(car_hat(vars)), sList(append(sList(symbol_quote), sList(symbol_undefined)))), value1_reg);
         k_reg = k2;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_38_d(object exp, object k) {
+    public static void b_cont2_39_d(object exp, object k) {
         value_reg = append(sList(symbol_let), append(sList(append(sList(append(sList(symbol_r), sList(exp))), value1_reg)), sList(append(sList(symbol_cond), value2_reg))));
         k_reg = k;
         pc = apply_cont;
     }
     
-    public static void b_cont2_39_d(object clauses, object var, object k2) {
+    public static void b_cont2_40_d(object clauses, object var, object k2) {
         object clause = symbol_undefined;
         clause = car_hat(clauses);
         if (true_q(eq_q_hat(car_hat(clause), symbol_else))) {
@@ -1432,7 +1462,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_cont2_40_d(object clauses, object var, object k2) {
+    public static void b_cont2_41_d(object clauses, object var, object k2) {
         object clause = symbol_undefined;
         clause = car_hat(clauses);
         if (true_q(eq_q_hat(car_hat(clause), symbol_else))) {
@@ -1459,7 +1489,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_cont2_41_d(object type_tester_name, object k) {
+    public static void b_cont2_42_d(object type_tester_name, object k) {
         object tester_def = symbol_undefined;
         tester_def = append(sList(symbol_define), append(sList(type_tester_name), sList(append(sList(symbol_lambda), append(sList(sList(symbol_x)), sList(append(sList(symbol_and), append(sList(append(sList(symbol_pair_q), sList(symbol_x))), sList(append(sList(symbol_not), sList(append(sList(symbol_not), sList(append(sList(symbol_memq), append(sList(append(sList(symbol_car), sList(symbol_x))), sList(append(sList(symbol_quote), sList(value1_reg))))))))))))))))));
         value_reg = append(sList(symbol_begin), append(sList(tester_def), value2_reg));
@@ -1467,45 +1497,45 @@ public class PJScheme:Scheme
         pc = apply_cont;
     }
     
-    public static void b_cont2_42_d(object def_, object name, object k2) {
+    public static void b_cont2_43_d(object def_, object name, object k2) {
         value2_reg = cons(def_, value2_reg);
         value1_reg = cons(name, value1_reg);
         k_reg = k2;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_43_d(object variants, object k2) {
-        k2_reg = make_cont2("cont2", 42, value2_reg, value1_reg, k2);
+    public static void b_cont2_44_d(object variants, object k2) {
+        k2_reg = make_cont2("cont2", 43, value2_reg, value1_reg, k2);
         variants_reg = cdr_hat(variants);
         pc = make_dd_variant_constructors_hat;
     }
     
-    public static void b_cont2_44_d(object exp, object type_name, object type_tester_name, object k) {
+    public static void b_cont2_45_d(object exp, object type_name, object type_tester_name, object k) {
         value_reg = append(sList(symbol_let), append(sList(append(sList(append(sList(symbol_r), sList(exp))), value1_reg)), sList(append(sList(symbol_if), append(sList(append(sList(symbol_not), sList(append(sList(type_tester_name), sList(symbol_r))))), append(sList(append(sList(symbol_error), append(sList(append(sList(symbol_quote), sList(symbol_cases))), append(sList("~a is not a valid ~a"), append(sList(symbol_r), sList(append(sList(symbol_quote), sList(type_name)))))))), sList(append(sList(symbol_cond), value2_reg))))))));
         k_reg = k;
         pc = apply_cont;
     }
     
-    public static void b_cont2_45_d(object macro_keyword, object k) {
+    public static void b_cont2_46_d(object macro_keyword, object k) {
         value1_reg = replace_info(value1_reg, snoc(macro_keyword, get_source_info(value1_reg)));
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_46_d(object fail, object k) {
+    public static void b_cont2_47_d(object fail, object k) {
         value1_reg = value2_reg;
         value2_reg = fail;
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_47_d() {
+    public static void b_cont2_48_d() {
         _starlast_fail_star = value2_reg;
         final_reg = value1_reg;
         pc = pc_halt_signal;
     }
     
-    public static void b_cont2_48_d() {
+    public static void b_cont2_49_d() {
         k_reg = REP_k;
         fail_reg = value2_reg;
         handler_reg = REP_handler;
@@ -1514,13 +1544,13 @@ public class PJScheme:Scheme
         pc = m;
     }
     
-    public static void b_cont2_49_d() {
+    public static void b_cont2_50_d() {
         final_reg = true;
         pc = pc_halt_signal;
     }
     
-    public static void b_cont2_50_d() {
-        k_reg = make_cont2("cont2", 49);
+    public static void b_cont2_51_d() {
+        k_reg = make_cont2("cont2", 50);
         fail_reg = value2_reg;
         handler_reg = try_parse_handler;
         senv_reg = initial_contours(toplevel_env);
@@ -1529,19 +1559,19 @@ public class PJScheme:Scheme
         pc = aparse_sexps;
     }
     
-    public static void b_cont2_51_d(object exp, object k) {
+    public static void b_cont2_52_d(object exp, object k) {
         handle_debug_info(exp, value1_reg);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_52_d(object exp, object k) {
+    public static void b_cont2_53_d(object exp, object k) {
         pop_stack_trace_b(exp);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_53_d(object args, object exp, object env, object info, object handler, object k) {
+    public static void b_cont2_54_d(object args, object exp, object env, object info, object handler, object k) {
         if (true_q(_staruse_stack_trace_star)) {
             push_stack_trace_b(exp);
         }
@@ -1557,7 +1587,7 @@ public class PJScheme:Scheme
         } else {
             if (true_q(procedure_object_q(value1_reg))) {
                 if (true_q(_staruse_stack_trace_star)) {
-                    k2_reg = make_cont2("cont2", 52, exp, k);
+                    k2_reg = make_cont2("cont2", 53, exp, k);
                     fail_reg = value2_reg;
                     handler_reg = handler;
                     info_reg = info;
@@ -1585,8 +1615,8 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_cont2_54_d(object exp, object operator_, object env, object info, object handler, object k) {
-        k_reg = make_cont2("cont2", 53, value1_reg, exp, env, info, handler, k);
+    public static void b_cont2_55_d(object exp, object operator_, object env, object info, object handler, object k) {
+        k_reg = make_cont2("cont2", 54, value1_reg, exp, env, info, handler, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         env_reg = env;
@@ -1594,21 +1624,21 @@ public class PJScheme:Scheme
         pc = m;
     }
     
-    public static void b_cont2_55_d(object handler) {
+    public static void b_cont2_56_d(object handler) {
         fail_reg = value2_reg;
         exception_reg = value1_reg;
         handler_reg = handler;
         pc = apply_handler2;
     }
     
-    public static void b_cont2_56_d(object v, object k) {
+    public static void b_cont2_57_d(object v, object k) {
         value1_reg = v;
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_57_d(object fexps, object env, object handler, object k) {
-        k_reg = make_cont2("cont2", 56, value1_reg, k);
+    public static void b_cont2_58_d(object fexps, object env, object handler, object k) {
+        k_reg = make_cont2("cont2", 57, value1_reg, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         env_reg = env;
@@ -1616,14 +1646,14 @@ public class PJScheme:Scheme
         pc = eval_sequence;
     }
     
-    public static void b_cont2_58_d(object aclauses, object clauses, object k) {
+    public static void b_cont2_59_d(object aclauses, object clauses, object k) {
         set_binding_value_b(value1_reg, make_pattern_macro_hat(clauses, aclauses));
         value1_reg = void_value;
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_59_d(object docstring, object var, object k) {
+    public static void b_cont2_60_d(object docstring, object var, object k) {
         if (true_q(procedure_object_q(value1_reg))) {
             set_global_value_b(var, dlr_func(value1_reg));
         } else {
@@ -1635,7 +1665,7 @@ public class PJScheme:Scheme
         pc = apply_cont2;
     }
     
-    public static void b_cont2_60_d(object docstring, object rhs_value, object k) {
+    public static void b_cont2_61_d(object docstring, object rhs_value, object k) {
         set_binding_value_b(value1_reg, rhs_value);
         set_binding_docstring_b(value1_reg, docstring);
         value1_reg = void_value;
@@ -1643,8 +1673,8 @@ public class PJScheme:Scheme
         pc = apply_cont2;
     }
     
-    public static void b_cont2_61_d(object docstring, object var, object env, object handler, object k) {
-        k_reg = make_cont2("cont2", 60, docstring, value1_reg, k);
+    public static void b_cont2_62_d(object docstring, object var, object env, object handler, object k) {
+        k_reg = make_cont2("cont2", 61, docstring, value1_reg, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         env_reg = env;
@@ -1652,7 +1682,7 @@ public class PJScheme:Scheme
         pc = lookup_binding_in_first_frame;
     }
     
-    public static void b_cont2_62_d(object rhs_value, object k) {
+    public static void b_cont2_63_d(object rhs_value, object k) {
         object old_value = symbol_undefined;
         old_value = binding_value(value1_reg);
         set_binding_value_b(value1_reg, rhs_value);
@@ -1664,7 +1694,7 @@ public class PJScheme:Scheme
         pc = apply_cont2;
     }
     
-    public static void b_cont2_63_d(object rhs_value, object k) {
+    public static void b_cont2_64_d(object rhs_value, object k) {
         object old_value = symbol_undefined;
         old_value = dlr_env_lookup(value1_reg);
         set_global_value_b(value1_reg, rhs_value);
@@ -1676,10 +1706,10 @@ public class PJScheme:Scheme
         pc = apply_cont2;
     }
     
-    public static void b_cont2_64_d(object var, object var_info, object env, object handler, object k) {
-        sk_reg = make_cont2("cont2", 62, value1_reg, k);
+    public static void b_cont2_65_d(object var, object var_info, object env, object handler, object k) {
+        sk_reg = make_cont2("cont2", 63, value1_reg, k);
         dk_reg = make_cont3("cont3", 4, value1_reg, k);
-        gk_reg = make_cont2("cont2", 63, value1_reg, k);
+        gk_reg = make_cont2("cont2", 64, value1_reg, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         var_info_reg = var_info;
@@ -1688,19 +1718,19 @@ public class PJScheme:Scheme
         pc = lookup_variable;
     }
     
-    public static void b_cont2_65_d(object k) {
+    public static void b_cont2_66_d(object k) {
         value1_reg = binding_docstring(value1_reg);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_66_d(object k) {
+    public static void b_cont2_67_d(object k) {
         value1_reg = help(dlr_env_lookup(value1_reg));
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_67_d(object else_exp, object then_exp, object env, object handler, object k) {
+    public static void b_cont2_68_d(object else_exp, object then_exp, object env, object handler, object k) {
         if (true_q(value1_reg)) {
             k_reg = k;
             fail_reg = value2_reg;
@@ -1718,20 +1748,20 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_cont2_68_d(object k) {
+    public static void b_cont2_69_d(object k) {
         value1_reg = callback(value1_reg);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_69_d(object k) {
+    public static void b_cont2_70_d(object k) {
         value1_reg = dlr_func(value1_reg);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_70_d(object exps, object env, object handler, object k) {
-        k_reg = make_cont2("cont2", 34, value1_reg, k);
+    public static void b_cont2_71_d(object exps, object env, object handler, object k) {
+        k_reg = make_cont2("cont2", 35, value1_reg, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         env_reg = env;
@@ -1739,7 +1769,7 @@ public class PJScheme:Scheme
         pc = m_star;
     }
     
-    public static void b_cont2_71_d(object exps, object env, object handler, object k) {
+    public static void b_cont2_72_d(object exps, object env, object handler, object k) {
         k_reg = k;
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1748,21 +1778,21 @@ public class PJScheme:Scheme
         pc = eval_sequence;
     }
     
-    public static void b_cont2_72_d(object e, object handler) {
+    public static void b_cont2_73_d(object e, object handler) {
         fail_reg = value2_reg;
         exception_reg = e;
         handler_reg = handler;
         pc = apply_handler2;
     }
     
-    public static void b_cont2_73_d(object trace_depth, object k2) {
+    public static void b_cont2_74_d(object trace_depth, object k2) {
         trace_depth = Subtract(trace_depth, 1);
         printf("~areturn: ~s~%", make_trace_depth_string(trace_depth), value1_reg);
         k_reg = k2;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_74_d(object args, object handler, object k2) {
+    public static void b_cont2_75_d(object args, object handler, object k2) {
         k_reg = k2;
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1771,7 +1801,7 @@ public class PJScheme:Scheme
         pc = m;
     }
     
-    public static void b_cont2_75_d(object handler, object k2) {
+    public static void b_cont2_76_d(object handler, object k2) {
         k_reg = k2;
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1780,7 +1810,7 @@ public class PJScheme:Scheme
         pc = m;
     }
     
-    public static void b_cont2_76_d(object handler, object k2) {
+    public static void b_cont2_77_d(object handler, object k2) {
         k_reg = make_cont4("cont4", 11, handler, k2);
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1789,7 +1819,7 @@ public class PJScheme:Scheme
         pc = read_sexp;
     }
     
-    public static void b_cont2_77_d(object handler, object k2) {
+    public static void b_cont2_78_d(object handler, object k2) {
         k_reg = make_cont4("cont4", 12, handler, k2);
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1798,7 +1828,7 @@ public class PJScheme:Scheme
         pc = read_sexp;
     }
     
-    public static void b_cont2_78_d(object k) {
+    public static void b_cont2_79_d(object k) {
         if (true_q(null_q(load_stack))) {
             printf("WARNING: empty load-stack encountered!\n");
         } else {
@@ -1809,8 +1839,8 @@ public class PJScheme:Scheme
         pc = apply_cont2;
     }
     
-    public static void b_cont2_79_d(object filename, object env2, object handler, object k) {
-        k_reg = make_cont2("cont2", 78, k);
+    public static void b_cont2_80_d(object filename, object env2, object handler, object k) {
+        k_reg = make_cont2("cont2", 79, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         env2_reg = env2;
@@ -1819,7 +1849,7 @@ public class PJScheme:Scheme
         pc = read_and_eval_asexps;
     }
     
-    public static void b_cont2_80_d(object src, object tokens_left, object env2, object handler, object k) {
+    public static void b_cont2_81_d(object src, object tokens_left, object env2, object handler, object k) {
         if (true_q(token_type_q(first(tokens_left), symbol_end_marker))) {
             k_reg = k;
             pc = apply_cont2;
@@ -1834,8 +1864,8 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_cont2_81_d(object src, object tokens_left, object env2, object handler, object k) {
-        k_reg = make_cont2("cont2", 80, src, tokens_left, env2, handler, k);
+    public static void b_cont2_82_d(object src, object tokens_left, object env2, object handler, object k) {
+        k_reg = make_cont2("cont2", 81, src, tokens_left, env2, handler, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         env_reg = env2;
@@ -1843,7 +1873,7 @@ public class PJScheme:Scheme
         pc = m;
     }
     
-    public static void b_cont2_82_d(object filenames, object env2, object info, object handler, object k) {
+    public static void b_cont2_83_d(object filenames, object env2, object info, object handler, object k) {
         k_reg = k;
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1853,7 +1883,7 @@ public class PJScheme:Scheme
         pc = load_files;
     }
     
-    public static void b_cont2_83_d(object lst, object k2) {
+    public static void b_cont2_84_d(object lst, object k2) {
         if (true_q(member(car(lst), value1_reg))) {
             k_reg = k2;
             pc = apply_cont2;
@@ -1864,7 +1894,7 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_cont2_84_d(object filename, object handler, object k2) {
+    public static void b_cont2_85_d(object filename, object handler, object k2) {
         object module = symbol_undefined;
         module = make_toplevel_env();
         set_binding_value_b(value1_reg, module);
@@ -1877,7 +1907,7 @@ public class PJScheme:Scheme
         pc = load_file;
     }
     
-    public static void b_cont2_85_d(object args, object sym, object info, object handler, object k) {
+    public static void b_cont2_86_d(object args, object sym, object info, object handler, object k) {
         if (true_q(null_q(cdr(args)))) {
             k_reg = k;
             pc = apply_cont2;
@@ -1900,13 +1930,13 @@ public class PJScheme:Scheme
         }
     }
     
-    public static void b_cont2_86_d(object ls1, object k2) {
+    public static void b_cont2_87_d(object ls1, object k2) {
         value1_reg = cons(car(ls1), value1_reg);
         k_reg = k2;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_87_d(object lists, object k2) {
+    public static void b_cont2_88_d(object lists, object k2) {
         k2_reg = k2;
         fail_reg = value2_reg;
         ls2_reg = value1_reg;
@@ -1914,7 +1944,7 @@ public class PJScheme:Scheme
         pc = append2;
     }
     
-    public static void b_cont2_88_d(object iterator, object proc, object env, object handler, object k) {
+    public static void b_cont2_89_d(object iterator, object proc, object env, object handler, object k) {
         k_reg = k;
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1924,8 +1954,8 @@ public class PJScheme:Scheme
         pc = iterate_continue;
     }
     
-    public static void b_cont2_89_d(object iterator, object proc, object env, object handler, object k) {
-        k_reg = make_cont2("cont2", 34, value1_reg, k);
+    public static void b_cont2_90_d(object iterator, object proc, object env, object handler, object k) {
+        k_reg = make_cont2("cont2", 35, value1_reg, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         env_reg = env;
@@ -1934,8 +1964,8 @@ public class PJScheme:Scheme
         pc = iterate_collect_continue;
     }
     
-    public static void b_cont2_90_d(object list1, object proc, object env, object handler, object k) {
-        k_reg = make_cont2("cont2", 34, value1_reg, k);
+    public static void b_cont2_91_d(object list1, object proc, object env, object handler, object k) {
+        k_reg = make_cont2("cont2", 35, value1_reg, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         env_reg = env;
@@ -1944,14 +1974,14 @@ public class PJScheme:Scheme
         pc = map1;
     }
     
-    public static void b_cont2_91_d(object list1, object proc, object k) {
+    public static void b_cont2_92_d(object list1, object proc, object k) {
         value1_reg = cons(dlr_apply(proc, sList(car(list1))), value1_reg);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_92_d(object list1, object list2, object proc, object env, object handler, object k) {
-        k_reg = make_cont2("cont2", 34, value1_reg, k);
+    public static void b_cont2_93_d(object list1, object list2, object proc, object env, object handler, object k) {
+        k_reg = make_cont2("cont2", 35, value1_reg, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         env_reg = env;
@@ -1961,14 +1991,14 @@ public class PJScheme:Scheme
         pc = map2;
     }
     
-    public static void b_cont2_93_d(object list1, object list2, object proc, object k) {
+    public static void b_cont2_94_d(object list1, object list2, object proc, object k) {
         value1_reg = cons(dlr_apply(proc, sList(car(list1), car(list2))), value1_reg);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_94_d(object lists, object proc, object env, object handler, object k) {
-        k_reg = make_cont2("cont2", 34, value1_reg, k);
+    public static void b_cont2_95_d(object lists, object proc, object env, object handler, object k) {
+        k_reg = make_cont2("cont2", 35, value1_reg, k);
         fail_reg = value2_reg;
         handler_reg = handler;
         env_reg = env;
@@ -1977,13 +2007,13 @@ public class PJScheme:Scheme
         pc = mapN;
     }
     
-    public static void b_cont2_95_d(object lists, object proc, object k) {
+    public static void b_cont2_96_d(object lists, object proc, object k) {
         value1_reg = cons(dlr_apply(proc, map(car_proc, lists)), value1_reg);
         k_reg = k;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_96_d(object arg_list, object proc, object env, object handler, object k) {
+    public static void b_cont2_97_d(object arg_list, object proc, object env, object handler, object k) {
         k_reg = k;
         fail_reg = value2_reg;
         handler_reg = handler;
@@ -1993,7 +2023,7 @@ public class PJScheme:Scheme
         pc = for_each_primitive;
     }
     
-    public static void b_cont2_97_d(object new_acdr1, object new_cdr1, object s_car, object k) {
+    public static void b_cont2_98_d(object new_acdr1, object new_cdr1, object s_car, object k) {
         k_reg = make_cont("cont", 50, s_car, k);
         ap2_reg = value2_reg;
         ap1_reg = new_acdr1;
@@ -2002,30 +2032,30 @@ public class PJScheme:Scheme
         pc = unify_patterns_hat;
     }
     
-    public static void b_cont2_98_d(object apair2, object pair2, object s_car, object k) {
-        k2_reg = make_cont2("cont2", 97, value2_reg, value1_reg, s_car, k);
+    public static void b_cont2_99_d(object apair2, object pair2, object s_car, object k) {
+        k2_reg = make_cont2("cont2", 98, value2_reg, value1_reg, s_car, k);
         ap_reg = cdr_hat(apair2);
         s_reg = s_car;
         pattern_reg = cdr(pair2);
         pc = instantiate_hat;
     }
     
-    public static void b_cont2_99_d(object a, object aa, object ap, object k2) {
+    public static void b_cont2_100_d(object a, object aa, object ap, object k2) {
         value2_reg = cons_hat(aa, value2_reg, get_source_info(ap));
         value1_reg = cons(a, value1_reg);
         k_reg = k2;
         pc = apply_cont2;
     }
     
-    public static void b_cont2_100_d(object ap, object pattern, object s, object k2) {
-        k2_reg = make_cont2("cont2", 99, value1_reg, value2_reg, ap, k2);
+    public static void b_cont2_101_d(object ap, object pattern, object s, object k2) {
+        k2_reg = make_cont2("cont2", 100, value1_reg, value2_reg, ap, k2);
         ap_reg = cdr_hat(ap);
         s_reg = s;
         pattern_reg = cdr(pattern);
         pc = instantiate_hat;
     }
     
-    public static void b_cont2_101_d(object s2, object k2) {
+    public static void b_cont2_102_d(object s2, object k2) {
         k2_reg = k2;
         ap_reg = value2_reg;
         s_reg = s2;
@@ -2160,7 +2190,7 @@ public class PJScheme:Scheme
     }
     
     public static void b_cont4_9_d(object senv, object src, object handler, object k) {
-        k_reg = make_cont2("cont2", 35, senv, src, value3_reg, handler, k);
+        k_reg = make_cont2("cont2", 36, senv, src, value3_reg, handler, k);
         fail_reg = value4_reg;
         handler_reg = handler;
         senv_reg = senv;
@@ -2170,7 +2200,7 @@ public class PJScheme:Scheme
     
     public static void b_cont4_10_d() {
         _startokens_left_star = value3_reg;
-        k_reg = make_cont2("cont2", 48);
+        k_reg = make_cont2("cont2", 49);
         fail_reg = value4_reg;
         handler_reg = REP_handler;
         senv_reg = initial_contours(toplevel_env);
@@ -2212,7 +2242,7 @@ public class PJScheme:Scheme
     }
     
     public static void b_cont4_13_d(object src, object env2, object handler, object k) {
-        k_reg = make_cont2("cont2", 81, src, value3_reg, env2, handler, k);
+        k_reg = make_cont2("cont2", 82, src, value3_reg, env2, handler, k);
         fail_reg = value4_reg;
         handler_reg = handler;
         senv_reg = initial_contours(env2);
@@ -2296,7 +2326,7 @@ public class PJScheme:Scheme
     }
     
     public static void b_handler2_5_d(object fexps, object env, object handler) {
-        k_reg = make_cont2("cont2", 72, exception_reg, handler);
+        k_reg = make_cont2("cont2", 73, exception_reg, handler);
         handler_reg = handler;
         env_reg = env;
         exps_reg = fexps;
@@ -2308,7 +2338,7 @@ public class PJScheme:Scheme
         new_env = extend(env, sList(cvar), sList(exception_reg), sList(""));
         object catch_handler = symbol_undefined;
         catch_handler = try_finally_handler(fexps, env, handler);
-        k_reg = make_cont2("cont2", 57, fexps, env, handler, k);
+        k_reg = make_cont2("cont2", 58, fexps, env, handler, k);
         handler_reg = catch_handler;
         env_reg = new_env;
         exps_reg = cexps;
@@ -2349,7 +2379,7 @@ public class PJScheme:Scheme
         if (true_q(Equal(length(args_reg), length(formals)))) {
             printf("~acall: ~s~%", make_trace_depth_string(trace_depth), cons(name, args_reg));
             trace_depth = Add(trace_depth, 1);
-            k_reg = make_cont2("cont2", 73, trace_depth, k2_reg);
+            k_reg = make_cont2("cont2", 74, trace_depth, k2_reg);
             env_reg = extend(env, formals, args_reg, make_empty_docstrings(length(formals)));
             exps_reg = bodies;
             pc = eval_sequence;
@@ -2365,7 +2395,7 @@ public class PJScheme:Scheme
             new_env = extend(env, cons(runt, formals), cons(list_tail(args_reg, length(formals)), list_head(args_reg, length(formals))), make_empty_docstrings(Add(1, length(formals))));
             printf("~acall: ~s~%", make_trace_depth_string(trace_depth), cons(name, args_reg));
             trace_depth = Add(trace_depth, 1);
-            k_reg = make_cont2("cont2", 73, trace_depth, k2_reg);
+            k_reg = make_cont2("cont2", 74, trace_depth, k2_reg);
             env_reg = new_env;
             exps_reg = bodies;
             pc = eval_sequence;
@@ -2491,14 +2521,14 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_15_d() {
-        k_reg = make_cont2("cont2", 76, handler_reg, k2_reg);
+        k_reg = make_cont2("cont2", 77, handler_reg, k2_reg);
         src_reg = symbol_stdin;
         input_reg = car(args_reg);
         pc = scan_input;
     }
     
     public static void b_proc_16_d() {
-        k_reg = make_cont2("cont2", 77, handler_reg, k2_reg);
+        k_reg = make_cont2("cont2", 78, handler_reg, k2_reg);
         src_reg = symbol_stdin;
         input_reg = car(args_reg);
         pc = scan_input;
@@ -2509,9 +2539,16 @@ public class PJScheme:Scheme
         object proc_args = symbol_undefined;
         proc_args = cadr(args_reg);
         proc = car(args_reg);
-        args_reg = proc_args;
-        proc_reg = proc;
-        pc = apply_proc;
+        if (true_q(dlr_proc_q(proc))) {
+            value2_reg = fail_reg;
+            value1_reg = dlr_apply(proc, proc_args);
+            k_reg = k2_reg;
+            pc = apply_cont2;
+        } else {
+            args_reg = proc_args;
+            proc_reg = proc;
+            pc = apply_proc;
+        }
     }
     
     public static void b_proc_18_d() {
@@ -2595,10 +2632,17 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_25_d() {
-        value2_reg = fail_reg;
-        value1_reg = substring(car(args_reg), cadr(args_reg), caddr(args_reg));
-        k_reg = k2_reg;
-        pc = apply_cont2;
+        if (true_q(Equal(length(args_reg), 3))) {
+            value2_reg = fail_reg;
+            value1_reg = substring(car(args_reg), cadr(args_reg), caddr(args_reg));
+            k_reg = k2_reg;
+            pc = apply_cont2;
+        } else {
+            value2_reg = fail_reg;
+            value1_reg = substring(car(args_reg), cadr(args_reg), string_length(car(args_reg)));
+            k_reg = k2_reg;
+            pc = apply_cont2;
+        }
     }
     
     public static void b_proc_26_d() {
@@ -3488,10 +3532,15 @@ public class PJScheme:Scheme
             msg_reg = "incorrect number of arguments to =";
             pc = runtime_error;
         } else {
-            value2_reg = fail_reg;
-            value1_reg = apply(Equal_proc, args_reg);
-            k_reg = k2_reg;
-            pc = apply_cont2;
+            if (true_q((! true_q(all_numeric_q(args_reg))))) {
+                msg_reg = "attempt to apply = on non-numeric argument";
+                pc = runtime_error;
+            } else {
+                value2_reg = fail_reg;
+                value1_reg = apply(Equal_proc, args_reg);
+                k_reg = k2_reg;
+                pc = apply_cont2;
+            }
         }
     }
     
@@ -3632,7 +3681,7 @@ public class PJScheme:Scheme
             object module_name = symbol_undefined;
             module_name = cadr(args_reg);
             filename = car(args_reg);
-            k_reg = make_cont2("cont2", 84, filename, handler_reg, k2_reg);
+            k_reg = make_cont2("cont2", 85, filename, handler_reg, k2_reg);
             env_reg = env2_reg;
             var_reg = module_name;
             pc = lookup_binding_in_first_frame;
@@ -3948,6 +3997,23 @@ public class PJScheme:Scheme
     }
     
     public static void b_proc_128_d() {
+<<<<<<< HEAD
+=======
+        value2_reg = fail_reg;
+        value1_reg = import_as_native(car(args_reg), cadr(args_reg), env2_reg);
+        k_reg = k2_reg;
+        pc = apply_cont2;
+    }
+    
+    public static void b_proc_129_d() {
+        value2_reg = fail_reg;
+        value1_reg = import_from_native(car(args_reg), cdr(args_reg), env2_reg);
+        k_reg = k2_reg;
+        pc = apply_cont2;
+    }
+    
+    public static void b_proc_130_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to not";
             pc = runtime_error;
@@ -3959,7 +4025,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_129_d() {
+=======
+    public static void b_proc_131_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         apply(printf_proc, args_reg);
         value2_reg = fail_reg;
         value1_reg = void_value;
@@ -3967,14 +4037,22 @@ public class PJScheme:Scheme
         pc = apply_cont2;
     }
     
+<<<<<<< HEAD
     public static void b_proc_130_d() {
+=======
+    public static void b_proc_132_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         value2_reg = fail_reg;
         value1_reg = apply(vector_native_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
+<<<<<<< HEAD
     public static void b_proc_131_d() {
+=======
+    public static void b_proc_133_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         vector_set_b(car(args_reg), cadr(args_reg), caddr(args_reg));
         value2_reg = fail_reg;
         value1_reg = void_value;
@@ -3982,21 +4060,33 @@ public class PJScheme:Scheme
         pc = apply_cont2;
     }
     
+<<<<<<< HEAD
     public static void b_proc_132_d() {
+=======
+    public static void b_proc_134_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         value2_reg = fail_reg;
         value1_reg = apply(vector_ref_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
+<<<<<<< HEAD
     public static void b_proc_133_d() {
+=======
+    public static void b_proc_135_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         value2_reg = fail_reg;
         value1_reg = apply(make_vector_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
+<<<<<<< HEAD
     public static void b_proc_134_d() {
+=======
+    public static void b_proc_136_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_at_least_q(1, args_reg))))) {
             msg_reg = "incorrect number of arguments to 'error' (should at least 1)";
             pc = runtime_error;
@@ -4010,7 +4100,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_135_d() {
+=======
+    public static void b_proc_137_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to list-ref";
             pc = runtime_error;
@@ -4022,7 +4116,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_136_d() {
+=======
+    public static void b_proc_138_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q(null_q(args_reg))) {
             value2_reg = fail_reg;
             value1_reg = current_directory();
@@ -4046,7 +4144,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_137_d() {
+=======
+    public static void b_proc_139_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((true_q(length_one_q(args_reg)) && true_q(number_q(car(args_reg)))))) {
             value2_reg = fail_reg;
             value1_reg = round(car(args_reg));
@@ -4058,7 +4160,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_138_d() {
+=======
+    public static void b_proc_140_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((true_q(length_one_q(args_reg)) && true_q(boolean_q(car(args_reg)))))) {
             set_use_stack_trace_b(car(args_reg));
             value2_reg = fail_reg;
@@ -4078,7 +4184,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_139_d() {
+=======
+    public static void b_proc_141_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((true_q(length_one_q(args_reg)) && true_q(boolean_q(car(args_reg)))))) {
             _startracing_on_q_star = true_q(car(args_reg));
             value2_reg = fail_reg;
@@ -4098,7 +4208,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_140_d() {
+=======
+    public static void b_proc_142_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to eqv?";
             pc = runtime_error;
@@ -4110,7 +4224,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_141_d() {
+=======
+    public static void b_proc_143_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to vector?";
             pc = runtime_error;
@@ -4122,7 +4240,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_142_d() {
+=======
+    public static void b_proc_144_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to atom?";
             pc = runtime_error;
@@ -4134,7 +4256,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_143_d() {
+=======
+    public static void b_proc_145_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to iter?";
             pc = runtime_error;
@@ -4146,7 +4272,32 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_144_d() {
+=======
+    public static void b_proc_146_d() {
+        value2_reg = fail_reg;
+        value1_reg = apply(contains_native_proc, args_reg);
+        k_reg = k2_reg;
+        pc = apply_cont2;
+    }
+    
+    public static void b_proc_147_d() {
+        value2_reg = fail_reg;
+        value1_reg = apply(getitem_native_proc, args_reg);
+        k_reg = k2_reg;
+        pc = apply_cont2;
+    }
+    
+    public static void b_proc_148_d() {
+        value2_reg = fail_reg;
+        value1_reg = apply(setitem_native_proc, args_reg);
+        k_reg = k2_reg;
+        pc = apply_cont2;
+    }
+    
+    public static void b_proc_149_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to list?";
             pc = runtime_error;
@@ -4158,7 +4309,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_145_d() {
+=======
+    public static void b_proc_150_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to procedure?";
             pc = runtime_error;
@@ -4170,7 +4325,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_146_d() {
+=======
+    public static void b_proc_151_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to string<?";
             pc = runtime_error;
@@ -4182,7 +4341,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_147_d() {
+=======
+    public static void b_proc_152_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to float";
             pc = runtime_error;
@@ -4194,7 +4357,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_148_d() {
+=======
+    public static void b_proc_153_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(null_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to globals";
             pc = runtime_error;
@@ -4206,7 +4373,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_149_d() {
+=======
+    public static void b_proc_154_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to int";
             pc = runtime_error;
@@ -4218,7 +4389,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_150_d() {
+=======
+    public static void b_proc_155_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_at_least_q(1, args_reg))))) {
             msg_reg = "incorrect number of arguments to apply-with-keywords";
             pc = runtime_error;
@@ -4230,7 +4405,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_151_d() {
+=======
+    public static void b_proc_156_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to assq";
             pc = runtime_error;
@@ -4242,14 +4421,22 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_152_d() {
+=======
+    public static void b_proc_157_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         value2_reg = fail_reg;
         value1_reg = apply(dict_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
+<<<<<<< HEAD
     public static void b_proc_153_d() {
+=======
+    public static void b_proc_158_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to property";
             pc = runtime_error;
@@ -4261,7 +4448,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_154_d() {
+=======
+    public static void b_proc_159_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to rational";
             pc = runtime_error;
@@ -4273,7 +4464,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_155_d() {
+=======
+    public static void b_proc_160_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(null_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to reset-toplevel-env";
             pc = runtime_error;
@@ -4285,7 +4480,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_156_d() {
+=======
+    public static void b_proc_161_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to sort";
             pc = runtime_error;
@@ -4297,7 +4496,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_157_d() {
+=======
+    public static void b_proc_162_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_at_least_q(2, args_reg))))) {
             msg_reg = "incorrect number of arguments to string-append";
             pc = runtime_error;
@@ -4309,7 +4512,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_158_d() {
+=======
+    public static void b_proc_163_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_two_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to string-split";
             pc = runtime_error;
@@ -4321,7 +4528,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_159_d() {
+=======
+    public static void b_proc_164_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to symbol";
             pc = runtime_error;
@@ -4333,7 +4544,11 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_160_d() {
+=======
+    public static void b_proc_165_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         if (true_q((! true_q(length_one_q(args_reg))))) {
             msg_reg = "incorrect number of arguments to typeof";
             pc = runtime_error;
@@ -4345,14 +4560,22 @@ public class PJScheme:Scheme
         }
     }
     
+<<<<<<< HEAD
     public static void b_proc_161_d() {
+=======
+    public static void b_proc_166_d() {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         value2_reg = fail_reg;
         value1_reg = apply(use_lexical_address_proc, args_reg);
         k_reg = k2_reg;
         pc = apply_cont2;
     }
     
+<<<<<<< HEAD
     public static void b_proc_162_d(object external_function_object) {
+=======
+    public static void b_proc_167_d(object external_function_object) {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         value2_reg = fail_reg;
         value1_reg = dlr_apply(external_function_object, args_reg);
         k_reg = k2_reg;
@@ -4400,7 +4623,7 @@ public class PJScheme:Scheme
         vars = map_hat(car_hat_proc, decls);
         procs = map_hat(cadr_hat_proc, decls);
         bodies = cddr_hat(datum_reg);
-        k2_reg = make_cont2("cont2", 36, bodies, k_reg);
+        k2_reg = make_cont2("cont2", 37, bodies, k_reg);
         procs_reg = procs;
         vars_reg = vars;
         pc = create_letrec_assignments_hat;
@@ -4550,7 +4773,7 @@ public class PJScheme:Scheme
         object clauses = symbol_undefined;
         clauses = cddr_hat(datum_reg);
         exp = cadr_hat(datum_reg);
-        k2_reg = make_cont2("cont2", 38, exp, k_reg);
+        k2_reg = make_cont2("cont2", 39, exp, k_reg);
         clauses_reg = clauses;
         var_reg = symbol_r;
         pc = case_clauses_to_cond_clauses_hat;
@@ -4561,7 +4784,7 @@ public class PJScheme:Scheme
         object clauses = symbol_undefined;
         clauses = cddr_hat(datum_reg);
         exp = cadr_hat(datum_reg);
-        k2_reg = make_cont2("cont2", 38, exp, k_reg);
+        k2_reg = make_cont2("cont2", 39, exp, k_reg);
         clauses_reg = clauses;
         var_reg = symbol_r;
         pc = record_case_clauses_to_cond_clauses_hat;
@@ -4579,7 +4802,7 @@ public class PJScheme:Scheme
         } else {
             object variants = symbol_undefined;
             variants = cdddr_hat(datum_reg);
-            k2_reg = make_cont2("cont2", 41, type_tester_name, k_reg);
+            k2_reg = make_cont2("cont2", 42, type_tester_name, k_reg);
             variants_reg = variants;
             pc = make_dd_variant_constructors_hat;
         }
@@ -4594,7 +4817,7 @@ public class PJScheme:Scheme
         type_tester_name = string_to_symbol(string_append(symbol_to_string_hat(type_name), "?"));
         exp = caddr_hat(datum_reg);
         clauses = cdddr_hat(datum_reg);
-        k2_reg = make_cont2("cont2", 44, exp, type_name, type_tester_name, k_reg);
+        k2_reg = make_cont2("cont2", 45, exp, type_name, type_tester_name, k_reg);
         clauses_reg = clauses;
         var_reg = symbol_r;
         pc = record_case_clauses_to_cond_clauses_hat;
@@ -6157,16 +6380,16 @@ public class PJScheme:Scheme
                                     pc = aparse_error;
                                 } else {
                                     if (true_q(syntactic_sugar_q_hat(adatum_reg))) {
-                                        k_reg = make_cont2("cont2", 31, senv_reg, handler_reg, k_reg);
+                                        k_reg = make_cont2("cont2", 32, senv_reg, handler_reg, k_reg);
                                         pc = expand_once_hat;
                                     } else {
                                         if (true_q(if_then_q_hat(adatum_reg))) {
-                                            k_reg = make_cont2("cont2", 30, adatum_reg, senv_reg, info, handler_reg, k_reg);
+                                            k_reg = make_cont2("cont2", 31, adatum_reg, senv_reg, info, handler_reg, k_reg);
                                             adatum_reg = cadr_hat(adatum_reg);
                                             pc = aparse;
                                         } else {
                                             if (true_q(if_else_q_hat(adatum_reg))) {
-                                                k_reg = make_cont2("cont2", 28, adatum_reg, senv_reg, info, handler_reg, k_reg);
+                                                k_reg = make_cont2("cont2", 29, adatum_reg, senv_reg, info, handler_reg, k_reg);
                                                 adatum_reg = cadr_hat(adatum_reg);
                                                 pc = aparse;
                                             } else {
@@ -6178,44 +6401,26 @@ public class PJScheme:Scheme
                                                     pc = apply_cont2;
                                                 } else {
                                                     if (true_q(assignment_q_hat(adatum_reg))) {
-                                                        k_reg = make_cont2("cont2", 25, adatum_reg, info, k_reg);
+                                                        k_reg = make_cont2("cont2", 26, adatum_reg, info, k_reg);
                                                         adatum_reg = caddr_hat(adatum_reg);
                                                         pc = aparse;
                                                     } else {
-                                                        if (true_q(func_q_hat(adatum_reg))) {
-                                                            k_reg = make_cont2("cont2", 24, info, k_reg);
-                                                            adatum_reg = cadr_hat(adatum_reg);
+                                                        if (true_q(association_q_hat(adatum_reg))) {
+                                                            k_reg = make_cont2("cont2", 25, adatum_reg, info, k_reg);
+                                                            adatum_reg = caddr_hat(adatum_reg);
                                                             pc = aparse;
                                                         } else {
-                                                            if (true_q(callback_q_hat(adatum_reg))) {
-                                                                k_reg = make_cont2("cont2", 23, info, k_reg);
+                                                            if (true_q(func_q_hat(adatum_reg))) {
+                                                                k_reg = make_cont2("cont2", 24, info, k_reg);
                                                                 adatum_reg = cadr_hat(adatum_reg);
                                                                 pc = aparse;
                                                             } else {
-                                                                if (true_q(define_q_hat(adatum_reg))) {
-                                                                    if (true_q(mit_style_define_q_hat(adatum_reg))) {
-                                                                        k_reg = make_cont("cont", 16, senv_reg, info, handler_reg, fail_reg, k_reg);
-                                                                        datum_reg = adatum_reg;
-                                                                        macro_reg = mit_define_transformer_hat;
-                                                                        pc = apply_macro;
-                                                                    } else {
-                                                                        if (true_q(Equal(length_hat(adatum_reg), 3))) {
-                                                                            k_reg = make_cont2("cont2", 22, adatum_reg, info, k_reg);
-                                                                            adatum_reg = caddr_hat(adatum_reg);
-                                                                            pc = aparse;
-                                                                        } else {
-                                                                            if (true_q((true_q(Equal(length_hat(adatum_reg), 4)) && true_q(string_q_hat(caddr_hat(adatum_reg)))))) {
-                                                                                k_reg = make_cont2("cont2", 21, adatum_reg, info, k_reg);
-                                                                                adatum_reg = cadddr_hat(adatum_reg);
-                                                                                pc = aparse;
-                                                                            } else {
-                                                                                msg_reg = "bad concrete syntax:";
-                                                                                pc = aparse_error;
-                                                                            }
-                                                                        }
-                                                                    }
+                                                                if (true_q(callback_q_hat(adatum_reg))) {
+                                                                    k_reg = make_cont2("cont2", 23, info, k_reg);
+                                                                    adatum_reg = cadr_hat(adatum_reg);
+                                                                    pc = aparse;
                                                                 } else {
-                                                                    if (true_q(define_b_q_hat(adatum_reg))) {
+                                                                    if (true_q(define_q_hat(adatum_reg))) {
                                                                         if (true_q(mit_style_define_q_hat(adatum_reg))) {
                                                                             k_reg = make_cont("cont", 16, senv_reg, info, handler_reg, fail_reg, k_reg);
                                                                             datum_reg = adatum_reg;
@@ -6223,12 +6428,12 @@ public class PJScheme:Scheme
                                                                             pc = apply_macro;
                                                                         } else {
                                                                             if (true_q(Equal(length_hat(adatum_reg), 3))) {
-                                                                                k_reg = make_cont2("cont2", 20, adatum_reg, info, k_reg);
+                                                                                k_reg = make_cont2("cont2", 22, adatum_reg, info, k_reg);
                                                                                 adatum_reg = caddr_hat(adatum_reg);
                                                                                 pc = aparse;
                                                                             } else {
                                                                                 if (true_q((true_q(Equal(length_hat(adatum_reg), 4)) && true_q(string_q_hat(caddr_hat(adatum_reg)))))) {
-                                                                                    k_reg = make_cont2("cont2", 19, adatum_reg, info, k_reg);
+                                                                                    k_reg = make_cont2("cont2", 21, adatum_reg, info, k_reg);
                                                                                     adatum_reg = cadddr_hat(adatum_reg);
                                                                                     pc = aparse;
                                                                                 } else {
@@ -6238,84 +6443,108 @@ public class PJScheme:Scheme
                                                                             }
                                                                         }
                                                                     } else {
-                                                                        if (true_q(define_syntax_q_hat(adatum_reg))) {
-                                                                            object name = symbol_undefined;
-                                                                            object aclauses = symbol_undefined;
-                                                                            aclauses = cddr_hat(adatum_reg);
-                                                                            name = define_var_hat(adatum_reg);
-                                                                            k_reg = make_cont("cont", 14, aclauses, name, info, fail_reg, k_reg);
-                                                                            x_reg = aclauses;
-                                                                            pc = unannotate_cps;
-                                                                        } else {
-                                                                            if (true_q(begin_q_hat(adatum_reg))) {
-                                                                                if (true_q(null_q_hat(cdr_hat(adatum_reg)))) {
-                                                                                    msg_reg = "bad concrete syntax:";
-                                                                                    pc = aparse_error;
+                                                                        if (true_q(define_b_q_hat(adatum_reg))) {
+                                                                            if (true_q(mit_style_define_q_hat(adatum_reg))) {
+                                                                                k_reg = make_cont("cont", 16, senv_reg, info, handler_reg, fail_reg, k_reg);
+                                                                                datum_reg = adatum_reg;
+                                                                                macro_reg = mit_define_transformer_hat;
+                                                                                pc = apply_macro;
+                                                                            } else {
+                                                                                if (true_q(Equal(length_hat(adatum_reg), 3))) {
+                                                                                    k_reg = make_cont2("cont2", 20, adatum_reg, info, k_reg);
+                                                                                    adatum_reg = caddr_hat(adatum_reg);
+                                                                                    pc = aparse;
                                                                                 } else {
-                                                                                    if (true_q(null_q_hat(cddr_hat(adatum_reg)))) {
-                                                                                        adatum_reg = cadr_hat(adatum_reg);
+                                                                                    if (true_q((true_q(Equal(length_hat(adatum_reg), 4)) && true_q(string_q_hat(caddr_hat(adatum_reg)))))) {
+                                                                                        k_reg = make_cont2("cont2", 19, adatum_reg, info, k_reg);
+                                                                                        adatum_reg = cadddr_hat(adatum_reg);
                                                                                         pc = aparse;
                                                                                     } else {
-                                                                                        k_reg = make_cont2("cont2", 18, info, k_reg);
-                                                                                        adatum_list_reg = cdr_hat(adatum_reg);
-                                                                                        pc = aparse_all;
+                                                                                        msg_reg = "bad concrete syntax:";
+                                                                                        pc = aparse_error;
                                                                                     }
                                                                                 }
+                                                                            }
+                                                                        } else {
+                                                                            if (true_q(define_syntax_q_hat(adatum_reg))) {
+                                                                                object name = symbol_undefined;
+                                                                                object aclauses = symbol_undefined;
+                                                                                aclauses = cddr_hat(adatum_reg);
+                                                                                name = define_var_hat(adatum_reg);
+                                                                                k_reg = make_cont("cont", 14, aclauses, name, info, fail_reg, k_reg);
+                                                                                x_reg = aclauses;
+                                                                                pc = unannotate_cps;
                                                                             } else {
-                                                                                if (true_q(lambda_q_hat(adatum_reg))) {
-                                                                                    k_reg = make_cont("cont", 13, adatum_reg, senv_reg, info, handler_reg, fail_reg, k_reg);
-                                                                                    x_reg = cadr_hat(adatum_reg);
-                                                                                    pc = unannotate_cps;
+                                                                                if (true_q(begin_q_hat(adatum_reg))) {
+                                                                                    if (true_q(null_q_hat(cdr_hat(adatum_reg)))) {
+                                                                                        msg_reg = "bad concrete syntax:";
+                                                                                        pc = aparse_error;
+                                                                                    } else {
+                                                                                        if (true_q(null_q_hat(cddr_hat(adatum_reg)))) {
+                                                                                            adatum_reg = cadr_hat(adatum_reg);
+                                                                                            pc = aparse;
+                                                                                        } else {
+                                                                                            k_reg = make_cont2("cont2", 18, info, k_reg);
+                                                                                            adatum_list_reg = cdr_hat(adatum_reg);
+                                                                                            pc = aparse_all;
+                                                                                        }
+                                                                                    }
                                                                                 } else {
-                                                                                    if (true_q(trace_lambda_q_hat(adatum_reg))) {
-                                                                                        k_reg = make_cont("cont", 12, adatum_reg, senv_reg, info, handler_reg, fail_reg, k_reg);
-                                                                                        x_reg = caddr_hat(adatum_reg);
+                                                                                    if (true_q(lambda_q_hat(adatum_reg))) {
+                                                                                        k_reg = make_cont("cont", 13, adatum_reg, senv_reg, info, handler_reg, fail_reg, k_reg);
+                                                                                        x_reg = cadr_hat(adatum_reg);
                                                                                         pc = unannotate_cps;
                                                                                     } else {
-                                                                                        if (true_q(try_q_hat(adatum_reg))) {
-                                                                                            if (true_q(Equal(length_hat(adatum_reg), 2))) {
-                                                                                                adatum_reg = try_body_hat(adatum_reg);
-                                                                                                pc = aparse;
-                                                                                            } else {
-                                                                                                if (true_q((true_q(Equal(length_hat(adatum_reg), 3)) && true_q(catch_q_hat(caddr_hat(adatum_reg)))))) {
-                                                                                                    k_reg = make_cont2("cont2", 15, adatum_reg, senv_reg, info, handler_reg, k_reg);
+                                                                                        if (true_q(trace_lambda_q_hat(adatum_reg))) {
+                                                                                            k_reg = make_cont("cont", 12, adatum_reg, senv_reg, info, handler_reg, fail_reg, k_reg);
+                                                                                            x_reg = caddr_hat(adatum_reg);
+                                                                                            pc = unannotate_cps;
+                                                                                        } else {
+                                                                                            if (true_q(try_q_hat(adatum_reg))) {
+                                                                                                if (true_q(Equal(length_hat(adatum_reg), 2))) {
                                                                                                     adatum_reg = try_body_hat(adatum_reg);
                                                                                                     pc = aparse;
                                                                                                 } else {
-                                                                                                    if (true_q((true_q(Equal(length_hat(adatum_reg), 3)) && true_q(finally_q_hat(caddr_hat(adatum_reg)))))) {
-                                                                                                        k_reg = make_cont2("cont2", 13, adatum_reg, senv_reg, info, handler_reg, k_reg);
+                                                                                                    if (true_q((true_q(Equal(length_hat(adatum_reg), 3)) && true_q(catch_q_hat(caddr_hat(adatum_reg)))))) {
+                                                                                                        k_reg = make_cont2("cont2", 15, adatum_reg, senv_reg, info, handler_reg, k_reg);
                                                                                                         adatum_reg = try_body_hat(adatum_reg);
                                                                                                         pc = aparse;
                                                                                                     } else {
-                                                                                                        if (true_q((true_q(Equal(length_hat(adatum_reg), 4)) && true_q(catch_q_hat(caddr_hat(adatum_reg))) && true_q(finally_q_hat(cadddr_hat(adatum_reg)))))) {
-                                                                                                            k_reg = make_cont2("cont2", 11, adatum_reg, senv_reg, info, handler_reg, k_reg);
+                                                                                                        if (true_q((true_q(Equal(length_hat(adatum_reg), 3)) && true_q(finally_q_hat(caddr_hat(adatum_reg)))))) {
+                                                                                                            k_reg = make_cont2("cont2", 13, adatum_reg, senv_reg, info, handler_reg, k_reg);
                                                                                                             adatum_reg = try_body_hat(adatum_reg);
                                                                                                             pc = aparse;
                                                                                                         } else {
-                                                                                                            msg_reg = "bad try syntax:";
-                                                                                                            pc = aparse_error;
+                                                                                                            if (true_q((true_q(Equal(length_hat(adatum_reg), 4)) && true_q(catch_q_hat(caddr_hat(adatum_reg))) && true_q(finally_q_hat(cadddr_hat(adatum_reg)))))) {
+                                                                                                                k_reg = make_cont2("cont2", 11, adatum_reg, senv_reg, info, handler_reg, k_reg);
+                                                                                                                adatum_reg = try_body_hat(adatum_reg);
+                                                                                                                pc = aparse;
+                                                                                                            } else {
+                                                                                                                msg_reg = "bad try syntax:";
+                                                                                                                pc = aparse_error;
+                                                                                                            }
                                                                                                         }
                                                                                                     }
                                                                                                 }
-                                                                                            }
-                                                                                        } else {
-                                                                                            if (true_q(raise_q_hat(adatum_reg))) {
-                                                                                                k_reg = make_cont2("cont2", 8, info, k_reg);
-                                                                                                adatum_reg = cadr_hat(adatum_reg);
-                                                                                                pc = aparse;
                                                                                             } else {
-                                                                                                if (true_q(choose_q_hat(adatum_reg))) {
-                                                                                                    k_reg = make_cont2("cont2", 7, info, k_reg);
-                                                                                                    adatum_list_reg = cdr_hat(adatum_reg);
-                                                                                                    pc = aparse_all;
+                                                                                                if (true_q(raise_q_hat(adatum_reg))) {
+                                                                                                    k_reg = make_cont2("cont2", 8, info, k_reg);
+                                                                                                    adatum_reg = cadr_hat(adatum_reg);
+                                                                                                    pc = aparse;
                                                                                                 } else {
-                                                                                                    if (true_q(application_q_hat(adatum_reg))) {
-                                                                                                        k_reg = make_cont2("cont2", 6, adatum_reg, senv_reg, info, handler_reg, k_reg);
-                                                                                                        adatum_reg = car_hat(adatum_reg);
-                                                                                                        pc = aparse;
+                                                                                                    if (true_q(choose_q_hat(adatum_reg))) {
+                                                                                                        k_reg = make_cont2("cont2", 7, info, k_reg);
+                                                                                                        adatum_list_reg = cdr_hat(adatum_reg);
+                                                                                                        pc = aparse_all;
                                                                                                     } else {
-                                                                                                        msg_reg = "bad concrete syntax:";
-                                                                                                        pc = aparse_error;
+                                                                                                        if (true_q(application_q_hat(adatum_reg))) {
+                                                                                                            k_reg = make_cont2("cont2", 6, adatum_reg, senv_reg, info, handler_reg, k_reg);
+                                                                                                            adatum_reg = car_hat(adatum_reg);
+                                                                                                            pc = aparse;
+                                                                                                        } else {
+                                                                                                            msg_reg = "bad concrete syntax:";
+                                                                                                            pc = aparse_error;
+                                                                                                        }
                                                                                                     }
                                                                                                 }
                                                                                             }
@@ -6348,7 +6577,7 @@ public class PJScheme:Scheme
             value1_reg = symbol_emptylist;
             pc = apply_cont2;
         } else {
-            k_reg = make_cont2("cont2", 33, adatum_list_reg, senv_reg, handler_reg, k_reg);
+            k_reg = make_cont2("cont2", 34, adatum_list_reg, senv_reg, handler_reg, k_reg);
             adatum_reg = car_hat(adatum_list_reg);
             pc = aparse;
         }
@@ -6410,7 +6639,7 @@ public class PJScheme:Scheme
             k_reg = k2_reg;
             pc = apply_cont2;
         } else {
-            k2_reg = make_cont2("cont2", 37, procs_reg, vars_reg, k2_reg);
+            k2_reg = make_cont2("cont2", 38, procs_reg, vars_reg, k2_reg);
             procs_reg = cdr_hat(procs_reg);
             vars_reg = cdr_hat(vars_reg);
             pc = create_letrec_assignments_hat;
@@ -6453,7 +6682,7 @@ public class PJScheme:Scheme
             k_reg = k2_reg;
             pc = apply_cont2;
         } else {
-            k2_reg = make_cont2("cont2", 39, clauses_reg, var_reg, k2_reg);
+            k2_reg = make_cont2("cont2", 40, clauses_reg, var_reg, k2_reg);
             clauses_reg = cdr_hat(clauses_reg);
             pc = case_clauses_to_cond_clauses_hat;
         }
@@ -6466,7 +6695,7 @@ public class PJScheme:Scheme
             k_reg = k2_reg;
             pc = apply_cont2;
         } else {
-            k2_reg = make_cont2("cont2", 40, clauses_reg, var_reg, k2_reg);
+            k2_reg = make_cont2("cont2", 41, clauses_reg, var_reg, k2_reg);
             clauses_reg = cdr_hat(clauses_reg);
             pc = record_case_clauses_to_cond_clauses_hat;
         }
@@ -6479,7 +6708,7 @@ public class PJScheme:Scheme
             k_reg = k2_reg;
             pc = apply_cont2;
         } else {
-            k2_reg = make_cont2("cont2", 43, variants_reg, k2_reg);
+            k2_reg = make_cont2("cont2", 44, variants_reg, k2_reg);
             variant_reg = car_hat(variants_reg);
             pc = make_dd_variant_constructor_hat;
         }
@@ -6510,7 +6739,7 @@ public class PJScheme:Scheme
     }
     
     public static object make_macro_env_hat() {
-        return make_initial_environment(sList(symbol_and, symbol_or, symbol_cond, symbol_let, symbol_letrec, symbol_let_star, symbol_case, symbol_record_case, symbol_define_datatype, symbol_cases), sList(and_transformer_hat, or_transformer_hat, cond_transformer_hat, let_transformer_hat, letrec_transformer_hat, let_star_transformer_hat, case_transformer_hat, record_case_transformer_hat, define_datatype_transformer_hat, cases_transformer_hat), sList("", "", "", "", "", "", "", "", "", ""));
+        return make_initial_environment(sList(symbol_and, symbol_or, symbol_cond, symbol_let, symbol_letrec, symbol_let_star, symbol_case, symbol_record_case, symbol_define_datatype, symbol_cases), sList(and_transformer_hat, or_transformer_hat, cond_transformer_hat, let_transformer_hat, letrec_transformer_hat, let_star_transformer_hat, case_transformer_hat, record_case_transformer_hat, define_datatype_transformer_hat, cases_transformer_hat), sList(string_append("(and ...) - short-circuiting `and` macro\n", "\n", "Example:\n", "    In  [1]: (and)\n", "    Out [1]: #t\n", "    In  [2]: (and #t #f)\n", "    Out [2]: #f\n"), string_append("(or ...) - short-circuiting `or` macro", "\n", "Example:\n", "    In  [1]: (or)\n", "    Out [1]: #f\n", "    In  [2]: (or #t #f)\n", "    Out [2]: #t\n"), string_append("(cond (TEST RETURN)...) - conditional evaluation macro", "\n", "Example:\n", "    In  [1]: (cond ((= 1 2) 3)(else 4))\n", "    Out [1]: 4\n"), string_append("(let ((VAR VALUE)...)...) - local variable macro", "\n", "Example:\n", "    In  [1]: (let ((x 3)) x)\n", "    Out [1]: 3\n"), string_append("(letrec ((VAR VALUE)...)...) - recursive local variable macro", "\n", "Example:\n", "    In  [*]: (letrec ((loop (lambda () (loop)))) (loop))\n"), string_append("(let* ((VAR VALUE)...)...) - cascading local variable macro", "\n", "Example:\n", "    In  [1]: (let* ((a 1)(b a)(c b)) c)\n", "    Out [1]: 1\n"), string_append("(case THING (ITEM RETURN)...)) - case macro", "\n", "Example:\n", "    In  [1]: (case 1 (1 2)(3 4))\n", "    Out [1]: 2\n"), string_append("(record-case ) - record-case macro for define-datatype", "\n", "Example:\n", "    In  [1]: (record-case ddtype (subtype (part...) return)...)\n"), string_append("(define-datatype NAME NAME? (TYPE (PART TEST))...) - defines new datatypes and support functions (macro)", "\n", "Example:\n", "    In  [1]: (define-datatype e e?)\n", "    In  [1]: (e? 1)\n", "    Out [1]: #f\n"), string_append("(cases ...) - cases macro for a more flexible case", "\n", "Example:\n", "    In  [1]: (cases 1 ((1 2) 3))\n", "    Out [1]: 3\n")));
     }
     
     public static object make_pattern_macro_hat(object clauses, object aclauses) {
@@ -6551,7 +6780,7 @@ public class PJScheme:Scheme
         object macro = symbol_undefined;
         macro = get_first_frame_value(macro_keyword, macro_env);
         if (true_q(pattern_macro_q(macro))) {
-            k_reg = make_cont2("cont2", 45, macro_keyword, k_reg);
+            k_reg = make_cont2("cont2", 46, macro_keyword, k_reg);
             aclauses_reg = macro_aclauses(macro);
             clauses_reg = macro_clauses(macro);
             pc = process_macro_clauses_hat;
@@ -6941,6 +7170,10 @@ public class PJScheme:Scheme
         return symbol_goodbye;
     }
     
+    public static object execute_string_top(object input_, object source) {
+        return execute_rm(input_, source);
+    }
+    
     public static object execute_string_rm(object input_) {
         return execute_rm(input_, symbol_stdin);
     }
@@ -6994,7 +7227,7 @@ public class PJScheme:Scheme
     
     public static object try_parse(object input_) {
         load_stack = symbol_emptylist;
-        k_reg = make_cont2("cont2", 50);
+        k_reg = make_cont2("cont2", 51);
         fail_reg = _starlast_fail_star;
         handler_reg = try_parse_handler;
         src_reg = symbol_stdin;
@@ -7012,7 +7245,7 @@ public class PJScheme:Scheme
     }
     
     public static object make_debugging_k(object exp, object k) {
-        return make_cont2("cont2", 51, exp, k);
+        return make_cont2("cont2", 52, exp, k);
     }
     
     public static object get_use_stack_trace() {
@@ -7081,14 +7314,14 @@ public class PJScheme:Scheme
                     if (true_q(Eq(car(exp_reg), symbol_func_aexp))) {
                         object exp = symbol_undefined;
                         exp = list_ref(exp_reg, 1);
-                        k_reg = make_cont2("cont2", 69, k);
+                        k_reg = make_cont2("cont2", 70, k);
                         exp_reg = exp;
                         pc = m;
                     } else {
                         if (true_q(Eq(car(exp_reg), symbol_callback_aexp))) {
                             object exp = symbol_undefined;
                             exp = list_ref(exp_reg, 1);
-                            k_reg = make_cont2("cont2", 68, k);
+                            k_reg = make_cont2("cont2", 69, k);
                             exp_reg = exp;
                             pc = m;
                         } else {
@@ -7099,7 +7332,7 @@ public class PJScheme:Scheme
                                 else_exp = list_ref(exp_reg, 3);
                                 then_exp = list_ref(exp_reg, 2);
                                 test_exp = list_ref(exp_reg, 1);
-                                k_reg = make_cont2("cont2", 67, else_exp, then_exp, env_reg, handler_reg, k);
+                                k_reg = make_cont2("cont2", 68, else_exp, then_exp, env_reg, handler_reg, k);
                                 exp_reg = test_exp;
                                 pc = m;
                             } else {
@@ -7108,9 +7341,9 @@ public class PJScheme:Scheme
                                     object var_info = symbol_undefined;
                                     var_info = list_ref(exp_reg, 2);
                                     var = list_ref(exp_reg, 1);
-                                    sk_reg = make_cont2("cont2", 65, k);
+                                    sk_reg = make_cont2("cont2", 66, k);
                                     dk_reg = make_cont3("cont3", 5, k);
-                                    gk_reg = make_cont2("cont2", 66, k);
+                                    gk_reg = make_cont2("cont2", 67, k);
                                     var_info_reg = var_info;
                                     var_reg = var;
                                     pc = lookup_variable;
@@ -7122,7 +7355,7 @@ public class PJScheme:Scheme
                                         var_info = list_ref(exp_reg, 3);
                                         rhs_exp = list_ref(exp_reg, 2);
                                         var = list_ref(exp_reg, 1);
-                                        k_reg = make_cont2("cont2", 64, var, var_info, env_reg, handler_reg, k);
+                                        k_reg = make_cont2("cont2", 65, var, var_info, env_reg, handler_reg, k);
                                         exp_reg = rhs_exp;
                                         pc = m;
                                     } else {
@@ -7133,7 +7366,7 @@ public class PJScheme:Scheme
                                             rhs_exp = list_ref(exp_reg, 3);
                                             docstring = list_ref(exp_reg, 2);
                                             var = list_ref(exp_reg, 1);
-                                            k_reg = make_cont2("cont2", 61, docstring, var, env_reg, handler_reg, k);
+                                            k_reg = make_cont2("cont2", 62, docstring, var, env_reg, handler_reg, k);
                                             exp_reg = rhs_exp;
                                             pc = m;
                                         } else {
@@ -7144,7 +7377,7 @@ public class PJScheme:Scheme
                                                 rhs_exp = list_ref(exp_reg, 3);
                                                 docstring = list_ref(exp_reg, 2);
                                                 var = list_ref(exp_reg, 1);
-                                                k_reg = make_cont2("cont2", 59, docstring, var, k);
+                                                k_reg = make_cont2("cont2", 60, docstring, var, k);
                                                 exp_reg = rhs_exp;
                                                 pc = m;
                                             } else {
@@ -7155,7 +7388,7 @@ public class PJScheme:Scheme
                                                     aclauses = list_ref(exp_reg, 3);
                                                     clauses = list_ref(exp_reg, 2);
                                                     name = list_ref(exp_reg, 1);
-                                                    k_reg = make_cont2("cont2", 58, aclauses, clauses, k);
+                                                    k_reg = make_cont2("cont2", 59, aclauses, clauses, k);
                                                     env_reg = macro_env;
                                                     var_reg = name;
                                                     pc = lookup_binding_in_first_frame;
@@ -7236,7 +7469,7 @@ public class PJScheme:Scheme
                                                                                 body = list_ref(exp_reg, 1);
                                                                                 object new_handler = symbol_undefined;
                                                                                 new_handler = try_finally_handler(fexps, env_reg, handler_reg);
-                                                                                k_reg = make_cont2("cont2", 57, fexps, env_reg, handler_reg, k);
+                                                                                k_reg = make_cont2("cont2", 58, fexps, env_reg, handler_reg, k);
                                                                                 handler_reg = new_handler;
                                                                                 exp_reg = body;
                                                                                 pc = m;
@@ -7252,7 +7485,7 @@ public class PJScheme:Scheme
                                                                                     body = list_ref(exp_reg, 1);
                                                                                     object new_handler = symbol_undefined;
                                                                                     new_handler = try_catch_finally_handler(cvar, cexps, fexps, env_reg, handler_reg, k);
-                                                                                    k_reg = make_cont2("cont2", 57, fexps, env_reg, handler_reg, k);
+                                                                                    k_reg = make_cont2("cont2", 58, fexps, env_reg, handler_reg, k);
                                                                                     handler_reg = new_handler;
                                                                                     exp_reg = body;
                                                                                     pc = m;
@@ -7260,7 +7493,7 @@ public class PJScheme:Scheme
                                                                                     if (true_q(Eq(car(exp_reg), symbol_raise_aexp))) {
                                                                                         object exp = symbol_undefined;
                                                                                         exp = list_ref(exp_reg, 1);
-                                                                                        k_reg = make_cont2("cont2", 55, handler_reg);
+                                                                                        k_reg = make_cont2("cont2", 56, handler_reg);
                                                                                         exp_reg = exp;
                                                                                         pc = m;
                                                                                     } else {
@@ -7278,7 +7511,7 @@ public class PJScheme:Scheme
                                                                                                 info = list_ref(exp_reg, 3);
                                                                                                 operands = list_ref(exp_reg, 2);
                                                                                                 operator_ = list_ref(exp_reg, 1);
-                                                                                                k_reg = make_cont2("cont2", 54, exp_reg, operator_, env_reg, info, handler_reg, k);
+                                                                                                k_reg = make_cont2("cont2", 55, exp_reg, operator_, env_reg, info, handler_reg, k);
                                                                                                 exps_reg = operands;
                                                                                                 pc = m_star;
                                                                                             } else {
@@ -7401,7 +7634,7 @@ public class PJScheme:Scheme
             value1_reg = symbol_emptylist;
             pc = apply_cont2;
         } else {
-            k_reg = make_cont2("cont2", 70, exps_reg, env_reg, handler_reg, k_reg);
+            k_reg = make_cont2("cont2", 71, exps_reg, env_reg, handler_reg, k_reg);
             exp_reg = car(exps_reg);
             pc = m;
         }
@@ -7412,7 +7645,7 @@ public class PJScheme:Scheme
             exp_reg = car(exps_reg);
             pc = m;
         } else {
-            k_reg = make_cont2("cont2", 71, exps_reg, env_reg, handler_reg, k_reg);
+            k_reg = make_cont2("cont2", 72, exps_reg, env_reg, handler_reg, k_reg);
             exp_reg = car(exps_reg);
             pc = m;
         }
@@ -7548,7 +7781,7 @@ public class PJScheme:Scheme
                     pc = runtime_error;
                 } else {
                     load_stack = cons(filename_reg, load_stack);
-                    k_reg = make_cont2("cont2", 79, filename_reg, env2_reg, handler_reg, k_reg);
+                    k_reg = make_cont2("cont2", 80, filename_reg, env2_reg, handler_reg, k_reg);
                     src_reg = filename_reg;
                     input_reg = read_content(filename_reg);
                     pc = scan_input;
@@ -7574,7 +7807,7 @@ public class PJScheme:Scheme
             value1_reg = void_value;
             pc = apply_cont2;
         } else {
-            k_reg = make_cont2("cont2", 82, filenames_reg, env2_reg, info_reg, handler_reg, k_reg);
+            k_reg = make_cont2("cont2", 83, filenames_reg, env2_reg, info_reg, handler_reg, k_reg);
             filename_reg = car(filenames_reg);
             pc = load_file;
         }
@@ -7605,7 +7838,7 @@ public class PJScheme:Scheme
             k_reg = k2_reg;
             pc = apply_cont2;
         } else {
-            k2_reg = make_cont2("cont2", 83, lst_reg, k2_reg);
+            k2_reg = make_cont2("cont2", 84, lst_reg, k2_reg);
             lst_reg = cdr(lst_reg);
             pc = make_set;
         }
@@ -7667,7 +7900,7 @@ public class PJScheme:Scheme
     public static void get_primitive() {
         object sym = symbol_undefined;
         sym = car(args_reg);
-        k_reg = make_cont2("cont2", 85, args_reg, sym, info_reg, handler_reg, k_reg);
+        k_reg = make_cont2("cont2", 86, args_reg, sym, info_reg, handler_reg, k_reg);
         var_info_reg = symbol_none;
         var_reg = sym;
         pc = lookup_value;
@@ -7680,7 +7913,7 @@ public class PJScheme:Scheme
             k_reg = k2_reg;
             pc = apply_cont2;
         } else {
-            k2_reg = make_cont2("cont2", 86, ls1_reg, k2_reg);
+            k2_reg = make_cont2("cont2", 87, ls1_reg, k2_reg);
             ls1_reg = cdr(ls1_reg);
             pc = append2;
         }
@@ -7703,7 +7936,7 @@ public class PJScheme:Scheme
                     msg_reg = format("append called on incorrect list structure ~s", car(lists_reg));
                     pc = runtime_error;
                 } else {
-                    k2_reg = make_cont2("cont2", 87, lists_reg, k2_reg);
+                    k2_reg = make_cont2("cont2", 88, lists_reg, k2_reg);
                     lists_reg = cdr(lists_reg);
                     pc = append_all;
                 }
@@ -7807,7 +8040,7 @@ public class PJScheme:Scheme
             value1_reg = symbol_emptylist;
             pc = apply_cont2;
         } else {
-            k2_reg = make_cont2("cont2", 88, iterator_reg, proc_reg, env_reg, handler_reg, k_reg);
+            k2_reg = make_cont2("cont2", 89, iterator_reg, proc_reg, env_reg, handler_reg, k_reg);
             info_reg = symbol_none;
             env2_reg = env_reg;
             args_reg = sList(item);
@@ -7830,7 +8063,7 @@ public class PJScheme:Scheme
             value1_reg = symbol_emptylist;
             pc = apply_cont2;
         } else {
-            k2_reg = make_cont2("cont2", 89, iterator_reg, proc_reg, env_reg, handler_reg, k_reg);
+            k2_reg = make_cont2("cont2", 90, iterator_reg, proc_reg, env_reg, handler_reg, k_reg);
             info_reg = symbol_none;
             env2_reg = env_reg;
             args_reg = sList(item);
@@ -7845,11 +8078,11 @@ public class PJScheme:Scheme
             pc = apply_cont2;
         } else {
             if (true_q(dlr_proc_q(proc_reg))) {
-                k_reg = make_cont2("cont2", 91, list1_reg, proc_reg, k_reg);
+                k_reg = make_cont2("cont2", 92, list1_reg, proc_reg, k_reg);
                 list1_reg = cdr(list1_reg);
                 pc = map1;
             } else {
-                k2_reg = make_cont2("cont2", 90, list1_reg, proc_reg, env_reg, handler_reg, k_reg);
+                k2_reg = make_cont2("cont2", 91, list1_reg, proc_reg, env_reg, handler_reg, k_reg);
                 info_reg = symbol_none;
                 env2_reg = env_reg;
                 args_reg = sList(car(list1_reg));
@@ -7865,12 +8098,12 @@ public class PJScheme:Scheme
             pc = apply_cont2;
         } else {
             if (true_q(dlr_proc_q(proc_reg))) {
-                k_reg = make_cont2("cont2", 93, list1_reg, list2_reg, proc_reg, k_reg);
+                k_reg = make_cont2("cont2", 94, list1_reg, list2_reg, proc_reg, k_reg);
                 list2_reg = cdr(list2_reg);
                 list1_reg = cdr(list1_reg);
                 pc = map2;
             } else {
-                k2_reg = make_cont2("cont2", 92, list1_reg, list2_reg, proc_reg, env_reg, handler_reg, k_reg);
+                k2_reg = make_cont2("cont2", 93, list1_reg, list2_reg, proc_reg, env_reg, handler_reg, k_reg);
                 info_reg = symbol_none;
                 env2_reg = env_reg;
                 args_reg = sList(car(list1_reg), car(list2_reg));
@@ -7886,11 +8119,11 @@ public class PJScheme:Scheme
             pc = apply_cont2;
         } else {
             if (true_q(dlr_proc_q(proc_reg))) {
-                k_reg = make_cont2("cont2", 95, lists_reg, proc_reg, k_reg);
+                k_reg = make_cont2("cont2", 96, lists_reg, proc_reg, k_reg);
                 lists_reg = map(cdr_proc, lists_reg);
                 pc = mapN;
             } else {
-                k2_reg = make_cont2("cont2", 94, lists_reg, proc_reg, env_reg, handler_reg, k_reg);
+                k2_reg = make_cont2("cont2", 95, lists_reg, proc_reg, env_reg, handler_reg, k_reg);
                 info_reg = symbol_none;
                 env2_reg = env_reg;
                 args_reg = map(car_proc, lists_reg);
@@ -7916,7 +8149,7 @@ public class PJScheme:Scheme
                     lists_reg = map(cdr_proc, arg_list);
                     pc = for_each_primitive;
                 } else {
-                    k2_reg = make_cont2("cont2", 96, arg_list, proc_reg, env_reg, handler_reg, k_reg);
+                    k2_reg = make_cont2("cont2", 97, arg_list, proc_reg, env_reg, handler_reg, k_reg);
                     info_reg = symbol_none;
                     env2_reg = env_reg;
                     args_reg = map(car_proc, arg_list);
@@ -7928,12 +8161,284 @@ public class PJScheme:Scheme
     
     public static object make_toplevel_env() {
         object primitives = symbol_undefined;
+<<<<<<< HEAD
         primitives = sList(sList(symbol_Multiply, times_prim, ""), sList(symbol_Add, plus_prim, ""), sList(symbol_Subtract, minus_prim, ""), sList(symbol_Divide, divide_prim, ""), sList(symbol_div, quotient_prim, ""), sList(symbol_p, modulo_prim, ""), sList(symbol_mod, modulo_prim, ""), sList(symbol_modulo, modulo_prim, ""), sList(symbol___, quotient_prim, ""), sList(symbol_quotient, quotient_prim, ""), sList(symbol_LessThan, lt_prim, ""), sList(symbol_LessThanEqual, lt_or_eq_prim, ""), sList(symbol_Equal, equal_sign_prim, ""), sList(symbol_GreaterThan, gt_prim, ""), sList(symbol_GreaterThanEqual, gt_or_eq_prim, ""), sList(symbol_abort, abort_prim, ""), sList(symbol_abs, abs_prim, ""), sList(symbol_append, append_prim, ""), sList(symbol_apply, apply_prim, ""), sList(symbol_assv, assv_prim, ""), sList(symbol_boolean_q, boolean_q_prim, ""), sList(symbol_caddr, caddr_prim, ""), sList(symbol_cadr, cadr_prim, ""), sList(symbol_call_with_current_continuation, call_cc_prim, ""), sList(symbol_call_cc, call_cc_prim, ""), sList(symbol_car, car_prim, "(car LIST) returns the first element of LIST"), sList(symbol_cdr, cdr_prim, ""), sList(symbol_caaaar, caaaar_prim, ""), sList(symbol_caaadr, caaadr_prim, ""), sList(symbol_caaar, caaar_prim, ""), sList(symbol_caadar, caadar_prim, ""), sList(symbol_caaddr, caaddr_prim, ""), sList(symbol_caadr, caadr_prim, ""), sList(symbol_caar, caar_prim, ""), sList(symbol_cadaar, cadaar_prim, ""), sList(symbol_cadadr, cadadr_prim, ""), sList(symbol_cadar, cadar_prim, ""), sList(symbol_caddar, caddar_prim, ""), sList(symbol_cadddr, cadddr_prim, ""), sList(symbol_cdaaar, cdaaar_prim, ""), sList(symbol_cdaadr, cdaadr_prim, ""), sList(symbol_cdaar, cdaar_prim, ""), sList(symbol_cdadar, cdadar_prim, ""), sList(symbol_cdaddr, cdaddr_prim, ""), sList(symbol_cdadr, cdadr_prim, ""), sList(symbol_cdar, cdar_prim, ""), sList(symbol_cddaar, cddaar_prim, ""), sList(symbol_cddadr, cddadr_prim, ""), sList(symbol_cddar, cddar_prim, ""), sList(symbol_cdddar, cdddar_prim, ""), sList(symbol_cddddr, cddddr_prim, ""), sList(symbol_cdddr, cdddr_prim, ""), sList(symbol_cddr, cddr_prim, ""), sList(symbol_char_q, char_q_prim, ""), sList(symbol_char_is__q, char_is__q_prim, ""), sList(symbol_char_whitespace_q, char_whitespace_q_prim, ""), sList(symbol_char_alphabetic_q, char_alphabetic_q_prim, ""), sList(symbol_char_numeric_q, char_numeric_q_prim, ""), sList(symbol_char_to_integer, char_to_integer_prim, ""), sList(symbol_cons, cons_prim, ""), sList(symbol_current_time, current_time_prim, ""), sList(symbol_cut, cut_prim, ""), sList(symbol_dir, dir_prim, ""), sList(symbol_display, display_prim, ""), sList(symbol_current_environment, current_environment_prim, ""), sList(symbol_eq_q, eq_q_prim, ""), sList(symbol_equal_q, equal_q_prim, ""), sList(symbol_error, error_prim, ""), sList(symbol_eval, eval_prim, ""), sList(symbol_eval_ast, eval_ast_prim, ""), sList(symbol_exit, exit_prim, ""), sList(symbol_for_each, for_each_prim, ""), sList(symbol_format, format_prim, ""), sList(symbol_get, get_prim, ""), sList(symbol_get_stack_trace, get_stack_trace_prim, ""), sList(symbol_load_as, load_as_prim, ""), sList(symbol_integer_to_char, integer_to_char_prim, ""), sList(symbol_length, length_prim, ""), sList(symbol_sList, list_prim, ""), sList(symbol_list_to_vector, list_to_vector_prim, ""), sList(symbol_list_to_string, list_to_string_prim, ""), sList(symbol_list_ref, list_ref_prim, ""), sList(symbol_load, load_prim, ""), sList(symbol_min, min_prim, ""), sList(symbol_max, max_prim, ""), sList(symbol_make_set, make_set_prim, ""), sList(symbol_make_vector, make_vector_prim, ""), sList(symbol_map, map_prim, ""), sList(symbol_member, member_prim, ""), sList(symbol_memq, memq_prim, ""), sList(symbol_memv, memv_prim, ""), sList(symbol_newline, newline_prim, ""), sList(symbol_not, not_prim, ""), sList(symbol_null_q, null_q_prim, ""), sList(symbol_number_to_string, number_to_string_prim, ""), sList(symbol_number_q, number_q_prim, ""), sList(symbol_pair_q, pair_q_prim, ""), sList(symbol_parse, parse_prim, ""), sList(symbol_parse_string, parse_string_prim, ""), sList(symbol_print, print_prim, ""), sList(symbol_printf, printf_prim, ""), sList(symbol_Range, range_prim, ""), sList(symbol_read_string, read_string_prim, ""), sList(symbol_require, require_prim, ""), sList(symbol_reverse, reverse_prim, ""), sList(symbol_set_car_b, set_car_b_prim, ""), sList(symbol_set_cdr_b, set_cdr_b_prim, ""), sList(symbol_snoc, snoc_prim, ""), sList(symbol_rac, rac_prim, ""), sList(symbol_rdc, rdc_prim, ""), sList(symbol_sqrt, sqrt_prim, ""), sList(symbol_odd_q, odd_q_prim, ""), sList(symbol_even_q, even_q_prim, ""), sList(symbol_remainder, remainder_prim, ""), sList(symbol_make_string, string_prim, ""), sList(symbol_string_length, string_length_prim, ""), sList(symbol_string_ref, string_ref_prim, ""), sList(symbol_string_q, string_q_prim, ""), sList(symbol_string_to_number, string_to_number_prim, ""), sList(symbol_string_is__q, string_is__q_prim, ""), sList(symbol_substring, substring_prim, ""), sList(symbol_symbol_q, symbol_q_prim, ""), sList(symbol_unparse, unparse_prim, ""), sList(symbol_unparse_procedure, unparse_procedure_prim, ""), sList(symbol_import, import_prim, ""), sList(symbol_use_stack_trace, use_stack_trace_prim, ""), sList(symbol_vector, vector_prim, ""), sList(symbol_vector_ref, vector_ref_prim, ""), sList(symbol_vector_set_b, vector_set_b_prim, ""), sList(symbol_void, void_prim, ""), sList(symbol_zero_q, zero_q_prim, ""), sList(symbol_current_directory, current_directory_prim, ""), sList(symbol_cd, current_directory_prim, ""), sList(symbol_round, round_prim, ""), sList(symbol_char_to_string, char_to_string_prim, ""), sList(symbol_string_to_list, string_to_list_prim, ""), sList(symbol_string_to_symbol, string_to_symbol_prim, ""), sList(symbol_symbol_to_string, symbol_to_string_prim, ""), sList(symbol_vector_to_list, vector_to_list_prim, ""), sList(symbol_eqv_q, eqv_q_prim, ""), sList(symbol_vector_q, vector_q_prim, ""), sList(symbol_atom_q, atom_q_prim, ""), sList(symbol_iter_q, iter_q_prim, ""), sList(symbol_list_q, list_q_prim, ""), sList(symbol_procedure_q, procedure_q_prim, ""), sList(symbol_stringLessThan_q, stringLessThan_q_prim, ""), sList(symbol_float_, float_prim, ""), sList(symbol_globals, globals_prim, ""), sList(symbol_int_, int_prim, ""), sList(symbol_apply_with_keywords, apply_with_keywords_prim, ""), sList(symbol_assq, assq_prim, ""), sList(symbol_dict, dict_prim, ""), sList(symbol_property, property_prim, ""), sList(symbol_rational, rational_prim, ""), sList(symbol_reset_toplevel_env, reset_toplevel_env_prim, ""), sList(symbol_sort, sort_prim, ""), sList(symbol_string_append, string_append_prim, ""), sList(symbol_string_split, string_split_prim, ""), sList(symbol_symbol, symbol_prim, ""), sList(symbol_typeof, typeof_prim, ""), sList(symbol_use_lexical_address, use_lexical_address_prim, ""), sList(symbol_use_tracing, use_tracing_prim, ""));
+=======
+        primitives = sList(sList(symbol_Multiply, times_prim, "(* ...): multiplication procedure; multiplies all arguments"), sList(symbol_Add, plus_prim, "(+ ...): addition procedure; adds all arguments"), sList(symbol_Subtract, minus_prim, "(- ...): subtraction procedure; subtracts all arguments"), sList(symbol_Divide, divide_prim, "(/ ...): division procedure; divides all arguments"), sList(symbol_div, quotient_prim, "(div arg0 arg1): quotient procedure for rationals/ints; divides arg0 by arg1 (aliases // and quotient)"), sList(symbol_p, modulo_prim, "(% arg0 arg1): modulo procedure for two arguments (aliases mod and modulo)"), sList(symbol_mod, modulo_prim, "(mod arg0 arg1): modulo procedure for two arguments (aliases % and modulo)"), sList(symbol_modulo, modulo_prim, "(modulo arg0 arg1): modulo procedure for two arguments (aliases mod and %)"), sList(symbol___, quotient_prim, "(// arg0 arg1): quotient procedure for rationals/ints; divides arg0 by arg1 (aliases div and quotient)"), sList(symbol_quotient, quotient_prim, "(quotient arg0 arg1): quotient procedure for rationals/ints; divides arg0 by arg1 (aliases // and div)"), sList(symbol_LessThan, lt_prim, "(< arg0 arg1): less-than procedure for two arguments"), sList(symbol_LessThanEqual, lt_or_eq_prim, "(<= arg0 arg1): less-than or equal procedure for two arguments"), sList(symbol_Equal, equal_sign_prim, "(= arg0 arg1): numeric equality procedure for two arguments"), sList(symbol_GreaterThan, gt_prim, "(> arg0 arg1): greater-than procedure for two arguments"), sList(symbol_GreaterThanEqual, gt_or_eq_prim, "(>= arg0 arg1): greater-than or equal procedure for two arguments"), sList(symbol_abort, abort_prim, "(abort) : aborts processing and returns to top level"), sList(symbol_abs, abs_prim, "(abs value): absolute value procedure"), sList(symbol_append, append_prim, "(append ...): append lists together into a single list"), sList(symbol_apply, apply_prim, "(apply PROCEDURE '(args...)): apply the PROCEDURE to the args"), sList(symbol_assv, assv_prim, "(assv KEY ((ITEM VALUE) ...)): look for KEY in ITEMs; return matching (ITEM VALUE) or #f if not found"), sList(symbol_boolean_q, boolean_q_prim, "(boolean? ITEM): return #t if ITEM is a boolean value"), sList(symbol_caddr, caddr_prim, "(caddr ITEM): return the (car (cdr (cdr ITEM)))"), sList(symbol_cadr, cadr_prim, "(cadr ITEM): return the (car (cdr ITEM))"), sList(symbol_call_with_current_continuation, call_cc_prim, "(call-with-current-continuation ...): "), sList(symbol_call_cc, call_cc_prim, "(call/cc ...): "), sList(symbol_car, car_prim, "(car LIST) returns the first element of LIST"), sList(symbol_cdr, cdr_prim, "(cdr LIST) returns rest of LIST after (car LIST)"), sList(symbol_caaaar, caaaar_prim, "caaaar ...): "), sList(symbol_caaadr, caaadr_prim, "(caaadr ...): "), sList(symbol_caaar, caaar_prim, "(caaar ...): "), sList(symbol_caadar, caadar_prim, "(caadar ...): "), sList(symbol_caaddr, caaddr_prim, "(caaddr ...): "), sList(symbol_caadr, caadr_prim, "(caadr ...): "), sList(symbol_caar, caar_prim, "(caar ...): "), sList(symbol_cadaar, cadaar_prim, "(cadaar ...): "), sList(symbol_cadadr, cadadr_prim, "(cadadr ...): "), sList(symbol_cadar, cadar_prim, "(cadar ...): "), sList(symbol_caddar, caddar_prim, "(caddar ...): "), sList(symbol_cadddr, cadddr_prim, "(cadddr ...): "), sList(symbol_cdaaar, cdaaar_prim, "(cdaaar ...): "), sList(symbol_cdaadr, cdaadr_prim, "(cdaadr ...): "), sList(symbol_cdaar, cdaar_prim, "(cdaar ...): "), sList(symbol_cdadar, cdadar_prim, "(cdadar ...): "), sList(symbol_cdaddr, cdaddr_prim, "(cdaddr ...): "), sList(symbol_cdadr, cdadr_prim, "(cdadr ...): "), sList(symbol_cdar, cdar_prim, "(cdar ...): "), sList(symbol_cddaar, cddaar_prim, "(cddaar ...): "), sList(symbol_cddadr, cddadr_prim, "(cddadr ...): "), sList(symbol_cddar, cddar_prim, "(cddar ...): "), sList(symbol_cdddar, cdddar_prim, "(cdddar ...): "), sList(symbol_cddddr, cddddr_prim, "(cddddr ...): "), sList(symbol_cdddr, cdddr_prim, "(cdddr ...): "), sList(symbol_cddr, cddr_prim, "(cddr ...): "), sList(symbol_char_q, char_q_prim, "(char? ITEM): return #t if ITEM is a character, #f otherwise"), sList(symbol_char_is__q, char_is__q_prim, "(char=? CHAR1 CHAR2): return #t if CHAR1 has the same values as CHAR2, #f otherwise"), sList(symbol_char_whitespace_q, char_whitespace_q_prim, "(char-whitespace? CHAR): return #t if CHAR is a whitespace character, #f otherwise"), sList(symbol_char_alphabetic_q, char_alphabetic_q_prim, "(char-alphabetic? CHAR): return #t if CHAR is an alphabetic character, #f otherwise"), sList(symbol_char_numeric_q, char_numeric_q_prim, "(char-numeric? CHAR): return #t if CHAR is a whitespace character, #f otherwise"), sList(symbol_char_to_integer, char_to_integer_prim, "(char->integer CHAR): return associated number of CHAR "), sList(symbol_cons, cons_prim, "(cons ITEM1 ITEM2): return a list with ITEM1 as car and ITEM2 as cdr (ITEM2 is typically a list)"), sList(symbol_current_time, current_time_prim, "(current-time): returns the current time as number of seconds since 1970-1-1"), sList(symbol_cut, cut_prim, "(cut ARGS...): return to toplevel with ARGS"), sList(symbol_dir, dir_prim, "(dir [ITEM]): return items in environment, or, if ITEM is given, the items in module"), sList(symbol_display, display_prim, "(display ITEM): display the ITEM as output"), sList(symbol_current_environment, current_environment_prim, "(current-environment): returns the current environment"), sList(symbol_eq_q, eq_q_prim, "(eq? ITEM1 ITEM2): return #t if ITEM1 is eq to ITEM2, #f otherwise"), sList(symbol_equal_q, equal_q_prim, "(equal? ITEM1 ITEM2): return #t if ITEM1 is equal to ITEM2, #f otherwise"), sList(symbol_error, error_prim, "(error NAME MESSAGE): create an exception in NAME with MESSAGE"), sList(symbol_eval, eval_prim, "(eval LIST): evaluates the LIST as a Scheme expression"), sList(symbol_eval_ast, eval_ast_prim, "(eval-ast AST): evaluates the Abstract Syntax Tree as a Scheme expression (see parse and parse-string)"), sList(symbol_exit, exit_prim, "(exit): "), sList(symbol_for_each, for_each_prim, "(for-each PROCEDURE LIST): apply PROCEDURE to each item in LIST, but don't return results"), sList(symbol_format, format_prim, "(format STRING ITEM ...): format the string with ITEMS as arguments"), sList(symbol_get, get_prim, "(get ...): "), sList(symbol_get_stack_trace, get_stack_trace_prim, "(get-stack-trace): return the current stack trace"), sList(symbol_load_as, load_as_prim, "(load-as FILENAME MODULE-NAME): load the filename, putting items in MODULE-NAME namespace"), sList(symbol_integer_to_char, integer_to_char_prim, "(integer->char INTEGER): return the assocated character of INTEGER"), sList(symbol_length, length_prim, "(length LIST): returns the number of elements in top level of LIST"), sList(symbol_sList, list_prim, "(list ITEM ...): returns a list composed of all of the items"), sList(symbol_list_to_vector, list_to_vector_prim, "(list->vector LIST): returns the LIST as a vector"), sList(symbol_list_to_string, list_to_string_prim, "(list->string LIST): returns the LIST as a string"), sList(symbol_list_ref, list_ref_prim, "(list-ref LIST INDEX): returns the item in LIST at INDEX (zero-based)"), sList(symbol_load, load_prim, "(load FILENAME...): loads the given FILENAMEs"), sList(symbol_min, min_prim, "(min ...): returns the minimum value from the list of values"), sList(symbol_max, max_prim, "(max ...): returns the maximum value from the list of values"), sList(symbol_make_set, make_set_prim, "(make-set LIST): returns a list of unique items from LIST"), sList(symbol_make_vector, make_vector_prim, "(make-vector LIST): returns a vector from LIST"), sList(symbol_map, map_prim, "(map PROCEDURE LIST...): apply PROCEDURE to each element of LIST, and return return results"), sList(symbol_member, member_prim, "(member ITEM LIST): return #t if MEMBER in top level of LIST"), sList(symbol_memq, memq_prim, "(memq ...): "), sList(symbol_memv, memv_prim, "(memv ...): "), sList(symbol_newline, newline_prim, "(newline): displays a new line in output"), sList(symbol_not, not_prim, "(not ITEM): returns the boolean not of ITEM; ITEM is only #t when #t, otherwise #f"), sList(symbol_null_q, null_q_prim, "(null? ITEM): return #t if ITEM is empty list, #f otherwise"), sList(symbol_number_to_string, number_to_string_prim, "(number->string NUMBER): return NUMBER as a string"), sList(symbol_number_q, number_q_prim, "(number? ITEM): return #t if ITEM is a number, #f otherwise"), sList(symbol_pair_q, pair_q_prim, "(pair? ITEM): "), sList(symbol_parse, parse_prim, "(parse LIST): parse a list; returns Abstract Syntax Tree (AST)"), sList(symbol_parse_string, parse_string_prim, "(parse-string STRING): parse a string; returns Abstract Syntax Tree (AST)"), sList(symbol_print, print_prim, "(print ITEM): "), sList(symbol_printf, printf_prim, "(printf FORMAT ARGS...): "), sList(symbol_Range, range_prim, "(range END), (range START END), or (RANGE START END STEP): (all integers)"), sList(symbol_read_string, read_string_prim, "(read-string ...): "), sList(symbol_require, require_prim, "(require ...): "), sList(symbol_reverse, reverse_prim, "(reverse LIST): "), sList(symbol_set_car_b, set_car_b_prim, "(set-car! LIST ITEM): set the car of LIST to be ITEM"), sList(symbol_set_cdr_b, set_cdr_b_prim, "(set-cdr! LIST ITEM): set the car of LIST to be ITEM (which is typically a list)"), sList(symbol_snoc, snoc_prim, "(snoc ITEM LIST): cons the ITEM onto the end of LIST"), sList(symbol_rac, rac_prim, "(rac LIST): return the last item of LIST"), sList(symbol_rdc, rdc_prim, "(rdc LIST): return everything but last item in LIST"), sList(symbol_sqrt, sqrt_prim, "(sqrt NUMBER): return the square root of NUMBER"), sList(symbol_odd_q, odd_q_prim, "(odd? NUMBER): returns #t if NUMBER is even, #f otherwise"), sList(symbol_even_q, even_q_prim, "(even? NUMBER): returns #t if NUMBER is odd, #f otherwise"), sList(symbol_remainder, remainder_prim, "(remainder NUMBER1 NUMBER2): returns the remainder after dividing NUMBER1 by NUMBER2"), sList(symbol_make_string, string_prim, "(string ITEM): returns ITEM as a string"), sList(symbol_string_length, string_length_prim, "(string-length STRING): returns the length of a string"), sList(symbol_string_ref, string_ref_prim, "(string-ref STRING INDEX): return the character of STRING at position INDEX"), sList(symbol_string_q, string_q_prim, "(string? ITEM): return #t if ITEM is a string, #f otherwise"), sList(symbol_string_to_number, string_to_number_prim, "(string->number STRING): return STRING as a number"), sList(symbol_string_is__q, string_is__q_prim, "(string=? STRING1 STRING2): return #t if STRING1 is the same as STRING2, #f otherwise"), sList(symbol_substring, substring_prim, "(substring STRING START [END]): return the substring of STRING starting with position START and ending before END. If END is not provided, it defaults to the length of the STRING"), sList(symbol_symbol_q, symbol_q_prim, "(symbol? ITEM): return #t if ITEM is a symbol, #f otherwise"), sList(symbol_unparse, unparse_prim, "(unparse AST): "), sList(symbol_unparse_procedure, unparse_procedure_prim, "(unparse-procedure ...): "), sList(symbol_import, import_prim, "(import MODULE...): import host-system modules; MODULEs are strings"), sList(symbol_import_as, import_as_prim, "(import-as MODULE NAME): import a host-system module; MODULE is a string, and NAME is a symbol or string. Use * for NAME to import into toplevel environment"), sList(symbol_import_from, import_from_prim, "(import-from MODULE NAME...): import from host-system module; MODULE is a string, and NAME is a symbol or string"), sList(symbol_use_stack_trace, use_stack_trace_prim, "(use-stack-trace BOOLEAN): set stack-trace usage on/off"), sList(symbol_vector, vector_prim, "(vector [ITEMS]...): return ITEMs as a vector"), sList(symbol_vector_ref, vector_ref_prim, "(vector-ref VECTOR INDEX): "), sList(symbol_vector_set_b, vector_set_b_prim, "(vector-set! VECTOR INDEX VALUE): "), sList(symbol_void, void_prim, "(void): The null value symbol"), sList(symbol_zero_q, zero_q_prim, "(zero? NUMBER): return #t if NUMBER is equal to zero, #f otherwise"), sList(symbol_current_directory, current_directory_prim, "(current-directory [PATH]): get the current directory, or set it if PATH is given (alias cd)"), sList(symbol_cd, current_directory_prim, "(cd [PATH]): get the current directory, or set it if PATH is given (alias current-directory)"), sList(symbol_round, round_prim, "(round NUMBER): round NUMBER to the nearest integer (may return float)"), sList(symbol_char_to_string, char_to_string_prim, "(char->string CHAR): "), sList(symbol_string_to_list, string_to_list_prim, "(string->list STRING): string STRING as a list of characters"), sList(symbol_string_to_symbol, string_to_symbol_prim, "(string->symbol STRING): return STRING as a symbol"), sList(symbol_symbol_to_string, symbol_to_string_prim, "(symbol->string SYMBOL): return SYMBOL as a string"), sList(symbol_vector_to_list, vector_to_list_prim, "(vector->list VECTOR): return VECTOR as a list"), sList(symbol_eqv_q, eqv_q_prim, "(eqv? ITEM1 ITEM2): return #t if ITEM1 and ITEM2 have the same value"), sList(symbol_vector_q, vector_q_prim, "(vector? ITEM): return #t if ITEM is a vector, #f otherwise"), sList(symbol_atom_q, atom_q_prim, "(atom? ITEM): return #t if ITEM is a atom, #f otherwise"), sList(symbol_iter_q, iter_q_prim, "(iter? ITEM): return #t if ITEM is a iterator, #f otherwise"), sList(symbol_list_q, list_q_prim, "(list? ITEM): return #t if ITEM is a list, #f otherwise"), sList(symbol_procedure_q, procedure_q_prim, "(procedure? ITEM): return #t if ITEM is a procedure, #f otherwise"), sList(symbol_stringLessThan_q, stringLessThan_q_prim, "(string<? STRING1 STRING2): compare two strings to see if STRING1 is less than STRING2"), sList(symbol_float_, float_prim, "(float NUMBER): return NUMBER as a floating point value"), sList(symbol_globals, globals_prim, "(globals): get global environment"), sList(symbol_int_, int_prim, "(int NUMBER): return NUMBER as an integer"), sList(symbol_apply_with_keywords, apply_with_keywords_prim, "(apply-with-keywords PROCEDURE ...): "), sList(symbol_assq, assq_prim, "(assq ...): "), sList(symbol_dict, dict_prim, "(dict ...): "), sList(symbol_contains, contains_prim, "(contains DICTIONARY ITEM): returns #t if DICTIONARY contains ITEM"), sList(symbol_getitem, getitem_prim, "(getitem DICTIONARY ITEM): returns the VALUE of DICTIONARY[ITEM]"), sList(symbol_setitem, setitem_prim, "(setitem DICTIONARY ITEM VALUE): sets and returns DICTIONARY[ITEM] with VALUE"), sList(symbol_property, property_prim, "(property ...): "), sList(symbol_rational, rational_prim, "(rational NUMERATOR DENOMINTAOR): return a rational number"), sList(symbol_reset_toplevel_env, reset_toplevel_env_prim, "(reset-toplevel-env): reset the toplevel environment"), sList(symbol_sort, sort_prim, "(sort PROCEDURE LIST): sort the list using PROCEDURE to compare items"), sList(symbol_string_append, string_append_prim, "(string-append STRING1 STRING2): append two strings together"), sList(symbol_string_split, string_split_prim, "(string-split STRING CHAR): return a list with substrings of STRING where split by CHAR"), sList(symbol_symbol, symbol_prim, "(symbol STRING): turn STRING into a symbol"), sList(symbol_typeof, typeof_prim, "(typeof ITEM): returns type of ITEM"), sList(symbol_use_lexical_address, use_lexical_address_prim, "(use-lexical-address [BOOLEAN]): get lexical-address setting, or set it on/off if BOOLEAN is given"), sList(symbol_use_tracing, use_tracing_prim, "(use-tracing [BOOLEAN]): get tracing setting, or set it on/off if BOOLEAN is given"));
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         return make_initial_env_extended(map(car_proc, primitives), map(cadr_proc, primitives), map(caddr_proc, primitives));
     }
     
     public static object make_external_proc(object external_function_object) {
+<<<<<<< HEAD
         return make_proc("proc", 162, external_function_object);
+=======
+        return make_proc("proc", 167, external_function_object);
+    }
+    
+    public static bool star_param_q(object x, object params) {
+        if (true_q(null_q(params))) {
+            return false;
+        } else {
+            if (true_q((true_q(association_q(sList(symbol__, symbol_:, symbol_Multiply), car(params))) && true_q(Eq(caar(params), x))))) {
+                return true;
+            } else {
+                return star_param_q(x, cdr(params));
+            }
+        }
+    }
+    
+    public static bool association_q(object pattern, object x) {
+        if (true_q((! true_q((true_q(list_q(x)) && true_q(Equal(length(x), 3)) && true_q(Eq(cadr(x), symbol_:))))))) {
+            return false;
+        } else {
+            if (true_q((true_q(Eq(car(pattern), symbol__)) && true_q(Eq(caddr(pattern), symbol__))))) {
+                return true;
+            } else {
+                if (true_q((true_q(Eq(car(pattern), symbol__)) && true_q(Eq(caddr(pattern), caddr(x)))))) {
+                    return true;
+                } else {
+                    if (true_q((true_q(Eq(car(pattern), car(x))) && true_q(Eq(caddr(pattern), symbol__))))) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
+    }
+    
+    public static object get__star_association_values(object vals) {
+        if (true_q(null_q(vals))) {
+            return symbol_emptylist;
+        } else {
+            if (true_q(association_q(sList(symbol_Multiply, symbol_:, symbol__), car(vals)))) {
+                return caddar(vals);
+            } else {
+                return get__star_association_values(cdr(vals));
+            }
+        }
+    }
+    
+    public static object get_positional_values(object vals) {
+        if (true_q(null_q(vals))) {
+            return symbol_emptylist;
+        } else {
+            if (true_q(association_q(sList(symbol__, symbol_:, symbol__), car(vals)))) {
+                return symbol_emptylist;
+            } else {
+                return cons(car(vals), get_positional_values(cdr(vals)));
+            }
+        }
+    }
+    
+    public static object get_all_positional_values(object vals) {
+        return append(get_positional_values(vals), get__star_association_values(vals));
+    }
+    
+    public static object filter(object pred_q, object ls) {
+        if (true_q(null_q(ls))) {
+            return symbol_emptylist;
+        } else {
+            if (true_q(pred_q(car(ls)))) {
+                return cons(car(ls), filter(pred_q_proc, cdr(ls)));
+            } else {
+                return filter(pred_q_proc, cdr(ls));
+            }
+        }
+    }
+    
+    public static object make_associations(object dict) {
+        if (true_q(null_q(dict_proc))) {
+            return symbol_emptylist;
+        } else {
+            object keyword = symbol_undefined;
+            object value = symbol_undefined;
+            value = cadar(dict_proc);
+            keyword = caar(dict_proc);
+            return cons(sList(keyword, symbol_:, value), make_associations(cdr(dict_proc)));
+        }
+    }
+    
+    public static object get_all_keyword_associations(object vals) {
+        if (true_q(null_q(vals))) {
+            return symbol_emptylist;
+        } else {
+            if (true_q(association_q(sList(symbol_Multiply, symbol_:, symbol__), car(vals)))) {
+                return get_all_keyword_associations(cdr(vals));
+            } else {
+                if (true_q(association_q(sList(symbol__star_star, symbol_:, symbol__), car(vals)))) {
+                    object dict = symbol_undefined;
+                    dict = caddar(vals);
+                    return append(make_associations(dict_proc), get_all_keyword_associations(cdr(vals)));
+                } else {
+                    if (true_q(association_q(sList(symbol__, symbol_:, symbol__), car(vals)))) {
+                        return cons(car(vals), get_all_keyword_associations(cdr(vals)));
+                    } else {
+                        return get_all_keyword_associations(cdr(vals));
+                    }
+                }
+            }
+        }
+    }
+    
+    public static object get_bindings_from_parameters_and_values(object params, object vals) {
+        object positional_vals = symbol_undefined;
+        object bindings = symbol_undefined;
+        object keywords = symbol_undefined;
+        object result = symbol_undefined;
+        object bindings = symbol_undefined;
+        object dict = symbol_undefined;
+        positional_vals = get_all_positional_values(vals);
+        bindings = matchup(params, positional_vals);
+        keywords = get_all_keyword_associations(vals);
+        result = add_keyword_values(keywords, bindings, symbol_emptylist, params);
+        bindings = car(result);
+        dict = cadr(result);
+        if (true_q(null_q(dict_proc))) {
+            return fill_in_defaults(bindings, params);
+        } else {
+            object star_star_param = symbol_undefined;
+            star_star_param = get_star_star_param(params);
+            if (true_q(star_star_param)) {
+                return fill_in_defaults(cons(sList(star_star_param, dict_proc), bindings), params);
+            } else {
+                throw new Exception("symbol_get_bindings_from_parameters_and_values: " + format("got some unexpected extra crap", ));;
+            }
+        }
+    }
+    
+    public static object get_star_star_param(object params) {
+        if (true_q(null_q(params))) {
+            return false;
+        } else {
+            if (true_q(association_q(sList(symbol__, symbol_:, symbol__star_star), car(params)))) {
+                return caar(params);
+            } else {
+                return get_star_star_param(cdr(params));
+            }
+        }
+    }
+    
+    public static object fill_in_defaults(object bindings, object params) {
+        if (true_q(null_q(params))) {
+            return bindings;
+        } else {
+            if (true_q(symbol_q(car(params)))) {
+                return fill_in_defaults(bindings, cdr(params));
+            } else {
+                if (true_q(association_q(sList(symbol__, symbol_:, symbol_Multiply), car(params)))) {
+                    return fill_in_defaults(bindings, cdr(params));
+                } else {
+                    if (true_q(association_q(sList(symbol__, symbol_:, symbol__star_star), car(params)))) {
+                        if (true_q(assq(caar(params), bindings))) {
+                            return fill_in_defaults(bindings, cdr(params));
+                        } else {
+                            object new_bindings = symbol_undefined;
+                            new_bindings = cons(sList(caar(params), symbol_emptylist), bindings);
+                            return fill_in_defaults(new_bindings, cdr(params));
+                        }
+                    } else {
+                        if (true_q(association_q(sList(symbol__, symbol_:, symbol__), car(params)))) {
+                            if (true_q(assq(caar(params), bindings))) {
+                                return fill_in_defaults(bindings, cdr(params));
+                            } else {
+                                object new_bindings = symbol_undefined;
+                                new_bindings = cons(sList(caar(params), caddar(params)), bindings);
+                                return fill_in_defaults(new_bindings, cdr(params));
+                            }
+                        } else {
+                            throw new Exception("symbol_fill_in_defaults: " + format("this should never happen", ));;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    public static bool member_params_q(object x, object params) {
+        if (true_q(null_q(params))) {
+            return false;
+        } else {
+            if (true_q((true_q(symbol_q(car(params))) && true_q(Eq(car(params), x))))) {
+                return true;
+            } else {
+                if (true_q((true_q(association_q(sList(symbol__, symbol_:, symbol_Multiply), car(params))) && true_q(Eq(caar(params), x))))) {
+                    return false;
+                } else {
+                    if (true_q((true_q(association_q(sList(symbol__, symbol_:, symbol__star_star), car(params))) && true_q(Eq(caar(params), x))))) {
+                        return false;
+                    } else {
+                        if (true_q((true_q(association_q(sList(symbol__, symbol_:, symbol__), car(params))) && true_q(Eq(caar(params), x))))) {
+                            return true;
+                        } else {
+                            return member_params_q(x, cdr(params));
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    public static object add_keyword_values(object keywords, object bindings, object dict, object params) {
+        if (true_q(null_q(keywords))) {
+            return sList(bindings, dict_proc);
+        } else {
+            if (true_q(star_param_q(caar(keywords), params))) {
+                throw new Exception("symbol_add_keyword_values: " + format("unexpected keyword argument", caar(keywords)));;
+            } else {
+                if (true_q(association_q(sList(symbol_Multiply, symbol_:, symbol__), car(keywords)))) {
+                    throw new Exception("symbol_add_keyword_values: " + format("this should never happen", ));;
+                } else {
+                    if (true_q(assq(caar(keywords), bindings))) {
+                        throw new Exception("symbol_add_keyword_values: " + format("got multiple values for", caar(keywords)));;
+                    } else {
+                        if (true_q((! true_q(member_params_q(caar(keywords), params))))) {
+                            object new_dict = symbol_undefined;
+                            new_dict = cons(sList(caar(keywords), caddar(keywords)), dict_proc);
+                            return add_keyword_values(cdr(keywords), bindings, new_dict, params);
+                        } else {
+                            object new_bindings = symbol_undefined;
+                            new_bindings = cons(sList(caar(keywords), caddar(keywords)), bindings);
+                            return add_keyword_values(cdr(keywords), new_bindings, dict_proc, params);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    public static object matchup(object params, object vals) {
+        if (true_q(null_q(params))) {
+            if (true_q(null_q(vals))) {
+                return symbol_emptylist;
+            } else {
+                throw new Exception("symbol_matchup: " + format("received too many values", ));;
+            }
+        } else {
+            if (true_q(symbol_q(car(params)))) {
+                if (true_q(null_q(vals))) {
+                    throw new Exception("symbol_matchup: " + format("not enough values received", ));;
+                } else {
+                    return cons(sList(car(params), car(vals)), matchup(cdr(params), cdr(vals)));
+                }
+            } else {
+                if (true_q(association_q(sList(symbol__, symbol_:, symbol_Multiply), car(params)))) {
+                    return sList(sList(caar(params), vals));
+                } else {
+                    if (true_q(association_q(sList(symbol__, symbol_:, symbol__), car(params)))) {
+                        if (true_q(null_q(vals))) {
+                            return matchup(cdr(params), vals);
+                        } else {
+                            return cons(sList(caar(params), car(vals)), matchup(cdr(params), cdr(vals)));
+                        }
+                    } else {
+                        throw new Exception("symbol_matchup: " + format("weird parameter encountered", ));;
+                    }
+                }
+            }
+        }
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
     }
     
     public static bool pattern_q(object x) {
@@ -8028,7 +8533,7 @@ public class PJScheme:Scheme
                 pc = apply_sub_hat;
             } else {
                 if (true_q(pair_q(pattern_reg))) {
-                    k2_reg = make_cont2("cont2", 100, ap_reg, pattern_reg, s_reg, k2_reg);
+                    k2_reg = make_cont2("cont2", 101, ap_reg, pattern_reg, s_reg, k2_reg);
                     ap_reg = car_hat(ap_reg);
                     pattern_reg = car(pattern_reg);
                     pc = instantiate_hat;
@@ -8077,7 +8582,7 @@ public class PJScheme:Scheme
                     object s2 = symbol_undefined;
                     s2 = list_ref(temp_1, 2);
                     s1 = list_ref(temp_1, 1);
-                    k2_reg = make_cont2("cont2", 101, s2, k2_reg);
+                    k2_reg = make_cont2("cont2", 102, s2, k2_reg);
                     s_reg = s1;
                     pc = apply_sub_hat;
                 } else {
@@ -8108,6 +8613,7 @@ public class PJScheme:Scheme
     public static Func<object,bool> if_then_q_hat = tagged_list_hat(symbol_if, Equal_proc, 3);
     public static Func<object,bool> if_else_q_hat = tagged_list_hat(symbol_if, Equal_proc, 4);
     public static Func<object,bool> help_q_hat = tagged_list_hat(symbol_help, Equal_proc, 2);
+    public static Func<object,bool> association_q_hat = tagged_list_hat(symbol_association, Equal_proc, 3);
     public static Func<object,bool> assignment_q_hat = tagged_list_hat(symbol_set_b, Equal_proc, 3);
     public static Func<object,bool> func_q_hat = tagged_list_hat(symbol_func, Equal_proc, 2);
     public static Func<object,bool> callback_q_hat = tagged_list_hat(symbol_callback, Equal_proc, 2);
@@ -8134,7 +8640,7 @@ public class PJScheme:Scheme
     public static object define_datatype_transformer_hat = make_macro("macro", 10);
     public static object cases_transformer_hat = make_macro("macro", 11);
     public static object macro_env = symbol_undefined;
-    public static object REP_k = make_cont2("cont2", 47);
+    public static object REP_k = make_cont2("cont2", 48);
     public static object REP_handler = make_handler2("handler2", 2);
     public static object REP_fail = make_fail("fail", 1);
     public static object _starlast_fail_star = REP_fail;
@@ -8268,6 +8774,7 @@ public class PJScheme:Scheme
     public static object format_prim = make_proc("proc", 125);
     public static object current_environment_prim = make_proc("proc", 126);
     public static object import_prim = make_proc("proc", 127);
+<<<<<<< HEAD
     public static object not_prim = make_proc("proc", 128);
     public static object printf_prim = make_proc("proc", 129);
     public static object vector_prim = make_proc("proc", 130);
@@ -8302,6 +8809,47 @@ public class PJScheme:Scheme
     public static object symbol_prim = make_proc("proc", 159);
     public static object typeof_prim = make_proc("proc", 160);
     public static object use_lexical_address_prim = make_proc("proc", 161);
+=======
+    public static object import_as_prim = make_proc("proc", 128);
+    public static object import_from_prim = make_proc("proc", 129);
+    public static object not_prim = make_proc("proc", 130);
+    public static object printf_prim = make_proc("proc", 131);
+    public static object vector_prim = make_proc("proc", 132);
+    public static object vector_set_b_prim = make_proc("proc", 133);
+    public static object vector_ref_prim = make_proc("proc", 134);
+    public static object make_vector_prim = make_proc("proc", 135);
+    public static object error_prim = make_proc("proc", 136);
+    public static object list_ref_prim = make_proc("proc", 137);
+    public static object current_directory_prim = make_proc("proc", 138);
+    public static object round_prim = make_proc("proc", 139);
+    public static object use_stack_trace_prim = make_proc("proc", 140);
+    public static object use_tracing_prim = make_proc("proc", 141);
+    public static object eqv_q_prim = make_proc("proc", 142);
+    public static object vector_q_prim = make_proc("proc", 143);
+    public static object atom_q_prim = make_proc("proc", 144);
+    public static object iter_q_prim = make_proc("proc", 145);
+    public static object contains_prim = make_proc("proc", 146);
+    public static object getitem_prim = make_proc("proc", 147);
+    public static object setitem_prim = make_proc("proc", 148);
+    public static object list_q_prim = make_proc("proc", 149);
+    public static object procedure_q_prim = make_proc("proc", 150);
+    public static object stringLessThan_q_prim = make_proc("proc", 151);
+    public static object float_prim = make_proc("proc", 152);
+    public static object globals_prim = make_proc("proc", 153);
+    public static object int_prim = make_proc("proc", 154);
+    public static object apply_with_keywords_prim = make_proc("proc", 155);
+    public static object assq_prim = make_proc("proc", 156);
+    public static object dict_prim = make_proc("proc", 157);
+    public static object property_prim = make_proc("proc", 158);
+    public static object rational_prim = make_proc("proc", 159);
+    public static object reset_toplevel_env_prim = make_proc("proc", 160);
+    public static object sort_prim = make_proc("proc", 161);
+    public static object string_append_prim = make_proc("proc", 162);
+    public static object string_split_prim = make_proc("proc", 163);
+    public static object symbol_prim = make_proc("proc", 164);
+    public static object typeof_prim = make_proc("proc", 165);
+    public static object use_lexical_address_prim = make_proc("proc", 166);
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
     public static object toplevel_env = symbol_undefined;
     public static MethodInfo[] mi_cont4;
     public static MethodInfo[] mi_handler;
@@ -8319,10 +8867,14 @@ public class PJScheme:Scheme
         mi_cont = new MethodInfo[52];
         mi_handler2 = new MethodInfo[7];
         mi_cont3 = new MethodInfo[6];
-        mi_cont2 = new MethodInfo[102];
+        mi_cont2 = new MethodInfo[103];
         mi_fail = new MethodInfo[6];
         mi_macro = new MethodInfo[12];
+<<<<<<< HEAD
         mi_proc = new MethodInfo[163];
+=======
+        mi_proc = new MethodInfo[168];
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
         
         for (int i = 1; i < 14; i++) {
             mi_cont4[i] = typeof(PJScheme).GetMethod(String.Format("b_cont4_{0}_d", i));
@@ -8359,7 +8911,7 @@ public class PJScheme:Scheme
             }
         }
         
-        for (int i = 1; i < 102; i++) {
+        for (int i = 1; i < 103; i++) {
             mi_cont2[i] = typeof(PJScheme).GetMethod(String.Format("b_cont2_{0}_d", i));
             if (mi_cont2[i] == null) {
                 throw new Exception(String.Format("Undefined mi: mi_cont2[{0}]", i));
@@ -8380,7 +8932,11 @@ public class PJScheme:Scheme
             }
         }
         
+<<<<<<< HEAD
         for (int i = 1; i < 163; i++) {
+=======
+        for (int i = 1; i < 168; i++) {
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
             mi_proc[i] = typeof(PJScheme).GetMethod(String.Format("b_proc_{0}_d", i));
             if (mi_proc[i] == null) {
                 throw new Exception(String.Format("Undefined mi: mi_proc[{0}]", i));

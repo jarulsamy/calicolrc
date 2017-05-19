@@ -327,75 +327,94 @@ namespace Calico {
                 PrintLine("Please activate and restart Calico to use this language.");
                 return null;
             }
-            Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.AutoDetect;
-            Microsoft.Scripting.Hosting.ScriptSource source;
-            Microsoft.Scripting.Hosting.CompiledCode compiledCode;
-            try {
-                source = engine.CreateScriptSourceFromString(text, sctype);
-                compiledCode = null;
-            } catch (Exception e) {
-                Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-                //PrintLine(eo.FormatException(e));
-                PrintLine(FormatException(e));
-                return null;
-            }
-            try {
-                if (compiler_options != null) {
-                    compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
-                } else {
-                    compiledCode = source.Compile();
-                }
-            } catch {
-                // let's try to Execute, before giving up:
-                try { 
-                    sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
-                    source = engine.CreateScriptSourceFromString(text, sctype);
-                    if (compiler_options != null) {
-                        compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
-                    } else {
-                        compiledCode = source.Compile();
-                    }		 
-                } catch {
-                    try {
-                        sctype = Microsoft.Scripting.SourceCodeKind.Statements;
-                        source = engine.CreateScriptSourceFromString(text, sctype);
-                        if (compiler_options != null) {
-                            compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
-                        } else {
-                            compiledCode = source.Compile();
-                        }
-                    } catch (Exception e) {
-                        Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-                        //PrintLine(eo.FormatException(e));
-                        PrintLine(FormatException(e));
-                        return null;
-                    }
-                }
-            }
-            object retval = null;
-            bool aborted = false;
-            try {
-                if (manager != null && manager.UseSharedScope)
-                    retval = compiledCode.Execute(manager.scope);
-                else
-                    retval = compiledCode.Execute(scope);
-            } catch (System.Threading.ThreadAbortException) {
-                System.Threading.Thread.Sleep(100);
-                try {
-                    System.Threading.Thread.ResetAbort();
-                } catch {
-                    // pass
-                }
-                aborted = true;
-            } catch (Exception e) {
-                Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-                //PrintLine(eo.FormatException(e));
-                PrintLine(FormatException(e));
-            }
-            if (aborted) {
-                System.Console.Error.WriteLine("Running script aborted!");
-            }
-            return retval;
+	    Microsoft.Scripting.SourceCodeKind sctype = Microsoft.Scripting.SourceCodeKind.AutoDetect;
+	    Microsoft.Scripting.Hosting.ScriptSource source;
+	    Microsoft.Scripting.Hosting.CompiledCode compiledCode;
+	    try {
+		source = engine.CreateScriptSourceFromString(text, sctype);
+		compiledCode = null;
+	    } catch (Exception e) {
+		Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+		try
+		  {
+		    PrintLine(eo.FormatException(e));
+		  }
+		catch
+		  {
+		    PrintLine(e.ToString());
+		  }
+
+		return null;
+	    }
+	    try {
+		if (compiler_options != null) {
+		    compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
+		} else {
+		    compiledCode = source.Compile();
+		}
+	    } catch {
+		// let's try to Execute, before giving up:
+		try { 
+		    sctype = Microsoft.Scripting.SourceCodeKind.InteractiveCode;
+		    source = engine.CreateScriptSourceFromString(text, sctype);
+		    if (compiler_options != null) {
+			compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
+		    } else {
+			compiledCode = source.Compile();
+		    }		 
+		} catch {
+		    try {
+			sctype = Microsoft.Scripting.SourceCodeKind.Statements;
+			source = engine.CreateScriptSourceFromString(text, sctype);
+			if (compiler_options != null) {
+			    compiledCode = SetDLRSpecificCompilerOptions(source, compiler_options);
+			} else {
+			    compiledCode = source.Compile();
+			}
+		    } catch (Exception e) {
+			Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+			try
+			  {
+			    PrintLine(eo.FormatException(e));
+			  }
+			catch
+			  {
+			    PrintLine(e.ToString());
+			  }
+			return null;
+		    }
+		}
+	    }
+	    object retval = null;
+	    bool aborted = false;
+	    try {
+		if (manager != null && manager.UseSharedScope)
+		    retval = compiledCode.Execute(manager.scope);
+		else
+		    retval = compiledCode.Execute(scope);
+	    } catch (System.Threading.ThreadAbortException) {
+		System.Threading.Thread.Sleep(100);
+		try {
+		    System.Threading.Thread.ResetAbort();
+		} catch {
+		    // pass
+		}
+		aborted = true;
+	    } catch (Exception e) {
+		Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+		try
+		  {
+		    PrintLine(eo.FormatException(e));
+		  }
+		catch
+		  {
+		    PrintLine(e.ToString());
+		  }
+	    }
+	    if (aborted) {
+		System.Console.Error.WriteLine("Running script aborted!");
+	    }
+	    return retval;
         }
 
         public object TryEvaluate(string text) {
@@ -463,8 +482,17 @@ namespace Calico {
 			  }
 			} catch (Exception e) {
 			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+			  try
+			    {
+			      PrintLine(eo.FormatException(e));
+			    }
+			  catch
+			    {
+			      PrintLine(e.ToString());
+			    }
+
 			  //PrintLine(eo.FormatException(e));
-			  PrintLine(FormatException(e));
+			  //PrintLine(FormatException(e));
 			  
 			  try
 			    {
@@ -502,6 +530,16 @@ namespace Calico {
 			if (e.Message.Contains("Thread was being aborted")) {
 			  PrintLine("[Script stopped----------]");
 			} else {
+			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
+			  try
+			    {
+			      PrintLine(eo.FormatException(e));
+			    }
+			  catch
+			    {
+			      PrintLine(e.ToString());
+			    }
+
               // Code copied from: /IronPython_Main/Languages/IronPython/IronPython/Runtime/Exceptions/PythonExceptions.cs
               //StackTrace outermostTrace = new StackTrace(e);
               //IList<StackTrace> otherTraces = ExceptionHelpers.GetExceptionStackTraces(e) ?? new List<StackTrace>();
@@ -529,9 +567,9 @@ namespace Calico {
               //PrintLine(e.ToString());
 
               //Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-			  PrintLine(FormatException(e));
+			  //PrintLine(FormatException(e));
 			  
-			  PrintLine(e.ToString());
+			  //PrintLine(e.ToString());
 			  ////FormatError(e,text,2);
 			  try
 			    {
@@ -572,8 +610,15 @@ namespace Calico {
 			}
 		  } catch (Exception e) {
 			Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-			//PrintLine(eo.FormatException(e));
-			PrintLine(FormatException(e));
+			try
+			    {
+			      PrintLine(eo.FormatException(e));
+			    }
+			  catch
+			    {
+			      PrintLine(e.ToString());
+			    }
+
 			return false;
 		  }
 		  ConfigureTrace();
@@ -595,8 +640,15 @@ namespace Calico {
 			  PrintLine("[Script stopped----------]");
 			} else {
 			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-//			  PrintLine(eo.FormatException(e));
-			  PrintLine(FormatException(e));
+			  try
+			    {
+			      PrintLine(eo.FormatException(e));
+			    }
+			  catch
+			    {
+			      PrintLine(e.ToString());
+			    }
+
 			}
 			return false;
 		  }

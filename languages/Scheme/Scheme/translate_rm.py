@@ -39,7 +39,7 @@ class Translator(object):
             "init-cont", "init-cont2", "init-cont3", "init-cont4",
             "init-handler", "init-handler2", "init-fail",
             "make-cont", "make-cont2", "make-cont3", "make-cont4", "make-macro", "make-proc",
-            "make-fail", "make-handler", "make-handler2"
+            "make-fail", "make-handler", "make-handler2",
         ] + self.overrides()
 
     def overrides(self):
@@ -113,7 +113,8 @@ class Translator(object):
             name = "b_" + name[1:-1] + "_d"
         for pattern in [("->", "_to_"), (">", "to_"), ("<", "LessThan"), ("*", "_star"),
                         ("=", "_is_"), ("-", "_"), ("?", "_q"), ("!", "_b"), ("/", "_"),
-                        (".", "dot"), ("+", "plus"), ("%" "percent"), ("^", "_hat")]:
+                        (".", "dot"), ("+", "plus"), ("%" "percent"), ("^", "_hat"),
+                        (":", "colon")]:
             name = name.replace(pattern[0], pattern[1])
         return name
 
@@ -426,6 +427,9 @@ class PythonTranslator(Translator):
             self.process_return(expr, indent)
         else: # must be a function call
             self.Print(indent, self.process_app(expr))
+
+    def to_ignore(self):
+        return super(PythonTranslator, self).to_ignore() + ["highlight-expression"]
                 
     def translate(self, filename):
         self.fp = open(filename, "w")
@@ -719,13 +723,14 @@ public class PJScheme:Scheme
                        "safe-print", "modulo", "vector_native", "car^", "cadr^", "string->symbol",
                        "make-binding", "aunparse", "format-stack-trace", "get-variables-from-frame",
                        "vector->list", "char->string", "string->list", "symbol->string", 
-                       "float", "int", "globals", "apply-with-keywords", "assq", "dict", "property",
+                       "float", "int", "globals", "assq", "dict", "property",
                        "reset-toplevel-env", "sort", "string-append", "string-split", "make-symbol",
                        "type", "use-lexical-address", "min", "max",
                        "caar", "cadr", "cdar", "cddr" , 
                        "caaar", "caadr", "cadar", "caddr" , "cdaar", "cdadr", "cddar", "cdddr",
                        "caaaar", "caaadr", "caadar", "caaddr" , "cadaar", "cadadr", "caddar", "cadddr",
                        "cdaaar", "cdaadr", "cdadar", "cdaddr" , "cddaar", "cddadr", "cdddar", "cddddr",
+                       "contains-native", "getitem-native", "setitem-native"
                    ] or 
             "?" in name):
             return self.fix_name(name) + "_proc"

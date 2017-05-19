@@ -195,11 +195,12 @@ public class Scribbler: Myro.Robot
                 if (port == null) 
                     need_port = false;
                 else if (serial.PortName.Equals (port) && serial.BaudRate == baud) {
-                    //need_port = false;
-                    serial.Close (); // and need_port
+                    need_port = false;
+                    //uninit();
+                    //serial.Open();
                 } else {
                     // It exists, but wrong port/baud, so close it:
-                    serial.Close (); // and need_port
+                    uninit();
                 }
             } else { // already closed
                 if ((serial.PortName.Equals (port) || port == null) && serial.BaudRate == baud) {
@@ -229,7 +230,11 @@ public class Scribbler: Myro.Robot
 
     public override void uninit() {
         lock (serial) {
-            serial.Close (); // and need_port
+            try {
+                serial.Close (); 
+            }catch {
+                Console.WriteLine("Could not close port");
+            }
         }
     }
 

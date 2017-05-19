@@ -5,14 +5,18 @@
 
 from __future__ import division, print_function
 
+from collections import Iterable
 import inspect
 import fractions
+import functools
 import operator
 import types
 import math
 import time
 import sys
 import os
+
+PY3 = sys.version_info[0] == 3
 
 #############################################################
 # Python implementation notes:
@@ -45,6 +49,14 @@ if "keys" in dir(__builtins__):
 ENVIRONMENT["DEBUG"] = False
 
 GLOBALS = globals()
+
+class DebugException(Exception):
+    """
+    Exception for use in GUI
+    """
+    def __init__(self, data):
+        super(DebugException, self).__init__()
+        self.data = data
 
 class Char(object):
     def __init__(self, c):
@@ -82,9 +94,21 @@ class Symbol(object):
         # So that EmptyList will be treated as []
         raise StopIteration
 
+    def __next__(self):
+        # So that EmptyList will be treated as []
+        raise StopIteration
+
     def __len__(self):
         # So that EmptyList will be treated as []
         return 0
+
+    def __getattr__(self, attr):
+        if attr == "name":
+            return self.__getattribute__("name")
+        elif hasattr(self.name, attr):
+            return getattr(self.name, attr)
+        else:
+            raise AttributeError("no such attribute '%s' on '%s'" % (attr, self.name))
 
 SYMBOLS = {}
 CHARS = {}
@@ -115,10 +139,13 @@ class cons(object):
         self.cdr = cdr
 
     def __repr__(self):
-        if self.car is symbol_procedure:
-            return "#<procedure>"
-        elif self.car is symbol_environment:
-            return "#<environment>"
+        # Written to not deal with exact same
+        # atoms, so will work with unpickled objs
+        if isinstance(self.car, Symbol):
+            if self.car.name == "procedure":
+                return "#<procedure>"
+            elif self.car.name == "environment":
+                return "#<environment>"
         retval = ""
         current = self
         while isinstance(current, cons):
@@ -126,7 +153,7 @@ class cons(object):
                 retval += " "
             retval += make_safe(current.car)
             current = current.cdr
-        if current != symbol_emptylist:
+        if not (isinstance(current, Symbol) and current.name == "()"):
             retval += " . " + make_safe(current)
         return "(%s)" % retval
 
@@ -137,11 +164,27 @@ class cons(object):
 
     def __len__(self):
         if isinstance(self.cdr, cons):
-            return 1 + len(self.cdr)
+            current = self
+            count = 0
+            while isinstance(current, cons):
+                count += 1
+                current = current.cdr
+            if null_q(current):
+                return count
+            else:
+                raise AttributeError("list is not a proper list")
         else:
             return 1
 
-    def next(self): # Python 3: def __next__(self)
+    def next(self): # Python 2
+        if not isinstance(self.current, cons):
+            raise StopIteration
+        else:
+            retval = self.current.car
+            self.current = self.current.cdr
+            return retval
+
+    def __next__(self): # Python 3
         if not isinstance(self.current, cons):
             raise StopIteration
         else:
@@ -243,7 +286,7 @@ def make_comparison_function(procedure):
     return compare
 
 def apply_comparison(p, carl, cadrl):
-    return apply(p, [carl, cadrl])
+    return p(carl, cadrl)
 
 ## usage: (partition 4 '(6 4 2 1 7) () ()) -> returns partitions
 def partition (p, piv, l, p1, p2):
@@ -455,6 +498,9 @@ def all_numeric_q(ls):
             return False
     return True
 
+def list_native(iterable):
+    return list(iterable)
+
 ### Questions:
 
 def even_q(n):
@@ -470,7 +516,10 @@ def char_q(item):
     return isinstance(item, Char)
 
 def string_q(item):
-    return isinstance(item, str)
+    if PY3:
+        return isinstance(item, str)
+    else:
+        return isinstance(item, (str, unicode))
 
 def char_whitespace_q(c):
     return c.char in [' ', '\t', '\n', '\r']
@@ -486,7 +535,7 @@ def char_is__q(c1, c2):
     return c1 == c2
 
 def number_q(item):
-    return isinstance(item, (int, long, float, fractions.Fraction))
+    return isinstance(item, (int, float, fractions.Fraction))
 
 def null_q(item):
     return item is symbol_emptylist
@@ -556,7 +605,7 @@ def sqrt(number):
     return math.sqrt(number)
 
 def plus(*args):
-    return reduce(operator.add, args, 0)
+    return functools.reduce(operator.add, args, 0)
 
 def minus(*args):
     if len(args) == 0:
@@ -564,21 +613,24 @@ def minus(*args):
     elif len(args) == 1:
         return -args[0]
     else:
-        return reduce(operator.sub, args[1:], args[0])
+        return functools.reduce(operator.sub, args[1:], args[0])
 
 def multiply(*args):
-    return reduce(operator.mul, args, 1)
+    return functools.reduce(operator.mul, args, 1)
 
 def divide(*args):
-    if len(args) == 0:
-        return 1
-    elif len(args) == 1:
-        return fractions.Fraction(1, args[0])
-    else:
-        current = fractions.Fraction(args[0], args[1])
-        for arg in args[2:]:
-            current = fractions.Fraction(current, arg)
-        return current
+    try:
+        if len(args) == 0:
+            return 1
+        elif len(args) == 1:
+            return fractions.Fraction(1, args[0])
+        else:
+            current = fractions.Fraction(args[0], args[1])
+            for arg in args[2:]:
+                current = fractions.Fraction(current, arg)
+            return current
+    except:
+        return functools.reduce(operator.truediv, args)
 
 def Equal(o1, o2):
     if boolean_q(o1) or boolean_q(o2):
@@ -677,8 +729,8 @@ def int_(number):
 
 ### Strings:
 
-def string_append(s1, s2):
-    return str(s1) + str(s2)
+def string_append(*args):
+    return "".join([str(arg) for arg in args])
 
 def string_ref(string, pos):
     return make_char(string[pos])
@@ -718,7 +770,7 @@ def substring(s, start, stop):
 ### Functions:
 
 def Apply(f, lyst):
-    return apply(f, list_to_vector(lyst))
+    return f(*list_to_vector(lyst))
 
 ### Annotated expression support:
 
@@ -729,6 +781,14 @@ def tagged_list_hat(keyword, op, length):
                 symbol_q_hat(car_hat(asexp)) and 
                 eq_q_hat(car_hat(asexp), keyword))
     return tagged_list
+
+def tagged2_list_hat(keyword, op, length):
+    def tagged2_list(asexp):
+        return (list_q_hat(asexp) and
+                op(length_hat(asexp), length) and
+                symbol_q_hat(car_hat(asexp)) and 
+                eq_q_hat(cadr_hat(asexp), keyword))
+    return tagged2_list
 
 ### Misc:
 
@@ -753,10 +813,12 @@ def trampoline():
         while pc:
             try:
                 pc()
+            except DebugException:
+                raise
             except KeyboardInterrupt:
                 exception_reg = make_exception("KeyboardInterrupt", "Keyboard interrupt", symbol_none, symbol_none, symbol_none)
                 pc = apply_handler2            
-            except Exception, e:
+            except Exception as e:
                 #arginfo = inspect.getargvalues(sys.exc_info()[2].tb_frame)
                 #extra = "\nArguments:\n"
                 #for arg in arginfo.args:
@@ -764,7 +826,7 @@ def trampoline():
                 #extra += "\nLocals:\n"
                 #for arg in arginfo.locals:
                 #    extra += "   %s = %s\n" % (arg, repr(arginfo.locals[arg]))
-                exception_reg = make_exception("UnhandledException", e.message, symbol_none, symbol_none, symbol_none)
+                exception_reg = make_exception("UnhandledException", str(e), symbol_none, symbol_none, symbol_none)
                 pc = apply_handler2
     return final_reg
 
@@ -783,7 +845,12 @@ def read_multiline(prompt):
     retval = ""
     while True:
         try:
-            retval += raw_input(prompt) ## Python 2
+            if retval:
+                retval += "\n"
+            if PY3:
+                retval += input(prompt) ## Python 3
+            else:
+                retval += raw_input(prompt) ## Python 2
             prompt = "... "
         except EOFError:
             return "(exit)"
@@ -908,9 +975,7 @@ def atom_q(item):
     return number_q(item) or symbol_q(item) or string_q(item)
 
 def iter_q(item):
-    # If an item is externally iterable. Scheme in Python
-    # has no such items.
-    return False
+    return isinstance(item, Iterable)
 
 def assq(x, ls):
     while not null_q(ls):
@@ -921,18 +986,39 @@ def assq(x, ls):
 
 ### External env interface:
 
-def apply_with_keywords(*args):
-    # FIXME: when this interface is enabled
-    pass
-
 def import_native(libraries, environment):
     retval = symbol_emptylist
     for library in libraries:
-        lib = __import__(library)
-        sym = make_symbol(library)
-        set_global_value_b(sym, lib)
-        retval = cons(sym, retval)
-    return reverse(retval)
+        if PY3:
+            exec("import %s" % library, env)
+        else:
+            exec ("import %s" % library) in env
+    ENVIRONMENT.update(env)
+    return List(*[make_symbol(name) for name in env.keys() if not name.startswith("_")])
+
+def import_as_native(library, name, environment):
+    env = {}
+    if name == make_symbol("*") or name == "*":
+        if PY3:
+            exec("from %s import *" % library, env)
+        else:
+            exec ("from %s import *" % library) in env
+    else:
+        if PY3:
+            exec("import %s as %s" % (library, name), env)
+        else:
+            exec ("import %s as %s" % (library, name)) in env
+    ENVIRONMENT.update(env)
+    return List(*[make_symbol(name) for name in env.keys() if not name.startswith("_")])
+
+def import_from_native(library, name_list, environment):
+    env = {}
+    if PY3:
+        exec("from %s import %s" % (library, ", ".join([str(name) for name in name_list])), env)
+    else:
+        exec ("from %s import %s" % (library, ", ".join([str(name) for name in name_list]))) in env
+    ENVIRONMENT.update(env)
+    return List(*[make_symbol(name) for name in env.keys() if not name.startswith("_")])
 
 def dlr_proc_q(item):
     return callable(item) or hasattr(item, "MoveNext")
@@ -967,6 +1053,7 @@ def get_external_member(obj, components):
     return retval
 
 def dlr_apply(f, args):
+    ## FIXME: Handle named params, and (* : ...), (** : ...)
     largs = list_to_vector(args)
     return f(*largs)
 
@@ -1017,6 +1104,27 @@ def load_native(filename):
     GLOBALS['filenames_reg'] = List(filename)
     GLOBALS['pc'] = load_files
     trampoline()
+
+def getitem_native(dictionary, item):
+    return dictionary[item]
+
+def setitem_native(dictionary, item, value):
+    dictionary[item] = value
+    return value
+
+def contains_native(dictionary, item):
+    return item in dictionary
+
+def highlight_expression(exp):
+    info = symbol_undefined
+    info = rac(exp)
+    if true_q(not((info) is (symbol_none))):
+        if GLOBALS.get("TRACE_GUI", False):
+            GLOBALS["TRACE_GUI_COUNT"] += 1
+            if GLOBALS["TRACE_GUI_COUNT"] % 2 == 1:
+                raise DebugException([get_start_line(info), get_start_char(info), get_end_line(info), get_end_char(info)])
+        else:
+            printf("call: ~s~%", aunparse(exp))
 
 # end of Scheme.py
 #############################################################

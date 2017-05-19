@@ -17,6 +17,7 @@ all: ../Sprites.dll
 		-r:Microsoft.Dynamic \
 		-r:IronPython \
 	        -r:IronRuby \
+		-r:System.Numerics \
 		-r:FarseerPhysics.dll \
 		-out:../Sprites.dll \
 		-pkg:gtk-sharp-2.0 \

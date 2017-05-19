@@ -13,7 +13,7 @@ and you are free to use them in various ways.
 
 For installation instructions, see:
 
-   http://calicoproject.org/Calico_Download
+   http://wiki.roboteducation.org/Calico
 
 Assuming that this README.txt is in a directory named Calico:
 
