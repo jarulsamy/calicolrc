@@ -3768,6 +3768,7 @@ public static class Graphics
         private bool _has_pen;
         internal bool close_path = true;
         SpeechBubble speechBubble = null;
+	public object UserData = null;
 
         public Shape (bool has_pen=true)
         {
@@ -4343,7 +4344,7 @@ public static class Graphics
                 }
             }
 
-            public void setWidth (int value)
+            public void setBorderWidth (int value)
             {
                 _border = value;
                 QueueDraw ();
@@ -5207,6 +5208,44 @@ public static class Graphics
                     shapes.Clear ();
                 }
             }
+
+	    public virtual double getWidth() {
+                double minx = 0.0;
+                double maxx = 0.0;
+		if(points == null) return 0;
+		if(points.Length > 0){
+			minx = points[0].x;
+			maxx = points[0].x;
+		}
+		for (int i = 1; i < points.Length; i++) {
+			if(minx > points[i].x){
+				minx = points[i].x;
+			}
+			if(maxx < points[i].x){
+				maxx = points[i].x;
+			}
+		}
+		return maxx - minx;
+	    }
+
+	    public virtual double getHeight() {
+                double miny = 0.0;
+                double maxy = 0.0;
+		if(points == null) return 0;
+		if(points.Length > 0){
+			miny = points[0].y;
+			maxy = points[0].y;
+		}
+		for (int i = 1; i < points.Length; i++) {
+			if(miny > points[i].y){
+				miny = points[i].y;
+			}
+			if(maxy < points[i].y){
+				maxy = points[i].y;
+			}
+		}
+		return maxy - miny;
+	    }
         }
 
         public class Text : Shape
@@ -5493,6 +5532,14 @@ public static class Graphics
                     return retval;
                 }
             }
+
+	    public override double getWidth() {
+		    return width;
+	    }
+
+	    public override double getHeight() {
+		    return height;
+	    }
 
             public double [] getExtents(string [] text) {
                 double [] retval = new double [text.Length];
@@ -5965,6 +6012,45 @@ public static class Graphics
                 }
                 g.Restore ();
             }
+
+	    public override double getWidth() {
+                double minx = 0.0;
+                double maxx = 0.0;
+		if(_path == null) return 0;
+		if(_path.Count > 0){
+			minx = _path[0].x;
+			maxx = _path[0].x;
+		}
+		for (int i = 1; i < _path.Count; i++) {
+			if(minx > _path[i].x){
+				minx = _path[i].x;
+			}
+			if(maxx < _path[i].x){
+				maxx = _path[i].x;
+			}
+		}
+		return maxx - minx;
+	    }
+
+	    public override double getHeight() {
+                double miny = 0.0;
+                double maxy = 0.0;
+		if(_path == null) return 0;
+		if(_path.Count > 0){
+			miny = _path[0].y;
+			maxy = _path[0].y;
+		}
+		for (int i = 1; i < _path.Count; i++) {
+			if(miny > _path[i].y){
+				miny = _path[i].y;
+			}
+			if(maxy < _path[i].y){
+				maxy = _path[i].y;
+			}
+		}
+		return maxy - miny;
+	    }
+	    
         }
 
         public class Pixel: IComparable
@@ -6115,6 +6201,7 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
+		_outline = null;
             }
 
 	    //JH: This is part of the big experiment
@@ -6166,6 +6253,7 @@ public static class Graphics
                 _cacheHeight = _pixbuf.Height;
                 //if (on_mac()) swap_red_blue();
                 });
+		_outline = null;
             }
 	    //JH: This is part of the big experiment
 
@@ -6193,6 +6281,7 @@ public static class Graphics
                     _cacheHeight = _pixbuf.Height;
                     if (on_mac()) swap_red_blue();
                 });
+		_outline = null;
             }
 
             public Picture (Canvas canvas) : this(true)
@@ -6242,10 +6331,12 @@ public static class Graphics
                 _cacheHeight = _pixbuf.Height;
                 //if (on_mac()) swap_red_blue();
                 });
+		_outline = null;
             }
 
             public Picture (WindowClass window) : this(window._canvas)
-            { 
+            {
+		    _outline = null;
             }
 
             // THIS IS IS A SUPER HACK
@@ -6273,12 +6364,14 @@ public static class Graphics
             }
 
             public Picture (System.Drawing.Bitmap bitmap) : this(bitmap, bitmap.Width, bitmap.Height)
-            { 
+            {
+		    _outline = null;
             }
 
             public Picture (bool has_pen) : base(has_pen)
             {
                 this._fill.picture = this;
+		_outline = null;
             }
 
 
@@ -6298,7 +6391,7 @@ public static class Graphics
                 this.filename = original.filename;
                 InvokeBlocking (delegate {
                     // Colorspace, has_alpha, bits_per_sample, width, height:
-                    _pixbuf = new Gdk.Pixbuf (original._pixbuf.Colorspace, true, 8, original.getWidth (), original.getHeight ());
+				_pixbuf = new Gdk.Pixbuf (original._pixbuf.Colorspace, true, 8, (int)original.getWidth (), (int)original.getHeight ());
                     if (!_pixbuf.HasAlpha) {
                         _pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
                     }
@@ -6339,11 +6432,13 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
+		_outline = null;
             }
 
 
             public Picture (System.Drawing.Bitmap bitmap, bool fluke1=false) : this(bitmap, bitmap.Width, bitmap.Height, fluke1) {
-            }
+		    _outline = null;
+	    }
 
             public Picture (System.Drawing.Bitmap bitmap, int width, int height, bool fluke1=false) : this(true) {
                 InvokeBlocking (delegate {
@@ -6388,7 +6483,9 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
+		_outline = null;
             }
+	    
 
             public System.Drawing.Bitmap toBitmap (params object [] args) {
                 return _pixbuf.ToBitmap(args);
@@ -6493,6 +6590,7 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
+		_outline = null;
             }
 
             public Picture (int width, int height, byte [] buffer) : this(true)
@@ -6525,6 +6623,7 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
+		_outline = null;
             }
 
             public Picture (int width, int height) : this(true)
@@ -6556,6 +6655,7 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
+		_outline = null;
             }
 
             public Picture (int width, int height, Color color) : this(true)
@@ -6587,6 +6687,7 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
+		_outline = null;
             }
 
             public Picture getRegion (IList iterable, int width, int height, double degrees)
@@ -6784,7 +6885,7 @@ public static class Graphics
                 return _pixbuf;
             }
 
-            public int getWidth ()
+            public override double getWidth ()
             {
                 int retval = 0;
                 InvokeBlocking( delegate {
@@ -6798,7 +6899,7 @@ public static class Graphics
                 return _pixbuf.Width;
             }
 
-            public int getHeight ()
+            public override double getHeight ()
             {
                 int retval = 0;
                 InvokeBlocking( delegate {
@@ -7141,16 +7242,18 @@ public static class Graphics
                 g.Scale (_scaleFactor, _scaleFactor);
                 Gdk.CairoHelper.SetSourcePixbuf (g, _pixbuf, -_pixbuf.Width / 2, -_pixbuf.Height / 2);
                 g.Paint ();
-                g.LineWidth = border;
-                g.MoveTo (-_pixbuf.Width / 2, -_pixbuf.Height / 2);
+
                 if (_outline != null) {
-                    g.LineTo (_pixbuf.Width / 2, -_pixbuf.Height / 2);
-                    g.LineTo (_pixbuf.Width / 2, _pixbuf.Height / 2);
-                    g.LineTo (-_pixbuf.Width / 2, _pixbuf.Height / 2);
-                    g.ClosePath ();
-                    g.Color = _outline._cairo;
+			g.LineWidth = border;
+			g.MoveTo (-_pixbuf.Width / 2, -_pixbuf.Height / 2);
+			g.LineTo (_pixbuf.Width / 2, -_pixbuf.Height / 2);
+			g.LineTo (_pixbuf.Width / 2, _pixbuf.Height / 2);
+			g.LineTo (-_pixbuf.Width / 2, _pixbuf.Height / 2);
+			g.ClosePath ();
+			g.Color = _outline._cairo;
+			g.Stroke ();
                 }
-                g.Stroke ();
+                
                 foreach (Shape shape in shapes) {
                     shape.render (g);
                     shape.updateGlobalPosition (g);
@@ -8055,6 +8158,14 @@ public static class Graphics
                 if (has_pen)
                     pen.render (g);
             }
+
+	    public override double getWidth(){
+		    return _radius*2;
+	    }
+
+	    public override double getHeight(){
+		    return _radius*2;
+	    }
         }
 
         public class Oval : Shape
@@ -8183,6 +8294,14 @@ public static class Graphics
                     body.FixtureList [0].UserData = this; // point back to this shape
                 }
             }
+
+	    public override double getWidth(){
+		    return _xRadius*2;
+	    }
+
+	    public override double getHeight(){
+		    return _yRadius*2;
+	    }
         }
 
         public class Pie : Shape
@@ -8346,6 +8465,14 @@ public static class Graphics
                     QueueDraw ();
                 }
             }
+
+	    public override double getWidth(){
+		    return _radius*2;
+	    }
+
+	    public override double getHeight(){
+		    return _radius*2;
+	    }
         }
 
         public class Arc : Shape
@@ -8484,6 +8611,14 @@ public static class Graphics
                     QueueDraw ();
                 }
             }
+
+	    public override double getWidth(){
+		    return _radius*2;
+	    }
+
+	    public override double getHeight(){
+		    return _radius*2;
+	    }
         }
 
         public class Frame : Shape
@@ -11152,33 +11287,54 @@ outer_loop : while ((c = iter.NextPixel()) != EOF)
 
             public override bool hit (double x, double y)
             {
+		    if(shape != null){
+			    return shape.hit(x, y);
+		    } else {
+			    return false;
+		    }
                 // ask the currenCostume what if it got hit:
-                Point p = new Point (x, y);
-                int counter = 0;
-                double xinters;
-                Point p1, p2;
-                if (shape.points != null) {
-                    p1 = shape.points [0];
-                    for (int i=1; i<=shape.points.Length; i++) {
-                        p2 = shape.points [i % shape.points.Length];
-                        if (p.y > (Math.Min (p1.gy, p2.gy))) {
-                            if (p.y <= (Math.Max (p1.gy, p2.gy))) {
-                                if (p.x <= (Math.Max (p1.gx, p2.gx))) {
-                                    if (p1.gy != p2.gy) {
-                                        xinters = (p.y - p1.gy) * (p2.gx - p1.gx) / (p2.gy - p1.gy) + p1.gx;
-                                        if (p1.gx == p2.gx || p.x <= xinters)
-                                            counter++;
-                                    }
-                                }
-                            }
-                        }
-                        p1 = p2;
-                    }
-                    return (counter % 2 != 0); // hit?
-                } else {
-                    return false;
-                }
+                /* Point p = new Point (x, y); */
+                /* int counter = 0; */
+                /* double xinters; */
+                /* Point p1, p2; */
+                /* if (shape.points != null) { */
+                /*     p1 = shape.points [0]; */
+                /*     for (int i=1; i<=shape.points.Length; i++) { */
+                /*         p2 = shape.points [i % shape.points.Length]; */
+                /*         if (p.y > (Math.Min (p1.gy, p2.gy))) { */
+                /*             if (p.y <= (Math.Max (p1.gy, p2.gy))) { */
+                /*                 if (p.x <= (Math.Max (p1.gx, p2.gx))) { */
+                /*                     if (p1.gy != p2.gy) { */
+                /*                         xinters = (p.y - p1.gy) * (p2.gx - p1.gx) / (p2.gy - p1.gy) + p1.gx; */
+                /*                         if (p1.gx == p2.gx || p.x <= xinters) */
+                /*                             counter++; */
+                /*                     } */
+                /*                 } */
+                /*             } */
+                /*         } */
+                /*         p1 = p2; */
+                /*     } */
+                /*     return (counter % 2 != 0); // hit? */
+                /* } else { */
+                /*     return false; */
+                /* } */
             }
+
+	    public override double getWidth(){
+		    if(shape != null){
+			    return shape.getWidth();
+		    } else {
+			    return 0;
+		    }
+	    }
+
+	    public override double getHeight(){
+		    if(shape != null){
+			    return shape.getHeight();
+		    } else {
+			    return 0;
+		    }
+	    }
         }
         //----------------------------------------------END OF SPRITE CLASS-----------------------------------------
 
