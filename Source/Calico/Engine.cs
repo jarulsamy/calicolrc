@@ -122,6 +122,10 @@ namespace Calico {
             return variable.Split('.');
         }
 
+	public virtual object getPersistentVariables(){
+	    return null;
+	}
+
 	// -----------------------------------------------------
 
 	public virtual object GetMember(object value, string part) {

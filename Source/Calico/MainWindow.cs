@@ -125,6 +125,26 @@ namespace Calico {
         public CustomStream cstderr;
         public IList<string> persistentPaths = new List<string>();
 
+	public void addPath(string path, string file=""){
+		if(file != ""){
+			string dir = System.IO.Path.GetDirectoryName(file);
+			path = dir + "/" + path; 
+		}
+		path = new FileInfo(path).FullName;
+		if(!persistentPaths.Contains(path)){
+			persistentPaths.Add(path);
+			manager.AddPath(path);
+		}
+	}
+
+	public object getGlobals(){
+		if(manager.ContainsKey("python")){
+			return manager["python"].engine.getPersistentVariables();
+		} else {
+			return null;
+		}
+	}
+
         public bool toolSwapped {
             get {
                 return (bool) config.GetValue("config", "toolSwapped");

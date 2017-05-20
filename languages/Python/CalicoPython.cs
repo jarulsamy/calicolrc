@@ -75,7 +75,12 @@ namespace CalicoPython
 		  ICollection<string > paths = engine.GetSearchPaths ();
 		  paths.Add (Path.GetFullPath(path));
 		  engine.SetSearchPaths (paths);
-		}	
+		}
+
+		public override object getPersistentVariables(){
+			return persistentVariables;
+		}
+
 		
 		public override Microsoft.Scripting.Hosting.CompiledCode SetDLRSpecificCompilerOptions(
 					  Microsoft.Scripting.Hosting.ScriptSource source, 
