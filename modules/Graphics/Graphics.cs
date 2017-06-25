@@ -1279,17 +1279,28 @@ public static class Graphics
 
     public class ColorStop
     {
-	public Color color;
-	public double offset;    
+		public Color color;
+		public double offset;    
     }
 
     public class Gradient
     {
-	public string gtype;
+		public string gtype;
         public Color c1, c2;
         public Point p1, p2;
         public double radius1, radius2;
 
+		public Gradient(Gradient other)
+		{
+			this.gtype = other.gtype;
+            this.p1 = new Point (other.p1);
+            this.radius1 = other.radius1;
+            this.c1 = new Color(other.c1);
+            this.p2 = new Point (other.p2);
+            this.radius2 = other.radius2;
+            this.c2 = new Color(other.c2);
+		}
+		
         // ("linear", (100, 200), Color("red"), (200, 100), Color("blue"))
         public Gradient (string gtype, IList p1, Color c1, IList p2, Color c2)
         {
@@ -1509,7 +1520,7 @@ public static class Graphics
                 onMouseUpCallbacks = new List ();
                 onKeyPressCallbacks = new List ();
                 onKeyReleaseCallbacks = new List ();
-		onConfigureCallbacks = new List ();
+				onConfigureCallbacks = new List ();
 
                 // clear listeners:
                 clearListeners();
@@ -1549,7 +1560,7 @@ public static class Graphics
                 onMouseUpCallbacks = new List ();
                 onKeyPressCallbacks = new List ();
                 onKeyReleaseCallbacks = new List ();
-		onConfigureCallbacks = new List ();
+				onConfigureCallbacks = new List ();
 
                 // clear listeners:
                 clearListeners();
@@ -2346,14 +2357,24 @@ public static class Graphics
         internal bool _dirty = false;
         private bool timer_running = false;
         private DateTime last_update = new DateTime (2000, 1, 1);
-        internal double _update_interval = .1; // how often, in seconds, to update
-        public List onClickCallbacks = new List ();
-        public List onMouseMovementCallbacks = new List ();
-        public List onMouseUpCallbacks = new List ();
-        public List onKeyPressCallbacks = new List ();
-        public List onKeyReleaseCallbacks = new List ();
-	public List onConfigureCallbacks = new List ();
-	public List onDeleteCallbacks = new List ();
+		// how often, in seconds, to update
+        internal double _update_interval = .1; 
+		// Callbacks
+        public List<Func<object,Event,object> > onClickCallbacks =
+			new List<Func<object,Event,object> > ();
+        public List<Func<object,Event,object> > onMouseMovementCallbacks =
+			new List<Func<object,Event,object> > ();
+        public List<Func<object,Event,object> > onMouseUpCallbacks =
+			new List<Func<object,Event,object> > ();
+        public List<Func<object,Event,object> > onKeyPressCallbacks =
+			new List<Func<object,Event,object> > ();
+        public List<Func<object,Event,object> > onKeyReleaseCallbacks =
+			new List<Func<object,Event,object> > ();
+		public List<Func<Gdk.EventConfigure,object> > onConfigureCallbacks =
+			new List<Func<Gdk.EventConfigure,object> > ();
+		public List<Func<Gdk.Event,object> > onDeleteCallbacks =
+			new List<Func<Gdk.Event,object> > ();
+		/* public List removedMouseUpCallbacks = new List (); */
         public PythonTuple _lastClick;
         public string _lastKey = "";
         public string _mouseState = "up";
@@ -2369,6 +2390,16 @@ public static class Graphics
         public int _cacheWidth;
         public bool HandleKeyPressOnShape = false;
         public bool HandleKeyReleaseOnShape = false;
+		// JH: Drag, enter, and leave code - start
+		protected List _clickedOnShapes = new List ();
+		
+		public void startDrag(Shape shape){
+			if(!_clickedOnShapes.Contains(shape)){
+				_clickedOnShapes.Add(shape);
+			}
+			shape.setClickedOn(true);
+		}
+		// JH: Drag, enter, and leave code - end
 
         public WindowClass (string title, Gtk.Widget widget) : base(title)
         {
@@ -2419,40 +2450,7 @@ public static class Graphics
            _cacheHeight = height;
            }
            */
-	protected override bool OnConfigureEvent(Gdk.EventConfigure args)
-	{
-	  base.OnConfigureEvent(args);
-	  foreach (Func<Gdk.EventConfigure,object> function in onConfigureCallbacks) {
-	    try {
-	      Invoke (delegate {
-		  Func<Gdk.EventConfigure,object > f = (Func<Gdk.EventConfigure,object>)function;
-		  f (args);
-		});
-	    } catch (Exception e) {
-	      Console.Error.WriteLine ("Error in OnConfigureEvent function");
-	      Console.Error.WriteLine (e.Message);
-	    }        
-	  }
-	  return true;
-	}
 
-	protected override bool OnDeleteEvent(Gdk.Event args)
-	{
-	  base.OnDeleteEvent(args);
-	  foreach (Func<Gdk.Event,object> function in onDeleteCallbacks) {
-	    try {
-	      Invoke (delegate {
-		  Func<Gdk.Event,object > f = (Func<Gdk.Event,object>)function;
-		  f (args);
-		});
-	    } catch (Exception e) {
-	      Console.Error.WriteLine ("Error in OnDeleteEvent function");
-	      Console.Error.WriteLine (e.Message);
-	    }        
-	  }
-	  //Console.Error.WriteLine ("Launching on-delete event");
-	  return false;
-	}
 
         public string title {
             get {
@@ -2526,85 +2524,54 @@ public static class Graphics
             reset (true);
         }
 
-        public void reset (bool redraw)
+		protected void resetNow (bool redraw)
+        {
+			mode = "auto";
+			//Resize (width, height); // removed because of scrollbar issue
+			timer_running = false;
+			last_update = new DateTime (2000, 1, 1);
+			_update_interval = .1; // how often, in seconds, to update
+			onClickCallbacks = new List<Func<object,Event,object> > ();
+			onMouseMovementCallbacks = new List<Func<object,Event,object> > ();
+			onMouseUpCallbacks = new List<Func<object,Event,object> > ();
+			//removedMouseUpCallbacks = new List ();
+			onKeyPressCallbacks = new List<Func<object,Event,object> > ();
+			onKeyReleaseCallbacks = new List<Func<object,Event,object> > ();
+			onConfigureCallbacks = new List<Func<Gdk.EventConfigure,object> >();
+			onDeleteCallbacks = new List<Func<Gdk.Event,object> > ();
+			
+			// clear listeners:
+			clearListeners();
+			_lastKey = "";
+			_mouseState = "up";
+			_keyState = false;
+			_keyStates = new Dictionary<string, bool>();
+			time = 0.0;
+			simulationStepTime = 0.01;
+			state = "init";
+			lock (_canvas.shapes)
+				_canvas.shapes.Clear ();
+			foreach (Gtk.Widget child in _canvas.Children) {
+				_canvas.Remove (child);
+			}
+			Gdk.Color bg = new Gdk.Color (242, 241, 240);
+			_canvas.ModifyBg (Gtk.StateType.Normal, bg);
+			if (redraw)
+				QueueDraw();
+		}
+
+		// TODO: Do we have any use for this version of the reset function?
+        public void resetAsync (bool redraw)
         {
             Invoke (delegate {
-                /* bad, causes lock up in IPython... don't know why
-                   _canvas.surface = new Cairo.ImageSurface (Cairo.Format.Argb32, width, height);
-                   _canvas.need_to_draw_surface = false;
-                   */
-                mode = "auto";
-                //Resize (width, height); // removed because of scrollbar issue
-                timer_running = false;
-                last_update = new DateTime (2000, 1, 1);
-                _update_interval = .1; // how often, in seconds, to update
-                onClickCallbacks = new List ();
-                onMouseMovementCallbacks = new List ();
-                onMouseUpCallbacks = new List ();
-                onKeyPressCallbacks = new List ();
-                onKeyReleaseCallbacks = new List ();
-		onConfigureCallbacks = new List ();
-		onDeleteCallbacks = new List ();
-
-                // clear listeners:
-                clearListeners();
-                _lastKey = "";
-                _mouseState = "up";
-                _keyState = false;
-                _keyStates = new Dictionary<string, bool>();
-                time = 0.0;
-                simulationStepTime = 0.01;
-                state = "init";
-                lock (_canvas.shapes)
-                    _canvas.shapes.Clear ();
-                foreach (Gtk.Widget child in _canvas.Children) {
-                    _canvas.Remove (child);
-                }
-                Gdk.Color bg = new Gdk.Color (242, 241, 240);
-                _canvas.ModifyBg (Gtk.StateType.Normal, bg);
-                if (redraw)
-                    QueueDraw();
+					resetNow(redraw);
             });
         }
 
-        public void resetBlocking(bool redraw)
+        public void reset(bool redraw)
         {
             InvokeBlocking (delegate {
-                /* bad, causes lock up in IPython... don't know why
-                   _canvas.surface = new Cairo.ImageSurface (Cairo.Format.Argb32, width, height);
-                   _canvas.need_to_draw_surface = false;
-                   */
-                mode = "auto";
-                //Resize (width, height); // removed because of scrollbar issue
-                timer_running = false;
-                last_update = new DateTime (2000, 1, 1);
-                _update_interval = .1; // how often, in seconds, to update
-                onClickCallbacks = new List ();
-                onMouseMovementCallbacks = new List ();
-                onMouseUpCallbacks = new List ();
-                onKeyPressCallbacks = new List ();
-                onKeyReleaseCallbacks = new List ();
-		onConfigureCallbacks = new List ();
-		onDeleteCallbacks = new List ();
-
-                // clear listeners:
-                clearListeners();
-                _lastKey = "";
-                _mouseState = "up";
-                _keyState = false;
-                _keyStates = new Dictionary<string, bool>();
-                time = 0.0;
-                simulationStepTime = 0.01;
-                state = "init";
-                lock (_canvas.shapes)
-                    _canvas.shapes.Clear ();
-                foreach (Gtk.Widget child in _canvas.Children) {
-                    _canvas.Remove (child);
-                }
-                Gdk.Color bg = new Gdk.Color (242, 241, 240);
-                _canvas.ModifyBg (Gtk.StateType.Normal, bg);
-                if (redraw)
-                    QueueDraw();
+					resetNow(redraw);
             });
         }
 
@@ -2738,23 +2705,9 @@ public static class Graphics
             _mouseState = "up";
         }
 
-        private void HandleMouseMovementCallbacks (object obj,
-                Gtk.MotionNotifyEventArgs args)
-        {
-            Event evt = new Event (args);
-            foreach (Func<object,Event,object> function in onMouseMovementCallbacks) {
-                try {
-                    Invoke (delegate {
-                        Func<object,Event,object > f = (Func<object,Event,object>)function;
-                        f (obj, evt);
-                    });
-                } catch (Exception e) {
-                    Console.Error.WriteLine ("Error in onMouseMove function");
-                    Console.Error.WriteLine (e.Message);
-                }        
-            }
-        }
 
+		// Listeners
+		// TODO start: Do we use any of this stuff below? 
         public void clearListeners() {
             MotionNotifyEvent -= HandleMouseMovementOnShape;
             ButtonPressEvent -= HandleClickOnShape;
@@ -2813,7 +2766,8 @@ public static class Graphics
         }
 
         public void HandleMouseUpOnShape (object obj,
-                Gtk.ButtonReleaseEventArgs args) {
+										  Gtk.ButtonReleaseEventArgs args)
+		{
             lock (canvas.shapes) {
                 foreach (Shape shape in canvas.shapes) {
                     if (shape.hit(args.Event.X, args.Event.Y)) {
@@ -2824,39 +2778,77 @@ public static class Graphics
                 }
             }
         }
+		// TODO end.
+
+		// Callback handlers
+        private void HandleMouseMovementCallbacks (object obj,
+                Gtk.MotionNotifyEventArgs args)
+        {
+            Event evt = new Event (args);
+			Invoke (delegate {
+					foreach (Func<object,Event,object> function in onMouseMovementCallbacks.ToArray()) {
+						try {
+                    
+							Func<object,Event,object > f = (Func<object,Event,object>)function;
+							f (obj, evt);
+                    
+						} catch (Exception e) {
+							Console.Error.WriteLine ("Error in onMouseMove function");
+							Console.Error.WriteLine (e.Message);
+						}        
+					}
+				});
+        }
+
 
         private void HandleClickCallbacks (object obj,
                 Gtk.ButtonPressEventArgs args)
         {
             Event evt = new Event (args);
-            foreach (Func<object,Event,object> function in onClickCallbacks) {
-                try {
-                    Invoke (delegate {
-                        Func<object,Event,object > f = (Func<object,Event,object>)function;
-                        f (obj, evt);
-                    });
-                } catch (Exception e) {
-                    Console.Error.WriteLine ("Error in onMouseDown function");
-                    Console.Error.WriteLine (e.Message);
-                }        
-            }
+			Invoke (delegate {
+					foreach (Func<object,Event,object> function in onClickCallbacks.ToArray()) {
+						try {
+                    
+							Func<object,Event,object > f = (Func<object,Event,object>)function;
+							f (obj, evt);
+                   
+						} catch (Exception e) {
+							Console.Error.WriteLine ("Error in onMouseDown function");
+							Console.Error.WriteLine (e.Message);
+						}        
+					}
+				});
         }
 
         private void HandleMouseUpCallbacks (object obj,
                 Gtk.ButtonReleaseEventArgs args)
         {
             Event evt = new Event (args);
-            foreach (Func<object,Event,object> function in onMouseUpCallbacks) {
-                try {
-                    Invoke (delegate {
-                        Func<object,Event,object > f = (Func<object,Event,object>)function;
-                        f (obj, evt);
-                    });
-                } catch (Exception e) {
-                    Console.Error.WriteLine ("Error in onMouseUp function");
-                    Console.Error.WriteLine (e.Message);
-                }        
-            }
+			/* foreach (Func<object,Event,object> function in removedMouseUpCallbacks) { */
+			/* 	if(onMouseUpCallbacks.Contains(function)){ */
+			/* 		onMouseUpCallbacks.Remove(function); */
+			/* 	} */
+			/* } */
+			Invoke (delegate {
+					foreach (Func<object,Event,object> function in onMouseUpCallbacks.ToArray()) {
+						try {
+							Func<object,Event,object > f = (Func<object,Event,object>)function;
+							f (obj, evt);
+							
+						} catch (Exception e) {
+							Console.Error.WriteLine ("Error in onMouseUp function");
+							Console.Error.WriteLine (e.Message);
+						}        
+					}
+					// JH: Drag, leave, and enter code - start
+					//System.Console.Write("Handeling mouse up callbacks.\n");
+					foreach(Shape shape in _clickedOnShapes){
+						shape.setClickedOn(false);
+						shape.handleDropCallbacks(shape, evt);
+					}
+					_clickedOnShapes.Clear();
+				});
+			// JH: Drag, leave, and enter code - end
         }
 
         [GLib.ConnectBefore]
@@ -2866,6 +2858,7 @@ public static class Graphics
             _lastKey = args.Event.Key.ToString ();
             _keyState = true;
             _keyStates[_lastKey] = true;
+			// TODO Start: Do we still use the code below?
             if (HandleKeyPressOnShape){
                 lock (canvas.shapes) {
                     foreach (Shape shape in canvas.shapes) {
@@ -2875,18 +2868,21 @@ public static class Graphics
                     }
                 }
             }
+			// TODO End.
             Event evt2 = new Event (args);
-            foreach (Func<object,Event,object> function in onKeyPressCallbacks) {
-                try {
-                    Invoke (delegate {
-                        Func<object,Event,object > f = (Func<object,Event,object>)function;
-                        f (obj, evt2);
-                    });
-                } catch (Exception e) {
-                    Console.Error.WriteLine ("Error in onKeypress function");
-                    Console.Error.WriteLine (e.Message);
-                }        
-            }
+			Invoke (delegate {
+					foreach (Func<object,Event,object> function in onKeyPressCallbacks.ToArray()) {
+						try {
+                    
+							Func<object,Event,object > f = (Func<object,Event,object>)function;
+							f (obj, evt2);
+                    
+						} catch (Exception e) {
+							Console.Error.WriteLine ("Error in onKeypress function");
+							Console.Error.WriteLine (e.Message);
+						}        
+					}
+				});
         }
 
         private void HandleKeyReleaseCallbacks (object obj,
@@ -2895,6 +2891,8 @@ public static class Graphics
             _keyState = false;
             string lastKey = args.Event.Key.ToString ();
             _keyStates[lastKey] = false;
+
+			// TODO Start: Do we still use the code below?
             if (HandleKeyReleaseOnShape){
                 lock (canvas.shapes) {
                     foreach (Shape shape in canvas.shapes) {
@@ -2904,38 +2902,162 @@ public static class Graphics
                     }
                 }
             }
+			// TODO End.
             Event evt2 = new Event (args);
-            foreach (Func<object,Event,object> function in onKeyReleaseCallbacks) {
-                try {
-                    Invoke (delegate {
-                        Func<object,Event,object > f = (Func<object,Event,object>)function;
-                        f (obj, evt2);
-                    });
-                } catch (Exception e) {
-                    Console.Error.WriteLine ("Error in onKeyRelease function");
-                    Console.Error.WriteLine (e.Message);
-                }        
-            }
+			Invoke (delegate {
+					foreach (Func<object,Event,object> function in onKeyReleaseCallbacks.ToArray()) {
+						try {
+							Func<object,Event,object > f = (Func<object,Event,object>)function;
+							f (obj, evt2);
+						} catch (Exception e) {
+							Console.Error.WriteLine ("Error in onKeyRelease function");
+							Console.Error.WriteLine (e.Message);
+						}        
+					}
+				});
         }
 
-        public void onClick (Func<object,Event,object> function)
+		protected override bool OnConfigureEvent(Gdk.EventConfigure args)
+		{
+			base.OnConfigureEvent(args);
+			Invoke (delegate {
+					foreach (Func<Gdk.EventConfigure,object> function in onConfigureCallbacks.ToArray()) {
+						try {
+							Func<Gdk.EventConfigure,object > f = (Func<Gdk.EventConfigure,object>)function;
+							f (args);
+						} catch (Exception e) {
+							Console.Error.WriteLine ("Error in OnConfigureEvent function");
+							Console.Error.WriteLine (e.Message);
+						}        
+					}
+				});
+			return true;
+		}
+		
+		protected override bool OnDeleteEvent(Gdk.Event args)
+		{
+			base.OnDeleteEvent(args);
+			Invoke (delegate {
+					foreach (Func<Gdk.Event,object> function in onDeleteCallbacks.ToArray()) {
+						try {
+							Func<Gdk.Event,object > f = (Func<Gdk.Event,object>)function;
+							f (args);
+						} catch (Exception e) {
+							Console.Error.WriteLine ("Error in OnDeleteEvent function");
+							Console.Error.WriteLine (e.Message);
+						}        
+					}
+					//Console.Error.WriteLine ("Launching on-delete event");
+				});
+			return false;
+		}
+
+		
+	    // Add callbacks
+        public Func<object,Event,object> onMouseUp (Func<object,Event,object> function)
+        {
+            onMouseUpCallbacks.Add (function);
+			return function;
+        }
+
+        public Func<object,Event,object> onMouseMovement (Func<object,Event,object> function)
+        {
+            onMouseMovementCallbacks.Add (function);
+			return function;
+        }
+
+		public Func<object,Event,object> onMouseDown (Func<object,Event,object> function)
         {
             onClickCallbacks.Add (function);
+			return function;
         }
 
-        public void onMouseDown (Func<object,Event,object> function)
+		public Func<object,Event,object> onClick (Func<object,Event,object> function)
         {
             onClickCallbacks.Add (function);
+			return function;
         }
 
-        public void onConfigure (Func<Gdk.EventConfigure,object> function)
+        public Func<object,Event,object> onKeyPress (Func<object,Event,object> function)
+        {
+            onKeyPressCallbacks.Add (function);
+			return function;
+        }
+
+        public Func<object,Event,object> onKeyRelease (Func<object,Event,object> function)
+        {
+            onKeyReleaseCallbacks.Add (function);
+			return function;
+        }
+
+        public Func<Gdk.EventConfigure,object> onConfigure (Func<Gdk.EventConfigure,object> function)
         {
             onConfigureCallbacks.Add (function);
+			return function;
         }
 
-	public void onDelete (Func<Gdk.Event,object> function)
+		public Func<Gdk.Event,object> onDelete (Func<Gdk.Event,object> function)
         {
             onDeleteCallbacks.Add (function);
+			return function;
+        }
+
+		
+		// Remove callbacks
+		public void removeMouseUp (Func<object,Event,object> function)
+        {
+			Invoke (delegate {
+					onMouseUpCallbacks.Remove(function);
+				});
+        }
+
+		public void removeMouseMovement (Func<object,Event,object> function)
+        {
+			Invoke (delegate {
+					onMouseMovementCallbacks.Remove (function);
+				});
+        }
+
+        public void removeKeyPress (Func<object,Event,object> function)
+        {
+			Invoke (delegate {
+					onKeyPressCallbacks.Remove (function);
+				});
+        }
+
+        public void removeKeyRelease (Func<object,Event,object> function)
+        {
+			Invoke (delegate {
+					onKeyReleaseCallbacks.Remove (function);
+				});
+        }
+
+        public void removeClick (Func<object,Event,object> function)
+        {
+			Invoke (delegate {
+					onClickCallbacks.Remove (function);
+				});
+        }
+
+        public void removeMouseDown (Func<object,Event,object> function)
+        {
+			Invoke (delegate {
+					onClickCallbacks.Remove (function);
+				});
+        }
+
+        public void removeConfigure (Func<Gdk.EventConfigure,object> function)
+        {
+			Invoke (delegate {
+					onConfigureCallbacks.Remove (function);
+				});
+        }
+
+		public void removeDelete (Func<Gdk.Event,object> function)
+        {
+			Invoke (delegate {
+					onDeleteCallbacks.Remove (function);
+				});
         }
 
         public void run (Func<object> function)
@@ -2943,6 +3065,17 @@ public static class Graphics
             try {
                 // FIXME: Understand why:
                 // This does not like a Gtk Application Invoke here
+				//
+				// JH (fixed): Because usually, the function would be something
+				// like:
+				//
+				// while True:
+				//     # do stuff
+				//
+				// Gtk Application Invoke will then move that function to
+				// the Calico event thread, and execute it as an event. However,
+				// because the function contains a "while True" loop, it never
+				// terminates, meaning Calico now becomes entirely unresponsive.
                 function ();
             } catch (Exception e) {
                 if (!e.Message.Contains ("Thread was being aborted")) {
@@ -2968,25 +3101,6 @@ public static class Graphics
             }
         }
 
-        public void onMouseUp (Func<object,Event,object> function)
-        {
-            onMouseUpCallbacks.Add (function);
-        }
-
-        public void onMouseMovement (Func<object,Event,object> function)
-        {
-            onMouseMovementCallbacks.Add (function);
-        }
-
-        public void onKeyPress (Func<object,Event,object> function)
-        {
-            onKeyPressCallbacks.Add (function);
-        }
-
-        public void onKeyRelease (Func<object,Event,object> function)
-        {
-            onKeyReleaseCallbacks.Add (function);
-        }
 
         public double updateInterval {
             get {
@@ -3738,8 +3852,8 @@ public static class Graphics
         public string tag;
         public WindowClass window;
 
-	//JH: This is part of the great experiment
-	public DockableWindowClass dockableWindow;
+		//JH: This is part of the great experiment
+		public DockableWindowClass dockableWindow;
 
 
         public Shape drawn_on_shape = null;
@@ -3768,7 +3882,263 @@ public static class Graphics
         private bool _has_pen;
         internal bool close_path = true;
         SpeechBubble speechBubble = null;
-	public object UserData = null;
+		public object UserData = null;
+		public bool clip = false;
+		// JH: Drag, leave, and enter code - start
+		protected bool _clickedOn = false;
+		protected bool _hoveredOver = false;
+		protected List _clickCallbacks = new List();
+		protected List _releaseCallbacks = new List();
+		protected List _moveCallbacks = new List();
+		protected List _enterCallbacks = new List();
+		protected List _leaveCallbacks = new List();
+		protected List _dragCallbacks = new List();
+		protected List _dropCallbacks = new List();
+		protected Func<object,Event,object> _clickHandler = null;
+		protected Func<object,Event,object> _moveHandler = null;
+		protected Func<object,Event,object> _releaseHandler = null;
+
+		protected void handleClickCallbacks (object obj, Event evt)
+        {
+			/* System.Console.Write("Click callbacks executed\n"); */
+            foreach (Func<object,Event,object> function in _clickCallbacks) {
+                try {
+					Func<object,Event,object > f;
+					f = (Func<object,Event,object>)function;
+					f (obj, evt);
+                } catch (Exception e) {
+                    Console.Error.WriteLine ("Error in ClickCallback function");
+                    Console.Error.WriteLine (e.Message);
+                }        
+            }
+        }
+
+		protected void handleReleaseCallbacks (object obj, Event evt)
+        {
+			/* System.Console.Write("Release callbacks executed\n"); */
+            foreach (Func<object,Event,object> function in _releaseCallbacks) {
+                try {
+					Func<object,Event,object > f;
+					f = (Func<object,Event,object>)function;
+					f (obj, evt);
+                } catch (Exception e) {
+                    Console.Error.WriteLine ("Error in ReleaseCallback function");
+                    Console.Error.WriteLine (e.Message);
+                }        
+            }
+        }
+		
+        protected void handleMoveCallbacks (object obj, Event evt)
+        {
+			/* System.Console.Write("Move callbacks executed\n"); */
+            foreach (Func<object,Event,object> function in _moveCallbacks) {
+                try {
+					Func<object,Event,object > f;
+					f = (Func<object,Event,object>)function;
+					f (obj, evt);
+                } catch (Exception e) {
+                    Console.Error.WriteLine ("Error in MoveCallback function");
+                    Console.Error.WriteLine (e.Message);
+                }        
+            }
+        }
+		
+        protected void handleEnterCallbacks (object obj, Event evt)
+        {
+			/* System.Console.Write("Enter callbacks executed\n"); */
+            foreach (Func<object,Event,object> function in _enterCallbacks) {
+                try {
+                    Invoke (delegate {
+							Func<object,Event,object > f;
+							f = (Func<object,Event,object>)function;
+							f (obj, evt);
+                    });
+                } catch (Exception e) {
+                    Console.Error.WriteLine ("Error in EnterCallback function");
+                    Console.Error.WriteLine (e.Message);
+                }        
+            }
+        }
+
+        protected void handleLeaveCallbacks (object obj, Event evt)
+        {
+			/* System.Console.Write("Leave callbacks executed\n"); */
+            foreach (Func<object,Event,object> function in _leaveCallbacks) {
+                try {
+                    Invoke (delegate {
+							Func<object,Event,object > f;
+							f = (Func<object,Event,object>)function;
+							f (obj, evt);
+                    });
+                } catch (Exception e) {
+                    Console.Error.WriteLine ("Error in LeaveCallback function");
+                    Console.Error.WriteLine (e.Message);
+                }        
+            }
+        }
+
+        protected void handleDragCallbacks (object obj, Event evt)
+        {
+			/* System.Console.Write("Drag callbacks executed\n"); */
+            foreach (Func<object,Event,object> function in _dragCallbacks) {
+                try {
+                    Invoke (delegate {
+							Func<object,Event,object > f;
+							f = (Func<object,Event,object>)function;
+							f (obj, evt);
+                    });
+                } catch (Exception e) {
+                    Console.Error.WriteLine ("Error in DragCallback function");
+                    Console.Error.WriteLine (e.Message);
+                }        
+            }
+        }
+
+		internal void handleDropCallbacks (object obj, Event evt)
+        {
+			/* System.Console.Write("Drop callbacks executed\n"); */
+            foreach (Func<object,Event,object> function in _dropCallbacks) {
+                try {
+                    Invoke (delegate {
+							Func<object,Event,object > f;
+							f = (Func<object,Event,object>)function;
+							f (obj, evt);
+                    });
+                } catch (Exception e) {
+                    Console.Error.WriteLine ("Error in DropCallback function");
+                    Console.Error.WriteLine (e.Message);
+                }        
+            }
+        }
+
+		public bool isHoveredOver(){
+			return _hoveredOver;
+		}
+
+		public void setHoveredOver(bool value){
+			_hoveredOver = value;
+		}
+
+		public bool isClickedOn(){
+			return _clickedOn;
+		}
+
+		public void setClickedOn(bool value){
+			_clickedOn = value;
+		}
+		
+		// JH: Drag, leave, and enter code - end
+
+		// JH: Copy - start
+		/**
+		 * JH: Some notes about copying:
+		 * - When copying an object, the copy still has to be drawn to a
+		 *   window, even if the original was already drawn to a window.
+		 *   This probably will feel more intuitive than having copies 
+		 *   automatically draw themselves to a window, but I can see arguments
+		 *   for either solution.
+		 * - Copying of physics objects is not currently supported, so
+		 *   properties applied to the original physics object may not be 
+		 *   inherited by the copy.
+		 * - Connected functions are not copied, meaning you will have to 
+		 *   reconnect the copy. I believe this shouldn't be a problem in 
+		 *   general, as you'll generally want to connect a different function
+		 *   to the copy.
+		 * - Pen, Joint, and SpeechBubbles are currently not copied, as that
+		 *   requires extra work, and probably will never come up in practice.
+		 */
+		public void copyAttributes(Shape other){
+			//System.Console.Write("Copying attributes\n");
+			tag = other.tag;
+			window = other.window;
+			//JH: This is part of the great experiment
+			dockableWindow = other.dockableWindow;
+			drawn_on_shape = other.drawn_on_shape;
+			_rotation = other._rotation; // internally radians
+			_scaleFactor = other._scaleFactor; // percent
+			//System.Console.Write("- Copying windows and tag - done\n");
+			//System.Console.Write("- Copying points - start\n");
+			set_points(other.points);
+			//System.Console.Write("- Copying points - done\n");
+			center = new Point(other.center);
+
+			// These attributes should be recreated by adding this object to
+			// physics.
+			//public FarseerPhysics.Dynamics.World world;
+			//public FarseerPhysics.Dynamics.Body body;
+			_bodyType = other._bodyType;
+			_bounce = other._bounce;
+			_friction = other._friction;
+			_density = other._density;
+			//System.Console.Write("- Copying physics attributes - done\n");
+
+			// To copy these attributes, we need to create a copy of each shape
+			// drawn onto the other shape.
+			//public List<Shape> shapes = new List<Shape> ();
+			//public List<Shape> joints = new List<Shape> ();
+			foreach(Shape shape in other.shapes){
+				shapes.Add(shape.copy());
+			}
+			gx = other.gx;
+			gy = other.gy;
+			z = other.z; // height off ground (3D) 0 - 1
+			zHeight = other.zHeight; // height of shape (3D) 0 - 1
+			visible = other.visible;
+			// We need to create new points for each
+			//public Point[] points;
+
+			//System.Console.Write("- Copying colors - start\n");
+			_fill = null;
+			_outline = null;
+			_gradient = null;
+			if(other._fill != null) _fill = new Color(other._fill);
+			if(other._outline != null) _outline = new Color(other._outline);
+			if(other._gradient != null) _gradient = new Gradient(other._gradient);
+			//System.Console.Write("- Copying colors - done\n");
+			_border = other.border;
+			wrap = other.wrap;
+			//System.Console.Write("- Copying color and position attributes - done\n");
+			
+			// JH: For now, I will not attempt to copy the pen; I doubt there will
+			// be any practical situation where this will be necessary.
+			//_pen = new Pen(other.pen);
+			//_has_pen = other._has_pen;
+			close_path = other.close_path;
+
+			// JH: For now, I will not attept to copy the speech bubble; I doubt
+			// there will be any practical situtation where this will be
+			// necessary.
+			//speechBubble = new SpeechBubble(other.speechBubble);
+			
+			UserData = other.UserData;
+			clip = other.clip;
+			//_clickedOn = other._clickedOn;
+			//_hoveredOver = other._hoveredOver;
+			//_hoveredTrackerRegistered = other._hoveredTrackerRegistered;
+			// We need to copy these callback-by-callback
+			//protected List _enterCallbacks = new List();
+			//protected List _leaveCallbacks = new List();
+			//foreach(Object callback in _enterCallbacks){
+			//	_enterCallbacks.Add(callback);
+			//}
+			//foreach(Object callback in _leaveCallbacks){
+			//	_leaveCallbacks.Add(callback);
+			//}
+			//System.Console.Write("- Copying callbacks - done\n");
+
+			// If the other shape was added to the physics simulator, we should
+			// add ourselve as well.
+			//if(other.body != null){
+			//	addToPhysics();
+			//}
+			//System.Console.Write("Copying attributes end\n");
+		}
+
+		public virtual Shape copy(){
+			Shape shapeCopy = new Shape();
+			shapeCopy.copyAttributes(this);
+			return shapeCopy;
+		}
 
         public Shape (bool has_pen=true)
         {
@@ -3787,16 +4157,16 @@ public static class Graphics
             _bodyType = FarseerPhysics.Dynamics.BodyType.Dynamic;
         }
 
-	//JH: This is part of the great experiment
-	public Canvas getCanvas(){
-	  if(window != null){
-	    return window._canvas;
-	  } else if(dockableWindow != null){
-	    return dockableWindow._canvas;
-	  } else {
-	    return null;
-	  }
-	}
+		//JH: This is part of the great experiment
+		public Canvas getCanvas(){
+			if(window != null){
+				return window._canvas;
+			} else if(dockableWindow != null){
+				return dockableWindow._canvas;
+			} else {
+				return null;
+			}
+		}
 
 
         // FIXME: points are in relative to center coordinates
@@ -4002,64 +4372,117 @@ public static class Graphics
 
         public void connect (string signal, Func<object,Event,object> function)
         {
-            if (signal == "click") 
-	      {
-                window.onMouseDown (delegate (object obj, Event evt) {
-                    if (hit (evt.x, evt.y)) {
-		      try {
-			Invoke (delegate {
-			    function (obj, evt);
-			  });
-		      } catch (Exception e) {
-			Console.Error.WriteLine ("Error in connect('click') function");
-			Console.Error.WriteLine (e.Message);
-		      }        
-		      return true;
-                    }
-                    return false;
-		  });
-	      } 
-            else if (signal == "release") 
-	      {
-                window.onMouseUp (delegate (object obj, Event evt) {
-                    if (hit (evt.x, evt.y)) {
-		      try {
-			Invoke (delegate {
-			    function (obj, evt);
-			  });
-		      } catch (Exception e) {
-			Console.Error.WriteLine ("Error in connect('release') function");
-			Console.Error.WriteLine (e.Message);
-		      }        
-		      return true;
-                    }
-                    return false;
-		  });
-	      } 
-            else if (signal == "move") 
-	      {
-                window.onMouseMovement (delegate (object obj, Event evt) {
-                    if (hit (evt.x, evt.y)) {
-		      try {
-			Invoke (delegate {
-			    function (obj, evt);
-			  });
-		      } catch (Exception e) {
-			Console.Error.WriteLine ("Error in connect('move') function");
-			Console.Error.WriteLine (e.Message);
-		      }        
-		      return true;
-                    }
-                    return false;
-		  });
-	      } 
+			if(window == null){
+				throw new Exception ("Shape needs to be drawn before calling connect.");
+			}
+			
+			if(signal == "move" || signal == "drag" ||
+			   signal ==  "enter" || signal == "leave")
+			{
+				/* System.Console.Write("Move handler requested\n"); */
+				if(_moveHandler == null){
+					/* System.Console.Write("Move handler registered\n"); */
+					_moveHandler = window.onMouseMovement (
+						delegate (object obj, Event evt) {
+							if (hit (evt.x, evt.y)) {
+								if(!_hoveredOver){
+									// Call enter callback
+									handleEnterCallbacks(this, evt);
+									_hoveredOver = true;
+								}
+							} else {
+								if(_hoveredOver){
+									// Call leave callback
+									handleLeaveCallbacks(this, evt);
+									_hoveredOver = false;
+								}
+							}
+							if (_clickedOn) {
+								handleDragCallbacks(this, evt);
+							}
+							handleMoveCallbacks(this, evt);
+							return true;
+						});
+				}
+			}
 
+			if (signal == "click" || signal == "drag" || signal == "drop") 
+			{
+				if(_clickHandler == null){
+					/* System.Console.Write("Click handler registered\n"); */
+					_clickHandler = window.onMouseDown (
+						delegate (object obj, Event evt) {
+							if (hit (evt.x, evt.y)) {
+								window.startDrag(this);
+								handleClickCallbacks(this, evt);
+							}
+							return true;
+						});
+				}
+			}
 
-	    else 
-	      {
+			if (signal == "release") 
+			{
+				if(_releaseHandler == null){
+					/* System.Console.Write("Release handler registered\n"); */
+					_releaseHandler = window.onMouseUp (
+						delegate (object obj, Event evt) {
+							if (hit (evt.x, evt.y)) {
+								handleReleaseCallbacks(this, evt);
+							}
+							return true;
+						});
+				}
+			}
+
+			if (signal == "click") { 
+				_clickCallbacks.Add(function);
+			} else if (signal == "release") {
+				_releaseCallbacks.Add(function);
+			} else if (signal == "move") {
+				_moveCallbacks.Add(function);
+			} else if (signal == "drop") {
+				_dropCallbacks.Add(function);
+			} else if (signal == "drag") {
+				_dragCallbacks.Add(function);
+			} else if(signal == "enter") {
+				_enterCallbacks.Add(function);
+			} else if(signal == "leave") {
+				_leaveCallbacks.Add(function);
+			} else {
                 throw new Exception ("invalid signal for this object");
-	      }
+			}
         }
+
+		protected void disconnectNow(){
+			_clickCallbacks.Clear();
+			_releaseCallbacks.Clear();
+			_moveCallbacks.Clear();
+			_dropCallbacks.Clear();
+			_dragCallbacks.Clear();
+			_enterCallbacks.Clear();
+			_leaveCallbacks.Clear();
+			if(window != null){
+				if(_clickHandler != null){
+					window.removeMouseDown(_clickHandler);
+				}
+				if(_moveHandler != null){
+					window.removeMouseMovement(_moveHandler);
+				}
+				if(_releaseHandler != null){
+					window.removeMouseUp(_releaseHandler);
+				}
+			}
+			_clickHandler = null;
+			_moveHandler = null;
+			_releaseHandler = null;
+		}
+
+		public void disconnect(){
+			InvokeBlocking(delegate(){
+					disconnectNow();
+				});
+		}
 
         public double bounce {
             get {
@@ -4603,6 +5026,9 @@ public static class Graphics
                     }
                     if (close_path)
                         g.ClosePath ();
+					if (clip){
+						g.ClipPreserve();
+					}
                     if (gradient != null) {
                         Cairo.Gradient pat;
                         if (gradient.gtype == "linear")
@@ -4855,6 +5281,15 @@ public static class Graphics
                 QueueDraw (); 
             }
 
+			public void setWindow(WindowClass win){
+				window = win;
+				lock (shapes) {
+					foreach (Shape shape in shapes) {
+						shape.setWindow(win);
+					}
+				}
+			}
+
             public GraphicsRepresentation drawAt (WindowClass win, IList iterable) {
                 moveTo(System.Convert.ToDouble(iterable[0]), 
                         System.Convert.ToDouble(iterable[1]));
@@ -4865,6 +5300,7 @@ public static class Graphics
 	    //JH: Part of the great experiment
             public GraphicsRepresentation draw (DockableWindowClass win)
             { // Shape
+				System.Console.Write("Drawing object\n");
                 InvokeBlocking( delegate {
                     // Add this shape to the Canvas list.
                     if (win.IsRealized) {
@@ -4897,7 +5333,7 @@ public static class Graphics
                 });
                 return new GraphicsRepresentation(win);
             }
-	    //JH: part of the greate experiment
+	    //JH: part of the great experiment
 
             public GraphicsRepresentation draw (WindowClass win)
             { // Shape
@@ -4918,13 +5354,9 @@ public static class Graphics
                             }
                             // Make sure each subshape is associated with this window
                             // so QueueDraw will redraw:
-                            lock (shapes) {
-                                foreach (Shape shape in shapes) {
-                                    shape.window = win;
-                                }
-                            }
+							
                         }
-                        window = win;
+                        setWindow(win);
                         if (window._canvas.world != null) {
                             addToPhysics ();
                         }
@@ -4932,7 +5364,7 @@ public static class Graphics
                     }
                 });
                 return new GraphicsRepresentation(win);
-            }
+            }			
 
             public GraphicsRepresentation drawAt (Canvas canvas, IList iterable)
             {
@@ -4989,41 +5421,45 @@ public static class Graphics
                             //}
                         }
                     }
-                    window = shape.window;
+					if(shape.window != null){
+						setWindow(shape.window);
+					}
                     drawn_on_shape = shape;
                     QueueDraw ();
                 });
                 return new GraphicsRepresentation(shape);
             }
 
+
             public void undraw ()
             {
                 InvokeBlocking( delegate {
-                    if (drawn_on_shape != null && drawn_on_shape.shapes != null) {
-                        lock (drawn_on_shape.shapes) {
-                            if (drawn_on_shape.shapes.Contains (this)) {
-                                drawn_on_shape.shapes.Remove (this);
-                                drawn_on_shape.QueueDraw();
-                                //System.Console.Error.WriteLine("Removed from shape!");
-                            }
-                        }
-                        drawn_on_shape = null;
-                    }
-                    if (window != null) {
-                        if (window._canvas != null && window._canvas.shapes != null) {
-                            lock (window.getCanvas().shapes) {
-                                if (window._canvas.world != null) {
-                                    removeFromPhysics ();
-                                }
-                                if (window.getCanvas ().shapes.Contains (this)) {
-                                    window.getCanvas ().shapes.Remove (this);
-                                    //System.Console.Error.WriteLine("Removed from win!");
-                                    window.QueueDraw();
-                                    window = null;
-                                }
-                            }
-                        }
-                    }
+				disconnectNow();
+				if (drawn_on_shape != null && drawn_on_shape.shapes != null) {
+					lock (drawn_on_shape.shapes) {
+						if (drawn_on_shape.shapes.Contains (this)) {
+							drawn_on_shape.shapes.Remove (this);
+							drawn_on_shape.QueueDraw();
+							//System.Console.Error.WriteLine("Removed from shape!");
+						}
+					}
+					drawn_on_shape = null;
+				}
+				if (window != null) {
+					if (window._canvas != null && window._canvas.shapes != null) {
+						lock (window.getCanvas().shapes) {
+							if (window._canvas.world != null) {
+								removeFromPhysics ();
+							}
+							if (window.getCanvas ().shapes.Contains (this)) {
+								window.getCanvas ().shapes.Remove (this);
+								//System.Console.Error.WriteLine("Removed from win!");
+								window.QueueDraw();
+								window = null;
+							}
+						}
+					}
+				}
                 });
             }
 
@@ -5259,6 +5695,32 @@ public static class Graphics
             public string _yJustification = "center"; // top, center, bottom
 
             // FIXME: add wrappers around weight, slant
+            public Text (IList iterable, string text)
+            {
+                this.text = text;
+                set_points (new Point (iterable));
+            }
+			
+			// JH: copy - start
+			public Text(){}
+			
+			public void copyAttributes(Text other){
+				base.copyAttributes(other);
+			    _text = other._text;
+				_fontFace = other._fontFace;
+				fontWeight = other.fontWeight;
+				fontSlant = other.fontSlant;
+				_fontSize = other.fontSize;
+				_xJustification = other.xJustification;
+				_yJustification = other.yJustification;
+			}
+			
+			public override Shape copy(){
+				Text shapeCopy = new Text();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
 
             public string xJustification {
                 get {
@@ -5377,12 +5839,6 @@ public static class Graphics
                 }
             }
 
-            public Text (IList iterable, string text)
-            {
-                this.text = text;
-                set_points (new Point (iterable));
-            }
-
             public override void render (Cairo.Context g)
             {
                 // MEMORY LEAK!
@@ -5426,12 +5882,12 @@ public static class Graphics
                 double total_height = 0.0;
                 double max_width = 0.0;
                 foreach (string line in text.Split('\n')) {
-		  //JH: Experiment which might make the text look better
-		  if (total_height != 0.0)
-		    total_height += fontSize*0.25; //Line skip
-		  total_height += fontSize;
-
-		  //JH: Pre-experiment code commented out below
+					//JH: Experiment which might make the text look better
+					if (total_height != 0.0)
+						total_height += fontSize*0.25; //Line skip
+					total_height += fontSize;
+					
+					//JH: Pre-experiment code commented out below
                     /* TextExtents te = g.TextExtents(line); */
                     /* if (total_height != 0.0) */
                     /*     total_height += te.Height * .5; */
@@ -5451,23 +5907,23 @@ public static class Graphics
                     if (yJustification == "center") {
                         p.y = points [0].y - total_height / 2 - te.YBearing;
                     } else if (yJustification == "bottom") {
-		      //JH: Experiment which might make the text look better
-		      p.y = points [0].y - total_height + fontSize;
-		      //JH: Pre-experiment code commented out below
-		      /* p.y = points [0].y - total_height + te.Height; */		      
+						//JH: Experiment which might make the text look better
+						p.y = points [0].y - total_height + fontSize;
+						//JH: Pre-experiment code commented out below
+						/* p.y = points [0].y - total_height + te.Height; */		      
                     } else if (yJustification == "top") {
-		      //JH: Experiment which might make the text look better
-		      p.y = points [0].y + fontSize;
-		      //JH: Pre-experiment code commented out below
-		      //p.y = points [0].y + te.Height;
+						//JH: Experiment which might make the text look better
+						p.y = points [0].y + fontSize;
+						//JH: Pre-experiment code commented out below
+						//p.y = points [0].y + te.Height;
 	
                     }
                     temp = screen_coord (p);
                     g.MoveTo (temp.x, temp.y - line_offset);
                     g.ShowText(line);
-		    //JH: Experiment which might make the text look better
-		    line_offset += fontSize * -1.25;
-		    //JH: Pre-experiment code commented out below
+					//JH: Experiment which might make the text look better
+					line_offset += fontSize * -1.25;
+					//JH: Pre-experiment code commented out below
                     /* line_offset += te.YBearing * 1.5; */
                 }
                 foreach (Shape shape in shapes) {
@@ -5602,27 +6058,24 @@ public static class Graphics
             }
         }
         
-  public class TextBox: Rectangle
-  {
-    public Text textObject;
+		public class TextBox: Rectangle
+		{
+			public Text textObject;
     
-    public TextBox (IList iterable1, IList iterable2, string text) : base(iterable1, iterable2)
-    {
+			public TextBox (IList iterable1, IList iterable2, string text) : base(iterable1, iterable2)
+			{
       
-      this.textObject=new Text(new int[] { 0,0},text);
-      //this.textObject.setXJustification("center");
-      //this.textObject.setYJustification("top");
-      this.textObject.fill=new Color("black");
-      this.textObject.draw(this);
-    }
-    public void setText(string text)
-    {
-      this.textObject.setText(text);
-    }
-    
-    
-    
-  }
+				this.textObject=new Text(new int[] { 0,0},text);
+				//this.textObject.setXJustification("center");
+				//this.textObject.setYJustification("top");
+				this.textObject.fill=new Color("black");
+				this.textObject.draw(this);
+			}
+			public void setText(string text)
+			{
+				this.textObject.setText(text);
+			}
+		}
 
         public class SpeechBubble : Text {
             public Point anchor;
@@ -5788,6 +6241,14 @@ public static class Graphics
                 fill = null;
             }
 
+			// JH: copy - start
+			public override Shape copy(){
+				Line shapeCopy = new Line();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
+
             public override Point getP2 ()
             {
                 return getScreenPoint (points [1]);
@@ -5817,6 +6278,16 @@ public static class Graphics
                 fill = null;
             }
 
+			// JH: copy - start
+			public Curve(){}
+			
+			public override Shape copy(){
+				Curve shapeCopy = new Curve();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
+
             public override void render (Cairo.Context g)
             {
                 if (!visible)
@@ -5831,6 +6302,9 @@ public static class Graphics
                     g.Scale (_scaleFactor, _scaleFactor);
                     temp = screen_coord (points [0]);
                     g.MoveTo (temp.x, temp.y);
+					if (clip){
+						g.ClipPreserve();
+					}
                     for (int p = 1; p < points.Length; p += 3) {
                         p1 = screen_coord (points [p]);
                         p2 = screen_coord (points [p + 1]);
@@ -5905,6 +6379,16 @@ public static class Graphics
                 center.y = System.Convert.ToDouble (iterable [1]);
                 rotate (degrees);
             }
+
+			// JH: copy - start
+			public Arrow(){}
+			
+			public override Shape copy(){
+				Arrow shapeCopy = new Arrow();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
         }
 
         public class Turtle : Shape
@@ -5924,6 +6408,16 @@ public static class Graphics
                 center.y = System.Convert.ToDouble (iterable [1]);
                 rotate (degrees);
             }
+
+			// JH: copy - start
+			public Turtle(){}
+			
+			public override Shape copy(){
+				Turtle shapeCopy = new Turtle();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
         }
 
         public class Pen : Shape
@@ -5947,6 +6441,25 @@ public static class Graphics
                 this.color = new Color (0, 0, 0);
                 this.border = border;
             }
+
+			// JH: copy - start
+			public Pen(){}
+
+			public void copyAttributes(Pen other){
+				base.copyAttributes(other);
+				foreach(Point point in other._path){
+					_path.Add(new Point(point));
+				}
+				_down = other._down;
+				minDistance = other.minDistance;
+			}
+			
+			public override Shape copy(){
+				Pen shapeCopy = new Pen();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
 
             public List<Point> getPath ()
             {
@@ -6001,6 +6514,9 @@ public static class Graphics
                         temp = screen_coord (path [p]);
                         g.LineTo (temp.x, temp.y);
                     }
+					if (clip){
+						g.ClipPreserve();
+					}
                     if (_outline != null) {
                         g.Color = _outline._cairo;
                         g.Stroke ();
@@ -6172,6 +6688,44 @@ public static class Graphics
                 }
             }
 
+			// JH: copy - start
+			public void copyAttributes(Picture original){
+				base.copyAttributes(original);
+                this.filename = original.filename;
+                InvokeBlocking (delegate {
+						// Colorspace, has_alpha, bits_per_sample, width, height:
+						_pixbuf = new Gdk.Pixbuf (original._pixbuf.Colorspace, true, 8, (int)original.getWidth (), (int)original.getHeight ());
+						if (!_pixbuf.HasAlpha) {
+							_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
+						}
+						for (int x=0; x < _pixbuf.Width; x++) {
+							for (int y=0; y < _pixbuf.Height; y++) {
+                            byte r = (byte)original.getRed (x, y);
+                            byte g = (byte)original.getGreen (x, y);
+                            byte b = (byte)original.getBlue (x, y);
+                            byte a = (byte)original.getAlpha (x, y);
+                            Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+											   x * _pixbuf.NChannels + 0, r);
+                            Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+											   x * _pixbuf.NChannels + 1, g);
+                            Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+                                x * _pixbuf.NChannels + 2, b);
+                            Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
+											   x * _pixbuf.NChannels + 3, a);
+							}
+						}
+						set_points (original.points);
+                    center = original.center;
+                    _cacheWidth = _pixbuf.Width;
+                    _cacheHeight = _pixbuf.Height;
+					});
+			}
+			
+			public override Shape copy(){
+				return new Picture(this);
+			}
+			// JH: copy - end
+
             public Picture (string filename) : this(true)
             {
                 this.filename = filename;
@@ -6201,7 +6755,7 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
-		_outline = null;
+				_outline = null;
             }
 
 	    //JH: This is part of the big experiment
@@ -6390,32 +6944,32 @@ public static class Graphics
             {
                 this.filename = original.filename;
                 InvokeBlocking (delegate {
-                    // Colorspace, has_alpha, bits_per_sample, width, height:
-				_pixbuf = new Gdk.Pixbuf (original._pixbuf.Colorspace, true, 8, (int)original.getWidth (), (int)original.getHeight ());
-                    if (!_pixbuf.HasAlpha) {
-                        _pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
-                    }
-                    for (int x=0; x < _pixbuf.Width; x++) {
-                        for (int y=0; y < _pixbuf.Height; y++) {
+						// Colorspace, has_alpha, bits_per_sample, width, height:
+						_pixbuf = new Gdk.Pixbuf (original._pixbuf.Colorspace, true, 8, (int)original.getWidth (), (int)original.getHeight ());
+						if (!_pixbuf.HasAlpha) {
+							_pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
+						}
+						for (int x=0; x < _pixbuf.Width; x++) {
+							for (int y=0; y < _pixbuf.Height; y++) {
                             byte r = (byte)original.getRed (x, y);
                             byte g = (byte)original.getGreen (x, y);
                             byte b = (byte)original.getBlue (x, y);
                             byte a = (byte)original.getAlpha (x, y);
                             Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                                x * _pixbuf.NChannels + 0, r);
+											   x * _pixbuf.NChannels + 0, r);
                             Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                                x * _pixbuf.NChannels + 1, g);
+											   x * _pixbuf.NChannels + 1, g);
                             Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
                                 x * _pixbuf.NChannels + 2, b);
                             Marshal.WriteByte (_pixbuf.Pixels, y * _pixbuf.Rowstride +
-                                x * _pixbuf.NChannels + 3, a);
-                        }
-                    }
-                    set_points (original.points);
+											   x * _pixbuf.NChannels + 3, a);
+							}
+						}
+						set_points (original.points);
                     center = original.center;
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
-                });
+					});
             }
 
             public Picture (Gdk.Pixbuf pixbuf) : this(true)
@@ -6426,13 +6980,13 @@ public static class Graphics
                         _pixbuf = _pixbuf.AddAlpha (false, 0, 0, 0); 
                     }
                     set_points (new Point (0, 0), 
-                        new Point (_pixbuf.Width, 0),
-                        new Point (_pixbuf.Width, _pixbuf.Height), 
-                        new Point (0, _pixbuf.Height));
+								new Point (_pixbuf.Width, 0),
+								new Point (_pixbuf.Width, _pixbuf.Height), 
+								new Point (0, _pixbuf.Height));
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
-                });
-		_outline = null;
+					});
+				_outline = null;
             }
 
 
@@ -7242,16 +7796,19 @@ public static class Graphics
                 g.Scale (_scaleFactor, _scaleFactor);
                 Gdk.CairoHelper.SetSourcePixbuf (g, _pixbuf, -_pixbuf.Width / 2, -_pixbuf.Height / 2);
                 g.Paint ();
-
+				g.MoveTo (-_pixbuf.Width / 2, -_pixbuf.Height / 2);
+				g.LineTo (_pixbuf.Width / 2, -_pixbuf.Height / 2);
+				g.LineTo (_pixbuf.Width / 2, _pixbuf.Height / 2);
+				g.LineTo (-_pixbuf.Width / 2, _pixbuf.Height / 2);
+				g.ClosePath ();
+				
+				if (clip){
+					g.ClipPreserve();
+				}
                 if (_outline != null) {
-			g.LineWidth = border;
-			g.MoveTo (-_pixbuf.Width / 2, -_pixbuf.Height / 2);
-			g.LineTo (_pixbuf.Width / 2, -_pixbuf.Height / 2);
-			g.LineTo (_pixbuf.Width / 2, _pixbuf.Height / 2);
-			g.LineTo (-_pixbuf.Width / 2, _pixbuf.Height / 2);
-			g.ClosePath ();
-			g.Color = _outline._cairo;
-			g.Stroke ();
+					g.LineWidth = border;
+					g.Color = _outline._cairo;
+					g.Stroke ();
                 }
                 
                 foreach (Shape shape in shapes) {
@@ -7841,7 +8398,7 @@ public static class Graphics
         // ----------------------------------------------------------------------------------
 
         public class Rectangle : Shape
-        {
+        {			
             public Rectangle (IList iterable1, IList iterable2) : base(true)
             {
                 set_points (new Point (iterable1 [0], iterable1 [1]),
@@ -7849,6 +8406,16 @@ public static class Graphics
                         new Point (iterable2 [0], iterable2 [1]),
                         new Point (iterable1 [0], iterable2 [1]));
             }
+
+			// JH: copy - start
+			public Rectangle(): base(true){}
+			
+			public override Shape copy(){
+				Rectangle shapeCopy = new Rectangle();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
 
             public double width {
                 get { return points [2].x - points [0].x;}
@@ -7889,6 +8456,21 @@ public static class Graphics
         {
             public double radius = 0.0;
 
+			// JH: copy - start
+			public RoundedRectangle(){}
+			
+			public void copyAttributes(RoundedRectangle other){
+				base.copyAttributes(other);
+				radius = other.radius;
+			}
+			
+			public override Shape copy(){
+				RoundedRectangle shapeCopy = new RoundedRectangle();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
+
             public RoundedRectangle (IList iterable1, IList iterable2, double radius) : base(true)
             {
                 set_points (new Point (iterable1 [0], iterable1 [1]),
@@ -7922,6 +8504,9 @@ public static class Graphics
                     g.Arc (left, bottom, radius, .25 * (Math.PI * 2.0), .50 * (Math.PI * 2.0));
 
                     g.ClosePath ();
+					if(clip){
+						g.ClipPreserve ();
+					}
                     if (_fill != null) {
                         g.Color = _fill._cairo;
                         g.FillPreserve ();
@@ -7979,6 +8564,17 @@ public static class Graphics
                 }
                 set_points (temp);
             }
+
+			// JH: copy - start
+			public Polygon(){}
+
+   			public override Shape copy(){
+				Polygon shapeCopy = new Polygon();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
+			
 
             public override void addToPhysics ()
             { // Polygon
@@ -8053,6 +8649,21 @@ public static class Graphics
                 _radius = radius;
             }
 
+			// JH: copy - start
+			public Circle(){}
+			
+			public void copyAttributes(Circle other){
+				base.copyAttributes(other);
+			    _radius = other._radius;
+			}
+			
+			public override Shape copy(){
+				Circle shapeCopy = new Circle();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
+
             public override bool hit (double x, double y)
             {
                 return (Math.Sqrt(Math.Pow(center.x - x, 2) + Math.Pow(center.y - y, 2)) < _radius);
@@ -8110,6 +8721,9 @@ public static class Graphics
                     g.Arc (temp.x, temp.y, radius, 0.0, 2.0 * Math.PI); // x, y, radius, start, end
                     g.ClosePath ();
                 }
+				if(clip){
+					g.ClipPreserve();
+				}
                 if (gradient != null) {
                     Cairo.Gradient pat;
                     if (gradient.gtype == "linear")
@@ -8200,6 +8814,22 @@ public static class Graphics
                 _yRadius = yRadius;
             }
 
+			// JH: copy - start
+			public Oval(){}
+			
+			public void copyAttributes(Oval other){
+				base.copyAttributes(other);
+			    _xRadius = other._xRadius;
+				_yRadius = other._yRadius;
+			}
+			
+			public override Shape copy(){
+				Oval shapeCopy = new Oval();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
+
             public override void render (Cairo.Context g)
             {
                 if (!visible)
@@ -8218,6 +8848,9 @@ public static class Graphics
                 g.LineWidth = border;
                 g.Arc (temp.x, temp.y, _xRadius, 0.0, 2.0 * Math.PI); // x, y, radius, start, end
                 g.ClosePath ();
+				if(clip){
+					g.ClipPreserve();
+				}
                 if (gradient != null) {
                     Cairo.Gradient pat;
                     if (gradient.gtype == "linear")
@@ -8318,6 +8951,23 @@ public static class Graphics
                 _stop = stop;
             }
 
+			// JH: copy - start
+			public Pie(){}
+			
+			public void copyAttributes(Pie other){
+				base.copyAttributes(other);
+			    _radius = other._radius;
+				_start = other._start;
+				_stop = other._stop;
+			}
+			
+			public override Shape copy(){
+				Pie shapeCopy = new Pie();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
+
             public override void addToPhysics ()
             { // Circle
                 world = window._canvas.world;
@@ -8387,6 +9037,9 @@ public static class Graphics
                 g.MoveTo (temp.x, temp.y);
                 g.Arc (temp.x, temp.y, radius, tstart, tstop); // x, y, radius, start, end
                 g.ClosePath ();
+				if(clip){
+					g.ClipPreserve();
+				}
                 if (gradient != null) {
                     Cairo.Gradient pat;
                     if (gradient.gtype == "linear")
@@ -8491,6 +9144,23 @@ public static class Graphics
                 _stop = stop;
             }
 
+			// JH: copy - start
+			public Arc(){}
+			
+			public void copyAttributes(Arc other){
+				base.copyAttributes(other);
+			    _radius = other._radius;
+				_start = other._start;
+				_stop = other._stop;
+			}
+			
+			public override Shape copy(){
+				Arc shapeCopy = new Arc();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
+
             public override void addToPhysics ()
             { // Circle
                 world = window._canvas.world;
@@ -8533,6 +9203,9 @@ public static class Graphics
                 double tstart = start * (Math.PI) / 180.0;
                 double tstop = stop * (Math.PI) / 180.0;
                 g.Arc (temp.x, temp.y, radius, tstart, tstop); // x, y, radius, start, end
+				if(clip){
+					g.ClipPreserve();
+				}
                 if (gradient != null) {
                     Cairo.Gradient pat;
                     if (gradient.gtype == "linear")
@@ -8629,6 +9302,14 @@ public static class Graphics
 	        // useless points.
             }
 
+			// JH: copy - start			
+			public override Shape copy(){
+				Frame shapeCopy = new Frame();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
+
             public Frame (int x, int y)
             {
                 set_points (new Point (x, y));
@@ -8649,23 +9330,32 @@ public static class Graphics
 
 
         public class ClippedFrame : Frame
-        {
-	    public bool clip = true;
-	      
+        {	      
             public ClippedFrame (IList iterable1, IList iterable2)
             {
-	      points = new Point[4];
-	      points[0] = new Point (iterable1 [0], iterable1 [1]);
-	      points[1] = new Point (iterable2 [0], iterable1 [1]);
-	      points[2] = new Point (iterable2 [0], iterable2 [1]);
-	      points[3] = new Point (iterable1 [0], iterable2 [1]);
+				points = new Point[4];
+				points[0] = new Point (iterable1 [0], iterable1 [1]);
+				points[1] = new Point (iterable2 [0], iterable1 [1]);
+				points[2] = new Point (iterable2 [0], iterable2 [1]);
+				points[3] = new Point (iterable1 [0], iterable2 [1]);
                 /* set_points (new Point (iterable1 [0], iterable1 [1]), */
                 /*         new Point (iterable2 [0], iterable1 [1]), */
                 /*         new Point (iterable2 [0], iterable2 [1]), */
                 /*         new Point (iterable1 [0], iterable2 [1])); */
-	      _fill = null;
-	      _outline = null;
+				_fill = null;
+				_outline = null;
+				clip = true;
             }
+
+			// JH: copy - start
+			public ClippedFrame(){}
+			
+			public override Shape copy(){
+				ClippedFrame shapeCopy = new ClippedFrame();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
 
             public double width {
                 get { return points[2].x - points[0].x;}
@@ -8677,8 +9367,8 @@ public static class Graphics
 
 
             public override void render(Cairo.Context context){
-	        Point temp;
-		temp = screen_coord (center);
+				Point temp;
+				temp = screen_coord (center);
 		
                 context.Save();
                 context.Translate (temp.x, temp.y);
@@ -8689,61 +9379,61 @@ public static class Graphics
                 for(int i=1; i<points.Length; ++i){
                     context.LineTo(points[i].x, points[i].y);
                 }
-		context.ClosePath ();
-		if (clip){
-		  context.ClipPreserve();
-		}
-		if (gradient != null) {
-		  Cairo.Gradient pat;
-		  if (gradient.gtype == "linear")
-		    pat = new Cairo.LinearGradient (gradient.p1.x,
-						    gradient.p1.y, 
-						    gradient.p2.x, 
-						    gradient.p2.y);
-		  else
-		    pat = new Cairo.RadialGradient (gradient.p1.x,
-						    gradient.p1.y, 
-						    gradient.radius1,
-						    gradient.p2.x, 
-						    gradient.p2.y,
-						    gradient.radius2);
-		  
-		  pat.AddColorStop (0, gradient.c1.getCairo ());
-		  pat.AddColorStop (1, gradient.c2.getCairo ());
-		  context.Pattern = pat;
-		  context.FillPreserve ();
-		} else if (_fill != null) {
-		  context.Color = _fill.getCairo ();
-		  context.FillPreserve ();
-		}
-		context.NewPath();
-		
-		foreach (Shape shape in shapes) {
+				context.ClosePath ();
+				if (clip){
+					context.ClipPreserve();
+				}
+				if (gradient != null) {
+					Cairo.Gradient pat;
+					if (gradient.gtype == "linear")
+						pat = new Cairo.LinearGradient (gradient.p1.x,
+														gradient.p1.y, 
+														gradient.p2.x, 
+														gradient.p2.y);
+					else
+						pat = new Cairo.RadialGradient (gradient.p1.x,
+														gradient.p1.y, 
+														gradient.radius1,
+														gradient.p2.x, 
+														gradient.p2.y,
+														gradient.radius2);
+					
+					pat.AddColorStop (0, gradient.c1.getCairo ());
+					pat.AddColorStop (1, gradient.c2.getCairo ());
+					context.Pattern = pat;
+					context.FillPreserve ();
+				} else if (_fill != null) {
+					context.Color = _fill.getCairo ();
+					context.FillPreserve ();
+				}
+				context.NewPath();
+				
+				foreach (Shape shape in shapes) {
                     shape.render (context);
                     shape.updateGlobalPosition (context);
                 }
                 //base.render(context);
                 context.Restore();
 
-		// Because we don't want the border of the clipped frame to be
-		// clipped, while we still want to respect any previous applied
-		// clips, we have draw the frame completely seperately.
-		if (_outline != null) {
-		  context.Save();
-		  context.Translate (temp.x, temp.y);
-		  context.Rotate (_rotation);
-		  context.Scale (_scaleFactor, _scaleFactor);
-		  context.NewPath();
-		  context.MoveTo(points[0].x, points[0].y);
-		  for(int i=1; i<points.Length; ++i){
-		    context.LineTo(points[i].x, points[i].y);
-		  }
-		  context.ClosePath ();
-		  context.LineWidth = border;
-		  context.Color = _outline.getCairo ();
-		  context.Stroke ();
-		  context.Restore();
-		}
+				// Because we don't want the border of the clipped frame to be
+				// clipped, while we still want to respect any previous applied
+				// clips, we have draw the frame completely seperately.
+				if (_outline != null) {
+					context.Save();
+					context.Translate (temp.x, temp.y);
+					context.Rotate (_rotation);
+					context.Scale (_scaleFactor, _scaleFactor);
+					context.NewPath();
+					context.MoveTo(points[0].x, points[0].y);
+					for(int i=1; i<points.Length; ++i){
+						context.LineTo(points[i].x, points[i].y);
+					}
+					context.ClosePath ();
+					context.LineWidth = border;
+					context.Color = _outline.getCairo ();
+					context.Stroke ();
+					context.Restore();
+				}
             }
         }
 
@@ -9542,6 +10232,24 @@ public static class Graphics
                 }
                 center = new Point (0, 0);
             }
+
+			// JH: copy - start
+			public Group(): base(false){}
+			
+			public void copyAttributes(Group other){
+				base.copyAttributes(other);
+			    foreach(Shape item in other.items){
+					items.Add(item);
+				}
+				mode = other.mode;
+			}
+			
+			public override Shape copy(){
+				Group shapeCopy = new Group();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
 
             public override void rotate (double degrees)
             {
@@ -11038,7 +11746,7 @@ outer_loop : while ((c = iter.NextPixel()) != EOF)
         public class Sprite : Shape {
             public Graphics.Shape shape; 
             public string costume;
-            public Dictionary<string, List<Graphics.Shape>> costumes;
+            public Dictionary<string, List<Graphics.Shape> > costumes;
             public int frame = 0;
             public string name;
 
@@ -11050,6 +11758,30 @@ outer_loop : while ((c = iter.NextPixel()) != EOF)
                 center = new Point(0,0);
                 set_points(center);
             }
+
+			// JH: copy - start
+			public void copyAttributes(Sprite other){
+				base.copyAttributes(other);
+				costume = other.costume;
+				foreach(KeyValuePair<string, List<Graphics.Shape> > entry in other.costumes)
+				{
+					List<Graphics.Shape> newFrames = new List<Graphics.Shape>();
+					foreach(Shape shape in entry.Value){
+						newFrames.Add(shape.copy());
+					}
+					costumes[entry.Key] = newFrames;
+				}
+				frame = other.frame;
+				name = other.name;
+				shape = costumes[costume][frame];
+			}
+			
+			public override Shape copy(){
+				Sprite shapeCopy = new Sprite();
+				shapeCopy.copyAttributes(this);
+				return shapeCopy;
+			}
+			// JH: copy - end
 
             public Sprite (string name) : this(new int [] {0,0}, name){
             }
