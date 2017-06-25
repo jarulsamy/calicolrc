@@ -1,6 +1,5 @@
-
 CalicoPython.dll: CalicoPython.cs ../../bin/Calico.exe
-	dmcs CalicoPython.cs \
+	mcs CalicoPython.cs \
 		-lib:../../bin \
 		-r:Calico.exe \
 		-r:IronPython \

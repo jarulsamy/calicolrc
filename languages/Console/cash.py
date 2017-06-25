@@ -25,10 +25,13 @@ import traceback
 import time
 import argparse
 # Needed in case you want to run this in Calico Python interactively:
-import clr
-clr.AddReference("Calico")
-# Above not needed, unless interactive
-import Calico
+try:
+    import clr
+    clr.AddReference("Calico")
+    # Above not needed, unless interactive
+    import Calico
+except:
+    Calico = None
 
 ## ------------------------------------------------------------
 ## Globals:
@@ -63,10 +66,12 @@ def ErrorLine(text):
     sys.stderr.write(text)
     sys.stderr.write("\n")
 
-def executeLines(calico, text, stack):
+def executeLines(calico=None, text="", stack=None):
     # put calico in the environment:
     globals()["calico"] = calico
     # compute the width, height of the output window:
+    if stack is None:
+        stack = [["<module>", 1, 0, len(text), "'Calico Shell'"]]
     try:
         w = calico.Output.Allocation.Width
         h = calico.Output.Allocation.Height
@@ -212,7 +217,7 @@ def setTraceButtons(filename, lineno, start, end):
             document.texteditor.SetSelection(lineno, start + 1, lineno, end + 1)
 
 def handleDebug(filename, lineno, start, end):
-    if Calico.MainWindow.serverMode:
+    if Calico is None or Calico.MainWindow.serverMode:
         return
     ## First, see if we need to do something:
     try:

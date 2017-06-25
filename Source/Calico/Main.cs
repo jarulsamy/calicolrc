@@ -4,7 +4,7 @@
 //  Author:
 //       Douglas S. Blank <dblank@cs.brynmawr.edu>
 // 
-//  Copyright (c) 2011-2014 The Calico Project
+//  Copyright (c) 2011-2015 The Calico Project
 // 
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ using System.Threading;
 
 namespace Calico {
     class MainClass {
-        public static string Version = "3.1.1";
+        public static string Version = "4.0.1";
         public static bool verbose = false;
 
         /*
@@ -173,12 +173,28 @@ namespace Calico {
             }
         }
 
+	public static string propercase(string text) {
+	    return text.Substring(0,1).ToUpper() + text.Substring(1).ToLower();
+	}
+
         [STAThread]
         public static void Main(string[] args) {
             System.Console.WriteLine(_("Loading Calico version {0}..."), Version);
             if (((IList<string>)args).Contains("--verbose")) {
                 verbose = true;
             }
+	    string lang_string = "";
+	    bool lang_only = false;
+	    string display_name = "";
+	    foreach (string arg in args) { 
+		if (arg == "--only") {
+		    lang_only = true;
+		} else if (arg.StartsWith("--lang=")) {
+		    lang_string = arg.Split('=')[1];
+		} else if (arg.StartsWith("--display-name=")) {
+		    display_name = arg.Split('=')[1];
+		}
+	    }
             // Setup config
             string config_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
             if (verbose) {
@@ -212,54 +228,77 @@ namespace Calico {
             } else if (((IList<string>)args).Contains("--create-profile")) {
                 create_profile(args, path, GetIPythonPath());
                 System.Environment.Exit(0);
+            } else if (((IList<string>)args).Contains("--create-kernelspec")) {
+		create_kernelspec(lang_string, display_name, args, path, GetIPythonPath());
+                System.Environment.Exit(0);
             } else if (((IList<string>)args).Contains("--version")) {
                 Print("Calico Project, version {0} on {1}", Version, System.Environment.OSVersion.VersionString);
                 Print("  " + _("Using Mono runtime version {0}"), MonoRuntimeVersion);
                 System.Environment.Exit(0);
             }
-            Dictionary<string, Language> languages = new Dictionary<string, Language>();
-            DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, "..", "languages"));
-            if (verbose) {
-                System.Console.WriteLine(_("    Looking for languages in \"{0}\"..."), 
-                        System.IO.Path.Combine(path, "..", "languages"));
-            }
-            foreach (DirectoryInfo d in dir.GetDirectories("*")) {
-                foreach (FileInfo f in d.GetFiles("Calico*.dll")) {
-                    LoadLanguage(f, languages);
-                }
-            }
+	    Dictionary<string, Language> languages = new Dictionary<string, Language>();
+	    DirectoryInfo dir = new DirectoryInfo(System.IO.Path.Combine(path, "..", "languages"));
+	    if (verbose) {
+		System.Console.WriteLine(_("    Looking for languages in \"{0}\"..."), 
+					 System.IO.Path.Combine(path, "..", "languages"));
+	    }
+	    foreach (DirectoryInfo d in dir.GetDirectories("*")) {
+		foreach (FileInfo f in d.GetFiles("Calico*.dll")) {
+		    if (lang_only) {
+			if ((f.Name == string.Format("Calico{0}.dll", propercase(lang_string))) ||
+			    (f.Name == "CalicoPython.dll")) {
+			    LoadLanguage(f, languages);
+			}
+			// else skip
+		    } else {
+			LoadLanguage(f, languages);
+		    }
+		}
+	    }
             // Now, let's load engines
             Calico.LanguageManager manager = new Calico.LanguageManager((IList<string>)config.GetValue("config", "visible-languages"), path, languages);
-            // First, let's dynamically load any need module DLLs
-            foreach (string filename in new string [] {"../modules/Graphics.dll"}) {
-                Assembly.LoadFrom(System.IO.Path.Combine(path, filename));
-            }
-            // Load Calico languages that depend on other Calico languages:
-            foreach (DirectoryInfo d in dir.GetDirectories("*")) {
-                foreach (FileInfo f in d.GetFiles("Calico*.py")) { // FIXME: allow other languages
-                    LoadLanguageSecondary(f, languages, "python", config, path, manager);
-                }
-            }
-            string local_lang_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
-            local_lang_path = System.IO.Path.Combine(local_lang_path, "calico", "languages");
-            if (verbose) {
-                System.Console.WriteLine(_("    Looking for local languages in \"{0}\"..."), local_lang_path);
-            }
-            dir = new DirectoryInfo(local_lang_path);
-            if (dir.Exists) {
-                foreach (DirectoryInfo d in dir.GetDirectories("*")) {
-                    foreach (FileInfo f in d.GetFiles("Calico*.py")) { // FIXME: allow other languages
-                        LoadLanguageSecondary(f, languages, "python", config, path, manager);
-                    }
-                }
-            }
-            // If a language isn't in the manager, it doesn't exist; remove it
-            List<string> vlangs = new List<string>();
-            foreach (string lang in ((IList<string>)config.GetValue("config", "visible-languages"))) {
-                if (manager.languages.ContainsKey(lang)) {
-                    vlangs.Add(lang);
-                }
-            }
+	    // First, let's dynamically load any need module DLLs
+	    foreach (string filename in new string [] {"../modules/Graphics.dll"}) {
+		Assembly.LoadFrom(System.IO.Path.Combine(path, filename));
+	    }
+	    // Load Calico languages that depend on other Calico languages:
+	    foreach (DirectoryInfo d in dir.GetDirectories("*")) {
+		foreach (FileInfo f in d.GetFiles("Calico*.py")) { // FIXME: allow other languages
+		    if (lang_only) {
+			if (f.Name == string.Format("Calico{0}.py", propercase(lang_string))) {
+			    LoadLanguageSecondary(f, languages, "python", config, path, manager);
+			}
+		    } else {
+			LoadLanguageSecondary(f, languages, "python", config, path, manager);
+		    }
+		}
+	    }
+	    string local_lang_path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData);
+	    local_lang_path = System.IO.Path.Combine(local_lang_path, "calico", "languages");
+	    if (verbose) {
+		System.Console.WriteLine(_("    Looking for local languages in \"{0}\"..."), local_lang_path);
+	    }
+	    dir = new DirectoryInfo(local_lang_path);
+	    if (dir.Exists) {
+		foreach (DirectoryInfo d in dir.GetDirectories("*")) {
+		    foreach (FileInfo f in d.GetFiles("Calico*.py")) { // FIXME: allow other languages
+			if (lang_only) {
+			    if (f.Name == string.Format("Calico{0}.py", propercase(lang_string))) {
+				LoadLanguageSecondary(f, languages, "python", config, path, manager);
+			    }
+			} else {
+			    LoadLanguageSecondary(f, languages, "python", config, path, manager);
+			}
+		    }
+		}
+	    }
+	    // If a language isn't in the manager, it doesn't exist; remove it
+	    List<string> vlangs = new List<string>();
+	    foreach (string lang in ((IList<string>)config.GetValue("config", "visible-languages"))) {
+		if (manager.languages.ContainsKey(lang)) {
+		    vlangs.Add(lang);
+		}
+	    }
             foreach (string lang in manager.getLanguages()) {
                 Language language = manager [lang];
                 language.InitializeConfig();
@@ -430,41 +469,124 @@ namespace Calico {
             }
         }
 
-        public static void create_profile(string[] args, string path, string ipython_base) {
-            // Copy the /notebooks/profile to $(ipython locate)
-            // First, make a default profile:
-            var proc = new Process {
-                StartInfo = new ProcessStartInfo {
-                    FileName = "ipython",
-                             Arguments = "profile create calico",
-                             UseShellExecute = false,
-                             RedirectStandardOutput = false,
-                             CreateNoWindow = true
-                }
-            };
-            proc.Start();
-            // Next, get destination:
-            string ipython_path = System.IO.Path.Combine(ipython_base, "profile_calico");
-            string nbextensions_path = System.IO.Path.Combine(ipython_base, "nbextensions");
-            // Now, copy recursively:
-            DirectoryCopy(System.IO.Path.Combine(path, "..", "notebooks", "profile"), ipython_path, true);
-            DirectoryCopy(System.IO.Path.Combine(path, "..", "notebooks", "nbextensions"), nbextensions_path, true);
-            // Now, put the top level ipython_config.py
-            string ipython_config = "";
-            string lang_string = "";
-            foreach (string arg in args) { 
-                if (arg.StartsWith("--lang=")) {
-                    lang_string = String.Format("      '{0}', \n", arg);
-                    break;
-                }
-            }
-            if (System.Environment.OSVersion.Platform.ToString().Contains("Win")) {
-                string executable_path = System.IO.Path.Combine(path, "Calico.exe");
-                ipython_config = String.Format(
-                        "# Configuration file for ipython.\n" +
-                        "\n" +
-                        "# set environment vars for Windows:\n" +
-                        "import os \n" +
+	public static void create_kernelspec(string kernelname, string display_name, string[] args, string path, string ipython_base) {
+	    string kernelspec_name;
+	    if (kernelname != "") {
+		kernelspec_name = "calico_" + kernelname;
+		if (display_name == "") 
+		    kernelname = "Calico " + propercase(kernelname);
+		else
+		    kernelname = display_name;
+	    } else {
+		kernelspec_name = "calico";
+		if (display_name == "")
+		    kernelname = "Calico";
+		else
+		    kernelname = display_name;
+	    }
+	    // Copy the /notebooks/kernelspec/* to $(ipython locate)/kernels/calico.../
+	    // Next, get destination:
+	    string ipython_path = System.IO.Path.Combine(ipython_base, "kernels", kernelspec_name);
+	    // Now, copy logos:
+	    DirectoryCopy(System.IO.Path.Combine(path, "..", "notebooks", "kernelspecs"), ipython_path, false);
+	    // Now, create kernel.json
+	    string ipython_config = "";
+	    string lang_string = "";
+	    foreach (string arg in args) { 
+		if (arg.StartsWith("--lang=")) {
+		    lang_string = String.Format("      \"{0}\", \n", arg);
+		    break;
+		}
+	    }
+	    if (System.Environment.OSVersion.Platform.ToString().Contains("Win")) {
+		string executable_path = System.IO.Path.Combine(path, "Calico.exe");
+		ipython_config = String.Format(
+					       "{{\n" + 
+					       " \"display_name\": \"{2}\",\n" +
+					       " \"env\" = {{\"MONO_PATH\": \"{0}\\..\\mono\\lib\\4.0;{0}\\..\\mono\\lib\\gtk-sharp-2.0;{0};{0}\\..\\mono\\lib\\2.0;{0}\\..\\mono\\lib\\3.5;{0}\\windows\", \n" +
+					       "            \"PATH\": \"c:\\Python27\\Scripts\" \n}}\n" +
+					       "\"argv\" = [\n" +
+					       "      \"{0}\\..\\mono\\bin\\mono.exe\", \"{1}\", \n", path, executable_path, kernelname) +
+		    (((IList<string>)args).Contains("--nographics") ? "     \"--nographics\",\n" : "") +
+		    (((IList<string>)args).Contains("--only") ? "     \"--only\",\n" : "") +
+		    lang_string +												     
+		    ("     \"--server\", \"{connection_file}\"]\n}}\n");
+	    } else { // Linux, Mac OSX, etc
+		string executable_path = System.IO.Path.Combine(path, "Calico.exe");
+		string oslib_path;
+		string ld_lib_path;
+		string oslib;
+		if (System.IO.Directory.Exists("/Applications")) {
+		    oslib = "mac";
+		    ld_lib_path = "/Library/Frameworks/Mono.framework/Libraries/";
+		} else {
+		    oslib = "linux";
+		    ld_lib_path = "";
+		}
+		oslib_path = System.IO.Path.Combine(path, oslib);
+		ipython_config = String.Format(
+					       "{{\n" +
+					       " \"display_name\": \"{4}\",\n" +
+					       " \"env\": {{\n" + 
+					       "      \"LD_LIBRARY_PATH\": \"{1}{2}\", \n" +
+					       "      \"MONO_PATH\": \"{2}\"\n" + 
+					       "  }}, \n" +
+					       " \"argv\": [" +
+					       "\"mono\", \"{3}\", ", 
+					       oslib, // {0}
+					       ld_lib_path, // {1}
+					       oslib_path, // {2}
+					       executable_path, // {3}
+					       kernelname // {4}
+					       ) + 
+		    // rest:
+		    (((IList<string>)args).Contains("--nographics") ? " \"--nographics\", " : "") +
+		    (((IList<string>)args).Contains("--only") ? " \"--only\", " : "") +
+		    lang_string +												     
+		    ("      \"--server\", \"{connection_file}\"]\n}\n");
+	    }
+	    string filename = System.IO.Path.Combine(ipython_path, "kernel.json");
+	    System.Console.WriteLine("    Creating kernelspec: \"{0}\"...", filename);
+	    System.IO.StreamWriter sw = new System.IO.StreamWriter(filename);
+	    sw.Write(ipython_config);
+	    sw.Close();
+	}
+
+	public static void create_profile(string[] args, string path, string ipython_base) {
+		// Copy the /notebooks/profile to $(ipython locate)
+		// First, make a default profile:
+		var proc = new Process {
+			StartInfo = new ProcessStartInfo {
+				FileName = "ipython",
+				    Arguments = "profile create calico",
+				    UseShellExecute = false,
+				    RedirectStandardOutput = false,
+				    CreateNoWindow = true
+				    }
+		    };
+		proc.Start();
+		// Next, get destination:
+		string ipython_path = System.IO.Path.Combine(ipython_base, "profile_calico");
+		string nbextensions_path = System.IO.Path.Combine(ipython_base, "nbextensions");
+		// Now, copy recursively:
+		DirectoryCopy(System.IO.Path.Combine(path, "..", "notebooks", "profile"), ipython_path, true);
+		DirectoryCopy(System.IO.Path.Combine(path, "..", "notebooks", "nbextensions"), nbextensions_path, true);
+		// Now, put the top level ipython_config.py
+		string ipython_config = "";
+		string lang_string = "";
+		foreach (string arg in args) { 
+		    if (arg.StartsWith("--lang=")) {
+			lang_string = String.Format("      '{0}', \n", arg);
+			break;
+		    }
+		}
+		if (System.Environment.OSVersion.Platform.ToString().Contains("Win")) {
+		    string executable_path = System.IO.Path.Combine(path, "Calico.exe");
+		    ipython_config = String.Format(
+			"# Configuration file for ipython.\n" +
+			"\n" +
+			"# set environment vars for Windows:\n" +
+			"import os \n" +
                         "os.environ[\"MONO_PATH\"] = r\"{0}\\..\\mono\\lib\\4.0;{0}\\..\\mono\\lib\\gtk-sharp-2.0;{0};{0}\\..\\mono\\lib\\2.0;{0}\\..\\mono\\lib\\3.5;{0}\\windows\" \n" +
                         "os.environ[\"PATH\"] = os.environ[\"PATH\"] + r\";c:\\Python27\\Scripts\" \n" +
                         "\n" +
@@ -529,24 +651,27 @@ namespace Calico {
             Print("  " + _("Using Mono runtime version {0}"), MonoRuntimeVersion);
             Print("----------------------------------------------------------------------------");
             Print(_("Start calico with the following options:"));
-            Print(_("  StartCalico                    Standard GUI"));
-            Print(_("  StartCalico FILENAME:LINE ...  Edits FILENAMEs, positioned on LINEs"));
-            Print(_("  StartCalico --lang=LANGUAGE    Sets default language (python, etc.)"));
-            Print(_("  StartCalico --exec FILENAMEs   Run FILENAMEs without opening the IDE"));
-            Print(_("  StartCalico --run FILENAME     Run FILENAME and open it in the IDE"));
-            Print(_("  StartCalico --repl FILENAMEs   Run FILENAMEs and starts read-eval-print loop"));
-            Print(_("  StartCalico   --nographics     Don't run with graphics (with --exec, --repl)"));
-            Print(_("  StartCalico   --noquit         Don't quit after executing file with --exec"));
-            Print(_("  StartCalico --nomodules        Does not load the modules from modules/*.dll"));
-            Print(_("  StartCalico --version          Displays the version number ({0})"), Version);
-            Print(_("  StartCalico --verbose          Displays detailed information (for debugging)"));
-            Print(_("  StartCalico --debug            Calico output goes to console rather than GUI"));
-            Print(_("  StartCalico --debug-handler    Calico will not catch system errors"));
-            Print(_("  StartCalico --reset            Resets config settings to factory defaults"));
-            Print(_("  StartCalico --create-profile   Create a new profile for IPython (overwrites)"));
-            Print(_("  StartCalico --check-profile    Create profile for IPython, if it doesn't exist"));
-            Print(_("  StartCalico --server [FILE]    Used as a backend language kernel for IPython"));
-            Print(_("  StartCalico --help             Displays this message"));
+            Print(_("  calico                     Standard GUI"));
+            Print(_("  calico FILENAME:LINE ...   Edit FILENAMEs, positioned on LINEs"));
+            Print(_("  calico --lang=LANGUAGE     Set default language (python, etc.)"));
+            Print(_("  calico   --only            Load only this language, skipping others"));	    
+            Print(_("  calico --exec FILENAMEs    Run FILENAMEs"));
+        Print(_("  StartCalico --run FILENAME     Run FILENAME and open it in the IDE"));
+            Print(_("  calico --repl FILENAMEs    Run FILENAMEs and starts read-eval-print loop"));
+            Print(_("  calico   --nographics      Don't run with graphics (with --exec, --repl)"));
+	    Print(_("  calico   --noquit          Don't quit after executing file with --exec"));
+	    Print(_("  calico --nomodules         Does not load the modules from modules/*.dll"));
+            Print(_("  calico --version           Display the version number ({0})"), Version);
+            Print(_("  calico --verbose           Display detailed information (for debugging)"));
+            Print(_("  calico --debug             Calico output goes to console rather than GUI"));
+            Print(_("  calico --debug-handler     Calico will not catch system errors"));
+            Print(_("  calico --reset             Reset config settings to factory defaults"));
+            Print(_("  calico --create-kernelspec Create a kernelspec for Jupyter (overwrites)"));
+            Print(_("  calico   --display-name=\"\" Display name to use with kernelspec"));
+            Print(_("  calico --create-profile    Create a profile for IPython 2 (overwrites)"));
+            Print(_("  calico --check-profile     Check to see if profile for IPython 2 exists"));
+            Print(_("  calico --server [FILE]     Use as language kernel for IPython/Jupyter"));
+            Print(_("  calico --help              Display this message"));
             Print("");
         }
     }

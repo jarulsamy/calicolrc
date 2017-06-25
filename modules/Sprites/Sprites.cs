@@ -58,8 +58,8 @@ public static class Sprites
 	public Background(string filename){
 		//TODO automate later by adding everything in a backdrops folder, add more possible backdrops
 		backdropDictionary = new Dictionary<string, Graphics.Picture>();
-		backdropDictionary.Add(Path.GetFileNameWithoutExtension(filename), new Graphics.Picture(getImagePath(filename)));
-		backdropDictionary.Add(Path.GetFileNameWithoutExtension("sun.png"), new Graphics.Picture(getImagePath("sun.png")));
+		backdropDictionary.Add(Path.GetFileNameWithoutExtension(filename), new Graphics.Picture(getBackgroundImagePath(filename)));
+		backdropDictionary.Add(Path.GetFileNameWithoutExtension("sun.png"), new Graphics.Picture(getBackgroundImagePath("sun.png")));
 
 		foreach(KeyValuePair<string, Graphics.Picture> entry in backdropDictionary){
 			Graphics.Picture pic = backdropDictionary[entry.Key];
@@ -88,7 +88,7 @@ public static class Sprites
 			throw new Exception("\'" + filename + "\' has already been added.");
 		}
 
-		Graphics.Picture newBackground = new Graphics.Picture(getImagePath(filename));
+		Graphics.Picture newBackground = new Graphics.Picture(getBackgroundImagePath(filename));
 		newBackground.border = 0;
 		newBackground.undraw();
 		backdropDictionary.Add(Path.GetFileNameWithoutExtension(filename), newBackground);
@@ -701,7 +701,7 @@ public static class Sprites
 	[method: JigsawTab("Sprites Look")]
 	public static void clearWindow(){
 		if(window != null){
-			window.clear();
+			window.reset();
 		}
 	}*/
 
@@ -978,7 +978,7 @@ public static class Sprites
 			backgroundObjs.Remove(name);
 		}
 
-		Background background = makeBackground(name, getImagePath("landscape.png"));
+		Background background = makeBackground(name, getBackgroundImagePath("landscape.png"));
 		return background;
 	}
 
@@ -1053,7 +1053,7 @@ public static class Sprites
 		    window = new Window();
 		}
 	
-		window.clear();
+		window.reset();
 		sprites.Clear();
 		Background b = makeBackground();
 		b.reset();
@@ -1084,7 +1084,7 @@ public static class Sprites
 		    window = new Window();
 		}
 	
-		window.clear();
+		window.reset();
 		sprites.Clear();
 		Background b = makeBackground();
 		b.reset();
@@ -1182,6 +1182,10 @@ public static class Sprites
 	return System.IO.Path.Combine(PictureDirectory, image);
     }
 	
+    static string getBackgroundImagePath(string image) {
+	return System.IO.Path.Combine(BackgroundPictureDirectory, image);
+    }
+	
 	static string getSoundPath(string sound){
 		return System.IO.Path.Combine(SoundDirectory, sound);
 	}
@@ -1199,7 +1203,17 @@ public static class Sprites
 	get {
 	    string path = System.IO.Path.Combine(AssemblyDirectory, "..", "examples");
 	    path = System.IO.Path.Combine(path, "images");
-	    path = System.IO.Path.Combine(path, "SpriteCostumes");
+	    path = System.IO.Path.Combine(path, "sprites");
+	    path = System.IO.Path.Combine(path, "example");
+	    return path;
+	}
+    }
+
+    static string BackgroundPictureDirectory {
+	get {
+	    string path = System.IO.Path.Combine(AssemblyDirectory, "..", "examples");
+	    path = System.IO.Path.Combine(path, "images");
+	    path = System.IO.Path.Combine(path, "backgrounds");
 	    return path;
 	}
     }

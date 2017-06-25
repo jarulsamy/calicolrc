@@ -125,6 +125,26 @@ namespace Calico {
         public CustomStream cstderr;
         public IList<string> persistentPaths = new List<string>();
 
+	public void addPath(string path, string file=""){
+		if(file != ""){
+			string dir = System.IO.Path.GetDirectoryName(file);
+			path = dir + "/" + path; 
+		}
+		path = new FileInfo(path).FullName;
+		if(!persistentPaths.Contains(path)){
+			persistentPaths.Add(path);
+			manager.AddPath(path);
+		}
+	}
+
+	public object getGlobals(){
+		if(manager.ContainsKey("python")){
+			return manager["python"].engine.getPersistentVariables();
+		} else {
+			return null;
+		}
+	}
+
         public bool toolSwapped {
             get {
                 return (bool) config.GetValue("config", "toolSwapped");
@@ -1333,6 +1353,15 @@ namespace Calico {
             }
         }
 
+    public void TrySetCurrentLanguage(string language) {
+        string lang = FindLanguage(language);
+        if (lang != null) {
+            ActivateLanguage(lang, CurrentLanguage);
+	    } else {
+            throw new Exception("unknown language: " + language);
+	    }
+	}
+
         public void ActivateLanguage(string language, string backup) {
             StartLanguage(language);
             if (manager[CurrentLanguage].engine == null) {
@@ -2014,8 +2043,13 @@ del _invoke, _
             text = text.Replace('\u2032', '\'');
             text = text.Replace('\u2033', '\"');
             // And then replace the rest with '':
-            byte[] bytes = Encoding.Convert(Encoding.UTF8, Encoding.GetEncoding(Encoding.ASCII.EncodingName, new EncoderReplacementFallback(string.Empty), new DecoderExceptionFallback()), Encoding.UTF8.GetBytes(text));
-            return Encoding.ASCII.GetString(bytes);
+	    ASCIIEncoding ascii = new ASCIIEncoding();
+	    Encoding encoder = ASCIIEncoding.GetEncoding("us-ascii", 
+						 new EncoderReplacementFallback(string.Empty), 
+						 new DecoderExceptionFallback());
+	    //encoder.Fallback = new EncoderReplacementFallback(string.Empty);
+	    byte[] bytes = encoder.GetBytes(text);
+	    return ascii.GetString(bytes); 
         }
 
         protected virtual void OnPasteActionActivated(object sender, System.EventArgs e) {

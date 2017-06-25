@@ -11,8 +11,8 @@ else
 fi ;
 ### --------------------------------------------
 if [[ $uname == 'Darwin' ]]; then
-    export LD_LIBRARY_PATH=/Library/Frameworks/Mono.framework/Libraries/:$DIR/bin/mac:$LD_LIBRARY_PATH
-    export MONO_PATH=$DIR/bin/mac:$MONO_PATH
+    export LD_LIBRARY_PATH=/Library/Frameworks/Mono.framework/Libraries/:$DIR/bin/mac:/usr/local/opt/gettext/lib:$LD_LIBRARY_PATH
+    export MONO_PATH=$DIR/bin/mac:/usr/local/opt/gettext/lib:$MONO_PATH
 else
     export LD_LIBRARY_PATH=$DIR/bin/linux:$LD_LIBRARY_PATH
     export MONO_PATH=$DIR/bin/linux:$MONO_PATH

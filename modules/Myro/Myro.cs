@@ -3446,7 +3446,7 @@ public static class Myro
       closeWindowButton.draw(window);
 
       selection.draw(window);
-      selection.setWidth(0);
+      selection.setBorderWidth(0);
       selection.color=makeColor(255,255,0,64);
 
       //essentially blocks until window is destroyed
@@ -5339,7 +5339,7 @@ public static class Myro
 	[method: JigsawTab("M/Graphics")]
 	public static int getHeight (Graphics.Picture picture)
 	{
-		return picture.getHeight ();
+		return (int)picture.getHeight ();
 	}
 
 	[method: JigsawTab("M/Graphics")]
@@ -5351,7 +5351,7 @@ public static class Myro
 	[method: JigsawTab("M/Graphics")]
 	public static int getWidth (Graphics.Picture picture)
 	{
-		return picture.getWidth ();
+		return (int)picture.getWidth ();
 	}
 
 	[method: JigsawTab("M/Graphics")]

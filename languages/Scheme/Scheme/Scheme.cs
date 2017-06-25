@@ -478,6 +478,9 @@ public class Scheme {
                                                                 1, 1);
     public static Proc use_lexical_address_proc = new Proc("use-lexical-address", (Procedure1Bool)PJScheme.use_lexical_address, -1, 2);
     public static Proc dict_proc = new Proc("dict", (Procedure1)dict, 1, 1);
+    public static Proc contains_native_proc = new Proc("contains", (Procedure2)contains_native, 2, 1);
+    public static Proc getitem_native_proc = new Proc("getitem", (Procedure2)getitem_native, 2, 1);
+    public static Proc setitem_native_proc = new Proc("setitem", (Procedure3)setitem_native, 3, 1);
     public static Proc property_proc = new Proc("property", (Procedure1)property, 1, 1);
     public static Proc reset_toplevel_env_proc = new Proc("reset-toplevel-env", (Procedure0Void)reset_toplevel_env, 0, 0);
     public static Proc string_split_proc = new Proc("string-split", (Procedure2)string_split, 2, 1);
@@ -1282,6 +1285,18 @@ public class Scheme {
           return result;
         }
         throw new Exception(String.Format("no such external type '{0}'", type));
+  }
+
+  public static object import_as_native(object module, object name, object env) {
+      object retval = list();
+      // FIXME: not implemented!
+      return retval;
+  }
+
+  public static object import_from_native(object module, object name_list, object env) {
+      object retval = list();
+      // FIXME: not implemented!
+      return retval;
   }
 
   public static object import_native(object args, object env) {
@@ -2779,6 +2794,60 @@ public class Scheme {
       return text.Append(obj2.ToString()).ToString();
   }
 
+  public static object string_append(object obj1, 
+				     object obj2,
+				     object obj3) {
+      System.Text.StringBuilder text = new System.Text.StringBuilder(obj1.ToString());
+      return text.Append(obj2.ToString()).Append(obj3.ToString()).ToString();
+  }
+
+  public static object string_append(object obj1, 
+				     object obj2,
+				     object obj3,
+				     object obj4) {
+      System.Text.StringBuilder text = new System.Text.StringBuilder(obj1.ToString());
+      return text.Append(obj2.ToString()).Append(obj3.ToString()).Append(obj4.ToString()).ToString();
+  }
+
+  public static object string_append(object obj1, 
+				     object obj2,
+				     object obj3,
+				     object obj4,
+				     object obj5) {
+      System.Text.StringBuilder text = new System.Text.StringBuilder(obj1.ToString());
+      return text.Append(obj2.ToString()).Append(obj3.ToString()).Append(obj4.ToString()).Append(obj5.ToString()).ToString();
+  }
+
+  public static object string_append(object obj1, 
+				     object obj2,
+				     object obj3,
+				     object obj4,
+				     object obj5,
+				     object obj6) {
+      System.Text.StringBuilder text = new System.Text.StringBuilder(obj1.ToString());
+      return text.Append(obj2.ToString())
+	  .Append(obj3.ToString())
+	  .Append(obj4.ToString())
+	  .Append(obj5.ToString())
+	  .Append(obj6.ToString()).ToString();
+  }
+
+  public static object string_append(object obj1, 
+				     object obj2,
+				     object obj3,
+				     object obj4,
+				     object obj5,
+				     object obj6,
+				     object obj7) {
+      System.Text.StringBuilder text = new System.Text.StringBuilder(obj1.ToString());
+      return text.Append(obj2.ToString())
+	  .Append(obj3.ToString())
+	  .Append(obj4.ToString())
+	  .Append(obj5.ToString())
+	  .Append(obj6.ToString())
+	  .Append(obj7.ToString()).ToString();
+  }
+
   public static object assq(object x, object ls) {
       object current = ls;
       while (! null_q(current)) {
@@ -3560,5 +3629,18 @@ public class Scheme {
 
     public static object help(object obj) {
 	return "No available help for host-system item.";
+    }
+    
+    public static object contains_native(object obj, object item) {
+	return ((IDictionary)obj).Contains(item);
+    }
+
+    public static object getitem_native(object obj, object item) {
+	return ((IDictionary)obj)[item];
+    }
+
+    public static object setitem_native(object obj, object item, object value) {
+	((IDictionary)obj)[item] = value;
+	return value;
     }
 }

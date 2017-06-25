@@ -4,8 +4,9 @@ from IPython.core import display
 from PIL import Image
 
 from .camera import Camera
+from .googlechart import GoogleChart
 
-__all__ = ['Camera']
+__all__ = ['Camera', 'GoogleChart']
 
 def display_pil_image(im):
    """Displayhook function for PIL Images, rendered as PNG."""

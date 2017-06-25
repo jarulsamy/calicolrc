@@ -1240,6 +1240,10 @@
     (var symbol?)
     (var-info source-info?)
     (info source-info?))
+  (association-aexp
+    (var symbol?)
+    (exp aexpression?)
+    (info source-info?))
   (assign-aexp
     (var symbol?)
     (rhs-exp aexpression?)
@@ -1387,6 +1391,14 @@
 	   (symbol?^ (car^ asexp))
 	   (eq?^ (car^ asexp) keyword)))))
 
+(define-native tagged2-list^
+  (lambda (keyword op len)
+    (lambda (asexp)
+      (and (list?^ asexp)
+	   (op (length^ asexp) len)
+	   (symbol?^ (car^ asexp))
+	   (eq?^ (cadr^ asexp) keyword)))))
+
 (define quote?^ (tagged-list^ 'quote = 2))
 (define quasiquote?^ (tagged-list^ 'quasiquote = 2))
 (define unquote?^ (tagged-list^ 'unquote >= 2))  ;; >= for alan bawden's qq-expand algorithm
@@ -1394,6 +1406,7 @@
 (define if-then?^ (tagged-list^ 'if = 3))
 (define if-else?^ (tagged-list^ 'if = 4))
 (define help?^ (tagged-list^ 'help = 2))
+(define association?^ (tagged2-list^ ': = 3))
 (define assignment?^ (tagged-list^ 'set! = 3))
 (define func?^ (tagged-list^ 'func = 2))
 (define callback?^ (tagged-list^ 'callback = 2))
@@ -1469,6 +1482,11 @@
 	   (lambda-cont2 (v fail)
 	     (let ((var-info (get-source-info (cadr^ adatum))))
 	       (k (assign-aexp (untag-atom^ (cadr^ adatum)) v var-info info) fail)))))
+	((association?^ adatum)
+	 (aparse (caddr^ adatum) senv handler fail
+	   (lambda-cont2 (v fail)
+	     (let ((var-info (get-source-info (cadr^ adatum))))
+	       (k (association-aexp (untag-atom^ (car^ adatum)) v var-info info) fail)))))
 	((func?^ adatum)
 	 (aparse (cadr^ adatum) senv handler fail
 	   (lambda-cont2 (e fail)
@@ -2022,7 +2040,70 @@
 	    define-datatype-transformer^
 	    cases-transformer^
 	    )
-      (list "" "" "" "" "" "" "" "" "" ""))))
+      (list (string-append "(and ...) - short-circuiting `and` macro\n"
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (and)\n"
+			   "    Out [1]: #t\n"
+			   "    In  [2]: (and #t #f)\n"
+			   "    Out [2]: #f\n"
+			   )
+	    (string-append "(or ...) - short-circuiting `or` macro" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (or)\n"
+			   "    Out [1]: #f\n"
+			   "    In  [2]: (or #t #f)\n"
+			   "    Out [2]: #t\n"
+			   )
+	    (string-append "(cond (TEST RETURN)...) - conditional evaluation macro" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (cond ((= 1 2) 3)(else 4))\n"
+			   "    Out [1]: 4\n"
+			   )
+	    (string-append "(let ((VAR VALUE)...)...) - local variable macro" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (let ((x 3)) x)\n"
+			   "    Out [1]: 3\n"
+			   )
+	    (string-append "(letrec ((VAR VALUE)...)...) - recursive local variable macro" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [*]: (letrec ((loop (lambda () (loop)))) (loop))\n"
+			   )
+	    (string-append "(let* ((VAR VALUE)...)...) - cascading local variable macro" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (let* ((a 1)(b a)(c b)) c)\n"
+			   "    Out [1]: 1\n"
+			   )
+	    (string-append "(case THING (ITEM RETURN)...)) - case macro"  
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (case 1 (1 2)(3 4))\n"
+			   "    Out [1]: 2\n"
+			   )
+	    (string-append "(record-case ) - record-case macro for define-datatype" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (record-case ddtype (subtype (part...) return)...)\n"
+			   )
+	    (string-append "(define-datatype NAME NAME? (TYPE (PART TEST))...) - defines new datatypes and support functions (macro)" 
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (define-datatype e e?)\n"
+			   "    In  [1]: (e? 1)\n"
+			   "    Out [1]: #f\n"
+			   )
+	    (string-append "(cases ...) - cases macro for a more flexible case"
+			   "\n"
+			   "Example:\n"
+			   "    In  [1]: (cases 1 ((1 2) 3))\n"
+			   "    Out [1]: 3\n"
+			   )
+	    ))))
 
 (define macro-env 'undefined)
 
@@ -2649,6 +2730,11 @@
 (define-native set-global-value! (lambda (var x) #f))
 (define-native set-global-docstring! (lambda (var x) #f))
 (define-native import-native (lambda ignore #f))
+<<<<<<< HEAD
+=======
+(define-native import-as-native (lambda ignore #f))
+(define-native import-from-native (lambda ignore #f))
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
 (define-native iterator? (lambda ignore #f))
 (define-native get_type (lambda (x) 'unknown))
 (define-native char->string (lambda (c) (string c)))
@@ -2656,6 +2742,10 @@
 (define-native float (lambda (n) (exact->inexact n)))
 (define-native int (lambda (n) (inexact->exact n)))
 (define-native iter? (lambda (x) #f))
+(define-native contains-native (lambda (dict x) #f))
+(define-native getitem-native (lambda (dict x) 'unknown))
+(define-native setitem-native (lambda (dict x value) 'unknown))
+(define-native list-native (lambda (v) v))
 
 (define use-lexical-address
   (lambda args
@@ -2827,6 +2917,11 @@
 ;;----------------------------------------------------------------------------
 ;; used only by scheme RM and C# RM code
 
+(define execute-string-top
+  (lambda (input source)
+    ;; source is input symbol, aka 'stdin
+    (execute-rm input source)))
+
 (define execute-string-rm
   (lambda (input)
     (execute-rm input 'stdin)))
@@ -2985,6 +3080,10 @@
 		(k (help (get-external-member dlr-obj components)) fail))
 	      (lambda-cont2 (binding fail)
 		(k (binding-docstring binding) fail))))
+      (association-aexp (var exp info)
+	(m exp env handler fail
+	  (lambda-cont2 (value fail)
+	     (k (association var value) fail))))
       (assign-aexp (var rhs-exp var-info info)
 	(m rhs-exp env handler fail
 	  (lambda-cont2 (rhs-value fail)
@@ -3191,25 +3290,35 @@
      ((= n 0) '())
      (else (cons "" (make-empty-docstrings (- n 1)))))))
 
+(define association
+  (lambda (var value)
+    (list var ': value)))
+
 (define closure
   (lambda (formals bodies env)
     (lambda-proc (args env2 info handler fail k2)
-      (if (= (length args) (length formals))
-	(eval-sequence bodies (extend env formals args (make-empty-docstrings (length args))) handler fail k2)
-	(runtime-error "incorrect number of arguments in application" info handler fail)))))
+      (let* ((formals-and-args (process-formals-and-args formals args))
+	     (new-formals (car formals-and-args))
+	     (new-args (cdr formals-and-args)))
+	(if (= (length new-args) (length new-formals))
+	    (eval-sequence bodies (extend env new-formals new-args (make-empty-docstrings (length new-args))) handler fail k2)
+	    (runtime-error "incorrect number of arguments in application" info handler fail))))))
 
 (define mu-closure
   (lambda (formals runt bodies env)
     (lambda-proc (args env2 info handler fail k2)
-      (if (>= (length args) (length formals))
-	(let ((new-env
-		(extend env
-		  (cons runt formals)
-		  (cons (list-tail args (length formals))
-			(list-head args (length formals)))
-		  (make-empty-docstrings (+ 1 (length formals))))))
-	  (eval-sequence bodies new-env handler fail k2))
-	(runtime-error "not enough arguments in application" info handler fail)))))
+      (let* ((formals-and-args (process-formals-and-args formals args))
+	     (new-formals (car formals-and-args))
+	     (new-args (cdr formals-and-args)))
+	(if (>= (length new-args) (length new-formals))
+	    (let ((new-env
+		   (extend env
+			   (cons runt new-formals)
+			   (cons (list-tail new-args (length new-formals))
+				 (list-head new-args (length new-formals)))
+			   (make-empty-docstrings (+ 1 (length new-formals))))))
+	      (eval-sequence bodies new-env handler fail k2))
+	    (runtime-error "not enough arguments in application" info handler fail))))))
 
 (define make-trace-depth-string
   (lambda (level)
@@ -3221,17 +3330,20 @@
   (lambda (name formals bodies env)
     (let ((trace-depth 0))
       (lambda-proc (args env2 info handler fail k2)
-	(if (= (length args) (length formals))
-	  (begin
-	    (printf "~acall: ~s~%" (make-trace-depth-string trace-depth) (cons name args))
-	    ;;(printf "k: ~a\n" (make-safe-continuation k2))
-	    (set! trace-depth (+ trace-depth 1))
-	    (eval-sequence bodies (extend env formals args (make-empty-docstrings (length formals))) handler fail 
-	      (lambda-cont2 (v fail)
-		(set! trace-depth (- trace-depth 1))
-		(printf "~areturn: ~s~%" (make-trace-depth-string trace-depth) v)
-		(k2 v fail))))
-	  (runtime-error "incorrect number of arguments in application" info handler fail))))))
+      (let ((formals-and-args (process-formals-and-args formals args))
+	    (new-formals (car formals-and-args))
+	    (new-args (cdr formals-and-args)))
+	(if (= (length new-args) (length new-formals))
+	    (begin
+	      (printf "~acall: ~s~%" (make-trace-depth-string trace-depth) (cons name new-args))
+	      ;;(printf "k: ~a\n" (make-safe-continuation k2))
+	      (set! trace-depth (+ trace-depth 1))
+	      (eval-sequence bodies (extend env new-formals new-args (make-empty-docstrings (length new-formals))) handler fail 
+	        (lambda-cont2 (v fail)
+ 	          (set! trace-depth (- trace-depth 1))
+		  (printf "~areturn: ~s~%" (make-trace-depth-string trace-depth) v)
+		  (k2 v fail))))
+	    (runtime-error "incorrect number of arguments in application" info handler fail)))))))
 
 ;; experimental
 (define-native make-safe-continuation
@@ -3253,21 +3365,24 @@
   (lambda (name formals runt bodies env)
     (let ((trace-depth 0))
       (lambda-proc (args env2 info handler fail k2)
-	(if (>= (length args) (length formals))
-	  (let ((new-env
-		  (extend env
-		    (cons runt formals)
-		    (cons (list-tail args (length formals))
-			  (list-head args (length formals)))
-		    (make-empty-docstrings (+ 1 (length formals))))))
-	    (printf "~acall: ~s~%" (make-trace-depth-string trace-depth) (cons name args))
-	    (set! trace-depth (+ trace-depth 1))
-	    (eval-sequence bodies new-env handler fail
-	      (lambda-cont2 (v fail)
-		(set! trace-depth (- trace-depth 1))
-		(printf "~areturn: ~s~%" (make-trace-depth-string trace-depth) v)
-		(k2 v fail))))
-	  (runtime-error "not enough arguments in application" info handler fail))))))
+        (let ((formals-and-args (process-formals-and-args formals args))
+	      (new-formals (car formals-and-args))
+	      (new-args (cdr formals-and-args)))
+	  (if (>= (length args) (length new-formals))
+	      (let ((new-env
+		     (extend env
+			     (cons runt new-formals)
+			     (cons (list-tail new-args (length new-formals))
+				   (list-head new-args (length new-formals)))
+			     (make-empty-docstrings (+ 1 (length new-formals))))))
+		(printf "~acall: ~s~%" (make-trace-depth-string trace-depth) (cons name new-args))
+		(set! trace-depth (+ trace-depth 1))
+		(eval-sequence bodies new-env handler fail
+		  (lambda-cont2 (v fail)
+		     (set! trace-depth (- trace-depth 1))
+		     (printf "~areturn: ~s~%" (make-trace-depth-string trace-depth) v)
+		     (k2 v fail))))
+	      (runtime-error "not enough arguments in application" info handler fail)))))))
 
 ;;----------------------------------------------------------------------------
 ;; Primitives
@@ -3418,7 +3533,9 @@
   (lambda-proc (args env2 info handler fail k2)
     (let ((proc (car args))
 	  (proc-args (cadr args)))
-      (proc proc-args env2 info handler fail k2))))
+      (if (dlr-proc? proc)
+	  (k2 (dlr-apply proc proc-args) fail)
+	  (proc proc-args env2 info handler fail k2)))))
 
 ;; sqrt
 (define sqrt-prim
@@ -3477,9 +3594,12 @@
 
 ;; substring
 (define substring-prim 
+  ;; (substring "string" start)
   ;; (substring "string" start stop)
   (lambda-proc (args env2 info handler fail k2)
-     (k2 (substring (car args) (cadr args) (caddr args)) fail))) 
+     (if (= (length args) 3)
+	 (k2 (substring (car args) (cadr args) (caddr args)) fail)
+	 (k2 (substring (car args) (cadr args) (string-length (car args))) fail))))
 
 ;; number->string
 (define number->string-prim 
@@ -4108,6 +4228,8 @@
     (cond
       ((not (length-at-least? 2 args))
        (runtime-error "incorrect number of arguments to =" info handler fail))
+      ((not (all-numeric? args))
+       (runtime-error "attempt to apply = on non-numeric argument" info handler fail))
       (else (k2 (apply = args) fail)))))
 
 ;; abs
@@ -4516,6 +4638,8 @@
       (cons (vector->list (car arg-list)) (listify (cdr arg-list))))
      ((string? (car arg-list))
       (cons (string->list (car arg-list)) (listify (cdr arg-list))))
+     ((iter? (car arg-list))
+      (cons (vector->list (list-native (car arg-list))) (listify (cdr arg-list))))
      (else (error 'map "cannot use object type '~a' in map" 
 		  (get_type (car arg-list))))))) ;; get_type is defined in C#
 
@@ -4634,6 +4758,19 @@
   (lambda-proc (args env2 info handler fail k2)
     (k2 (import-native args env2) fail)))
 
+<<<<<<< HEAD
+=======
+;; import-as
+(define import-as-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (k2 (import-as-native (car args) (cadr args) env2) fail)))
+
+;; import
+(define import-from-prim
+  (lambda-proc (args env2 info handler fail k2)
+    (k2 (import-from-native (car args) (cdr args) env2) fail)))
+
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
 ;; not
 (define not-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -4763,6 +4900,18 @@
       (runtime-error "incorrect number of arguments to iter?" info handler fail))
      (else (k2 (apply iter? args) fail)))))
 
+(define contains-prim
+  (lambda-proc (args env2 info handler fail k2)
+       (k2 (apply contains-native args) fail)))
+
+(define getitem-prim
+  (lambda-proc (args env2 info handler fail k2)
+       (k2 (apply getitem-native args) fail)))
+
+(define setitem-prim
+  (lambda-proc (args env2 info handler fail k2)
+       (k2 (apply setitem-native args) fail)))
+
 (define list?-prim
   (lambda-proc (args env2 info handler fail k2)
     (cond
@@ -4804,13 +4953,6 @@
       ((not (length-one? args))
        (runtime-error "incorrect number of arguments to int" info handler fail))
       (else (k2 (apply int args) fail)))))
-
-(define apply-with-keywords-prim
-  (lambda-proc (args env2 info handler fail k2)
-    (cond
-      ((not (length-at-least? 1 args))
-       (runtime-error "incorrect number of arguments to apply-with-keywords" info handler fail))
-      (else (k2 (apply apply-with-keywords args) fail)))))
 
 (define assq-prim
   (lambda-proc (args env2 info handler fail k2)
@@ -4925,6 +5067,7 @@
 	    (list 'call-with-current-continuation call/cc-prim "")
 	    (list 'call/cc call/cc-prim "")
 	    (list 'car car-prim "(car LIST) returns the first element of LIST")
+<<<<<<< HEAD
 	    (list 'cdr cdr-prim "")
 	    (list 'caaaar caaaar-prim "")
 	    (list 'caaadr caaadr-prim "")
@@ -5061,6 +5204,148 @@
  	    (list 'typeof typeof-prim "")
  	    (list 'use-lexical-address use-lexical-address-prim "")
 	    (list 'use-tracing use-tracing-prim "")
+=======
+	    (list 'cdr cdr-prim "(cdr LIST) returns rest of LIST after (car LIST)")
+	    (list 'caaaar caaaar-prim "caaaar ...): ")
+	    (list 'caaadr caaadr-prim "(caaadr ...): ")
+	    (list 'caaar caaar-prim "(caaar ...): ")
+	    (list 'caadar caadar-prim "(caadar ...): ")
+	    (list 'caaddr caaddr-prim "(caaddr ...): ")
+	    (list 'caadr caadr-prim "(caadr ...): ")
+	    (list 'caar caar-prim "(caar ...): ")
+	    (list 'cadaar cadaar-prim "(cadaar ...): ")
+	    (list 'cadadr cadadr-prim "(cadadr ...): ")
+	    (list 'cadar cadar-prim "(cadar ...): ")
+	    (list 'caddar caddar-prim "(caddar ...): ")
+	    (list 'cadddr cadddr-prim "(cadddr ...): ")
+	    (list 'cdaaar cdaaar-prim "(cdaaar ...): ")
+	    (list 'cdaadr cdaadr-prim "(cdaadr ...): ")
+	    (list 'cdaar cdaar-prim "(cdaar ...): ")
+	    (list 'cdadar cdadar-prim "(cdadar ...): ")
+	    (list 'cdaddr cdaddr-prim "(cdaddr ...): ")
+	    (list 'cdadr cdadr-prim "(cdadr ...): ")
+	    (list 'cdar cdar-prim "(cdar ...): ")
+	    (list 'cddaar cddaar-prim "(cddaar ...): ")
+	    (list 'cddadr cddadr-prim "(cddadr ...): ")
+	    (list 'cddar cddar-prim "(cddar ...): ")
+	    (list 'cdddar cdddar-prim "(cdddar ...): ")
+	    (list 'cddddr cddddr-prim "(cddddr ...): ")
+	    (list 'cdddr cdddr-prim "(cdddr ...): ")
+	    (list 'cddr cddr-prim "(cddr ...): ")
+	    (list 'char? char?-prim "(char? ITEM): return #t if ITEM is a character, #f otherwise")
+	    (list 'char=? char=?-prim "(char=? CHAR1 CHAR2): return #t if CHAR1 has the same values as CHAR2, #f otherwise")
+	    (list 'char-whitespace? char-whitespace?-prim "(char-whitespace? CHAR): return #t if CHAR is a whitespace character, #f otherwise")
+	    (list 'char-alphabetic? char-alphabetic?-prim "(char-alphabetic? CHAR): return #t if CHAR is an alphabetic character, #f otherwise")
+	    (list 'char-numeric? char-numeric?-prim "(char-numeric? CHAR): return #t if CHAR is a whitespace character, #f otherwise")
+	    (list 'char->integer char->integer-prim "(char->integer CHAR): return associated number of CHAR ")
+	    (list 'cons cons-prim "(cons ITEM1 ITEM2): return a list with ITEM1 as car and ITEM2 as cdr (ITEM2 is typically a list)")
+	    (list 'current-time current-time-prim "(current-time): returns the current time as number of seconds since 1970-1-1")
+	    (list 'cut cut-prim "(cut ARGS...): return to toplevel with ARGS")
+	    (list 'dir dir-prim "(dir [ITEM]): return items in environment, or, if ITEM is given, the items in module")
+	    (list 'display display-prim "(display ITEM): display the ITEM as output")
+	    (list 'current-environment current-environment-prim "(current-environment): returns the current environment")
+	    (list 'eq? eq?-prim "(eq? ITEM1 ITEM2): return #t if ITEM1 is eq to ITEM2, #f otherwise")
+	    (list 'equal? equal?-prim "(equal? ITEM1 ITEM2): return #t if ITEM1 is equal to ITEM2, #f otherwise")
+	    (list 'error error-prim "(error NAME MESSAGE): create an exception in NAME with MESSAGE")
+	    (list 'eval eval-prim "(eval LIST): evaluates the LIST as a Scheme expression")
+	    (list 'eval-ast eval-ast-prim "(eval-ast AST): evaluates the Abstract Syntax Tree as a Scheme expression (see parse and parse-string)")
+	    (list 'exit exit-prim "(exit): ")
+	    (list 'for-each for-each-prim "(for-each PROCEDURE LIST): apply PROCEDURE to each item in LIST, but don't return results")
+	    (list 'format format-prim "(format STRING ITEM ...): format the string with ITEMS as arguments")
+	    (list 'get get-prim "(get ...): ")
+	    (list 'get-stack-trace get-stack-trace-prim "(get-stack-trace): return the current stack trace")
+	    (list 'load-as load-as-prim "(load-as FILENAME MODULE-NAME): load the filename, putting items in MODULE-NAME namespace")
+	    (list 'integer->char integer->char-prim "(integer->char INTEGER): return the assocated character of INTEGER")
+	    (list 'length length-prim "(length LIST): returns the number of elements in top level of LIST")
+	    (list 'list list-prim "(list ITEM ...): returns a list composed of all of the items")
+	    (list 'list->vector list->vector-prim "(list->vector LIST): returns the LIST as a vector")
+	    (list 'list->string list->string-prim "(list->string LIST): returns the LIST as a string")
+	    (list 'list-ref list-ref-prim "(list-ref LIST INDEX): returns the item in LIST at INDEX (zero-based)")
+	    (list 'load load-prim "(load FILENAME...): loads the given FILENAMEs")
+	    (list 'min min-prim "(min ...): returns the minimum value from the list of values")
+	    (list 'max max-prim "(max ...): returns the maximum value from the list of values")
+	    (list 'make-set make-set-prim "(make-set LIST): returns a list of unique items from LIST")
+	    (list 'make-vector make-vector-prim "(make-vector LIST): returns a vector from LIST")
+	    (list 'map map-prim "(map PROCEDURE LIST...): apply PROCEDURE to each element of LIST, and return return results")
+	    (list 'member member-prim "(member ITEM LIST): return #t if MEMBER in top level of LIST")
+	    (list 'memq memq-prim "(memq ...): ")
+	    (list 'memv memv-prim "(memv ...): ")
+	    (list 'newline newline-prim "(newline): displays a new line in output")
+	    (list 'not not-prim "(not ITEM): returns the boolean not of ITEM; ITEM is only #t when #t, otherwise #f")
+	    (list 'null? null?-prim "(null? ITEM): return #t if ITEM is empty list, #f otherwise")
+	    (list 'number->string number->string-prim "(number->string NUMBER): return NUMBER as a string")
+	    (list 'number? number?-prim "(number? ITEM): return #t if ITEM is a number, #f otherwise")
+	    (list 'pair? pair?-prim "(pair? ITEM): ")
+	    (list 'parse parse-prim "(parse LIST): parse a list; returns Abstract Syntax Tree (AST)")
+	    (list 'parse-string parse-string-prim "(parse-string STRING): parse a string; returns Abstract Syntax Tree (AST)")
+	    (list 'print print-prim "(print ITEM): ")
+	    (list 'printf printf-prim "(printf FORMAT ARGS...): ")
+	    (list 'range range-prim "(range END), (range START END), or (RANGE START END STEP): (all integers)")
+	    (list 'read-string read-string-prim "(read-string ...): ")
+	    (list 'require require-prim "(require ...): ")
+	    (list 'reverse reverse-prim "(reverse LIST): ")
+	    (list 'set-car! set-car!-prim "(set-car! LIST ITEM): set the car of LIST to be ITEM")
+	    (list 'set-cdr! set-cdr!-prim "(set-cdr! LIST ITEM): set the car of LIST to be ITEM (which is typically a list)")
+	    (list 'snoc snoc-prim "(snoc ITEM LIST): cons the ITEM onto the end of LIST")
+	    (list 'rac rac-prim "(rac LIST): return the last item of LIST")
+	    (list 'rdc rdc-prim "(rdc LIST): return everything but last item in LIST")
+	    (list 'sqrt sqrt-prim "(sqrt NUMBER): return the square root of NUMBER")
+	    (list 'odd? odd?-prim "(odd? NUMBER): returns #t if NUMBER is even, #f otherwise")
+	    (list 'even? even?-prim "(even? NUMBER): returns #t if NUMBER is odd, #f otherwise")
+	    (list 'remainder remainder-prim "(remainder NUMBER1 NUMBER2): returns the remainder after dividing NUMBER1 by NUMBER2")
+	    (list 'string string-prim "(string ITEM): returns ITEM as a string")
+	    (list 'string-length string-length-prim "(string-length STRING): returns the length of a string")
+	    (list 'string-ref string-ref-prim "(string-ref STRING INDEX): return the character of STRING at position INDEX")
+	    (list 'string? string?-prim "(string? ITEM): return #t if ITEM is a string, #f otherwise")
+	    (list 'string->number string->number-prim "(string->number STRING): return STRING as a number")
+	    (list 'string=? string=?-prim "(string=? STRING1 STRING2): return #t if STRING1 is the same as STRING2, #f otherwise")
+	    (list 'substring substring-prim "(substring STRING START [END]): return the substring of STRING starting with position START and ending before END. If END is not provided, it defaults to the length of the STRING")
+	    (list 'symbol? symbol?-prim "(symbol? ITEM): return #t if ITEM is a symbol, #f otherwise")
+	    (list 'unparse unparse-prim "(unparse AST): ")    
+	    (list 'unparse-procedure unparse-procedure-prim "(unparse-procedure ...): ")  ;; unparse should be in CPS
+	    (list 'import import-prim "(import MODULE...): import host-system modules; MODULEs are strings")
+	    (list 'import-as import-as-prim "(import-as MODULE NAME): import a host-system module; MODULE is a string, and NAME is a symbol or string. Use * for NAME to import into toplevel environment")
+	    (list 'import-from import-from-prim "(import-from MODULE NAME...): import from host-system module; MODULE is a string, and NAME is a symbol or string")
+	    (list 'use-stack-trace use-stack-trace-prim "(use-stack-trace BOOLEAN): set stack-trace usage on/off")
+	    (list 'vector vector-prim "(vector [ITEMS]...): return ITEMs as a vector")
+	    (list 'vector-ref vector-ref-prim "(vector-ref VECTOR INDEX): ")
+	    (list 'vector-set! vector-set!-prim "(vector-set! VECTOR INDEX VALUE): ")
+	    (list 'void void-prim "(void): The null value symbol")
+	    (list 'zero? zero?-prim "(zero? NUMBER): return #t if NUMBER is equal to zero, #f otherwise")
+	    (list 'current-directory current-directory-prim "(current-directory [PATH]): get the current directory, or set it if PATH is given (alias cd)")
+	    (list 'cd current-directory-prim "(cd [PATH]): get the current directory, or set it if PATH is given (alias current-directory)")
+	    (list 'round round-prim "(round NUMBER): round NUMBER to the nearest integer (may return float)")
+	    (list 'char->string char->string-prim "(char->string CHAR): ")
+	    (list 'string->list string->list-prim "(string->list STRING): string STRING as a list of characters")
+	    (list 'string->symbol string->symbol-prim "(string->symbol STRING): return STRING as a symbol")
+	    (list 'symbol->string symbol->string-prim "(symbol->string SYMBOL): return SYMBOL as a string")
+	    (list 'vector->list vector->list-prim "(vector->list VECTOR): return VECTOR as a list")
+	    (list 'eqv? eqv?-prim "(eqv? ITEM1 ITEM2): return #t if ITEM1 and ITEM2 have the same value")
+	    (list 'vector? vector?-prim "(vector? ITEM): return #t if ITEM is a vector, #f otherwise")
+	    (list 'atom? atom?-prim "(atom? ITEM): return #t if ITEM is a atom, #f otherwise")
+	    (list 'iter? iter?-prim "(iter? ITEM): return #t if ITEM is a iterator, #f otherwise")
+	    (list 'list? list?-prim "(list? ITEM): return #t if ITEM is a list, #f otherwise")
+	    (list 'procedure? procedure?-prim "(procedure? ITEM): return #t if ITEM is a procedure, #f otherwise")
+	    (list 'string<? string<?-prim "(string<? STRING1 STRING2): compare two strings to see if STRING1 is less than STRING2")
+ 	    (list 'float float-prim "(float NUMBER): return NUMBER as a floating point value")
+ 	    (list 'globals globals-prim "(globals): get global environment")
+ 	    (list 'int int-prim "(int NUMBER): return NUMBER as an integer")
+ 	    (list 'assq assq-prim "(assq ...): ")
+ 	    (list 'dict dict-prim "(dict ...): ")
+ 	    (list 'contains contains-prim "(contains DICTIONARY ITEM): returns #t if DICTIONARY contains ITEM")
+ 	    (list 'getitem getitem-prim "(getitem DICTIONARY ITEM): returns the VALUE of DICTIONARY[ITEM]")
+ 	    (list 'setitem setitem-prim "(setitem DICTIONARY ITEM VALUE): sets and returns DICTIONARY[ITEM] with VALUE")
+ 	    (list 'property property-prim "(property ...): ")
+ 	    (list 'rational rational-prim "(rational NUMERATOR DENOMINTAOR): return a rational number")
+ 	    (list 'reset-toplevel-env reset-toplevel-env-prim "(reset-toplevel-env): reset the toplevel environment")
+ 	    (list 'sort sort-prim "(sort PROCEDURE LIST): sort the list using PROCEDURE to compare items")
+ 	    (list 'string-append string-append-prim "(string-append STRING1 STRING2): append two strings together")
+ 	    (list 'string-split string-split-prim "(string-split STRING CHAR): return a list with substrings of STRING where split by CHAR")
+ 	    (list 'symbol symbol-prim "(symbol STRING): turn STRING into a symbol")
+ 	    (list 'typeof typeof-prim "(typeof ITEM): returns type of ITEM")
+ 	    (list 'use-lexical-address use-lexical-address-prim "(use-lexical-address [BOOLEAN]): get lexical-address setting, or set it on/off if BOOLEAN is given")
+	    (list 'use-tracing use-tracing-prim "(use-tracing [BOOLEAN]): get tracing setting, or set it on/off if BOOLEAN is given")
+>>>>>>> 7b5f0a93aa30a9f98cbe9b1aa737eb7c3c2c3ece
 	    )))
       (make-initial-env-extended (map car primitives) (map cadr primitives) (map caddr primitives)))))
 
@@ -5083,6 +5368,184 @@
   (lambda (external-function-object)
     (lambda-proc (args env2 info handler fail k2)
       (k2 (apply* external-function-object args) fail))))
+
+;; Named parameters and varargs:
+
+;; 1. First we gather positional, kwargs, a place for extra
+;;    args, extra kwargs
+;; 2. Go through positional, and assign
+;; 3. Go through kwargs and assign
+;; 4. Go through bindings, use default if one
+;; 5. Return params and args in proper order, no associations (clean-up)
+
+(define process-formals-and-args
+  (lambda (params vals)
+    ;; params, perhaps an improper list composed of:
+    ;;    var - x
+    ;;    var with default value - (x : 7)
+    ;;    extra args - (args : *)
+    ;;    extra kwargs - (kwargs : **)
+    ;; vals, list composed of:
+    ;;    value - 42
+    ;;    named values - (x : 42)
+    ;;    list of args - (* : [1 2 3])
+    ;;    dict of named values (** : (dict ...))
+    (cons params vals)))
+    ;; (let ((positional-vals (get-all-positional-values vals))
+    ;; 	  (assocs (get-all-keyword-associations vals))
+    ;; 	  (extra-args (get-extra-args params))
+    ;; 	  (extra-kwargs (get-extra-kwargs params)))
+    ;;   (process-params-by-pos params params positional-vals assocs extra-args extra-kwargs '()))))
+
+(define process-params-by-pos
+  (lambda (oparams params positional-vals assocs extra-args extra-kwargs bindings)
+    ;; params, perhaps an improper list (gets rest)
+    ;; positional-vals (1 2 3)
+    ;; assocs ((x : 1) ...)
+    ;; extra-args: (symbol : list) or #f
+    ;; extra-kwargs: (symbol : dict) or #f
+    ;; return params and args, stripped of associations
+    (cond
+     ((null? positional-vals) 
+      (process-params-by-kw oparams assocs extra-args extra-kwargs bindings #f))
+     ((not (pair? params)) ;; rest
+      (process-params-by-kw oparams assocs extra-args extra-kwargs 
+			    (cons (list (cdr params) positional-vals) bindings) #f))
+     ((null? params) ;; Maybe extra positional-vals as rest
+      (process-params-by-kw oparams assocs extra-args extra-kwargs bindings positional-vals))
+     (else
+      (let ((var (get-next-var params))
+	    (val (car positional-vals)))
+	(process-params-by-pos oparams (cdr params) (cdr positional-vals) 
+			       assocs extra-args extra-kwargs 
+			       (cons (list var val) bindings)))))))
+
+(define process-params-by-kw 
+  (lambda (params assocs extra-args extra-kwargs bindings rest)
+    (cond
+     ((null? assocs)
+      (cons (clean-up-params params) (clean-up-bindings bindings params rest '())))
+     (else
+      (process-params-by-kw params (cdr assocs) extra-args extra-kwargs 
+			    (cons (list (caar assocs) (caddar assocs)) bindings) rest)))))
+
+(define clean-up-params
+  (lambda (params)
+    ;; params could be improper list
+    ;; just return names
+    (cond
+     ((null? params) '())
+     ((not (pair? params))
+      (cond
+       ((symbol? params) params)
+       ((association? params) (car params))))
+     ((symbol? (car params))
+      (cons (car params) (clean-up-params (cdr params))))
+     ((association? (car params))
+      (cons (caar params) (clean-up-params (cdr params))))
+     (else
+      (error 'clean-up-params "invalid parameter type")))))
+
+(define clean-up-bindings
+  (lambda (bindings params rest args)
+    ;; return values (or get from default if not specified)
+    ;; params can be improper list
+    (cond
+     ((null? params) args)
+     ((symbol? (car params))
+      (let* ((symbol (car params))
+	     (val (assq symbol bindings)))
+	(if val
+	    (clean-up-bindings bindings (cdr params) rest
+			       (cons (cadr val) args))
+	    (error 'clean-up-bindings "no value for ~a" symbol))))
+     ((association? (car params))
+      (let* ((symbol (caar params))
+	     (val (assq symbol bindings)))
+	(if val
+	    (clean-up-bindings bindings (cdr params) rest
+			       (cons (cadr val) args))
+	    (clean-up-bindings bindings (cdr params) rest
+			       (cons (caddr params) args))))))))
+
+(define get-extra-args
+  (lambda (params)
+    (cond
+      ((null? params) #f)
+      ((association? (car params))
+       (if (eq? (caddr (car params)) '*)
+	   (list (caar params) '()) ;; return symbol/list
+	   (get-extra-args (cdr params))))
+      (else (get-extra-args (cdr params))))))
+
+(define get-extra-kwargs
+  (lambda (params)
+    (cond
+      ((null? params) #f)
+      ((association? (car params))
+       (if (eq? (caddr (car params)) '**)
+	   (list (caar params) '()) ;; return symbol/dict
+	   (get-extra-kwargs (cdr params))))
+      (else (get-extra-kwargs (cdr params))))))
+
+(define get-next-var
+  (lambda (params)
+    (cond
+     ((symbol? (car params)) (car params))
+     ((association? (car params)) (caar params))
+     (else (error 'get-next-var "unknown variable type in parameters")))))
+
+(define association?
+  (lambda (x)
+    (and (list? x) (= (length x) 3) (eq? (cadr x) ':))))
+
+(define association-pattern?
+  (lambda (pattern x)
+    (cond
+      ((not (and (list? x) (= (length x) 3) (eq? (cadr x) ':))) #f)
+      ((and (eq? (car pattern) '_) (eq? (caddr pattern) '_)) #t)
+      ((and (eq? (car pattern) '_) (eq? (caddr pattern) (caddr x))) #t)
+      ((and (eq? (car pattern) (car x)) (eq? (caddr pattern) '_)) #t)
+      (else #f))))
+
+(define get-*-association-values
+  (lambda (vals)
+    (cond
+      ((null? vals) '())
+      ((association-pattern? '(* : _) (car vals)) (caddar vals))
+      (else (get-*-association-values (cdr vals))))))
+
+(define get-positional-values
+  (lambda (vals)
+    (cond
+      ((null? vals) '())
+      ((association-pattern? '(_ : _) (car vals)) '())
+      (else (cons (car vals) (get-positional-values (cdr vals)))))))
+
+(define get-all-positional-values
+  (lambda (vals)
+    (append (get-positional-values vals) (get-*-association-values vals))))
+
+(define make-associations
+  (lambda (dict)
+    (cond
+      ((null? dict) '())
+      (else (let ((keyword (caar dict))
+		  (value (cadar dict)))
+	      (cons (list keyword ': value) (make-associations (cdr dict))))))))
+
+(define get-all-keyword-associations
+  (lambda (vals)
+    (cond
+      ((null? vals) '())
+      ((association-pattern? '(* : _) (car vals)) (get-all-keyword-associations (cdr vals)))
+      ((association-pattern? '(** : _) (car vals))
+       (let ((dict (caddar vals)))
+	 (append (make-associations dict) (get-all-keyword-associations (cdr vals)))))
+      ((association-pattern? '(_ : _) (car vals))
+       (cons (car vals) (get-all-keyword-associations (cdr vals))))
+      (else (get-all-keyword-associations (cdr vals))))))
+
 (load "transformer-macros.ss")
 
 ;; Unification pattern-matcher
