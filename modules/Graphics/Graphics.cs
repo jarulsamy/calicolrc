@@ -2374,6 +2374,8 @@ public static class Graphics
 			new List<Func<Gdk.EventConfigure,object> > ();
 		public List<Func<Gdk.Event,object> > onDeleteCallbacks =
 			new List<Func<Gdk.Event,object> > ();
+		public List<Func<object, Event, object> > onDestroyCallbacks =
+			new List<Func<object, Event, object> > ();
 		/* public List removedMouseUpCallbacks = new List (); */
         public PythonTuple _lastClick;
         public string _lastKey = "";
@@ -2438,10 +2440,13 @@ public static class Graphics
             // ------------------------------------------
             //ConfigureEvent += configureEventBefore;
             DeleteEvent += OnDelete;
+			Destroyed += OnDestroyEvent;
             Add(_canvas);
             if (gui_thread_id != -1)
                 ShowAll ();
         }
+
+
 
         /*
            new public void BeginResizeDrag (Gdk.WindowEdge edge, int button, int root_x, int root_y, uint timestamp) {
@@ -2539,6 +2544,7 @@ public static class Graphics
 			onKeyReleaseCallbacks = new List<Func<object,Event,object> > ();
 			onConfigureCallbacks = new List<Func<Gdk.EventConfigure,object> >();
 			onDeleteCallbacks = new List<Func<Gdk.Event,object> > ();
+			onDestroyCallbacks = new List<Func<object, Event,object> > ();
 			
 			// clear listeners:
 			clearListeners();
@@ -2952,6 +2958,26 @@ public static class Graphics
 			return false;
 		}
 
+		protected void OnDestroyEvent(object obj, EventArgs args)
+		{
+            Event evt = new Event (args);
+			Invoke (delegate {
+					foreach (Func<object,Event,object> function in onDestroyCallbacks.ToArray()) {
+						try {
+                    
+							Func<object,Event,object > f = (Func<object,Event,object>)function;
+							f (obj, evt);
+                    
+						} catch (Exception e) {
+							Console.Error.WriteLine ("Error in OnDestroy function");
+							Console.Error.WriteLine (e.Message);
+						}        
+					}
+				});
+			//Console.WriteLine("OnDestroy");
+			//Application.Quit();
+		}
+
 		
 	    // Add callbacks
         public Func<object,Event,object> onMouseUp (Func<object,Event,object> function)
@@ -2999,6 +3025,12 @@ public static class Graphics
 		public Func<Gdk.Event,object> onDelete (Func<Gdk.Event,object> function)
         {
             onDeleteCallbacks.Add (function);
+			return function;
+        }
+
+		public Func<object, Event,object> onDestroy (Func<object, Event,object> function)
+        {
+            onDestroyCallbacks.Add (function);
 			return function;
         }
 
@@ -3057,6 +3089,13 @@ public static class Graphics
         {
 			Invoke (delegate {
 					onDeleteCallbacks.Remove (function);
+				});
+        }
+
+		public void removeDestroy (Func<object, Event,object> function)
+        {
+			Invoke (delegate {
+					onDestroyCallbacks.Remove (function);
 				});
         }
 
