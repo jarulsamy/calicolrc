@@ -9406,6 +9406,8 @@ public static class Graphics
 
 
             public override void render(Cairo.Context context){
+				if(!visible) return;
+				
 				Point temp;
 				temp = screen_coord (center);
 		
