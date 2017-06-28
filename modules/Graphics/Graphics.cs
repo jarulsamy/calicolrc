@@ -6874,7 +6874,7 @@ public static class Graphics
                     _cacheHeight = _pixbuf.Height;
                     if (on_mac()) swap_red_blue();
                 });
-		_outline = null;
+				_outline = null;
             }
 
             public Picture (Canvas canvas) : this(true)
@@ -6924,7 +6924,7 @@ public static class Graphics
                 _cacheHeight = _pixbuf.Height;
                 //if (on_mac()) swap_red_blue();
                 });
-		_outline = null;
+				_outline = null;
             }
 
             public Picture (WindowClass window) : this(window._canvas)
@@ -6958,13 +6958,13 @@ public static class Graphics
 
             public Picture (System.Drawing.Bitmap bitmap) : this(bitmap, bitmap.Width, bitmap.Height)
             {
-		    _outline = null;
+                _outline = null;
             }
 
             public Picture (bool has_pen) : base(has_pen)
             {
                 this._fill.picture = this;
-		_outline = null;
+                _outline = null;
             }
 
 
@@ -7030,8 +7030,8 @@ public static class Graphics
 
 
             public Picture (System.Drawing.Bitmap bitmap, bool fluke1=false) : this(bitmap, bitmap.Width, bitmap.Height, fluke1) {
-		    _outline = null;
-	    }
+                _outline = null;
+            }
 
             public Picture (System.Drawing.Bitmap bitmap, int width, int height, bool fluke1=false) : this(true) {
                 InvokeBlocking (delegate {
@@ -7076,7 +7076,7 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
-		_outline = null;
+                _outline = null;
             }
 	    
 
@@ -7183,7 +7183,7 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
-		_outline = null;
+                _outline = null;
             }
 
             public Picture (int width, int height, byte [] buffer) : this(true)
@@ -7216,7 +7216,7 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
-		_outline = null;
+                _outline = null;
             }
 
             public Picture (int width, int height) : this(true)
@@ -7248,7 +7248,7 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
-		_outline = null;
+                _outline = null;
             }
 
             public Picture (int width, int height, Color color) : this(true)
@@ -7280,7 +7280,7 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
-		_outline = null;
+                _outline = null;
             }
 
             public Picture getRegion (IList iterable, int width, int height, double degrees)
@@ -7849,6 +7849,9 @@ public static class Graphics
 					g.Color = _outline._cairo;
 					g.Stroke ();
                 }
+				// The method name is a bit deceptive, but this is the correct
+				// way of clearing the old path.
+				g.NewPath();
                 
                 foreach (Shape shape in shapes) {
                     shape.render (g);
