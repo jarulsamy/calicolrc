@@ -4660,12 +4660,46 @@ public static class Graphics
             if (window != null) {
                 window.stackOnTop (this);
             }
+			if(drawn_on_shape != null){
+				drawn_on_shape.stackOnBottom (this);
+			}
         }
 
         public void stackOnBottom ()
         {
             if (window != null) {
                 window.stackOnBottom (this);
+            }
+			if(drawn_on_shape != null){
+				drawn_on_shape.stackOnBottom (this);
+			}
+        }
+
+		public void stackOnTop (Shape shape)
+        {
+            // last drawn is on top
+            if (shapes.Contains (shape)) {
+                Invoke( delegate {
+                    lock (shapes) {
+                        shapes.Remove (shape);
+                        shapes.Insert (shapes.Count, shape);
+                    }
+                });
+                QueueDraw ();
+            }
+        }
+
+        public void stackOnBottom (Shape shape)
+        {
+            // first drawn is on bottom
+            if (shapes.Contains (shape)) {
+                Invoke( delegate {
+                    lock (shapes) {
+                        shapes.Remove (shape);
+                        shapes.Insert (0, shape);
+                    }
+                });
+				QueueDraw ();
             }
         }
 
@@ -5436,22 +5470,31 @@ public static class Graphics
                 return new GraphicsRepresentation(canvas);
             }
 
-            public GraphicsRepresentation draw (Shape shape, IList iterable)
-            {
-                double x = System.Convert.ToDouble(iterable[0]);
-                double y = System.Convert.ToDouble(iterable[1]);
-                moveTo(x, y);
-                draw(shape);
-                return new GraphicsRepresentation(this);
-            }
+            /* public GraphicsRepresentation draw (Shape shape, IList iterable) */
+            /* { */
+            /*     double x = System.Convert.ToDouble(iterable[0]); */
+            /*     double y = System.Convert.ToDouble(iterable[1]); */
+            /*     moveTo(x, y); */
+            /*     draw(shape); */
+            /*     return new GraphicsRepresentation(this); */
+            /* } */
 
-            public GraphicsRepresentation draw (Shape shape)
+			public GraphicsRepresentation draw (Shape shape)
+			{
+				return draw(shape, -1);
+			}
+
+            public GraphicsRepresentation draw (Shape shape, int index)
             { // Shape
                 InvokeBlocking( delegate {
                     // Add this shape to the shape's list.
                     lock (shape.shapes) {
                         if (! shape.shapes.Contains (this)) {
-                            shape.shapes.Add (this);
+							if(index != -1){
+								shape.shapes.Insert(index, this);
+							} else {
+								shape.shapes.Add (this);
+							}
                             //System.Console.Error.WriteLine("Added to shape!");
                             //if (window.canvas.world != null) {
                             //_bodyType = FarseerPhysics.Dynamics.BodyType.Static; // must be static, to stay
