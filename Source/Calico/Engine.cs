@@ -338,17 +338,8 @@ namespace Calico {
 		source = engine.CreateScriptSourceFromString(text, sctype);
 		compiledCode = null;
 	    } catch (Exception e) {
-		Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-		try
-		  {
-		    PrintLine(eo.FormatException(e));
-		  }
-		catch
-		  {
-		    PrintLine(e.ToString());
-		  }
-
-		return null;
+			PrintLine(FormatException(e));
+			return null;
 	    }
 	    try {
 		if (compiler_options != null) {
@@ -376,16 +367,8 @@ namespace Calico {
 			    compiledCode = source.Compile();
 			}
 		    } catch (Exception e) {
-			Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-			try
-			  {
-			    PrintLine(eo.FormatException(e));
-			  }
-			catch
-			  {
-			    PrintLine(e.ToString());
-			  }
-			return null;
+				PrintLine(FormatException(e));
+				return null;
 		    }
 		}
 	    }
@@ -405,15 +388,7 @@ namespace Calico {
 		}
 		aborted = true;
 	    } catch (Exception e) {
-		Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-		try
-		  {
-		    PrintLine(eo.FormatException(e));
-		  }
-		catch
-		  {
-		    PrintLine(e.ToString());
-		  }
+		    PrintLine(FormatException(e));
 	    }
 	    if (aborted) {
 		System.Console.Error.WriteLine("Running script aborted!");
@@ -485,18 +460,7 @@ namespace Calico {
 				compiledCode = source.Compile();
 			  }
 			} catch (Exception e) {
-			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-			  try
-			    {
-			      PrintLine(eo.FormatException(e));
-			    }
-			  catch
-			    {
-			      PrintLine(e.ToString());
-			    }
-
-			  //PrintLine(eo.FormatException(e));
-			  //PrintLine(FormatException(e));
+			    PrintLine(FormatException(e));
 			  
 			  try
 			    {
@@ -532,49 +496,9 @@ namespace Calico {
 			}
 		  } catch (Exception e) {
 			if (e.Message.Contains("Thread was being aborted")) {
-			  PrintLine("[Script stopped----------]");
+				PrintLine("[Script stopped----------]");
 			} else {
-			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-			  try
-			    {
-			      PrintLine(eo.FormatException(e));
-			    }
-			  catch
-			    {
-			      PrintLine(e.ToString());
-			    }
-
-              // Code copied from: /IronPython_Main/Languages/IronPython/IronPython/Runtime/Exceptions/PythonExceptions.cs
-              //StackTrace outermostTrace = new StackTrace(e);
-              //IList<StackTrace> otherTraces = ExceptionHelpers.GetExceptionStackTraces(e) ?? new List<StackTrace>();
-              //List<StackFrame> clrFrames = new List<StackFrame>();
-
-              //// Print other traces
-              //PrintLine("Printing other traces");
-              //foreach (StackTrace trace in otherTraces) {
-              //    clrFrames.AddRange(trace.GetFrames() ?? new StackFrame[0]);
-              //    PrintLine("Current frame count: "+ clrFrames.Count.ToString());
-              //}
-              //clrFrames.AddRange(outermostTrace.GetFrames() ?? new StackFrame[0]);
-              //PrintLine("Printing outermost frames");
-              //PrintLine(clrFrames.Count.ToString());
-
-              //foreach (StackFrame clrFrame in clrFrames) {
-              //    PrintLine("Stack frame: " + clrFrame.ToString());
-              //    MethodBase method = clrFrame.GetMethod();
-              //    if(method == null){
-              //        PrintLine("Found the null method");
-              //    }
-              //}
-
-              //PrintLine("");
-              //PrintLine(e.ToString());
-
-              //Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-			  //PrintLine(FormatException(e));
-			  
-			  //PrintLine(e.ToString());
-			  ////FormatError(e,text,2);
+			    PrintLine(FormatException(e));
 			  try
 			    {
 			      if(OnErrorCallback != null)
@@ -613,15 +537,7 @@ namespace Calico {
 			  compiledCode = source.Compile();
 			}
 		  } catch (Exception e) {
-			Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-			try
-			    {
-			      PrintLine(eo.FormatException(e));
-			    }
-			  catch
-			    {
-			      PrintLine(e.ToString());
-			    }
+			  PrintLine(FormatException(e));
 
 			return false;
 		  }
@@ -643,15 +559,7 @@ namespace Calico {
 			if (e.Message.ToString().Contains("Thread was being aborted")) {
 			  PrintLine("[Script stopped----------]");
 			} else {
-			  Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
-			  try
-			    {
-			      PrintLine(eo.FormatException(e));
-			    }
-			  catch
-			    {
-			      PrintLine(e.ToString());
-			    }
+				PrintLine(FormatException(e));
 
 			}
 			return false;
@@ -740,12 +648,14 @@ namespace Calico {
     public string FormatException(Exception exception) {
         Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
         string result = "";
-        try{
-            result = eo.FormatException(exception);
-        } catch(ArgumentNullException newExeption) {
-            result = FormatStackTraces(exception);
-            result += exception.Message;
-        }
+		result = FormatStackTraces(exception);
+		result += exception.Message;
+        /* try{ */
+        /*     result = eo.FormatException(exception); */
+        /* } catch(ArgumentNullException newExeption) { */
+        /*     result = FormatStackTraces(exception); */
+        /*     result += exception.Message; */
+        /* } */
         return result;
     }
 
