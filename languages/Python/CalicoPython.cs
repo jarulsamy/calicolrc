@@ -194,6 +194,9 @@ namespace CalicoPython
 				"_srl(1024);" + 
 				"del _srl;", false);
 		    }
+			if(calico.onReset != null){
+				Execute(calico.onReset, false);
+			}
 		}
 	}
 

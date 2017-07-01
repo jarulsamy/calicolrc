@@ -124,6 +124,7 @@ namespace Calico {
         public CustomStream cstdout;
         public CustomStream cstderr;
         public IList<string> persistentPaths = new List<string>();
+        public string onReset = null;
 
 	public void addPath(string path, string file=""){
 		if(file != ""){
@@ -3707,9 +3708,9 @@ del _invoke, _
                         public void ResetShell() {
                             manager.Setup(path);
                             manager.Start(path);
-			    foreach(string path in persistentPaths){
-			      manager.AddPath(path);
-			    }
+                            foreach(string path in persistentPaths){
+                                manager.AddPath(path);
+                            }
                             manager.SetCalico(this);
                             configureIO();
 

@@ -2374,6 +2374,8 @@ public static class Graphics
 			new List<Func<Gdk.EventConfigure,object> > ();
 		public List<Func<Gdk.Event,object> > onDeleteCallbacks =
 			new List<Func<Gdk.Event,object> > ();
+		public List<Func<object, Event, object> > onDestroyCallbacks =
+			new List<Func<object, Event, object> > ();
 		/* public List removedMouseUpCallbacks = new List (); */
         public PythonTuple _lastClick;
         public string _lastKey = "";
@@ -2438,10 +2440,13 @@ public static class Graphics
             // ------------------------------------------
             //ConfigureEvent += configureEventBefore;
             DeleteEvent += OnDelete;
+			Destroyed += OnDestroyEvent;
             Add(_canvas);
             if (gui_thread_id != -1)
                 ShowAll ();
         }
+
+
 
         /*
            new public void BeginResizeDrag (Gdk.WindowEdge edge, int button, int root_x, int root_y, uint timestamp) {
@@ -2539,6 +2544,7 @@ public static class Graphics
 			onKeyReleaseCallbacks = new List<Func<object,Event,object> > ();
 			onConfigureCallbacks = new List<Func<Gdk.EventConfigure,object> >();
 			onDeleteCallbacks = new List<Func<Gdk.Event,object> > ();
+			onDestroyCallbacks = new List<Func<object, Event,object> > ();
 			
 			// clear listeners:
 			clearListeners();
@@ -2952,6 +2958,26 @@ public static class Graphics
 			return false;
 		}
 
+		protected void OnDestroyEvent(object obj, EventArgs args)
+		{
+            Event evt = new Event (args);
+			Invoke (delegate {
+					foreach (Func<object,Event,object> function in onDestroyCallbacks.ToArray()) {
+						try {
+                    
+							Func<object,Event,object > f = (Func<object,Event,object>)function;
+							f (obj, evt);
+                    
+						} catch (Exception e) {
+							Console.Error.WriteLine ("Error in OnDestroy function");
+							Console.Error.WriteLine (e.Message);
+						}        
+					}
+				});
+			//Console.WriteLine("OnDestroy");
+			//Application.Quit();
+		}
+
 		
 	    // Add callbacks
         public Func<object,Event,object> onMouseUp (Func<object,Event,object> function)
@@ -2999,6 +3025,12 @@ public static class Graphics
 		public Func<Gdk.Event,object> onDelete (Func<Gdk.Event,object> function)
         {
             onDeleteCallbacks.Add (function);
+			return function;
+        }
+
+		public Func<object, Event,object> onDestroy (Func<object, Event,object> function)
+        {
+            onDestroyCallbacks.Add (function);
 			return function;
         }
 
@@ -3057,6 +3089,13 @@ public static class Graphics
         {
 			Invoke (delegate {
 					onDeleteCallbacks.Remove (function);
+				});
+        }
+
+		public void removeDestroy (Func<object, Event,object> function)
+        {
+			Invoke (delegate {
+					onDestroyCallbacks.Remove (function);
 				});
         }
 
@@ -4621,12 +4660,46 @@ public static class Graphics
             if (window != null) {
                 window.stackOnTop (this);
             }
+			if(drawn_on_shape != null){
+				drawn_on_shape.stackOnBottom (this);
+			}
         }
 
         public void stackOnBottom ()
         {
             if (window != null) {
                 window.stackOnBottom (this);
+            }
+			if(drawn_on_shape != null){
+				drawn_on_shape.stackOnBottom (this);
+			}
+        }
+
+		public void stackOnTop (Shape shape)
+        {
+            // last drawn is on top
+            if (shapes.Contains (shape)) {
+                Invoke( delegate {
+                    lock (shapes) {
+                        shapes.Remove (shape);
+                        shapes.Insert (shapes.Count, shape);
+                    }
+                });
+                QueueDraw ();
+            }
+        }
+
+        public void stackOnBottom (Shape shape)
+        {
+            // first drawn is on bottom
+            if (shapes.Contains (shape)) {
+                Invoke( delegate {
+                    lock (shapes) {
+                        shapes.Remove (shape);
+                        shapes.Insert (0, shape);
+                    }
+                });
+				QueueDraw ();
             }
         }
 
@@ -5397,22 +5470,31 @@ public static class Graphics
                 return new GraphicsRepresentation(canvas);
             }
 
-            public GraphicsRepresentation draw (Shape shape, IList iterable)
-            {
-                double x = System.Convert.ToDouble(iterable[0]);
-                double y = System.Convert.ToDouble(iterable[1]);
-                moveTo(x, y);
-                draw(shape);
-                return new GraphicsRepresentation(this);
-            }
+            /* public GraphicsRepresentation draw (Shape shape, IList iterable) */
+            /* { */
+            /*     double x = System.Convert.ToDouble(iterable[0]); */
+            /*     double y = System.Convert.ToDouble(iterable[1]); */
+            /*     moveTo(x, y); */
+            /*     draw(shape); */
+            /*     return new GraphicsRepresentation(this); */
+            /* } */
 
-            public GraphicsRepresentation draw (Shape shape)
+			public GraphicsRepresentation draw (Shape shape)
+			{
+				return draw(shape, -1);
+			}
+
+            public GraphicsRepresentation draw (Shape shape, int index)
             { // Shape
                 InvokeBlocking( delegate {
                     // Add this shape to the shape's list.
                     lock (shape.shapes) {
                         if (! shape.shapes.Contains (this)) {
-                            shape.shapes.Add (this);
+							if(index != -1){
+								shape.shapes.Insert(index, this);
+							} else {
+								shape.shapes.Add (this);
+							}
                             //System.Console.Error.WriteLine("Added to shape!");
                             //if (window.canvas.world != null) {
                             //_bodyType = FarseerPhysics.Dynamics.BodyType.Static; // must be static, to stay
@@ -6835,7 +6917,7 @@ public static class Graphics
                     _cacheHeight = _pixbuf.Height;
                     if (on_mac()) swap_red_blue();
                 });
-		_outline = null;
+				_outline = null;
             }
 
             public Picture (Canvas canvas) : this(true)
@@ -6885,7 +6967,7 @@ public static class Graphics
                 _cacheHeight = _pixbuf.Height;
                 //if (on_mac()) swap_red_blue();
                 });
-		_outline = null;
+				_outline = null;
             }
 
             public Picture (WindowClass window) : this(window._canvas)
@@ -6919,13 +7001,13 @@ public static class Graphics
 
             public Picture (System.Drawing.Bitmap bitmap) : this(bitmap, bitmap.Width, bitmap.Height)
             {
-		    _outline = null;
+                _outline = null;
             }
 
             public Picture (bool has_pen) : base(has_pen)
             {
                 this._fill.picture = this;
-		_outline = null;
+                _outline = null;
             }
 
 
@@ -6991,8 +7073,8 @@ public static class Graphics
 
 
             public Picture (System.Drawing.Bitmap bitmap, bool fluke1=false) : this(bitmap, bitmap.Width, bitmap.Height, fluke1) {
-		    _outline = null;
-	    }
+                _outline = null;
+            }
 
             public Picture (System.Drawing.Bitmap bitmap, int width, int height, bool fluke1=false) : this(true) {
                 InvokeBlocking (delegate {
@@ -7037,7 +7119,7 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
-		_outline = null;
+                _outline = null;
             }
 	    
 
@@ -7144,7 +7226,7 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
-		_outline = null;
+                _outline = null;
             }
 
             public Picture (int width, int height, byte [] buffer) : this(true)
@@ -7177,7 +7259,7 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
-		_outline = null;
+                _outline = null;
             }
 
             public Picture (int width, int height) : this(true)
@@ -7209,7 +7291,7 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
-		_outline = null;
+                _outline = null;
             }
 
             public Picture (int width, int height, Color color) : this(true)
@@ -7241,7 +7323,7 @@ public static class Graphics
                     _cacheWidth = _pixbuf.Width;
                     _cacheHeight = _pixbuf.Height;
                 });
-		_outline = null;
+                _outline = null;
             }
 
             public Picture getRegion (IList iterable, int width, int height, double degrees)
@@ -7810,6 +7892,9 @@ public static class Graphics
 					g.Color = _outline._cairo;
 					g.Stroke ();
                 }
+				// The method name is a bit deceptive, but this is the correct
+				// way of clearing the old path.
+				g.NewPath();
                 
                 foreach (Shape shape in shapes) {
                     shape.render (g);
@@ -8547,6 +8632,8 @@ public static class Graphics
                 center = line.center;
             }
 
+			// The params keyword specifies a variable number of arguments, thus
+			// this is also the constructor used when no arguments are provided.
             public Polygon (params object [] points) : base(true)
             {
                 Point [] temp = new Point [points.Length];
@@ -8566,8 +8653,6 @@ public static class Graphics
             }
 
 			// JH: copy - start
-			public Polygon(){}
-
    			public override Shape copy(){
 				Polygon shapeCopy = new Polygon();
 				shapeCopy.copyAttributes(this);
@@ -9367,6 +9452,8 @@ public static class Graphics
 
 
             public override void render(Cairo.Context context){
+				if(!visible) return;
+				
 				Point temp;
 				temp = screen_coord (center);
 		
