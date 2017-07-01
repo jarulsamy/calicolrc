@@ -27,6 +27,7 @@ public class SimScribbler : Myro.Robot
 
 		public SimScribbler (Myro.Simulation simulation)
 		{
+            //Console.WriteLine("Building Scribbler");
 			this.simulation = simulation;
 			frame = new Graphics.Rectangle (new Graphics.Point (320 - 23, 240 - 23),
 							new Graphics.Point (320 + 23, 240 + 23));
@@ -36,7 +37,9 @@ public class SimScribbler : Myro.Robot
 			//frame = new Graphics.Circle (new Graphics.Point (320, 240), 23);
 			frame.pen.minDistance = 10; // minimum distance from last point
 			// Draw a body:
+            //Console.WriteLine("Creating body");
 			Graphics.Polygon body = new Graphics.Polygon ();
+            //Console.WriteLine("Creating body done");
 
 			double [] sx = new double[] {0.05, 0.05, 0.07, 0.07, 0.09, 0.09, 0.07, 
 				   0.07, 0.05, 0.05, -0.05, -0.05, -0.07, 
@@ -233,10 +236,16 @@ public class SimScribbler : Myro.Robot
 			frame.tag = "robot";
 			frame.body.OnCollision += SetStall;
 			frame.body.IgnoreGravity = true;
+
+            //Console.WriteLine("Adding Scribbler");
 			lock (this.simulation.robots) {
 			    this.simulation.robots.Add (this);
 			}
+
+            //Console.WriteLine("Setup Scribbler");
 			setup();
+
+            //Console.WriteLine("Building Scribbler done");
 		}
 
 		public override void uninit() {

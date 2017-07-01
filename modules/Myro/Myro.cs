@@ -1319,9 +1319,9 @@ public static class Myro
 			object robot;
 			try {
 			  robot = constructor.Invoke (args);
-			} catch{
+			} catch(Exception e) {
                 //System.Console.WriteLine ("Failure; skipping robot '{0}': {1}", f.Name, e.Message);
-                //System.Console.WriteLine ("Failure; skipping robot '{0}'", f.Name);
+                //System.Console.WriteLine ("{0}", e.ToString());
 			  continue;
 			}
             Myro.robot = (Robot)robot;
