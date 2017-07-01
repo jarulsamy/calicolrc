@@ -774,6 +774,8 @@ public static class Graphics
             int width=300, 
             int height=300)
     {
+		// JH FIXME: This invoke blocking may actually be the source of a race
+		// condition that can crash calico
         InvokeBlocking( delegate {
             if (!(_windows.ContainsKey (title) && (_windows [title].canvas.IsRealized))) {
                 _windows [title] = new Graphics.WindowClass (title, width, height);
