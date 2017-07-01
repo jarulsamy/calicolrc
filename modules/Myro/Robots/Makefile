@@ -97,7 +97,7 @@ ROSRobot.dll: ROSRobot.cs
 		ROSRobot.cs
 
 Finch.dll: Finch.cs
-	dmcs -sdk:4 -lib:../../../bin \
+	mcs -sdk:4 -lib:../../../bin \
 		-lib:../../../bin/linux \
 		-r:../../Myro.dll \
 		-r:../../../bin/Calico.exe \
@@ -114,7 +114,7 @@ Finch.dll: Finch.cs
 		$^ 
 
 Hummingbird.dll: Hummingbird.cs Finch.cs
-	dmcs -sdk:4 -lib:../../../bin \
+	mcs -sdk:4 -lib:../../../bin \
 		-lib:../../../bin/linux \
 		-r:../../Myro.dll \
 		-r:../../../bin/Calico.exe \
@@ -138,7 +138,7 @@ NxtRobot.dll: NxtRobot/NxtRobot.cs NxtRobot/NxtNet.cs NxtRobot/MotorPort.cs \
 	NxtRobot/MotorModes.cs NxtRobot/MotorRegulationMode.cs \
 	NxtRobot/MotorRunState.cs NxtRobot/MotorState.cs \
 	NxtRobot/Error.cs NxtRobot/Extensions.cs NxtRobot/Version.cs 
-	dmcs -sdk:4 -lib:../../bin -lib:../../modules \
+	mcs -sdk:4 -lib:../../bin -lib:../../modules \
 		-r:../../../bin/IronPython.dll \
 		-r:../../Myro.dll \
 		-r:../../../bin/Calico.exe \
@@ -153,7 +153,7 @@ NxtRobot.dll: NxtRobot/NxtRobot.cs NxtRobot/NxtNet.cs NxtRobot/MotorPort.cs \
 		$^ 
 
 Scribbler.dll: Scribbler.cs ../Myro.cs
-	dmcs -sdk:4 -r:../../../bin/IronPython.dll \
+	mcs -sdk:4 -r:../../../bin/IronPython.dll \
 		-r:../../Myro.dll \
 		-r:../../../bin/Calico.exe \
 		-r:../../Graphics.dll \
@@ -167,7 +167,7 @@ Scribbler.dll: Scribbler.cs ../Myro.cs
 		-target:library
 
 Bioloid.dll: Bioloid.cs ../Myro.cs
-	dmcs -sdk:4 -r:../../../bin/IronPython.dll \
+	mcs -sdk:4 -r:../../../bin/IronPython.dll \
 		-r:../../Myro.dll \
 		-r:../../../bin/Calico.exe \
 		-r:../../Graphics.dll \
@@ -181,7 +181,7 @@ Bioloid.dll: Bioloid.cs ../Myro.cs
 		-target:library
 
 SimScribbler.dll: SimScribbler.cs ../Myro.cs
-	dmcs -sdk:4 -r:../../../bin/IronPython.dll \
+	mcs -sdk:4 -r:../../../bin/IronPython.dll \
 		-r:../../Myro.dll \
 		-r:../../../bin/Calico.exe \
 		-r:../../Graphics.dll \
@@ -197,7 +197,7 @@ SimScribbler.dll: SimScribbler.cs ../Myro.cs
 		-target:library
 
 SimScribblerRounded.dll: SimScribblerRounded.cs ../Myro.cs
-	dmcs -sdk:4 -r:../../../bin/IronPython.dll \
+	mcs -sdk:4 -r:../../../bin/IronPython.dll \
 		-r:../../Myro.dll \
 		-r:../../../bin/Calico.exe \
 		-r:../../Graphics.dll \
@@ -213,7 +213,7 @@ SimScribblerRounded.dll: SimScribblerRounded.cs ../Myro.cs
 		-target:library
 
 SimPioneer.dll: SimPioneer.cs ../Myro.cs
-	dmcs -sdk:4 -r:../../../bin/IronPython.dll \
+	mcs -sdk:4 -r:../../../bin/IronPython.dll \
 		-r:../../Myro.dll \
 		-r:../../Graphics.dll \
 		-r:../../../bin/Calico.exe \
