@@ -8632,6 +8632,8 @@ public static class Graphics
                 center = line.center;
             }
 
+			// The params keyword specifies a variable number of arguments, thus
+			// this is also the constructor used when no arguments are provided.
             public Polygon (params object [] points) : base(true)
             {
                 Point [] temp = new Point [points.Length];
@@ -8651,8 +8653,6 @@ public static class Graphics
             }
 
 			// JH: copy - start
-			public Polygon(){}
-
    			public override Shape copy(){
 				Polygon shapeCopy = new Polygon();
 				shapeCopy.copyAttributes(this);
