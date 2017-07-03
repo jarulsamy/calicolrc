@@ -1397,25 +1397,40 @@ public static class Myro
 		public List<Robot> robots = new List<Robot> ();
 		public List<Graphics.Shape> lights = new List<Graphics.Shape> ();
 		public Graphics.Color groundColor = new Graphics.Color (24, 155, 28);
-	        public bool run = true;
-	        public bool isRandom = false;
-	        public bool fast = true;
-	        public double simStep=0.1;
-	        public Func<object> userThread=null;
+		public bool run = true;
+		public bool isRandom = false;
+		public bool fast = true;
+		public double simStep=0.1;
+		public Func<object> userThread=null;
 
-		public Simulation (string title, int width, int height, Graphics.Color color)
+		public Simulation (string title, int width, int height,
+						   Graphics.Color color,
+						   Graphics.WindowClass targetWindow = null)
 		{
-		    // Force destruction here, so we can wait till it gets started:
-		    if (Myro.simulation != null) {
-			if (Myro.simulation.window.isRealized()) {
-			    InvokeBlocking(delegate {
-				    Myro.simulation.window.Destroy();
-				});
-			    Myro.simulation = null;
-			    Myro.robot = null;
+			if(targetWindow != null){
+				// Stoping the simulation should be sufficient to clean old
+				// simulation threads without destroying the window.
+				if (Myro.simulation != null) {
+					Myro.simulation.stop();
+				}
+				Myro.simulation = null;
+				Myro.robot = null;
+				window = targetWindow;
+			} else {
+				// JH: If no target window is provided, we revert to old Myro
+				// behavior
+				// Force destruction here, so we can wait till it gets started:
+				if (Myro.simulation != null) {
+					if (Myro.simulation.window.isRealized()) {
+						InvokeBlocking(delegate {
+								Myro.simulation.window.Destroy();
+							});
+						Myro.simulation = null;
+						Myro.robot = null;
+					}
+				}
+				window = makeWindow (title, width, height);
 			}
-		    }
-		    window = makeWindow (title, width, height);
 		    groundColor = color;
 		    window.setBackground (groundColor);
 		    window.mode = "physics";
