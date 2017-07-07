@@ -1616,6 +1616,9 @@ public static class Myro
 		  Stopwatch stopWatch = new Stopwatch();
 		  stopWatch.Start();
 		  while(running && (stopWatch.ElapsedMilliseconds < 5000)){
+			  if(window != null){
+				  window.handleEvents();
+			  }
 			  Thread.Sleep(100);
 		  }
 		  stopWatch.Stop();
