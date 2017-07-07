@@ -648,14 +648,14 @@ namespace Calico {
     public string FormatException(Exception exception) {
         Microsoft.Scripting.Hosting.ExceptionOperations eo = engine.GetService<Microsoft.Scripting.Hosting.ExceptionOperations>();
         string result = "";
-		result = FormatStackTraces(exception);
-		result += exception.Message;
-        /* try{ */
-        /*     result = eo.FormatException(exception); */
-        /* } catch(ArgumentNullException newExeption) { */
-        /*     result = FormatStackTraces(exception); */
-        /*     result += exception.Message; */
-        /* } */
+		//result = FormatStackTraces(exception);
+		//result += exception.Message;
+        try{ 
+             result = eo.FormatException(exception); 
+        } catch(ArgumentNullException newExeption) { 
+            result = FormatStackTraces(exception); 
+            result += exception.Message; 
+        } 
         return result;
     }
 
