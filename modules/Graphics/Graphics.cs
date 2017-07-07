@@ -2184,12 +2184,18 @@ public static class Graphics
             }
         }
 
+		public void handleEvents()
+		{
+            while (Gtk.Application.EventsPending()){
+                Gtk.Application.RunIteration ();
+			}
+		}
+
         public void updateNow ()
         { // Window
             need_to_redraw ();
             // Manual call to update, let's update then:
-            while (Gtk.Application.EventsPending())
-                Gtk.Application.RunIteration ();
+			handleEvents();
         }
 
         public void update ()
@@ -3356,12 +3362,18 @@ public static class Graphics
             }
         }
 
+		public void handleEvents()
+		{
+            while (Gtk.Application.EventsPending()){
+                Gtk.Application.RunIteration ();
+			}
+		}
+
         public void updateNow ()
         { // Window
             need_to_redraw ();
             // Manual call to update, let's update then:
-            while (Gtk.Application.EventsPending())
-                Gtk.Application.RunIteration ();
+			handleEvents();
         }
 
         public void update ()
