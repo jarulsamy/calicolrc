@@ -1430,10 +1430,10 @@ public static class Myro
 					}
 				}
 				window = makeWindow (title, width, height);
+				window.setBackground (groundColor);
+				window.mode = "physics";
 			}
 		    groundColor = color;
-		    window.setBackground (groundColor);
-		    window.mode = "physics";
 		    window.gravity = Graphics.Vector (0, 0); // turn off gravity
 		    Myro.simulation = this;
 		}
