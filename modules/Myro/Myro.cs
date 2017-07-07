@@ -1397,7 +1397,8 @@ public static class Myro
 		public List<Robot> robots = new List<Robot> ();
 		public List<Graphics.Shape> lights = new List<Graphics.Shape> ();
 		public Graphics.Color groundColor = new Graphics.Color (24, 155, 28);
-		public bool run = true;
+		volatile public bool run = true;
+		volatile public bool running = false;
 		public bool isRandom = false;
 		public bool fast = true;
 		public double simStep=0.1;
@@ -1610,6 +1611,19 @@ public static class Myro
 		run = false;
 	  }
 
+	  public void stopBlocking() {
+		  stop();
+		  Stopwatch stopWatch = new Stopwatch();
+		  stopWatch.Start();
+		  while(running && (stopWatch.ElapsedMilliseconds < 5000)){
+			  Thread.Sleep(100);
+		  }
+		  stopWatch.Stop();
+		  if(!(stopWatch.ElapsedMilliseconds < 5000)){
+			  System.Console.WriteLine("Unable to stop simulator");
+		  }
+	  }
+
 	  public void setPose(int position, int x, int y, double theta) {
 	      lock (robots) {
 		  robots[position].setPose(x, y, theta);
@@ -1626,22 +1640,24 @@ public static class Myro
 
 	  public void loop ()
 	    {
-		run = true;
-		while (window.isRealized() && run) {
-		    lock (robots) {
-			foreach (Robot robot in robots) {
-			    robot.update_simulation ();
+			run = true;
+			running = true;
+			while (window.isRealized() && run) {
+				lock (robots) {
+					foreach (Robot robot in robots) {
+						robot.update_simulation ();
+					}
+					foreach (Robot robot in robots) {
+						robot.update ();
+					}
+				}
+				window.step (simStep);
+				
+				//way to add a user defined thread to the mix. RV
+				if(userThread != null)
+					userThread();
 			}
-			foreach (Robot robot in robots) {
-			    robot.update ();
-			}
-		    }
-		    window.step (simStep);
-
-		    //way to add a user defined thread to the mix. RV
-		    if(userThread != null)
-		      userThread();
-		}
+			running = false;
 	    }
 
 	    public IDictionary<string, string> GetRepresentations() {
