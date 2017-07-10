@@ -146,6 +146,12 @@ namespace Calico {
 		}
 	}
 
+	public void clearGlobals(){
+		if(manager.ContainsKey("python")){
+			manager["python"].engine.clearPersistentVariables();
+		}
+	}
+
         public bool toolSwapped {
             get {
                 return (bool) config.GetValue("config", "toolSwapped");

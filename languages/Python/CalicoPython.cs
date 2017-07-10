@@ -81,6 +81,9 @@ namespace CalicoPython
 			return persistentVariables;
 		}
 
+		public override void clearPersistentVariables(){
+			persistentVariables = new IronPython.Runtime.PythonDictionary();
+		}
 		
 		public override Microsoft.Scripting.Hosting.CompiledCode SetDLRSpecificCompilerOptions(
 					  Microsoft.Scripting.Hosting.ScriptSource source, 

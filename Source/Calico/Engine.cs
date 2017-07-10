@@ -122,9 +122,13 @@ namespace Calico {
             return variable.Split('.');
         }
 
-	public virtual object getPersistentVariables(){
-	    return null;
-	}
+		public virtual object getPersistentVariables(){
+			return null;
+		}
+		
+		public virtual void clearPersistentVariables(){
+			// nop
+		}
 
 	// -----------------------------------------------------
 
